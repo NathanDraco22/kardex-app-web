@@ -1,0 +1,22 @@
+import 'package:flutter/material.dart';
+
+class AppTheme {
+  ThemeData get lightTheme => ThemeData.light(useMaterial3: false).copyWith(
+    pageTransitionsTheme: const PageTransitionsTheme(
+      builders: {
+        TargetPlatform.android: FadeForwardsPageTransitionsBuilder(),
+        TargetPlatform.windows: FadeForwardsPageTransitionsBuilder(),
+      },
+    ),
+    appBarTheme: const AppBarTheme(
+      elevation: 1.0,
+      backgroundColor: Color.fromARGB(255, 52, 57, 92),
+    ),
+    scaffoldBackgroundColor: Colors.indigo.shade50,
+    inputDecorationTheme: const InputDecorationTheme(
+      border: OutlineInputBorder(),
+      isCollapsed: true,
+      contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 6),
+    ),
+  );
+}
