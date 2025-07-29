@@ -5,10 +5,15 @@ class TitleTextField extends StatelessWidget {
     super.key,
     required this.title,
     this.titleTextAlign,
+    this.validator,
+    this.initialValue,
   });
 
+  final String? initialValue;
   final String title;
   final TextAlign? titleTextAlign;
+
+  final String? Function(String?)? validator;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +26,10 @@ class TitleTextField extends StatelessWidget {
           title,
           textAlign: titleTextAlign,
         ),
-        const TextField(),
+        TextFormField(
+          initialValue: initialValue,
+          validator: validator,
+        ),
       ],
     );
   }

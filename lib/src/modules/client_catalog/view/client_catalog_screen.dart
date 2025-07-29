@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/repositories/client_repository.dart';
-import 'package:kardex_app_front/src/modules/client_catalog/cubit/client_catalog_cubit.dart';
+import 'package:kardex_app_front/src/modules/client_catalog/cubit/read_client_catalog_cubit.dart';
+import 'package:kardex_app_front/src/modules/client_catalog/cubit/write_client_catalog_cubit.dart';
 
 import '../dialogs/create_client_dialog.dart';
 import '../widgets/clients_table.dart';
@@ -12,11 +13,11 @@ class ClientCatalogScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final clientRepo = context.read<ClientsRepository>();
-    return BlocProvider(
-      lazy: false,
-      create: (context) {
-        return ClientCatalogCubit(clientRepo)..loadAllClients();
-      },
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => ReadClientCatalogCubit(clientRepo)..loadAllClients()),
+        BlocProvider(create: (context) => ClientWriteCubit(clientRepo)),
+      ],
       child: const _RootScaffold(),
     );
   }
@@ -29,7 +30,7 @@ class _RootScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Lista de Clientes")),
-      body: BlocBuilder<ClientCatalogCubit, ClientCatalogState>(
+      body: BlocBuilder<ReadClientCatalogCubit, ClientCatalogState>(
         builder: (context, state) {
           if (state is ClientCatalogLoading || state is ClientCatalogInitial) {
             return const Center(
@@ -68,13 +69,11 @@ class _Body extends StatelessWidget {
                 SizedBox(
                   height: 40,
                   child: ElevatedButton.icon(
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          return const CreateClientDialog();
-                        },
-                      );
+                    onPressed: () async {
+                      final res = await showCreateClientDialog(context);
+                      if (res == null) return;
+                      if (!context.mounted) return;
+                      context.read<ReadClientCatalogCubit>().putClientFirst(res);
                     },
                     icon: const Icon(Icons.add),
                     label: const Text("Agregar Nuevo Cliente"),

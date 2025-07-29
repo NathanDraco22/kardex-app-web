@@ -13,7 +13,7 @@ class BaseClient {
 class CreateClient extends BaseClient {
   CreateClient({required super.name});
 
-  factory CreateClient.fromJson(Map<String, dynamic> json) {
+  factory CreateClient.fromJson(Map json) {
     return CreateClient(
       name: json['name'] as String,
     );
@@ -25,7 +25,7 @@ class UpdateClient {
 
   UpdateClient({this.name});
 
-  factory UpdateClient.fromJson(Map<String, dynamic> json) {
+  factory UpdateClient.fromJson(Map json) {
     return UpdateClient(
       name: json['name'] as String?,
     );

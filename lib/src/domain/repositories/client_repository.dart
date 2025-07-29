@@ -7,15 +7,23 @@ class ClientsRepository {
 
   ClientsRepository(this.clientsDataSource);
 
+  List<ClientInDb> _clients = [];
+
+  List<ClientInDb> get clients => _clients;
+
   Future<ClientInDb> createClient(CreateClient createClient) async {
     final result = await clientsDataSource.createClient(createClient.toJson());
-    return ClientInDb.fromJson(result);
+    final newClient = ClientInDb.fromJson(result);
+    _clients = [newClient, ...clients];
+    return newClient;
   }
 
   Future<List<ClientInDb>> getAllClients() async {
     final results = await clientsDataSource.getAllClients();
     final models = ClientsResponseModel.fromJson(results);
-    return models.data;
+
+    _clients = models.data;
+    return _clients;
   }
 
   Future<ClientInDb?> getClientById(String clientId) async {
@@ -41,6 +49,10 @@ class ClientsRepository {
       return null;
     }
 
-    return ClientInDb.fromJson(result);
+    final updatedClient = ClientInDb.fromJson(result);
+
+    final index = _clients.indexWhere((client) => client.id == clientId);
+    _clients[index] = updatedClient;
+    return updatedClient;
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/src/modules/client_catalog/cubit/client_catalog_cubit.dart';
+import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
+import 'package:kardex_app_front/src/modules/client_catalog/cubit/read_client_catalog_cubit.dart';
+import 'package:kardex_app_front/src/modules/client_catalog/dialogs/create_client_dialog.dart';
 import 'package:kardex_app_front/widgets/no_item.dart';
 
 class ClientsTable extends StatelessWidget {
@@ -10,7 +12,7 @@ class ClientsTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cubit = context.read<ClientCatalogCubit>();
+    final cubit = context.read<ReadClientCatalogCubit>();
     final state = cubit.state as ClientCatalogSuccess;
     return Card(
       margin: EdgeInsets.zero,
@@ -91,7 +93,7 @@ class _InnerRows extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cubit = context.read<ClientCatalogCubit>();
+    final cubit = context.watch<ReadClientCatalogCubit>();
     final state = cubit.state as ClientCatalogSuccess;
     final clients = state.clients;
     return Expanded(
@@ -99,43 +101,74 @@ class _InnerRows extends StatelessWidget {
         itemCount: clients.length,
         itemBuilder: (context, index) {
           final currentClient = clients[index];
-          return Container(
-            color: index.isOdd ? Colors.white : Colors.grey.shade200,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Row(
-                children: [
-                  Flexible(
-                    fit: FlexFit.tight,
-                    flex: 2,
-                    child: Text(currentClient.name),
-                  ),
-                  const Flexible(
-                    fit: FlexFit.tight,
-                    child: Text("Codigo"),
-                  ),
-                  const Flexible(
-                    fit: FlexFit.tight,
-                    child: Text("Marca"),
-                  ),
 
-                  Flexible(
-                    fit: FlexFit.tight,
-                    child: Align(
-                      alignment: Alignment.centerRight,
+          Color color = index.isOdd ? Colors.white : Colors.grey.shade200;
 
-                      child: TextButton.icon(
-                        onPressed: () {},
-                        icon: const Icon(Icons.edit),
-                        label: const Text("Editar"),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          if (state is HighlightedClient) {
+            if (state.updatedClients.any((element) => element.id == currentClient.id)) {
+              color = Colors.indigo.shade200;
+            } else if (state.newClients.any((element) => element.id == currentClient.id)) {
+              color = Colors.yellow.shade200;
+            }
+          }
+
+          return _RowWidget(
+            client: currentClient,
+            color: color,
           );
         },
+      ),
+    );
+  }
+}
+
+class _RowWidget extends StatelessWidget {
+  const _RowWidget({required this.client, required this.color});
+
+  final ClientInDb client;
+  final Color color;
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: color,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Row(
+          children: [
+            Flexible(
+              fit: FlexFit.tight,
+              flex: 2,
+              child: Text(client.name),
+            ),
+            const Flexible(
+              fit: FlexFit.tight,
+              child: Text("Codigo"),
+            ),
+            const Flexible(
+              fit: FlexFit.tight,
+              child: Text("Marca"),
+            ),
+
+            Flexible(
+              fit: FlexFit.tight,
+              child: Align(
+                alignment: Alignment.centerRight,
+
+                child: TextButton.icon(
+                  onPressed: () async {
+                    final res = await showCreateClientDialog(context, client: client);
+
+                    if (res == null) return;
+                    if (!context.mounted) return;
+                    context.read<ReadClientCatalogCubit>().markClientUpdated(res);
+                  },
+                  icon: const Icon(Icons.edit),
+                  label: const Text("Editar"),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

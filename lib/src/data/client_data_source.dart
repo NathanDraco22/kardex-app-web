@@ -5,7 +5,9 @@ class ClientsDataSource with HttpService {
   final _clientEndpoint = "/clients";
 
   Future<Map<String, dynamic>> createClient(Map<String, dynamic> client) async {
-    throw UnimplementedError();
+    final uri = HttpTools.generateUri(_clientEndpoint);
+    final res = await postQuery(uri, client);
+    return res;
   }
 
   Future<Map<String, dynamic>> getAllClients() async {
@@ -22,6 +24,8 @@ class ClientsDataSource with HttpService {
     String clientId,
     Map<String, dynamic> client,
   ) async {
-    throw UnimplementedError();
+    final uri = HttpTools.generateUri("$_clientEndpoint/$clientId");
+    final res = await patchQuery(uri, body: client);
+    return res;
   }
 }
