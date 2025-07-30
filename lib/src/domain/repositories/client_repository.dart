@@ -36,6 +36,12 @@ class ClientsRepository {
     return ClientInDb.fromJson(result);
   }
 
+  Future<List<ClientInDb>> searchClientByKeyword(String keyword) async {
+    final result = await clientsDataSource.searchClientByKeyword(keyword);
+    final clients = ClientsResponseModel.fromJson(result).data;
+    return clients;
+  }
+
   Future<ClientInDb?> updateClientById(
     String clientId,
     UpdateClient client,

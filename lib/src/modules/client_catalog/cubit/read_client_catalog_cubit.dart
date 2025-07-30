@@ -19,6 +19,27 @@ class ReadClientCatalogCubit extends Cubit<ClientCatalogState> {
     }
   }
 
+  Future<void> searchClientByKeyword(String keyword) async {
+    final currentState = state as ClientCatalogSuccess;
+
+    if (keyword.isEmpty) {
+      emit(ClientCatalogSuccess(clientsRepository.clients));
+      return;
+    }
+
+    emit(
+      ClientCatalogSearching(
+        currentState.clients,
+      ),
+    );
+    try {
+      final clients = await clientsRepository.searchClientByKeyword(keyword);
+      emit(ClientCatalogSuccess(clients));
+    } catch (error) {
+      emit(ClientCatalogError(error.toString()));
+    }
+  }
+
   Future<void> putClientFirst(ClientInDb client) async {
     final currentState = state as ClientCatalogSuccess;
     final freshClientList = clientsRepository.clients;

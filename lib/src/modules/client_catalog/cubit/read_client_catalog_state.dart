@@ -11,6 +11,10 @@ class ClientCatalogSuccess extends ClientCatalogState {
   ClientCatalogSuccess(this.clients);
 }
 
+final class ClientCatalogSearching extends ClientCatalogSuccess {
+  ClientCatalogSearching(super.clients);
+}
+
 class HighlightedClient extends ClientCatalogSuccess {
   List<ClientInDb> newClients;
   List<ClientInDb> updatedClients;

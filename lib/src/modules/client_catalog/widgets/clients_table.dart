@@ -4,6 +4,8 @@ import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/cubit/read_client_catalog_cubit.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/dialogs/create_client_dialog.dart';
 import 'package:kardex_app_front/widgets/no_item.dart';
+import 'package:kardex_app_front/widgets/search_debounce.dart';
+import 'package:kardex_app_front/widgets/status_tag_label.dart';
 
 class ClientsTable extends StatelessWidget {
   const ClientsTable({
@@ -12,7 +14,7 @@ class ClientsTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cubit = context.read<ReadClientCatalogCubit>();
+    final cubit = context.watch<ReadClientCatalogCubit>();
     final state = cubit.state as ClientCatalogSuccess;
     return Card(
       margin: EdgeInsets.zero,
@@ -24,19 +26,18 @@ class ClientsTable extends StatelessWidget {
               children: [
                 SizedBox(
                   width: MediaQuery.sizeOf(context).width * 0.3,
-                  child: SearchAnchor(
-                    builder: (context, controller) {
-                      return TextField(
-                        onSubmitted: (value) => controller.openView(),
-                      );
-                    },
-                    suggestionsBuilder: (context, controller) {
-                      return [Container()];
-                    },
+                  child: SearchFieldDebounced(
+                    onSearch: (value) => cubit.searchClientByKeyword(value),
                   ),
                 ),
               ],
             ),
+          ),
+          BlocBuilder<ReadClientCatalogCubit, ClientCatalogState>(
+            builder: (context, state) {
+              if (state is! ClientCatalogSearching) return const SizedBox();
+              return const LinearProgressIndicator();
+            },
           ),
 
           const SizedBox(height: 12),
@@ -51,12 +52,17 @@ class ClientsTable extends StatelessWidget {
                 ),
                 Flexible(
                   fit: FlexFit.tight,
+                  child: Text("Cedula"),
+                ),
+
+                Flexible(
+                  fit: FlexFit.tight,
                   child: Text("Telefono"),
                 ),
 
                 Flexible(
                   fit: FlexFit.tight,
-                  child: Text("Email"),
+                  child: Center(child: Text("Estado")),
                 ),
 
                 Flexible(
@@ -140,13 +146,34 @@ class _RowWidget extends StatelessWidget {
               flex: 2,
               child: Text(client.name),
             ),
-            const Flexible(
+            Flexible(
               fit: FlexFit.tight,
-              child: Text("Codigo"),
+              child: Text(client.cardId),
             ),
-            const Flexible(
+            Flexible(
               fit: FlexFit.tight,
-              child: Text("Marca"),
+              child: Text(client.phone),
+            ),
+
+            Flexible(
+              fit: FlexFit.tight,
+              child: Center(
+                child: Builder(
+                  builder: (context) {
+                    if (client.isActive) {
+                      return const StatusTagLabel(
+                        label: "Activo",
+                        isActive: true,
+                      );
+                    } else {
+                      return const StatusTagLabel(
+                        label: "Inactivo",
+                        isActive: false,
+                      );
+                    }
+                  },
+                ),
+              ),
             ),
 
             Flexible(

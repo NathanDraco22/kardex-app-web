@@ -20,6 +20,12 @@ class ClientsDataSource with HttpService {
     throw UnimplementedError();
   }
 
+  Future<Map<String, dynamic>> searchClientByKeyword(String keyword) async {
+    final uri = HttpTools.generateUri("$_clientEndpoint/search/$keyword");
+    final res = await getQuery(uri);
+    return res;
+  }
+
   Future<Map<String, dynamic>?> updateClientById(
     String clientId,
     Map<String, dynamic> client,

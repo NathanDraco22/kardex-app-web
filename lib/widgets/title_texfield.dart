@@ -7,11 +7,17 @@ class TitleTextField extends StatelessWidget {
     this.titleTextAlign,
     this.validator,
     this.initialValue,
+    this.focusNode,
+    this.autofocus = false,
+    this.onEditingComplete,
   });
 
+  final FocusNode? focusNode;
+  final bool autofocus;
   final String? initialValue;
   final String title;
   final TextAlign? titleTextAlign;
+  final void Function()? onEditingComplete;
 
   final String? Function(String?)? validator;
 
@@ -27,7 +33,10 @@ class TitleTextField extends StatelessWidget {
           textAlign: titleTextAlign,
         ),
         TextFormField(
+          focusNode: focusNode,
+          autofocus: autofocus,
           initialValue: initialValue,
+          onEditingComplete: onEditingComplete,
           validator: validator,
         ),
       ],
