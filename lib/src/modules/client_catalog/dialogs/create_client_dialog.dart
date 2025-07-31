@@ -42,6 +42,8 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final writeCubit = context.read<ClientWriteCubit>();
+
     final wordPrefix = widget.client == null ? "Agregar" : "Actualizar";
 
     bool isActive = true;
@@ -51,6 +53,8 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
     }
 
     creationMap['isActive'] = isActive;
+
+    final currentClient = widget.client;
 
     return BlocListener<ClientWriteCubit, ClientWriteState>(
       listener: (context, state) {
@@ -68,101 +72,137 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
       },
       child: Form(
         key: formKey,
-        child: AlertDialog(
-          title: Text("$wordPrefix Cliente"),
-          actions: [
-            OutlinedButton(
-              onPressed: () {
-                context.pop();
-              },
-              child: const Text("Cancelar"),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (!formKey.currentState!.validate()) return;
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AlertDialog(
+              title: Text("$wordPrefix Cliente"),
+              actions: [
+                OutlinedButton(
+                  onPressed: () {
+                    context.pop();
+                  },
+                  child: const Text("Cancelar"),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    if (!formKey.currentState!.validate()) return;
 
-                final writeCubit = context.read<ClientWriteCubit>();
-
-                if (widget.client == null) {
-                  final createClient = CreateClient.fromJson(creationMap);
-                  writeCubit.createNewClient(createClient);
-                } else {
-                  final updateClient = UpdateClient.fromJson(creationMap);
-                  writeCubit.updateClient(widget.client!.id, updateClient);
-                }
-              },
-              child: Text("$wordPrefix Cliente"),
-            ),
-          ],
-          content: SizedBox(
-            width: 350,
-
-            child: Column(
-              children: [
-                TitleTextField(
-                  key: const ValueKey("name_field"),
-                  autofocus: true,
-                  title: "Nombre Completo*",
-                  onEditingComplete: () => FocusScope.of(context).nextFocus(),
-                  initialValue: widget.client?.name,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "El campo es requerido";
+                    if (widget.client == null) {
+                      final createClient = CreateClient.fromJson(creationMap);
+                      writeCubit.createNewClient(createClient);
+                    } else {
+                      final updateClient = UpdateClient.fromJson(creationMap);
+                      writeCubit.updateClient(widget.client!.id, updateClient);
                     }
-                    creationMap["name"] = value;
-                    return null;
                   },
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Flexible(
-                      child: TitleTextField(
-                        key: const ValueKey("cardId_field"),
-                        initialValue: widget.client?.cardId,
-                        title: "Cedula",
-                        onEditingComplete: () => FocusScope.of(context).nextFocus(),
-                        validator: (value) {
-                          creationMap["cardId"] = value;
-                          return null;
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Flexible(
-                      child: TitleTextField(
-                        key: const ValueKey("phone_field"),
-                        initialValue: widget.client?.phone,
-                        title: "Telefono",
-                        onEditingComplete: () {
-                          FocusScope.of(context).unfocus();
-                        },
-                        validator: (value) {
-                          creationMap["phone"] = value;
-                          return null;
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                StatefulBuilder(
-                  builder: (context, setState) {
-                    return SwitchListTile(
-                      focusNode: FocusNode(skipTraversal: true),
-                      value: isActive,
-                      onChanged: (value) {
-                        isActive = value;
-                        creationMap["isActive"] = value;
-                        setState(() {});
-                      },
-                      title: const Text("Activo"),
-                    );
-                  },
+                  child: Text("$wordPrefix Cliente"),
                 ),
               ],
+              content: SizedBox(
+                width: 350,
+
+                child: Column(
+                  children: [
+                    TitleTextField(
+                      key: const ValueKey("name_field"),
+                      autofocus: true,
+                      title: "Nombre Completo*",
+                      onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                      initialValue: widget.client?.name,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "El campo es requerido";
+                        }
+                        creationMap["name"] = value;
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: TitleTextField(
+                            key: const ValueKey("cardId_field"),
+                            initialValue: widget.client?.cardId,
+                            title: "Cedula",
+                            onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                            validator: (value) {
+                              creationMap["cardId"] = value;
+                              return null;
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Flexible(
+                          child: TitleTextField(
+                            key: const ValueKey("phone_field"),
+                            initialValue: widget.client?.phone,
+                            title: "Telefono",
+                            onEditingComplete: () async {
+                              if (widget.client != null) return;
+                              if (!formKey.currentState!.validate()) return;
+                              final res = await DialogManager.confirmActionDialog(
+                                context,
+                                "Deseas crear el cliente ${creationMap["name"]}?",
+                              );
+                              if (!res) return;
+                              final createClient = CreateClient.fromJson(creationMap);
+                              writeCubit.createNewClient(createClient);
+                            },
+                            validator: (value) {
+                              creationMap["phone"] = value;
+                              return null;
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    StatefulBuilder(
+                      builder: (context, setState) {
+                        return SwitchListTile(
+                          focusNode: FocusNode(skipTraversal: true),
+                          value: isActive,
+                          onChanged: (value) {
+                            isActive = value;
+                            creationMap["isActive"] = value;
+                            setState(() {});
+                          },
+                          title: const Text("Activo"),
+                        );
+                      },
+                    ),
+
+                    if (currentClient != null) ...[
+                      const Divider(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          TextButton.icon(
+                            onPressed: () async {
+                              final res = await DialogManager.slideToConfirmDeleteActionDialog(
+                                context,
+                                "Deseas eliminar el cliente ${currentClient.name}?",
+                              );
+                              if (!res) return;
+                              writeCubit.deleteClient(currentClient.id);
+                            },
+                            style: TextButton.styleFrom(foregroundColor: Colors.red),
+                            label: const Text("Eliminar Cliente"),
+                            icon: const Icon(
+                              Icons.delete,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ],
+                ),
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );

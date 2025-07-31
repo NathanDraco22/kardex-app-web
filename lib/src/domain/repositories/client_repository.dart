@@ -23,6 +23,11 @@ class ClientsRepository {
     final models = ClientsResponseModel.fromJson(results);
 
     _clients = models.data;
+    _clients.sort(
+      (ClientInDb a, ClientInDb b) => a.name.toLowerCase().compareTo(
+        b.name.toLowerCase(),
+      ),
+    );
     return _clients;
   }
 
@@ -60,5 +65,15 @@ class ClientsRepository {
     final index = _clients.indexWhere((client) => client.id == clientId);
     _clients[index] = updatedClient;
     return updatedClient;
+  }
+
+  Future<ClientInDb?> deleteClientById(String clientId) async {
+    final result = await clientsDataSource.deleteClientById(clientId);
+    if (result == null) {
+      return null;
+    }
+    final deletedClient = ClientInDb.fromJson(result);
+    _clients.removeWhere((client) => client.id == clientId);
+    return deletedClient;
   }
 }

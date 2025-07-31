@@ -20,6 +20,7 @@ class _SearchFieldDebouncedState extends State<SearchFieldDebounced> {
   @override
   Widget build(BuildContext context) {
     return TextField(
+      onEditingComplete: () {},
       onChanged: (value) {
         _debounceTime?.cancel();
         _debounceTime = Timer(const Duration(milliseconds: 500), () {

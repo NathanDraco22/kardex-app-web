@@ -82,4 +82,24 @@ class ReadClientCatalogCubit extends Cubit<ClientCatalogState> {
       ),
     );
   }
+
+  Future<void> refreshClient() async {
+    final currentState = state as ClientCatalogSuccess;
+    final freshClientList = clientsRepository.clients;
+    if (currentState is HighlightedClient) {
+      emit(
+        HighlightedClient(
+          freshClientList,
+          newClients: currentState.newClients,
+          updatedClients: currentState.updatedClients,
+        ),
+      );
+      return;
+    }
+    emit(
+      HighlightedClient(
+        freshClientList,
+      ),
+    );
+  }
 }

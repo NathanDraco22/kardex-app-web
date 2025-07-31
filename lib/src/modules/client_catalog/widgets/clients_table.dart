@@ -181,16 +181,17 @@ class _RowWidget extends StatelessWidget {
               child: Align(
                 alignment: Alignment.centerRight,
 
-                child: TextButton.icon(
+                child: IconButton(
                   onPressed: () async {
                     final res = await showCreateClientDialog(context, client: client);
 
                     if (res == null) return;
                     if (!context.mounted) return;
-                    context.read<ReadClientCatalogCubit>().markClientUpdated(res);
+                    await context.read<ReadClientCatalogCubit>().markClientUpdated(res);
+                    if (!context.mounted) return;
+                    context.read<ReadClientCatalogCubit>().refreshClient();
                   },
                   icon: const Icon(Icons.edit),
-                  label: const Text("Editar"),
                 ),
               ),
             ),

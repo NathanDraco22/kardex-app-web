@@ -73,7 +73,7 @@ class _Body extends StatelessWidget {
                       final res = await showCreateClientDialog(context);
                       if (res == null) return;
                       if (!context.mounted) return;
-                      context.read<ReadClientCatalogCubit>().putClientFirst(res);
+                      await context.read<ReadClientCatalogCubit>().putClientFirst(res);
                     },
                     icon: const Icon(Icons.add),
                     label: const Text("Agregar Nuevo Cliente"),

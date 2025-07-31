@@ -1,5 +1,5 @@
 import 'package:kardex_app_front/src/services/http_service.dart';
-import 'package:kardex_app_front/src/tools/tool.dart';
+import 'package:kardex_app_front/src/tools/http_tool.dart';
 
 class ClientsDataSource with HttpService {
   final _clientEndpoint = "/clients";
@@ -32,6 +32,14 @@ class ClientsDataSource with HttpService {
   ) async {
     final uri = HttpTools.generateUri("$_clientEndpoint/$clientId");
     final res = await patchQuery(uri, body: client);
+    return res;
+  }
+
+  Future<Map<String, dynamic>?> deleteClientById(
+    String clientId,
+  ) async {
+    final uri = HttpTools.generateUri("$_clientEndpoint/$clientId");
+    final res = await deleteQuery(uri);
     return res;
   }
 }
