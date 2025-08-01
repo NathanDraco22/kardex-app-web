@@ -2,7 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 
-part 'write_client_catalog_state.dart';
+part 'client_write_state.dart';
 
 class ClientWriteCubit extends Cubit<ClientWriteState> {
   ClientWriteCubit(this.clientsRepository) : super(ClientWriteInitial());

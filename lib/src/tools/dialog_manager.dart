@@ -66,11 +66,20 @@ class DialogManager {
                 child: Shimmer.fromColors(
                   baseColor: Colors.grey,
                   highlightColor: Colors.grey.shade200,
-                  child: const Text(
-                    "Desliza para confirmar",
-                    style: TextStyle(
-                      color: Colors.grey,
-                    ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        "Desliza para confirmar",
+                        style: TextStyle(
+                          color: Colors.grey,
+                        ),
+                      ),
+                      Icon(
+                        Icons.delete,
+                        color: Colors.grey,
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -92,7 +101,7 @@ class DialogManager {
                       ),
                     ),
                     Icon(
-                      Icons.delete,
+                      Icons.chevron_right_rounded,
                       color: Colors.white,
                     ),
                   ],
@@ -111,11 +120,9 @@ class DialogManager {
             ),
           ),
           actions: [
-            TextButton.icon(
+            OutlinedButton(
               onPressed: () => context.pop(false),
-              label: const Text('Cancelar'),
-              icon: const Icon(Icons.cancel),
-              style: TextButton.styleFrom(foregroundColor: Colors.red.shade300),
+              child: const Text('Cancelar'),
             ),
           ],
         );

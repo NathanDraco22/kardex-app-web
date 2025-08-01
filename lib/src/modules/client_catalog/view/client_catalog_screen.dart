@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/repositories/client_repository.dart';
-import 'package:kardex_app_front/src/modules/client_catalog/cubit/read_client_catalog_cubit.dart';
-import 'package:kardex_app_front/src/modules/client_catalog/cubit/write_client_catalog_cubit.dart';
+import 'package:kardex_app_front/src/modules/client_catalog/cubit/client_read_cubit.dart';
+import 'package:kardex_app_front/src/modules/client_catalog/cubit/client_write_cubit.dart';
 
 import '../dialogs/create_client_dialog.dart';
 import '../widgets/clients_table.dart';
@@ -15,7 +15,7 @@ class ClientCatalogScreen extends StatelessWidget {
     final clientRepo = context.read<ClientsRepository>();
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => ReadClientCatalogCubit(clientRepo)..loadAllClients()),
+        BlocProvider(create: (context) => ReadClientCubit(clientRepo)..loadAllClients()),
         BlocProvider(create: (context) => ClientWriteCubit(clientRepo)),
       ],
       child: const _RootScaffold(),
@@ -30,21 +30,19 @@ class _RootScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Lista de Clientes")),
-      body: BlocBuilder<ReadClientCatalogCubit, ClientCatalogState>(
+      body: BlocBuilder<ReadClientCubit, ReadClientState>(
         builder: (context, state) {
-          if (state is ClientCatalogLoading || state is ClientCatalogInitial) {
+          if (state is ReadClientLoading || state is ReadClientInitial) {
             return const Center(
               child: CircularProgressIndicator(),
             );
           }
 
-          if (state is ClientCatalogError) {
+          if (state is ClientReadError) {
             return Center(
               child: Text(state.message),
             );
           }
-
-          state as ClientCatalogSuccess;
 
           return const _Body();
         },
@@ -73,7 +71,7 @@ class _Body extends StatelessWidget {
                       final res = await showCreateClientDialog(context);
                       if (res == null) return;
                       if (!context.mounted) return;
-                      await context.read<ReadClientCatalogCubit>().putClientFirst(res);
+                      await context.read<ReadClientCubit>().putClientFirst(res);
                     },
                     icon: const Icon(Icons.add),
                     label: const Text("Agregar Nuevo Cliente"),

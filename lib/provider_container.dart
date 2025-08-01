@@ -11,12 +11,15 @@ class ProviderContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final clientDataSource = ClientsDataSource();
+    final supplierDataSource = SuppliersDataSource();
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider(
-          create: (context) {
-            return ClientsRepository(clientDataSource);
-          },
+          create: (context) => ClientsRepository(clientDataSource),
+        ),
+
+        RepositoryProvider(
+          create: (context) => SuppliersRepository(supplierDataSource),
         ),
       ],
       child: child,

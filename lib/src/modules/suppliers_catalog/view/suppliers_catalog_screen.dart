@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
+import 'package:kardex_app_front/src/modules/suppliers_catalog/cubit/supplier_read_cubit.dart';
+import 'package:kardex_app_front/src/modules/suppliers_catalog/cubit/supplier_write_cubit.dart';
 
 import '../dialogs/create_supplier_dialog.dart';
 import '../widgets/suppliers_table.dart';
@@ -8,7 +12,16 @@ class SuppliersCatalogScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const _RootScaffold();
+    final supplierRepo = context.read<SuppliersRepository>();
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => ReadSupplierCubit(supplierRepo)..loadAllSuppliers(),
+        ),
+        BlocProvider(create: (context) => SupplierWriteCubit(supplierRepo)),
+      ],
+      child: const _RootScaffold(),
+    );
   }
 }
 
@@ -19,7 +32,23 @@ class _RootScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Lista de Proveedores")),
-      body: const _Body(),
+      body: BlocBuilder<ReadSupplierCubit, ReadSupplierState>(
+        builder: (context, state) {
+          if (state is ReadSupplierLoading || state is ReadSupplierInitial) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          if (state is SupplierReadError) {
+            return Center(
+              child: Text(state.message),
+            );
+          }
+
+          return const _Body();
+        },
+      ),
     );
   }
 }
@@ -40,13 +69,11 @@ class _Body extends StatelessWidget {
                 SizedBox(
                   height: 40,
                   child: ElevatedButton.icon(
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          return const CreateSupplierDialog();
-                        },
-                      );
+                    onPressed: () async {
+                      final res = await showCreateSupplierDialog(context);
+                      if (res == null) return;
+                      if (!context.mounted) return;
+                      await context.read<ReadSupplierCubit>().putSupplierFirst(res);
                     },
                     icon: const Icon(Icons.add),
                     label: const Text("Agregar Nuevo Proveedor"),

@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/view/client_catalog_screen.dart';
 import 'package:kardex_app_front/src/modules/home/view/home_screen.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/view/product_catalog_screen.dart';
+import 'package:kardex_app_front/src/modules/suppliers_catalog/view/suppliers_catalog_screen.dart';
 
 class AppRouter {
   static GoRouter router = GoRouter(
@@ -23,6 +24,12 @@ class AppRouter {
         path: '/client-catalog',
         name: 'client-catalog',
         builder: (context, state) => const ClientCatalogScreen(),
+      ),
+
+      GoRoute(
+        path: '/suppliers-catalog',
+        name: 'suppliers-catalog',
+        builder: (context, state) => const SuppliersCatalogScreen(),
       ),
     ],
   );

@@ -59,13 +59,17 @@ class _Body extends StatelessWidget {
                 HomeOptionCard(
                   title: "Lista de Proveedores",
                   icon: Icons.warehouse,
-                  onTap: () {},
+                  onTap: () {
+                    context.pushNamed("suppliers-catalog");
+                  },
                 ),
 
                 HomeOptionCard(
                   title: "Catalogo de Productos",
                   icon: Icons.shopping_bag_sharp,
-                  onTap: () {},
+                  onTap: () {
+                    context.pushNamed("product-catalog");
+                  },
                 ),
               ],
             ),

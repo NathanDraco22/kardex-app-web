@@ -1,14 +1,14 @@
 class BaseClient {
   final String name;
-  final String cardId;
-  final String phone;
+  final String? cardId;
+  final String? phone;
   final bool isActive;
 
   BaseClient({
     required this.name,
-    required this.cardId,
-    required this.phone,
-    required this.isActive,
+    this.cardId,
+    this.phone,
+    this.isActive = true,
   });
 
   Map<String, dynamic> toJson() {
@@ -78,9 +78,9 @@ class ClientInDb extends BaseClient {
   ClientInDb({
     required this.id,
     required super.name,
-    required super.cardId,
-    required super.phone,
-    required super.isActive,
+    super.cardId,
+    super.phone,
+    super.isActive,
     required this.createdAt,
     this.updatedAt,
   });

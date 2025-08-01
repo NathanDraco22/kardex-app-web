@@ -1,4 +1,4 @@
-part of 'write_client_catalog_cubit.dart';
+part of 'client_write_cubit.dart';
 
 sealed class ClientWriteState {}
 

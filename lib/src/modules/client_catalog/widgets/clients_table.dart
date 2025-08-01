@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
-import 'package:kardex_app_front/src/modules/client_catalog/cubit/read_client_catalog_cubit.dart';
+import 'package:kardex_app_front/src/modules/client_catalog/cubit/client_read_cubit.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/dialogs/create_client_dialog.dart';
 import 'package:kardex_app_front/widgets/no_item.dart';
 import 'package:kardex_app_front/widgets/search_debounce.dart';
@@ -14,8 +14,8 @@ class ClientsTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cubit = context.watch<ReadClientCatalogCubit>();
-    final state = cubit.state as ClientCatalogSuccess;
+    final cubit = context.watch<ReadClientCubit>();
+    final state = cubit.state as ReadClientSuccess;
     return Card(
       margin: EdgeInsets.zero,
       child: Column(
@@ -33,9 +33,9 @@ class ClientsTable extends StatelessWidget {
               ],
             ),
           ),
-          BlocBuilder<ReadClientCatalogCubit, ClientCatalogState>(
+          BlocBuilder<ReadClientCubit, ReadClientState>(
             builder: (context, state) {
-              if (state is! ClientCatalogSearching) return const SizedBox();
+              if (state is! ReadClientSearching) return const SizedBox();
               return const LinearProgressIndicator();
             },
           ),
@@ -99,8 +99,8 @@ class _InnerRows extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cubit = context.watch<ReadClientCatalogCubit>();
-    final state = cubit.state as ClientCatalogSuccess;
+    final cubit = context.watch<ReadClientCubit>();
+    final state = cubit.state as ReadClientSuccess;
     final clients = state.clients;
     return Expanded(
       child: ListView.builder(
@@ -108,19 +108,19 @@ class _InnerRows extends StatelessWidget {
         itemBuilder: (context, index) {
           final currentClient = clients[index];
 
-          Color color = index.isOdd ? Colors.white : Colors.grey.shade200;
+          Color rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
 
           if (state is HighlightedClient) {
             if (state.updatedClients.any((element) => element.id == currentClient.id)) {
-              color = Colors.indigo.shade200;
+              rowColor = Colors.indigo.shade200;
             } else if (state.newClients.any((element) => element.id == currentClient.id)) {
-              color = Colors.yellow.shade200;
+              rowColor = Colors.yellow.shade200;
             }
           }
 
           return _RowWidget(
             client: currentClient,
-            color: color,
+            color: rowColor,
           );
         },
       ),
@@ -135,7 +135,7 @@ class _RowWidget extends StatelessWidget {
   final Color color;
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Ink(
       color: color,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -148,11 +148,11 @@ class _RowWidget extends StatelessWidget {
             ),
             Flexible(
               fit: FlexFit.tight,
-              child: Text(client.cardId),
+              child: Text(client.cardId ?? "--"),
             ),
             Flexible(
               fit: FlexFit.tight,
-              child: Text(client.phone),
+              child: Text(client.phone ?? "--"),
             ),
 
             Flexible(
@@ -187,9 +187,9 @@ class _RowWidget extends StatelessWidget {
 
                     if (res == null) return;
                     if (!context.mounted) return;
-                    await context.read<ReadClientCatalogCubit>().markClientUpdated(res);
+                    await context.read<ReadClientCubit>().markClientUpdated(res);
                     if (!context.mounted) return;
-                    context.read<ReadClientCatalogCubit>().refreshClient();
+                    context.read<ReadClientCubit>().refreshClient();
                   },
                   icon: const Icon(Icons.edit),
                 ),
