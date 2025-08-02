@@ -57,12 +57,19 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
     final currentClient = widget.client;
 
     return BlocListener<ClientWriteCubit, ClientWriteState>(
-      listener: (context, state) {
+      listener: (context, state) async {
         if (state is ClientWriteInProgress) {
           LoadingDialogManager.showLoadingDialog(context);
         }
         if (state is ClientWriteSuccess) {
           LoadingDialogManager.closeLoadingDialog(context);
+          context.pop(state.client);
+        }
+
+        if (state is ClientDeleteSuccess) {
+          LoadingDialogManager.closeLoadingDialog(context);
+          await DialogManager.showInfoDialog(context, "Se ha borrado el cliente ${state.client.name}");
+          if (!context.mounted) return;
           context.pop(state.client);
         }
         if (state is ClientWriteError) {

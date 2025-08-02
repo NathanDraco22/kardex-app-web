@@ -35,7 +35,7 @@ class ClientWriteCubit extends Cubit<ClientWriteState> {
     emit(ClientWriteInProgress());
     try {
       final clients = await clientsRepository.deleteClientById(clientId);
-      emit(ClientWriteSuccess(clients!));
+      emit(ClientDeleteSuccess(clients!));
       emit(ClientWriteInitial());
     } catch (error) {
       emit(ClientWriteError(error.toString()));

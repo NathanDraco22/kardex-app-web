@@ -57,13 +57,20 @@ class _CreateSupplierDialogState extends State<CreateSupplierDialog> {
     final currentSupplier = widget.supplier;
 
     return BlocListener<SupplierWriteCubit, SupplierWriteState>(
-      listener: (context, state) {
+      listener: (context, state) async {
         if (state is SupplierWriteInProgress) {
           LoadingDialogManager.showLoadingDialog(context);
         }
 
         if (state is SupplierWriteSuccess) {
           LoadingDialogManager.closeLoadingDialog(context);
+          context.pop(state.supplier);
+        }
+
+        if (state is SupplierDeleteSuccess) {
+          LoadingDialogManager.closeLoadingDialog(context);
+          await DialogManager.showInfoDialog(context, "Se ha borrado el proveedor ${state.supplier.name}");
+          if (!context.mounted) return;
           context.pop(state.supplier);
         }
 
@@ -108,7 +115,7 @@ class _CreateSupplierDialogState extends State<CreateSupplierDialog> {
                   children: [
                     TitleTextField(
                       key: const ValueKey("name_field"),
-                      title: "Nombre",
+                      title: "Nombre*",
                       onEditingComplete: () => FocusScope.of(context).nextFocus(),
                       initialValue: widget.supplier?.name,
                       validator: (value) {

@@ -26,6 +26,27 @@ class DialogManager {
     );
   }
 
+  static Future<void> showInfoDialog(BuildContext context, String message) async {
+    await showDialog<void>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(message),
+          icon: Icon(
+            Icons.info,
+            color: Colors.blue.shade300,
+          ),
+          actions: [
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () => context.pop(),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   static Future<bool> confirmActionDialog(BuildContext context, String message) async {
     final result = await showDialog<bool>(
       context: context,

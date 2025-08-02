@@ -35,7 +35,7 @@ class SupplierWriteCubit extends Cubit<SupplierWriteState> {
     emit(SupplierWriteInProgress());
     try {
       final supplier = await suppliersRepository.deleteSupplierById(supplierId);
-      emit(SupplierWriteSuccess(supplier!));
+      emit(SupplierDeleteSuccess(supplier!));
       emit(SupplierWriteInitial());
     } catch (error) {
       emit(SupplierWriteError(error.toString()));

@@ -11,6 +11,11 @@ final class SupplierWriteSuccess extends SupplierWriteState {
   SupplierWriteSuccess(this.supplier);
 }
 
+final class SupplierDeleteSuccess extends SupplierWriteState {
+  final SupplierInDb supplier;
+  SupplierDeleteSuccess(this.supplier);
+}
+
 final class SupplierWriteError extends SupplierWriteState {
   final String error;
   SupplierWriteError(this.error);

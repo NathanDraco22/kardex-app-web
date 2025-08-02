@@ -11,6 +11,11 @@ final class ClientWriteSuccess extends ClientWriteState {
   ClientWriteSuccess(this.client);
 }
 
+final class ClientDeleteSuccess extends ClientWriteState {
+  final ClientInDb client;
+  ClientDeleteSuccess(this.client);
+}
+
 final class ClientWriteError extends ClientWriteState {
   final String error;
   ClientWriteError(this.error);
