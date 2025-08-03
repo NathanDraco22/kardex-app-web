@@ -1,22 +1,22 @@
 part of 'write_product_category_cubit.dart';
 
-sealed class ProductCategoryWriteState {}
+sealed class WriteProductCategoryState {}
 
-final class ProductCategoryWriteInitial extends ProductCategoryWriteState {}
+final class WriteProductCategoryInitial extends WriteProductCategoryState {}
 
-final class ProductCategoryWriteInProgress extends ProductCategoryWriteState {}
+final class WriteProductCategoryInProgress extends WriteProductCategoryState {}
 
-final class ProductCategoryWriteSuccess extends ProductCategoryWriteState {
+final class WriteProductCategorySuccess extends WriteProductCategoryState {
   final ProductCategoryInDb productCategory;
-  ProductCategoryWriteSuccess(this.productCategory);
+  WriteProductCategorySuccess(this.productCategory);
 }
 
-final class ProductCategoryDeleteSuccess extends ProductCategoryWriteState {
+final class DeleteProductCategorySuccess extends WriteProductCategoryState {
   final ProductCategoryInDb productCategory;
-  ProductCategoryDeleteSuccess(this.productCategory);
+  DeleteProductCategorySuccess(this.productCategory);
 }
 
-final class ProductCategoryWriteError extends ProductCategoryWriteState {
+final class WriteProductCategoryError extends WriteProductCategoryState {
   final String error;
-  ProductCategoryWriteError(this.error);
+  WriteProductCategoryError(this.error);
 }

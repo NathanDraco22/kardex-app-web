@@ -71,6 +71,14 @@ class _Body extends StatelessWidget {
                     context.pushNamed("product-catalog");
                   },
                 ),
+
+                HomeOptionCard(
+                  title: "Configuraciones",
+                  icon: Icons.settings,
+                  onTap: () {
+                    context.pushNamed("settings");
+                  },
+                ),
               ],
             ),
           ],

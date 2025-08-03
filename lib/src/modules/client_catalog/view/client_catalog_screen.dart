@@ -22,7 +22,7 @@ class ClientCatalogScreen extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => ReadClientCubit(clientRepo)..loadAllClients()),
-        BlocProvider(create: (context) => ClientWriteCubit(clientRepo)),
+        BlocProvider(create: (context) => WriteClientCubit(clientRepo)),
       ],
       child: const _BaseScaffold(),
     );

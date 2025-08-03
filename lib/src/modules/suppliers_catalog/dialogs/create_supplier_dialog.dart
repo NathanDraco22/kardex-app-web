@@ -8,7 +8,7 @@ import 'package:kardex_app_front/src/tools/loading_dialog.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
 
 Future<SupplierInDb?> showCreateSupplierDialog(BuildContext context, {SupplierInDb? supplier}) async {
-  final writeCubit = context.read<SupplierWriteCubit>();
+  final writeCubit = context.read<WriteSupplierCubit>();
   final res = await showDialog<SupplierInDb>(
     context: context,
     builder: (context) {
@@ -42,7 +42,7 @@ class _CreateSupplierDialogState extends State<CreateSupplierDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final writeCubit = context.read<SupplierWriteCubit>();
+    final writeCubit = context.read<WriteSupplierCubit>();
 
     final wordPrefix = widget.supplier == null ? "Agregar" : "Actualizar";
 
@@ -56,25 +56,25 @@ class _CreateSupplierDialogState extends State<CreateSupplierDialog> {
 
     final currentSupplier = widget.supplier;
 
-    return BlocListener<SupplierWriteCubit, SupplierWriteState>(
+    return BlocListener<WriteSupplierCubit, WriteSupplierState>(
       listener: (context, state) async {
         if (state is SupplierWriteInProgress) {
           LoadingDialogManager.showLoadingDialog(context);
         }
 
-        if (state is SupplierWriteSuccess) {
+        if (state is WriteSupplierSuccess) {
           LoadingDialogManager.closeLoadingDialog(context);
           context.pop(state.supplier);
         }
 
-        if (state is SupplierDeleteSuccess) {
+        if (state is DeleteSupplierSuccess) {
           LoadingDialogManager.closeLoadingDialog(context);
           await DialogManager.showInfoDialog(context, "Se ha borrado el proveedor ${state.supplier.name}");
           if (!context.mounted) return;
           context.pop(state.supplier);
         }
 
-        if (state is SupplierWriteError) {
+        if (state is WriteSupplierError) {
           LoadingDialogManager.closeLoadingDialog(context);
           DialogManager.showErrorDialog(context, state.error);
         }

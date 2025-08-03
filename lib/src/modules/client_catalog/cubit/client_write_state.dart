@@ -1,22 +1,22 @@
 part of 'client_write_cubit.dart';
 
-sealed class ClientWriteState {}
+sealed class WriteClientState {}
 
-final class ClientWriteInitial extends ClientWriteState {}
+final class WriteClientInitial extends WriteClientState {}
 
-final class ClientWriteInProgress extends ClientWriteState {}
+final class WriteClientInProgress extends WriteClientState {}
 
-final class ClientWriteSuccess extends ClientWriteState {
+final class WriteClientSuccess extends WriteClientState {
   final ClientInDb client;
-  ClientWriteSuccess(this.client);
+  WriteClientSuccess(this.client);
 }
 
-final class ClientDeleteSuccess extends ClientWriteState {
+final class DeleteClientSuccess extends WriteClientState {
   final ClientInDb client;
-  ClientDeleteSuccess(this.client);
+  DeleteClientSuccess(this.client);
 }
 
-final class ClientWriteError extends ClientWriteState {
+final class WriteClientError extends WriteClientState {
   final String error;
-  ClientWriteError(this.error);
+  WriteClientError(this.error);
 }

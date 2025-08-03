@@ -4,41 +4,41 @@ import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 
 part 'write_product_category_state.dart';
 
-class ProductCategoryWriteCubit extends Cubit<ProductCategoryWriteState> {
-  ProductCategoryWriteCubit(this.productCategoriesRepository) : super(ProductCategoryWriteInitial());
+class WriteProductCategoryCubit extends Cubit<WriteProductCategoryState> {
+  WriteProductCategoryCubit(this.productCategoriesRepository) : super(WriteProductCategoryInitial());
 
   final ProductCategoriesRepository productCategoriesRepository;
 
   Future<void> createNewProductCategory(CreateProductCategory createProductCategory) async {
-    emit(ProductCategoryWriteInProgress());
+    emit(WriteProductCategoryInProgress());
     try {
       final category = await productCategoriesRepository.createProductCategory(createProductCategory);
-      emit(ProductCategoryWriteSuccess(category));
-      emit(ProductCategoryWriteInitial());
+      emit(WriteProductCategorySuccess(category));
+      emit(WriteProductCategoryInitial());
     } catch (error) {
-      emit(ProductCategoryWriteError(error.toString()));
+      emit(WriteProductCategoryError(error.toString()));
     }
   }
 
   Future<void> updateProductCategory(String categoryId, UpdateProductCategory updateProductCategory) async {
-    emit(ProductCategoryWriteInProgress());
+    emit(WriteProductCategoryInProgress());
     try {
       final category = await productCategoriesRepository.updateProductCategoryById(categoryId, updateProductCategory);
-      emit(ProductCategoryWriteSuccess(category!));
-      emit(ProductCategoryWriteInitial());
+      emit(WriteProductCategorySuccess(category!));
+      emit(WriteProductCategoryInitial());
     } catch (error) {
-      emit(ProductCategoryWriteError(error.toString()));
+      emit(WriteProductCategoryError(error.toString()));
     }
   }
 
   Future<void> deleteProductCategory(String categoryId) async {
-    emit(ProductCategoryWriteInProgress());
+    emit(WriteProductCategoryInProgress());
     try {
       final category = await productCategoriesRepository.deleteProductCategoryById(categoryId);
-      emit(ProductCategoryDeleteSuccess(category!));
-      emit(ProductCategoryWriteInitial());
+      emit(DeleteProductCategorySuccess(category!));
+      emit(WriteProductCategoryInitial());
     } catch (error) {
-      emit(ProductCategoryWriteError(error.toString()));
+      emit(WriteProductCategoryError(error.toString()));
     }
   }
 }

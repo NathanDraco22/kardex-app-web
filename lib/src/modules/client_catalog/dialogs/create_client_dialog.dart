@@ -8,7 +8,7 @@ import 'package:kardex_app_front/src/tools/loading_dialog.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
 
 Future<ClientInDb?> showCreateClientDialog(BuildContext context, {ClientInDb? client}) async {
-  final writeCubit = context.read<ClientWriteCubit>();
+  final writeCubit = context.read<WriteClientCubit>();
   final res = await showDialog(
     context: context,
     builder: (context) {
@@ -42,7 +42,7 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final writeCubit = context.read<ClientWriteCubit>();
+    final writeCubit = context.read<WriteClientCubit>();
 
     final wordPrefix = widget.client == null ? "Agregar" : "Actualizar";
 
@@ -56,23 +56,23 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
 
     final currentClient = widget.client;
 
-    return BlocListener<ClientWriteCubit, ClientWriteState>(
+    return BlocListener<WriteClientCubit, WriteClientState>(
       listener: (context, state) async {
-        if (state is ClientWriteInProgress) {
+        if (state is WriteClientInProgress) {
           LoadingDialogManager.showLoadingDialog(context);
         }
-        if (state is ClientWriteSuccess) {
+        if (state is WriteClientSuccess) {
           LoadingDialogManager.closeLoadingDialog(context);
           context.pop(state.client);
         }
 
-        if (state is ClientDeleteSuccess) {
+        if (state is DeleteClientSuccess) {
           LoadingDialogManager.closeLoadingDialog(context);
           await DialogManager.showInfoDialog(context, "Se ha borrado el cliente ${state.client.name}");
           if (!context.mounted) return;
           context.pop(state.client);
         }
-        if (state is ClientWriteError) {
+        if (state is WriteClientError) {
           LoadingDialogManager.closeLoadingDialog(context);
           DialogManager.showErrorDialog(context, state.error);
         }

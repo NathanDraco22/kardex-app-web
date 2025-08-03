@@ -1,7 +1,9 @@
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/view/client_catalog_screen.dart';
 import 'package:kardex_app_front/src/modules/home/view/home_screen.dart';
+import 'package:kardex_app_front/src/modules/product_catalog/view/product_catalog_menu_screen.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/view/product_catalog_screen.dart';
+import 'package:kardex_app_front/src/modules/settings/view/settings_screen.dart';
 import 'package:kardex_app_front/src/modules/suppliers_catalog/view/suppliers_catalog_screen.dart';
 
 class AppRouter {
@@ -17,7 +19,7 @@ class AppRouter {
       GoRoute(
         path: '/product-catalog',
         name: 'product-catalog',
-        builder: (context, state) => const ProductCatalogScreen(),
+        builder: (context, state) => const ProductCatalogMenuScreen(),
       ),
 
       GoRoute(
@@ -30,6 +32,12 @@ class AppRouter {
         path: '/suppliers-catalog',
         name: 'suppliers-catalog',
         builder: (context, state) => const SuppliersCatalogScreen(),
+      ),
+
+      GoRoute(
+        path: '/settings',
+        name: 'settings',
+        builder: (context, state) => const SettingsScreen(),
       ),
     ],
   );

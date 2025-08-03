@@ -24,7 +24,7 @@ class SuppliersCatalogScreen extends StatelessWidget {
         BlocProvider(
           create: (context) => ReadSupplierCubit(supplierRepo)..loadAllSuppliers(),
         ),
-        BlocProvider(create: (context) => SupplierWriteCubit(supplierRepo)),
+        BlocProvider(create: (context) => WriteSupplierCubit(supplierRepo)),
       ],
       child: const _BaseScaffold(),
     );

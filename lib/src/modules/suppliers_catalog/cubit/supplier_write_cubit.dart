@@ -4,8 +4,8 @@ import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 
 part 'supplier_write_state.dart';
 
-class SupplierWriteCubit extends Cubit<SupplierWriteState> {
-  SupplierWriteCubit(this.suppliersRepository) : super(SupplierWriteInitial());
+class WriteSupplierCubit extends Cubit<WriteSupplierState> {
+  WriteSupplierCubit(this.suppliersRepository) : super(WriteSupplierInitial());
 
   final SuppliersRepository suppliersRepository;
 
@@ -13,10 +13,10 @@ class SupplierWriteCubit extends Cubit<SupplierWriteState> {
     emit(SupplierWriteInProgress());
     try {
       final supplier = await suppliersRepository.createSupplier(createSupplier);
-      emit(SupplierWriteSuccess(supplier));
-      emit(SupplierWriteInitial());
+      emit(WriteSupplierSuccess(supplier));
+      emit(WriteSupplierInitial());
     } catch (error) {
-      emit(SupplierWriteError(error.toString()));
+      emit(WriteSupplierError(error.toString()));
     }
   }
 
@@ -24,10 +24,10 @@ class SupplierWriteCubit extends Cubit<SupplierWriteState> {
     emit(SupplierWriteInProgress());
     try {
       final supplier = await suppliersRepository.updateSupplierById(supplierId, updateSupplier);
-      emit(SupplierWriteSuccess(supplier!));
-      emit(SupplierWriteInitial());
+      emit(WriteSupplierSuccess(supplier!));
+      emit(WriteSupplierInitial());
     } catch (error) {
-      emit(SupplierWriteError(error.toString()));
+      emit(WriteSupplierError(error.toString()));
     }
   }
 
@@ -35,10 +35,10 @@ class SupplierWriteCubit extends Cubit<SupplierWriteState> {
     emit(SupplierWriteInProgress());
     try {
       final supplier = await suppliersRepository.deleteSupplierById(supplierId);
-      emit(SupplierDeleteSuccess(supplier!));
-      emit(SupplierWriteInitial());
+      emit(DeleteSupplierSuccess(supplier!));
+      emit(WriteSupplierInitial());
     } catch (error) {
-      emit(SupplierWriteError(error.toString()));
+      emit(WriteSupplierError(error.toString()));
     }
   }
 }

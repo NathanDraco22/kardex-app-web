@@ -1,22 +1,22 @@
 part of 'supplier_write_cubit.dart';
 
-sealed class SupplierWriteState {}
+sealed class WriteSupplierState {}
 
-final class SupplierWriteInitial extends SupplierWriteState {}
+final class WriteSupplierInitial extends WriteSupplierState {}
 
-final class SupplierWriteInProgress extends SupplierWriteState {}
+final class SupplierWriteInProgress extends WriteSupplierState {}
 
-final class SupplierWriteSuccess extends SupplierWriteState {
+final class WriteSupplierSuccess extends WriteSupplierState {
   final SupplierInDb supplier;
-  SupplierWriteSuccess(this.supplier);
+  WriteSupplierSuccess(this.supplier);
 }
 
-final class SupplierDeleteSuccess extends SupplierWriteState {
+final class DeleteSupplierSuccess extends WriteSupplierState {
   final SupplierInDb supplier;
-  SupplierDeleteSuccess(this.supplier);
+  DeleteSupplierSuccess(this.supplier);
 }
 
-final class SupplierWriteError extends SupplierWriteState {
+final class WriteSupplierError extends WriteSupplierState {
   final String error;
-  SupplierWriteError(this.error);
+  WriteSupplierError(this.error);
 }

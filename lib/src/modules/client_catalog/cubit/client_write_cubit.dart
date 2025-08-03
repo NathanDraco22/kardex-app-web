@@ -4,41 +4,41 @@ import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 
 part 'client_write_state.dart';
 
-class ClientWriteCubit extends Cubit<ClientWriteState> {
-  ClientWriteCubit(this.clientsRepository) : super(ClientWriteInitial());
+class WriteClientCubit extends Cubit<WriteClientState> {
+  WriteClientCubit(this.clientsRepository) : super(WriteClientInitial());
 
   final ClientsRepository clientsRepository;
 
   Future<void> createNewClient(CreateClient createClient) async {
-    emit(ClientWriteInProgress());
+    emit(WriteClientInProgress());
     try {
       final clients = await clientsRepository.createClient(createClient);
-      emit(ClientWriteSuccess(clients));
-      emit(ClientWriteInitial());
+      emit(WriteClientSuccess(clients));
+      emit(WriteClientInitial());
     } catch (error) {
-      emit(ClientWriteError(error.toString()));
+      emit(WriteClientError(error.toString()));
     }
   }
 
   Future<void> updateClient(String clientId, UpdateClient updateClient) async {
-    emit(ClientWriteInProgress());
+    emit(WriteClientInProgress());
     try {
       final clients = await clientsRepository.updateClientById(clientId, updateClient);
-      emit(ClientWriteSuccess(clients!));
-      emit(ClientWriteInitial());
+      emit(WriteClientSuccess(clients!));
+      emit(WriteClientInitial());
     } catch (error) {
-      emit(ClientWriteError(error.toString()));
+      emit(WriteClientError(error.toString()));
     }
   }
 
   Future<void> deleteClient(String clientId) async {
-    emit(ClientWriteInProgress());
+    emit(WriteClientInProgress());
     try {
       final clients = await clientsRepository.deleteClientById(clientId);
-      emit(ClientDeleteSuccess(clients!));
-      emit(ClientWriteInitial());
+      emit(DeleteClientSuccess(clients!));
+      emit(WriteClientInitial());
     } catch (error) {
-      emit(ClientWriteError(error.toString()));
+      emit(WriteClientError(error.toString()));
     }
   }
 }
