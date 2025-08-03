@@ -1,6 +1,6 @@
 import 'package:kardex_app_front/src/data/client_data_source.dart';
 import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
-import 'package:kardex_app_front/src/domain/models/client/responses.dart';
+import 'package:kardex_app_front/src/domain/responses/list_responses.dart';
 
 class ClientsRepository {
   final ClientsDataSource clientsDataSource;
@@ -20,9 +20,13 @@ class ClientsRepository {
 
   Future<List<ClientInDb>> getAllClients() async {
     final results = await clientsDataSource.getAllClients();
-    final models = ClientsResponseModel.fromJson(results);
 
-    _clients = models.data;
+    final responseModel = ListResponse<ClientInDb>.fromJson(
+      results,
+      ClientInDb.fromJson,
+    );
+
+    _clients = responseModel.data;
     _clients.sort(
       (ClientInDb a, ClientInDb b) => a.name.toLowerCase().compareTo(
         b.name.toLowerCase(),
@@ -43,8 +47,12 @@ class ClientsRepository {
 
   Future<List<ClientInDb>> searchClientByKeyword(String keyword) async {
     final result = await clientsDataSource.searchClientByKeyword(keyword);
-    final clients = ClientsResponseModel.fromJson(result).data;
-    return clients;
+
+    final responseModel = ListResponse<ClientInDb>.fromJson(
+      result,
+      ClientInDb.fromJson,
+    );
+    return responseModel.data;
   }
 
   Future<ClientInDb?> updateClientById(

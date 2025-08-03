@@ -3,9 +3,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/repositories/client_repository.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/cubit/client_read_cubit.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/cubit/client_write_cubit.dart';
+import 'package:kardex_app_front/widgets/no_item.dart';
+import 'package:kardex_app_front/widgets/row_widgets/mobile_row.dart';
+import 'package:kardex_app_front/widgets/search_debounce.dart';
 
 import '../dialogs/create_client_dialog.dart';
-import '../widgets/clients_table.dart';
+import 'widgets/clients_table.dart';
+
+part 'web/cliente_catalog_web.dart';
+part 'mobile/client_catalog_mobile.dart';
 
 class ClientCatalogScreen extends StatelessWidget {
   const ClientCatalogScreen({super.key});
@@ -18,76 +24,19 @@ class ClientCatalogScreen extends StatelessWidget {
         BlocProvider(create: (context) => ReadClientCubit(clientRepo)..loadAllClients()),
         BlocProvider(create: (context) => ClientWriteCubit(clientRepo)),
       ],
-      child: const _RootScaffold(),
+      child: const _BaseScaffold(),
     );
   }
 }
 
-class _RootScaffold extends StatelessWidget {
-  const _RootScaffold();
+class _BaseScaffold extends StatelessWidget {
+  const _BaseScaffold();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Lista de Clientes")),
-      body: BlocBuilder<ReadClientCubit, ReadClientState>(
-        builder: (context, state) {
-          if (state is ReadClientLoading || state is ReadClientInitial) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
+    final screenSize = MediaQuery.sizeOf(context);
 
-          if (state is ClientReadError) {
-            return Center(
-              child: Text(state.message),
-            );
-          }
-
-          return const _Body();
-        },
-      ),
-    );
-  }
-}
-
-class _Body extends StatelessWidget {
-  const _Body();
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                const Spacer(),
-                SizedBox(
-                  height: 40,
-                  child: ElevatedButton.icon(
-                    onPressed: () async {
-                      final res = await showCreateClientDialog(context);
-                      if (res == null) return;
-                      if (!context.mounted) return;
-                      await context.read<ReadClientCubit>().putClientFirst(res);
-                    },
-                    icon: const Icon(Icons.add),
-                    label: const Text("Agregar Nuevo Cliente"),
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 12),
-
-            const Expanded(
-              child: ClientsTable(),
-            ),
-          ],
-        ),
-      ),
-    );
+    if (screenSize.width < 600) return const ClientCatalogMobile();
+    return const ClientCatalogWeb();
   }
 }

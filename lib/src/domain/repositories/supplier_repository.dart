@@ -1,6 +1,6 @@
 import 'package:kardex_app_front/src/data/supplier_data_source.dart';
-import 'package:kardex_app_front/src/domain/models/supplier/reponses.dart';
 import 'package:kardex_app_front/src/domain/models/supplier/supplier_model.dart';
+import 'package:kardex_app_front/src/domain/responses/list_responses.dart';
 
 class SuppliersRepository {
   final SuppliersDataSource suppliersDataSource;
@@ -20,7 +20,10 @@ class SuppliersRepository {
 
   Future<List<SupplierInDb>> getAllSuppliers() async {
     final results = await suppliersDataSource.getAllSuppliers();
-    final models = SuppliersResponseModel.fromJson(results);
+    final models = ListResponse<SupplierInDb>.fromJson(
+      results,
+      SupplierInDb.fromJson,
+    );
 
     _suppliers = models.data;
     _suppliers.sort(
@@ -43,7 +46,7 @@ class SuppliersRepository {
 
   Future<List<SupplierInDb>> searchSupplierByKeyword(String keyword) async {
     final result = await suppliersDataSource.searchSupplierByKeyword(keyword);
-    final suppliers = SuppliersResponseModel.fromJson(result).data;
+    final suppliers = ListResponse<SupplierInDb>.fromJson(result, SupplierInDb.fromJson).data;
     return suppliers;
   }
 

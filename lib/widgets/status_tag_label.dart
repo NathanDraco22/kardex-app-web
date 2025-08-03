@@ -23,6 +23,7 @@ class StatusTagLabel extends StatelessWidget {
       child: Text(
         label,
         style: TextStyle(color: fontColor),
+        textAlign: TextAlign.center,
       ),
     );
   }

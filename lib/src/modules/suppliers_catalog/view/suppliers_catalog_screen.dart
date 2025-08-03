@@ -3,9 +3,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/suppliers_catalog/cubit/supplier_read_cubit.dart';
 import 'package:kardex_app_front/src/modules/suppliers_catalog/cubit/supplier_write_cubit.dart';
+import 'package:kardex_app_front/widgets/no_item.dart';
+import 'package:kardex_app_front/widgets/row_widgets/mobile_row.dart';
+import 'package:kardex_app_front/widgets/search_debounce.dart';
 
 import '../dialogs/create_supplier_dialog.dart';
-import '../widgets/suppliers_table.dart';
+import 'widgets/suppliers_table.dart';
+
+part 'web/supplier_catalog_web.dart';
+part 'mobile/supplier_catalog_mobile.dart';
 
 class SuppliersCatalogScreen extends StatelessWidget {
   const SuppliersCatalogScreen({super.key});
@@ -20,76 +26,19 @@ class SuppliersCatalogScreen extends StatelessWidget {
         ),
         BlocProvider(create: (context) => SupplierWriteCubit(supplierRepo)),
       ],
-      child: const _RootScaffold(),
+      child: const _BaseScaffold(),
     );
   }
 }
 
-class _RootScaffold extends StatelessWidget {
-  const _RootScaffold();
+class _BaseScaffold extends StatelessWidget {
+  const _BaseScaffold();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Lista de Proveedores")),
-      body: BlocBuilder<ReadSupplierCubit, ReadSupplierState>(
-        builder: (context, state) {
-          if (state is ReadSupplierLoading || state is ReadSupplierInitial) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
+    final screenSized = MediaQuery.sizeOf(context);
 
-          if (state is SupplierReadError) {
-            return Center(
-              child: Text(state.message),
-            );
-          }
-
-          return const _Body();
-        },
-      ),
-    );
-  }
-}
-
-class _Body extends StatelessWidget {
-  const _Body();
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                const Spacer(),
-                SizedBox(
-                  height: 40,
-                  child: ElevatedButton.icon(
-                    onPressed: () async {
-                      final res = await showCreateSupplierDialog(context);
-                      if (res == null) return;
-                      if (!context.mounted) return;
-                      await context.read<ReadSupplierCubit>().putSupplierFirst(res);
-                    },
-                    icon: const Icon(Icons.add),
-                    label: const Text("Agregar Nuevo Proveedor"),
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 12),
-
-            const Expanded(
-              child: SuppliersTable(),
-            ),
-          ],
-        ),
-      ),
-    );
+    if (screenSized.width < 600) return const SupplierCatalogMobile();
+    return const SuppliersCatalogWeb();
   }
 }
