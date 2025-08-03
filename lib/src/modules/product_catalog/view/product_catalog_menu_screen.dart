@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class ProductCatalogMenuScreen extends StatelessWidget {
   const ProductCatalogMenuScreen({super.key});
@@ -50,7 +51,9 @@ class _Body extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.category_rounded),
             title: const Text("Lista de Categorias de Productos"),
-            onTap: () {},
+            onTap: () {
+              context.pushNamed("product-category");
+            },
             trailing: const Icon(Icons.chevron_right),
           ),
           const Divider(
