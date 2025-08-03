@@ -10,7 +10,7 @@ class WriteProductPriceCubit extends Cubit<WriteProductPriceState> {
   final ProductPricesRepository productPricesRepository;
 
   Future<void> createNewProductPrice(CreateProductPrice createProductPrice) async {
-    emit(ProductPriceWriteInProgress());
+    emit(WriteProductPriceInProgress());
     try {
       final price = await productPricesRepository.createProductPrice(createProductPrice);
       emit(WriteProductPriceSuccess(price));
@@ -21,7 +21,7 @@ class WriteProductPriceCubit extends Cubit<WriteProductPriceState> {
   }
 
   Future<void> updateProductPrice(String priceId, UpdateProductPrice updateProductPrice) async {
-    emit(ProductPriceWriteInProgress());
+    emit(WriteProductPriceInProgress());
     try {
       final price = await productPricesRepository.updateProductPriceById(priceId, updateProductPrice);
       emit(WriteProductPriceSuccess(price!));
@@ -32,7 +32,7 @@ class WriteProductPriceCubit extends Cubit<WriteProductPriceState> {
   }
 
   Future<void> deleteProductPrice(String priceId) async {
-    emit(ProductPriceWriteInProgress());
+    emit(WriteProductPriceInProgress());
     try {
       final price = await productPricesRepository.deleteProductPriceById(priceId);
       emit(DeleteProductPriceSuccess(price!));

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -32,9 +33,13 @@ class _Body extends StatelessWidget {
       child: ListView(
         children: [
           ListTile(
+            tileColor: Colors.white,
             leading: const Icon(Icons.price_change_outlined),
             title: const Text("Precios para Productos"),
             trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              context.pushNamed("product-price");
+            },
           ),
         ],
       ),

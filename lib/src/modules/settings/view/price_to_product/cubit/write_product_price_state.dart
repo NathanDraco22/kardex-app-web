@@ -4,7 +4,7 @@ sealed class WriteProductPriceState {}
 
 final class WriteProductPriceInitial extends WriteProductPriceState {}
 
-final class ProductPriceWriteInProgress extends WriteProductPriceState {}
+final class WriteProductPriceInProgress extends WriteProductPriceState {}
 
 final class WriteProductPriceSuccess extends WriteProductPriceState {
   final ProductPriceInDb productPrice;

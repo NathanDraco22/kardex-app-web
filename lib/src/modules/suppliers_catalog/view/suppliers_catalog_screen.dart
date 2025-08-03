@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/suppliers_catalog/cubit/supplier_read_cubit.dart';
 import 'package:kardex_app_front/src/modules/suppliers_catalog/cubit/supplier_write_cubit.dart';
+import 'package:kardex_app_front/src/tools/constant.dart';
 import 'package:kardex_app_front/widgets/no_item.dart';
 import 'package:kardex_app_front/widgets/row_widgets/mobile_row.dart';
 import 'package:kardex_app_front/widgets/search_debounce.dart';
@@ -38,7 +39,7 @@ class _BaseScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenSized = MediaQuery.sizeOf(context);
 
-    if (screenSized.width < 600) return const SupplierCatalogMobile();
+    if (screenSized.width < maxPhoneScreenWidth) return const SupplierCatalogMobile();
     return const SuppliersCatalogWeb();
   }
 }

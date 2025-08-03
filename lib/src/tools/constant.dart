@@ -1,0 +1,1 @@
+const maxPhoneScreenWidth = 600;

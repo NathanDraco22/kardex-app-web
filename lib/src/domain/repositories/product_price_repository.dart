@@ -14,7 +14,7 @@ class ProductPricesRepository {
   Future<ProductPriceInDb> createProductPrice(CreateProductPrice createProductPrice) async {
     final result = await productPricesDataSource.createProductPrice(createProductPrice.toJson());
     final newPrice = ProductPriceInDb.fromJson(result);
-    _productPrices = [newPrice, ..._productPrices];
+    _productPrices = [..._productPrices, newPrice];
     return newPrice;
   }
 

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 class AppTheme {
   ThemeData get lightTheme => ThemeData.light(useMaterial3: false).copyWith(
+    listTileTheme: const ListTileThemeData(
+      tileColor: Colors.white,
+    ),
     pageTransitionsTheme: const PageTransitionsTheme(
       builders: {
         TargetPlatform.android: FadeForwardsPageTransitionsBuilder(),
