@@ -80,7 +80,7 @@ class DialogManager {
         return AlertDialog(
           title: Text(message),
           content: SizedBox(
-            width: 200,
+            width: 100,
             child: SlideToSubmit.custom(
               hint: Align(
                 alignment: Alignment.centerRight,
@@ -116,6 +116,86 @@ class DialogManager {
                   children: [
                     Text(
                       'Eliminar',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Icon(
+                      Icons.chevron_right_rounded,
+                      color: Colors.white,
+                    ),
+                  ],
+                ),
+              ),
+              backgroundDecoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(24),
+              ),
+              sliderWidth: 120,
+              height: 60,
+              onSubmit: (controller) {
+                context.pop(true);
+              },
+              threshold: 0.95,
+            ),
+          ),
+          actions: [
+            OutlinedButton(
+              onPressed: () => context.pop(false),
+              child: const Text('Cancelar'),
+            ),
+          ],
+        );
+      },
+    );
+
+    return result ?? false;
+  }
+
+  static Future<bool> slideToConfirmActionDialog(BuildContext context, String message) async {
+    final result = await showDialog<bool?>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(message),
+          content: SizedBox(
+            width: 100,
+            child: SlideToSubmit.custom(
+              hint: Align(
+                alignment: Alignment.centerRight,
+                child: Shimmer.fromColors(
+                  baseColor: Colors.grey,
+                  highlightColor: Colors.grey.shade200,
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        "Desliza para confirmar",
+                        style: TextStyle(
+                          color: Colors.grey,
+                        ),
+                      ),
+                      Icon(
+                        Icons.delete,
+                        color: Colors.grey,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              slider: Container(
+                height: 40,
+                width: 40,
+                decoration: BoxDecoration(
+                  color: Colors.green.shade300,
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Confirmar',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,

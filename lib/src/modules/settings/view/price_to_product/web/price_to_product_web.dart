@@ -53,6 +53,19 @@ class _WebBody extends StatelessWidget {
           children: [
             Row(
               children: [
+                Icon(
+                  Icons.warning_amber_rounded,
+                  color: Colors.amber.shade600,
+                ),
+                Text(
+                  "Los Precios no pueden ser modificados",
+                  style: TextStyle(color: Colors.amber.shade600, letterSpacing: 1.5),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
                 const Spacer(),
                 SizedBox(
                   height: 40,

@@ -33,7 +33,6 @@ class _Body extends StatelessWidget {
       child: ListView(
         children: [
           ListTile(
-            tileColor: Colors.white,
             leading: const Icon(Icons.price_change_outlined),
             title: const Text("Precios para Productos"),
             trailing: const Icon(Icons.chevron_right),
@@ -41,6 +40,16 @@ class _Body extends StatelessWidget {
               context.pushNamed("product-price");
             },
           ),
+          const Divider(height: 0.0),
+          ListTile(
+            leading: const Icon(Icons.other_houses),
+            title: const Text("Ramas/Sucursales"),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              context.pushNamed("branches");
+            },
+          ),
+          const Divider(height: 0.0),
         ],
       ),
     );

@@ -71,7 +71,7 @@ class _CreateProductPriceDialogState extends State<CreateProductPriceDialog> {
 
                     final newProductPrice = CreateProductPrice.fromJson(creationMap);
 
-                    final isConfirmed = await DialogManager.confirmActionDialog(
+                    final isConfirmed = await DialogManager.slideToConfirmActionDialog(
                       context,
                       "¿Desea agregar el precio de producto ${newProductPrice.name}?",
                     );
