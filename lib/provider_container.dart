@@ -16,6 +16,7 @@ class ProviderContainer extends StatelessWidget {
     final branchDataSource = BranchesDataSource();
     final productCateDataSource = ProductCategoriesDataSource();
     final unitDataSource = UnitsDataSource();
+    final productDataSource = ProductsDataSource();
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider(
@@ -34,6 +35,10 @@ class ProviderContainer extends StatelessWidget {
           create: (context) => ProductPricesRepository(
             productPriceDataSource,
           ),
+        ),
+
+        RepositoryProvider(
+          create: (context) => ProductsRepository(productDataSource),
         ),
 
         RepositoryProvider(
