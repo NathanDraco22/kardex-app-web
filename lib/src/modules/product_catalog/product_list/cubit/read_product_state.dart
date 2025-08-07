@@ -11,8 +11,8 @@ class ReadProductSuccess extends ReadProductState {
   ReadProductSuccess(this.products);
 }
 
-final class ProductReadSearching extends ReadProductSuccess {
-  ProductReadSearching(super.products);
+final class ReadProductSearching extends ReadProductSuccess {
+  ReadProductSearching(super.products);
 }
 
 class HighlightedProduct extends ReadProductSuccess {

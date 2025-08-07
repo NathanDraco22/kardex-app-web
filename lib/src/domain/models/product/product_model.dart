@@ -1,6 +1,7 @@
 class BaseProduct {
   final String name;
   final String? description;
+  final String brandName;
   final String unitName;
   final String categoryName;
   final List<String> tags;
@@ -9,6 +10,7 @@ class BaseProduct {
   BaseProduct({
     required this.name,
     this.description,
+    required this.brandName,
     required this.unitName,
     required this.categoryName,
     required this.tags,
@@ -19,6 +21,7 @@ class BaseProduct {
     return BaseProduct(
       name: json['name'] as String,
       description: json['description'] as String?,
+      brandName: json['brandName'] as String,
       unitName: json['unitName'] as String,
       categoryName: json['categoryName'] as String,
       tags: List<String>.from(json['tags'] as List),
@@ -30,6 +33,7 @@ class BaseProduct {
     return {
       'name': name,
       'description': description,
+      'brandName': brandName,
       'unitName': unitName,
       'categoryName': categoryName,
       'tags': tags,
@@ -42,6 +46,7 @@ class CreateProduct extends BaseProduct {
   CreateProduct({
     required super.name,
     super.description,
+    required super.brandName,
     required super.unitName,
     required super.categoryName,
     required super.tags,
@@ -52,6 +57,7 @@ class CreateProduct extends BaseProduct {
     return CreateProduct(
       name: json['name'] as String,
       description: json['description'] as String?,
+      brandName: json['brandName'] as String,
       unitName: json['unitName'] as String,
       categoryName: json['categoryName'] as String,
       tags: List<String>.from(json['tags'] as List),
@@ -63,6 +69,7 @@ class CreateProduct extends BaseProduct {
 class UpdateProduct {
   final String? name;
   final String? description;
+  final String? brandName;
   final String? unitName;
   final String? categoryName;
   final List<String>? tags;
@@ -71,6 +78,7 @@ class UpdateProduct {
   UpdateProduct({
     this.name,
     this.description,
+    this.brandName,
     this.unitName,
     this.categoryName,
     this.tags,
@@ -81,6 +89,7 @@ class UpdateProduct {
     return UpdateProduct(
       name: json['name'] as String?,
       description: json['description'] as String?,
+      brandName: json['brandName'] as String?,
       unitName: json['unitName'] as String?,
       categoryName: json['categoryName'] as String?,
       tags: json['tags'] != null ? List<String>.from(json['tags'] as List) : null,
@@ -92,6 +101,7 @@ class UpdateProduct {
     final Map<String, dynamic> data = {
       'name': name,
       'description': description,
+      'brandName': brandName,
       'unitName': unitName,
       'categoryName': categoryName,
       'tags': tags,
@@ -112,6 +122,7 @@ class ProductInDb extends BaseProduct {
     required this.id,
     required super.name,
     super.description,
+    required super.brandName,
     required super.unitName,
     required super.categoryName,
     required super.tags,
@@ -126,6 +137,7 @@ class ProductInDb extends BaseProduct {
       id: json['id'] as String,
       name: json['name'] as String,
       description: json['description'] as String?,
+      brandName: json['brandName'] as String,
       unitName: json['unitName'] as String,
       categoryName: json['categoryName'] as String,
       tags: List<String>.from(json['tags'] as List),

@@ -27,7 +27,7 @@ class ReadProductCubit extends Cubit<ReadProductState> {
       return;
     }
 
-    emit(ProductReadSearching(currentState.products));
+    emit(ReadProductSearching(currentState.products));
     try {
       final products = await productsRepository.searchProductByKeyword(keyword);
       emit(ReadProductSuccess(products));

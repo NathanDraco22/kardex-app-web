@@ -14,8 +14,25 @@ class _WebScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: _WebBody(),
+    return Scaffold(
+      appBar: AppBar(title: const Text("Lista de Productos")),
+      body: BlocBuilder<ReadProductCubit, ReadProductState>(
+        builder: (context, state) {
+          if (state is ReadProductLoading || state is ReadProductInitial) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          if (state is ProductReadError) {
+            return Center(
+              child: Text(state.message),
+            );
+          }
+
+          return const _WebBody();
+        },
+      ),
     );
   }
 }
@@ -25,8 +42,38 @@ class _WebBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text("ProductListScreenWeb"),
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                const Spacer(),
+                SizedBox(
+                  height: 40,
+                  child: ElevatedButton.icon(
+                    onPressed: () async {
+                      // final res = await showCreateProductDialog(context);
+                      // if (res == null) return;
+                      // if (!context.mounted) return;
+                      // await context.read<ReadProductCubit>().putProductFirst(res);
+                    },
+                    icon: const Icon(Icons.add),
+                    label: const Text("Agregar Nuevo Producto"),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+
+            const Expanded(
+              child: ProductsTable(),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
