@@ -116,6 +116,7 @@ class _CreateSupplierDialogState extends State<CreateSupplierDialog> {
                     TitleTextField(
                       key: const ValueKey("name_field"),
                       title: "Nombre*",
+                      textCapitalization: TextCapitalization.words,
                       onEditingComplete: () => FocusScope.of(context).nextFocus(),
                       initialValue: widget.supplier?.name,
                       validator: (value) {

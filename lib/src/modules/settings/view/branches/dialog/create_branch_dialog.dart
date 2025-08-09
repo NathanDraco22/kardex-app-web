@@ -66,7 +66,7 @@ class _CreateProductPriceDialogState extends State<CreateProductPriceDialog> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             AlertDialog(
-              title: Text("$prefixTitle Precio de Producto"),
+              title: Text("$prefixTitle Rama/Sucursal"),
               actions: [
                 OutlinedButton(
                   onPressed: () {
@@ -101,13 +101,14 @@ class _CreateProductPriceDialogState extends State<CreateProductPriceDialog> {
                       );
                     }
                   },
-                  child: const Text("Agregar Precio de Producto"),
+                  child: const Text("Agregar Rama/Sucursal"),
                 ),
               ],
               content: Column(
                 children: [
                   TitleTextField(
                     title: "Nombre de Rama/Sucursal*",
+                    textCapitalization: TextCapitalization.words,
                     initialValue: currenBranch?.name,
                     onEditingComplete: () => FocusScope.of(context).nextFocus(),
                     validator: (value) {
@@ -120,6 +121,7 @@ class _CreateProductPriceDialogState extends State<CreateProductPriceDialog> {
                   TitleTextField(
                     title: "Descripción de Rama/Sucursal",
                     initialValue: currenBranch?.description,
+                    textCapitalization: TextCapitalization.sentences,
                     validator: (value) {
                       if (value == null) return null;
                       creationMap['description'] = value.trim();

@@ -114,6 +114,7 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
                     TitleTextField(
                       key: const ValueKey("name_field"),
                       autofocus: true,
+                      textCapitalization: TextCapitalization.words,
                       title: "Nombre Completo*",
                       onEditingComplete: () => FocusScope.of(context).nextFocus(),
                       initialValue: widget.client?.name,

@@ -12,8 +12,10 @@ class TitleTextField extends StatelessWidget {
     this.autofocus = false,
     this.maxLines = 1,
     this.onEditingComplete,
+    this.textCapitalization = TextCapitalization.none,
   });
 
+  final TextCapitalization textCapitalization;
   final TextEditingController? controller;
   final int maxLines;
   final FocusNode? focusNode;
@@ -38,6 +40,7 @@ class TitleTextField extends StatelessWidget {
         ),
         TextFormField(
           maxLines: maxLines,
+          textCapitalization: textCapitalization,
           controller: controller,
           focusNode: focusNode,
           autofocus: autofocus,

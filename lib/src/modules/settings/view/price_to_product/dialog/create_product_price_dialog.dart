@@ -86,6 +86,7 @@ class _CreateProductPriceDialogState extends State<CreateProductPriceDialog> {
                 children: [
                   TitleTextField(
                     title: "Nombre del Precio de Producto*",
+                    textCapitalization: TextCapitalization.words,
                     validator: (value) {
                       if (value == null || value.isEmpty) return 'Campo requerido';
                       creationMap['name'] = value.trim();

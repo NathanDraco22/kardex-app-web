@@ -88,6 +88,7 @@ class _FormContentState extends State<_FormContent> {
                 TitleTextField(
                   key: const ValueKey("product_name"),
                   title: "Nombre del Producto*",
+                  textCapitalization: TextCapitalization.words,
                   autofocus: true,
                   onEditingComplete: () => FocusScope.of(context).nextFocus(),
                   initialValue: widget.currentProduct?.name,
@@ -104,6 +105,7 @@ class _FormContentState extends State<_FormContent> {
                     Flexible(
                       child: TitleTextField(
                         key: const ValueKey("product_brand"),
+                        textCapitalization: TextCapitalization.words,
                         initialValue: widget.currentProduct?.brandName,
                         onEditingComplete: () => FocusScope.of(context).nextFocus(),
                         title: "Marca*",

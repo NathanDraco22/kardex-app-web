@@ -111,6 +111,7 @@ class _CreateProductCategoryDialogState extends State<CreateProductCategoryDialo
                   TitleTextField(
                     initialValue: currentCategory?.name,
                     title: "Nombre de la Categoria*",
+                    textCapitalization: TextCapitalization.words,
                     validator: (value) {
                       if (value == null || value.isEmpty) return "Campo requerido";
                       creationMap['name'] = value.trim();

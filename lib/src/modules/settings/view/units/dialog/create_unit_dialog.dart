@@ -79,6 +79,7 @@ class _CreateUnitDialogState extends State<CreateUnitDialog> {
                 children: [
                   TitleTextField(
                     title: "Nombre de la Unidad*",
+                    textCapitalization: TextCapitalization.words,
                     validator: (value) {
                       if (value == null || value.isEmpty) return "El nombre de la unidad es requerido";
                       creationMap['name'] = value.trim();
