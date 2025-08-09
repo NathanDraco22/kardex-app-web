@@ -121,7 +121,7 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
                         if (value == null || value.isEmpty) {
                           return "El campo es requerido";
                         }
-                        creationMap["name"] = value;
+                        creationMap["name"] = value.trim();
                         return null;
                       },
                     ),
@@ -135,7 +135,10 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
                             title: "Cedula",
                             onEditingComplete: () => FocusScope.of(context).nextFocus(),
                             validator: (value) {
-                              creationMap["cardId"] = value;
+                              if (value == null) {
+                                return null;
+                              }
+                              creationMap["cardId"] = value.trim();
                               return null;
                             },
                           ),
@@ -158,7 +161,10 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
                               writeCubit.createNewClient(createClient);
                             },
                             validator: (value) {
-                              creationMap["phone"] = value;
+                              if (value == null) {
+                                return null;
+                              }
+                              creationMap["phone"] = value.trim();
                               return null;
                             },
                           ),
@@ -170,6 +176,7 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
                       builder: (context, setState) {
                         return SwitchListTile(
                           focusNode: FocusNode(skipTraversal: true),
+                          tileColor: Colors.grey.shade100,
                           value: isActive,
                           onChanged: (value) {
                             isActive = value;

@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/product_list/cubit/read_product_cubit.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/product_list/cubit/write_product_cubit.dart';
+import 'package:kardex_app_front/src/modules/product_catalog/product_list/dialogs/create_product_dialog.dart';
+import 'package:kardex_app_front/src/modules/product_catalog/product_list/view/widgets/products_table.dart';
 import 'package:kardex_app_front/src/tools/constant.dart';
 
 part 'web/product_list_screen_web.dart';
@@ -14,9 +16,17 @@ class ProductListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final productRepo = context.read<ProductsRepository>();
+    final productCateRepo = context.read<ProductCategoriesRepository>();
+    final unitRepo = context.read<UnitsRepository>();
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => ReadProductCubit(productRepo)..loadAllProducts()),
+        BlocProvider(
+          create: (context) => ReadProductCubit(
+            productsRepository: productRepo,
+            categoriesRepository: productCateRepo,
+            unitsRepository: unitRepo,
+          )..loadAllProducts(),
+        ),
         BlocProvider(create: (context) => WriteProductCubit(productRepo)),
       ],
       child: const _RootScaffold(),

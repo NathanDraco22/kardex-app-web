@@ -4,14 +4,18 @@ class TitleTextField extends StatelessWidget {
   const TitleTextField({
     super.key,
     required this.title,
+    this.controller,
     this.titleTextAlign,
     this.validator,
     this.initialValue,
     this.focusNode,
     this.autofocus = false,
+    this.maxLines = 1,
     this.onEditingComplete,
   });
 
+  final TextEditingController? controller;
+  final int maxLines;
   final FocusNode? focusNode;
   final bool autofocus;
   final String? initialValue;
@@ -24,7 +28,7 @@ class TitleTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      spacing: 8,
+      spacing: 6,
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -33,6 +37,8 @@ class TitleTextField extends StatelessWidget {
           textAlign: titleTextAlign,
         ),
         TextFormField(
+          maxLines: maxLines,
+          controller: controller,
           focusNode: focusNode,
           autofocus: autofocus,
           initialValue: initialValue,

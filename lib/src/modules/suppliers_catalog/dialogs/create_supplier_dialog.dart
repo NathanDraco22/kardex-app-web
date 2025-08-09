@@ -122,7 +122,7 @@ class _CreateSupplierDialogState extends State<CreateSupplierDialog> {
                         if (value == null || value.isEmpty) {
                           return "El campo es requerido";
                         }
-                        creationMap["name"] = value;
+                        creationMap["name"] = value.trim();
                         return null;
                       },
                     ),
@@ -134,7 +134,10 @@ class _CreateSupplierDialogState extends State<CreateSupplierDialog> {
                       onEditingComplete: () => FocusScope.of(context).nextFocus(),
                       initialValue: widget.supplier?.cardId,
                       validator: (value) {
-                        creationMap["cardId"] = value;
+                        if (value == null || value.isEmpty) {
+                          return null;
+                        }
+                        creationMap["cardId"] = value.trim();
                         return null;
                       },
                     ),
@@ -150,7 +153,8 @@ class _CreateSupplierDialogState extends State<CreateSupplierDialog> {
                             title: "Email",
                             onEditingComplete: () => FocusScope.of(context).nextFocus(),
                             validator: (value) {
-                              creationMap["email"] = value;
+                              if (value == null || value.isEmpty) return null;
+                              creationMap["email"] = value.trim();
                               return null;
                             },
                           ),
@@ -173,7 +177,8 @@ class _CreateSupplierDialogState extends State<CreateSupplierDialog> {
                               writeCubit.createNewSupplier(createSupplier);
                             },
                             validator: (value) {
-                              creationMap["phone"] = value;
+                              if (value == null || value.isEmpty) return null;
+                              creationMap["phone"] = value.trim();
                               return null;
                             },
                           ),
@@ -185,6 +190,7 @@ class _CreateSupplierDialogState extends State<CreateSupplierDialog> {
                       builder: (context, setState) {
                         return SwitchListTile(
                           focusNode: FocusNode(skipTraversal: true),
+                          tileColor: Colors.grey.shade100,
                           value: isActive,
                           onChanged: (value) {
                             isActive = value;

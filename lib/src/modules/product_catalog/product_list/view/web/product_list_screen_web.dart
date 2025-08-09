@@ -54,10 +54,10 @@ class _WebBody extends StatelessWidget {
                   height: 40,
                   child: ElevatedButton.icon(
                     onPressed: () async {
-                      // final res = await showCreateProductDialog(context);
-                      // if (res == null) return;
-                      // if (!context.mounted) return;
-                      // await context.read<ReadProductCubit>().putProductFirst(res);
+                      final res = await showCreateProductDialog(context);
+                      if (res == null) return;
+                      if (!context.mounted) return;
+                      await context.read<ReadProductCubit>().putProductFirst(res);
                     },
                     icon: const Icon(Icons.add),
                     label: const Text("Agregar Nuevo Producto"),

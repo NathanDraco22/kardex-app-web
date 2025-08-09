@@ -88,7 +88,7 @@ class _CreateProductPriceDialogState extends State<CreateProductPriceDialog> {
                     title: "Nombre del Precio de Producto*",
                     validator: (value) {
                       if (value == null || value.isEmpty) return 'Campo requerido';
-                      creationMap['name'] = value;
+                      creationMap['name'] = value.trim();
                       return null;
                     },
                   ),

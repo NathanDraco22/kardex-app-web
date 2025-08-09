@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../dialogs/create_product_dialog.dart';
-import '../widgets/products_table.dart';
+import '../product_list/view/widgets/products_table.dart';
 
 class ProductCatalogScreen extends StatelessWidget {
   const ProductCatalogScreen({super.key});

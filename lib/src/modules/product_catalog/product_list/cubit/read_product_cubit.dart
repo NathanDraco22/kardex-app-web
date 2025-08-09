@@ -5,13 +5,23 @@ import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 part 'read_product_state.dart';
 
 class ReadProductCubit extends Cubit<ReadProductState> {
-  ReadProductCubit(this.productsRepository) : super(ReadProductInitial());
+  ReadProductCubit({
+    required this.productsRepository,
+    required this.unitsRepository,
+    required this.categoriesRepository,
+  }) : super(ReadProductInitial());
 
   final ProductsRepository productsRepository;
+  final UnitsRepository unitsRepository;
+  final ProductCategoriesRepository categoriesRepository;
 
   Future<void> loadAllProducts() async {
     emit(ReadProductLoading());
     try {
+      await Future.wait([
+        unitsRepository.getAllUnits(),
+        categoriesRepository.getAllProductCategories(),
+      ]);
       final products = await productsRepository.getAllProducts();
       emit(ReadProductSuccess(products));
     } catch (error) {

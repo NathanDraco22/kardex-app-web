@@ -112,7 +112,7 @@ class _CreateProductPriceDialogState extends State<CreateProductPriceDialog> {
                     onEditingComplete: () => FocusScope.of(context).nextFocus(),
                     validator: (value) {
                       if (value == null || value.isEmpty) return 'Campo requerido';
-                      creationMap['name'] = value;
+                      creationMap['name'] = value.trim();
                       return null;
                     },
                   ),
@@ -121,7 +121,8 @@ class _CreateProductPriceDialogState extends State<CreateProductPriceDialog> {
                     title: "Descripción de Rama/Sucursal",
                     initialValue: currenBranch?.description,
                     validator: (value) {
-                      creationMap['description'] = value;
+                      if (value == null) return null;
+                      creationMap['description'] = value.trim();
                       return null;
                     },
                   ),

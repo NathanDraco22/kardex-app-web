@@ -13,14 +13,16 @@ Future<ProductCategoryInDb?> showCreateProductCategoryDialog(
 }) async {
   final cubit = context.read<WriteProductCategoryCubit>();
 
+  final widget = BlocProvider.value(
+    value: cubit,
+    child: CreateProductCategoryDialog(
+      category: category,
+    ),
+  );
+
   final result = await showDialog<ProductCategoryInDb?>(
     context: context,
-    builder: (_) => BlocProvider.value(
-      value: cubit,
-      child: CreateProductCategoryDialog(
-        category: category,
-      ),
-    ),
+    builder: (_) => widget,
   );
   return result;
 }
@@ -111,7 +113,7 @@ class _CreateProductCategoryDialogState extends State<CreateProductCategoryDialo
                     title: "Nombre de la Categoria*",
                     validator: (value) {
                       if (value == null || value.isEmpty) return "Campo requerido";
-                      creationMap['name'] = value;
+                      creationMap['name'] = value.trim();
                       return null;
                     },
                   ),

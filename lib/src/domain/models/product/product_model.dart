@@ -1,15 +1,17 @@
 class BaseProduct {
   final String name;
   final String? description;
+  final String? code;
   final String brandName;
   final String unitName;
-  final String categoryName;
+  final String? categoryName;
   final List<String> tags;
   final bool isActive;
 
   BaseProduct({
     required this.name,
     this.description,
+    this.code,
     required this.brandName,
     required this.unitName,
     required this.categoryName,
@@ -21,9 +23,10 @@ class BaseProduct {
     return BaseProduct(
       name: json['name'] as String,
       description: json['description'] as String?,
+      code: json['code'] as String?,
       brandName: json['brandName'] as String,
       unitName: json['unitName'] as String,
-      categoryName: json['categoryName'] as String,
+      categoryName: json['categoryName'] as String?,
       tags: List<String>.from(json['tags'] as List),
       isActive: json['isActive'] as bool? ?? true,
     );
@@ -33,6 +36,7 @@ class BaseProduct {
     return {
       'name': name,
       'description': description,
+      'code': code,
       'brandName': brandName,
       'unitName': unitName,
       'categoryName': categoryName,
@@ -46,6 +50,7 @@ class CreateProduct extends BaseProduct {
   CreateProduct({
     required super.name,
     super.description,
+    super.code,
     required super.brandName,
     required super.unitName,
     required super.categoryName,
@@ -53,13 +58,14 @@ class CreateProduct extends BaseProduct {
     super.isActive,
   });
 
-  factory CreateProduct.fromJson(Map<String, dynamic> json) {
+  factory CreateProduct.fromJson(Map json) {
     return CreateProduct(
       name: json['name'] as String,
       description: json['description'] as String?,
+      code: json['code'] as String?,
       brandName: json['brandName'] as String,
       unitName: json['unitName'] as String,
-      categoryName: json['categoryName'] as String,
+      categoryName: json['categoryName'] as String?,
       tags: List<String>.from(json['tags'] as List),
       isActive: json['isActive'] as bool? ?? true,
     );
@@ -69,6 +75,7 @@ class CreateProduct extends BaseProduct {
 class UpdateProduct {
   final String? name;
   final String? description;
+  final String? code;
   final String? brandName;
   final String? unitName;
   final String? categoryName;
@@ -78,6 +85,7 @@ class UpdateProduct {
   UpdateProduct({
     this.name,
     this.description,
+    this.code,
     this.brandName,
     this.unitName,
     this.categoryName,
@@ -85,10 +93,11 @@ class UpdateProduct {
     this.isActive,
   });
 
-  factory UpdateProduct.fromJson(Map<String, dynamic> json) {
+  factory UpdateProduct.fromJson(Map json) {
     return UpdateProduct(
       name: json['name'] as String?,
       description: json['description'] as String?,
+      code: json['code'] as String?,
       brandName: json['brandName'] as String?,
       unitName: json['unitName'] as String?,
       categoryName: json['categoryName'] as String?,
@@ -101,6 +110,7 @@ class UpdateProduct {
     final Map<String, dynamic> data = {
       'name': name,
       'description': description,
+      'code': code,
       'brandName': brandName,
       'unitName': unitName,
       'categoryName': categoryName,
@@ -122,6 +132,7 @@ class ProductInDb extends BaseProduct {
     required this.id,
     required super.name,
     super.description,
+    super.code,
     required super.brandName,
     required super.unitName,
     required super.categoryName,
@@ -137,9 +148,10 @@ class ProductInDb extends BaseProduct {
       id: json['id'] as String,
       name: json['name'] as String,
       description: json['description'] as String?,
+      code: json['code'] as String?,
       brandName: json['brandName'] as String,
       unitName: json['unitName'] as String,
-      categoryName: json['categoryName'] as String,
+      categoryName: json['categoryName'] as String?,
       tags: List<String>.from(json['tags'] as List),
       isActive: json['isActive'] as bool? ?? true,
       isDeleted: json['isDeleted'] as bool? ?? false,

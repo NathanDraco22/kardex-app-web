@@ -33,7 +33,9 @@ class _Body extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.square_rounded),
             title: const Text("Lista de Productos"),
-            onTap: () {},
+            onTap: () {
+              context.pushNamed("product-list");
+            },
             trailing: const Icon(Icons.chevron_right),
           ),
           const Divider(

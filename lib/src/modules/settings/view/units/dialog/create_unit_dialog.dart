@@ -81,7 +81,7 @@ class _CreateUnitDialogState extends State<CreateUnitDialog> {
                     title: "Nombre de la Unidad*",
                     validator: (value) {
                       if (value == null || value.isEmpty) return "El nombre de la unidad es requerido";
-                      creationMap['name'] = value;
+                      creationMap['name'] = value.trim();
                       return null;
                     },
                   ),
