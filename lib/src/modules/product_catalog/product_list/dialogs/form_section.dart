@@ -18,10 +18,28 @@ class _FormContent extends StatefulWidget {
 class _FormContentState extends State<_FormContent> {
   late WordChipTextController controller;
 
+  String tagField = "";
+
   @override
   void initState() {
     super.initState();
     controller = WordChipTextController();
+
+    tagField = "";
+    if (widget.currentProduct != null) {
+      tagField = widget.currentProduct!.tags.join(" ");
+    }
+
+    Future(
+      () {
+        controller.text = tagField;
+      },
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
   }
 
   @override
@@ -46,13 +64,6 @@ class _FormContentState extends State<_FormContent> {
     );
 
     final wordPrefix = widget.currentProduct == null ? "Agregar" : "Actualizar";
-
-    String tagField = "";
-    if (widget.currentProduct != null) {
-      tagField = widget.currentProduct!.tags.join(" ");
-    }
-
-    controller.text = tagField;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,

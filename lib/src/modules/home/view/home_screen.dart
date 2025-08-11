@@ -73,6 +73,14 @@ class _Body extends StatelessWidget {
                 ),
 
                 HomeOptionCard(
+                  title: "Inventario",
+                  icon: Icons.inventory_2_outlined,
+                  onTap: () {
+                    context.pushNamed("inventory");
+                  },
+                ),
+
+                HomeOptionCard(
                   title: "Configuraciones",
                   icon: Icons.settings,
                   onTap: () {

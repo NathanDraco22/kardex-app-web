@@ -6,9 +6,11 @@ class SearchFieldDebounced extends StatefulWidget {
   const SearchFieldDebounced({
     super.key,
     this.onSearch,
+    this.autoFocus = false,
   });
 
   final void Function(String)? onSearch;
+  final bool autoFocus;
 
   @override
   State<SearchFieldDebounced> createState() => _SearchFieldDebouncedState();
@@ -20,6 +22,7 @@ class _SearchFieldDebouncedState extends State<SearchFieldDebounced> {
   @override
   Widget build(BuildContext context) {
     return TextField(
+      autofocus: widget.autoFocus,
       onEditingComplete: () {},
       onChanged: (value) {
         _debounceTime?.cancel();
