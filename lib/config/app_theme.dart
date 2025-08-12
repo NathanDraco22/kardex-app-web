@@ -16,8 +16,8 @@ class AppTheme {
       backgroundColor: Color.fromARGB(255, 52, 57, 92),
     ),
     scaffoldBackgroundColor: Colors.indigo.shade50,
-    dropdownMenuTheme: DropdownMenuThemeData(
-      inputDecorationTheme: const InputDecorationTheme(
+    dropdownMenuTheme: const DropdownMenuThemeData(
+      inputDecorationTheme: InputDecorationTheme(
         border: OutlineInputBorder(),
         isCollapsed: true,
         contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 6),
