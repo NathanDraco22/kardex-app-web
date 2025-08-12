@@ -114,6 +114,7 @@ class _CreateSupplierDialogState extends State<CreateSupplierDialog> {
                 child: Column(
                   children: [
                     TitleTextField(
+                      autofocus: true,
                       key: const ValueKey("name_field"),
                       title: "Nombre*",
                       textCapitalization: TextCapitalization.words,

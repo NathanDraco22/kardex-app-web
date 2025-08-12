@@ -5,10 +5,14 @@ import 'package:flutter/material.dart';
 class SearchFieldDebounced extends StatefulWidget {
   const SearchFieldDebounced({
     super.key,
+    this.controller,
     this.onSearch,
     this.autoFocus = false,
+    this.duration = const Duration(milliseconds: 500),
   });
 
+  final Duration duration;
+  final TextEditingController? controller;
   final void Function(String)? onSearch;
   final bool autoFocus;
 
@@ -22,11 +26,12 @@ class _SearchFieldDebouncedState extends State<SearchFieldDebounced> {
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: widget.controller,
       autofocus: widget.autoFocus,
       onEditingComplete: () {},
       onChanged: (value) {
         _debounceTime?.cancel();
-        _debounceTime = Timer(const Duration(milliseconds: 500), () {
+        _debounceTime = Timer(widget.duration, () {
           widget.onSearch?.call(value);
         });
       },

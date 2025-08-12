@@ -1,9 +1,18 @@
+import 'dart:async';
+import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:kardex_app_front/src/domain/models/product/product_model.dart';
+import 'package:kardex_app_front/src/domain/models/supplier/supplier_model.dart';
+import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_entry/view/mediator.dart';
 import 'package:kardex_app_front/src/tools/constant.dart';
 import 'package:kardex_app_front/src/tools/input_formatters.dart';
 import 'package:kardex_app_front/src/tools/search_product_dialog.dart';
+import 'package:kardex_app_front/widgets/custom_autocomplete_textfield.dart';
+import 'package:kardex_app_front/widgets/search_debounce.dart';
+import 'package:kardex_app_front/widgets/text_field_date_selector.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
 
 part 'sections/header_section.dart';

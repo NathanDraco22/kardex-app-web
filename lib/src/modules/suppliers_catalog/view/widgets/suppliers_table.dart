@@ -14,7 +14,7 @@ class SuppliersTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cubit = context.read<ReadSupplierCubit>();
+    final cubit = context.watch<ReadSupplierCubit>();
     final state = cubit.state as ReadSupplierSuccess;
     return Card(
       margin: EdgeInsets.zero,
