@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:kardex_app_front/widgets/tables/inventory_movement_product_table.dart';
 
-class InventoryEntryMediator extends InheritedWidget {
-  InventoryEntryMediator({super.key, required super.child});
-
-  final SharedNotifiers sharedNotifiers = SharedNotifiers();
-
-  static InventoryEntryMediator of(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<InventoryEntryMediator>()!;
-  }
-
-  @override
-  bool updateShouldNotify(InventoryEntryMediator oldWidget) {
-    return false;
-  }
+class InventoryEntryNotifier extends ChangeNotifier {
+  final ProductTableController controller = ProductTableController();
 }
 
-class SharedNotifiers {
-  final ValueNotifier<int> totalNotifier = ValueNotifier(0);
+class InventoryEntryMediator extends InheritedNotifier<InventoryEntryNotifier> {
+  const InventoryEntryMediator({super.key, required super.child, super.notifier});
+
+  static InventoryEntryMediator? of(BuildContext context) {
+    final element = context.getElementForInheritedWidgetOfExactType<InventoryEntryMediator>();
+    return element?.widget as InventoryEntryMediator?;
+  }
 }

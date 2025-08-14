@@ -28,7 +28,8 @@ class _HeaderSection extends StatelessWidget {
                       CustomAutocompleteTextfield<SupplierInDb>(
                         titleBuilder: (value) => value.name,
                         onSearch: (value) async {
-                          final res = await context.read<SuppliersRepository>().searchSupplierByKeyword(value);
+                          final repo = context.read<SuppliersRepository>();
+                          final res = await repo.searchSupplierByKeyword(value);
                           return res;
                         },
                         suggestionBuilder: (value, close) {
@@ -73,14 +74,65 @@ class _HeaderSection extends StatelessWidget {
         ),
         const SizedBox(width: 8),
 
-        const Flexible(
-          flex: 2,
+        Flexible(
           fit: FlexFit.tight,
           child: Card(
             margin: EdgeInsets.zero,
-            child: Padding(
-              padding: EdgeInsets.all(8.0),
-              child: SizedBox.expand(),
+            child: FractionallySizedBox(
+              widthFactor: 1.0,
+              heightFactor: 1.0,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    Flexible(
+                      child: Row(
+                        children: [
+                          const Flexible(
+                            child: SizedBox.expand(),
+                          ),
+                          Flexible(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                ElevatedButton.icon(
+                                  onPressed: () {},
+                                  icon: const Icon(Icons.save),
+                                  label: const Text("Guardar"),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Flexible(
+                      flex: 3,
+                      child: Row(
+                        children: [
+                          Flexible(
+                            flex: 2,
+                            child: FractionallySizedBox(
+                              heightFactor: 1.0,
+                              child: Align(
+                                alignment: Alignment.bottomCenter,
+                                child: TitleTextField(
+                                  title: "Observaciones",
+                                  maxLines: 2,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Flexible(
+                            child: SizedBox.expand(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),

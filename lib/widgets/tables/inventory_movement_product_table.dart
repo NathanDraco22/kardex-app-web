@@ -190,43 +190,46 @@ class _TableFooter extends StatelessWidget {
 
     final total = controller.total / 100;
 
-    return Row(
-      children: [
-        const Flexible(
-          fit: FlexFit.tight,
-          flex: 2,
-          child: SizedBox(),
-        ),
-        const Flexible(
-          fit: FlexFit.tight,
-          flex: 3,
-          child: SizedBox(),
-        ),
-        const Flexible(
-          fit: FlexFit.tight,
-          child: Center(
-            child: Text(
-              "Total: ",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
+    return SizedBox(
+      height: 30,
+      child: Row(
+        children: [
+          const Flexible(
+            fit: FlexFit.tight,
+            flex: 2,
+            child: SizedBox(),
+          ),
+          const Flexible(
+            fit: FlexFit.tight,
+            flex: 3,
+            child: SizedBox(),
+          ),
+          const Flexible(
+            fit: FlexFit.tight,
+            child: Center(
+              child: Text(
+                "Total: ",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
               ),
             ),
           ),
-        ),
-        Flexible(
-          fit: FlexFit.tight,
-          child: Center(
-            child: Text(
-              "$defaultCoinSymbol ${total.toStringAsFixed(2)}",
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
+          Flexible(
+            fit: FlexFit.tight,
+            child: Center(
+              child: Text(
+                "$defaultCoinSymbol ${total.toStringAsFixed(2)}",
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

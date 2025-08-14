@@ -13,12 +13,21 @@ import 'package:kardex_app_front/widgets/title_texfield.dart';
 part 'sections/header_section.dart';
 part 'sections/content_section.dart';
 
-class InventoryEntryScreen extends StatelessWidget {
+class InventoryEntryScreen extends StatefulWidget {
   const InventoryEntryScreen({super.key});
 
   @override
+  State<InventoryEntryScreen> createState() => _InventoryEntryScreenState();
+}
+
+class _InventoryEntryScreenState extends State<InventoryEntryScreen> {
+  final InventoryEntryNotifier notifier = InventoryEntryNotifier();
+  @override
   Widget build(BuildContext context) {
-    return InventoryEntryMediator(child: const _RootScaffold());
+    return InventoryEntryMediator(
+      notifier: notifier,
+      child: const _RootScaffold(),
+    );
   }
 }
 
