@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/cubits/config_app/config_app_cubit.dart';
 import 'package:kardex_app_front/src/data/data.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 
@@ -17,6 +18,7 @@ class ProviderContainer extends StatelessWidget {
     final productCateDataSource = ProductCategoriesDataSource();
     final unitDataSource = UnitsDataSource();
     final productDataSource = ProductsDataSource();
+    final entryDocsDataSource = EntryDocsDataSource();
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider(
@@ -48,6 +50,28 @@ class ProviderContainer extends StatelessWidget {
         RepositoryProvider(
           create: (context) => UnitsRepository(unitDataSource),
         ),
+
+        RepositoryProvider(
+          create: (context) => EntryDocsRepository(entryDocsDataSource),
+        ),
+      ],
+      child: GlobalCubitProvider(
+        child: child,
+      ),
+    );
+  }
+}
+
+class GlobalCubitProvider extends StatelessWidget {
+  const GlobalCubitProvider({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => ConfigAppCubit()),
       ],
       child: child,
     );

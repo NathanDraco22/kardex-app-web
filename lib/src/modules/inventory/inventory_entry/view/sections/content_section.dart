@@ -5,7 +5,10 @@ class _ContentSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mediator = InventoryEntryMediator.of(context)!;
+    final tableController = mediator.productTableController;
     return InventoryMovementProductTable(
+      controller: tableController,
       onAddRowAction: (controller) async {
         final res = await showSearchProductDialog(context);
         if (res == null) return;

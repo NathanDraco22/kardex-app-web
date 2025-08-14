@@ -5,6 +5,8 @@ class _HeaderSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mediator = InventoryEntryMediator.of(context)!;
+    final headerData = mediator.headerData;
     return Row(
       children: [
         SizedBox(
@@ -40,6 +42,7 @@ class _HeaderSection extends StatelessWidget {
                               return ListTile(
                                 title: Text(supplier.name),
                                 onTap: () {
+                                  headerData.supplier = supplier;
                                   close(supplier);
                                 },
                               );
@@ -52,7 +55,14 @@ class _HeaderSection extends StatelessWidget {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Flexible(child: TitleTextField(title: "Documento")),
+                      Flexible(
+                        child: TitleTextField(
+                          title: "Documento",
+                          onChanged: (value) {
+                            headerData.docNumber = value;
+                          },
+                        ),
+                      ),
                       const SizedBox(width: 8),
                       Flexible(
                         child: Column(
@@ -60,7 +70,9 @@ class _HeaderSection extends StatelessWidget {
                             const Text("Fecha Doc"),
                             const SizedBox(height: 6),
                             DateFieldSelector(
-                              onSelectedDate: (value) {},
+                              onSelectedDate: (value) {
+                                headerData.docDate = value;
+                              },
                             ),
                           ],
                         ),
@@ -85,29 +97,19 @@ class _HeaderSection extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
                   children: [
-                    Flexible(
+                    const Flexible(
                       child: Row(
                         children: [
                           const Flexible(
                             child: SizedBox.expand(),
                           ),
-                          Flexible(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                ElevatedButton.icon(
-                                  onPressed: () {},
-                                  icon: const Icon(Icons.save),
-                                  label: const Text("Guardar"),
-                                ),
-                              ],
-                            ),
+                          const Flexible(
+                            child: MenuActions(),
                           ),
                         ],
                       ),
                     ),
-                    const Flexible(
+                    Flexible(
                       flex: 3,
                       child: Row(
                         children: [
@@ -120,11 +122,14 @@ class _HeaderSection extends StatelessWidget {
                                 child: TitleTextField(
                                   title: "Observaciones",
                                   maxLines: 2,
+                                  onChanged: (p0) {
+                                    headerData.observations = p0;
+                                  },
                                 ),
                               ),
                             ),
                           ),
-                          Flexible(
+                          const Flexible(
                             child: SizedBox.expand(),
                           ),
                         ],
@@ -135,6 +140,50 @@ class _HeaderSection extends StatelessWidget {
               ),
             ),
           ),
+        ),
+      ],
+    );
+  }
+}
+
+class MenuActions extends StatelessWidget {
+  const MenuActions({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final configState = context.read<ConfigAppCubit>().state;
+    final mediator = InventoryEntryMediator.of(context)!;
+    final headerData = mediator.headerData;
+    final productTableController = mediator.productTableController;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        ElevatedButton.icon(
+          onPressed: () {
+            final items = productTableController.rows.map((e) {
+              return EntryItem(
+                productId: e.product.id,
+                quantity: e.quantity,
+                cost: e.unitaryCost,
+              );
+            }).toList();
+
+            final createEntryDoct = CreateEntryDoc(
+              supplierId: headerData.supplier!.id,
+              docNumber: headerData.docNumber!,
+              docDate: headerData.docDate!,
+              branchId: configState.currentBranch,
+              items: items,
+            );
+
+            context.read<WriteEntryDocCubit>().createNewEntryDoc(createEntryDoct);
+          },
+          icon: const Icon(Icons.save),
+          label: const Text("Guardar"),
         ),
       ],
     );

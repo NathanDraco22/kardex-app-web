@@ -12,6 +12,7 @@ class TitleTextField extends StatelessWidget {
     this.autofocus = false,
     this.maxLines = 1,
     this.onEditingComplete,
+    this.onChanged,
     this.textCapitalization = TextCapitalization.none,
   });
 
@@ -26,6 +27,7 @@ class TitleTextField extends StatelessWidget {
   final void Function()? onEditingComplete;
 
   final String? Function(String?)? validator;
+  final void Function(String)? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +42,7 @@ class TitleTextField extends StatelessWidget {
         ),
         TextFormField(
           maxLines: maxLines,
+          onChanged: onChanged,
           textCapitalization: textCapitalization,
           controller: controller,
           focusNode: focusNode,
