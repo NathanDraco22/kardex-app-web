@@ -5,7 +5,7 @@ class _HeaderSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mediator = InventoryEntryMediator.of(context)!;
+    final mediator = InventoryEntryMediator.read(context)!;
     final headerData = mediator.headerData;
     return Row(
       children: [
@@ -31,8 +31,12 @@ class _HeaderSection extends StatelessWidget {
                         titleBuilder: (value) => value.name,
                         onSearch: (value) async {
                           final repo = context.read<SuppliersRepository>();
-                          final res = await repo.searchSupplierByKeyword(value);
-                          return res;
+                          try {
+                            final res = await repo.searchSupplierByKeyword(value);
+                            return res;
+                          } catch (e) {
+                            return [];
+                          }
                         },
                         suggestionBuilder: (value, close) {
                           return ListView.builder(
@@ -44,6 +48,7 @@ class _HeaderSection extends StatelessWidget {
                                 onTap: () {
                                   headerData.supplier = supplier;
                                   close(supplier);
+                                  mediator.refresh();
                                 },
                               );
                             },
@@ -60,6 +65,7 @@ class _HeaderSection extends StatelessWidget {
                           title: "Documento",
                           onChanged: (value) {
                             headerData.docNumber = value;
+                            mediator.refresh();
                           },
                         ),
                       ),
@@ -72,6 +78,7 @@ class _HeaderSection extends StatelessWidget {
                             DateFieldSelector(
                               onSelectedDate: (value) {
                                 headerData.docDate = value;
+                                mediator.refresh();
                               },
                             ),
                           ],
@@ -154,34 +161,50 @@ class MenuActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final configState = context.read<ConfigAppCubit>().state;
-    final mediator = InventoryEntryMediator.of(context)!;
+    final mediator = InventoryEntryMediator.watch(context)!;
     final headerData = mediator.headerData;
     final productTableController = mediator.productTableController;
+
+    final isDisabled = !mediator.hasAllRequiredFields();
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         ElevatedButton.icon(
-          onPressed: () {
-            final items = productTableController.rows.map((e) {
-              return EntryItem(
-                productId: e.product.id,
-                quantity: e.quantity,
-                cost: e.unitaryCost,
-              );
-            }).toList();
+          onPressed: isDisabled
+              ? null
+              : () async {
+                  if (mediator.hasProductWithZeroValue()) {
+                    await DialogManager.showErrorDialog(context, "No se pueden guardar productos con valor 0");
+                    return;
+                  }
 
-            final createEntryDoct = CreateEntryDoc(
-              supplierId: headerData.supplier!.id,
-              docNumber: headerData.docNumber!,
-              docDate: headerData.docDate!,
-              branchId: configState.currentBranch,
-              items: items,
-            );
+                  final res = await DialogManager.slideToConfirmActionDialog(
+                    context,
+                    "Deseas Guardar el Documento? (No se puede deshacer)",
+                  );
 
-            context.read<WriteEntryDocCubit>().createNewEntryDoc(createEntryDoct);
-          },
+                  if (res != true) return;
+
+                  final items = productTableController.rows.map((e) {
+                    return EntryItem(
+                      productId: e.product.id,
+                      quantity: e.quantity,
+                      cost: e.unitaryCost,
+                    );
+                  }).toList();
+
+                  final createEntryDoct = CreateEntryDoc(
+                    supplierId: headerData.supplier!.id,
+                    docNumber: headerData.docNumber!,
+                    docDate: headerData.docDate!,
+                    branchId: configState.currentBranch,
+                    items: items,
+                  );
+                  if (!context.mounted) return;
+                  context.read<WriteEntryDocCubit>().createNewEntryDoc(createEntryDoct);
+                },
           icon: const Icon(Icons.save),
           label: const Text("Guardar"),
         ),

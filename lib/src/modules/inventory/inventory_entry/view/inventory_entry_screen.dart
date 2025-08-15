@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -12,8 +10,10 @@ import 'package:kardex_app_front/src/modules/inventory/inventory_entry/cubit/wri
 import 'package:kardex_app_front/src/modules/inventory/inventory_entry/view/mediator.dart';
 import 'package:kardex_app_front/src/tools/dialog_manager.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
+import 'package:kardex_app_front/src/tools/notifications.dart';
 import 'package:kardex_app_front/src/tools/search_product_dialog.dart';
 import 'package:kardex_app_front/widgets/custom_autocomplete_textfield.dart';
+import 'package:kardex_app_front/widgets/empy_scaffold.dart';
 import 'package:kardex_app_front/widgets/tables/inventory_movement_product_table.dart';
 import 'package:kardex_app_front/widgets/text_field_date_selector.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
@@ -29,16 +29,41 @@ class InventoryEntryScreen extends StatefulWidget {
 }
 
 class _InventoryEntryScreenState extends State<InventoryEntryScreen> {
-  final InventoryEntryNotifier notifier = InventoryEntryNotifier();
+  late InventoryEntryNotifier notifier;
+
+  bool rebuildScreen = false;
+
+  @override
+  void initState() {
+    notifier = InventoryEntryNotifier();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (rebuildScreen) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        rebuildScreen = false;
+        setState(() {});
+      });
+      return const EmpyScaffold();
+    }
+
     final entryDocRepo = context.read<EntryDocsRepository>();
-    log("se dibuja la raiz");
-    return BlocProvider(
-      create: (context) => WriteEntryDocCubit(entryDocRepo),
-      child: InventoryEntryMediator(
-        notifier: notifier,
-        child: const _RootScaffold(),
+    return NotificationListener<RebuildScreeenNotification>(
+      onNotification: (notification) {
+        notifier = InventoryEntryNotifier();
+        rebuildScreen = true;
+        setState(() {});
+        return true;
+      },
+
+      child: BlocProvider(
+        create: (context) => WriteEntryDocCubit(entryDocRepo),
+        child: InventoryEntryMediator(
+          notifier: notifier,
+          child: const _RootScaffold(),
+        ),
       ),
     );
   }
@@ -49,10 +74,9 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mediator = InventoryEntryMediator.read(context)!;
     return BlocListener<WriteEntryDocCubit, WriteEntryDocState>(
-      listener: (context, state) {
-        // TODO: add Dialogs to confirm and success
-
+      listener: (context, state) async {
         if (state is WriteEntryDocInProgress) {
           LoadingDialogManager.showLoadingDialog(context);
         }
@@ -64,11 +88,34 @@ class _RootScaffold extends StatelessWidget {
 
         if (state is WriteEntryDocSuccess) {
           LoadingDialogManager.closeLoadingDialog(context);
-          context.pop();
+          await DialogManager.showInfoDialog(context, "Entrada de inventario guardada");
+          if (!context.mounted) return;
+          RebuildScreeenNotification().dispatch(context);
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text("Entrada de Inventario")),
+        appBar: AppBar(
+          title: const Text("Entrada de Inventario"),
+          leading: IconButton(
+            onPressed: () async {
+              final allFields = mediator.hasAllRequiredFields();
+              if (!allFields) {
+                context.pop();
+                return;
+              }
+              final res = await DialogManager.confirmActionDialog(
+                context,
+                "Deseas salir sin guardar? (Perderas los cambios)",
+              );
+              if (res != true) return;
+              if (!context.mounted) return;
+              context.pop();
+            },
+            icon: const Icon(
+              Icons.arrow_back,
+            ),
+          ),
+        ),
         body: const _Body(),
       ),
     );

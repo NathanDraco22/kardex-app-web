@@ -5,7 +5,7 @@ class _ContentSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mediator = InventoryEntryMediator.of(context)!;
+    final mediator = InventoryEntryMediator.read(context)!;
     final tableController = mediator.productTableController;
     return InventoryMovementProductTable(
       controller: tableController,
@@ -18,6 +18,7 @@ class _ContentSection extends StatelessWidget {
           unitaryCost: 0,
         );
         controller.addRow(productRow);
+        mediator.refresh();
       },
 
       onRemoveRowAction: (controller, row) {

@@ -16,11 +16,23 @@ class HeaderData {
       'observations': observations,
     };
   }
+
+  bool hasNullFields() => [supplier, docNumber, docDate].contains(null);
 }
 
 class InventoryEntryNotifier extends ChangeNotifier {
   final ProductTableController controller = ProductTableController();
   final HeaderData headerData = HeaderData();
+
+  bool hasProductWithZeroValue() {
+    final rows = controller.rows;
+    for (var row in rows) {
+      if (row.quantity == 0 || row.unitaryCost == 0) return true;
+    }
+    return false;
+  }
+
+  void refresh() => notifyListeners();
 }
 
 class InventoryEntryMediator extends InheritedNotifier<InventoryEntryNotifier> {
@@ -29,8 +41,17 @@ class InventoryEntryMediator extends InheritedNotifier<InventoryEntryNotifier> {
   HeaderData get headerData => notifier!.headerData;
   ProductTableController get productTableController => notifier!.controller;
 
-  static InventoryEntryMediator? of(BuildContext context) {
+  bool hasAllRequiredFields() => ![headerData.hasNullFields(), productTableController.rows.isEmpty].contains(true);
+
+  bool hasProductWithZeroValue() => notifier!.hasProductWithZeroValue();
+
+  void refresh() => notifier!.refresh();
+
+  static InventoryEntryMediator? read(BuildContext context) {
     final element = context.getElementForInheritedWidgetOfExactType<InventoryEntryMediator>();
     return element?.widget as InventoryEntryMediator?;
   }
+
+  static InventoryEntryMediator? watch(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<InventoryEntryMediator>()!;
 }

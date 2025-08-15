@@ -27,7 +27,14 @@ class ProductTableController extends ChangeNotifier {
     (previousValue, element) => previousValue + element.subTotal,
   );
 
+  bool get hasRows => rows.isNotEmpty;
+
   void refresh() => notifyListeners();
+
+  void clear() {
+    rows.clear();
+    notifyListeners();
+  }
 
   void addRow(ProductRow newRow) {
     final isAlreadyExists = rows.any(
@@ -348,16 +355,22 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
             fit: FlexFit.tight,
             child: Center(
               child: TextField(
-                key: ValueKey("quantity_${product.id}"),
                 focusNode: focusNode,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 inputFormatters: [IntegerTextInputFormatter()],
                 textAlign: TextAlign.center,
                 onEditingComplete: () => FocusScope.of(context).nextFocus(),
                 onChanged: (value) {
+                  if (value.isEmpty) {
+                    widget.rowModel.quantity = 0;
+                    EntryRowSubtotalChangedNotification(widget.rowModel).dispatch(context);
+                    setState(() {});
+                    return;
+                  }
                   final numValue = int.tryParse(value);
                   if (numValue == null) return;
                   widget.rowModel.quantity = numValue;
+                  EntryRowSubtotalChangedNotification(widget.rowModel).dispatch(context);
                   setState(() {});
                 },
               ),
@@ -367,12 +380,17 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
             fit: FlexFit.tight,
             child: Center(
               child: TextField(
-                key: ValueKey("unitaryCost_${product.id}"),
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 inputFormatters: [DecimalTextInputFormatter()],
                 textAlign: TextAlign.center,
                 onEditingComplete: () => FocusScope.of(context).nextFocus(),
                 onChanged: (value) {
+                  if (value.isEmpty) {
+                    widget.rowModel.unitaryCost = 0;
+                    EntryRowSubtotalChangedNotification(widget.rowModel).dispatch(context);
+                    setState(() {});
+                    return;
+                  }
                   final numValue = double.tryParse(value);
                   if (numValue == null) return;
                   final minimalUnit = (numValue * 100).round();
