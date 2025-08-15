@@ -17,7 +17,6 @@ final class EntryDocReadSearching extends ReadEntryDocSuccess {
 
 class HighlightedEntryDoc extends ReadEntryDocSuccess {
   List<EntryDocInDb> newEntryDocs;
-  // No hay 'updated' porque no se pueden editar
   HighlightedEntryDoc(
     super.entryDocs, {
     this.newEntryDocs = const [],

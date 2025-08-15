@@ -1,4 +1,3 @@
-// Modelo para los items anidados dentro del documento
 class EntryItem {
   final String productId;
   final int cost;
@@ -27,7 +26,6 @@ class EntryItem {
   }
 }
 
-// Clase base para el documento de entrada
 class BaseEntryDoc {
   final String supplierId;
   final String docNumber;
@@ -72,7 +70,6 @@ class BaseEntryDoc {
   }
 }
 
-// Clase para crear un nuevo documento
 class CreateEntryDoc extends BaseEntryDoc {
   CreateEntryDoc({
     required super.supplierId,
@@ -95,7 +92,6 @@ class CreateEntryDoc extends BaseEntryDoc {
   }
 }
 
-// Clase que representa el documento en la base de datos
 class EntryDocInDb extends BaseEntryDoc {
   final String id;
   final DateTime createdAt;
