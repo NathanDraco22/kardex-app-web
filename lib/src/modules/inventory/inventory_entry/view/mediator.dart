@@ -18,6 +18,13 @@ class HeaderData {
   }
 
   bool hasNullFields() => [supplier, docNumber, docDate].contains(null);
+
+  void clear() {
+    supplier = null;
+    docNumber = null;
+    docDate = null;
+    observations = null;
+  }
 }
 
 class InventoryEntryNotifier extends ChangeNotifier {

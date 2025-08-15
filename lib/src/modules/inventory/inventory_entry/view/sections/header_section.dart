@@ -107,10 +107,10 @@ class _HeaderSection extends StatelessWidget {
                     const Flexible(
                       child: Row(
                         children: [
-                          const Flexible(
+                          Flexible(
                             child: SizedBox.expand(),
                           ),
-                          const Flexible(
+                          Flexible(
                             child: MenuActions(),
                           ),
                         ],

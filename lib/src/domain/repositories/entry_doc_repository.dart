@@ -1,5 +1,5 @@
 import 'package:kardex_app_front/src/data/entry_doc_data_source.dart';
-import 'package:kardex_app_front/src/domain/models/entry_doct/entry_doc_model.dart';
+import 'package:kardex_app_front/src/domain/models/entry_doc/entry_doc_model.dart';
 import 'package:kardex_app_front/src/domain/responses/list_responses.dart';
 
 class EntryDocsRepository {

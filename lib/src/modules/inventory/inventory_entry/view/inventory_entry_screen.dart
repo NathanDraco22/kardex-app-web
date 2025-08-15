@@ -2,21 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/cubits/config_app/config_app_cubit.dart';
-import 'package:kardex_app_front/src/domain/models/entry_doct/entry_doc_model.dart';
-
+import 'package:kardex_app_front/src/domain/models/entry_doc/entry_doc_model.dart';
 import 'package:kardex_app_front/src/domain/models/supplier/supplier_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_entry/cubit/write_entry_doc_cubit.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_entry/view/mediator.dart';
-import 'package:kardex_app_front/src/tools/dialog_manager.dart';
-import 'package:kardex_app_front/src/tools/loading_dialog.dart';
-import 'package:kardex_app_front/src/tools/notifications.dart';
-import 'package:kardex_app_front/src/tools/search_product_dialog.dart';
-import 'package:kardex_app_front/widgets/custom_autocomplete_textfield.dart';
-import 'package:kardex_app_front/widgets/empy_scaffold.dart';
+import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/tables/inventory_movement_product_table.dart';
-import 'package:kardex_app_front/widgets/text_field_date_selector.dart';
-import 'package:kardex_app_front/widgets/title_texfield.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 
 part 'sections/header_section.dart';
 part 'sections/content_section.dart';

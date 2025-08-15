@@ -16,6 +16,7 @@ class _ContentSection extends StatelessWidget {
           product: res,
           quantity: 0,
           unitaryCost: 0,
+          editableCost: true,
         );
         controller.addRow(productRow);
         mediator.refresh();
@@ -31,6 +32,7 @@ class _ContentSection extends StatelessWidget {
           product: res,
           quantity: 0,
           unitaryCost: 0,
+          editableCost: true,
         );
         controller.updateRow(row, newProductRow);
       },

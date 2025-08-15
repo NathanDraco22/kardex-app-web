@@ -10,11 +10,14 @@ class ProductRow {
     required this.product,
     this.quantity = 0,
     this.unitaryCost = 0,
+    this.editableCost = false,
   });
 
   ProductInDb product;
   int quantity = 0;
   int unitaryCost = 0;
+
+  bool editableCost;
 
   int get subTotal => (quantity * unitaryCost);
 }
@@ -379,24 +382,32 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
           Flexible(
             fit: FlexFit.tight,
             child: Center(
-              child: TextField(
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                inputFormatters: [DecimalTextInputFormatter()],
-                textAlign: TextAlign.center,
-                onEditingComplete: () => FocusScope.of(context).nextFocus(),
-                onChanged: (value) {
-                  if (value.isEmpty) {
-                    widget.rowModel.unitaryCost = 0;
-                    EntryRowSubtotalChangedNotification(widget.rowModel).dispatch(context);
-                    setState(() {});
-                    return;
+              child: Builder(
+                builder: (context) {
+                  if (!widget.rowModel.editableCost) {
+                    return const Text("--");
                   }
-                  final numValue = double.tryParse(value);
-                  if (numValue == null) return;
-                  final minimalUnit = (numValue * 100).round();
-                  widget.rowModel.unitaryCost = minimalUnit;
-                  EntryRowSubtotalChangedNotification(widget.rowModel).dispatch(context);
-                  setState(() {});
+
+                  return TextField(
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    inputFormatters: [DecimalTextInputFormatter()],
+                    textAlign: TextAlign.center,
+                    onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                    onChanged: (value) {
+                      if (value.isEmpty) {
+                        widget.rowModel.unitaryCost = 0;
+                        EntryRowSubtotalChangedNotification(widget.rowModel).dispatch(context);
+                        setState(() {});
+                        return;
+                      }
+                      final numValue = double.tryParse(value);
+                      if (numValue == null) return;
+                      final minimalUnit = (numValue * 100).round();
+                      widget.rowModel.unitaryCost = minimalUnit;
+                      EntryRowSubtotalChangedNotification(widget.rowModel).dispatch(context);
+                      setState(() {});
+                    },
+                  );
                 },
               ),
             ),
