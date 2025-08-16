@@ -23,7 +23,7 @@ class ExitItem {
 }
 
 class BaseExitDoc {
-  final String supplierId;
+  final String clientId;
   final String docNumber;
   final DateTime docDate;
   final String branchId;
@@ -31,7 +31,7 @@ class BaseExitDoc {
   final List<ExitItem> items;
 
   BaseExitDoc({
-    required this.supplierId,
+    required this.clientId,
     required this.docNumber,
     required this.docDate,
     required this.branchId,
@@ -41,7 +41,7 @@ class BaseExitDoc {
 
   factory BaseExitDoc.fromJson(Map<String, dynamic> json) {
     return BaseExitDoc(
-      supplierId: json['supplierId'] as String,
+      clientId: json['clientId'] as String,
       docNumber: json['docNumber'] as String,
       docDate: DateTime.parse(json['docDate'] as String),
       branchId: json['branchId'] as String,
@@ -52,7 +52,7 @@ class BaseExitDoc {
 
   Map<String, dynamic> toJson() {
     return {
-      'supplierId': supplierId,
+      'clientId': clientId,
       'docNumber': docNumber,
       'docDate': docDate.toIso8601String(),
       'branchId': branchId,
@@ -64,7 +64,7 @@ class BaseExitDoc {
 
 class CreateExitDoc extends BaseExitDoc {
   CreateExitDoc({
-    required super.supplierId,
+    required super.clientId,
     required super.docNumber,
     required super.docDate,
     required super.branchId,
@@ -74,7 +74,7 @@ class CreateExitDoc extends BaseExitDoc {
 
   factory CreateExitDoc.fromJson(Map<String, dynamic> json) {
     return CreateExitDoc(
-      supplierId: json['supplierId'] as String,
+      clientId: json['clientId'] as String,
       docNumber: json['docNumber'] as String,
       docDate: DateTime.parse(json['docDate'] as String),
       branchId: json['branchId'] as String,
@@ -90,7 +90,7 @@ class ExitDocInDb extends BaseExitDoc {
 
   ExitDocInDb({
     required this.id,
-    required super.supplierId,
+    required super.clientId,
     required super.docNumber,
     required super.docDate,
     required super.branchId,
@@ -102,7 +102,7 @@ class ExitDocInDb extends BaseExitDoc {
   factory ExitDocInDb.fromJson(Map<String, dynamic> json) {
     return ExitDocInDb(
       id: json['id'] as String,
-      supplierId: json['supplierId'] as String,
+      clientId: json['clientId'] as String,
       docNumber: json['docNumber'] as String,
       docDate: DateTime.parse(json['docDate'] as String),
       branchId: json['branchId'] as String,

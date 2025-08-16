@@ -1,5 +1,5 @@
 export 'custom_autocomplete_textfield.dart';
-export 'empy_scaffold.dart';
+export 'empty_scaffold.dart';
 export 'no_item.dart';
 export 'search_debounce.dart';
 export 'status_tag_label.dart';

@@ -39,7 +39,7 @@ class _InventoryEntryScreenState extends State<InventoryEntryScreen> {
         rebuildScreen = false;
         setState(() {});
       });
-      return const EmpyScaffold();
+      return const EmptyScaffold();
     }
 
     final entryDocRepo = context.read<EntryDocsRepository>();

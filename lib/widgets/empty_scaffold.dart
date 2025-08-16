@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class EmpyScaffold extends StatelessWidget {
-  const EmpyScaffold({super.key});
+class EmptyScaffold extends StatelessWidget {
+  const EmptyScaffold({super.key});
 
   @override
   Widget build(BuildContext context) {

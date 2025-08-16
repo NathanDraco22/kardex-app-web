@@ -26,7 +26,7 @@ class EntryDocsRepository {
     );
 
     _entryDocs = response.data;
-    // Ordena por fecha de documento, de más reciente a más antiguo
+    
     _entryDocs.sort((a, b) => b.docDate.compareTo(a.docDate));
     return _entryDocs;
   }
