@@ -1,6 +1,9 @@
+import 'dart:developer';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/product/product_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
+import 'package:kardex_app_front/src/tools/constant.dart';
 
 part 'read_product_state.dart';
 
@@ -15,17 +18,35 @@ class ReadProductCubit extends Cubit<ReadProductState> {
   final UnitsRepository unitsRepository;
   final ProductCategoriesRepository categoriesRepository;
 
-  Future<void> loadAllProducts() async {
+  bool isLastPage = false;
+
+  List<ProductInDb> _productsCache = [];
+
+  Future<void> loadPaginatedProducts() async {
     emit(ReadProductLoading());
     try {
       await Future.wait([
         unitsRepository.getAllUnits(),
         categoriesRepository.getAllProductCategories(),
       ]);
-      final products = await productsRepository.getAllProducts();
-      emit(ReadProductSuccess(products));
+      final products = await productsRepository.getPaginatedProducts(_productsCache.length);
+      if (products.length < paginationItems) isLastPage = true;
+      _productsCache = [..._productsCache, ...products];
+      emit(ReadProductSuccess(_productsCache));
     } catch (error) {
       emit(ProductReadError(error.toString()));
+    }
+  }
+
+  Future<void> getNextPagedProducts() async {
+    if (isLastPage) return;
+    try {
+      final products = await productsRepository.getPaginatedProducts(_productsCache.length);
+      if (products.length < paginationItems) isLastPage = true;
+      _productsCache = [..._productsCache, ...products];
+      emit(ReadProductSuccess(_productsCache));
+    } catch (e) {
+      log(e.toString());
     }
   }
 
@@ -33,7 +54,7 @@ class ReadProductCubit extends Cubit<ReadProductState> {
     final currentState = state as ReadProductSuccess;
 
     if (keyword.isEmpty) {
-      emit(ReadProductSuccess(productsRepository.products));
+      emit(ReadProductSuccess(_productsCache));
       return;
     }
 
@@ -48,7 +69,8 @@ class ReadProductCubit extends Cubit<ReadProductState> {
 
   Future<void> putProductFirst(ProductInDb product) async {
     final currentState = state as ReadProductSuccess;
-    final freshList = productsRepository.products;
+    _productsCache = [product, ..._productsCache];
+    final freshList = _productsCache;
     if (currentState is HighlightedProduct) {
       emit(
         HighlightedProduct(
@@ -69,7 +91,11 @@ class ReadProductCubit extends Cubit<ReadProductState> {
 
   Future<void> markProductUpdated(ProductInDb product) async {
     final currentState = state as ReadProductSuccess;
-    final freshList = productsRepository.products;
+
+    final productIndex = _productsCache.indexWhere((element) => element.id == product.id);
+    _productsCache[productIndex] = product;
+
+    final freshList = _productsCache;
 
     if (currentState is HighlightedProduct) {
       emit(
@@ -89,9 +115,10 @@ class ReadProductCubit extends Cubit<ReadProductState> {
     );
   }
 
-  Future<void> refreshProduct() async {
+  Future<void> removeProduct(ProductInDb product) async {
     final currentState = state as ReadProductSuccess;
-    final freshList = productsRepository.products;
+    _productsCache.removeWhere((element) => element.id == product.id);
+    final freshList = _productsCache;
     if (currentState is HighlightedProduct) {
       emit(
         HighlightedProduct(

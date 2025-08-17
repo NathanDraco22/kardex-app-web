@@ -6,6 +6,7 @@ import 'package:kardex_app_front/src/modules/product_catalog/product_list/cubit/
 import 'package:kardex_app_front/src/modules/product_catalog/product_list/dialogs/create_product_dialog.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/product_list/view/widgets/products_table.dart';
 import 'package:kardex_app_front/src/tools/constant.dart';
+import 'package:kardex_app_front/src/tools/scroll_tools.dart';
 
 part 'web/product_list_screen_web.dart';
 part 'mobile/product_list_screen_mobile.dart';
@@ -25,7 +26,7 @@ class ProductListScreen extends StatelessWidget {
             productsRepository: productRepo,
             categoriesRepository: productCateRepo,
             unitsRepository: unitRepo,
-          )..loadAllProducts(),
+          )..loadPaginatedProducts(),
         ),
         BlocProvider(create: (context) => WriteProductCubit(productRepo)),
       ],
@@ -39,9 +40,25 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.sizeOf(context);
+    return NotificationListener<ScrollNotification>(
+      onNotification: (notification) {
+        final maxScrollExtends = notification.metrics.maxScrollExtent;
+        final scrollOffset = notification.metrics.pixels;
 
-    if (screenSize.width < maxPhoneScreenWidth) return const ProductListScreenMobile();
-    return const ProductListScreenWeb();
+        if (ScrollTools.calculateScrollPercent(maxScrollExtends, scrollOffset) > 70) {
+          final cubit = context.read<ReadProductCubit>();
+          cubit.getNextPagedProducts();
+        }
+        return true;
+      },
+      child: Builder(
+        builder: (context) {
+          final screenSize = MediaQuery.sizeOf(context);
+
+          if (screenSize.width < maxPhoneScreenWidth) return const ProductListScreenMobile();
+          return const ProductListScreenWeb();
+        },
+      ),
+    );
   }
 }

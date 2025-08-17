@@ -13,8 +13,10 @@ class ReadSupplierCubit extends Cubit<ReadSupplierState> {
     emit(ReadSupplierLoading());
     try {
       final suppliers = await suppliersRepository.getAllSuppliers();
+      if (isClosed) return;
       emit(ReadSupplierSuccess(suppliers));
     } catch (error) {
+      if (isClosed) return;
       emit(SupplierReadError(error.toString()));
     }
   }
@@ -23,6 +25,8 @@ class ReadSupplierCubit extends Cubit<ReadSupplierState> {
     final currentState = state as ReadSupplierSuccess;
 
     if (keyword.isEmpty) {
+      if (isClosed) return;
+
       emit(ReadSupplierSuccess(suppliersRepository.suppliers));
       return;
     }
@@ -34,8 +38,12 @@ class ReadSupplierCubit extends Cubit<ReadSupplierState> {
     );
     try {
       final suppliers = await suppliersRepository.searchSupplierByKeyword(keyword);
+      if (isClosed) return;
+
       emit(ReadSupplierSuccess(suppliers));
     } catch (error) {
+      if (isClosed) return;
+
       emit(SupplierReadError(error.toString()));
     }
   }

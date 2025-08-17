@@ -217,8 +217,6 @@ class _RowWidget extends StatelessWidget {
                     if (res == null) return;
                     if (!context.mounted) return;
                     await context.read<ReadProductCubit>().markProductUpdated(res);
-                    if (!context.mounted) return;
-                    await context.read<ReadProductCubit>().refreshProduct();
                   },
                   icon: const Icon(Icons.edit),
                 ),

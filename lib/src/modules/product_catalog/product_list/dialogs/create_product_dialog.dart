@@ -10,6 +10,8 @@ import 'package:kardex_app_front/src/tools/dialog_manager.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
 
+import '../cubit/read_product_cubit.dart';
+
 part 'form_section.dart';
 part 'widgets.dart';
 
@@ -17,7 +19,8 @@ Future<ProductInDb?> showCreateProductDialog(
   BuildContext context, {
   ProductInDb? product,
 }) async {
-  final cubit = context.read<WriteProductCubit>();
+  final writeCubit = context.read<WriteProductCubit>();
+  final readCubit = context.read<ReadProductCubit>();
 
   final productCateRepo = context.read<ProductCategoriesRepository>();
   final unitRepo = context.read<UnitsRepository>();
@@ -27,8 +30,11 @@ Future<ProductInDb?> showCreateProductDialog(
       RepositoryProvider.value(value: productCateRepo),
       RepositoryProvider.value(value: unitRepo),
     ],
-    child: BlocProvider.value(
-      value: cubit,
+    child: MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: writeCubit),
+        BlocProvider.value(value: readCubit),
+      ],
       child: CreateProductDialog(
         product: product,
       ),
@@ -68,7 +74,7 @@ class _CreateProductDialogState extends State<CreateProductDialog> {
     final currentProduct = widget.product;
 
     return BlocListener<WriteProductCubit, WriteProductState>(
-      listener: (context, state) {
+      listener: (context, state) async {
         if (state is WriteProductInProgress) {
           LoadingDialogManager.showLoadingDialog(context);
         }
@@ -85,7 +91,8 @@ class _CreateProductDialogState extends State<CreateProductDialog> {
 
         if (state is DeleteProductSuccess) {
           LoadingDialogManager.closeLoadingDialog(context);
-          DialogManager.showInfoDialog(context, "Se ha borrado el producto ${state.product.name}");
+          context.read<ReadProductCubit>().removeProduct(state.product);
+          await DialogManager.showInfoDialog(context, "Se ha borrado el producto ${state.product.name}");
           if (!context.mounted) return;
           context.pop(state.product);
         }

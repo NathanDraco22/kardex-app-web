@@ -7,29 +7,16 @@ class ProductsRepository {
 
   ProductsRepository(this.productsDataSource);
 
-  List<ProductInDb> _products = [];
-
-  List<ProductInDb> get products => _products;
-
   Future<ProductInDb> createProduct(CreateProduct createProduct) async {
     final result = await productsDataSource.createProduct(createProduct.toJson());
     final newProduct = ProductInDb.fromJson(result);
-    _products = [newProduct, ..._products];
     return newProduct;
   }
 
-  Future<List<ProductInDb>> getAllProducts() async {
-    final results = await productsDataSource.getAllProducts();
-    final response = ListResponse<ProductInDb>.fromJson(
-      results,
-      ProductInDb.fromJson,
-    );
-
-    _products = response.data;
-    _products.sort(
-      (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
-    );
-    return _products;
+  Future<List<ProductInDb>> getPaginatedProducts(int offset) async {
+    final results = await productsDataSource.getPaginatedProducts(offset);
+    final response = ListResponse.fromJson(results, ProductInDb.fromJson);
+    return response.data;
   }
 
   Future<ProductInDb?> getProductById(String productId) async {
@@ -58,10 +45,7 @@ class ProductsRepository {
     if (result == null) return null;
 
     final updatedProduct = ProductInDb.fromJson(result);
-    final index = _products.indexWhere((p) => p.id == productId);
-    if (index != -1) {
-      _products[index] = updatedProduct;
-    }
+
     return updatedProduct;
   }
 
@@ -70,7 +54,6 @@ class ProductsRepository {
     if (result == null) return null;
 
     final deletedProduct = ProductInDb.fromJson(result);
-    _products.removeWhere((p) => p.id == productId);
     return deletedProduct;
   }
 }

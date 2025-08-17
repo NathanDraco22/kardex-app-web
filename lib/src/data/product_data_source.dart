@@ -1,4 +1,5 @@
 import 'package:kardex_app_front/src/services/http_service.dart';
+import 'package:kardex_app_front/src/tools/constant.dart';
 import 'package:kardex_app_front/src/tools/http_tool.dart';
 
 class ProductsDataSource with HttpService {
@@ -18,6 +19,18 @@ class ProductsDataSource with HttpService {
 
   Future<Map<String, dynamic>> getAllProducts() async {
     final uri = HttpTools.generateUri(_endpoint);
+    final res = await getQuery(uri);
+    return res;
+  }
+
+  Future<Map<String, dynamic>> getPaginatedProducts(int offset) async {
+    final uri = HttpTools.generateUri(
+      "$_endpoint/paginated",
+      queryParameters: {
+        "offset": offset.toString(),
+        "limit": paginationItems.toString(),
+      },
+    );
     final res = await getQuery(uri);
     return res;
   }
