@@ -103,7 +103,7 @@ class _CreateProductCategoryDialogState extends State<CreateProductCategoryDialo
                       );
                     }
                   },
-                  child: Text("$prefixTitle Categoria de Producto"),
+                  child: Text(prefixTitle),
                 ),
               ],
               content: Column(

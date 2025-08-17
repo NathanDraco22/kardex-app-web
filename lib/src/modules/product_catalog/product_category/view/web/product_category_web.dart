@@ -53,9 +53,12 @@ class _WebBody extends StatelessWidget {
                   Icons.warning_amber_rounded,
                   color: Colors.amber.shade600,
                 ),
-                Text(
-                  "Las Categorias de Productos no pueden ser eliminadas",
-                  style: TextStyle(color: Colors.amber.shade600, letterSpacing: 1.5),
+                Flexible(
+                  child: Text(
+                    "Las Categorias de Productos no pueden ser eliminadas",
+                    maxLines: 2,
+                    style: TextStyle(color: Colors.amber.shade600, letterSpacing: 1.5),
+                  ),
                 ),
               ],
             ),

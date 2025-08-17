@@ -5,8 +5,10 @@ import 'package:kardex_app_front/src/modules/product_catalog/product_list/cubit/
 import 'package:kardex_app_front/src/modules/product_catalog/product_list/cubit/write_product_cubit.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/product_list/dialogs/create_product_dialog.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/product_list/view/widgets/products_table.dart';
-import 'package:kardex_app_front/src/tools/constant.dart';
+import 'package:kardex_app_front/src/tools/extensiones.dart';
 import 'package:kardex_app_front/src/tools/scroll_tools.dart';
+import 'package:kardex_app_front/widgets/row_widgets/mobile_row.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 
 part 'web/product_list_screen_web.dart';
 part 'mobile/product_list_screen_mobile.dart';
@@ -53,9 +55,7 @@ class _RootScaffold extends StatelessWidget {
       },
       child: Builder(
         builder: (context) {
-          final screenSize = MediaQuery.sizeOf(context);
-
-          if (screenSize.width < maxPhoneScreenWidth) return const ProductListScreenMobile();
+          if (context.isMobile()) return const ProductListScreenMobile();
           return const ProductListScreenWeb();
         },
       ),

@@ -25,71 +25,84 @@ class MobileRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTab,
-      child: Ink(
-        color: color,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Flexible(
-                flex: 5,
-                fit: FlexFit.tight,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-                    const SizedBox(height: 8),
-
-                    if (subtitle1 != null || subtitle2 != null)
-                      Row(
-                        children: [
-                          Flexible(
-                            fit: FlexFit.tight,
-                            child: Text(
-                              subtitle1 ?? "",
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Flexible(
-                            fit: FlexFit.tight,
-                            child: Text(subtitle2 ?? "", overflow: TextOverflow.ellipsis, maxLines: 1),
-                          ),
-                        ],
+      child: Material(
+        color: Colors.transparent,
+        child: Ink(
+          color: color,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Flexible(
+                  flex: 5,
+                  fit: FlexFit.tight,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                  ],
+                      const SizedBox(height: 8),
+
+                      if (subtitle1 != null || subtitle2 != null)
+                        Row(
+                          children: [
+                            Flexible(
+                              fit: FlexFit.tight,
+                              child: Text(
+                                subtitle1 ?? "",
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Flexible(
+                              fit: FlexFit.tight,
+                              child: Text(
+                                subtitle2 ?? "",
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 4),
-              Flexible(
-                fit: FlexFit.tight,
-                flex: 2,
-                child: Builder(
-                  builder: (context) {
-                    if (isActive) {
-                      return const StatusTagLabel(
-                        label: "Activo",
-                        isActive: true,
-                      );
-                    } else {
-                      return const StatusTagLabel(
-                        label: "Inactivo",
-                        isActive: false,
-                      );
-                    }
-                  },
+                const SizedBox(width: 4),
+                Flexible(
+                  fit: FlexFit.tight,
+                  flex: 2,
+                  child: Builder(
+                    builder: (context) {
+                      if (isActive) {
+                        return const StatusTagLabel(
+                          label: "Activo",
+                          isActive: true,
+                        );
+                      } else {
+                        return const StatusTagLabel(
+                          label: "Inactivo",
+                          isActive: false,
+                        );
+                      }
+                    },
+                  ),
                 ),
-              ),
-              Flexible(
-                fit: FlexFit.tight,
-                child: IconButton(
-                  onPressed: onEditButtonPresesed,
-                  icon: const Icon(Icons.edit),
+                Flexible(
+                  fit: FlexFit.tight,
+                  child: IconButton(
+                    onPressed: onEditButtonPresesed,
+                    icon: const Icon(Icons.edit),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

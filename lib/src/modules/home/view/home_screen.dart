@@ -31,65 +31,67 @@ class _Body extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Text("Bienvenido, Usuario Numero 1", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text("Bienvenido, Usuario Numero 1", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 12),
 
-            const Text("Elige una opcion", style: TextStyle(fontSize: 18)),
+              const Text("Elige una opcion", style: TextStyle(fontSize: 18)),
 
-            const SizedBox(height: 12),
+              const SizedBox(height: 12),
 
-            Wrap(
-              spacing: 24,
-              runSpacing: 20,
-              alignment: WrapAlignment.center,
-              children: [
-                HomeOptionCard(
-                  title: "Lista de Clientes",
-                  icon: Icons.people,
-                  onTap: () {
-                    context.pushNamed("client-catalog");
-                  },
-                ),
+              Wrap(
+                spacing: 24,
+                runSpacing: 20,
+                alignment: WrapAlignment.center,
+                children: [
+                  HomeOptionCard(
+                    title: "Lista de Clientes",
+                    icon: Icons.people,
+                    onTap: () {
+                      context.pushNamed("client-catalog");
+                    },
+                  ),
 
-                HomeOptionCard(
-                  title: "Lista de Proveedores",
-                  icon: Icons.warehouse,
-                  onTap: () {
-                    context.pushNamed("suppliers-catalog");
-                  },
-                ),
+                  HomeOptionCard(
+                    title: "Lista de Proveedores",
+                    icon: Icons.warehouse,
+                    onTap: () {
+                      context.pushNamed("suppliers-catalog");
+                    },
+                  ),
 
-                HomeOptionCard(
-                  title: "Catalogo de Productos",
-                  icon: Icons.shopping_bag_sharp,
-                  onTap: () {
-                    context.pushNamed("product-catalog");
-                  },
-                ),
+                  HomeOptionCard(
+                    title: "Catalogo de Productos",
+                    icon: Icons.shopping_bag_sharp,
+                    onTap: () {
+                      context.pushNamed("product-catalog");
+                    },
+                  ),
 
-                HomeOptionCard(
-                  title: "Inventario",
-                  icon: Icons.inventory_2_outlined,
-                  onTap: () {
-                    context.pushNamed("inventory");
-                  },
-                ),
+                  HomeOptionCard(
+                    title: "Inventario",
+                    icon: Icons.inventory_2_outlined,
+                    onTap: () {
+                      context.pushNamed("inventory");
+                    },
+                  ),
 
-                HomeOptionCard(
-                  title: "Configuraciones",
-                  icon: Icons.settings,
-                  onTap: () {
-                    context.pushNamed("settings");
-                  },
-                ),
-              ],
-            ),
-          ],
+                  HomeOptionCard(
+                    title: "Configuraciones",
+                    icon: Icons.settings,
+                    onTap: () {
+                      context.pushNamed("settings");
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
