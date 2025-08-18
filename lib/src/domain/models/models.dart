@@ -1,0 +1,9 @@
+export 'branch/branch.dart';
+export 'client/client.dart';
+export 'entry_doc/entry_doc.dart';
+export 'exit_doc/exit_doc.dart';
+export 'product/product.dart';
+export 'product_category/product_category.dart';
+export 'product_price/product_price.dart';
+export 'supplier/supplier.dart';
+export 'unit/unit.dart';

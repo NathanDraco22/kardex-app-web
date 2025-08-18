@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class TitleTextField extends StatelessWidget {
   const TitleTextField({
     super.key,
     required this.title,
+    this.keyboardType,
     this.controller,
     this.titleTextAlign,
     this.validator,
@@ -14,8 +16,11 @@ class TitleTextField extends StatelessWidget {
     this.onEditingComplete,
     this.onChanged,
     this.textCapitalization = TextCapitalization.none,
+    this.inputFormatters,
   });
 
+  final TextInputType? keyboardType;
+  final List<TextInputFormatter>? inputFormatters;
   final TextCapitalization textCapitalization;
   final TextEditingController? controller;
   final int maxLines;
@@ -26,8 +31,8 @@ class TitleTextField extends StatelessWidget {
   final TextAlign? titleTextAlign;
   final void Function()? onEditingComplete;
 
-  final String? Function(String?)? validator;
-  final void Function(String)? onChanged;
+  final String? Function(String? value)? validator;
+  final void Function(String value)? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -41,8 +46,12 @@ class TitleTextField extends StatelessWidget {
           textAlign: titleTextAlign,
         ),
         TextFormField(
+          style: const TextStyle(fontWeight: FontWeight.w500),
+          textAlign: titleTextAlign ?? TextAlign.start,
+          inputFormatters: inputFormatters,
           maxLines: maxLines,
           onChanged: onChanged,
+          keyboardType: keyboardType,
           textCapitalization: textCapitalization,
           controller: controller,
           focusNode: focusNode,

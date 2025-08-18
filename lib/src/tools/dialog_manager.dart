@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shimmer/shimmer.dart';
-import 'package:slide_to_submit_button/slide_to_submit_button.dart';
+import 'package:kardex_app_front/widgets/custom_slider.dart';
 
 class DialogManager {
   static Future<void> showErrorDialog(BuildContext context, String message) async {
@@ -79,66 +78,12 @@ class DialogManager {
       builder: (context) {
         return AlertDialog(
           title: Text(message),
-          content: SizedBox(
-            width: 100,
-            child: SlideToSubmit.custom(
-              hint: Align(
-                alignment: Alignment.centerRight,
-                child: Shimmer.fromColors(
-                  baseColor: Colors.grey,
-                  highlightColor: Colors.grey.shade200,
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        "Desliza para confirmar",
-                        style: TextStyle(
-                          color: Colors.grey,
-                        ),
-                      ),
-                      Icon(
-                        Icons.delete,
-                        color: Colors.grey,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              slider: Container(
-                height: 40,
-                width: 40,
-                decoration: BoxDecoration(
-                  color: Colors.red.shade300,
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Eliminar',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Icon(
-                      Icons.chevron_right_rounded,
-                      color: Colors.white,
-                    ),
-                  ],
-                ),
-              ),
-              backgroundDecoration: BoxDecoration(
-                color: Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(24),
-              ),
-              sliderWidth: 120,
-              height: 60,
-              onSubmit: (controller) {
-                context.pop(true);
-              },
-              threshold: 0.95,
-            ),
+          content: CustomSlider(
+            hintText: "Desliza para eliminar",
+            hintIcon: Icons.delete,
+            sliderColor: Colors.red.shade300,
+            sliderText: "Eliminar",
+            onSubmit: () => context.pop(true),
           ),
           actions: [
             OutlinedButton(
@@ -159,66 +104,12 @@ class DialogManager {
       builder: (context) {
         return AlertDialog(
           title: Text(message),
-          content: SizedBox(
-            width: 100,
-            child: SlideToSubmit.custom(
-              hint: Align(
-                alignment: Alignment.centerRight,
-                child: Shimmer.fromColors(
-                  baseColor: Colors.grey,
-                  highlightColor: Colors.grey.shade200,
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        "Desliza para confirmar",
-                        style: TextStyle(
-                          color: Colors.grey,
-                        ),
-                      ),
-                      Icon(
-                        Icons.delete,
-                        color: Colors.grey,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              slider: Container(
-                height: 40,
-                width: 40,
-                decoration: BoxDecoration(
-                  color: Colors.green.shade300,
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Confirmar',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Icon(
-                      Icons.chevron_right_rounded,
-                      color: Colors.white,
-                    ),
-                  ],
-                ),
-              ),
-              backgroundDecoration: BoxDecoration(
-                color: Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(24),
-              ),
-              sliderWidth: 120,
-              height: 60,
-              onSubmit: (controller) {
-                context.pop(true);
-              },
-              threshold: 0.95,
-            ),
+          content: CustomSlider(
+            hintText: "Desliza para guardar",
+            hintIcon: Icons.save,
+            sliderColor: Colors.green.shade300,
+            sliderText: "Guardar",
+            onSubmit: () => context.pop(true),
           ),
           actions: [
             OutlinedButton(

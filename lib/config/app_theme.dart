@@ -1,9 +1,31 @@
 import 'package:flutter/material.dart';
 
+class ColourPalette {
+  static const Color primary = Color(0xFF162b4e);
+  static const Color primaryVariant = Color(0xFF3B62A1);
+  static const Color secondary = Color(0xFF3B62A1);
+  static const Color primaryInverse = Colors.amber;
+}
+
 class AppTheme {
   ThemeData get lightTheme => ThemeData.light(useMaterial3: false).copyWith(
+    colorScheme: const ColorScheme.light(
+      primary: ColourPalette.primaryVariant,
+      secondary: ColourPalette.secondary,
+    ),
+    floatingActionButtonTheme: const FloatingActionButtonThemeData(
+      foregroundColor: Colors.white,
+    ),
+    progressIndicatorTheme: ProgressIndicatorThemeData(
+      color: ColourPalette.primaryInverse,
+      linearTrackColor: Colors.amber.shade100,
+      circularTrackColor: Colors.amber.shade100,
+    ),
     listTileTheme: const ListTileThemeData(
       tileColor: Colors.white,
+    ),
+    cardTheme: const CardThemeData(
+      margin: EdgeInsets.zero,
     ),
     pageTransitionsTheme: const PageTransitionsTheme(
       builders: {
@@ -13,7 +35,7 @@ class AppTheme {
     ),
     appBarTheme: const AppBarTheme(
       elevation: 1.0,
-      backgroundColor: Color.fromARGB(255, 52, 57, 92),
+      backgroundColor: ColourPalette.primary,
     ),
     scaffoldBackgroundColor: Colors.indigo.shade50,
     dropdownMenuTheme: const DropdownMenuThemeData(
@@ -25,6 +47,9 @@ class AppTheme {
     ),
     inputDecorationTheme: const InputDecorationTheme(
       border: OutlineInputBorder(),
+      focusedBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.blue, width: 1.5),
+      ),
       isCollapsed: true,
       contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 6),
     ),

@@ -415,7 +415,7 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
           Flexible(
             fit: FlexFit.tight,
             child: Center(
-              child: Text("C\$ ${subtotal.toStringAsFixed(4)}"),
+              child: Text("C\$ ${subtotal.toStringAsFixed(2)}"),
             ),
           ),
         ],

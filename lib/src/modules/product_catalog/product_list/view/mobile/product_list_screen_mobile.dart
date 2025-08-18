@@ -47,7 +47,7 @@ class _MobileBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.symmetric(vertical: 8),
         child: Column(
           children: [
             Row(

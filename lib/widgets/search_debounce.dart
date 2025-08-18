@@ -28,6 +28,7 @@ class _SearchFieldDebouncedState extends State<SearchFieldDebounced> {
     return TextField(
       controller: widget.controller,
       autofocus: widget.autoFocus,
+      style: const TextStyle(fontWeight: FontWeight.w500),
       onEditingComplete: () {},
       onChanged: (value) {
         _debounceTime?.cancel();

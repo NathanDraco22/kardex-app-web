@@ -2,17 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/cubits/config_app/config_app_cubit.dart';
-import 'package:kardex_app_front/src/domain/models/entry_doc/entry_doc_model.dart';
-import 'package:kardex_app_front/src/domain/models/supplier/supplier_model.dart';
+import 'package:kardex_app_front/src/domain/models/models.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_entry/cubit/write_entry_doc_cubit.dart';
-import 'package:kardex_app_front/src/modules/inventory/inventory_entry/view/mediator.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
-import 'package:kardex_app_front/widgets/tables/inventory_movement_product_table.dart';
+import 'package:kardex_app_front/widgets/custom_listviews/inventory_movement_product_list_view.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
-part 'sections/header_section.dart';
-part 'sections/content_section.dart';
+import 'mediator.dart';
+import 'mobile/widgets/appbar_menu.dart';
+
+part 'web/inventory_entry_screen_web.dart';
+part 'web/sections/content_section.dart';
+part 'web/sections/header_section.dart';
+
+part 'mobile/inventory_entry_mobile_screen.dart';
 
 class InventoryEntryScreen extends StatefulWidget {
   const InventoryEntryScreen({super.key});
@@ -67,7 +71,6 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mediator = InventoryEntryMediator.read(context)!;
     return BlocListener<WriteEntryDocCubit, WriteEntryDocState>(
       listener: (context, state) async {
         if (state is WriteEntryDocInProgress) {
@@ -86,58 +89,20 @@ class _RootScaffold extends StatelessWidget {
           RebuildScreeenNotification().dispatch(context);
         }
       },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Entrada de Inventario"),
-          leading: IconButton(
-            onPressed: () async {
-              final allFields = mediator.hasAllRequiredFields();
-              if (!allFields) {
-                context.pop();
-                return;
-              }
-              final res = await DialogManager.confirmActionDialog(
-                context,
-                "Deseas salir sin guardar? (Perderas los cambios)",
-              );
-              if (res != true) return;
-              if (!context.mounted) return;
-              context.pop();
-            },
-            icon: const Icon(
-              Icons.arrow_back,
-            ),
-          ),
-        ),
-        body: const _Body(),
-      ),
+      child: const _RootBody(),
     );
   }
 }
 
-class _Body extends StatelessWidget {
-  const _Body();
+class _RootBody extends StatelessWidget {
+  const _RootBody();
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Padding(
-        padding: EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(
-              height: 150,
-              child: _HeaderSection(),
-            ),
-            SizedBox(height: 8),
-            Flexible(
-              fit: FlexFit.tight,
-              child: _ContentSection(),
-            ),
-          ],
-        ),
-      ),
-    );
+    final isMobile = context.isMobile();
+
+    if (isMobile) return const InventoryEntryMobileScreen();
+
+    return const InventoryEntryScreenWeb();
   }
 }

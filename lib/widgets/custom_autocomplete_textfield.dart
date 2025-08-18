@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kardex_app_front/src/tools/extensiones.dart';
 
 import 'search_debounce.dart';
 
@@ -38,15 +39,11 @@ class _CustomAutocompleteTextfieldState<T> extends State<CustomAutocompleteTextf
   void initState() {
     super.initState();
     Future(() {
-      final renderBox = textFieldKey.currentContext!.findRenderObject() as RenderBox;
-      globalPosOffset = renderBox.localToGlobal(Offset.zero);
+      getTextFieldSize();
       final initValue = widget.initValue;
       if (initValue != null) {
         controller.text = widget.titleBuilder(initValue);
       }
-      setState(() {
-        textFieldSize = renderBox.size;
-      });
     });
   }
 
@@ -62,9 +59,11 @@ class _CustomAutocompleteTextfieldState<T> extends State<CustomAutocompleteTextf
       children: [
         TextField(
           controller: controller,
+          style: const TextStyle(fontWeight: FontWeight.w500),
           key: textFieldKey,
           readOnly: true,
           onTap: () async {
+            getTextFieldSize();
             final res = await showDialog(
               context: context,
               builder: (context) {
@@ -105,6 +104,19 @@ class _CustomAutocompleteTextfieldState<T> extends State<CustomAutocompleteTextf
         ),
       ],
     );
+  }
+
+  void getTextFieldSize() {
+    final renderBox = textFieldKey.currentContext!.findRenderObject() as RenderBox;
+    globalPosOffset = renderBox.localToGlobal(Offset.zero);
+
+    if (context.isMobile()) {
+      globalPosOffset = Offset(globalPosOffset.dx, globalPosOffset.dy - kToolbarHeight);
+    }
+
+    setState(() {
+      textFieldSize = renderBox.size;
+    });
   }
 }
 

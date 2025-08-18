@@ -20,6 +20,7 @@ class _DateFieldSelectorState extends State<DateFieldSelector> {
   Widget build(BuildContext context) {
     return TextField(
       textAlign: TextAlign.center,
+      style: const TextStyle(fontWeight: FontWeight.w500),
       readOnly: true,
       controller: controller,
       onTap: () async {
