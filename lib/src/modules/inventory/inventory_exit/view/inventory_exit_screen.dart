@@ -1,21 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
-import 'package:kardex_app_front/cubits/config_app/config_app_cubit.dart';
-import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
-import 'package:kardex_app_front/src/domain/models/exit_doc/exit_doc_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_exit/cubit/write_exit_doc_cubit.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_exit/view/mediator.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
-import 'package:kardex_app_front/widgets/custom_autocomplete_textfield.dart';
-import 'package:kardex_app_front/widgets/empty_scaffold.dart';
-import 'package:kardex_app_front/widgets/tables/inventory_movement_product_table.dart';
-import 'package:kardex_app_front/widgets/text_field_date_selector.dart';
-import 'package:kardex_app_front/widgets/title_texfield.dart';
 
-part 'sections/header_section.dart';
-part 'sections/content_section.dart';
+import 'package:kardex_app_front/widgets/empty_scaffold.dart';
+
+import 'mobile/inventory_exit_screen_mobile.dart';
+import 'web/inventory_exit_screen_web.dart';
 
 class InventoryExitScreen extends StatefulWidget {
   const InventoryExitScreen({super.key});
@@ -69,7 +62,6 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mediator = InventoryExitMediator.read(context)!;
     return BlocListener<WriteExitDocCubit, WriteExitDocState>(
       listener: (context, state) {
         if (state is WriteExitDocInProgress) {
@@ -88,56 +80,19 @@ class _RootScaffold extends StatelessWidget {
           RebuildScreeenNotification().dispatch(context);
         }
       },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Salida de Inventario"),
-          leading: IconButton(
-            onPressed: () async {
-              final allFields = mediator.hasAllRequiredFields();
-              if (!allFields) {
-                context.pop();
-                return;
-              }
-              final res = await DialogManager.confirmActionDialog(
-                context,
-                "Deseas salir sin guardar? (Perderas los cambios)",
-              );
-              if (res != true) return;
-              if (!context.mounted) return;
-              context.pop();
-            },
-            icon: const Icon(Icons.arrow_back),
-          ),
-        ),
-        body: const _Body(),
-      ),
+      child: const _RootBody(),
     );
   }
 }
 
-class _Body extends StatelessWidget {
-  const _Body();
+class _RootBody extends StatelessWidget {
+  const _RootBody();
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Padding(
-        padding: EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(
-              height: 150,
-              child: _HeaderSection(),
-            ),
-            SizedBox(height: 8),
-            Flexible(
-              fit: FlexFit.tight,
-              child: _ContentSection(),
-            ),
-          ],
-        ),
-      ),
-    );
+    final isMobile = context.isMobile();
+
+    if (isMobile) return const InventoryExitScreenMobile();
+    return const InventoryExitScreenWeb();
   }
 }

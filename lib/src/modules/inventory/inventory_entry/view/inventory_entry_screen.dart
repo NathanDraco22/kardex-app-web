@@ -5,6 +5,7 @@ import 'package:kardex_app_front/cubits/config_app/config_app_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/models.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_entry/cubit/write_entry_doc_cubit.dart';
+import 'package:kardex_app_front/src/modules/inventory/inventory_exit/view/mobile/widgets/app_bar_menu.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/custom_listviews/inventory_movement_product_list_view.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';

@@ -60,7 +60,7 @@ class _MobileScaffold extends StatelessWidget {
         ),
         bottom: const PreferredSize(
           preferredSize: Size.fromHeight(kToolbarHeight),
-          child: AppBarMenusButton(),
+          child: EntryAppBarMenusButton(),
         ),
       ),
       body: const _MobileBody(),

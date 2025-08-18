@@ -1,0 +1,204 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/src/domain/models/models.dart';
+import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
+import 'package:kardex_app_front/src/modules/inventory/inventory_exit/view/mediator.dart';
+import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_app_front/widgets/custom_listviews/inventory_movement_product_list_view.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
+
+import 'widgets/app_bar_menu.dart';
+
+class InventoryExitScreenMobile extends StatelessWidget {
+  const InventoryExitScreenMobile({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const _MobileScaffold();
+  }
+}
+
+class _MobileScaffold extends StatelessWidget {
+  const _MobileScaffold();
+
+  @override
+  Widget build(BuildContext context) {
+    final mediator = InventoryExitMediator.read(context)!;
+    return Scaffold(
+      floatingActionButton: Visibility(
+        visible: MediaQuery.viewInsetsOf(context).bottom == 0.0,
+        child: FloatingActionButton.extended(
+          onPressed: () async {
+            final res = await showProductSearchDelegate(context);
+            if (res == null) return;
+            final newRow = ProductRowCard(
+              product: res,
+              quantity: 0,
+              unitaryCost: 0,
+              editableCost: false,
+            );
+            mediator.productListViewController.addRowCard(newRow);
+            mediator.refresh();
+          },
+          label: const Text("Agregar Producto"),
+          icon: const Icon(Icons.add),
+        ),
+      ),
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () async {
+            final allFields = mediator.hasMobileAllRequiredFields();
+            if (!allFields) {
+              context.pop();
+              return;
+            }
+            final res = await DialogManager.confirmActionDialog(
+              context,
+              "Deseas salir sin guardar? (Perderas los cambios)",
+            );
+            if (res != true) return;
+            if (!context.mounted) return;
+            context.pop();
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+          ),
+        ),
+        title: const Text(
+          "Salida de Inventario",
+        ),
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(kToolbarHeight),
+          child: ExitAppBarMenusButton(),
+        ),
+      ),
+      body: const _MobileBody(),
+    );
+  }
+}
+
+class _MobileBody extends StatelessWidget {
+  const _MobileBody();
+
+  @override
+  Widget build(BuildContext context) {
+    final mediator = InventoryExitMediator.read(context)!;
+    return Center(
+      child: ListView(
+        padding: const EdgeInsets.only(bottom: 112, top: 8),
+        children: [
+          const _MobileHeaderSection(),
+          const SizedBox(
+            height: 12,
+          ),
+          Column(
+            children: [
+              InventoryMovementProductListView(
+                controller: mediator.productListViewController,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MobileHeaderSection extends StatelessWidget {
+  const _MobileHeaderSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final mediator = InventoryExitMediator.read(context)!;
+    final headerData = mediator.headerData;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text(
+                  "Cliente",
+                  textAlign: TextAlign.left,
+                ),
+                const SizedBox(height: 6),
+                CustomAutocompleteTextfield<ClientInDb>(
+                  titleBuilder: (value) => value.name,
+                  onSearch: (value) async {
+                    final repo = context.read<ClientsRepository>();
+                    try {
+                      final res = await repo.searchClientByKeyword(value);
+                      return res;
+                    } catch (e) {
+                      return [];
+                    }
+                  },
+                  suggestionBuilder: (value, close) {
+                    return ListView.builder(
+                      itemCount: value.length,
+                      itemBuilder: (context, index) {
+                        final client = value[index];
+                        return ListTile(
+                          title: Text(client.name),
+                          onTap: () {
+                            headerData.client = client;
+                            close(client);
+                            mediator.refresh();
+                          },
+                        );
+                      },
+                    );
+                  },
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Flexible(
+                      child: TitleTextField(
+                        title: "Documento",
+                        keyboardType: TextInputType.number,
+                        onChanged: (value) {
+                          headerData.docNumber = value;
+                          mediator.refresh();
+                        },
+                      ),
+                    ),
+
+                    const SizedBox(
+                      width: 12,
+                    ),
+
+                    Flexible(
+                      child: Column(
+                        children: [
+                          const Text("Fecha Doc"),
+                          const SizedBox(height: 6),
+                          DateFieldSelector(
+                            onSelectedDate: (value) {
+                              headerData.docDate = value;
+                              mediator.refresh();
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 12),
+
+                const TitleTextField(
+                  title: "Observaciones",
+                  maxLines: 2,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

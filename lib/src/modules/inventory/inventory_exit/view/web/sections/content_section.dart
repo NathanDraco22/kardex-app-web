@@ -1,4 +1,4 @@
-part of '../inventory_exit_screen.dart';
+part of '../inventory_exit_screen_web.dart';
 
 class _ContentSection extends StatelessWidget {
   const _ContentSection();

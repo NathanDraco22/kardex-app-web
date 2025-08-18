@@ -8,8 +8,8 @@ import 'package:kardex_app_front/src/modules/inventory/inventory_entry/view/medi
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/custom_listviews/confirmation_product_listview.dart';
 
-class AppBarMenusButton extends StatelessWidget {
-  const AppBarMenusButton({super.key});
+class EntryAppBarMenusButton extends StatelessWidget {
+  const EntryAppBarMenusButton({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -72,8 +72,11 @@ class InventoryEntryMediator extends InheritedNotifier<InventoryEntryNotifier> {
 
   bool hasProductWithZeroValue() => notifier!.hasProductWithZeroValue();
 
-  bool hasMobileAllRequiredFields() =>
-      ![headerData.hasNullFields(), productListViewController.rowCards.isEmpty].contains(true);
+  bool hasMobileAllRequiredFields() => ![
+    headerData.hasNullFields(),
+    productListViewController.rowCards.isEmpty,
+  ].contains(true);
+
   bool hasMobileProductWithZeroValue() => notifier!.hasMobileProductWithZeroValue();
 
   int get productCount => productTableController.rows.length;

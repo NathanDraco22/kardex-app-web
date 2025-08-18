@@ -243,24 +243,30 @@ class _EntryRowCardState extends State<EntryRowCard> {
                     ),
                     Flexible(
                       fit: FlexFit.tight,
-                      child: TitleTextField(
-                        inputFormatters: [DecimalTextInputFormatter()],
-                        titleTextAlign: TextAlign.center,
-                        keyboardType: const TextInputType.numberWithOptions(
-                          decimal: true,
-                        ),
-                        title: "Costo Unitario",
-                        onChanged: (value) {
-                          if (value.isEmpty) {
-                            rowCard.unitaryCost = 0;
-                            setState(() {});
-                            return;
-                          }
-                          final numValue = double.tryParse(value);
-                          if (numValue == null) return;
-                          final minimalUnit = (numValue * 100).round();
-                          rowCard.unitaryCost = minimalUnit;
-                          setState(() {});
+                      child: Builder(
+                        builder: (context) {
+                          if (!rowCard.editableCost) return const Text("--");
+
+                          return TitleTextField(
+                            inputFormatters: [DecimalTextInputFormatter()],
+                            titleTextAlign: TextAlign.center,
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                            title: "Costo Unitario",
+                            onChanged: (value) {
+                              if (value.isEmpty) {
+                                rowCard.unitaryCost = 0;
+                                setState(() {});
+                                return;
+                              }
+                              final numValue = double.tryParse(value);
+                              if (numValue == null) return;
+                              final minimalUnit = (numValue * 100).round();
+                              rowCard.unitaryCost = minimalUnit;
+                              setState(() {});
+                            },
+                          );
                         },
                       ),
                     ),
