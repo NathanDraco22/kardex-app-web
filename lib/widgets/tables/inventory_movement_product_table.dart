@@ -2,8 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:kardex_app_front/src/domain/models/product/product_model.dart';
-import 'package:kardex_app_front/src/tools/constant.dart';
-import 'package:kardex_app_front/src/tools/input_formatters.dart';
+import 'package:kardex_app_front/src/tools/tools.dart';
 
 class ProductRow {
   ProductRow({
@@ -198,7 +197,7 @@ class _TableFooter extends StatelessWidget {
     final mediator = _TableMediator.of(context);
     final controller = mediator.notifier!;
 
-    final total = controller.total / 100;
+    final total = controller.total;
 
     return SizedBox(
       height: 30,
@@ -230,7 +229,7 @@ class _TableFooter extends StatelessWidget {
             fit: FlexFit.tight,
             child: Center(
               child: Text(
-                "$defaultCoinSymbol ${total.toStringAsFixed(2)}",
+                NumberFormatter.convertToMoneyLike(total),
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
@@ -329,7 +328,7 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
 
     final product = widget.rowModel.product;
 
-    final subtotal = (widget.rowModel.quantity * widget.rowModel.unitaryCost) / 100;
+    final subtotal = (widget.rowModel.quantity * widget.rowModel.unitaryCost);
     return Ink(
       color: widget.color,
       padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -415,7 +414,7 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
           Flexible(
             fit: FlexFit.tight,
             child: Center(
-              child: Text("C\$ ${subtotal.toStringAsFixed(2)}"),
+              child: Text(NumberFormatter.convertToMoneyLike(subtotal)),
             ),
           ),
         ],

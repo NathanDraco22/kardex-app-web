@@ -31,68 +31,63 @@ class _Body extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: ListView(
+        padding: const EdgeInsets.all(16.0),
+        children: [
+          const Text("Bienvenido, Usuario Numero 1", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 12),
+
+          const Text("Elige una opcion", style: TextStyle(fontSize: 18)),
+
+          const SizedBox(height: 12),
+
+          Wrap(
+            spacing: 24,
+            runSpacing: 20,
+            alignment: WrapAlignment.center,
             children: [
-              const Text("Bienvenido, Usuario Numero 1", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 12),
+              HomeOptionCard(
+                title: "Lista de Clientes",
+                icon: Icons.people,
+                onTap: () {
+                  context.pushNamed("client-catalog");
+                },
+              ),
 
-              const Text("Elige una opcion", style: TextStyle(fontSize: 18)),
+              HomeOptionCard(
+                title: "Lista de Proveedores",
+                icon: Icons.warehouse,
+                onTap: () {
+                  context.pushNamed("suppliers-catalog");
+                },
+              ),
 
-              const SizedBox(height: 12),
+              HomeOptionCard(
+                title: "Catalogo de Productos",
+                icon: Icons.shopping_bag_sharp,
+                onTap: () {
+                  context.pushNamed("product-catalog");
+                },
+              ),
 
-              Wrap(
-                spacing: 24,
-                runSpacing: 20,
-                alignment: WrapAlignment.center,
-                children: [
-                  HomeOptionCard(
-                    title: "Lista de Clientes",
-                    icon: Icons.people,
-                    onTap: () {
-                      context.pushNamed("client-catalog");
-                    },
-                  ),
+              HomeOptionCard(
+                title: "Inventario",
+                icon: Icons.inventory_2_outlined,
+                onTap: () {
+                  context.pushNamed("inventory");
+                },
+              ),
 
-                  HomeOptionCard(
-                    title: "Lista de Proveedores",
-                    icon: Icons.warehouse,
-                    onTap: () {
-                      context.pushNamed("suppliers-catalog");
-                    },
-                  ),
-
-                  HomeOptionCard(
-                    title: "Catalogo de Productos",
-                    icon: Icons.shopping_bag_sharp,
-                    onTap: () {
-                      context.pushNamed("product-catalog");
-                    },
-                  ),
-
-                  HomeOptionCard(
-                    title: "Inventario",
-                    icon: Icons.inventory_2_outlined,
-                    onTap: () {
-                      context.pushNamed("inventory");
-                    },
-                  ),
-
-                  HomeOptionCard(
-                    title: "Configuraciones",
-                    icon: Icons.settings,
-                    onTap: () {
-                      context.pushNamed("settings");
-                    },
-                  ),
-                ],
+              HomeOptionCard(
+                title: "Configuraciones",
+                icon: Icons.settings,
+                onTap: () {
+                  context.pushNamed("settings");
+                },
               ),
             ],
           ),
-        ),
+        ],
       ),
     );
   }
