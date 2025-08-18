@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/src/tools/icon_widgets.dart';
 
 class InventoryMenuScreen extends StatelessWidget {
   const InventoryMenuScreen({super.key});
@@ -31,14 +32,14 @@ class _Body extends StatelessWidget {
       child: ListView(
         children: [
           ListTile(
-            leading: const Icon(Icons.download_rounded),
+            leading: IconWidgets.entryInventoryIcon,
             title: const Text("Entrada de Inventario"),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.pushNamed("inventory-entry"),
           ),
           const Divider(height: 0.0),
           ListTile(
-            leading: const Icon(Icons.upload_rounded),
+            leading: IconWidgets.exitInventoryIcon,
             title: const Text("Salida de Inventario"),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.pushNamed("inventory-exit"),

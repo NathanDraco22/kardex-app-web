@@ -1,3 +1,4 @@
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -48,7 +49,7 @@ class _Body extends StatelessWidget {
             children: [
               HomeOptionCard(
                 title: "Lista de Clientes",
-                icon: Icons.people,
+                icon: FluentIcons.contact_card_16_filled,
                 onTap: () {
                   context.pushNamed("client-catalog");
                 },
@@ -56,7 +57,7 @@ class _Body extends StatelessWidget {
 
               HomeOptionCard(
                 title: "Lista de Proveedores",
-                icon: Icons.warehouse,
+                icon: FluentIcons.building_multiple_20_filled,
                 onTap: () {
                   context.pushNamed("suppliers-catalog");
                 },
@@ -64,7 +65,7 @@ class _Body extends StatelessWidget {
 
               HomeOptionCard(
                 title: "Catalogo de Productos",
-                icon: Icons.shopping_bag_sharp,
+                icon: FluentIcons.receipt_bag_20_filled,
                 onTap: () {
                   context.pushNamed("product-catalog");
                 },
@@ -72,7 +73,7 @@ class _Body extends StatelessWidget {
 
               HomeOptionCard(
                 title: "Inventario",
-                icon: Icons.inventory_2_outlined,
+                icon: FluentIcons.box_toolbox_20_filled,
                 onTap: () {
                   context.pushNamed("inventory");
                 },
@@ -80,7 +81,7 @@ class _Body extends StatelessWidget {
 
               HomeOptionCard(
                 title: "Configuraciones",
-                icon: Icons.settings,
+                icon: FluentIcons.settings_20_filled,
                 onTap: () {
                   context.pushNamed("settings");
                 },
