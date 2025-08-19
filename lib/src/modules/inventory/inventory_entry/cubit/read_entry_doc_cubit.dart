@@ -1,21 +1,52 @@
+import 'dart:developer';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/entry_doc/entry_doc_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
+import 'package:kardex_app_front/src/tools/constant.dart';
 
 part 'read_entry_doc_state.dart';
 
 class ReadEntryDocCubit extends Cubit<ReadEntryDocState> {
-  ReadEntryDocCubit(this.entryDocsRepository) : super(ReadEntryDocInitial());
+  ReadEntryDocCubit({
+    required this.entryDocsRepository,
+    required this.suppliersRepository,
+    required this.branchesRepository,
+  }) : super(ReadEntryDocInitial());
 
   final EntryDocsRepository entryDocsRepository;
+  final SuppliersRepository suppliersRepository;
+  final BranchesRepository branchesRepository;
 
-  Future<void> loadAllEntryDocs() async {
+  bool isLastPage = false;
+  List<EntryDocInDb> _entryDocsCache = [];
+
+  Future<void> loadPaginatedEntryDocs() async {
+    if (isLastPage) return;
     emit(ReadEntryDocLoading());
     try {
-      final docs = await entryDocsRepository.getAllEntryDocs();
-      emit(ReadEntryDocSuccess(docs));
+      // Carga datos relacionados necesarios para la vista
+      await Future.wait([
+        suppliersRepository.getAllSuppliers(),
+        branchesRepository.getAllBranches(),
+      ]);
+      final docs = await entryDocsRepository.getPaginatedEntryDocs(_entryDocsCache.length);
+      if (docs.length < paginationItems) isLastPage = true;
+      _entryDocsCache = [..._entryDocsCache, ...docs];
+      emit(ReadEntryDocSuccess(_entryDocsCache));
     } catch (error) {
       emit(EntryDocReadError(error.toString()));
+    }
+  }
+
+  Future<void> getNextPagedEntryDocs() async {
+    if (isLastPage) return;
+    try {
+      final docs = await entryDocsRepository.getPaginatedEntryDocs(_entryDocsCache.length);
+      if (docs.length < paginationItems) isLastPage = true;
+      _entryDocsCache = [..._entryDocsCache, ...docs];
+      emit(ReadEntryDocSuccess(_entryDocsCache));
+    } catch (e) {
+      log(e.toString());
     }
   }
 
@@ -23,7 +54,7 @@ class ReadEntryDocCubit extends Cubit<ReadEntryDocState> {
     final currentState = state as ReadEntryDocSuccess;
 
     if (keyword.isEmpty) {
-      emit(ReadEntryDocSuccess(entryDocsRepository.entryDocs));
+      emit(ReadEntryDocSuccess(_entryDocsCache));
       return;
     }
 
@@ -38,7 +69,8 @@ class ReadEntryDocCubit extends Cubit<ReadEntryDocState> {
 
   Future<void> putEntryDocFirst(EntryDocInDb doc) async {
     final currentState = state as ReadEntryDocSuccess;
-    final freshList = entryDocsRepository.entryDocs;
+    _entryDocsCache = [doc, ..._entryDocsCache];
+    final freshList = _entryDocsCache;
     if (currentState is HighlightedEntryDoc) {
       emit(
         HighlightedEntryDoc(
@@ -58,7 +90,7 @@ class ReadEntryDocCubit extends Cubit<ReadEntryDocState> {
 
   Future<void> refreshEntryDoc() async {
     final currentState = state as ReadEntryDocSuccess;
-    final freshList = entryDocsRepository.entryDocs;
+    final freshList = _entryDocsCache;
     if (currentState is HighlightedEntryDoc) {
       emit(
         HighlightedEntryDoc(

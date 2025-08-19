@@ -1,3 +1,4 @@
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -31,7 +32,7 @@ class _Body extends StatelessWidget {
       child: ListView(
         children: [
           ListTile(
-            leading: const Icon(Icons.square_rounded),
+            leading: const Icon(FluentIcons.cube_12_filled),
             title: const Text("Lista de Productos"),
             onTap: () {
               context.pushNamed("product-list");

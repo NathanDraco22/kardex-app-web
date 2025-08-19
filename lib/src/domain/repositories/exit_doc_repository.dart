@@ -1,4 +1,4 @@
-import 'package:kardex_app_front/src/data/exit_doc_data_source.dart';
+import 'package:kardex_app_front/src/data/data.dart';
 import 'package:kardex_app_front/src/domain/models/exit_doc/exit_doc_model.dart';
 import 'package:kardex_app_front/src/domain/responses/list_responses.dart';
 
@@ -7,27 +7,19 @@ class ExitDocsRepository {
 
   ExitDocsRepository(this.exitDocsDataSource);
 
-  List<ExitDocInDb> _exitDocs = [];
-
-  List<ExitDocInDb> get exitDocs => _exitDocs;
-
   Future<ExitDocInDb> createExitDoc(CreateExitDoc createExitDoc) async {
     final result = await exitDocsDataSource.createExitDoc(createExitDoc.toJson());
     final newDoc = ExitDocInDb.fromJson(result);
-    _exitDocs = [newDoc, ..._exitDocs];
     return newDoc;
   }
 
-  Future<List<ExitDocInDb>> getAllExitDocs() async {
-    final results = await exitDocsDataSource.getAllExitDocs();
+  Future<List<ExitDocInDb>> getPaginatedExitDocs(int offset) async {
+    final results = await exitDocsDataSource.getPaginatedExitDocs(offset);
     final response = ListResponse<ExitDocInDb>.fromJson(
       results,
       ExitDocInDb.fromJson,
     );
-
-    _exitDocs = response.data;
-    _exitDocs.sort((a, b) => b.docDate.compareTo(a.docDate));
-    return _exitDocs;
+    return response.data;
   }
 
   Future<ExitDocInDb?> getExitDocById(String docId) async {

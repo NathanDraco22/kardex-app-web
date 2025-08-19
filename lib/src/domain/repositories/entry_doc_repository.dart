@@ -1,4 +1,4 @@
-import 'package:kardex_app_front/src/data/entry_doc_data_source.dart';
+import 'package:kardex_app_front/src/data/data.dart';
 import 'package:kardex_app_front/src/domain/models/entry_doc/entry_doc_model.dart';
 import 'package:kardex_app_front/src/domain/responses/list_responses.dart';
 
@@ -7,28 +7,19 @@ class EntryDocsRepository {
 
   EntryDocsRepository(this.entryDocsDataSource);
 
-  List<EntryDocInDb> _entryDocs = [];
-
-  List<EntryDocInDb> get entryDocs => _entryDocs;
-
   Future<EntryDocInDb> createEntryDoc(CreateEntryDoc createEntryDoc) async {
     final result = await entryDocsDataSource.createEntryDoc(createEntryDoc.toJson());
     final newDoc = EntryDocInDb.fromJson(result);
-    _entryDocs = [newDoc, ..._entryDocs];
     return newDoc;
   }
 
-  Future<List<EntryDocInDb>> getAllEntryDocs() async {
-    final results = await entryDocsDataSource.getAllEntryDocs();
+  Future<List<EntryDocInDb>> getPaginatedEntryDocs(int offset) async {
+    final results = await entryDocsDataSource.getPaginatedEntryDocs(offset);
     final response = ListResponse<EntryDocInDb>.fromJson(
       results,
       EntryDocInDb.fromJson,
     );
-
-    _entryDocs = response.data;
-    
-    _entryDocs.sort((a, b) => b.docDate.compareTo(a.docDate));
-    return _entryDocs;
+    return response.data;
   }
 
   Future<EntryDocInDb?> getEntryDocById(String docId) async {
