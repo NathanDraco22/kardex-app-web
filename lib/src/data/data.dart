@@ -1,6 +1,7 @@
 export 'branche_data_source.dart';
 export 'client_data_source.dart';
 export 'entry_doc_data_source.dart';
+export 'entry_histories_data_source.dart';
 export 'exit_doc_data_source.dart';
 export 'product_category_data_source.dart';
 export 'product_data_source.dart';

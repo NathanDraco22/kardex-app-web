@@ -1,3 +1,4 @@
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/src/tools/icon_widgets.dart';
@@ -44,6 +45,29 @@ class _Body extends StatelessWidget {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.pushNamed("inventory-exit"),
           ),
+
+          const Divider(height: 0.0),
+
+          ListTile(
+            leading: const Icon(
+              FluentIcons.history_28_filled,
+              color: Colors.blue,
+            ),
+            title: const Text("Historial de Entradas"),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.pushNamed("history-entry"),
+          ),
+          const Divider(height: 0.0),
+          ListTile(
+            leading: const Icon(
+              FluentIcons.history_28_filled,
+              color: Colors.red,
+            ),
+            title: const Text("Historial de salidas"),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.pushNamed("history-exit"),
+          ),
+          const Divider(height: 0.0),
         ],
       ),
     );
