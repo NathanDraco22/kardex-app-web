@@ -15,7 +15,7 @@ class ReadEntryHistoryCubit extends Cubit<ReadEntryHistoryState> {
   List<EntryHistoryInDb> _historiesCache = [];
 
   Future<void> loadPaginatedHistories({
-    required String supplierId,
+    String? supplierId,
     required String branchId,
   }) async {
     emit(ReadEntryHistoryLoading());
@@ -39,7 +39,7 @@ class ReadEntryHistoryCubit extends Cubit<ReadEntryHistoryState> {
   }
 
   Future<void> getNextPage({
-    required String supplierId,
+    String? supplierId,
     required String branchId,
   }) async {
     if (isLastPage) return;

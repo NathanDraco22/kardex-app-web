@@ -13,7 +13,7 @@ class EntryHistoriesDataSource with HttpService {
   Future<Map<String, dynamic>> getEntryHistories({
     required int offset,
     int? limit,
-    required String supplierId,
+    String? supplierId,
     required String branchId,
   }) async {
     final uri = HttpTools.generateUri(
@@ -21,7 +21,7 @@ class EntryHistoriesDataSource with HttpService {
       queryParameters: {
         "offset": offset.toString(),
         if (limit != null) "limit": limit.toString(),
-        "supplierId": supplierId,
+        "supplierId": ?supplierId,
         "branchId": branchId,
       },
     );

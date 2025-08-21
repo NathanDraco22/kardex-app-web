@@ -7,7 +7,6 @@ import 'package:kardex_app_front/src/modules/product_catalog/product_list/dialog
 import 'package:kardex_app_front/src/modules/product_catalog/product_list/view/widgets/products_table.dart';
 import 'package:kardex_app_front/src/tools/extensiones.dart';
 import 'package:kardex_app_front/src/tools/scroll_tools.dart';
-import 'package:kardex_app_front/widgets/row_widgets/mobile_row.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
 part 'web/product_list_screen_web.dart';

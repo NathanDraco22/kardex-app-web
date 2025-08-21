@@ -10,7 +10,7 @@ class EntryHistoriesRepository {
   Future<ListResponse<EntryHistoryInDb>> getEntryHistories({
     required int offset,
     int? limit,
-    required String supplierId,
+    String? supplierId,
     required String branchId,
   }) async {
     final results = await entryHistoriesDataSource.getEntryHistories(
