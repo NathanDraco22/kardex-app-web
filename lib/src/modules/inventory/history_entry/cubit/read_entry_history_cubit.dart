@@ -14,16 +14,18 @@ class ReadEntryHistoryCubit extends Cubit<ReadEntryHistoryState> {
   bool isLastPage = false;
   List<EntryHistoryInDb> _historiesCache = [];
 
-  Future<void> loadPaginatedHistories({
-    String? supplierId,
-    required String branchId,
-  }) async {
+  String? supplierId;
+  String? startDate;
+  String? endDate;
+
+  Future<void> loadPaginatedHistories() async {
     emit(ReadEntryHistoryLoading());
     try {
       final response = await entryHistoriesRepository.getEntryHistories(
         offset: 0,
         supplierId: supplierId,
-        branchId: branchId,
+        startDate: startDate,
+        endDate: endDate,
       );
 
       _historiesCache = response.data;
@@ -32,31 +34,49 @@ class ReadEntryHistoryCubit extends Cubit<ReadEntryHistoryState> {
       } else {
         isLastPage = false;
       }
+      if (isClosed) return;
       emit(ReadEntryHistorySuccess(_historiesCache, response.count));
     } catch (error) {
+      if (isClosed) return;
       emit(ReadEntryHistoryError(error.toString()));
     }
   }
 
-  Future<void> getNextPage({
-    String? supplierId,
-    required String branchId,
-  }) async {
+  Future<void> getNextPage() async {
     if (isLastPage) return;
     try {
       final response = await entryHistoriesRepository.getEntryHistories(
         offset: _historiesCache.length,
         supplierId: supplierId,
-        branchId: branchId,
+        startDate: startDate,
+        endDate: endDate,
       );
 
       _historiesCache.addAll(response.data);
       if (_historiesCache.length >= response.count) {
         isLastPage = true;
       }
+      if (isClosed) return;
       emit(ReadEntryHistorySuccess(_historiesCache, response.count));
     } catch (e) {
       log(e.toString());
     }
+  }
+
+  Future<void> setFilterParams({String? supplierId, String? startDate, String? endDate}) async {
+    this.supplierId ??= supplierId;
+    this.startDate ??= startDate;
+    this.endDate ??= endDate;
+    _historiesCache = [];
+  }
+
+  Future<void> clearFilterParams() async {
+    if (supplierId == null && startDate == null && endDate == null) return;
+
+    supplierId = null;
+    startDate = null;
+    endDate = null;
+    _historiesCache = [];
+    loadPaginatedHistories();
   }
 }

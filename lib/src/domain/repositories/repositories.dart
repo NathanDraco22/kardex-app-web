@@ -1,7 +1,9 @@
 export 'branch_repository.dart';
 export 'client_repository.dart';
 export 'entry_doc_repository.dart';
+export 'entry_histories_repository.dart';
 export 'exit_doc_repository.dart';
+export 'exit_histories_repository.dart';
 export 'product_category_repository.dart';
 export 'product_price_repository.dart';
 export 'product_repository.dart';

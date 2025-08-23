@@ -11,13 +11,15 @@ class EntryHistoriesRepository {
     required int offset,
     int? limit,
     String? supplierId,
-    required String branchId,
+    String? startDate,
+    String? endDate,
   }) async {
     final results = await entryHistoriesDataSource.getEntryHistories(
       offset: offset,
       limit: limit,
       supplierId: supplierId,
-      branchId: branchId,
+      startDate: startDate,
+      endDate: endDate,
     );
     final response = ListResponse<EntryHistoryInDb>.fromJson(
       results,
