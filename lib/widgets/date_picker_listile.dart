@@ -2,14 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 
 class DatePickerListTile extends StatefulWidget {
-  final String title;
-  final ValueChanged<DateTime> onSelected;
-
   const DatePickerListTile({
     super.key,
     required this.title,
     required this.onSelected,
+    this.isActive = true,
   });
+
+  final String title;
+  final ValueChanged<DateTime> onSelected;
+  final bool isActive;
 
   @override
   DatePickerListTileState createState() => DatePickerListTileState();
@@ -42,7 +44,7 @@ class DatePickerListTileState extends State<DatePickerListTile> {
         style: const TextStyle(fontWeight: FontWeight.w500, color: Colors.black),
       ),
       trailing: const Icon(Icons.calendar_today),
-      onTap: () => _selectDate(context),
+      onTap: !widget.isActive ? null : () => _selectDate(context),
     );
   }
 }

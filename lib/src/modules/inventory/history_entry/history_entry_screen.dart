@@ -3,6 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/inventory/history_entry/cubit/read_entry_history_cubit.dart';
 import 'package:kardex_app_front/src/modules/inventory/history_entry/web/history_entry_screen_web.dart';
+import 'package:kardex_app_front/src/tools/tools.dart';
+
+import 'mobile/history_entry_screen_mobile.dart';
 
 class HistoryEntryScreen extends StatelessWidget {
   const HistoryEntryScreen({super.key});
@@ -39,6 +42,10 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (context.isMobile()) {
+      return const HistoryEntryScreenMobile();
+    }
+
     return const HistoryEntryScreenWeb();
   }
 }

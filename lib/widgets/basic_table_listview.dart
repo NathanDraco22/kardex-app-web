@@ -99,7 +99,7 @@ class BasicTableListView extends StatelessWidget {
                   color: Colors.transparent,
                   child: Ink(
                     color: tableRow.color,
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     child: Row(
                       children: [
                         for (var i = 0; i < tableRow.cells.length; i++)
