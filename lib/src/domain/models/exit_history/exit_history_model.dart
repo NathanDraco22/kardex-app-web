@@ -1,3 +1,31 @@
+class ExitItem {
+  final String productId;
+  final int? cost;
+  final int quantity;
+
+  ExitItem({
+    required this.productId,
+    this.cost,
+    required this.quantity,
+  });
+
+  factory ExitItem.fromJson(Map<String, dynamic> json) {
+    return ExitItem(
+      productId: json['productId'] as String,
+      cost: json['cost'] as int?,
+      quantity: json['quantity'] as int,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'productId': productId,
+      'cost': cost,
+      'quantity': quantity,
+    };
+  }
+}
+
 class Client {
   final String name;
 
@@ -21,6 +49,7 @@ class ExitHistoryInDb {
   final DateTime docDate;
   final String branchId;
   final String description;
+  final List<ExitItem> items;
   final String id;
   final DateTime createdAt;
 
@@ -31,9 +60,14 @@ class ExitHistoryInDb {
     required this.docDate,
     required this.branchId,
     required this.description,
+    required this.items,
     required this.id,
     required this.createdAt,
   });
+
+  int get total {
+    return items.fold(0, (sum, item) => sum + ((item.cost ?? 0) * item.quantity.abs()));
+  }
 
   factory ExitHistoryInDb.fromJson(Map<String, dynamic> json) {
     return ExitHistoryInDb(
@@ -43,6 +77,7 @@ class ExitHistoryInDb {
       docDate: DateTime.parse(json['docDate'] as String),
       branchId: json['branchId'] as String,
       description: json['description'] as String,
+      items: (json['items'] as List<dynamic>).map((item) => ExitItem.fromJson(item as Map<String, dynamic>)).toList(),
       id: json['id'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
     );
@@ -56,11 +91,9 @@ class ExitHistoryInDb {
       'docDate': docDate.toIso8601String(),
       'branchId': branchId,
       'description': description,
+      'items': items.map((item) => item.toJson()).toList(),
       'id': id,
       'createdAt': createdAt.toIso8601String(),
     };
   }
 }
-
-// TODO: implementar las demas capas.
-// TODO: clientes y proveedores opcionales para consultas

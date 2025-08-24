@@ -1,0 +1,124 @@
+part of '../history_exit_screen_mobile.dart';
+
+class _HeaderSection extends StatefulWidget {
+  const _HeaderSection();
+
+  @override
+  State<_HeaderSection> createState() => _HeaderSectionState();
+}
+
+class _HeaderSectionState extends State<_HeaderSection> {
+  @override
+  Widget build(BuildContext context) {
+    // Cambiado a ReadExitHistoryCubit
+    final readCubit = context.read<ReadExitHistoryCubit>();
+
+    return Card(
+      key: UniqueKey(),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            SizedBox(
+              height: 70,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Flexible(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const Text(
+                          "Cliente", // Cambiado de "Proveedor"
+                          textAlign: TextAlign.left,
+                        ),
+                        const SizedBox(height: 6),
+                        // Cambiado a ClientInDb y ClientsRepository
+                        CustomAutocompleteTextfield<ClientInDb>(
+                          key: ValueKey(readCubit.clientId),
+                          titleBuilder: (value) => value.name,
+                          onSearch: (value) async {
+                            final repo = context.read<ClientsRepository>();
+                            try {
+                              final res = await repo.searchClientByKeyword(value);
+                              return res;
+                            } catch (e) {
+                              return [];
+                            }
+                          },
+                          suggestionBuilder: (value, close) {
+                            return ListView.builder(
+                              itemCount: value.length,
+                              itemBuilder: (context, index) {
+                                final client = value[index];
+                                return ListTile(
+                                  title: Text(client.name),
+                                  onTap: () {
+                                    // Llama al setFilterParams del cubit correcto
+                                    readCubit.setFilterParams(clientId: client.id);
+                                    close(client);
+                                  },
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Row(
+              children: [
+                Flexible(
+                  child: DatePickerListTile(
+                    key: ValueKey(readCubit.startDate),
+                    title: "Fecha Inicio",
+                    onSelected: (value) {
+                      final startDate = DateTimeTool.formatyyyyMMdd(value);
+                      readCubit.setFilterParams(startDate: startDate);
+                    },
+                  ),
+                ),
+                const VerticalDivider(),
+                Flexible(
+                  child: DatePickerListTile(
+                    key: ValueKey(readCubit.endDate),
+                    title: "Fecha Fin",
+                    onSelected: (value) {
+                      final endDate = DateTimeTool.formatyyyyMMdd(value);
+                      readCubit.setFilterParams(endDate: endDate);
+                    },
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                FilledButton.icon(
+                  onPressed: () {
+                    readCubit.loadPaginatedHistories();
+                  },
+                  label: const Text("Filtrar"),
+                  icon: const Icon(Icons.filter_alt_rounded),
+                ),
+                const SizedBox(width: 12),
+                FilledButton(
+                  onPressed: () {
+                    // Llama al cubit correcto
+                    final readCubit = context.read<ReadExitHistoryCubit>();
+                    readCubit.clearFilterParams();
+                    setState(() {});
+                  },
+                  child: const Icon(Icons.clear),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

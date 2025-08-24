@@ -67,6 +67,7 @@ class ReadEntryHistoryCubit extends Cubit<ReadEntryHistoryState> {
     this.supplierId ??= supplierId;
     this.startDate ??= startDate;
     this.endDate ??= endDate;
+    isLastPage = false;
     _historiesCache = [];
   }
 
