@@ -11,6 +11,12 @@ class IconWidgets {
     color: Colors.red,
   );
 
+  static Icon get currentInventoryIcon => const Icon(
+    FluentIcons.book_toolbox_24_filled,
+    color: Colors.teal,
+    size: 28,
+  );
+
   Icon getSupplierIcon({Color? color}) => Icon(
     FluentIcons.building_multiple_20_filled,
     color: color,

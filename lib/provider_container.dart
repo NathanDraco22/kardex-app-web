@@ -22,6 +22,7 @@ class ProviderContainer extends StatelessWidget {
     final exitDocsDataSource = ExitDocsDataSource();
     final entryHistoryDataSource = EntryHistoriesDataSource();
     final exitHistoryDataSource = ExitHistoriesDataSource();
+    final inventoryDataSource = InventoriesDataSource();
 
     return MultiRepositoryProvider(
       providers: [
@@ -69,6 +70,10 @@ class ProviderContainer extends StatelessWidget {
 
         RepositoryProvider(
           create: (context) => ExitHistoriesRepository(exitHistoryDataSource),
+        ),
+
+        RepositoryProvider(
+          create: (context) => InventoriesRepository(inventoryDataSource),
         ),
       ],
       child: GlobalCubitProvider(

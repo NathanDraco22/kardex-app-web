@@ -33,6 +33,12 @@ class _Body extends StatelessWidget {
       child: ListView(
         children: [
           ListTile(
+            leading: IconWidgets.currentInventoryIcon,
+            title: const Text("Inventario Actual"),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.pushNamed("current-inventory"),
+          ),
+          ListTile(
             leading: IconWidgets.entryInventoryIcon,
             title: const Text("Entrada de Inventario"),
             trailing: const Icon(Icons.chevron_right),

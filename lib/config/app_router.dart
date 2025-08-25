@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/view/client_catalog_screen.dart';
 import 'package:kardex_app_front/src/modules/home/view/home_screen.dart';
+import 'package:kardex_app_front/src/modules/inventory/current_inventory/current_inventory_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/history_entry/history_entry_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/history_exit/history_exit_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_entry/view/inventory_entry_screen.dart';
@@ -60,6 +61,11 @@ class AppRouter {
         name: 'inventory',
         builder: (context, state) => const InventoryMenuScreen(),
         routes: [
+          GoRoute(
+            path: "current-inventory",
+            name: "current-inventory",
+            builder: (context, state) => const CurrentInventoryScreen(),
+          ),
           GoRoute(
             path: "inventory-entry",
             name: "inventory-entry",
