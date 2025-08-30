@@ -72,6 +72,14 @@ class _Body extends StatelessWidget {
               ),
 
               HomeOptionCard(
+                title: "Comercio",
+                icon: FluentIcons.money_calculator_20_filled,
+                onTap: () {
+                  context.pushNamed("commercial");
+                },
+              ),
+
+              HomeOptionCard(
                 title: "Inventario",
                 icon: FluentIcons.box_toolbox_20_filled,
                 onTap: () {
