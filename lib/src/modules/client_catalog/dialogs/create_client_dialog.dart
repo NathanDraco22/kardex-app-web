@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/cubit/client_write_cubit.dart';
-import 'package:kardex_app_front/src/tools/dialog_manager.dart';
-import 'package:kardex_app_front/src/tools/loading_dialog.dart';
+import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
 
 Future<ClientInDb?> showCreateClientDialog(BuildContext context, {ClientInDb? client}) async {
@@ -47,9 +47,11 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
     final wordPrefix = widget.client == null ? "Agregar" : "Actualizar";
 
     bool isActive = true;
+    bool isCreditActive = false;
 
     if (widget.client != null) {
       isActive = widget.client!.isActive;
+      isCreditActive = widget.client!.isCreditActive;
     }
 
     creationMap['isActive'] = isActive;
@@ -68,7 +70,10 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
 
         if (state is DeleteClientSuccess) {
           LoadingDialogManager.closeLoadingDialog(context);
-          await DialogManager.showInfoDialog(context, "Se ha borrado el cliente ${state.client.name}");
+          await DialogManager.showInfoDialog(
+            context,
+            "Se ha borrado el cliente ${state.client.name}",
+          );
           if (!context.mounted) return;
           context.pop(state.client);
         }
@@ -150,17 +155,8 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
                             key: const ValueKey("phone_field"),
                             initialValue: widget.client?.phone,
                             title: "Telefono",
-                            onEditingComplete: () async {
-                              if (widget.client != null) return;
-                              if (!formKey.currentState!.validate()) return;
-                              final res = await DialogManager.confirmActionDialog(
-                                context,
-                                "Deseas crear el cliente ${creationMap["name"]}?",
-                              );
-                              if (!res) return;
-                              final createClient = CreateClient.fromJson(creationMap);
-                              writeCubit.createNewClient(createClient);
-                            },
+                            onEditingComplete: () => FocusScope.of(context).nextFocus(),
+
                             validator: (value) {
                               if (value == null) {
                                 return null;
@@ -172,7 +168,34 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
                         ),
                       ],
                     ),
+
                     const SizedBox(height: 12),
+
+                    TitleTextField(
+                      key: const ValueKey("credit_field"),
+                      title: "Limite de Credito(C\$)*",
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [IntegerThousandsFormatter()],
+                      initialValue: widget.client?.creditLimit.toString(),
+                      validator: (value) {
+                        final formattedValue = value?.replaceAll(RegExp(r'[^0-9]'), "");
+                        if (formattedValue == null || formattedValue.isEmpty) {
+                          return "El campo es requerido";
+                        }
+
+                        final number = int.tryParse(formattedValue.trim());
+
+                        if (number == null) {
+                          return "Numero incorrecto";
+                        }
+
+                        creationMap["creditLimit"] = number;
+                        return null;
+                      },
+                    ),
+
+                    const SizedBox(height: 12),
+
                     StatefulBuilder(
                       builder: (context, setState) {
                         return SwitchListTile(
@@ -185,6 +208,22 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
                             setState(() {});
                           },
                           title: const Text("Activo"),
+                        );
+                      },
+                    ),
+
+                    StatefulBuilder(
+                      builder: (context, setState) {
+                        return SwitchListTile(
+                          focusNode: FocusNode(skipTraversal: true),
+                          tileColor: Colors.grey.shade100,
+                          value: isCreditActive,
+                          onChanged: (value) {
+                            isCreditActive = value;
+                            creationMap["isCreditActive"] = value;
+                            setState(() {});
+                          },
+                          title: const Text("Credito Activo"),
                         );
                       },
                     ),

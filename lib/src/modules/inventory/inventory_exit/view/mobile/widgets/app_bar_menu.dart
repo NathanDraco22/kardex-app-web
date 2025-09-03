@@ -5,8 +5,7 @@ import 'package:kardex_app_front/src/domain/models/models.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_entry/modals/confirmation_save_modal.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_exit/cubit/write_exit_doc_cubit.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_exit/view/mediator.dart';
-import 'package:kardex_app_front/src/tools/tools.dart';
-import 'package:kardex_app_front/widgets/custom_listviews/confirmation_product_listview.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 
 class ExitAppBarMenusButton extends StatelessWidget {
   const ExitAppBarMenusButton({super.key});

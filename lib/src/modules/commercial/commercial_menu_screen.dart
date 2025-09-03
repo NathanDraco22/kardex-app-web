@@ -1,4 +1,6 @@
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class CommercialMenuScreen extends StatelessWidget {
   const CommercialMenuScreen({super.key});
@@ -26,8 +28,34 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text("CommercialMenuScreen"),
+    return Center(
+      child: ListView(
+        children: [
+          ListTile(
+            leading: Icon(
+              FluentIcons.person_money_20_filled,
+              size: 32,
+              color: Colors.green.shade600,
+            ),
+            title: const Text("Facturacion a Clientes"),
+            onTap: () {
+              context.pushNamed("client-invoice");
+            },
+          ),
+
+          ListTile(
+            leading: Icon(
+              FluentIcons.money_calculator_20_filled,
+              size: 32,
+              color: Colors.blue.shade600,
+            ),
+            title: const Text("Configuracion de Precios de Productos"),
+            onTap: () {
+              context.pushNamed("product-price-setting");
+            },
+          ),
+        ],
+      ),
     );
   }
 }

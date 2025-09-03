@@ -1,11 +1,9 @@
 export 'constant.dart';
-export 'dialog_manager.dart';
 export 'extensiones.dart';
 export 'http_tool.dart';
 export 'input_formatters.dart';
 export 'loading_dialog.dart';
 export 'notifications.dart';
 export 'number_formatter.dart';
-export 'product_search_delegate.dart';
+
 export 'scroll_tools.dart';
-export 'search_product_dialog.dart';

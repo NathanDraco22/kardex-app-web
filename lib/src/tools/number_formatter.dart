@@ -13,6 +13,8 @@ class NumberFormatter {
     return defaultCoinSymbol + _instance.format(value);
   }
 
+  static String decimalPattern(num value) => _instance.format(value);
+
   static int convertFromDoubleToCents(double value) {
     return (value * 100).round();
   }

@@ -2,20 +2,41 @@ class BaseClient {
   final String name;
   final String? cardId;
   final String? phone;
+  final int balance;
+  final int creditLimit;
+  final bool isCreditActive;
   final bool isActive;
 
   BaseClient({
     required this.name,
     this.cardId,
     this.phone,
+    this.balance = 0,
+    this.creditLimit = 0,
+    this.isCreditActive = false,
     this.isActive = true,
   });
+
+  factory BaseClient.fromJson(Map json) {
+    return BaseClient(
+      name: json['name'] as String,
+      cardId: json['cardId'] as String?,
+      phone: json['phone'] as String?,
+      balance: json['balance'] as int? ?? 0,
+      creditLimit: json['creditLimit'] as int? ?? 0,
+      isCreditActive: json['isCreditActive'] as bool? ?? false,
+      isActive: json['isActive'] as bool? ?? true,
+    );
+  }
 
   Map<String, dynamic> toJson() {
     return {
       'name': name,
       'cardId': cardId,
       'phone': phone,
+      'balance': balance,
+      'creditLimit': creditLimit,
+      'isCreditActive': isCreditActive,
       'isActive': isActive,
     };
   }
@@ -24,17 +45,23 @@ class BaseClient {
 class CreateClient extends BaseClient {
   CreateClient({
     required super.name,
-    required super.cardId,
-    required super.phone,
-    required super.isActive,
+    super.cardId,
+    super.phone,
+    super.balance,
+    super.creditLimit,
+    super.isCreditActive,
+    super.isActive,
   });
 
   factory CreateClient.fromJson(Map json) {
     return CreateClient(
       name: json['name'] as String,
-      cardId: json['cardId'] as String,
-      phone: json['phone'] as String,
-      isActive: json['isActive'] as bool,
+      cardId: json['cardId'] as String?,
+      phone: json['phone'] as String?,
+      balance: json['balance'] as int? ?? 0,
+      creditLimit: json['creditLimit'] as int? ?? 0,
+      isCreditActive: json['isCreditActive'] as bool? ?? false,
+      isActive: json['isActive'] as bool? ?? true,
     );
   }
 }
@@ -44,8 +71,17 @@ class UpdateClient {
   final String? cardId;
   final String? phone;
   final bool? isActive;
+  final bool? isCreditActive;
+  final int? creditLimit;
 
-  UpdateClient({this.name, this.cardId, this.phone, this.isActive});
+  UpdateClient({
+    this.name,
+    this.cardId,
+    this.phone,
+    this.isActive,
+    this.isCreditActive,
+    this.creditLimit,
+  });
 
   factory UpdateClient.fromJson(Map json) {
     return UpdateClient(
@@ -53,6 +89,8 @@ class UpdateClient {
       cardId: json['cardId'] as String?,
       phone: json['phone'] as String?,
       isActive: json['isActive'] as bool?,
+      isCreditActive: json['isCreditActive'] as bool?,
+      creditLimit: json['creditLimit'] as int?,
     );
   }
 
@@ -62,16 +100,17 @@ class UpdateClient {
       'cardId': cardId,
       'phone': phone,
       'isActive': isActive,
+      'isCreditActive': isCreditActive,
+      'creditLimit': creditLimit,
     };
-
     data.removeWhere((key, value) => value == null);
-
     return data;
   }
 }
 
 class ClientInDb extends BaseClient {
   final String id;
+  final bool isDeleted;
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -80,18 +119,26 @@ class ClientInDb extends BaseClient {
     required super.name,
     super.cardId,
     super.phone,
+    super.balance,
+    super.creditLimit,
+    super.isCreditActive,
     super.isActive,
+    this.isDeleted = false,
     required this.createdAt,
     this.updatedAt,
   });
 
-  factory ClientInDb.fromJson(Map<String, dynamic> json) {
+  factory ClientInDb.fromJson(Map json) {
     return ClientInDb(
       id: json['id'] as String,
       name: json['name'] as String,
-      cardId: json['cardId'] as String,
-      phone: json['phone'] as String,
-      isActive: json['isActive'] as bool,
+      cardId: json['cardId'] as String?,
+      phone: json['phone'] as String?,
+      balance: json['balance'] as int? ?? 0,
+      creditLimit: json['creditLimit'] as int? ?? 0,
+      isCreditActive: json['isCreditActive'] as bool? ?? false,
+      isActive: json['isActive'] as bool? ?? true,
+      isDeleted: json['isDeleted'] as bool? ?? false,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt'] as String) : null,
     );
@@ -99,9 +146,10 @@ class ClientInDb extends BaseClient {
 
   @override
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = super.toJson();
+    final data = super.toJson();
     data.addAll({
       'id': id,
+      'isDeleted': isDeleted,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
     });

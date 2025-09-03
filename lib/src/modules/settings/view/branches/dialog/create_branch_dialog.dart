@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/src/domain/models/branch/branch_model.dart';
 import 'package:kardex_app_front/src/modules/settings/view/branches/cubit/write_branch_cubit.dart';
-import 'package:kardex_app_front/src/tools/dialog_manager.dart';
+import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
 

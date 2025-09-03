@@ -43,15 +43,6 @@ class _Body extends StatelessWidget {
             height: 0.0,
           ),
           ListTile(
-            leading: const Icon(Icons.monetization_on_outlined),
-            title: const Text("Lista de Precios por Producto"),
-            onTap: () {},
-            trailing: const Icon(Icons.chevron_right),
-          ),
-          const Divider(
-            height: 0.0,
-          ),
-          ListTile(
             leading: const Icon(Icons.category_rounded),
             title: const Text("Lista de Categorias de Productos"),
             onTap: () {

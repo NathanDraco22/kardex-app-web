@@ -11,6 +11,7 @@ final class ReadCurrentInventorySuccess extends ReadCurrentInventoryState {
   ReadCurrentInventorySuccess(this.inventories);
 
   int get total {
+    if (inventories.isEmpty) return 0;
     final totals = inventories.map((e) => e.total).toList();
     return totals.reduce((value, element) => value + element);
   }

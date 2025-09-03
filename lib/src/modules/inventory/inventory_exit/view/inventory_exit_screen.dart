@@ -5,7 +5,7 @@ import 'package:kardex_app_front/src/modules/inventory/inventory_exit/cubit/writ
 import 'package:kardex_app_front/src/modules/inventory/inventory_exit/view/mediator.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 
-import 'package:kardex_app_front/widgets/empty_scaffold.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 
 import 'mobile/inventory_exit_screen_mobile.dart';
 import 'web/inventory_exit_screen_web.dart';
