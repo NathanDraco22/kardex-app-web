@@ -115,7 +115,7 @@ class _InnerRows extends StatelessWidget {
 
           if (state is HighlightedProduct) {
             if (state.updatedProducts.any((element) => element.id == currentProduct.id)) {
-              rowColor = Colors.indigo.shade200;
+              rowColor = Colors.blue.shade100;
             } else if (state.newProducts.any((element) => element.id == currentProduct.id)) {
               rowColor = Colors.yellow.shade200;
             }

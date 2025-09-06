@@ -135,7 +135,7 @@ class MobileClientsTable extends StatelessWidget {
 
                     if (state is HighlightedClient) {
                       if (state.updatedClients.any((element) => element.id == currentClient.id)) {
-                        rowColor = Colors.indigo.shade200;
+                        rowColor = Colors.blue.shade100;
                       } else if (state.newClients.any((element) => element.id == currentClient.id)) {
                         rowColor = Colors.yellow.shade200;
                       }

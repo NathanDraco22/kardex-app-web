@@ -68,3 +68,55 @@ class IntegerThousandsFormatter extends TextInputFormatter {
     );
   }
 }
+
+class DoubleThousandsFormatter extends TextInputFormatter {
+  final int decimalDigits;
+
+  DoubleThousandsFormatter({this.decimalDigits = 2});
+
+  @override
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+    // Si se borra el texto, permite que el campo quede vacío.
+    if (newValue.text.isEmpty) {
+      return newValue.copyWith(text: '');
+    }
+
+    // Limpia el texto para procesarlo, quitando las comas.
+    String text = newValue.text.replaceAll(',', '');
+
+    // Permite solo números y un punto decimal.
+    final regExp = RegExp(r'^\d*\.?\d*$');
+    if (!regExp.hasMatch(text)) {
+      return oldValue;
+    }
+
+    List<String> parts = text.split('.');
+    String integerPart = parts[0];
+    String decimalPart = parts.length > 1 ? parts[1] : '';
+
+    // Formatea la parte entera con comas.
+    if (integerPart.isNotEmpty) {
+      final number = int.parse(integerPart);
+      final formatter = NumberFormat("#,###");
+      integerPart = formatter.format(number);
+    }
+
+    // Limita la longitud de la parte decimal.
+    if (decimalPart.length > decimalDigits) {
+      decimalPart = decimalPart.substring(0, decimalDigits);
+    }
+
+    // Reconstruye el texto.
+    String newText;
+    if (parts.length > 1) {
+      newText = '$integerPart.$decimalPart';
+    } else {
+      newText = integerPart;
+    }
+
+    return newValue.copyWith(
+      text: newText,
+      selection: TextSelection.collapsed(offset: newText.length),
+    );
+  }
+}

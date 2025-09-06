@@ -1,11 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
+import 'package:kardex_app_front/src/tools/tools.dart';
+
+import 'cubit/read_product_sale_profile_cubit.dart';
+import 'cubit/write_product_sale_profile_cubit.dart';
+import 'mobile/product_price_setting_mobile.dart';
+import 'web/product_price_setting_web.dart';
 
 class ProductPriceSettingScreen extends StatelessWidget {
   const ProductPriceSettingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const _RootScaffold();
+    final profileRepo = context.read<ProductSaleProfilesRepository>();
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) {
+            return ReadProductSaleProfileCubit(
+              profilesRepository: profileRepo,
+            )..loadCurrentBranchProfiles();
+          },
+        ),
+        BlocProvider(
+          create: (context) => WriteProductSaleProfileCubit(
+            profilesRepository: profileRepo,
+          ),
+        ),
+      ],
+      child: const _RootScaffold(),
+    );
   }
 }
 
@@ -28,8 +53,9 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text("ProductPriceSetting"),
-    );
+    final isMobile = context.isMobile();
+
+    if (isMobile) return const ProductPriceSettingMobile();
+    return const ProductPriceSettingWeb();
   }
 }

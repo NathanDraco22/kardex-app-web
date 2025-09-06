@@ -34,9 +34,11 @@ class BasicTableListView extends StatelessWidget {
     required this.columns,
     required this.itemCount,
     required this.rowBuilder,
+    this.controller,
   });
 
   final List<BasicTableColumn> columns;
+  final ScrollController? controller;
 
   final int itemCount;
   final BasicTableRow? Function(BuildContext context, int index) rowBuilder;
@@ -69,6 +71,7 @@ class BasicTableListView extends StatelessWidget {
           ),
           Expanded(
             child: ListView.builder(
+              controller: controller,
               itemCount: itemCount,
               itemBuilder: (context, index) {
                 final tableRow = rowBuilder.call(context, index);
@@ -78,6 +81,7 @@ class BasicTableListView extends StatelessWidget {
 
                 if (columns.length != tableRow.cells.length) {
                   return Ink(
+                    key: ValueKey(index),
                     color: Colors.red,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
