@@ -74,6 +74,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
           TitleTextField(
             title: "Descuento en %",
             initialValue: currentDiscount.percentValue.toString(),
+            keyboardType: TextInputType.number,
             inputFormatters: [IntegerTextInputFormatter()],
             onChanged: (value) {
               currentDiscount.percentValue = int.tryParse(value) ?? 0;

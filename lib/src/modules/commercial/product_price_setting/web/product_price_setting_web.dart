@@ -51,7 +51,7 @@ class _Body extends StatelessWidget {
 
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(4.0),
         child: Card(
           child: Column(
             children: [
@@ -63,6 +63,7 @@ class _Body extends StatelessWidget {
                       width: 8,
                     ),
                     Flexible(
+                      flex: 2,
                       child: SearchFieldDebounced(
                         onSearch: (value) {
                           readCubit.searchProfile(value);

@@ -31,30 +31,33 @@ class _ContentSection extends StatelessWidget {
             "Producto",
           ),
         ),
+
         BasicTableColumn(
           flex: 2,
-          label: const Text(
-            "Ultima Compra",
-            textAlign: TextAlign.center,
+          label: Column(
+            children: [
+              Text(
+                "Costo",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.green.shade900,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                "Ultima Compra",
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
         ),
         BasicTableColumn(
           flex: 2,
-          label: const Text(
-            "Costo",
-            textAlign: TextAlign.center,
-          ),
-        ),
-        BasicTableColumn(
-          flex: 1,
           label: const Text(
             "Precio",
             textAlign: TextAlign.center,
           ),
-        ),
-        BasicTableColumn(
-          flex: 1,
-          label: const SizedBox(),
         ),
       ],
       itemCount: profiles.length,
@@ -117,31 +120,37 @@ class _ContentSection extends StatelessWidget {
                 ],
               ),
             ),
+
             BasicTableCell(
-              content: Text(
-                lastCost,
-                textAlign: TextAlign.center,
+              content: Column(
+                children: [
+                  Text(
+                    averageCost,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.green.shade900,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    lastCost,
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
             ),
             BasicTableCell(
-              content: Text(
-                averageCost,
-                textAlign: TextAlign.center,
-              ),
-            ),
-            BasicTableCell(
-              content: Text(
-                price,
-                textAlign: TextAlign.center,
-              ),
-            ),
-            BasicTableCell(
-              content: IconButton(
+              content: TextButton(
+                style: TextButton.styleFrom(
+                  textStyle: const TextStyle(fontWeight: FontWeight.bold),
+                ),
                 onPressed: () {
                   showProductPriceDetail(context, profile);
                 },
-                icon: const Icon(
-                  Icons.edit,
+                child: Text(
+                  price,
+                  textAlign: TextAlign.center,
                 ),
               ),
             ),
