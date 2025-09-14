@@ -1,12 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:kardex_app_front/widgets/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
+import 'package:kardex_app_front/src/modules/commercial/client_invoices/cubit/write_invoice_cubit.dart';
+import 'web/client_invoices_screen_web.dart';
 
 class ClientInvoiceScreen extends StatelessWidget {
   const ClientInvoiceScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const _RootScaffold();
+    final invoiceRepo = context.read<InvoicesRepository>();
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => WriteInvoiceCubit(
+            invoicesRepository: invoiceRepo,
+          ),
+        ),
+      ],
+      child: const _RootScaffold(),
+    );
   }
 }
 
@@ -29,13 +42,6 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: TextButton(
-        onPressed: () {
-          showSearchProductDialog(context);
-        },
-        child: const Text("ClientInvoicesScreen"),
-      ),
-    );
+    return ClientInvoicesScreenWeb();
   }
 }

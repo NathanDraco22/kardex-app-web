@@ -37,6 +37,7 @@ class DialogManager {
           ),
           actions: [
             TextButton(
+              autofocus: true,
               child: const Text('OK'),
               onPressed: () => context.pop(),
             ),

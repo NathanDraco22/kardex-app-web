@@ -282,6 +282,19 @@ class _InnerContent extends StatelessWidget {
           ),
 
           const SizedBox(height: 16),
+          StatefulBuilder(
+            builder: (context, setState) {
+              return SwitchListTile(
+                value: widget.creationMap['hasIva'] ?? false,
+                tileColor: Colors.grey.shade100,
+                title: const Text("IVA"),
+                onChanged: (value) {
+                  widget.creationMap['hasIva'] = value;
+                  setState(() {});
+                },
+              );
+            },
+          ),
 
           StatefulBuilder(
             builder: (context, setState) {

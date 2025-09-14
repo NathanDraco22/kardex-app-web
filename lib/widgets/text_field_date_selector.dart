@@ -5,9 +5,11 @@ class DateFieldSelector extends StatefulWidget {
   const DateFieldSelector({
     super.key,
     required this.onSelectedDate,
+    this.initDate,
   });
 
   final void Function(DateTime? value) onSelectedDate;
+  final DateTime? initDate;
 
   @override
   State<DateFieldSelector> createState() => _DateFieldSelectorState();
@@ -16,6 +18,16 @@ class DateFieldSelector extends StatefulWidget {
 class _DateFieldSelectorState extends State<DateFieldSelector> {
   DateTime? selectedDate;
   TextEditingController controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    selectedDate = widget.initDate;
+    if (selectedDate != null) {
+      controller.text = DateFormat('dd/MM/yyyy').format(selectedDate!);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return TextField(

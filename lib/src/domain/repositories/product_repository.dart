@@ -34,6 +34,15 @@ class ProductsRepository {
     return response.data;
   }
 
+  Future<List<ProductInDbInBranch>> searchProductInBranch(String keyword) async {
+    final result = await productsDataSource.searchProductInBranch(keyword);
+    final response = ListResponse<ProductInDbInBranch>.fromJson(
+      result,
+      ProductInDbInBranch.fromJson,
+    );
+    return response.data;
+  }
+
   Future<ProductInDb?> updateProductById(
     String productId,
     UpdateProduct product,

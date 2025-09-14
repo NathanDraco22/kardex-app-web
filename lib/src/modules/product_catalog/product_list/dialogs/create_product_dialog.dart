@@ -80,12 +80,15 @@ class _CreateProductDialogState extends State<CreateProductDialog> {
   @override
   Widget build(BuildContext context) {
     bool isActive = true;
+    bool hasIva = false;
 
     if (widget.product != null) {
       isActive = widget.product!.isActive;
+      hasIva = widget.product!.hasIva;
     }
 
     creationMap['isActive'] = isActive;
+    creationMap['hasIva'] = hasIva;
 
     final currentProduct = widget.product;
 

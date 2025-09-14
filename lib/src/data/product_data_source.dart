@@ -1,4 +1,5 @@
 import 'package:kardex_app_front/src/services/http_service.dart';
+import 'package:kardex_app_front/src/tools/branches_tool.dart';
 import 'package:kardex_app_front/src/tools/constant.dart';
 import 'package:kardex_app_front/src/tools/http_tool.dart';
 
@@ -43,6 +44,15 @@ class ProductsDataSource with HttpService {
 
   Future<Map<String, dynamic>> searchProductByKeyword(String keyword) async {
     final uri = HttpTools.generateUri("$_endpoint/search/$keyword");
+    final res = await getQuery(uri);
+    return res;
+  }
+
+  Future<Map<String, dynamic>> searchProductInBranch(
+    String textQuery,
+  ) async {
+    final currentBranch = BranchesTool.getCurrentBranchId();
+    final uri = HttpTools.generateUri("$_endpoint/branch/$currentBranch/search/$textQuery");
     final res = await getQuery(uri);
     return res;
   }

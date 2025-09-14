@@ -1,3 +1,6 @@
+import '../product_account/product_account.dart';
+import '../product_sale_profile/product_sale_profile_model.dart';
+
 class BaseProduct {
   final String name;
   final String? description;
@@ -6,6 +9,7 @@ class BaseProduct {
   final String unitName;
   final String? categoryName;
   final List<String> tags;
+  final bool hasIva;
   final bool isActive;
 
   BaseProduct({
@@ -16,6 +20,7 @@ class BaseProduct {
     required this.unitName,
     required this.categoryName,
     required this.tags,
+    required this.hasIva,
     this.isActive = true,
   });
 
@@ -28,6 +33,7 @@ class BaseProduct {
       unitName: json['unitName'] as String,
       categoryName: json['categoryName'] as String?,
       tags: List<String>.from(json['tags'] as List),
+      hasIva: json['hasIva'] as bool,
       isActive: json['isActive'] as bool? ?? true,
     );
   }
@@ -55,6 +61,7 @@ class CreateProduct extends BaseProduct {
     required super.unitName,
     required super.categoryName,
     required super.tags,
+    required super.hasIva,
     super.isActive,
   });
 
@@ -67,6 +74,7 @@ class CreateProduct extends BaseProduct {
       unitName: json['unitName'] as String,
       categoryName: json['categoryName'] as String?,
       tags: List<String>.from(json['tags'] as List),
+      hasIva: json['hasIva'] as bool,
       isActive: json['isActive'] as bool? ?? true,
     );
   }
@@ -80,6 +88,7 @@ class UpdateProduct {
   final String? unitName;
   final String? categoryName;
   final List<String>? tags;
+  final bool? hasIva;
   final bool? isActive;
 
   UpdateProduct({
@@ -90,6 +99,7 @@ class UpdateProduct {
     this.unitName,
     this.categoryName,
     this.tags,
+    this.hasIva,
     this.isActive,
   });
 
@@ -101,6 +111,7 @@ class UpdateProduct {
       brandName: json['brandName'] as String?,
       unitName: json['unitName'] as String?,
       categoryName: json['categoryName'] as String?,
+      hasIva: json['hasIva'] as bool?,
       tags: json['tags'] != null ? List<String>.from(json['tags'] as List) : null,
       isActive: json['isActive'] as bool?,
     );
@@ -115,6 +126,7 @@ class UpdateProduct {
       'unitName': unitName,
       'categoryName': categoryName,
       'tags': tags,
+      'hasIva': hasIva,
       'isActive': isActive,
     };
     data.removeWhere((key, value) => value == null);
@@ -137,6 +149,7 @@ class ProductInDb extends BaseProduct {
     required super.unitName,
     required super.categoryName,
     required super.tags,
+    required super.hasIva,
     super.isActive,
     this.isDeleted = false,
     required this.createdAt,
@@ -153,6 +166,7 @@ class ProductInDb extends BaseProduct {
       unitName: json['unitName'] as String,
       categoryName: json['categoryName'] as String?,
       tags: List<String>.from(json['tags'] as List),
+      hasIva: json['hasIva'] as bool,
       isActive: json['isActive'] as bool? ?? true,
       isDeleted: json['isDeleted'] as bool? ?? false,
       createdAt: DateTime.parse(json['createdAt'] as String),
@@ -169,6 +183,57 @@ class ProductInDb extends BaseProduct {
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
     });
+    return data;
+  }
+}
+
+class ProductInDbInBranch extends ProductInDb {
+  final ProductAccountInDb account;
+  final ProductSaleProfileInDb saleProfile;
+
+  ProductInDbInBranch({
+    required super.id,
+    required super.name,
+    super.description,
+    super.code,
+    required super.brandName,
+    required super.unitName,
+    super.categoryName,
+    required super.tags,
+    required super.hasIva,
+    super.isActive,
+    super.isDeleted,
+    required super.createdAt,
+    super.updatedAt,
+    required this.account,
+    required this.saleProfile,
+  });
+
+  factory ProductInDbInBranch.fromJson(Map<String, dynamic> json) {
+    return ProductInDbInBranch(
+      id: json['id'],
+      name: json['name'],
+      description: json['description'],
+      code: json['code'],
+      brandName: json['brandName'],
+      unitName: json['unitName'],
+      categoryName: json['categoryName'],
+      tags: List<String>.from(json['tags']),
+      hasIva: json['hasIva'],
+      isActive: json['isActive'] ?? true,
+      isDeleted: json['isDeleted'] ?? false,
+      createdAt: DateTime.parse(json['createdAt']),
+      updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
+      account: ProductAccountInDb.fromJson(json['account']),
+      saleProfile: ProductSaleProfileInDb.fromJson(json['saleProfile']),
+    );
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    final data = super.toJson();
+    data['account'] = account.toJson();
+    data['saleProfile'] = saleProfile.toJson();
     return data;
   }
 }

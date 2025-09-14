@@ -5,7 +5,7 @@ class ListResponse<T> {
   ListResponse({required this.count, required this.data});
 
   factory ListResponse.fromJson(
-    Map<String, dynamic> json,
+    Map json,
     T Function(Map<String, dynamic>) fromJsonT,
   ) {
     return ListResponse<T>(
