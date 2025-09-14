@@ -234,26 +234,86 @@ class _InnerContent extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
           Row(
             children: [
               Flexible(
-                fit: FlexFit.tight,
-                child: _UnitFormField(
-                  unitsMenuEntries: unitsMenuEntries,
-                  creationMap: widget.creationMap,
-                  initialSelection: widget.currentProduct?.unitName,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Text(
+                      "Unidad*",
+                      textAlign: TextAlign.start,
+                    ),
+                    const SizedBox(height: 6),
+                    CustomAutocompleteTextfield<UnitInDb>(
+                      onFieldSubmitted: (value) {
+                        FocusScope.of(context).nextFocus();
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Campo requerido";
+                        }
+                        return null;
+                      },
+                      onSearch: (value) {
+                        final repo = context.read<UnitsRepository>();
+                        return repo.searchUnitByKeywordLocal(value);
+                      },
+                      suggestionBuilder: (value, close) {
+                        return ListView.builder(
+                          itemCount: value.length,
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) => ListTile(
+                            title: Text(value[index].name),
+                            onTap: () {
+                              widget.creationMap['unitName'] = value[index].name;
+                              close(value[index]);
+                              FocusScope.of(context).nextFocus();
+                            },
+                          ),
+                        );
+                      },
+                      titleBuilder: (value) => value.name,
+                    ),
+                  ],
                 ),
               ),
 
               const SizedBox(width: 12),
 
               Flexible(
-                fit: FlexFit.tight,
-                child: _CategoryFormField(
-                  creationMap: widget.creationMap,
-                  initialSelection: widget.currentProduct?.categoryName,
-                  productCaterogriesEntries: productCaterogriesEntries,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Text(
+                      "Categoria",
+                      textAlign: TextAlign.start,
+                    ),
+                    const SizedBox(height: 6),
+                    CustomAutocompleteTextfield<ProductCategoryInDb>(
+                      readOnly: false,
+                      onSearch: (value) {
+                        final repo = context.read<ProductCategoriesRepository>();
+                        return repo.searchProductCategoryByKeywordLocal(value);
+                      },
+                      suggestionBuilder: (value, close) {
+                        return ListView.builder(
+                          itemCount: value.length,
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) => ListTile(
+                            title: Text(value[index].name),
+                            onTap: () {
+                              widget.creationMap['categoryName'] = value[index].name;
+                              close(value[index]);
+                              FocusScope.of(context).nextFocus();
+                            },
+                          ),
+                        );
+                      },
+                      titleBuilder: (value) => value.name,
+                    ),
+                  ],
                 ),
               ),
             ],

@@ -47,6 +47,17 @@ class UnitsRepository {
     return response.data;
   }
 
+  Future<List<UnitInDb>> searchUnitByKeywordLocal(String keyword) async {
+    final result = units
+        .where(
+          (u) => u.name.toLowerCase().contains(
+            keyword.toLowerCase(),
+          ),
+        )
+        .toList();
+    return result;
+  }
+
   Future<UnitInDb?> updateUnitById(
     String unitId,
     UpdateUnit unit,

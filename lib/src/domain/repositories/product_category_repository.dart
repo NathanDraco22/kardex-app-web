@@ -47,6 +47,17 @@ class ProductCategoriesRepository {
     return categories;
   }
 
+  Future<List<ProductCategoryInDb>> searchProductCategoryByKeywordLocal(String keyword) async {
+    final result = _productCategories
+        .where(
+          (cat) => cat.name.toLowerCase().contains(
+            keyword.toLowerCase(),
+          ),
+        )
+        .toList();
+    return result;
+  }
+
   Future<ProductCategoryInDb?> updateProductCategoryById(
     String categoryId,
     UpdateProductCategory category,

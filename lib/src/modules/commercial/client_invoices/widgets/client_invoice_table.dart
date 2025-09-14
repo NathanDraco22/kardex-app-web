@@ -124,7 +124,7 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
                   Row(
                     children: [
                       const SizedBox(width: 32),
-                      ElevatedButton(
+                      ElevatedButton.icon(
                         focusNode: FocusNode()..requestFocus(),
                         onPressed: () async {
                           final res = await showSearchProductCommercialDialog(context);
@@ -139,7 +139,8 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
                             curve: Curves.easeInOut,
                           );
                         },
-                        child: const Text("Agregar Producto"),
+                        icon: const Icon(Icons.add),
+                        label: const Text("Agregar Producto"),
                       ),
                     ],
                   ),

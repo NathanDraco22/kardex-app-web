@@ -72,12 +72,12 @@ class DiscountTile extends StatelessWidget {
                     itemBuilder: (context) {
                       return [
                         const PopupMenuItem(
-                          child: Text("Editar"),
                           value: "edit",
+                          child: Text("Editar"),
                         ),
                         const PopupMenuItem(
-                          child: Text("Eliminar"),
                           value: "delete",
+                          child: Text("Eliminar"),
                         ),
                       ];
                     },

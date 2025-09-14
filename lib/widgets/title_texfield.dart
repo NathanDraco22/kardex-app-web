@@ -17,6 +17,9 @@ class TitleTextField extends StatelessWidget {
     this.onChanged,
     this.textCapitalization = TextCapitalization.none,
     this.inputFormatters,
+    this.style,
+    this.readOnly = false,
+    this.onTap,
   });
 
   final TextInputType? keyboardType;
@@ -29,6 +32,9 @@ class TitleTextField extends StatelessWidget {
   final String? initialValue;
   final String title;
   final TextAlign? titleTextAlign;
+  final TextStyle? style;
+  final bool readOnly;
+  final void Function()? onTap;
   final void Function()? onEditingComplete;
 
   final String? Function(String? value)? validator;
@@ -46,7 +52,9 @@ class TitleTextField extends StatelessWidget {
           textAlign: titleTextAlign,
         ),
         TextFormField(
-          style: const TextStyle(fontWeight: FontWeight.w500),
+          readOnly: readOnly,
+          onTap: onTap,
+          style: style ?? const TextStyle(fontWeight: FontWeight.w500),
           textAlign: titleTextAlign ?? TextAlign.start,
           inputFormatters: inputFormatters,
           maxLines: maxLines,

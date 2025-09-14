@@ -10,6 +10,9 @@ class CustomAutocompleteTextfield<T> extends StatefulWidget {
     required this.onSearch,
     required this.suggestionBuilder,
     required this.titleBuilder,
+    this.validator,
+    this.readOnly = false,
+    this.onFieldSubmitted,
   });
 
   final T? initValue;
@@ -19,6 +22,12 @@ class CustomAutocompleteTextfield<T> extends StatefulWidget {
   final Future<List<T>> Function(String value) onSearch;
 
   final Widget Function(List<T> value, void Function(T value) close) suggestionBuilder;
+
+  final String? Function(String?)? validator;
+
+  final bool readOnly;
+
+  final void Function(String)? onFieldSubmitted;
 
   @override
   State<CustomAutocompleteTextfield<T>> createState() => _CustomAutocompleteTextfieldState<T>();
@@ -55,55 +64,60 @@ class _CustomAutocompleteTextfieldState<T> extends State<CustomAutocompleteTextf
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TextField(
-          controller: controller,
-          style: const TextStyle(fontWeight: FontWeight.w500),
-          key: textFieldKey,
-          readOnly: true,
-          onTap: () async {
-            getTextFieldSize();
-            final res = await showDialog(
-              context: context,
-              builder: (context) {
-                return Stack(
-                  children: [
-                    TweenAnimationBuilder(
-                      duration: const Duration(milliseconds: 250),
-                      curve: Curves.decelerate,
-                      tween: SizeTween(begin: textFieldSize, end: textFieldSize * 6),
-                      builder: (context, value, child) {
-                        return Positioned(
-                          top: globalPosOffset.dy,
-                          left: globalPosOffset.dx,
-                          width: textFieldSize.width,
-                          height: value?.height ?? 0,
-                          child: _InnerSearchTextField<T>(
-                            widget.onSearch,
-                            widget.suggestionBuilder,
-                            controller,
-                          ),
-                        );
-                      },
-                    ),
-                  ],
+    return TextFormField(
+      controller: controller,
+      validator: widget.validator,
+      style: const TextStyle(fontWeight: FontWeight.w500),
+      key: textFieldKey,
+      readOnly: widget.readOnly,
+      onFieldSubmitted: widget.onFieldSubmitted,
+      onChanged: (value) {
+        displaySuggestions(context);
+      },
+      onTap: () {
+        displaySuggestions(context);
+      },
+    );
+  }
+
+  void displaySuggestions(BuildContext context) async {
+    getTextFieldSize();
+    final res = await showDialog(
+      context: context,
+      builder: (context) {
+        return Stack(
+          children: [
+            TweenAnimationBuilder(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.decelerate,
+              tween: SizeTween(begin: textFieldSize, end: textFieldSize * 6),
+              builder: (context, value, child) {
+                return Positioned(
+                  top: globalPosOffset.dy,
+                  left: globalPosOffset.dx,
+                  width: textFieldSize.width,
+                  height: value?.height ?? 0,
+                  child: _InnerSearchTextField<T>(
+                    widget.onSearch,
+                    widget.suggestionBuilder,
+                    controller,
+                  ),
                 );
               },
-            );
-
-            if (res == null) {
-              if (currentValue != null) {
-                controller.text = widget.titleBuilder(currentValue as T);
-              }
-              return;
-            }
-            currentValue = res;
-            controller.text = widget.titleBuilder(res);
-          },
-        ),
-      ],
+            ),
+          ],
+        );
+      },
     );
+
+    if (res == null) {
+      if (currentValue != null) {
+        controller.text = widget.titleBuilder(currentValue as T);
+      }
+      return;
+    }
+    currentValue = res;
+    controller.text = widget.titleBuilder(res);
   }
 
   void getTextFieldSize() {

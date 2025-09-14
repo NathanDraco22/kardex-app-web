@@ -49,6 +49,7 @@ class _UnitFormFieldState extends State<_UnitFormField> {
         }
 
         return DropdownMenu(
+          requestFocusOnTap: true,
           label: const Text("Unidad"),
           initialSelection: widget.initialSelection,
           controller: controller,
@@ -62,8 +63,6 @@ class _UnitFormFieldState extends State<_UnitFormField> {
               currentValue = null;
               widget.creationMap['unitName'] = null;
               controller.text = "";
-              log(value.toString());
-
               return;
             }
             currentValue = value;

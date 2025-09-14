@@ -83,10 +83,10 @@ class _RootScaffold extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Row(
             children: [
-              Spacer(
+              const Spacer(
                 flex: 6,
               ),
-              Expanded(
+              const Expanded(
                 child: Center(
                   child: Text(
                     "Total:",
@@ -106,7 +106,7 @@ class _RootScaffold extends StatelessWidget {
                       alignment: Alignment.center,
                       child: Text(
                         totalMoney,
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                     );
                   },
