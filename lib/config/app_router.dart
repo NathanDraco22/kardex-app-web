@@ -5,6 +5,8 @@ import 'package:kardex_app_front/src/modules/commercial/commercial_menu_screen.d
 import 'package:kardex_app_front/src/modules/commercial/invoice_history/invoice_history_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/pending_invoice_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/product_price_setting/product_price_setting.dart';
+import 'package:kardex_app_front/src/modules/finance/client_accounts/view/client_account_screen.dart';
+import 'package:kardex_app_front/src/modules/finance/finances_menu_screen.dart';
 import 'package:kardex_app_front/src/modules/home/view/home_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/current_inventory/current_inventory_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/history_entry/history_entry_screen.dart';
@@ -118,6 +120,19 @@ class AppRouter {
             path: "history-exit",
             name: "history-exit",
             builder: (context, state) => const HistoryExitScreen(),
+          ),
+        ],
+      ),
+
+      GoRoute(
+        path: "/finances",
+        name: "finances",
+        builder: (context, state) => const FinancesMenuScreen(),
+        routes: [
+          GoRoute(
+            path: "client-accounts",
+            name: "client-accounts",
+            builder: (context, state) => const ClientAccountScreen(),
           ),
         ],
       ),

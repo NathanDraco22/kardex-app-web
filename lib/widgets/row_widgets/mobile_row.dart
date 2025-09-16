@@ -94,13 +94,14 @@ class MobileRow extends StatelessWidget {
                     },
                   ),
                 ),
-                Flexible(
-                  fit: FlexFit.tight,
-                  child: IconButton(
-                    onPressed: onEditButtonPresesed,
-                    icon: const Icon(Icons.edit),
+                if (onEditButtonPresesed != null)
+                  Flexible(
+                    fit: FlexFit.tight,
+                    child: IconButton(
+                      onPressed: onEditButtonPresesed,
+                      icon: const Icon(Icons.edit),
+                    ),
                   ),
-                ),
               ],
             ),
           ),

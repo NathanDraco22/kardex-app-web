@@ -88,6 +88,14 @@ class _Body extends StatelessWidget {
               ),
 
               HomeOptionCard(
+                title: "Finanzas",
+                icon: FluentIcons.arrow_trending_lines_24_regular,
+                onTap: () {
+                  context.pushNamed("finances");
+                },
+              ),
+
+              HomeOptionCard(
                 title: "Configuraciones",
                 icon: FluentIcons.settings_20_filled,
                 onTap: () {
