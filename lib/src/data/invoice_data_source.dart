@@ -1,6 +1,4 @@
 import 'package:kardex_app_front/src/services/http_service.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
-import 'package:kardex_app_front/src/tools/constant.dart';
 import 'package:kardex_app_front/src/tools/http_tool.dart';
 
 class InvoicesDataSource with HttpService {
@@ -11,6 +9,7 @@ class InvoicesDataSource with HttpService {
   }
 
   final _endpoint = "/invoices";
+  final _pendingEndoint = "/invoices/pending";
 
   Future<Map<String, dynamic>> createInvoice(Map<String, dynamic> invoice) async {
     final uri = HttpTools.generateUri(_endpoint);
@@ -18,24 +17,14 @@ class InvoicesDataSource with HttpService {
     return res;
   }
 
-  Future<Map<String, dynamic>> getPaginatedInvoices({
-    required int offset,
-    String? clientId,
-    String? startDate,
-    String? endDate,
-  }) async {
-    final currentBranch = BranchesTool.getCurrentBranchId();
-    final uri = HttpTools.generateUri(
-      "$_endpoint/paginated",
-      queryParameters: {
-        "offset": offset.toString(),
-        "limit": paginationItems.toString(),
-        "clientId": ?clientId,
-        "startDate": ?startDate,
-        "endDate": ?endDate,
-        "branchId": currentBranch,
-      },
-    );
+  Future<Map<String, dynamic>> getInvoicesByClientId(String clientId) async {
+    final uri = HttpTools.generateUri("$_endpoint/client/$clientId");
+    final res = await getQuery(uri);
+    return res;
+  }
+
+  Future<Map<String, dynamic>> getPendingInvoices(String clientId) async {
+    final uri = HttpTools.generateUri("$_pendingEndoint/$clientId");
     final res = await getQuery(uri);
     return res;
   }

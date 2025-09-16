@@ -12,7 +12,16 @@ class WriteInvoiceCubit extends Cubit<WriteInvoiceState> {
   Future<void> createNewInvoice(CreateInvoice createInvoice) async {
     emit(WriteInvoiceInProgress());
     try {
-      final invoice = await invoicesRepository.createInvoice(createInvoice);
+      CreateInvoice currentInvoice = createInvoice;
+      if (createInvoice.paymentType == PaymentType.cash) {
+        final refreshedData = createInvoice.toJson();
+        refreshedData['amountPaid'] = createInvoice.total;
+        refreshedData['status'] = InvoiceStatus.paid.name;
+
+        currentInvoice = CreateInvoice.fromJson(refreshedData);
+      }
+
+      final invoice = await invoicesRepository.createInvoice(currentInvoice);
       emit(WriteInvoiceSuccess(invoice));
       emit(WriteInvoiceInitial());
     } catch (error) {

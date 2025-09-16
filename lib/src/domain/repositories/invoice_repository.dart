@@ -13,23 +13,16 @@ class InvoicesRepository {
     return InvoiceInDb.fromJson(invoice);
   }
 
-  Future<ListResponse<InvoiceInDb>> getPaginatedInvoices({
-    required int offset,
-    String? clientId,
-    String? startDate,
-    String? endDate,
-  }) async {
-    final results = await invoicesDataSource.getPaginatedInvoices(
-      offset: offset,
-      clientId: clientId,
-      startDate: startDate,
-      endDate: endDate,
-    );
-    final response = ListResponse<InvoiceInDb>.fromJson(
-      results,
-      InvoiceInDb.fromJson,
-    );
-    return response;
+  Future<ListResponse<InvoiceInDb>> getInvoicesByClientId(String clientId) async {
+    final res = await invoicesDataSource.getInvoicesByClientId(clientId);
+    final result = ListResponse<InvoiceInDb>.fromJson(res, InvoiceInDb.fromJson);
+    return result;
+  }
+
+  Future<ListResponse<InvoiceInDb>> getPendingInvoices(String clientId) async {
+    final res = await invoicesDataSource.getPendingInvoices(clientId);
+    final result = ListResponse<InvoiceInDb>.fromJson(res, InvoiceInDb.fromJson);
+    return result;
   }
 
   Future<InvoiceInDb?> getInvoiceById(String invoiceId) async {

@@ -38,6 +38,8 @@ class _Body extends StatelessWidget {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.pushNamed("current-inventory"),
           ),
+          const Divider(height: 0.0),
+
           ListTile(
             leading: IconWidgets.entryInventoryIcon,
             title: const Text("Entrada de Inventario"),

@@ -42,6 +42,33 @@ class _Body extends StatelessWidget {
               context.pushNamed("client-invoice");
             },
           ),
+          const Divider(height: 0.0),
+
+          ListTile(
+            leading: Icon(
+              FluentIcons.document_endnote_24_filled,
+              size: 32,
+              color: Colors.amber.shade600,
+            ),
+            title: const Text("Facturas por Cobrar"),
+            onTap: () {
+              context.pushNamed("pending-invoices");
+            },
+          ),
+          const Divider(height: 0.0),
+
+          ListTile(
+            leading: Icon(
+              FluentIcons.history_28_filled,
+              size: 32,
+              color: Colors.teal.shade600,
+            ),
+            title: const Text("Historial de Facturacion a Clientes"),
+            onTap: () {
+              context.pushNamed("invoice-history");
+            },
+          ),
+          const Divider(height: 0.0),
 
           ListTile(
             leading: Icon(
@@ -54,6 +81,7 @@ class _Body extends StatelessWidget {
               context.pushNamed("product-price-setting");
             },
           ),
+          const Divider(height: 0.0),
         ],
       ),
     );

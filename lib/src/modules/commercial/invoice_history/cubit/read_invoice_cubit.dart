@@ -20,11 +20,8 @@ class ReadInvoiceCubit extends Cubit<ReadInvoiceState> {
   Future<void> loadPaginatedInvoices() async {
     emit(ReadInvoiceLoading());
     try {
-      final response = await invoicesRepository.getPaginatedInvoices(
-        offset: 0,
-        clientId: clientId,
-        startDate: startDate,
-        endDate: endDate,
+      final response = await invoicesRepository.getInvoicesByClientId(
+        clientId ?? '',
       );
 
       _invoicesCache = response.data;
@@ -44,12 +41,7 @@ class ReadInvoiceCubit extends Cubit<ReadInvoiceState> {
   Future<void> getNextPage() async {
     if (isLastPage) return;
     try {
-      final response = await invoicesRepository.getPaginatedInvoices(
-        offset: _invoicesCache.length,
-        clientId: clientId,
-        startDate: startDate,
-        endDate: endDate,
-      );
+      final response = await invoicesRepository.getInvoicesByClientId(clientId ?? '');
 
       _invoicesCache.addAll(response.data);
       if (_invoicesCache.length >= response.count) {

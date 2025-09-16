@@ -27,7 +27,7 @@ class _RootScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("HistoryExitScreenWeb"),
+        title: const Text("Historial de Salidas"),
       ),
       body: const _Body(),
     );

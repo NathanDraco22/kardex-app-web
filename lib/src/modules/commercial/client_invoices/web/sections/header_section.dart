@@ -111,15 +111,18 @@ class _HeaderSection extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Flexible(
-                        child: Column(
-                          children: [
-                            const Text("Fecha"),
-                            const SizedBox(height: 6),
-                            DateFieldSelector(
-                              initDate: viewController.selectedDate,
-                              onSelectedDate: (value) {},
-                            ),
-                          ],
+                        child: AbsorbPointer(
+                          absorbing: true,
+                          child: Column(
+                            children: [
+                              const Text("Fecha"),
+                              const SizedBox(height: 6),
+                              DateFieldSelector(
+                                initDate: viewController.selectedDate,
+                                onSelectedDate: (value) {},
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ],
