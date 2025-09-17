@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/view/client_catalog_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/client_invoices_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/commercial_menu_screen.dart';
+import 'package:kardex_app_front/src/modules/commercial/current_orders/current_orders_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/invoice_history/invoice_history_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/pending_invoice_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/product_price_setting/product_price_setting.dart';
@@ -68,6 +69,20 @@ class AppRouter {
         name: 'commercial',
         builder: (context, state) => const CommercialMenuScreen(),
         routes: [
+          GoRoute(
+            path: "current-orders",
+            name: "current-orders",
+            builder: (context, state) => const CurrentOrdersScreen(),
+          ),
+
+          GoRoute(
+            path: "sale-order",
+            name: "sale-order",
+            builder: (context, state) => const ClientInvoiceScreen(
+              isOrder: true,
+            ),
+          ),
+
           GoRoute(
             path: "client-invoice",
             name: "client-invoice",

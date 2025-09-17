@@ -6,10 +6,7 @@ final class WriteInvoiceInitial extends WriteInvoiceState {}
 
 final class WriteInvoiceInProgress extends WriteInvoiceState {}
 
-final class WriteInvoiceSuccess extends WriteInvoiceState {
-  final InvoiceInDb invoice;
-  WriteInvoiceSuccess(this.invoice);
-}
+final class WriteInvoiceSuccess extends WriteInvoiceState {}
 
 final class WriteInvoiceError extends WriteInvoiceState {
   final String error;

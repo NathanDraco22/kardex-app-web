@@ -1,19 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/src/domain/models/client/client.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
 import 'package:kardex_app_front/widgets/custom_slider.dart';
 
 Future<bool> showConfirmationInvoiceDialog(
   BuildContext context,
-  CreateInvoice createInvoice,
-) async {
+  ClientInDb client,
+  CreateInvoice createInvoice, {
+  bool isOrder = false,
+}) async {
   bool result = false;
+  String title = "Facturar a Cliente";
+  if (isOrder) title = "Orden de Compra";
+
+  String slideWord = "Facturar";
+  if (isOrder) slideWord = "Enviar";
   await showDialog(
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: const Text("Confirmar Guardar Factura"),
+        title: Column(
+          children: [
+            Text(title),
+            Text(client.name),
+          ],
+        ),
         content: SizedBox(
           height: 600,
           width: 600,
@@ -75,10 +88,10 @@ Future<bool> showConfirmationInvoiceDialog(
                 children: [
                   Expanded(
                     child: CustomSlider(
-                      hintText: "Desliza para guardar",
+                      hintText: "Desliza para $slideWord",
                       hintIcon: Icons.save,
                       sliderColor: Colors.green.shade300,
-                      sliderText: "Guardar",
+                      sliderText: slideWord,
                       onSubmit: () {
                         result = true;
                         context.pop();

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
+import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
 import 'package:kardex_app_front/src/domain/models/models.dart';
 
 import '../widgets/client_invoice_table.dart';

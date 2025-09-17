@@ -1,39 +1,49 @@
 class ProductAccountInDb {
-  final String productId;
-  final String branchId;
-  final int currentStock;
-  final int averageCost;
-  final int lastCost;
-  final DateTime createdAt;
-  final DateTime? updatedAt;
-
   ProductAccountInDb({
     required this.productId,
     required this.branchId,
     required this.currentStock,
+    this.promiseStock = 0,
     required this.averageCost,
     required this.lastCost,
     required this.createdAt,
     this.updatedAt,
   });
 
-  factory ProductAccountInDb.fromJson(Map<String, dynamic> json) => ProductAccountInDb(
-    productId: json['productId'],
-    branchId: json['branchId'],
-    currentStock: json['currentStock'],
-    averageCost: json['averageCost'],
-    lastCost: json['lastCost'],
-    createdAt: DateTime.parse(json['createdAt']),
-    updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
-  );
+  final String productId;
+  final String branchId;
+  final int currentStock;
+  final int promiseStock;
+  final int averageCost;
+  final int lastCost;
+  final DateTime createdAt;
+  final DateTime? updatedAt;
 
-  Map<String, dynamic> toJson() => {
-    'productId': productId,
-    'branchId': branchId,
-    'currentStock': currentStock,
-    'averageCost': averageCost,
-    'lastCost': lastCost,
-    'createdAt': createdAt.toIso8601String(),
-    'updatedAt': updatedAt?.toIso8601String(),
-  };
+  int get availableStock => currentStock - promiseStock;
+
+  factory ProductAccountInDb.fromJson(Map<String, dynamic> json) {
+    return ProductAccountInDb(
+      productId: json['productId'] as String,
+      branchId: json['branchId'] as String,
+      currentStock: json['currentStock'] as int,
+      promiseStock: json['promiseStock'] as int? ?? 0,
+      averageCost: json['averageCost'] as int,
+      lastCost: json['lastCost'] as int,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt'] as String) : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'productId': productId,
+      'branchId': branchId,
+      'currentStock': currentStock,
+      'promiseStock': promiseStock,
+      'averageCost': averageCost,
+      'lastCost': lastCost,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt?.toIso8601String(),
+    };
+  }
 }

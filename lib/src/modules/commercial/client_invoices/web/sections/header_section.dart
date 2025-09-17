@@ -200,6 +200,14 @@ class MenuActions extends StatelessWidget {
     final viewController = ClientInvoiceWebMediator.of(context).viewController;
     final tableController = ClientInvoiceWebMediator.of(context).tableController;
 
+    final cubit = context.read<WriteInvoiceCubit>();
+
+    String saveButtonTitle = "Facturar";
+    if (cubit.isOrder) saveButtonTitle = "Enviar Orden";
+
+    IconData saveIcon = Icons.save;
+    if (cubit.isOrder) saveIcon = Icons.send;
+
     return ListenableBuilder(
       listenable: viewController,
       builder: (context, _) {
@@ -216,16 +224,24 @@ class MenuActions extends StatelessWidget {
                         tableController,
                       );
 
-                      final res = await showConfirmationInvoiceDialog(context, newInvoice);
+                      final res = await showConfirmationInvoiceDialog(
+                        context,
+                        viewController.selectedClient!,
+                        newInvoice,
+                        isOrder: cubit.isOrder,
+                      );
 
                       if (res != true) return;
 
                       if (!context.mounted) return;
-                      context.read<WriteInvoiceCubit>().createNewInvoice(newInvoice);
+                      context.read<WriteInvoiceCubit>().createNewInvoice(
+                        newInvoice,
+                        viewController.selectedClient!,
+                      );
                     }
                   : null,
-              icon: const Icon(Icons.save),
-              label: const Text("Guardar"),
+              icon: Icon(saveIcon),
+              label: Text(saveButtonTitle),
             ),
           ],
         );

@@ -33,6 +33,30 @@ class _Body extends StatelessWidget {
         children: [
           ListTile(
             leading: Icon(
+              FluentIcons.receipt_bag_24_filled,
+              size: 32,
+              color: Colors.orange.shade600,
+            ),
+            title: const Text("Ordenes de Compra"),
+            onTap: () {
+              context.pushNamed("current-orders");
+            },
+          ),
+          const Divider(height: 0.0),
+          ListTile(
+            leading: Icon(
+              FluentIcons.receipt_add_24_filled,
+              size: 32,
+              color: Colors.lightBlue.shade600,
+            ),
+            title: const Text("Crear Orden de Compra"),
+            onTap: () {
+              context.pushNamed("sale-order");
+            },
+          ),
+          const Divider(height: 0.0),
+          ListTile(
+            leading: Icon(
               FluentIcons.person_money_20_filled,
               size: 32,
               color: Colors.green.shade600,

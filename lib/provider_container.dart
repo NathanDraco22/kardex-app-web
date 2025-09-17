@@ -26,6 +26,7 @@ class ProviderContainer extends StatelessWidget {
     final productSaleProfileDataSource = ProductSaleProfilesDataSource();
     final invoiceDataSource = InvoicesDataSource();
     final receiptDataSource = ReceiptsDataSource();
+    final orderDataSource = OrdersDataSource();
 
     return MultiRepositoryProvider(
       providers: [
@@ -91,6 +92,10 @@ class ProviderContainer extends StatelessWidget {
 
         RepositoryProvider(
           create: (context) => ReceiptsRepository(receiptDataSource),
+        ),
+
+        RepositoryProvider(
+          create: (context) => OrdersRepository(orderDataSource),
         ),
       ],
       child: GlobalCubitProvider(

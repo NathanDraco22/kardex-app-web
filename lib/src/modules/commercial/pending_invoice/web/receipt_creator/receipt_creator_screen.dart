@@ -9,7 +9,6 @@ import 'package:kardex_app_front/src/modules/commercial/pending_invoice/cubit/wr
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/modals/confirm_receipt_modal.dart';
 import 'package:kardex_app_front/src/tools/branches_tool.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
-import 'package:kardex_app_front/src/tools/number_formatter.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 

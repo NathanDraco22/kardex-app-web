@@ -5,16 +5,21 @@ import 'package:kardex_app_front/src/modules/commercial/client_invoices/cubit/wr
 import 'web/client_invoices_screen_web.dart';
 
 class ClientInvoiceScreen extends StatelessWidget {
-  const ClientInvoiceScreen({super.key});
+  const ClientInvoiceScreen({super.key, this.isOrder = false});
+
+  final bool isOrder;
 
   @override
   Widget build(BuildContext context) {
     final invoiceRepo = context.read<InvoicesRepository>();
+    final orderRepo = context.read<OrdersRepository>();
     return MultiBlocProvider(
       providers: [
         BlocProvider(
           create: (context) => WriteInvoiceCubit(
             invoicesRepository: invoiceRepo,
+            ordersRepository: orderRepo,
+            isOrder: isOrder,
           ),
         ),
       ],
@@ -28,9 +33,14 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cubit = context.read<WriteInvoiceCubit>();
+
+    String title = "Facturacion a Clientes";
+    if (cubit.isOrder) title = "Orden de compra";
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Facturacion a Clientes"),
+        title: Text(title),
       ),
       body: const _Body(),
     );
@@ -42,6 +52,6 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClientInvoicesScreenWeb();
+    return const ClientInvoicesScreenWeb();
   }
 }

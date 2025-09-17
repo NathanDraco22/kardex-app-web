@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
 
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
 import 'package:kardex_app_front/src/domain/models/models.dart';
@@ -52,7 +53,10 @@ class _ClientInvoicesScreenWebState extends State<ClientInvoicesScreenWeb> {
 
         if (state is WriteInvoiceSuccess) {
           LoadingDialogManager.closeLoadingDialog(context);
-          await DialogManager.showInfoDialog(context, "Factura guardada con éxito");
+          final cubit = context.read<WriteInvoiceCubit>();
+          String message = "Factura guardada con éxito";
+          if (cubit.isOrder) message = "Orden de compra enviada con éxito";
+          await DialogManager.showInfoDialog(context, message);
           if (!context.mounted) return;
           rebuild = true;
           setState(() {});

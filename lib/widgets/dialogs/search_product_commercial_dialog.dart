@@ -273,7 +273,7 @@ class ProductResultRow extends StatelessWidget {
               Flexible(
                 fit: FlexFit.tight,
                 child: Text(
-                  product.account.currentStock.toString(),
+                  product.account.availableStock.toString(),
                 ),
               ),
               Flexible(

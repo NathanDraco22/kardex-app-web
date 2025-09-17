@@ -36,6 +36,6 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InvoiceHistoryWebScreen();
+    return const InvoiceHistoryWebScreen();
   }
 }
