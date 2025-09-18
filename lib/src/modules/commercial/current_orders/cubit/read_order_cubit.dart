@@ -72,4 +72,12 @@ class ReadOrderCubit extends Cubit<ReadOrderState> {
     isLastPage = false;
     loadPaginatedOrders();
   }
+
+  Future<void> updateOrderCache(OrderInDb order) async {
+    final index = _ordersCache.indexWhere((element) => element.id == order.id);
+    if (index != -1) {
+      _ordersCache[index] = order;
+      emit(ReadOrderSuccess(_ordersCache, _ordersCache.length));
+    }
+  }
 }

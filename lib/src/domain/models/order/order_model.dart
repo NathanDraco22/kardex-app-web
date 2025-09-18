@@ -1,6 +1,13 @@
 import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
 
-enum OrderStatus { open, completed, cancelled }
+enum OrderStatus {
+  open("Abierto"),
+  completed("Completado"),
+  cancelled("Cancelado");
+
+  const OrderStatus(this.tag);
+  final String tag;
+}
 
 class ClientInfo {
   final String name;

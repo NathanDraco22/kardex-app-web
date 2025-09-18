@@ -41,4 +41,16 @@ class OrdersRepository {
     if (result == null) return null;
     return OrderInDb.fromJson(result);
   }
+
+  Future<OrderInDb?> convertOrderToInvoice(String orderId) async {
+    final result = await ordersDataSource.convertOrderToInvoice(orderId);
+    if (result == null) return null;
+    return OrderInDb.fromJson(result);
+  }
+
+  Future<OrderInDb?> cancelOrderById(String orderId) async {
+    final result = await ordersDataSource.cancelOrderById(orderId);
+    if (result == null) return null;
+    return OrderInDb.fromJson(result);
+  }
 }

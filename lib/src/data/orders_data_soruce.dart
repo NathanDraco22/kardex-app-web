@@ -54,4 +54,16 @@ class OrdersDataSource with HttpService {
     final res = await patchQuery(uri, body: order);
     return res;
   }
+
+  Future<Map<String, dynamic>?> convertOrderToInvoice(String orderId) async {
+    final uri = HttpTools.generateUri("$_endpoint/make-invoice/$orderId");
+    final res = await postQuery(uri, {});
+    return res;
+  }
+
+  Future<Map<String, dynamic>?> cancelOrderById(String orderId) async {
+    final uri = HttpTools.generateUri("$_endpoint/cancel/$orderId");
+    final res = await patchQuery(uri);
+    return res;
+  }
 }

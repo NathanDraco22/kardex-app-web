@@ -52,7 +52,7 @@ class _PendingInvoiceFloatingButtons extends StatelessWidget {
     final viewController = PendingInvoiceMediator.of(context).notifier!;
     if (viewController.selectedInvoices.isEmpty) return const SizedBox.shrink();
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
         ElevatedButton(
           onPressed: () {
