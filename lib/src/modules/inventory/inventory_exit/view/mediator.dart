@@ -13,7 +13,7 @@ class ExitHeaderData {
     return {
       'supplierId': client?.id,
       'docNumber': docNumber,
-      'docDate': docDate?.toIso8601String(),
+      'docDate': docDate?.millisecondsSinceEpoch,
       'observations': observations,
     };
   }

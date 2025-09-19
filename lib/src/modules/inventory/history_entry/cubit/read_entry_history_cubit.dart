@@ -15,8 +15,8 @@ class ReadEntryHistoryCubit extends Cubit<ReadEntryHistoryState> {
   List<EntryHistoryInDb> _historiesCache = [];
 
   String? supplierId;
-  String? startDate;
-  String? endDate;
+  int? startDate;
+  int? endDate;
 
   Future<void> loadPaginatedHistories() async {
     emit(ReadEntryHistoryLoading());
@@ -61,14 +61,6 @@ class ReadEntryHistoryCubit extends Cubit<ReadEntryHistoryState> {
     } catch (e) {
       log(e.toString());
     }
-  }
-
-  Future<void> setFilterParams({String? supplierId, String? startDate, String? endDate}) async {
-    this.supplierId ??= supplierId;
-    this.startDate ??= startDate;
-    this.endDate ??= endDate;
-    isLastPage = false;
-    _historiesCache = [];
   }
 
   Future<void> clearFilterParams() async {

@@ -74,12 +74,12 @@ class ExitHistoryInDb {
       clientId: json['clientId'] as String,
       client: Client.fromJson(json['client'] as Map<String, dynamic>),
       docNumber: json['docNumber'] as String,
-      docDate: DateTime.parse(json['docDate'] as String),
+      docDate: DateTime.fromMillisecondsSinceEpoch(json['docDate'] as int),
       branchId: json['branchId'] as String,
       description: json['description'] as String,
       items: (json['items'] as List<dynamic>).map((item) => ExitItem.fromJson(item as Map<String, dynamic>)).toList(),
       id: json['id'] as String,
-      createdAt: DateTime.parse(json['createdAt'] as String),
+      createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
     );
   }
 
@@ -88,12 +88,12 @@ class ExitHistoryInDb {
       'clientId': clientId,
       'client': client.toJson(),
       'docNumber': docNumber,
-      'docDate': docDate.toIso8601String(),
+      'docDate': docDate.millisecondsSinceEpoch,
       'branchId': branchId,
       'description': description,
       'items': items.map((item) => item.toJson()).toList(),
       'id': id,
-      'createdAt': createdAt.toIso8601String(),
+      'createdAt': createdAt.millisecondsSinceEpoch,
     };
   }
 }

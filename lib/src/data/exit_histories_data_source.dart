@@ -14,8 +14,8 @@ class ExitHistoriesDataSource with HttpService {
   Future<Map<String, dynamic>> getExitHistories({
     required int offset,
     String? clientId,
-    String? startDate,
-    String? endDate,
+    int? startDate,
+    int? endDate,
   }) async {
     final currentBranch = BranchesTool.getCurrentBranchId();
     final uri = HttpTools.generateUri(
@@ -24,8 +24,8 @@ class ExitHistoriesDataSource with HttpService {
         "offset": offset.toString(),
         "limit": 50.toString(),
         "clientId": ?clientId,
-        "startDate": ?startDate,
-        "endDate": ?endDate,
+        "startDate": ?startDate?.toString(),
+        "endDate": ?endDate?.toString(),
         "branchId": currentBranch,
       },
     );

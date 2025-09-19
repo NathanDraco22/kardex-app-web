@@ -154,8 +154,8 @@ class OrderInDb extends BaseOrder {
     paymentType: PaymentType.values.byName(json['paymentType']),
     totalCost: json['totalCost'],
     total: json['total'],
-    createdAt: DateTime.parse(json['createdAt']),
-    updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
+    createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt']),
+    updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt']) : null,
   );
 
   @override
@@ -163,8 +163,8 @@ class OrderInDb extends BaseOrder {
     final data = super.toJson();
     data.addAll({
       'id': id,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt?.toIso8601String(),
+      'createdAt': createdAt.millisecondsSinceEpoch,
+      'updatedAt': updatedAt?.millisecondsSinceEpoch,
     });
     return data;
   }

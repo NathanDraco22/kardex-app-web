@@ -80,8 +80,8 @@ class BranchInDb extends BaseBranch {
       id: json['id'] as String,
       name: json['name'] as String,
       description: json['description'] as String? ?? "",
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt'] as String) : null,
+      createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
+      updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt'] as int) : null,
     );
   }
 
@@ -90,8 +90,8 @@ class BranchInDb extends BaseBranch {
     final data = super.toJson();
     data.addAll({
       'id': id,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt?.toIso8601String(),
+      'createdAt': createdAt.millisecondsSinceEpoch,
+      'updatedAt': updatedAt?.millisecondsSinceEpoch,
     });
     return data;
   }

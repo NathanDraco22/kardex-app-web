@@ -29,8 +29,8 @@ class ProductAccountInDb {
       promiseStock: json['promiseStock'] as int? ?? 0,
       averageCost: json['averageCost'] as int,
       lastCost: json['lastCost'] as int,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt'] as String) : null,
+      createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
+      updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt'] as int) : null,
     );
   }
 
@@ -42,8 +42,8 @@ class ProductAccountInDb {
       'promiseStock': promiseStock,
       'averageCost': averageCost,
       'lastCost': lastCost,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt?.toIso8601String(),
+      'createdAt': createdAt.millisecondsSinceEpoch,
+      'updatedAt': updatedAt?.millisecondsSinceEpoch,
     };
   }
 }

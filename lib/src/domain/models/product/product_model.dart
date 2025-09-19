@@ -169,8 +169,8 @@ class ProductInDb extends BaseProduct {
       hasIva: json['hasIva'] as bool,
       isActive: json['isActive'] as bool? ?? true,
       isDeleted: json['isDeleted'] as bool? ?? false,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt'] as String) : null,
+      createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
+      updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt'] as int) : null,
     );
   }
 
@@ -180,8 +180,8 @@ class ProductInDb extends BaseProduct {
     data.addAll({
       'id': id,
       'isDeleted': isDeleted,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt?.toIso8601String(),
+      'createdAt': createdAt.millisecondsSinceEpoch,
+      'updatedAt': updatedAt?.millisecondsSinceEpoch,
     });
     return data;
   }
@@ -222,8 +222,8 @@ class ProductInDbInBranch extends ProductInDb {
       hasIva: json['hasIva'],
       isActive: json['isActive'] ?? true,
       isDeleted: json['isDeleted'] ?? false,
-      createdAt: DateTime.parse(json['createdAt']),
-      updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
+      createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt']),
+      updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt']) : null,
       account: ProductAccountInDb.fromJson(json['account']),
       saleProfile: ProductSaleProfileInDb.fromJson(json['saleProfile']),
     );

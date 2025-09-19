@@ -140,14 +140,14 @@ class ProductSaleProfileInDb extends BaseProductSaleProfile {
       discounts:
           (json['discounts'] as List<dynamic>?)?.map((e) => Discount.fromJson(e as Map<String, dynamic>)).toList() ??
           [],
-      updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at'] as String) : null,
+      updatedAt: json['updated_at'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updated_at'] as int) : null,
     );
   }
 
   @override
   Map<String, dynamic> toJson() {
     final data = super.toJson();
-    data['updated_at'] = updatedAt?.toIso8601String();
+    data['updated_at'] = updatedAt?.millisecondsSinceEpoch;
     return data;
   }
 }
@@ -177,7 +177,7 @@ class ProductSaleProfileInDbWithProduct extends BaseProductSaleProfile {
       discounts:
           (json['discounts'] as List<dynamic>?)?.map((e) => Discount.fromJson(e as Map<String, dynamic>)).toList() ??
           [],
-      updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at'] as String) : null,
+      updatedAt: json['updated_at'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updated_at'] as int) : null,
       product: InventoryProduct.fromJson(json['product'] as Map<String, dynamic>),
       account: ProductAccount.fromJson(json['account'] as Map<String, dynamic>),
     );
@@ -186,7 +186,7 @@ class ProductSaleProfileInDbWithProduct extends BaseProductSaleProfile {
   @override
   Map<String, dynamic> toJson() {
     final data = super.toJson();
-    data['updated_at'] = updatedAt?.toIso8601String();
+    data['updated_at'] = updatedAt?.millisecondsSinceEpoch;
     data['product'] = product.toJson();
     data['account'] = account.toJson();
     return data;

@@ -10,8 +10,8 @@ class ExitHistoriesRepository {
   Future<ListResponse<ExitHistoryInDb>> getExitHistories({
     required int offset,
     String? clientId,
-    String? startDate,
-    String? endDate,
+    int? startDate,
+    int? endDate,
   }) async {
     final results = await exitHistoriesDataSource.getExitHistories(
       offset: offset,

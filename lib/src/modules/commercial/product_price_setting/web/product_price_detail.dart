@@ -206,7 +206,11 @@ class _RootScaffoldState extends State<_RootScaffold> {
                       title: "Precio de Venta (C\$ )",
                       keyboardType: TextInputType.number,
                       onChanged: (value) {
-                        if (value.isEmpty) return;
+                        if (value.isEmpty) {
+                          currentProfile.salePrice = 0;
+                          setState(() {});
+                          return;
+                        }
                         final formattedValue = value.replaceAll(",", "");
                         final cents = (double.parse(formattedValue) * 100).round();
                         currentProfile.salePrice = cents;

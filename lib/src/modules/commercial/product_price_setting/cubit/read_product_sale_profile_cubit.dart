@@ -13,7 +13,6 @@ class ReadProductSaleProfileCubit extends Cubit<ReadProductSaleProfileState> {
   Future<void> loadCurrentBranchProfiles() async {
     emit(ReadProductSaleProfileLoading());
     try {
-      await Future.delayed(const Duration(seconds: 1));
       final profiles = await profilesRepository.getAllProductSaleProfilesCurrentBranch();
       _profilesCache = profiles;
       if (isClosed) return;

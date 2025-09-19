@@ -11,8 +11,8 @@ class EntryHistoriesRepository {
     required int offset,
     int? limit,
     String? supplierId,
-    String? startDate,
-    String? endDate,
+    int? startDate,
+    int? endDate,
   }) async {
     final results = await entryHistoriesDataSource.getEntryHistories(
       offset: offset,

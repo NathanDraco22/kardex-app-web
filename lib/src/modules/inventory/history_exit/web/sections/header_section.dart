@@ -56,8 +56,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                                 return ListTile(
                                   title: Text(client.name),
                                   onTap: () {
-                                    // Llama al setFilterParams del cubit correcto
-                                    readCubit.setFilterParams(clientId: client.id);
+                                    readCubit.clientId = client.id;
                                     close(client);
                                   },
                                 );
@@ -79,8 +78,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                             key: ValueKey(readCubit.startDate),
                             title: "Fecha Inicio",
                             onSelected: (value) {
-                              final startDate = DateTimeTool.formatyyyyMMdd(value);
-                              readCubit.setFilterParams(startDate: startDate);
+                              readCubit.startDate = value.millisecondsSinceEpoch;
                             },
                           ),
                         ),
@@ -90,8 +88,10 @@ class _HeaderSectionState extends State<_HeaderSection> {
                             key: ValueKey(readCubit.endDate),
                             title: "Fecha Fin",
                             onSelected: (value) {
-                              final endDate = DateTimeTool.formatyyyyMMdd(value);
-                              readCubit.setFilterParams(endDate: endDate);
+                              final topEndDate = value.add(
+                                const Duration(days: 1),
+                              );
+                              readCubit.endDate = topEndDate.millisecondsSinceEpoch;
                             },
                           ),
                         ),

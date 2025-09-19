@@ -122,8 +122,8 @@ class ReceiptInDb extends BaseReceipt {
     paymentMethod: PaymentMethod.values.byName(json['paymentMethod']),
     bankReference: json['bankReference'] ?? "",
     total: json['total'],
-    createdAt: DateTime.parse(json['createdAt']),
-    updatedAt: (json['updatedAt'] != null) ? DateTime.parse(json['updatedAt']) : null,
+    createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt']),
+    updatedAt: (json['updatedAt'] != null) ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt']) : null,
   );
 
   @override
@@ -131,8 +131,8 @@ class ReceiptInDb extends BaseReceipt {
     final data = super.toJson();
     data.addAll({
       'id': id,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt?.toIso8601String(),
+      'createdAt': createdAt.millisecondsSinceEpoch,
+      'updatedAt': updatedAt?.millisecondsSinceEpoch,
     });
     return data;
   }

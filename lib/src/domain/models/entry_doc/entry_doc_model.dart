@@ -47,7 +47,7 @@ class BaseEntryDoc {
     return BaseEntryDoc(
       supplierId: json['supplierId'] as String,
       docNumber: json['docNumber'] as String,
-      docDate: DateTime.parse(json['docDate'] as String),
+      docDate: DateTime.fromMillisecondsSinceEpoch(json['docDate'] as int),
       branchId: json['branchId'] as String,
       description: json['description'] as String? ?? "",
       items: (json['items'] as List<dynamic>)
@@ -62,7 +62,7 @@ class BaseEntryDoc {
     return {
       'supplierId': supplierId,
       'docNumber': docNumber,
-      'docDate': docDate.toIso8601String(),
+      'docDate': docDate.millisecondsSinceEpoch,
       'branchId': branchId,
       'description': description,
       'items': items.map((item) => item.toJson()).toList(),
@@ -84,7 +84,7 @@ class CreateEntryDoc extends BaseEntryDoc {
     return CreateEntryDoc(
       supplierId: json['supplierId'] as String,
       docNumber: json['docNumber'] as String,
-      docDate: DateTime.parse(json['docDate'] as String),
+      docDate: DateTime.fromMillisecondsSinceEpoch(json['docDate'] as int),
       branchId: json['branchId'] as String,
       description: json['description'] as String? ?? "",
       items: (json['items'] as List<dynamic>).map((item) => EntryItem.fromJson(item as Map<String, dynamic>)).toList(),
@@ -112,11 +112,11 @@ class EntryDocInDb extends BaseEntryDoc {
       id: json['id'] as String,
       supplierId: json['supplierId'] as String,
       docNumber: json['docNumber'] as String,
-      docDate: DateTime.parse(json['docDate'] as String),
+      docDate: DateTime.fromMillisecondsSinceEpoch(json['docDate'] as int),
       branchId: json['branchId'] as String,
       description: json['description'] as String? ?? "",
       items: (json['items'] as List<dynamic>).map((item) => EntryItem.fromJson(item as Map<String, dynamic>)).toList(),
-      createdAt: DateTime.parse(json['createdAt'] as String),
+      createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
     );
   }
 
@@ -125,7 +125,7 @@ class EntryDocInDb extends BaseEntryDoc {
     final data = super.toJson();
     data.addAll({
       'id': id,
-      'createdAt': createdAt.toIso8601String(),
+      'createdAt': createdAt.millisecondsSinceEpoch,
     });
     return data;
   }

@@ -15,8 +15,8 @@ class EntryHistoriesDataSource with HttpService {
     required int offset,
     int? limit,
     String? supplierId,
-    String? startDate,
-    String? endDate,
+    int? startDate,
+    int? endDate,
   }) async {
     final currentBranch = BranchesTool.getCurrentBranchId();
     final uri = HttpTools.generateUri(
@@ -25,8 +25,8 @@ class EntryHistoriesDataSource with HttpService {
         "offset": offset.toString(),
         "limit": 50.toString(),
         "supplierId": ?supplierId,
-        "startDate": ?startDate,
-        "endDate": ?endDate,
+        "startDate": ?startDate?.toString(),
+        "endDate": ?endDate?.toString(),
         "branchId": currentBranch,
       },
     );

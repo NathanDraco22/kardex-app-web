@@ -13,7 +13,7 @@ class HeaderData {
     return {
       'supplierId': supplier?.id,
       'docNumber': docNumber,
-      'docDate': docDate?.toIso8601String(),
+      'docDate': docDate?.millisecondsSinceEpoch,
       'observations': observations,
     };
   }
