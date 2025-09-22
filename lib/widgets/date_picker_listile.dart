@@ -40,7 +40,7 @@ class DatePickerListTileState extends State<DatePickerListTile> {
     return ListTile(
       title: Text(widget.title),
       subtitle: Text(
-        _selectedDate == null ? '  -  -   ' : DateTimeTool.formatddMMyyyy(_selectedDate!),
+        _selectedDate == null ? '  -  -   ' : DateTimeTool.formatddMMyy(_selectedDate!),
         style: const TextStyle(fontWeight: FontWeight.w500, color: Colors.black),
       ),
       trailing: const Icon(Icons.calendar_today),

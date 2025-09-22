@@ -45,7 +45,6 @@ class SuppliersRepository {
   }
 
   Future<List<SupplierInDb>> searchSupplierByKeyword(String keyword) async {
-    await Future.delayed(const Duration(seconds: 1));
     final result = await suppliersDataSource.searchSupplierByKeyword(keyword);
     final suppliers = ListResponse<SupplierInDb>.fromJson(result, SupplierInDb.fromJson).data;
     return suppliers;

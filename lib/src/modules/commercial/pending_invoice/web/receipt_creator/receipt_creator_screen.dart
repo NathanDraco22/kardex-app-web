@@ -244,7 +244,7 @@ Iterable<Widget> _buildInvoiceRows(List<InvoiceInDb> invoices) sync* {
           ],
         ),
         subtitle: Text(
-          DateTimeTool.formatddMMyyyy(
+          DateTimeTool.formatddMMyy(
             currentInvoice.createdAt,
           ),
         ),

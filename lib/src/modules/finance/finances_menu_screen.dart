@@ -34,11 +34,21 @@ class _Body extends StatelessWidget {
           ListTile(
             leading: const Icon(
               FluentIcons.notepad_person_24_filled,
-              color: Colors.green,
+              color: Colors.blue,
             ),
             title: const Text("Estado de cuenta de Clientes"),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.pushNamed("client-accounts"),
+          ),
+          const Divider(height: 0.0),
+          ListTile(
+            leading: const Icon(
+              FluentIcons.receipt_money_24_filled,
+              color: Colors.green,
+            ),
+            title: const Text("Facturas Liquidadas"),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.pushNamed("paid-invoices"),
           ),
           const Divider(height: 0.0),
         ],

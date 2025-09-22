@@ -3,6 +3,7 @@ import 'package:kardex_app_front/src/modules/commercial/client_invoices/web/medi
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/widgets/more_action_row_button.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
 import 'package:kardex_app_front/widgets/dialogs/commercial_product_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_product_commercial_dialog.dart';
 
 class ClientInvoiceItem {

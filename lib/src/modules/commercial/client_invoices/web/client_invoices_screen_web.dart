@@ -78,8 +78,15 @@ class _RootScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = ClientInvoiceWebMediator.of(context).tableController;
+    final cubit = context.read<WriteInvoiceCubit>();
+
+    String title = "Facturacion a Clientes";
+    if (cubit.isOrder) title = "Orden de compra";
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text(title),
+      ),
       body: const _Body(),
       bottomNavigationBar: BottomAppBar(
         height: 60,

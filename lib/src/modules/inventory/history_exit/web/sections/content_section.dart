@@ -5,7 +5,6 @@ class _ContentSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Cambiado a ReadExitHistoryCubit
     final readCubit = context.watch<ReadExitHistoryCubit>();
     final state = readCubit.state;
 
@@ -54,7 +53,7 @@ class _ContentSection extends StatelessWidget {
                     final rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
 
                     final currentExitHistory = exitHistories[index];
-                    final currentDocDate = DateTimeTool.formatddMMyyyy(currentExitHistory.docDate);
+                    final currentDocDate = DateTimeTool.formatddMMyy(currentExitHistory.docDate);
                     final totalInMoney = NumberFormatter.convertToMoneyLike(currentExitHistory.total);
 
                     return BasicTableRow(

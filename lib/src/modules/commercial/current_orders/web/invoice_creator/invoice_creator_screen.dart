@@ -192,7 +192,7 @@ class _BodyState extends State<_Body> {
                           ),
 
                           Text(
-                            DateTimeTool.formatddMMyyyy(order.createdAt),
+                            DateTimeTool.formatddMMyy(order.createdAt),
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,

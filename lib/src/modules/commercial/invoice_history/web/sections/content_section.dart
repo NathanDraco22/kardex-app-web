@@ -46,7 +46,7 @@ class _ContentSection extends StatelessWidget {
                     final rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
 
                     final invoice = invoices[index];
-                    final invoiceDate = DateTimeTool.formatddMMyyyy(invoice.createdAt);
+                    final invoiceDate = DateTimeTool.formatddMMyy(invoice.createdAt);
                     final total = NumberFormatter.convertToMoneyLike(invoice.total);
 
                     return BasicTableRow(

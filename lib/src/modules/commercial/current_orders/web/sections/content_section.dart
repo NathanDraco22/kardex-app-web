@@ -78,7 +78,7 @@ class _ContentSection extends StatelessWidget {
                 subtitle: Row(
                   children: [
                     Text(
-                      DateTimeTool.formatddMMyyyy(
+                      DateTimeTool.formatddMMyy(
                         currentOrder.createdAt,
                       ),
                       style: const TextStyle(fontWeight: FontWeight.w500),

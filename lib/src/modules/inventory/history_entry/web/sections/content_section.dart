@@ -75,7 +75,7 @@ class _ContentSection extends StatelessWidget {
                     final rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
 
                     final currentEntryHistory = entryHistories[index];
-                    final currentDocDate = DateTimeTool.formatddMMyyyy(currentEntryHistory.docDate);
+                    final currentDocDate = DateTimeTool.formatddMMyy(currentEntryHistory.docDate);
                     final totalInMoney = NumberFormatter.convertToMoneyLike(currentEntryHistory.total);
 
                     return BasicTableRow(

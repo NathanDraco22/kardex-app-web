@@ -8,6 +8,8 @@ import 'package:kardex_app_front/widgets/dialogs/commercial_product_dialog.dart'
 import 'package:kardex_app_front/widgets/no_item.dart';
 import 'package:kardex_app_front/widgets/search_debounce.dart';
 
+import 'models/commercial_product_result.dart';
+
 Future<CommercialProductResult?> showSearchProductCommercialDialog(
   BuildContext context, {
   ProductInDb? product,

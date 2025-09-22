@@ -64,7 +64,7 @@ class _ContentSection extends StatelessWidget {
 
               final currentInvoices = invoices[index];
               final total = NumberFormatter.convertToMoneyLike(currentInvoices.total);
-              final date = DateTimeTool.formatddMMyyyy(currentInvoices.createdAt);
+              final date = DateTimeTool.formatddMMyy(currentInvoices.createdAt);
 
               return CheckboxListTile(
                 value: viewController.isInSelected(currentInvoices),

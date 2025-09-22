@@ -14,6 +14,7 @@ class BaseInvoice {
   final PaymentType paymentType;
   final int totalCost;
   final int total;
+  final DateTime? paidAt;
 
   BaseInvoice({
     required this.branchId,
@@ -26,6 +27,7 @@ class BaseInvoice {
     required this.paymentType,
     required this.totalCost,
     required this.total,
+    this.paidAt,
   });
 
   factory BaseInvoice.fromJson(Map<String, dynamic> json) => BaseInvoice(
@@ -39,6 +41,7 @@ class BaseInvoice {
     paymentType: PaymentType.values.byName(json['paymentType'].toString().toLowerCase()),
     totalCost: json['totalCost'],
     total: json['total'],
+    paidAt: DateTime.fromMillisecondsSinceEpoch(json['paidAt']),
   );
 
   Map<String, dynamic> toJson() => {
@@ -118,6 +121,7 @@ class InvoiceInDb extends BaseInvoice {
     required super.total,
     required this.createdAt,
     this.updatedAt,
+    super.paidAt,
   });
 
   factory InvoiceInDb.fromJson(Map<String, dynamic> json) => InvoiceInDb(
@@ -132,6 +136,7 @@ class InvoiceInDb extends BaseInvoice {
     paymentType: PaymentType.values.byName(json['paymentType'].toString().toLowerCase()),
     totalCost: json['totalCost'],
     total: json['total'],
+    paidAt: json['paidAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['paidAt']) : null,
     createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt']),
     updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt']) : null,
   );

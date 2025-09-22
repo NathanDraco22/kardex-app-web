@@ -7,8 +7,8 @@ class DateTimeTool {
     return formatter.format(datetime);
   }
 
-  static String formatddMMyyyy(DateTime datetime) {
-    final formatter = DateFormat('dd-MM-yyyy');
+  static String formatddMMyy(DateTime datetime) {
+    final formatter = DateFormat('dd-MM-yy');
     return formatter.format(datetime);
   }
 }

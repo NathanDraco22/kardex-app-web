@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/cubit/write_invoice_cubit.dart';
+import 'package:kardex_app_front/src/modules/commercial/client_invoices/mobile/client_invoices_screen_mobile.dart';
+import 'package:kardex_app_front/src/tools/extensiones.dart';
 import 'web/client_invoices_screen_web.dart';
 
 class ClientInvoiceScreen extends StatelessWidget {
@@ -33,16 +35,8 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cubit = context.read<WriteInvoiceCubit>();
-
-    String title = "Facturacion a Clientes";
-    if (cubit.isOrder) title = "Orden de compra";
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-      ),
-      body: const _Body(),
+    return const Scaffold(
+      body: _Body(),
     );
   }
 }
@@ -52,6 +46,10 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = context.isMobile();
+
+    if (isMobile) return const ClientInvoicesScreenMobile();
+
     return const ClientInvoicesScreenWeb();
   }
 }

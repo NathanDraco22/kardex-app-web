@@ -1,5 +1,6 @@
 import 'package:kardex_app_front/src/data/data.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
+import 'package:kardex_app_front/src/domain/models/invoice/invoice_totals.dart';
 import 'package:kardex_app_front/src/domain/responses/list_responses.dart';
 
 class InvoicesRepository {
@@ -22,6 +23,38 @@ class InvoicesRepository {
   Future<ListResponse<InvoiceInDb>> getPendingInvoices(String clientId) async {
     final res = await invoicesDataSource.getPendingInvoices(clientId);
     final result = ListResponse<InvoiceInDb>.fromJson(res, InvoiceInDb.fromJson);
+    return result;
+  }
+
+  Future<ListResponse<InvoiceInDb>> getPaidInvoices({
+    String? clientId,
+    int? startDate,
+    int? endDate,
+    required int offset,
+  }) async {
+    final res = await invoicesDataSource.getPaidInvoices(
+      clientId: clientId,
+      startDate: startDate,
+      endDate: endDate,
+      offset: offset,
+    );
+    final result = ListResponse<InvoiceInDb>.fromJson(res, InvoiceInDb.fromJson);
+    return result;
+  }
+
+  Future<InvoiceTotals> getTotalFromPaidInvoices({
+    String? clientId,
+    int? startDate,
+    int? endDate,
+    required int offset,
+  }) async {
+    final res = await invoicesDataSource.getTotalFromPaidInvoices(
+      clientId: clientId,
+      startDate: startDate,
+      endDate: endDate,
+      offset: offset,
+    );
+    final result = InvoiceTotals.fromJson(res);
     return result;
   }
 

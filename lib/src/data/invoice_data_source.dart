@@ -1,4 +1,5 @@
 import 'package:kardex_app_front/src/services/http_service.dart';
+import 'package:kardex_app_front/src/tools/branches_tool.dart';
 import 'package:kardex_app_front/src/tools/http_tool.dart';
 
 class InvoicesDataSource with HttpService {
@@ -25,6 +26,51 @@ class InvoicesDataSource with HttpService {
 
   Future<Map<String, dynamic>> getPendingInvoices(String clientId) async {
     final uri = HttpTools.generateUri("$_pendingEndoint/$clientId");
+    final res = await getQuery(uri);
+    return res;
+  }
+
+  Future<Map<String, dynamic>> getPaidInvoices({
+    String? clientId,
+    int? startDate,
+    int? endDate,
+    required int offset,
+  }) async {
+    final currentBranch = BranchesTool.getCurrentBranchId();
+    final uri = HttpTools.generateUri(
+      _endpoint,
+      queryParameters: {
+        "branchId": currentBranch,
+        "clientId": ?clientId,
+        "startDate": ?startDate?.toString(),
+        "endDate": ?endDate?.toString(),
+        "byPaidAt": true.toString(),
+        "status": "paid",
+        "offset": offset.toString(),
+      },
+    );
+    final res = await getQuery(uri);
+    return res;
+  }
+
+  Future<Map<String, dynamic>> getTotalFromPaidInvoices({
+    String? clientId,
+    int? startDate,
+    int? endDate,
+    required int offset,
+  }) async {
+    final currentBranch = BranchesTool.getCurrentBranchId();
+    final uri = HttpTools.generateUri(
+      "$_endpoint/totals",
+      queryParameters: {
+        "branchId": currentBranch,
+        "clientId": ?clientId,
+        "startDate": ?startDate?.toString(),
+        "endDate": ?endDate?.toString(),
+        "byPaidAt": true.toString(),
+        "status": "paid",
+      },
+    );
     final res = await getQuery(uri);
     return res;
   }

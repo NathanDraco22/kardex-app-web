@@ -8,6 +8,7 @@ import 'package:kardex_app_front/src/modules/commercial/pending_invoice/pending_
 import 'package:kardex_app_front/src/modules/commercial/product_price_setting/product_price_setting.dart';
 import 'package:kardex_app_front/src/modules/finance/client_accounts/view/client_account_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/finances_menu_screen.dart';
+import 'package:kardex_app_front/src/modules/finance/paid_invoices/paid_invoices_screen.dart';
 import 'package:kardex_app_front/src/modules/home/view/home_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/current_inventory/current_inventory_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/history_entry/history_entry_screen.dart';
@@ -148,6 +149,11 @@ class AppRouter {
             path: "client-accounts",
             name: "client-accounts",
             builder: (context, state) => const ClientAccountScreen(),
+          ),
+          GoRoute(
+            path: "paid-invoices",
+            name: "paid-invoices",
+            builder: (context, state) => const PaidInvoicesScreen(),
           ),
         ],
       ),
