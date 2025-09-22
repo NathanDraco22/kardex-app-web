@@ -9,6 +9,12 @@ class InvoiceMobileViewController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void updateItem(CommercialProductResult oldItem, CommercialProductResult newItem) {
+    final index = items.indexOf(oldItem);
+    items[index] = newItem;
+    notifyListeners();
+  }
+
   void removeItem(CommercialProductResult item) {
     items.remove(item);
     notifyListeners();

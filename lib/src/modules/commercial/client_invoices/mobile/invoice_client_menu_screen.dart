@@ -40,6 +40,14 @@ class ViewController extends ChangeNotifier {
 
   set selectedClient(ClientInDb? value) {
     _selectedClient = value;
+    if (value == null) {
+      _selectedPaymentType = PaymentType.cash;
+    }
+
+    if (value?.isCreditActive == true) {
+      _selectedPaymentType = PaymentType.credit;
+    }
+
     notifyListeners();
   }
 
@@ -175,14 +183,14 @@ class _BodyState extends State<_Body> {
                           const Text("Tipo de Pago"),
                           const SizedBox(height: 6),
                           SizedBox(
-                            height: 46,
+                            height: 38,
                             child: ListenableBuilder(
                               listenable: viewController,
                               builder: (context, _) {
                                 final selectedClient = viewController.selectedClient;
                                 final hasCredit = selectedClient?.isCreditActive ?? false;
                                 final initValue = hasCredit ? PaymentType.credit : PaymentType.cash;
-                                viewController.selectedPaymentType = initValue;
+                                viewController.selectedPaymentType ??= initValue;
                                 final dropdown = DropdownButtonFormField(
                                   key: ValueKey(selectedClient ?? 'select_payment_type'),
                                   initialValue: initValue,
@@ -257,83 +265,122 @@ class _BodyState extends State<_Body> {
 
                 const SizedBox(height: 16),
 
-                ElevatedButton.icon(
-                  onPressed: () async {
-                    final totalCost = widget.saleItems.fold<int>(
-                      0,
-                      (previousValue, element) => previousValue + (element.cost * element.quantity),
-                    );
-
-                    final total = widget.saleItems.fold<int>(
-                      0,
-                      (previousValue, element) => previousValue + element.total,
-                    );
-
-                    final newInvoice = CreateInvoice(
-                      branchId: BranchesTool.getCurrentBranchId(),
-                      clientId: viewController.selectedClient!.id,
-                      description: viewController.description,
-                      docNumber: "",
-                      saleItems: widget.saleItems,
-                      status: InvoiceStatus.open,
-                      paymentType: viewController.selectedPaymentType!,
-                      totalCost: totalCost,
-                      total: total,
-                    );
-
-                    final res = await showConfirmationSendBottomModal(
-                      context,
-                      title: "Enviar Orden",
-                      subtitle: "¿Desea enviar la orden de compra?",
-                      content: Column(
-                        children: [
-                          Text(
-                            viewController.selectedClient!.name,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-
-                          Expanded(
-                            child: ListView(
-                              children: [
-                                for (final item in newInvoice.saleItems)
-                                  ListTile(
-                                    title: Text(item.product.name),
-                                    subtitle: Row(
-                                      children: [
-                                        Text(
-                                          item.quantity.toString(),
-                                        ),
-                                        Text(NumberFormatter.convertFromCentsToDouble(item.price).toString()),
-                                        Text(NumberFormatter.convertFromCentsToDouble(item.totalDiscount).toString()),
-                                        Text(NumberFormatter.convertFromCentsToDouble(item.total).toString()),
-                                      ],
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-
-                    if (res != true) return;
-                    if (!context.mounted) return;
-                    context.read<WriteInvoiceCubit>().createNewInvoice(
-                      newInvoice,
-                      viewController.selectedClient!,
-                    );
-                  },
-                  icon: const Icon(Icons.send),
-                  label: const Text("Enviar Orden de Compra"),
-                ),
+                _SendButton(viewController: viewController, widget: widget),
               ],
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _SendButton extends StatelessWidget {
+  const _SendButton({
+    required this.viewController,
+    required this.widget,
+  });
+
+  final ViewController viewController;
+  final _Body widget;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: viewController,
+      builder: (context, _) {
+        return ElevatedButton.icon(
+          onPressed: viewController.selectedClient == null
+              ? null
+              : () async {
+                  final totalCost = widget.saleItems.fold<int>(
+                    0,
+                    (previousValue, element) => previousValue + (element.cost * element.quantity),
+                  );
+
+                  final total = widget.saleItems.fold<int>(
+                    0,
+                    (previousValue, element) => previousValue + element.total,
+                  );
+
+                  final newInvoice = CreateInvoice(
+                    branchId: BranchesTool.getCurrentBranchId(),
+                    clientId: viewController.selectedClient!.id,
+                    description: viewController.description,
+                    docNumber: "",
+                    saleItems: widget.saleItems,
+                    status: InvoiceStatus.open,
+                    paymentType: viewController.selectedPaymentType!,
+                    totalCost: totalCost,
+                    total: total,
+                  );
+
+                  final res = await showConfirmationSendBottomModal(
+                    context,
+                    title: "Enviar Orden",
+                    subtitle: "¿Desea enviar la orden de compra?",
+                    content: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          viewController.selectedClient!.name,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+
+                        Expanded(
+                          child: ListView(
+                            children: [
+                              for (final item in newInvoice.saleItems)
+                                ListTile(
+                                  title: Text(item.product.name),
+                                  subtitle: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        item.quantity.toString(),
+                                      ),
+                                      Text(NumberFormatter.convertToMoneyLike(item.price).toString()),
+                                      Text(
+                                        NumberFormatter.convertToMoneyLike(
+                                          item.totalDiscount,
+                                        ).toString(),
+                                      ),
+                                      Text(NumberFormatter.convertToMoneyLike(item.total).toString()),
+                                    ],
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                        const Divider(),
+                        Text(
+                          "Total: ${NumberFormatter.convertToMoneyLike(newInvoice.total)}",
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
+                  );
+
+                  if (res != true) return;
+                  if (!context.mounted) return;
+                  context.read<WriteInvoiceCubit>().createNewInvoice(
+                    newInvoice,
+                    viewController.selectedClient!,
+                  );
+                },
+          icon: const Icon(Icons.send),
+          label: const Text("Enviar Orden de Compra"),
+        );
+      },
     );
   }
 }

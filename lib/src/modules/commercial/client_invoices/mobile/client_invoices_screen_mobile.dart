@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/cubit/write_invoice_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/mobile/mediator.dart';
+import 'package:kardex_app_front/widgets/dialogs/commercial_product_modal.dart';
 import 'package:kardex_app_front/widgets/dialogs/custom_product_commercial_search_delegate.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 
@@ -62,30 +63,32 @@ class _RootScaffold extends StatelessWidget {
       ),
       appBar: AppBar(
         title: Text(title),
-        leading: IconButton(
-          onPressed: () async {},
-          icon: const Icon(
-            Icons.arrow_back,
-          ),
-        ),
-
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(kToolbarHeight),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              TextButton.icon(
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.white,
-                ),
-                onPressed: () async {
-                  final saleItems = createSaleItemFromCommercial(viewController.items);
-                  await showInvoiceClientMenuScreen(context, saleItems);
-                },
-                label: Text(saveButton),
-                icon: Icon(saveIcon),
-              ),
-            ],
+          child: ListenableBuilder(
+            listenable: viewController,
+            builder: (context, _) {
+              final isEmptyItems = viewController.items.isEmpty;
+
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton.icon(
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.white,
+                    ),
+                    onPressed: isEmptyItems
+                        ? null
+                        : () async {
+                            final saleItems = createSaleItemFromCommercial(viewController.items);
+                            await showInvoiceClientMenuScreen(context, saleItems);
+                          },
+                    label: Text(saveButton),
+                    icon: Icon(saveIcon),
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ),
@@ -146,6 +149,23 @@ class _Body extends StatelessWidget {
                         tileColor: tileColor,
                         item: currentCommercial,
                         percentDiscount: currentCommercial.selectedDisocunt?.percentValue ?? 0,
+                        onRemove: () => viewController.removeItem(currentCommercial),
+                        onEdit: () async {
+                          final res = await showCommercialProductModal(context, product: currentCommercial.product);
+                          if (res == null) return;
+                          viewController.updateItem(
+                            currentCommercial,
+                            res,
+                          );
+                        },
+                        onChange: () async {
+                          final res = await showCommercialProductSearchDelegate(context);
+                          if (res == null) return;
+                          viewController.updateItem(
+                            currentCommercial,
+                            res,
+                          );
+                        },
                       );
                     },
                   );

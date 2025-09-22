@@ -170,7 +170,9 @@ class _HeaderSection extends StatelessWidget {
                                 child: TitleTextField(
                                   title: "Observaciones",
                                   maxLines: 2,
-                                  onChanged: (p0) {},
+                                  onChanged: (value) {
+                                    viewController.description = value;
+                                  },
                                 ),
                               ),
                             ),
@@ -284,6 +286,7 @@ CreateInvoice createInvoiceFromControllers(
     branchId: BranchesTool.getCurrentBranchId(),
     clientId: viewController.selectedClient!.id,
     docNumber: "",
+    description: viewController.description,
     saleItems: salesItems.toList(),
     status: InvoiceStatus.open,
     paymentType: viewController.selectedPaymentType,

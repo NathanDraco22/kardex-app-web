@@ -7,6 +7,8 @@ import '../widgets/client_invoice_table.dart';
 class ViewController extends ChangeNotifier {
   DateTime? _selectedDate;
 
+  String description = '';
+
   DateTime get selectedDate => _selectedDate ?? DateTime.now();
   set selectedDate(DateTime value) {
     _selectedDate = value;

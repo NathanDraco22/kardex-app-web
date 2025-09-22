@@ -9,6 +9,7 @@ Future<bool?> showConfirmationSendBottomModal(
 }) async {
   return await showModalBottomSheet<bool?>(
     context: context,
+    scrollControlDisabledMaxHeightRatio: 0.65,
     builder: (context) {
       return ConfirmationSaveModal(
         title: title,
