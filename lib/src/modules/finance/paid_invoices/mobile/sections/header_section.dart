@@ -17,6 +17,19 @@ class _HeaderSectionState extends State<_HeaderSection> {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                FilledButton(
+                  onPressed: () {
+                    readCubit.clearFilters();
+                    setState(() {});
+                    readCubit.loadPaidInvoices();
+                  },
+                  child: const Icon(Icons.clear),
+                ),
+              ],
+            ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -61,9 +74,10 @@ class _HeaderSectionState extends State<_HeaderSection> {
                 Flexible(
                   child: DatePickerListTile(
                     key: ValueKey("start_date_${readCubit.startDate.hashCode}"),
+                    defaultDate: readCubit.startDate,
                     title: "Fecha Inicio",
                     onSelected: (value) {
-                      readCubit.startDate = value.millisecondsSinceEpoch;
+                      readCubit.startDate = value;
                     },
                   ),
                 ),
@@ -71,12 +85,10 @@ class _HeaderSectionState extends State<_HeaderSection> {
                 Flexible(
                   child: DatePickerListTile(
                     key: ValueKey("end_date_${readCubit.endDate.hashCode}"),
+                    defaultDate: readCubit.endDate,
                     title: "Fecha Fin",
                     onSelected: (value) {
-                      final topEndDate = value.add(
-                        const Duration(days: 1),
-                      );
-                      readCubit.endDate = topEndDate.millisecondsSinceEpoch;
+                      readCubit.endDate = value;
                     },
                   ),
                 ),
@@ -93,15 +105,6 @@ class _HeaderSectionState extends State<_HeaderSection> {
                   },
                   label: const Text("Filtrar"),
                   icon: const Icon(Icons.filter_alt_rounded),
-                ),
-                const SizedBox(width: 12),
-                FilledButton(
-                  onPressed: () {
-                    readCubit.clearFilters();
-                    setState(() {});
-                    readCubit.loadPaidInvoices();
-                  },
-                  child: const Icon(Icons.clear),
                 ),
               ],
             ),

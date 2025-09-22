@@ -262,7 +262,8 @@ CreateInvoice createInvoiceFromControllers(
         cost: product.account.averageCost,
         price: product.saleProfile.salePrice,
         quantity: e.commercial.quantity,
-        discount: e.commercial.discountPercent,
+        discountPercentage: e.commercial.discountPercent,
+        totalDiscount: e.commercial.totalDiscount,
         subTotal: e.commercial.subTotal,
         total: e.commercial.total,
       );

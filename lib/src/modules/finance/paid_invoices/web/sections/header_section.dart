@@ -21,8 +21,6 @@ class _HeaderSectionState extends State<_HeaderSection> {
             SizedBox(
               height: 70,
               child: Row(
-                // crossAxisAlignment y spacing no son propiedades de Row,
-                // las he movido a los widgets hijos donde corresponda.
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Flexible(
@@ -74,9 +72,10 @@ class _HeaderSectionState extends State<_HeaderSection> {
                         Flexible(
                           child: DatePickerListTile(
                             key: ValueKey(readCubit.startDate),
+                            defaultDate: readCubit.startDate,
                             title: "Fecha Inicio",
                             onSelected: (value) {
-                              readCubit.startDate = value.millisecondsSinceEpoch;
+                              readCubit.startDate = value;
                             },
                           ),
                         ),
@@ -84,12 +83,10 @@ class _HeaderSectionState extends State<_HeaderSection> {
                         Flexible(
                           child: DatePickerListTile(
                             key: ValueKey(readCubit.endDate),
+                            defaultDate: readCubit.endDate,
                             title: "Fecha Fin",
                             onSelected: (value) {
-                              final topEndDate = value.add(
-                                const Duration(days: 1),
-                              );
-                              readCubit.endDate = topEndDate.millisecondsSinceEpoch;
+                              readCubit.endDate = value;
                             },
                           ),
                         ),

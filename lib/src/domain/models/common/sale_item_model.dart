@@ -47,7 +47,8 @@ class SaleItem {
   final int cost;
   final int price;
   final int subTotal;
-  final int discount;
+  final int discountPercentage;
+  final int totalDiscount;
   final int total;
 
   SaleItem({
@@ -57,7 +58,8 @@ class SaleItem {
     required this.cost,
     required this.price,
     required this.subTotal,
-    this.discount = 0,
+    this.discountPercentage = 0,
+    this.totalDiscount = 0,
     required this.total,
   });
 
@@ -68,7 +70,8 @@ class SaleItem {
     cost: json['cost'],
     price: json['price'],
     subTotal: json['subTotal'],
-    discount: json['discount'] ?? 0,
+    discountPercentage: json['discountPercentage'] ?? 0,
+    totalDiscount: json['totalDiscount'] ?? 0,
     total: json['total'],
   );
 
@@ -79,7 +82,8 @@ class SaleItem {
     'cost': cost,
     'price': price,
     'subTotal': subTotal,
-    'discount': discount,
+    'discountPercentage': discountPercentage,
+    'totalDiscount': totalDiscount,
     'total': total,
   };
 }

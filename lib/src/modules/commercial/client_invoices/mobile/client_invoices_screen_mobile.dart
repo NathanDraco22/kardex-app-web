@@ -167,7 +167,8 @@ List<SaleItem> createSaleItemFromCommercial(List<CommercialProductResult> items)
       cost: product.account.averageCost,
       price: product.saleProfile.salePrice,
       quantity: commercial.quantity,
-      discount: commercial.discountPercent,
+      discountPercentage: commercial.discountPercent,
+      totalDiscount: commercial.totalDiscount,
       subTotal: commercial.subTotal,
       total: commercial.total,
     );

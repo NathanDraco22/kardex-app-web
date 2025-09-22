@@ -6,12 +6,14 @@ class DatePickerListTile extends StatefulWidget {
     super.key,
     required this.title,
     required this.onSelected,
+    this.defaultDate,
     this.isActive = true,
   });
 
   final String title;
   final ValueChanged<DateTime> onSelected;
   final bool isActive;
+  final DateTime? defaultDate;
 
   @override
   DatePickerListTileState createState() => DatePickerListTileState();
@@ -19,6 +21,25 @@ class DatePickerListTile extends StatefulWidget {
 
 class DatePickerListTileState extends State<DatePickerListTile> {
   DateTime? _selectedDate;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedDate = widget.defaultDate;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: Text(widget.title),
+      subtitle: Text(
+        _selectedDate == null ? '  -  -   ' : DateTimeTool.formatddMMyy(_selectedDate!),
+        style: const TextStyle(fontWeight: FontWeight.w500, color: Colors.black),
+      ),
+      trailing: const Icon(Icons.calendar_today),
+      onTap: !widget.isActive ? null : () => _selectDate(context),
+    );
+  }
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -33,18 +54,5 @@ class DatePickerListTileState extends State<DatePickerListTile> {
       });
       widget.onSelected(picked);
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(widget.title),
-      subtitle: Text(
-        _selectedDate == null ? '  -  -   ' : DateTimeTool.formatddMMyy(_selectedDate!),
-        style: const TextStyle(fontWeight: FontWeight.w500, color: Colors.black),
-      ),
-      trailing: const Icon(Icons.calendar_today),
-      onTap: !widget.isActive ? null : () => _selectDate(context),
-    );
   }
 }

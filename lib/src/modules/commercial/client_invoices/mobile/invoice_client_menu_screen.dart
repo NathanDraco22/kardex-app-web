@@ -307,7 +307,7 @@ class _BodyState extends State<_Body> {
                                           item.quantity.toString(),
                                         ),
                                         Text(NumberFormatter.convertFromCentsToDouble(item.price).toString()),
-                                        Text(NumberFormatter.convertFromCentsToDouble(item.discount).toString()),
+                                        Text(NumberFormatter.convertFromCentsToDouble(item.totalDiscount).toString()),
                                         Text(NumberFormatter.convertFromCentsToDouble(item.total).toString()),
                                       ],
                                     ),

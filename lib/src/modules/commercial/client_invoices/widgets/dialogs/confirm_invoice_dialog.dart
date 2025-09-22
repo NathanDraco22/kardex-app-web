@@ -59,7 +59,7 @@ Future<bool> showConfirmationInvoiceDialog(
                         Flexible(
                           fit: FlexFit.tight,
                           child: Text(
-                            NumberFormatter.convertToMoneyLike(item.discount),
+                            NumberFormatter.convertToMoneyLike(item.totalDiscount),
                           ),
                         ),
                         Flexible(

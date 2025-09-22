@@ -11,4 +11,9 @@ class DateTimeTool {
     final formatter = DateFormat('dd-MM-yy');
     return formatter.format(datetime);
   }
+
+  static DateTime getTodayMidnight() {
+    final now = DateTime.now();
+    return DateTime(now.year, now.month, now.day);
+  }
 }
