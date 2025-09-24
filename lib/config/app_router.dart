@@ -23,6 +23,7 @@ import 'package:kardex_app_front/src/modules/settings/view/branches/branches_scr
 import 'package:kardex_app_front/src/modules/settings/view/price_to_product/price_to_product_screen.dart';
 import 'package:kardex_app_front/src/modules/settings/view/settings_screen.dart';
 import 'package:kardex_app_front/src/modules/settings/view/units/units_screen.dart';
+import 'package:kardex_app_front/src/modules/settings/view/users/users_screen.dart';
 import 'package:kardex_app_front/src/modules/suppliers_catalog/view/suppliers_catalog_screen.dart';
 
 class AppRouter {
@@ -163,6 +164,11 @@ class AppRouter {
         name: 'settings',
         builder: (context, state) => const SettingsScreen(),
         routes: [
+          GoRoute(
+            path: "users",
+            name: "users",
+            builder: (context, state) => const UsersScreen(),
+          ),
           GoRoute(
             path: "product-price",
             name: "product-price",

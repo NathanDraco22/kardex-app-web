@@ -33,11 +33,11 @@ class _Body extends StatelessWidget {
       child: ListView(
         children: [
           ListTile(
-            leading: const Icon(Icons.price_change_outlined),
-            title: const Text("Precios para Productos"),
+            leading: const Icon(Icons.person),
+            title: const Text("Usuarios"),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              context.pushNamed("product-price");
+              context.pushNamed("users");
             },
           ),
           const Divider(height: 0.0),
