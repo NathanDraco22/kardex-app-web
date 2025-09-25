@@ -5,24 +5,30 @@ class ClientsDataSource with HttpService {
   final _clientEndpoint = "/clients";
 
   Future<Map<String, dynamic>> createClient(Map<String, dynamic> client) async {
+    final headers = HttpTools.generateAuthHeaders();
     final uri = HttpTools.generateUri(_clientEndpoint);
-    final res = await postQuery(uri, client);
+    final res = await postQuery(uri, client, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>> getAllClients() async {
+    final headers = HttpTools.generateAuthHeaders();
     final uri = HttpTools.generateUri(_clientEndpoint);
-    final res = await getQuery(uri);
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>?> getClientById(String clientId) async {
-    throw UnimplementedError();
+    final headers = HttpTools.generateAuthHeaders();
+    final uri = HttpTools.generateUri("$_clientEndpoint/$clientId");
+    final res = await getQuery(uri, headers: headers);
+    return res;
   }
 
   Future<Map<String, dynamic>> searchClientByKeyword(String keyword) async {
+    final headers = HttpTools.generateAuthHeaders();
     final uri = HttpTools.generateUri("$_clientEndpoint/search/$keyword");
-    final res = await getQuery(uri);
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
@@ -30,16 +36,18 @@ class ClientsDataSource with HttpService {
     String clientId,
     Map<String, dynamic> client,
   ) async {
+    final headers = HttpTools.generateAuthHeaders();
     final uri = HttpTools.generateUri("$_clientEndpoint/$clientId");
-    final res = await patchQuery(uri, body: client);
+    final res = await patchQuery(uri, body: client, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>?> deleteClientById(
     String clientId,
   ) async {
+    final headers = HttpTools.generateAuthHeaders();
     final uri = HttpTools.generateUri("$_clientEndpoint/$clientId");
-    final res = await deleteQuery(uri);
+    final res = await deleteQuery(uri, headers: headers);
     return res;
   }
 }

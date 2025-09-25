@@ -14,7 +14,8 @@ class OrdersDataSource with HttpService {
 
   Future<Map<String, dynamic>> createOrder(Map<String, dynamic> order) async {
     final uri = HttpTools.generateUri(_endpoint);
-    final res = await postQuery(uri, order);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await postQuery(uri, order, headers: headers);
     return res;
   }
 
@@ -36,13 +37,15 @@ class OrdersDataSource with HttpService {
         "branchId": currentBranch,
       },
     );
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>?> getOrderById(String orderId) async {
     final uri = HttpTools.generateUri("$_endpoint/$orderId");
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
@@ -51,19 +54,22 @@ class OrdersDataSource with HttpService {
     Map<String, dynamic> order,
   ) async {
     final uri = HttpTools.generateUri("$_endpoint/$orderId");
-    final res = await patchQuery(uri, body: order);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await patchQuery(uri, body: order, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>?> convertOrderToInvoice(String orderId) async {
     final uri = HttpTools.generateUri("$_endpoint/make-invoice/$orderId");
-    final res = await postQuery(uri, {});
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await postQuery(uri, {}, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>?> cancelOrderById(String orderId) async {
     final uri = HttpTools.generateUri("$_endpoint/cancel/$orderId");
-    final res = await patchQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await patchQuery(uri, headers: headers);
     return res;
   }
 }

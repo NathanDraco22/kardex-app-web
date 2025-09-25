@@ -11,26 +11,30 @@ class BranchesDataSource with HttpService {
   final _endpoint = "/branches";
 
   Future<Map<String, dynamic>> createBranch(Map<String, dynamic> branch) async {
+    final headers = HttpTools.generateAuthHeaders();
     final uri = HttpTools.generateUri(_endpoint);
-    final res = await postQuery(uri, branch);
+    final res = await postQuery(uri, branch, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>> getAllBranches() async {
+    final headers = HttpTools.generateAuthHeaders();
     final uri = HttpTools.generateUri(_endpoint);
-    final res = await getQuery(uri);
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>?> getBranchById(String branchId) async {
+    final headers = HttpTools.generateAuthHeaders();
     final uri = HttpTools.generateUri("$_endpoint/$branchId");
-    final res = await getQuery(uri);
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>> searchBranchByKeyword(String keyword) async {
+    final headers = HttpTools.generateAuthHeaders();
     final uri = HttpTools.generateUri("$_endpoint/search/$keyword");
-    final res = await getQuery(uri);
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
@@ -38,14 +42,16 @@ class BranchesDataSource with HttpService {
     String branchId,
     Map<String, dynamic> branch,
   ) async {
+    final headers = HttpTools.generateAuthHeaders();
     final uri = HttpTools.generateUri("$_endpoint/$branchId");
-    final res = await patchQuery(uri, body: branch);
+    final res = await patchQuery(uri, body: branch, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>?> deleteBranchById(String branchId) async {
+    final headers = HttpTools.generateAuthHeaders();
     final uri = HttpTools.generateUri("$_endpoint/$branchId");
-    final res = await deleteQuery(uri);
+    final res = await deleteQuery(uri, headers: headers);
     return res;
   }
 }

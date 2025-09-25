@@ -13,7 +13,8 @@ class UsersDataSource with HttpService {
 
   Future<Map<String, dynamic>> createUser(Map<String, dynamic> user) async {
     final uri = HttpTools.generateUri(_endpoint);
-    final res = await postQuery(uri, user);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await postQuery(uri, user, headers: headers);
     return res;
   }
 
@@ -25,19 +26,22 @@ class UsersDataSource with HttpService {
         "limit": paginationItems.toString(),
       },
     );
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>?> getUserById(String userId) async {
     final uri = HttpTools.generateUri("$_endpoint/$userId");
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>> searchUserByKeyword(String keyword) async {
     final uri = HttpTools.generateUri("$_endpoint/search/$keyword");
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
@@ -46,13 +50,15 @@ class UsersDataSource with HttpService {
     Map<String, dynamic> user,
   ) async {
     final uri = HttpTools.generateUri("$_endpoint/$userId");
-    final res = await patchQuery(uri, body: user);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await patchQuery(uri, body: user, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>?> deleteUserById(String userId) async {
     final uri = HttpTools.generateUri("$_endpoint/$userId");
-    final res = await deleteQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await deleteQuery(uri, headers: headers);
     return res;
   }
 }

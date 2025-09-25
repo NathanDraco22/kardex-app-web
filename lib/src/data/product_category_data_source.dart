@@ -12,25 +12,29 @@ class ProductCategoriesDataSource with HttpService {
 
   Future<Map<String, dynamic>> createProductCategory(Map<String, dynamic> productCategory) async {
     final uri = HttpTools.generateUri(_endpoint);
-    final res = await postQuery(uri, productCategory);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await postQuery(uri, productCategory, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>> getAllProductCategories() async {
     final uri = HttpTools.generateUri(_endpoint);
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>?> getProductCategoryById(String productCategoryId) async {
     final uri = HttpTools.generateUri("$_endpoint/$productCategoryId");
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>> searchProductCategoryByKeyword(String keyword) async {
     final uri = HttpTools.generateUri("$_endpoint/search/$keyword");
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
@@ -39,13 +43,15 @@ class ProductCategoriesDataSource with HttpService {
     Map<String, dynamic> productCategory,
   ) async {
     final uri = HttpTools.generateUri("$_endpoint/$productCategoryId");
-    final res = await patchQuery(uri, body: productCategory);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await patchQuery(uri, body: productCategory, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>?> deleteProductCategoryById(String productCategoryId) async {
     final uri = HttpTools.generateUri("$_endpoint/$productCategoryId");
-    final res = await deleteQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await deleteQuery(uri, headers: headers);
     return res;
   }
 }

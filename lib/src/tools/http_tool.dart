@@ -1,4 +1,5 @@
 import 'package:kardex_app_front/config/app_env.dart';
+import 'package:kardex_app_front/src/core/token_manager.dart';
 
 class HttpTools {
   static const String _baseUrl = AppEnv.serverUrl;
@@ -23,11 +24,11 @@ class HttpTools {
     }
   }
 
-  // static Future<Map<String, String>> generateAuthHeaders() async {
-  //   final token = await SecureStorageService().secureStorage.read(key: "token");
-  //   if (token == null) {
-  //     throw Exception("HttpTools.generateAuthHeaders: No token found");
-  //   }
-  //   return {"Authorization": "Bearer $token"};
-  // }
+  static Map<String, String> generateAuthHeaders() {
+    final token = TokenManager().getToken();
+    return {
+      "Authorization": "Bearer $token",
+      "X-Agent": "Neptuno",
+    };
+  }
 }

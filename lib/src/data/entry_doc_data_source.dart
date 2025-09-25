@@ -13,13 +13,15 @@ class EntryDocsDataSource with HttpService {
 
   Future<Map<String, dynamic>> createEntryDoc(Map<String, dynamic> entryDoc) async {
     final uri = HttpTools.generateUri(_endpoint);
-    final res = await postQuery(uri, entryDoc);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await postQuery(uri, entryDoc, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>> getAllEntryDocs() async {
     final uri = HttpTools.generateUri(_endpoint);
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
@@ -31,19 +33,22 @@ class EntryDocsDataSource with HttpService {
         "limit": paginationItems.toString(),
       },
     );
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>?> getEntryDocById(String docId) async {
     final uri = HttpTools.generateUri("$_endpoint/$docId");
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>> searchEntryDocByKeyword(String keyword) async {
     final uri = HttpTools.generateUri("$_endpoint/search/$keyword");
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 }

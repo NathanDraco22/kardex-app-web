@@ -12,19 +12,22 @@ class UserRolesDataSource with HttpService {
 
   Future<Map<String, dynamic>> createUserRole(Map<String, dynamic> userRole) async {
     final uri = HttpTools.generateUri(_endpoint);
-    final res = await postQuery(uri, userRole);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await postQuery(uri, userRole, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>> getAllUserRoles() async {
     final uri = HttpTools.generateUri(_endpoint);
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>?> getUserRoleById(String userRoleId) async {
     final uri = HttpTools.generateUri("$_endpoint/$userRoleId");
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
@@ -33,13 +36,15 @@ class UserRolesDataSource with HttpService {
     Map<String, dynamic> userRole,
   ) async {
     final uri = HttpTools.generateUri("$_endpoint/$userRoleId");
-    final res = await patchQuery(uri, body: userRole);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await patchQuery(uri, body: userRole, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>?> deleteUserRoleById(String userRoleId) async {
     final uri = HttpTools.generateUri("$_endpoint/$userRoleId");
-    final res = await deleteQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await deleteQuery(uri, headers: headers);
     return res;
   }
 }

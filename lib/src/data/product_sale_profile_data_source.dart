@@ -13,7 +13,8 @@ class ProductSaleProfilesDataSource with HttpService {
 
   Future<Map<String, dynamic>> createProductSaleProfile(Map<String, dynamic> profile) async {
     final uri = HttpTools.generateUri(_endpoint);
-    final res = await postQuery(uri, profile);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await postQuery(uri, profile, headers: headers);
     return res;
   }
 
@@ -22,7 +23,8 @@ class ProductSaleProfilesDataSource with HttpService {
     final uri = HttpTools.generateUri(
       "$_endpoint/$currentBranch",
     );
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
@@ -32,7 +34,8 @@ class ProductSaleProfilesDataSource with HttpService {
       "$_endpoint/$productId",
       queryParameters: {'branchId': currentBranch},
     );
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
@@ -42,7 +45,8 @@ class ProductSaleProfilesDataSource with HttpService {
   ) async {
     final currentBranch = BranchesTool.getCurrentBranchId();
     final uri = HttpTools.generateUri("$_endpoint/$currentBranch/$productId");
-    final res = await patchQuery(uri, body: profile);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await patchQuery(uri, body: profile, headers: headers);
     return res;
   }
 }

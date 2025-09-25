@@ -12,25 +12,29 @@ class SuppliersDataSource with HttpService {
 
   Future<Map<String, dynamic>> createSupplier(Map<String, dynamic> supplier) async {
     final uri = HttpTools.generateUri(_supplierEndpoint);
-    final res = await postQuery(uri, supplier);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await postQuery(uri, supplier, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>> getAllSuppliers() async {
     final uri = HttpTools.generateUri(_supplierEndpoint);
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>?> getSupplierById(String supplierId) async {
     final uri = HttpTools.generateUri("$_supplierEndpoint/$supplierId");
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>> searchSupplierByKeyword(String keyword) async {
     final uri = HttpTools.generateUri("$_supplierEndpoint/search/$keyword");
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
@@ -39,13 +43,15 @@ class SuppliersDataSource with HttpService {
     Map<String, dynamic> supplier,
   ) async {
     final uri = HttpTools.generateUri("$_supplierEndpoint/$supplierId");
-    final res = await patchQuery(uri, body: supplier);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await patchQuery(uri, body: supplier, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>?> deleteSupplierById(String supplierId) async {
     final uri = HttpTools.generateUri("$_supplierEndpoint/$supplierId");
-    final res = await deleteQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await deleteQuery(uri, headers: headers);
     return res;
   }
 }

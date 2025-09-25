@@ -13,7 +13,8 @@ class ReceiptsDataSource with HttpService {
 
   Future<Map<String, dynamic>> createReceipt(Map<String, dynamic> receipt) async {
     final uri = HttpTools.generateUri(_endpoint);
-    final res = await postQuery(uri, receipt);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await postQuery(uri, receipt, headers: headers);
     return res;
   }
 
@@ -26,7 +27,8 @@ class ReceiptsDataSource with HttpService {
         'branchId': currentBranch,
       },
     );
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 }

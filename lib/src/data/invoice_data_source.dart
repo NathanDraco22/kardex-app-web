@@ -20,13 +20,15 @@ class InvoicesDataSource with HttpService {
 
   Future<Map<String, dynamic>> getInvoicesByClientId(String clientId) async {
     final uri = HttpTools.generateUri("$_endpoint/client/$clientId");
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>> getPendingInvoices(String clientId) async {
     final uri = HttpTools.generateUri("$_pendingEndoint/$clientId");
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
@@ -49,7 +51,8 @@ class InvoicesDataSource with HttpService {
         "offset": offset.toString(),
       },
     );
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
@@ -71,13 +74,15 @@ class InvoicesDataSource with HttpService {
         "status": "paid",
       },
     );
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>?> getInvoiceById(String invoiceId) async {
     final uri = HttpTools.generateUri("$_endpoint/$invoiceId");
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
@@ -86,7 +91,8 @@ class InvoicesDataSource with HttpService {
     Map<String, dynamic> invoice,
   ) async {
     final uri = HttpTools.generateUri("$_endpoint/$invoiceId");
-    final res = await patchQuery(uri, body: invoice);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await patchQuery(uri, body: invoice, headers: headers);
     return res;
   }
 }

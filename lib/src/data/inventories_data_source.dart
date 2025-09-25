@@ -19,7 +19,8 @@ class InventoriesDataSource with HttpService {
       queryParameters: {'branchId': currentBranch},
     );
 
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 }

@@ -12,25 +12,29 @@ class ProductPricesDataSource with HttpService {
 
   Future<Map<String, dynamic>> createProductPrice(Map<String, dynamic> productPrice) async {
     final uri = HttpTools.generateUri(_endpoint);
-    final res = await postQuery(uri, productPrice);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await postQuery(uri, productPrice, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>> getAllProductPrices() async {
     final uri = HttpTools.generateUri(_endpoint);
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>?> getProductPriceById(String productPriceId) async {
     final uri = HttpTools.generateUri("$_endpoint/$productPriceId");
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>> searchProductPriceByKeyword(String keyword) async {
     final uri = HttpTools.generateUri("$_endpoint/search/$keyword");
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
@@ -39,13 +43,15 @@ class ProductPricesDataSource with HttpService {
     Map<String, dynamic> productPrice,
   ) async {
     final uri = HttpTools.generateUri("$_endpoint/$productPriceId");
-    final res = await patchQuery(uri, body: productPrice);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await patchQuery(uri, body: productPrice, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>?> deleteProductPriceById(String productPriceId) async {
     final uri = HttpTools.generateUri("$_endpoint/$productPriceId");
-    final res = await deleteQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await deleteQuery(uri, headers: headers);
     return res;
   }
 }

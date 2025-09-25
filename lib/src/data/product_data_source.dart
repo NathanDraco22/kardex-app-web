@@ -14,13 +14,15 @@ class ProductsDataSource with HttpService {
 
   Future<Map<String, dynamic>> createProduct(Map<String, dynamic> product) async {
     final uri = HttpTools.generateUri(_endpoint);
-    final res = await postQuery(uri, product);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await postQuery(uri, product, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>> getAllProducts() async {
     final uri = HttpTools.generateUri(_endpoint);
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
@@ -32,19 +34,22 @@ class ProductsDataSource with HttpService {
         "limit": paginationItems.toString(),
       },
     );
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>?> getProductById(String productId) async {
     final uri = HttpTools.generateUri("$_endpoint/$productId");
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>> searchProductByKeyword(String keyword) async {
     final uri = HttpTools.generateUri("$_endpoint/search/$keyword");
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
@@ -53,7 +58,8 @@ class ProductsDataSource with HttpService {
   ) async {
     final currentBranch = BranchesTool.getCurrentBranchId();
     final uri = HttpTools.generateUri("$_endpoint/branch/$currentBranch/search/$textQuery");
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
@@ -62,13 +68,15 @@ class ProductsDataSource with HttpService {
     Map<String, dynamic> product,
   ) async {
     final uri = HttpTools.generateUri("$_endpoint/$productId");
-    final res = await patchQuery(uri, body: product);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await patchQuery(uri, body: product, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>?> deleteProductById(String productId) async {
     final uri = HttpTools.generateUri("$_endpoint/$productId");
-    final res = await deleteQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await deleteQuery(uri, headers: headers);
     return res;
   }
 }

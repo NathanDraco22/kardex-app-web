@@ -11,7 +11,12 @@ class TokenManager {
     _currentSessionToken = token;
   }
 
-  String getToken() => _currentSessionToken;
+  String getToken() {
+    if (_currentSessionToken.isEmpty) {
+      throw Exception("Token not found");
+    }
+    return _currentSessionToken;
+  }
 
   void removeToken() => _currentSessionToken = "";
 
