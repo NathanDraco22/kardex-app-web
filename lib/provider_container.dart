@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/cubits/config_app/config_app_cubit.dart';
 import 'package:kardex_app_front/src/data/data.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
@@ -29,6 +30,7 @@ class ProviderContainer extends StatelessWidget {
     final orderDataSource = OrdersDataSource();
     final usersDataSource = UsersDataSource();
     final userRolesDataSource = UserRolesDataSource();
+    final authDataSource = AuthDataSource();
 
     return MultiRepositoryProvider(
       providers: [
@@ -107,6 +109,10 @@ class ProviderContainer extends StatelessWidget {
         RepositoryProvider(
           create: (context) => UserRolesRepository(userRolesDataSource),
         ),
+
+        RepositoryProvider(
+          create: (context) => AuthRepository(authDataSource),
+        ),
       ],
       child: GlobalCubitProvider(
         child: child,
@@ -122,9 +128,15 @@ class GlobalCubitProvider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authRepo = context.read<AuthRepository>();
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => ConfigAppCubit()),
+        BlocProvider(
+          create: (context) => AuthCubit(
+            authRepository: authRepo,
+          ),
+        ),
       ],
       child: child,
     );

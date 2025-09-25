@@ -1,6 +1,12 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/constants/const_modules.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/src/core/access_manager.dart';
+import 'package:kardex_app_front/src/tools/loading_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -16,12 +22,91 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authState = context.read<AuthCubit>().state;
+    if (authState is! Authenticated) {
+      Future(() {
+        if (!context.mounted) return;
+        context.goNamed("login");
+      });
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    final user = authState.session.user;
     return Scaffold(
+      endDrawer: Drawer(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primaryContainer,
+              ),
+              child: Text(
+                user.username,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                ),
+              ),
+            ),
+            const Spacer(),
+            ListTile(
+              tileColor: Colors.red.shade100,
+              leading: Icon(Icons.exit_to_app, color: Colors.red.shade700),
+
+              title: Text(
+                "Cerrar Sesión",
+                style: TextStyle(
+                  color: Colors.red.shade700,
+                ),
+              ),
+              onTap: () async {
+                final res = await DialogManager.confirmActionDialog(context, "Deseas cerrar sesión?");
+                if (res != true) return;
+                if (!context.mounted) return;
+                LoadingDialogManager.showLoadingDialog(context);
+                await context.read<AuthCubit>().logout();
+                if (!context.mounted) return;
+                LoadingDialogManager.closeLoadingDialog(context);
+                context.goNamed("login");
+              },
+            ),
+          ],
+        ),
+      ),
       appBar: AppBar(
-        title: const Text("Nombre del Sistema"),
+        title: const Text("Sistema Neptuno"),
+        actions: [
+          const AvatarButton(),
+          const SizedBox(width: 12),
+        ],
       ),
       backgroundColor: Colors.white,
       body: const _Body(),
+    );
+  }
+}
+
+class AvatarButton extends StatelessWidget {
+  const AvatarButton({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () async {
+        Scaffold.of(context).openEndDrawer();
+      },
+      child: CircleAvatar(
+        backgroundColor: Colors.amber.shade100,
+        child: Icon(
+          Icons.person,
+          color: Colors.grey.shade800,
+        ),
+      ),
     );
   }
 }
@@ -31,11 +116,22 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authState = context.read<AuthCubit>().state as Authenticated;
+    final user = authState.session.user;
+    final userName = user.username;
+    final firstName = userName.split(" ")[0];
+    final accessManager = AccessManager();
     return Center(
       child: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
-          const Text("Bienvenido, Usuario Numero 1", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+          Text(
+            "Bienvenido/a, $firstName",
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 12),
 
           const Text("Elige una opcion", style: TextStyle(fontSize: 18)),
@@ -47,61 +143,68 @@ class _Body extends StatelessWidget {
             runSpacing: 20,
             alignment: WrapAlignment.center,
             children: [
-              HomeOptionCard(
-                title: "Lista de Clientes",
-                icon: FluentIcons.contact_card_16_filled,
-                onTap: () {
-                  context.pushNamed("client-catalog");
-                },
-              ),
+              if (accessManager.hasAccessTo(user, Modules.clients))
+                HomeOptionCard(
+                  title: "Lista de Clientes",
+                  icon: FluentIcons.contact_card_16_filled,
+                  onTap: () {
+                    context.pushNamed("client-catalog");
+                  },
+                ),
 
-              HomeOptionCard(
-                title: "Lista de Proveedores",
-                icon: FluentIcons.building_multiple_20_filled,
-                onTap: () {
-                  context.pushNamed("suppliers-catalog");
-                },
-              ),
+              if (accessManager.hasAccessTo(user, Modules.suppliers))
+                HomeOptionCard(
+                  title: "Lista de Proveedores",
+                  icon: FluentIcons.building_multiple_20_filled,
+                  onTap: () {
+                    context.pushNamed("suppliers-catalog");
+                  },
+                ),
 
-              HomeOptionCard(
-                title: "Catalogo de Productos",
-                icon: FluentIcons.receipt_bag_20_filled,
-                onTap: () {
-                  context.pushNamed("product-catalog");
-                },
-              ),
+              if (accessManager.hasAccessTo(user, Modules.products))
+                HomeOptionCard(
+                  title: "Catalogo de Productos",
+                  icon: FluentIcons.receipt_bag_20_filled,
+                  onTap: () {
+                    context.pushNamed("product-catalog");
+                  },
+                ),
 
-              HomeOptionCard(
-                title: "Comercio",
-                icon: FluentIcons.money_calculator_20_filled,
-                onTap: () {
-                  context.pushNamed("commercial");
-                },
-              ),
+              if (accessManager.hasAccessTo(user, Modules.commercial))
+                HomeOptionCard(
+                  title: "Comercio",
+                  icon: FluentIcons.money_calculator_20_filled,
+                  onTap: () {
+                    context.pushNamed("commercial");
+                  },
+                ),
 
-              HomeOptionCard(
-                title: "Inventario",
-                icon: FluentIcons.box_toolbox_20_filled,
-                onTap: () {
-                  context.pushNamed("inventory");
-                },
-              ),
+              if (accessManager.hasAccessTo(user, Modules.inventory))
+                HomeOptionCard(
+                  title: "Inventario",
+                  icon: FluentIcons.box_toolbox_20_filled,
+                  onTap: () {
+                    context.pushNamed("inventory");
+                  },
+                ),
 
-              HomeOptionCard(
-                title: "Finanzas",
-                icon: FluentIcons.arrow_trending_lines_24_regular,
-                onTap: () {
-                  context.pushNamed("finances");
-                },
-              ),
+              if (accessManager.hasAccessTo(user, Modules.finance))
+                HomeOptionCard(
+                  title: "Finanzas",
+                  icon: FluentIcons.arrow_trending_lines_24_regular,
+                  onTap: () {
+                    context.pushNamed("finances");
+                  },
+                ),
 
-              HomeOptionCard(
-                title: "Configuraciones",
-                icon: FluentIcons.settings_20_filled,
-                onTap: () {
-                  context.pushNamed("settings");
-                },
-              ),
+              if (accessManager.hasAccessTo(user, Modules.settings))
+                HomeOptionCard(
+                  title: "Configuraciones",
+                  icon: FluentIcons.settings_20_filled,
+                  onTap: () {
+                    context.pushNamed("settings");
+                  },
+                ),
             ],
           ),
         ],

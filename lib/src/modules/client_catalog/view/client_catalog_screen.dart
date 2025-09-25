@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/constants/const_modules.dart';
 import 'package:kardex_app_front/src/domain/repositories/client_repository.dart';
 
 import 'package:kardex_app_front/src/tools/constant.dart';
@@ -17,6 +18,8 @@ part 'mobile/client_catalog_mobile.dart';
 
 class ClientCatalogScreen extends StatelessWidget {
   const ClientCatalogScreen({super.key});
+
+  static const accessName = Modules.clients;
 
   @override
   Widget build(BuildContext context) {

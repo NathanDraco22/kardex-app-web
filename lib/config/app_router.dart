@@ -16,6 +16,7 @@ import 'package:kardex_app_front/src/modules/inventory/history_exit/history_exit
 import 'package:kardex_app_front/src/modules/inventory/inventory_entry/view/inventory_entry_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_exit/view/inventory_exit_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_menu_screen.dart';
+import 'package:kardex_app_front/src/modules/login/login_screen.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/product_category/view/product_category_screen.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/product_list/view/product_list_screen.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/view/product_catalog_menu_screen.dart';
@@ -24,12 +25,25 @@ import 'package:kardex_app_front/src/modules/settings/view/price_to_product/pric
 import 'package:kardex_app_front/src/modules/settings/view/settings_screen.dart';
 import 'package:kardex_app_front/src/modules/settings/view/units/units_screen.dart';
 import 'package:kardex_app_front/src/modules/settings/view/users/users_screen.dart';
+import 'package:kardex_app_front/src/modules/splash/splash_screen.dart';
 import 'package:kardex_app_front/src/modules/suppliers_catalog/view/suppliers_catalog_screen.dart';
 
 class AppRouter {
   static GoRouter router = GoRouter(
-    initialLocation: '/home',
+    initialLocation: '/splash',
     routes: [
+      GoRoute(
+        path: '/splash',
+        name: 'splash',
+        builder: (context, state) => const SplashScreen(),
+      ),
+
+      GoRoute(
+        path: '/login',
+        name: 'login',
+        builder: (context, state) => const LoginScreen(),
+      ),
+
       GoRoute(
         path: '/home',
         name: 'home',

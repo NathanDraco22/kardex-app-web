@@ -1,3 +1,4 @@
+export 'auth_repository.dart';
 export 'branch_repository.dart';
 export 'client_repository.dart';
 export 'entry_doc_repository.dart';

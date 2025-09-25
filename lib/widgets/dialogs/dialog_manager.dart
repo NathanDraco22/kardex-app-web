@@ -124,4 +124,6 @@ class DialogManager {
 
     return result ?? false;
   }
+
+  static void showLoadingDialog(BuildContext context) {}
 }

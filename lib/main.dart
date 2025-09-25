@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:hive_ce_flutter/adapters.dart';
 import 'package:kardex_app_front/config/app_router.dart';
 import 'package:kardex_app_front/config/app_theme.dart';
 import 'package:kardex_app_front/provider_container.dart';
 
-void main() => runApp(const MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Hive.initFlutter();
+
+  runApp(const MyApp());
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

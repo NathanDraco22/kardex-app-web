@@ -1,3 +1,4 @@
+export 'auth_data_source.dart';
 export 'branche_data_source.dart';
 export 'client_data_source.dart';
 export 'entry_doc_data_source.dart';

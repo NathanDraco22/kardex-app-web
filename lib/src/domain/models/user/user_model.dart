@@ -152,7 +152,7 @@ class UserInDbWithRole extends UserInDb {
     required this.userRole,
   });
 
-  factory UserInDbWithRole.fromJson(Map<String, dynamic> json) {
+  factory UserInDbWithRole.fromJson(Map json) {
     return UserInDbWithRole(
       id: json['id'] as String,
       username: json['username'] as String,

@@ -1,0 +1,36 @@
+import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
+
+class TokenManager {
+  static final TokenManager _instance = TokenManager._internal();
+  factory TokenManager() => _instance;
+  TokenManager._internal();
+
+  String _currentSessionToken = "";
+
+  void storeToken(String token) {
+    _currentSessionToken = token;
+  }
+
+  String getToken() => _currentSessionToken;
+
+  void removeToken() => _currentSessionToken = "";
+
+  bool isTokenNearToExpiration(String token) {
+    late JWT decodedToken;
+    try {
+      decodedToken = JWT.decode(token);
+    } catch (e) {
+      return false;
+    }
+    final expiration = decodedToken.payload["exp"] as int?;
+    if (expiration == null) return false;
+    final expirationDate = DateTime.fromMillisecondsSinceEpoch(
+      expiration * 1000,
+      isUtc: true,
+    );
+    final now = DateTime.now().toUtc();
+    final difference = expirationDate.difference(now);
+    if (difference.inHours < 1) return true;
+    return false;
+  }
+}

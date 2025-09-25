@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/constants/const_modules.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
+
+  static const accessName = Modules.settings;
 
   @override
   Widget build(BuildContext context) {

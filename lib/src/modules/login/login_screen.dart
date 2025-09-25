@@ -1,0 +1,108 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/src/tools/loading_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
+import 'package:kardex_app_front/widgets/title_texfield.dart';
+
+class LoginScreen extends StatelessWidget {
+  const LoginScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const _RootScaffold();
+  }
+}
+
+class _RootScaffold extends StatelessWidget {
+  const _RootScaffold();
+
+  @override
+  Widget build(BuildContext context) {
+    final authCubit = context.read<AuthCubit>();
+    return BlocListener(
+      bloc: authCubit,
+      listener: (context, state) {
+        if (state is AuthLoading) {
+          LoadingDialogManager.showLoadingDialog(context);
+        }
+
+        if (state is! AuthLoading) {
+          LoadingDialogManager.closeLoadingDialog(context);
+        }
+
+        if (state is Authenticated) {
+          context.goNamed("home");
+        }
+
+        if (state is AuthError) {
+          DialogManager.showErrorDialog(context, state.message);
+        }
+
+        if (state is Unauthenticated) {
+          context.goNamed("login");
+        }
+      },
+      child: const Scaffold(
+        body: _Body(),
+      ),
+    );
+  }
+}
+
+class _Body extends StatefulWidget {
+  const _Body();
+
+  @override
+  State<_Body> createState() => _BodyState();
+}
+
+class _BodyState extends State<_Body> {
+  String userId = "";
+  String password = "";
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 400),
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TitleTextField(
+                  title: "Codigo de Usuario",
+                  onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                  onChanged: (value) {
+                    userId = value;
+                  },
+                ),
+                const SizedBox(height: 8),
+                TitleTextField(
+                  title: "Contraseña",
+                  onEditingComplete: () {
+                    context.read<AuthCubit>().login(userId, password);
+                  },
+                  onChanged: (value) {
+                    password = value;
+                  },
+                ),
+
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    context.read<AuthCubit>().login(userId, password);
+                  },
+                  child: const Text("Iniciar Sesión"),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

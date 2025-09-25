@@ -12,10 +12,12 @@ class AppTheme {
     colorScheme: const ColorScheme.light(
       primary: ColourPalette.primaryVariant,
       secondary: ColourPalette.secondary,
+      primaryContainer: ColourPalette.primary,
     ),
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
       foregroundColor: Colors.white,
     ),
+
     progressIndicatorTheme: ProgressIndicatorThemeData(
       color: ColourPalette.primaryInverse,
       linearTrackColor: Colors.amber.shade100,
