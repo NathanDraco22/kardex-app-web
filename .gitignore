@@ -46,3 +46,4 @@ app.*.map.json
 
 
 secrets.json
+secrets_dev.json
