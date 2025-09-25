@@ -20,6 +20,7 @@ class TitleTextField extends StatelessWidget {
     this.style,
     this.readOnly = false,
     this.onTap,
+    this.textInputAction,
   });
 
   final TextInputType? keyboardType;
@@ -33,6 +34,7 @@ class TitleTextField extends StatelessWidget {
   final String title;
   final TextAlign? titleTextAlign;
   final TextStyle? style;
+  final TextInputAction? textInputAction;
   final bool readOnly;
   final void Function()? onTap;
   final void Function()? onEditingComplete;
@@ -53,6 +55,7 @@ class TitleTextField extends StatelessWidget {
         ),
         TextFormField(
           readOnly: readOnly,
+          textInputAction: textInputAction,
           onTap: onTap,
           style: style ?? const TextStyle(fontWeight: FontWeight.w500),
           textAlign: titleTextAlign ?? TextAlign.start,

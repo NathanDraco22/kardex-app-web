@@ -85,6 +85,8 @@ class _CreateSupplierDialogState extends State<CreateSupplierDialog> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             AlertDialog(
+              constraints: const BoxConstraints(maxWidth: 600),
+              insetPadding: EdgeInsets.zero,
               title: Text("$wordPrefix Proveedor"),
               actions: [
                 OutlinedButton(

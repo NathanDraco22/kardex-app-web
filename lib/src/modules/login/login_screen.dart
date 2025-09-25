@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
+import 'package:kardex_app_front/widgets/password_title_textfield.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -76,18 +77,19 @@ class _BodyState extends State<_Body> {
                 TitleTextField(
                   title: "Codigo de Usuario",
                   onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                  keyboardType: TextInputType.number,
                   onChanged: (value) {
-                    userId = value;
+                    userId = value.trim();
                   },
                 ),
                 const SizedBox(height: 8),
-                TitleTextField(
+                PasswordTextField(
                   title: "Contraseña",
                   onEditingComplete: () {
                     context.read<AuthCubit>().login(userId, password);
                   },
                   onChanged: (value) {
-                    password = value;
+                    password = value.trim();
                   },
                 ),
 

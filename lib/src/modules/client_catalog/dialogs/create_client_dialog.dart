@@ -88,6 +88,11 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             AlertDialog(
+              insetPadding: EdgeInsets.zero,
+              constraints: BoxConstraints(
+                maxWidth: 600,
+                minWidth: 550,
+              ),
               title: Text("$wordPrefix Cliente"),
               actions: [
                 OutlinedButton(

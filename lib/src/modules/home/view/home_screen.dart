@@ -123,7 +123,7 @@ class _Body extends StatelessWidget {
     final accessManager = AccessManager();
     return Center(
       child: ListView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 24),
         children: [
           Text(
             "Bienvenido/a, $firstName",
@@ -207,6 +207,7 @@ class _Body extends StatelessWidget {
                 ),
             ],
           ),
+          const SizedBox(height: 8),
         ],
       ),
     );

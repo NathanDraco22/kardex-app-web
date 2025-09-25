@@ -242,7 +242,7 @@ class _InnerContent extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const Text(
-                      "Unidad*",
+                      "Unidad de Medida*",
                       textAlign: TextAlign.start,
                     ),
                     const SizedBox(height: 6),

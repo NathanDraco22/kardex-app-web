@@ -9,12 +9,14 @@ class SearchFieldDebounced extends StatefulWidget {
     this.onSearch,
     this.autoFocus = false,
     this.duration = const Duration(milliseconds: 500),
+    this.hasPrefixIcon = true,
   });
 
   final Duration duration;
   final TextEditingController? controller;
   final void Function(String)? onSearch;
   final bool autoFocus;
+  final bool hasPrefixIcon;
 
   @override
   State<SearchFieldDebounced> createState() => _SearchFieldDebouncedState();
@@ -36,11 +38,11 @@ class _SearchFieldDebouncedState extends State<SearchFieldDebounced> {
           widget.onSearch?.call(value);
         });
       },
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         isCollapsed: false,
-        border: OutlineInputBorder(),
-        prefixIcon: Icon(Icons.search, size: 16),
-        label: Text("Buscar..."),
+        border: const OutlineInputBorder(),
+        prefixIcon: widget.hasPrefixIcon ? const Icon(Icons.search, size: 16) : null,
+        label: const Text("Buscar..."),
       ),
     );
   }

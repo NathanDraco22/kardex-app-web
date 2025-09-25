@@ -111,6 +111,7 @@ class _CustomAutocompleteTextfieldState<T> extends State<CustomAutocompleteTextf
     );
 
     if (res == null) {
+      controller.text = "";
       if (currentValue != null) {
         controller.text = widget.titleBuilder(currentValue as T);
       }
@@ -125,7 +126,7 @@ class _CustomAutocompleteTextfieldState<T> extends State<CustomAutocompleteTextf
     globalPosOffset = renderBox.localToGlobal(Offset.zero);
 
     if (context.isMobile()) {
-      globalPosOffset = Offset(globalPosOffset.dx, globalPosOffset.dy - kToolbarHeight);
+      globalPosOffset = Offset(globalPosOffset.dx, globalPosOffset.dy);
     }
 
     setState(() {
@@ -158,6 +159,7 @@ class _InnerSearchTextFieldState<T> extends State<_InnerSearchTextField<T>> {
         children: [
           SearchFieldDebounced(
             duration: const Duration(milliseconds: 300),
+            hasPrefixIcon: false,
             controller: widget.controller,
             autoFocus: true,
             onSearch: (value) async {
