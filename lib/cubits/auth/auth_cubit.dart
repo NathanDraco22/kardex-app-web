@@ -16,7 +16,7 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       LoginResponse? loginResponse = await authRepository.getLocalSession();
       if (loginResponse != null) {
-        final isTokenNearToExpiration = TokenManager().isTokenNearToExpiration(
+        final isTokenNearToExpiration = TokenManager().isTokenGotExpired(
           loginResponse.accessToken,
         );
         if (isTokenNearToExpiration) {

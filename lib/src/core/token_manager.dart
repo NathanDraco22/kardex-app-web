@@ -20,7 +20,7 @@ class TokenManager {
 
   void removeToken() => _currentSessionToken = "";
 
-  bool isTokenNearToExpiration(String token) {
+  bool isTokenGotExpired(String token) {
     late JWT decodedToken;
     try {
       decodedToken = JWT.decode(token);
@@ -33,9 +33,9 @@ class TokenManager {
       expiration * 1000,
       isUtc: true,
     );
-    final now = DateTime.now().toUtc();
-    final difference = expirationDate.difference(now);
-    if (difference.inHours < 1) return true;
+    final nowUtc = DateTime.now().toUtc();
+    final expirationLimit = expirationDate.subtract(const Duration(hours: 1));
+    if (nowUtc.isAfter(expirationLimit)) return true;
     return false;
   }
 }
