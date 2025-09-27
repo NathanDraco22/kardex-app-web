@@ -454,13 +454,22 @@ class MoreActionRowButton extends StatelessWidget {
 
               items: [
                 PopupMenuItem(
-                  child: const Text("Cambiar"),
-                  onTap: () {
-                    EntryRowChangeNotification(widget.rowModel).dispatch(context);
-                  },
+                  child: ListTile(
+                    title: const Text("Cambiar"),
+                    leading: const Icon(
+                      Icons.swap_horiz,
+                    ),
+
+                    onTap: () {
+                      EntryRowChangeNotification(widget.rowModel).dispatch(context);
+                    },
+                  ),
                 ),
                 PopupMenuItem(
-                  child: const Text("Eliminar"),
+                  child: const ListTile(
+                    leading: Icon(Icons.delete),
+                    title: Text("Eliminar"),
+                  ),
                   onTap: () {
                     EntryRowDeleteNotification(widget.rowModel).dispatch(context);
                   },
