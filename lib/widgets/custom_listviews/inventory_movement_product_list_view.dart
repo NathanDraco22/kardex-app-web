@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_app_front/src/domain/models/models.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_app_front/widgets/dialogs/custom_product_search_delegate.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
 
 class ProductRowCard {
@@ -111,18 +112,36 @@ class _Content extends StatelessWidget {
     final controller = mediator.notifier!;
     return Column(
       children: [
-        ..._generateRowCards(controller),
+        ..._generateRowCards(context, controller),
       ],
     );
   }
 
-  Iterable<Widget> _generateRowCards(ProductListViewController controller) sync* {
+  Iterable<Widget> _generateRowCards(BuildContext context, ProductListViewController controller) sync* {
     final rowCard = controller.rowCards;
 
     for (var i = 0; i < rowCard.length; i++) {
       final currentRowCardModel = rowCard[i];
       final color = i.isOdd ? Colors.white : Colors.grey.shade200;
-      yield EntryRowCard(rowColor: color, rowCardModel: currentRowCardModel);
+      yield EntryRowCard(
+        key: ValueKey(currentRowCardModel),
+        rowColor: color,
+        rowCardModel: currentRowCardModel,
+
+        onRemove: () => controller.removeRowCard(currentRowCardModel),
+        onChange: () async {
+          final res = await showProductSearchDelegate(context);
+          if (res == null) return;
+          final newRow = ProductRowCard(
+            product: res,
+            quantity: 0,
+            unitaryCost: 0,
+            editableCost: true,
+          );
+
+          controller.updateRowCard(currentRowCardModel, newRow);
+        },
+      );
     }
   }
 }
@@ -132,10 +151,15 @@ class EntryRowCard extends StatefulWidget {
     super.key,
     required this.rowColor,
     required this.rowCardModel,
+    this.onRemove,
+    this.onChange,
   });
 
   final Color rowColor;
   final ProductRowCard rowCardModel;
+
+  final VoidCallback? onRemove;
+  final VoidCallback? onChange;
 
   @override
   State<EntryRowCard> createState() => _EntryRowCardState();
@@ -152,6 +176,8 @@ class _EntryRowCardState extends State<EntryRowCard> {
       focusNode.requestFocus();
     });
   }
+
+  Offset? offset;
 
   @override
   Widget build(BuildContext context) {
@@ -173,137 +199,185 @@ class _EntryRowCardState extends State<EntryRowCard> {
       },
       child: Material(
         color: Colors.transparent,
-        child: Ink(
-          decoration: BoxDecoration(
-            color: widget.rowColor,
-            border: border,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              spacing: 8,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      product.name,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Flexible(
-                      fit: FlexFit.tight,
-                      child: Text(
-                        product.unitName,
-                      ),
-                    ),
-                    Flexible(
-                      fit: FlexFit.tight,
-                      child: Text(
-                        product.brandName,
-                      ),
-                    ),
-                  ],
-                ),
-
-                const Divider(
-                  height: 4.0,
-                  thickness: 2,
-                  color: Colors.black12,
-                ),
-
-                Row(
-                  children: [
-                    Flexible(
-                      fit: FlexFit.tight,
-                      child: TitleTextField(
-                        focusNode: focusNode,
-                        inputFormatters: [IntegerTextInputFormatter()],
-                        titleTextAlign: TextAlign.center,
-                        keyboardType: TextInputType.number,
-                        onEditingComplete: () => FocusScope.of(context).nextFocus(),
-                        title: "Cantidad",
-                        onChanged: (value) {
-                          if (value.isEmpty) {
-                            rowCard.quantity = 0;
-                            setState(() {});
-                            return;
-                          }
-                          final numValue = int.tryParse(value);
-                          if (numValue == null) return;
-                          rowCard.quantity = numValue;
-                          setState(() {});
-                        },
-                      ),
-                    ),
-                    Flexible(
-                      fit: FlexFit.tight,
-                      child: Builder(
-                        builder: (context) {
-                          if (!rowCard.editableCost) return const Text("--");
-
-                          return TitleTextField(
-                            inputFormatters: [DecimalTextInputFormatter()],
-                            titleTextAlign: TextAlign.center,
-                            keyboardType: const TextInputType.numberWithOptions(
-                              decimal: true,
-                            ),
-                            title: "Costo Unitario",
-                            onChanged: (value) {
-                              if (value.isEmpty) {
-                                rowCard.unitaryCost = 0;
-                                setState(() {});
-                                return;
-                              }
-                              final numValue = double.tryParse(value);
-                              if (numValue == null) return;
-                              final minimalUnit = (numValue * 100).round();
-                              rowCard.unitaryCost = minimalUnit;
-                              setState(() {});
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-
-                DefaultTextStyle(
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 16,
-                    color: Colors.black,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+        child: InkWell(
+          onTapDown: (details) {
+            offset = details.globalPosition;
+          },
+          onLongPress: () async {
+            if (offset == null) return;
+            final res = await _showContextMenu(context, offset!);
+            offset = null;
+            if (res == null) return;
+            switch (res) {
+              case _MenuOptions.change:
+                widget.onChange?.call();
+              case _MenuOptions.delete:
+                widget.onRemove?.call();
+            }
+          },
+          child: Ink(
+            decoration: BoxDecoration(
+              color: widget.rowColor,
+              border: border,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                spacing: 8,
+                children: [
+                  Row(
                     children: [
-                      const Flexible(
+                      Text(
+                        product.name,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Flexible(
                         fit: FlexFit.tight,
                         child: Text(
-                          "Subtotal: ",
-                          textAlign: TextAlign.end,
+                          product.unitName,
                         ),
                       ),
                       Flexible(
                         fit: FlexFit.tight,
                         child: Text(
-                          NumberFormatter.convertToMoneyLike(subtotal.toInt()),
-                          textAlign: TextAlign.center,
+                          product.brandName,
                         ),
                       ),
                     ],
                   ),
-                ),
-              ],
+
+                  const Divider(
+                    height: 4.0,
+                    thickness: 2,
+                    color: Colors.black12,
+                  ),
+
+                  Row(
+                    children: [
+                      Flexible(
+                        fit: FlexFit.tight,
+                        child: TitleTextField(
+                          focusNode: focusNode,
+                          inputFormatters: [IntegerTextInputFormatter()],
+                          titleTextAlign: TextAlign.center,
+                          keyboardType: TextInputType.number,
+                          onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                          title: "Cantidad",
+                          onChanged: (value) {
+                            if (value.isEmpty) {
+                              rowCard.quantity = 0;
+                              setState(() {});
+                              return;
+                            }
+                            final numValue = int.tryParse(value);
+                            if (numValue == null) return;
+                            rowCard.quantity = numValue;
+                            setState(() {});
+                          },
+                        ),
+                      ),
+                      Flexible(
+                        fit: FlexFit.tight,
+                        child: Builder(
+                          builder: (context) {
+                            if (!rowCard.editableCost) return const Text("--");
+
+                            return TitleTextField(
+                              inputFormatters: [DecimalTextInputFormatter()],
+                              titleTextAlign: TextAlign.center,
+                              keyboardType: const TextInputType.numberWithOptions(
+                                decimal: true,
+                              ),
+                              title: "Costo Unitario",
+                              onChanged: (value) {
+                                if (value.isEmpty) {
+                                  rowCard.unitaryCost = 0;
+                                  setState(() {});
+                                  return;
+                                }
+                                final numValue = double.tryParse(value);
+                                if (numValue == null) return;
+                                final minimalUnit = (numValue * 100).round();
+                                rowCard.unitaryCost = minimalUnit;
+                                setState(() {});
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  DefaultTextStyle(
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 16,
+                      color: Colors.black,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        const Flexible(
+                          fit: FlexFit.tight,
+                          child: Text(
+                            "Subtotal: ",
+                            textAlign: TextAlign.end,
+                          ),
+                        ),
+                        Flexible(
+                          fit: FlexFit.tight,
+                          child: Text(
+                            NumberFormatter.convertToMoneyLike(subtotal.toInt()),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
       ),
     );
   }
+}
+
+enum _MenuOptions { change, delete }
+
+Future<_MenuOptions?> _showContextMenu(BuildContext context, Offset position) async {
+  final result = await showMenu<_MenuOptions>(
+    context: context,
+    position: RelativeRect.fromLTRB(position.dx, position.dy, position.dx, position.dy),
+    items: [
+      const PopupMenuItem(
+        value: _MenuOptions.change,
+        child: ListTile(
+          leading: Icon(Icons.swap_horiz),
+          title: Text('Cambiar'),
+        ),
+      ),
+      const PopupMenuItem(
+        value: _MenuOptions.delete,
+        child: ListTile(
+          leading: Icon(Icons.delete),
+          title: Text('Eliminar'),
+        ),
+      ),
+    ],
+  );
+
+  if (result != null) {
+    return result;
+  }
+
+  return null;
 }
