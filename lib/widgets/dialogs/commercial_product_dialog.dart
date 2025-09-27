@@ -310,6 +310,11 @@ class _FormContentState extends State<_FormContent> {
                     ),
                     ElevatedButton(
                       onPressed: () {
+                        if (product.saleProfile.salePrice == 0) {
+                          DialogManager.showErrorDialog(context, "El producto tiene un precio 0, no se puede vender");
+                          return;
+                        }
+
                         final isValid = formKey.currentState!.validate();
 
                         if (!isValid) {

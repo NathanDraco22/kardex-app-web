@@ -5,6 +5,7 @@ import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 import 'package:kardex_app_front/widgets/title_label.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 
 Future<CommercialProductResult?> showCommercialProductModal(
   BuildContext context, {
@@ -58,7 +59,7 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
   @override
   Widget build(BuildContext context) {
     final product = commercialProductResult.product;
-    final price = NumberFormatter.convertToMoneyLike(product.saleProfile.salePrice);
+    String price = NumberFormatter.convertToMoneyLike(product.saleProfile.salePrice);
     final subtotal = NumberFormatter.convertToMoneyLike(commercialProductResult.subTotal);
     final totalDiscount = NumberFormatter.convertToMoneyLike(commercialProductResult.totalDiscount);
     final total = NumberFormatter.convertToMoneyLike(commercialProductResult.total);
@@ -288,6 +289,11 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                     ),
                     ElevatedButton(
                       onPressed: () {
+                        if (product.saleProfile.salePrice == 0) {
+                          DialogManager.showErrorDialog(context, "El producto no tiene precio de venta");
+                          return;
+                        }
+
                         final isValid = formKey.currentState!.validate();
 
                         if (!isValid) {
