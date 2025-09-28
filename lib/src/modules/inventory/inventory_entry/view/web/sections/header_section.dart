@@ -28,6 +28,7 @@ class _HeaderSection extends StatelessWidget {
                       ),
                       const SizedBox(height: 6),
                       CustomAutocompleteTextfield<SupplierInDb>(
+                        onClose: (value) => headerData.supplier = value,
                         titleBuilder: (value) => value.name,
                         onSearch: (value) async {
                           final repo = context.read<SuppliersRepository>();

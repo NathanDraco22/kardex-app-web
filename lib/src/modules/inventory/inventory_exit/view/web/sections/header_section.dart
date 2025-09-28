@@ -27,6 +27,7 @@ class _HeaderSection extends StatelessWidget {
                       ),
                       const SizedBox(height: 6),
                       CustomAutocompleteTextfield<ClientInDb>(
+                        onClose: (value) => headerData.client = value,
                         titleBuilder: (value) => value.name,
                         onSearch: (value) async {
                           final repo = context.read<ClientsRepository>();

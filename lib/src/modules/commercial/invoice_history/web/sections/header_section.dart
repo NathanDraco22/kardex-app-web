@@ -27,6 +27,10 @@ class _HeaderSection extends StatelessWidget {
                         const SizedBox(height: 6),
 
                         CustomAutocompleteTextfield<ClientInDb>(
+                          onClose: (value) {
+                            readCubit.setFilterParams(clientId: value.id);
+                            readCubit.loadPaginatedInvoices();
+                          },
                           titleBuilder: (value) => value.name,
                           onSearch: (value) async {
                             final repo = context.read<ClientsRepository>();
@@ -46,10 +50,6 @@ class _HeaderSection extends StatelessWidget {
                                   title: Text(client.name),
                                   onTap: () {
                                     close(client);
-                                    readCubit.setFilterParams(
-                                      clientId: client.id,
-                                    );
-                                    readCubit.loadPaginatedInvoices();
                                   },
                                 );
                               },

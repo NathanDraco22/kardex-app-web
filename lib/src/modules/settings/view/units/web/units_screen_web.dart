@@ -78,7 +78,7 @@ class _WebBody extends StatelessWidget {
                       await context.read<ReadUnitCubit>().refreshUnit();
                     },
                     icon: const Icon(Icons.add),
-                    label: const Text("Agregar Nuevo Precio"),
+                    label: const Text("Agregar Unidad de Medida"),
                   ),
                 ),
               ],

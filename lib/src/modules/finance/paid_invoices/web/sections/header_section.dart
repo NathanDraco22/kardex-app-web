@@ -33,6 +33,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                         ),
                         const SizedBox(height: 6),
                         CustomAutocompleteTextfield<ClientInDb>(
+                          onClose: (value) => readCubit.clientId = value.id,
                           key: ValueKey(readCubit.clientId),
                           titleBuilder: (value) => value.name,
                           onSearch: (value) async {

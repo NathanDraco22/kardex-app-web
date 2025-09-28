@@ -13,6 +13,7 @@ class CustomAutocompleteTextfield<T> extends StatefulWidget {
     this.validator,
     this.readOnly = false,
     this.onFieldSubmitted,
+    this.onClose,
   });
 
   final T? initValue;
@@ -22,6 +23,7 @@ class CustomAutocompleteTextfield<T> extends StatefulWidget {
   final Future<List<T>> Function(String value) onSearch;
 
   final Widget Function(List<T> value, void Function(T value) close) suggestionBuilder;
+  final void Function(T value)? onClose;
 
   final String? Function(String?)? validator;
 
@@ -123,6 +125,7 @@ class _CustomAutocompleteTextfieldState<T> extends State<CustomAutocompleteTextf
     }
     currentValue = res;
     controller.text = widget.titleBuilder(res);
+    widget.onClose?.call(res);
   }
 
   void getTextFieldSize() {

@@ -249,6 +249,7 @@ class _InnerContent extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     CustomAutocompleteTextfield<UnitInDb>(
+                      onClose: (value) => widget.creationMap['unitName'] = value.name,
                       onFieldSubmitted: (value) {
                         FocusScope.of(context).nextFocus();
                       },
@@ -295,6 +296,7 @@ class _InnerContent extends StatelessWidget {
                     const SizedBox(height: 6),
                     CustomAutocompleteTextfield<ProductCategoryInDb>(
                       readOnly: false,
+                      onClose: (value) => widget.creationMap['categoryName'] = value.name,
                       onSearch: (value) {
                         final repo = context.read<ProductCategoriesRepository>();
                         return repo.searchProductCategoryByKeywordLocal(value);
