@@ -43,6 +43,7 @@ class _CustomAutocompleteTextfieldState<T> extends State<CustomAutocompleteTextf
   late Offset globalPosOffset;
 
   FocusNode alterTextFieldFocus = FocusNode();
+  FocusNode mainTextFieldFocus = FocusNode();
 
   @override
   void initState() {
@@ -65,22 +66,25 @@ class _CustomAutocompleteTextfieldState<T> extends State<CustomAutocompleteTextf
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      focusNode: mainTextFieldFocus,
       controller: controller,
       validator: widget.validator,
       style: const TextStyle(fontWeight: FontWeight.w500),
       key: textFieldKey,
       readOnly: widget.readOnly,
       onFieldSubmitted: widget.onFieldSubmitted,
-      onChanged: (value) {
-        displaySuggestions(context);
+      onChanged: (value) async {
+        await displaySuggestions(context);
+        mainTextFieldFocus.requestFocus();
       },
-      onTap: () {
-        displaySuggestions(context);
+      onTap: () async {
+        await displaySuggestions(context);
+        mainTextFieldFocus.requestFocus();
       },
     );
   }
 
-  void displaySuggestions(BuildContext context) async {
+  Future<void> displaySuggestions(BuildContext context) async {
     getTextFieldSize();
     final res = await showDialog(
       context: context,
@@ -162,6 +166,12 @@ class _InnerSearchTextFieldState<T> extends State<_InnerSearchTextField<T>> {
             hasPrefixIcon: false,
             controller: widget.controller,
             autoFocus: true,
+            textInputAction: TextInputAction.done,
+            onSubmitted: (value) {
+              if (suggestions.isNotEmpty) {
+                close(suggestions.first);
+              }
+            },
             onSearch: (value) async {
               if (value.isEmpty) return;
               isSearching = true;

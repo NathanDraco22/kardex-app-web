@@ -10,6 +10,9 @@ class SearchFieldDebounced extends StatefulWidget {
     this.autoFocus = false,
     this.duration = const Duration(milliseconds: 500),
     this.hasPrefixIcon = true,
+    this.textInputAction,
+    this.onEditingComplete,
+    this.onSubmitted,
   });
 
   final Duration duration;
@@ -17,6 +20,9 @@ class SearchFieldDebounced extends StatefulWidget {
   final void Function(String)? onSearch;
   final bool autoFocus;
   final bool hasPrefixIcon;
+  final TextInputAction? textInputAction;
+  final void Function()? onEditingComplete;
+  final void Function(String)? onSubmitted;
 
   @override
   State<SearchFieldDebounced> createState() => _SearchFieldDebouncedState();
@@ -31,7 +37,9 @@ class _SearchFieldDebouncedState extends State<SearchFieldDebounced> {
       controller: widget.controller,
       autofocus: widget.autoFocus,
       style: const TextStyle(fontWeight: FontWeight.w500),
-      onEditingComplete: () {},
+      textInputAction: widget.textInputAction,
+      onEditingComplete: widget.onEditingComplete ?? () {},
+      onSubmitted: widget.onSubmitted,
       onChanged: (value) {
         _debounceTime?.cancel();
         _debounceTime = Timer(widget.duration, () {
