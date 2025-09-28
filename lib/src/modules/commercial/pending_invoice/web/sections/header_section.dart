@@ -18,6 +18,7 @@ class _HeaderSection extends StatelessWidget {
               child: Row(
                 children: [
                   Flexible(
+                    flex: 2,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [

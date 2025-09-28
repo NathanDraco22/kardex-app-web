@@ -19,6 +19,9 @@ class ViewController extends ChangeNotifier {
 
   ClientInDb? get selectedClient => _selectedClient;
   set selectedClient(ClientInDb? value) {
+    final hasCredit = value?.isCreditActive ?? false;
+    final initValue = hasCredit ? PaymentType.credit : PaymentType.cash;
+    selectedPaymentType = initValue;
     _selectedClient = value;
     notifyListeners();
   }

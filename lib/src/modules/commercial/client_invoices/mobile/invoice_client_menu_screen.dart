@@ -188,12 +188,10 @@ class _BodyState extends State<_Body> {
                               listenable: viewController,
                               builder: (context, _) {
                                 final selectedClient = viewController.selectedClient;
-                                final hasCredit = selectedClient?.isCreditActive ?? false;
-                                final initValue = hasCredit ? PaymentType.credit : PaymentType.cash;
-                                viewController.selectedPaymentType ??= initValue;
+
                                 final dropdown = DropdownButtonFormField(
                                   key: ValueKey(selectedClient ?? 'select_payment_type'),
-                                  initialValue: initValue,
+                                  initialValue: viewController.selectedPaymentType,
                                   style: const TextStyle(
                                     color: Colors.black,
                                     fontWeight: FontWeight.bold,
@@ -204,7 +202,7 @@ class _BodyState extends State<_Body> {
                                       value: PaymentType.cash,
                                       child: Text("Contado"),
                                     ),
-                                    if (hasCredit)
+                                    if (selectedClient?.isCreditActive ?? false)
                                       const DropdownMenuItem(
                                         value: PaymentType.credit,
                                         child: Text("Credito"),
