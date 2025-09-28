@@ -91,7 +91,11 @@ class _HeaderSection extends StatelessWidget {
                                           child: Text("Credito"),
                                         ),
                                     ],
-                                    onChanged: (value) {},
+                                    onChanged: (value) {
+                                      if (value != null) {
+                                        viewController.selectedPaymentType = value;
+                                      }
+                                    },
                                   );
 
                                   if (viewController.selectedClient == null) {

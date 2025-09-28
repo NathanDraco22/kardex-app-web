@@ -45,6 +45,16 @@ class _Body extends StatelessWidget {
           const Divider(
             height: 0.0,
           ),
+
+          ListTile(
+            leading: const Icon(Icons.tag),
+            title: const Text("Unidades de Medida de Productos"),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              context.pushNamed("units");
+            },
+          ),
+          const Divider(height: 0.0),
           ListTile(
             leading: const Icon(Icons.category_rounded),
             title: const Text("Lista de Categorias de Productos"),

@@ -14,7 +14,15 @@ class InvoicesDataSource with HttpService {
 
   Future<Map<String, dynamic>> createInvoice(Map<String, dynamic> invoice) async {
     final uri = HttpTools.generateUri(_endpoint);
-    final res = await postQuery(uri, invoice);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await postQuery(uri, invoice, headers: headers);
+    return res;
+  }
+
+  Future<Map<String, dynamic>> createAnonInvoice(Map<String, dynamic> invoice) async {
+    final uri = HttpTools.generateUri("$_endpoint/anon");
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await postQuery(uri, invoice, headers: headers);
     return res;
   }
 

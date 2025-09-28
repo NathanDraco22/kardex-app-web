@@ -44,15 +44,6 @@ class _Body extends StatelessWidget {
             },
           ),
           const Divider(height: 0.0),
-          ListTile(
-            leading: const Icon(Icons.tag),
-            title: const Text("Unidades"),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              context.pushNamed("units");
-            },
-          ),
-          const Divider(height: 0.0),
 
           ListTile(
             leading: const Icon(Icons.other_houses),

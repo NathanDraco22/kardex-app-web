@@ -1,3 +1,4 @@
+import 'package:kardex_app_front/constants/default_values.dart';
 import 'package:kardex_app_front/src/data/data.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_totals.dart';
@@ -9,7 +10,13 @@ class InvoicesRepository {
   InvoicesRepository(this.invoicesDataSource);
 
   Future<InvoiceInDb> createInvoice(CreateInvoice createInvoice) async {
-    final result = await invoicesDataSource.createInvoice(createInvoice.toJson());
+    late Map<String, dynamic> result;
+
+    if (createInvoice.clientId == kSaleClientId) {
+      result = await invoicesDataSource.createAnonInvoice(createInvoice.toJson());
+    } else {
+      result = await invoicesDataSource.createInvoice(createInvoice.toJson());
+    }
     final invoice = result["invoice"];
     return InvoiceInDb.fromJson(invoice);
   }

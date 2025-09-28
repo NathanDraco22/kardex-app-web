@@ -65,6 +65,11 @@ class AppRouter {
             name: "product-list",
             builder: (context, state) => const ProductListScreen(),
           ),
+          GoRoute(
+            path: "units",
+            name: "units",
+            builder: (context, state) => const UnitsScreen(),
+          ),
         ],
       ),
 
@@ -189,11 +194,6 @@ class AppRouter {
             builder: (context, state) => const PriceToProductScreen(),
           ),
 
-          GoRoute(
-            path: "units",
-            name: "units",
-            builder: (context, state) => const UnitsScreen(),
-          ),
           GoRoute(
             path: "branches",
             name: "branches",
