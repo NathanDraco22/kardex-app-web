@@ -129,6 +129,8 @@ class _FormContentState extends State<_FormContent> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         AlertDialog(
+          constraints: const BoxConstraints(minWidth: 600),
+          insetPadding: EdgeInsets.zero,
           title: Text("$wordPrefix Producto"),
           actions: [
             OutlinedButton(
