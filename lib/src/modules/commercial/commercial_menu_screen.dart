@@ -36,6 +36,19 @@ class _Body extends StatelessWidget {
     return Center(
       child: ListView(
         children: [
+          if (accessManager.hasCurrentAccess(context, CommercialSubModules.createInvoice))
+            ListTile(
+              leading: Icon(
+                FluentIcons.building_retail_money_24_filled,
+                size: 32,
+                color: Colors.green.shade600,
+              ),
+              title: const Text("Facturacion de productos"),
+              onTap: () {
+                context.pushNamed("anon-invoice");
+              },
+            ),
+          const Divider(height: 0.0),
           if (accessManager.hasCurrentAccess(context, CommercialSubModules.orders))
             ListTile(
               leading: Icon(

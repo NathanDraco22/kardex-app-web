@@ -179,7 +179,7 @@ class _InnerSearchTextFieldState<T> extends State<_InnerSearchTextField<T>> {
               if (value.isEmpty) return;
               isSearching = true;
               setState(() {});
-              final res = await widget.onSearch(value);
+              final res = await widget.onSearch(value.trim());
               isSearching = false;
               suggestions = res;
               setState(() {});

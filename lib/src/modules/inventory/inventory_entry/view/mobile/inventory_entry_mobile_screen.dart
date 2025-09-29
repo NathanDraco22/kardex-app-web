@@ -76,9 +76,12 @@ class _MobileBody extends StatelessWidget {
     final mediator = InventoryEntryMediator.read(context)!;
     return Center(
       child: ListView(
+        addAutomaticKeepAlives: true,
         padding: const EdgeInsets.only(bottom: 112, top: 8),
         children: [
-          const _MobileHeaderSection(),
+          const _MobileHeaderSection(
+            key: ValueKey("header"),
+          ),
           const SizedBox(
             height: 12,
           ),
@@ -96,9 +99,14 @@ class _MobileBody extends StatelessWidget {
   }
 }
 
-class _MobileHeaderSection extends StatelessWidget {
-  const _MobileHeaderSection();
+class _MobileHeaderSection extends StatefulWidget {
+  const _MobileHeaderSection({super.key});
 
+  @override
+  State<_MobileHeaderSection> createState() => _MobileHeaderSectionState();
+}
+
+class _MobileHeaderSectionState extends State<_MobileHeaderSection> {
   @override
   Widget build(BuildContext context) {
     final mediator = InventoryEntryMediator.read(context)!;

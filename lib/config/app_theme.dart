@@ -9,6 +9,10 @@ class ColourPalette {
 
 class AppTheme {
   ThemeData get lightTheme => ThemeData.light(useMaterial3: false).copyWith(
+    dialogTheme: const DialogThemeData(
+      constraints: BoxConstraints(minWidth: 600, maxWidth: 600),
+      insetPadding: EdgeInsets.zero,
+    ),
     colorScheme: const ColorScheme.light(
       primary: ColourPalette.primaryVariant,
       secondary: ColourPalette.secondary,
@@ -17,7 +21,6 @@ class AppTheme {
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
       foregroundColor: Colors.white,
     ),
-
     progressIndicatorTheme: ProgressIndicatorThemeData(
       color: ColourPalette.primaryInverse,
       linearTrackColor: Colors.amber.shade100,

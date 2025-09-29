@@ -13,20 +13,23 @@ import 'models/commercial_product_result.dart';
 Future<CommercialProductResult?> showSearchProductCommercialDialog(
   BuildContext context, {
   ProductInDb? product,
+  bool isDirectSale = false,
 }) async {
   final res = await showDialog<CommercialProductResult?>(
     context: context,
     builder: (context) => SearchProductCommercialDialog(
       product: product,
+      isDirectSale: isDirectSale,
     ),
   );
   return res;
 }
 
 class SearchProductCommercialDialog extends StatefulWidget {
-  const SearchProductCommercialDialog({super.key, this.product});
+  const SearchProductCommercialDialog({super.key, this.product, required this.isDirectSale});
 
   final ProductInDb? product;
+  final bool isDirectSale;
 
   @override
   State<SearchProductCommercialDialog> createState() => _SearchProductCommercialDialogState();
@@ -80,6 +83,13 @@ class _SearchProductCommercialDialogState extends State<SearchProductCommercialD
                           if (event is KeyDownEvent) {
                             if (event.logicalKey == LogicalKeyboardKey.enter) {
                               if (products.isNotEmpty) {
+                                if (widget.isDirectSale) {
+                                  final result = CommercialProductResult(
+                                    product: products[cursorPosition],
+                                  );
+                                  Navigator.pop(context, result);
+                                  return KeyEventResult.handled;
+                                }
                                 showCommercialProductDialog(
                                   context,
                                   product: products[cursorPosition],
@@ -148,7 +158,7 @@ class _SearchProductCommercialDialogState extends State<SearchProductCommercialD
                       }
                       return ResultTable(
                         products: products,
-
+                        isDirectSale: widget.isDirectSale,
                         cursorPosition: cursorPosition,
                       );
                     },
@@ -167,6 +177,7 @@ class ResultTable extends StatefulWidget {
   const ResultTable({
     super.key,
     required this.products,
+    required this.isDirectSale,
     this.focus,
     this.cursorPosition = 0,
   });
@@ -174,6 +185,7 @@ class ResultTable extends StatefulWidget {
   final List<ProductInDbInBranch> products;
   final FocusNode? focus;
   final int cursorPosition;
+  final bool isDirectSale;
 
   @override
   State<ResultTable> createState() => _ResultTableState();
@@ -202,6 +214,14 @@ class _ResultTableState extends State<ResultTable> {
         return ProductResultRow(
           product: product,
           onTap: () async {
+            if (widget.isDirectSale) {
+              final result = CommercialProductResult(
+                product: product,
+              );
+              Navigator.pop(context, result);
+              return;
+            }
+
             final res = await showCommercialProductDialog(
               context,
               product: product,

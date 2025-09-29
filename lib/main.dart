@@ -4,6 +4,8 @@ import 'package:kardex_app_front/config/app_router.dart';
 import 'package:kardex_app_front/config/app_theme.dart';
 import 'package:kardex_app_front/provider_container.dart';
 
+import 'config/scroll_behavior.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -35,6 +37,7 @@ class MyApp extends StatelessWidget {
           );
         },
         debugShowCheckedModeBanner: false,
+        scrollBehavior: AlwaysStretchScrollBehavior(),
         theme: AppTheme().lightTheme,
       ),
     );
