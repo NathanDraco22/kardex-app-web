@@ -65,7 +65,7 @@ class _HeaderSection extends StatelessWidget {
                             const Text("Tipo de Pago"),
                             const SizedBox(height: 6),
                             SizedBox(
-                              height: 36,
+                              height: 44,
                               child: ListenableBuilder(
                                 key: ValueKey(viewController.selectedClient ?? 'client_selected'),
                                 listenable: viewController,

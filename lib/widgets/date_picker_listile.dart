@@ -30,11 +30,25 @@ class DatePickerListTileState extends State<DatePickerListTile> {
 
   @override
   Widget build(BuildContext context) {
+    String text = '  -  -   ';
+
+    if (_selectedDate != null) {
+      text = DateTimeTool.formatddMMyy(_selectedDate!);
+
+      if (_selectedDate!.day == DateTimeTool.getTodayMidnight().day) {
+        text = 'Hoy';
+      }
+    }
+
     return ListTile(
       title: Text(widget.title),
       subtitle: Text(
-        _selectedDate == null ? '  -  -   ' : DateTimeTool.formatddMMyy(_selectedDate!),
-        style: const TextStyle(fontWeight: FontWeight.w500, color: Colors.black),
+        text,
+        style: const TextStyle(
+          fontWeight: FontWeight.w500,
+          color: Colors.black,
+          fontSize: 16,
+        ),
       ),
       trailing: const Icon(Icons.calendar_today),
       onTap: !widget.isActive ? null : () => _selectDate(context),

@@ -12,6 +12,11 @@ class DateTimeTool {
     return formatter.format(datetime);
   }
 
+  static String formatHHmm(DateTime datetime) {
+    final formatter = DateFormat('HH:mm');
+    return formatter.format(datetime);
+  }
+
   static DateTime getTodayMidnight() {
     final now = DateTime.now();
     return DateTime(now.year, now.month, now.day);

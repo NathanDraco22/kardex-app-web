@@ -116,7 +116,21 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authState = context.read<AuthCubit>().state as Authenticated;
+    final authState = context.read<AuthCubit>().state;
+    if (authState is AuthLoading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+    if (authState is! Authenticated) {
+      Future(() {
+        if (!context.mounted) return;
+        context.goNamed("login");
+      });
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
     final user = authState.session.user;
     final userName = user.username;
     final firstName = userName.split(" ")[0];

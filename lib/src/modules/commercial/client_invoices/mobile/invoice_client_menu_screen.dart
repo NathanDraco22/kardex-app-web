@@ -184,7 +184,7 @@ class _BodyState extends State<_Body> {
                           const Text("Tipo de Pago"),
                           const SizedBox(height: 6),
                           SizedBox(
-                            height: 38,
+                            height: 44,
                             child: ListenableBuilder(
                               listenable: viewController,
                               builder: (context, _) {

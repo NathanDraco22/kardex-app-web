@@ -48,6 +48,25 @@ class _Body extends StatelessWidget {
                 context.pushNamed("anon-invoice");
               },
             ),
+
+          if (accessManager.hasCurrentAccess(context, CommercialSubModules.createInvoice))
+            ListTile(
+              leading: Icon(
+                FluentIcons.history_28_filled,
+                size: 32,
+                color: Colors.blueGrey.shade600,
+              ),
+              title: const Text("Historial de Facturacion por dia"),
+              onTap: () {
+                context.pushNamed("daily-invoice");
+              },
+            ),
+
+          const Divider(
+            height: 4.0,
+            thickness: 2,
+          ),
+
           const Divider(height: 0.0),
           if (accessManager.hasCurrentAccess(context, CommercialSubModules.orders))
             ListTile(
@@ -116,6 +135,11 @@ class _Body extends StatelessWidget {
               },
             ),
           const Divider(height: 0.0),
+
+          const Divider(
+            height: 4.0,
+            thickness: 2,
+          ),
 
           if (accessManager.hasCurrentAccess(context, CommercialSubModules.priceSetting))
             ListTile(
