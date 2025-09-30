@@ -89,7 +89,7 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
           children: [
             AlertDialog(
               insetPadding: EdgeInsets.zero,
-              constraints: BoxConstraints(
+              constraints: const BoxConstraints(
                 maxWidth: 600,
                 minWidth: 550,
               ),

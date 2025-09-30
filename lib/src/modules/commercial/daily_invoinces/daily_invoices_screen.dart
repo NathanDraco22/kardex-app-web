@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/commercial/daily_invoinces/web/daily_invoices_screen_web.dart';
+import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 
 import 'cubit/read_daily_anon_invoices_cubit.dart';
 
@@ -12,9 +13,12 @@ class DailyAnonInvoicesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final invoiceRepo = context.read<InvoicesRepository>();
     return BlocProvider(
-      create: (context) => ReadDailyAnonInvoicesCubit(
-        invoicesRepository: invoiceRepo,
-      )..loadPaidInvoices(startDate: DateTime.now()),
+      create: (context) =>
+          ReadDailyAnonInvoicesCubit(
+            invoicesRepository: invoiceRepo,
+          )..loadPaidInvoices(
+            startDate: DateTimeTool.getTodayMidnight(),
+          ),
       child: const _RootScaffold(),
     );
   }

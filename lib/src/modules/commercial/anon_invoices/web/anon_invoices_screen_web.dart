@@ -101,7 +101,7 @@ class _AnonBottomAppBar extends StatelessWidget {
             final formattedTotal = NumberFormatter.convertToMoneyLike(total);
             return Row(
               children: [
-                Spacer(
+                const Spacer(
                   flex: 4,
                 ),
                 Expanded(
