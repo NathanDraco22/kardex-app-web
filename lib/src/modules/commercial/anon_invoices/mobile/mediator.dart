@@ -11,6 +11,10 @@ class AnonInvoiceMobileViewController extends ChangeNotifier {
     notifyListeners();
   }
 
+  int get totalItems => items.length;
+
+  int get totalAmount => items.fold<int>(0, (previousValue, element) => previousValue + element.total);
+
   void updateItem(CommercialProductResult oldItem, CommercialProductResult newItem) {
     final index = items.indexOf(oldItem);
     items[index] = newItem;

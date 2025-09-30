@@ -27,9 +27,9 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: _Body(),
-      bottomNavigationBar: const _BottomAppBar(),
+      bottomNavigationBar: _BottomAppBar(),
     );
   }
 }

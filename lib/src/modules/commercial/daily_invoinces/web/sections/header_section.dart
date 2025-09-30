@@ -34,7 +34,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                       },
                     ),
                   ),
-                  VerticalDivider(),
+                  const VerticalDivider(),
                 ],
               ),
             ),

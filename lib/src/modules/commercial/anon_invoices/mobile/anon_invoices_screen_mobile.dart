@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/mobile/invoice_anon_menu_screen.dart';
+import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/commercial_product_modal.dart';
 import 'package:kardex_app_front/widgets/dialogs/custom_product_commercial_search_delegate.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
@@ -92,22 +93,71 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) {
     final mediator = AnonInvoiceMobileMediator.of(context);
     final viewController = mediator.viewController;
+
     return Center(
       child: Column(
         spacing: 8,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Card(
+          Card(
             child: SizedBox(
               height: 40,
               child: Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text(
-                  "Productos:",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                padding: const EdgeInsets.all(8.0),
+                child: ListenableBuilder(
+                  listenable: viewController,
+                  builder: (context, _) {
+                    final formattedTotal = NumberFormatter.convertToMoneyLike(viewController.totalAmount);
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              const TextSpan(
+                                text: 'Productos: ',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              TextSpan(
+                                text: viewController.totalItems.toString(),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              const TextSpan(
+                                text: 'Total: ',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              TextSpan(
+                                text: formattedTotal,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: Colors.green.shade700,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ),
             ),

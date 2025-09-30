@@ -71,9 +71,20 @@ class _Body extends StatelessWidget {
                           children: [
                             const TextSpan(
                               text: 'Productos: ',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                                color: Colors.grey,
+                              ),
                             ),
-                            TextSpan(text: state.inventories.length.toString()),
+                            TextSpan(
+                              text: state.inventories.length.toString(),
+                              style: const TextStyle(
+                                fontSize: 18,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -83,9 +94,20 @@ class _Body extends StatelessWidget {
                           children: [
                             const TextSpan(
                               text: 'Total: ',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                                color: Colors.grey,
+                              ),
                             ),
-                            TextSpan(text: totalInventory),
+                            TextSpan(
+                              text: totalInventory,
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.green.shade700,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ],
                         ),
                       ),

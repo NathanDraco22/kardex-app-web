@@ -43,6 +43,11 @@ class _Body extends StatelessWidget {
           ),
           const Divider(height: 0.0),
 
+          const Divider(
+            height: 4.0,
+            thickness: 2,
+          ),
+
           ListTile(
             leading: IconWidgets.entryInventoryIcon,
             title: const Text("Entrada de Inventario"),

@@ -4,6 +4,10 @@ import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_resul
 class InvoiceMobileViewController extends ChangeNotifier {
   List<CommercialProductResult> items = [];
 
+  int get totalItems => items.length;
+
+  int get totalAmount => items.fold(0, (previousValue, element) => previousValue + element.total);
+
   void addItem(CommercialProductResult item) {
     items.add(item);
     notifyListeners();
