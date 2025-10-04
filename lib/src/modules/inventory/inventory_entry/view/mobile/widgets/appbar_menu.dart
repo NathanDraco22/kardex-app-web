@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/cubits/config_app/config_app_cubit.dart';
+import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
 import 'package:kardex_app_front/src/domain/models/models.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_entry/cubit/write_entry_doc_cubit.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_entry/modals/confirmation_save_modal.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_entry/view/mediator.dart';
+import 'package:kardex_app_front/src/tools/session_tool.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
 class EntryAppBarMenusButton extends StatelessWidget {
@@ -73,14 +75,21 @@ class _SaveButton extends StatelessWidget {
           );
         });
 
+        if (!context.mounted) return;
+
+        final (currentUser, _) = SessionTool.getFullUserFrom(context);
+
         final createEntryDoct = CreateEntryDoc(
           supplierId: headerData.supplier!.id,
           docNumber: headerData.docNumber!,
           docDate: headerData.docDate!,
           branchId: configState.currentBranch,
           items: entryDocItems.toList(),
+          createdBy: UserInfo(
+            id: currentUser.id,
+            name: currentUser.username,
+          ),
         );
-        if (!context.mounted) return;
         context.read<WriteEntryDocCubit>().createNewEntryDoc(createEntryDoct);
       };
     }

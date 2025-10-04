@@ -3,10 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/constants/default_values.dart';
 import 'package:kardex_app_front/src/domain/models/common/client_info.dart';
 import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
+import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/cubits/write_invoice_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/widgets/confirmation_send_modal.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
+import 'package:kardex_app_front/src/tools/session_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/text_field_date_selector.dart';
@@ -232,8 +233,10 @@ class _SendButton extends StatelessWidget {
               (previousValue, element) => previousValue + element.total,
             );
 
+            final (currentUser, currentBranch) = SessionTool.getFullUserFrom(context);
+
             final newInvoice = CreateInvoice(
-              branchId: BranchesTool.getCurrentBranchId(),
+              branchId: currentBranch.id,
               clientId: kSaleClientId,
               clientInfo: ClientInfo(name: "Sin Cliente"),
               description: viewController.description,
@@ -244,6 +247,10 @@ class _SendButton extends StatelessWidget {
               totalCost: totalCost,
               amountPaid: total,
               total: total,
+              createdBy: UserInfo(
+                id: currentUser.id,
+                name: currentUser.username,
+              ),
             );
 
             final res = await showConfirmationSendBottomModal(

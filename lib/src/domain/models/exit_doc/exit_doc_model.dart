@@ -1,3 +1,5 @@
+import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
+
 class ExitItem {
   final String productId;
   final int quantity;
@@ -29,6 +31,7 @@ class BaseExitDoc {
   final String branchId;
   final String description;
   final List<ExitItem> items;
+  final UserInfo createdBy;
 
   BaseExitDoc({
     required this.clientId,
@@ -37,6 +40,7 @@ class BaseExitDoc {
     required this.branchId,
     this.description = "",
     required this.items,
+    required this.createdBy,
   });
 
   factory BaseExitDoc.fromJson(Map<String, dynamic> json) {
@@ -47,6 +51,7 @@ class BaseExitDoc {
       branchId: json['branchId'] as String,
       description: json['description'] as String? ?? "",
       items: (json['items'] as List<dynamic>).map((item) => ExitItem.fromJson(item as Map<String, dynamic>)).toList(),
+      createdBy: UserInfo.fromJson(json['createdBy']),
     );
   }
 
@@ -58,6 +63,7 @@ class BaseExitDoc {
       'branchId': branchId,
       'description': description,
       'items': items.map((item) => item.toJson()).toList(),
+      'createdBy': createdBy.toJson(),
     };
   }
 }
@@ -70,6 +76,7 @@ class CreateExitDoc extends BaseExitDoc {
     required super.branchId,
     super.description,
     required super.items,
+    required super.createdBy,
   });
 
   factory CreateExitDoc.fromJson(Map<String, dynamic> json) {
@@ -80,6 +87,7 @@ class CreateExitDoc extends BaseExitDoc {
       branchId: json['branchId'] as String,
       description: json['description'] as String? ?? "",
       items: (json['items'] as List<dynamic>).map((item) => ExitItem.fromJson(item as Map<String, dynamic>)).toList(),
+      createdBy: UserInfo.fromJson(json['createdBy']),
     );
   }
 }
@@ -97,6 +105,7 @@ class ExitDocInDb extends BaseExitDoc {
     super.description,
     required super.items,
     required this.createdAt,
+    required super.createdBy,
   });
 
   factory ExitDocInDb.fromJson(Map<String, dynamic> json) {
@@ -109,6 +118,7 @@ class ExitDocInDb extends BaseExitDoc {
       description: json['description'] as String? ?? "",
       items: (json['items'] as List<dynamic>).map((item) => ExitItem.fromJson(item as Map<String, dynamic>)).toList(),
       createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
+      createdBy: UserInfo.fromJson(json['createdBy']),
     );
   }
 

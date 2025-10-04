@@ -208,6 +208,12 @@ class MenuActions extends StatelessWidget {
 
     final cubit = context.read<WriteInvoiceCubit>();
 
+    final currentUser = SessionTool.getUserFrom(context);
+
+    if (currentUser == null) {
+      throw Exception("User not found in Client Invoices");
+    }
+
     String saveButtonTitle = "Facturar";
     if (cubit.isOrder) saveButtonTitle = "Enviar Orden";
 
@@ -225,10 +231,7 @@ class MenuActions extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: canSave
                   ? () async {
-                      final newInvoice = createInvoiceFromControllers(
-                        viewController,
-                        tableController,
-                      );
+                      final newInvoice = createInvoiceFromControllers(viewController, tableController, context);
 
                       final res = await showConfirmationInvoiceDialog(
                         context,
@@ -243,6 +246,7 @@ class MenuActions extends StatelessWidget {
                       context.read<WriteInvoiceCubit>().createNewInvoice(
                         newInvoice,
                         viewController.selectedClient!,
+                        currentUser,
                       );
                     }
                   : null,
@@ -259,6 +263,7 @@ class MenuActions extends StatelessWidget {
 CreateInvoice createInvoiceFromControllers(
   ViewController viewController,
   ClientInvoiceTableController tableController,
+  BuildContext context,
 ) {
   final salesItems = tableController.items.map(
     (e) {
@@ -288,8 +293,10 @@ CreateInvoice createInvoiceFromControllers(
 
   final selectedClient = viewController.selectedClient!;
 
+  final (currentUser, currentBranch) = SessionTool.getFullUserFrom(context);
+
   final createClientInvoice = CreateInvoice(
-    branchId: BranchesTool.getCurrentBranchId(),
+    branchId: currentBranch.id,
     clientId: selectedClient.id,
     clientInfo: ClientInfo(
       name: selectedClient.name,
@@ -306,6 +313,10 @@ CreateInvoice createInvoiceFromControllers(
     paymentType: viewController.selectedPaymentType,
     totalCost: totalCost,
     total: total,
+    createdBy: UserInfo(
+      id: currentUser.id,
+      name: currentUser.username,
+    ),
   );
 
   return createClientInvoice;

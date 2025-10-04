@@ -3,13 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:kardex_app_front/src/domain/models/client/client.dart';
 import 'package:kardex_app_front/src/domain/models/common/client_info.dart';
+import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
 import 'package:kardex_app_front/src/domain/models/receipt/receipt_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/receipt_repository.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/cubit/write_receipt_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/modals/confirm_receipt_modal.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
+import 'package:kardex_app_front/src/tools/session_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 
@@ -123,8 +124,12 @@ class _RootScaffold extends StatelessWidget {
                     );
                   }).toList();
 
+                  if (!context.mounted) return;
+
+                  final (currentUser, currentBranch) = SessionTool.getFullUserFrom(context);
+
                   final createReceipt = CreateReceipt(
-                    branchId: BranchesTool.getCurrentBranchId(),
+                    branchId: currentBranch.id,
                     clientInfo: ClientInfo(
                       name: client.name,
                       address: client.address,
@@ -137,7 +142,12 @@ class _RootScaffold extends StatelessWidget {
                     appliedInvoices: appliedInvoices,
                     paymentMethod: PaymentMethod.cash,
                     total: total,
+                    createdBy: UserInfo(
+                      id: currentUser.id,
+                      name: currentUser.username,
+                    ),
                   );
+
                   if (!context.mounted) return;
                   context.read<WriteReceiptCubit>().createNewReceipt(createReceipt);
                 },

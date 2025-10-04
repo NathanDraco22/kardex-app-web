@@ -8,6 +8,7 @@ import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/basic_table_listview.dart';
 import 'package:kardex_app_front/widgets/custom_autocomplete_textfield.dart';
 import 'package:kardex_app_front/widgets/date_picker_listile.dart';
+import 'package:kardex_app_front/widgets/dialogs/invoice_viewer.dart';
 import 'package:kardex_app_front/widgets/title_label.dart';
 
 part 'sections/header_section.dart';

@@ -196,14 +196,21 @@ class MenuActions extends StatelessWidget {
                     );
                   }).toList();
 
+                  if (!context.mounted) return;
+
+                  final (currentUser, _) = SessionTool.getFullUserFrom(context);
+
                   final createEntryDoct = CreateEntryDoc(
                     supplierId: headerData.supplier!.id,
                     docNumber: headerData.docNumber!,
                     docDate: headerData.docDate!,
                     branchId: configState.currentBranch,
                     items: items,
+                    createdBy: UserInfo(
+                      id: currentUser.id,
+                      name: currentUser.username,
+                    ),
                   );
-                  if (!context.mounted) return;
                   context.read<WriteEntryDocCubit>().createNewEntryDoc(createEntryDoct);
                 },
           icon: const Icon(Icons.save),

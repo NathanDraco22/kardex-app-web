@@ -2,8 +2,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
 import 'package:kardex_app_front/src/domain/models/common/client_info.dart';
 import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
+import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
 import 'package:kardex_app_front/src/domain/models/order/order_model.dart';
+import 'package:kardex_app_front/src/domain/models/user/user_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/tools/branches_tool.dart';
 
@@ -21,7 +23,11 @@ class WriteInvoiceCubit extends Cubit<WriteInvoiceState> {
 
   final bool isOrder;
 
-  Future<void> createNewInvoice(CreateInvoice createInvoice, ClientInDb client) async {
+  Future<void> createNewInvoice(
+    CreateInvoice createInvoice,
+    ClientInDb client,
+    UserInDbWithRole user,
+  ) async {
     emit(WriteInvoiceInProgress());
     try {
       CreateInvoice currentInvoice = createInvoice;
@@ -47,6 +53,10 @@ class WriteInvoiceCubit extends Cubit<WriteInvoiceState> {
           total: createInvoice.total,
           status: OrderStatus.open,
           amountPaid: createInvoice.amountPaid,
+          createdBy: UserInfo(
+            id: user.id,
+            name: user.username,
+          ),
         );
 
         await ordersRepository.createOrder(createOrder);

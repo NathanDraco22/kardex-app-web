@@ -1,3 +1,5 @@
+import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
+
 class EntryItem {
   final String productId;
   final int cost;
@@ -33,6 +35,7 @@ class BaseEntryDoc {
   final String branchId;
   final String description;
   final List<EntryItem> items;
+  final UserInfo createdBy;
 
   BaseEntryDoc({
     required this.supplierId,
@@ -41,6 +44,7 @@ class BaseEntryDoc {
     required this.branchId,
     this.description = "",
     required this.items,
+    required this.createdBy,
   });
 
   factory BaseEntryDoc.fromJson(Map<String, dynamic> json) {
@@ -55,6 +59,7 @@ class BaseEntryDoc {
             (item) => EntryItem.fromJson(item as Map<String, dynamic>),
           )
           .toList(),
+      createdBy: UserInfo.fromJson(json['createdBy']),
     );
   }
 
@@ -66,6 +71,7 @@ class BaseEntryDoc {
       'branchId': branchId,
       'description': description,
       'items': items.map((item) => item.toJson()).toList(),
+      'createdBy': createdBy.toJson(),
     };
   }
 }
@@ -78,6 +84,7 @@ class CreateEntryDoc extends BaseEntryDoc {
     required super.branchId,
     super.description,
     required super.items,
+    required super.createdBy,
   });
 
   factory CreateEntryDoc.fromJson(Map<String, dynamic> json) {
@@ -88,6 +95,7 @@ class CreateEntryDoc extends BaseEntryDoc {
       branchId: json['branchId'] as String,
       description: json['description'] as String? ?? "",
       items: (json['items'] as List<dynamic>).map((item) => EntryItem.fromJson(item as Map<String, dynamic>)).toList(),
+      createdBy: UserInfo.fromJson(json['createdBy']),
     );
   }
 }
@@ -105,6 +113,7 @@ class EntryDocInDb extends BaseEntryDoc {
     super.description,
     required super.items,
     required this.createdAt,
+    required super.createdBy,
   });
 
   factory EntryDocInDb.fromJson(Map<String, dynamic> json) {
@@ -117,6 +126,7 @@ class EntryDocInDb extends BaseEntryDoc {
       description: json['description'] as String? ?? "",
       items: (json['items'] as List<dynamic>).map((item) => EntryItem.fromJson(item as Map<String, dynamic>)).toList(),
       createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
+      createdBy: UserInfo.fromJson(json['createdBy']),
     );
   }
 

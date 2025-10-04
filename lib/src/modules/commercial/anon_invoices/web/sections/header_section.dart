@@ -121,10 +121,7 @@ class MenuActions extends StatelessWidget {
           children: [
             ElevatedButton.icon(
               onPressed: () async {
-                final newInvoice = createAnonInvoiceFromControllers(
-                  viewController,
-                  tableController,
-                );
+                final newInvoice = createAnonInvoiceFromControllers(viewController, tableController, context);
 
                 final res = await showConfirmationAnonInvoiceDialog(
                   context,
@@ -151,6 +148,7 @@ class MenuActions extends StatelessWidget {
 CreateInvoice createAnonInvoiceFromControllers(
   AnonInvoiceViewController viewController,
   AnonInvoiceTableController tableController,
+  BuildContext context,
 ) {
   final salesItems = tableController.items.map(
     (e) {
@@ -178,8 +176,10 @@ CreateInvoice createAnonInvoiceFromControllers(
     (previousValue, element) => previousValue + element.total,
   );
 
+  final (currentUser, currentBranch) = SessionTool.getFullUserFrom(context);
+
   final createClientInvoice = CreateInvoice(
-    branchId: BranchesTool.getCurrentBranchId(),
+    branchId: currentBranch.id,
     clientId: kSaleClientId,
     clientInfo: ClientInfo(name: "Sin Cliente"),
     docNumber: "",
@@ -190,6 +190,10 @@ CreateInvoice createAnonInvoiceFromControllers(
     amountPaid: total,
     totalCost: totalCost,
     total: total,
+    createdBy: UserInfo(
+      id: currentUser.id,
+      name: currentUser.username,
+    ),
   );
 
   return createClientInvoice;

@@ -1,5 +1,6 @@
 import 'package:kardex_app_front/src/domain/models/common/client_info.dart';
 import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
+import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
 
 enum InvoiceStatus { open, paid, parciallyPaid, cancelled }
 
@@ -16,6 +17,7 @@ class BaseInvoice {
   final int totalCost;
   final int total;
   final DateTime? paidAt;
+  final UserInfo createdBy;
 
   BaseInvoice({
     required this.branchId,
@@ -30,6 +32,7 @@ class BaseInvoice {
     required this.totalCost,
     required this.total,
     this.paidAt,
+    required this.createdBy,
   });
 
   factory BaseInvoice.fromJson(Map<String, dynamic> json) => BaseInvoice(
@@ -44,12 +47,14 @@ class BaseInvoice {
     paymentType: PaymentType.values.byName(json['paymentType'].toString().toLowerCase()),
     totalCost: json['totalCost'],
     total: json['total'],
-    paidAt: DateTime.fromMillisecondsSinceEpoch(json['paidAt']),
+    paidAt: json['paidAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['paidAt']) : null,
+    createdBy: UserInfo.fromJson(json['createdBy']),
   );
 
   Map<String, dynamic> toJson() => {
     'branchId': branchId,
     'clientId': clientId,
+    'clientInfo': clientInfo.toJson(),
     'docNumber': docNumber,
     'saleItems': saleItems.map((e) => e.toJson()).toList(),
     'description': description,
@@ -58,6 +63,8 @@ class BaseInvoice {
     'paymentType': paymentType.name,
     'totalCost': totalCost,
     'total': total,
+    'paidAt': paidAt?.millisecondsSinceEpoch,
+    'createdBy': createdBy.toJson(),
   };
 }
 
@@ -74,6 +81,7 @@ class CreateInvoice extends BaseInvoice {
     required super.paymentType,
     required super.totalCost,
     required super.total,
+    required super.createdBy,
   });
 
   factory CreateInvoice.fromJson(Map<String, dynamic> json) => CreateInvoice(
@@ -88,6 +96,7 @@ class CreateInvoice extends BaseInvoice {
     paymentType: PaymentType.values.byName(json['paymentType'].toString().toLowerCase()),
     totalCost: json['totalCost'],
     total: json['total'],
+    createdBy: UserInfo.fromJson(json['createdBy']),
   );
 }
 
@@ -128,6 +137,7 @@ class InvoiceInDb extends BaseInvoice {
     required this.createdAt,
     this.updatedAt,
     super.paidAt,
+    required super.createdBy,
   });
 
   factory InvoiceInDb.fromJson(Map<String, dynamic> json) => InvoiceInDb(
@@ -146,6 +156,7 @@ class InvoiceInDb extends BaseInvoice {
     paidAt: json['paidAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['paidAt']) : null,
     createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt']),
     updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt']) : null,
+    createdBy: UserInfo.fromJson(json['createdBy']),
   );
 
   @override

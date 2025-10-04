@@ -192,15 +192,22 @@ class MenuActions extends StatelessWidget {
                     );
                   }).toList();
 
+                  if (!context.mounted) return;
+
+                  final (currentUser, _) = SessionTool.getFullUserFrom(context);
+
                   final createExitDoct = CreateExitDoc(
                     clientId: headerData.client!.id,
                     docNumber: headerData.docNumber!,
                     docDate: headerData.docDate!,
                     branchId: configState.currentBranch,
                     items: items,
+                    createdBy: UserInfo(
+                      id: currentUser.id,
+                      name: currentUser.username,
+                    ),
                   );
 
-                  if (!context.mounted) return;
                   context.read<WriteExitDocCubit>().createNewExitDoc(createExitDoct);
                 },
           icon: const Icon(Icons.save),

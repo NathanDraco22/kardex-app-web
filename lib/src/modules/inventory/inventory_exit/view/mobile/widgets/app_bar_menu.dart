@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/cubits/config_app/config_app_cubit.dart';
+import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
 import 'package:kardex_app_front/src/domain/models/models.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_entry/modals/confirmation_save_modal.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_exit/cubit/write_exit_doc_cubit.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_exit/view/mediator.dart';
+import 'package:kardex_app_front/src/tools/session_tool.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
 class ExitAppBarMenusButton extends StatelessWidget {
@@ -72,14 +74,21 @@ class _SaveButton extends StatelessWidget {
           );
         });
 
+        if (!context.mounted) return;
+
+        final (currentUser, _) = SessionTool.getFullUserFrom(context);
+
         final createExitDoct = CreateExitDoc(
           clientId: headerData.client!.id,
           docNumber: headerData.docNumber!,
           docDate: headerData.docDate!,
           branchId: configState.currentBranch,
           items: exitDocItems.toList(),
+          createdBy: UserInfo(
+            id: currentUser.id,
+            name: currentUser.username,
+          ),
         );
-        if (!context.mounted) return;
         context.read<WriteExitDocCubit>().createNewExitDoc(createExitDoct);
       };
     }

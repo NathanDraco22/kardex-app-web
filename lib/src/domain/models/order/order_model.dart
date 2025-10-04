@@ -1,5 +1,6 @@
 import 'package:kardex_app_front/src/domain/models/common/client_info.dart';
 import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
+import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
 
 enum OrderStatus {
   open("Abierto"),
@@ -22,6 +23,7 @@ class BaseOrder {
   final PaymentType paymentType;
   final int totalCost;
   final int total;
+  final UserInfo createdBy;
 
   BaseOrder({
     required this.branchId,
@@ -35,6 +37,7 @@ class BaseOrder {
     required this.paymentType,
     required this.totalCost,
     required this.total,
+    required this.createdBy,
   });
 
   factory BaseOrder.fromJson(Map<String, dynamic> json) => BaseOrder(
@@ -49,6 +52,7 @@ class BaseOrder {
     paymentType: PaymentType.values.byName(json['paymentType']),
     totalCost: json['totalCost'],
     total: json['total'],
+    createdBy: UserInfo.fromJson(json['createdBy']),
   );
 
   Map<String, dynamic> toJson() => {
@@ -63,6 +67,7 @@ class BaseOrder {
     'paymentType': paymentType.name,
     'totalCost': totalCost,
     'total': total,
+    'createdBy': createdBy.toJson(),
   };
 }
 
@@ -79,6 +84,7 @@ class CreateOrder extends BaseOrder {
     required super.paymentType,
     required super.totalCost,
     required super.total,
+    required super.createdBy,
   });
 
   factory CreateOrder.fromJson(Map<String, dynamic> json) => CreateOrder(
@@ -93,6 +99,7 @@ class CreateOrder extends BaseOrder {
     paymentType: PaymentType.values.byName(json['paymentType']),
     totalCost: json['totalCost'],
     total: json['total'],
+    createdBy: UserInfo.fromJson(json['createdBy']),
   );
 }
 
@@ -130,6 +137,7 @@ class OrderInDb extends BaseOrder {
     required super.total,
     required this.createdAt,
     this.updatedAt,
+    required super.createdBy,
   });
 
   factory OrderInDb.fromJson(Map<String, dynamic> json) => OrderInDb(
@@ -147,6 +155,7 @@ class OrderInDb extends BaseOrder {
     total: json['total'],
     createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt']),
     updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt']) : null,
+    createdBy: UserInfo.fromJson(json['createdBy']),
   );
 
   @override

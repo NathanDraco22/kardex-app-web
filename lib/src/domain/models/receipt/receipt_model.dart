@@ -1,4 +1,5 @@
 import 'package:kardex_app_front/src/domain/models/common/client_info.dart';
+import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
 
 enum PaymentMethod {
   cash,
@@ -8,7 +9,6 @@ enum PaymentMethod {
   other,
 }
 
-// --- Modelos Anidados ---
 class AppliedInvoice {
   final String invoiceId;
   final int amountApplied;
@@ -29,7 +29,6 @@ class AppliedInvoice {
   };
 }
 
-// --- Modelos Principales de Recibo ---
 class BaseReceipt {
   final String branchId;
   final String clientId;
@@ -39,6 +38,7 @@ class BaseReceipt {
   final PaymentMethod paymentMethod;
   final String bankReference;
   final int total;
+  final UserInfo createdBy;
 
   BaseReceipt({
     required this.branchId,
@@ -49,6 +49,7 @@ class BaseReceipt {
     required this.paymentMethod,
     this.bankReference = "",
     required this.total,
+    required this.createdBy,
   });
 
   factory BaseReceipt.fromJson(Map<String, dynamic> json) => BaseReceipt(
@@ -60,6 +61,7 @@ class BaseReceipt {
     paymentMethod: PaymentMethod.values.byName(json['paymentMethod']),
     bankReference: json['bankReference'] ?? "",
     total: json['total'],
+    createdBy: UserInfo.fromJson(json['createdBy']),
   );
 
   Map<String, dynamic> toJson() => {
@@ -71,6 +73,7 @@ class BaseReceipt {
     'paymentMethod': paymentMethod.name,
     'bankReference': bankReference,
     'total': total,
+    'createdBy': createdBy.toJson(),
   };
 }
 
@@ -84,6 +87,7 @@ class CreateReceipt extends BaseReceipt {
     required super.paymentMethod,
     super.bankReference,
     required super.total,
+    required super.createdBy,
   });
 
   factory CreateReceipt.fromJson(Map<String, dynamic> json) => CreateReceipt(
@@ -95,6 +99,7 @@ class CreateReceipt extends BaseReceipt {
     paymentMethod: PaymentMethod.values.byName(json['paymentMethod']),
     bankReference: json['bankReference'] ?? "",
     total: json['total'],
+    createdBy: UserInfo.fromJson(json['createdBy']),
   );
 }
 
@@ -119,6 +124,7 @@ class ReceiptInDb extends BaseReceipt {
     required super.total,
     required this.createdAt,
     required this.updatedAt,
+    required super.createdBy,
   });
 
   factory ReceiptInDb.fromJson(Map<String, dynamic> json) => ReceiptInDb(
@@ -133,6 +139,7 @@ class ReceiptInDb extends BaseReceipt {
     total: json['total'],
     createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt']),
     updatedAt: (json['updatedAt'] != null) ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt']) : null,
+    createdBy: UserInfo.fromJson(json['createdBy']),
   );
 
   @override
