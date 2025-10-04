@@ -181,6 +181,7 @@ CreateInvoice createAnonInvoiceFromControllers(
   final createClientInvoice = CreateInvoice(
     branchId: BranchesTool.getCurrentBranchId(),
     clientId: kSaleClientId,
+    clientInfo: ClientInfo(name: "Sin Cliente"),
     docNumber: "",
     description: viewController.description,
     saleItems: salesItems.toList(),

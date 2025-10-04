@@ -1,3 +1,4 @@
+import 'package:kardex_app_front/src/domain/models/common/client_info.dart';
 import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
 
 enum OrderStatus {
@@ -7,16 +8,6 @@ enum OrderStatus {
 
   const OrderStatus(this.tag);
   final String tag;
-}
-
-class ClientInfo {
-  final String name;
-
-  ClientInfo({required this.name});
-
-  factory ClientInfo.fromJson(Map<String, dynamic> json) => ClientInfo(name: json['name']);
-
-  Map<String, dynamic> toJson() => {'name': name};
 }
 
 class BaseOrder {

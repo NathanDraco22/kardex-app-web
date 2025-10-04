@@ -286,9 +286,19 @@ CreateInvoice createInvoiceFromControllers(
     (previousValue, element) => previousValue + element.total,
   );
 
+  final selectedClient = viewController.selectedClient!;
+
   final createClientInvoice = CreateInvoice(
     branchId: BranchesTool.getCurrentBranchId(),
-    clientId: viewController.selectedClient!.id,
+    clientId: selectedClient.id,
+    clientInfo: ClientInfo(
+      name: selectedClient.name,
+      address: selectedClient.address,
+      cardId: selectedClient.cardId,
+      location: selectedClient.location,
+      phone: selectedClient.phone,
+      email: selectedClient.email,
+    ),
     docNumber: "",
     description: viewController.description,
     saleItems: salesItems.toList(),

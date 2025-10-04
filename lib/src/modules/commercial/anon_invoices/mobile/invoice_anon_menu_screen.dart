@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/constants/default_values.dart';
+import 'package:kardex_app_front/src/domain/models/common/client_info.dart';
 import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/cubits/write_invoice_cubit.dart';
@@ -234,6 +235,7 @@ class _SendButton extends StatelessWidget {
             final newInvoice = CreateInvoice(
               branchId: BranchesTool.getCurrentBranchId(),
               clientId: kSaleClientId,
+              clientInfo: ClientInfo(name: "Sin Cliente"),
               description: viewController.description,
               docNumber: "",
               saleItems: widget.saleItems,

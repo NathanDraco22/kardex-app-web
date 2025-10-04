@@ -32,15 +32,30 @@ class _ContentSection extends StatelessWidget {
                   itemCount: invoices.length,
                   columns: [
                     BasicTableColumn(
-                      label: const Text("Hora", style: TextStyle(fontWeight: FontWeight.bold)),
+                      label: const Text(
+                        "Hora",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       flex: 1,
                     ),
                     BasicTableColumn(
-                      label: const Text("Factura", style: TextStyle(fontWeight: FontWeight.bold)), // Cambiado
+                      label: const Text(
+                        "Factura",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       flex: 1,
                     ),
                     BasicTableColumn(
-                      label: const Text("Monto", style: TextStyle(fontWeight: FontWeight.bold)),
+                      label: const Text(
+                        "Monto",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       flex: 1,
                     ),
                   ],
@@ -50,16 +65,21 @@ class _ContentSection extends StatelessWidget {
                     final currentInvoice = invoices[index];
                     final totalPaid = NumberFormatter.convertToMoneyLike(currentInvoice.total);
 
-                    final paidAtFormatted = DateTimeTool.formatHHmm(currentInvoice.paidAt ?? DateTime.now());
+                    final paidAtFormatted = DateTimeTool.formatHHmm(
+                      currentInvoice.paidAt ?? DateTime.now(),
+                    );
 
                     return BasicTableRow(
+                      onTap: () {
+                        showInvoiceViewerDialog(context, currentInvoice);
+                      },
                       color: rowColor,
                       cells: [
                         BasicTableCell(
                           content: Text(paidAtFormatted),
                         ),
                         BasicTableCell(
-                          content: Text(currentInvoice.docNumber),
+                          content: Text("#${currentInvoice.docNumber}"),
                         ),
 
                         BasicTableCell(

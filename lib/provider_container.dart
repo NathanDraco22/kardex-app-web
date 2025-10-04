@@ -129,12 +129,14 @@ class GlobalCubitProvider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authRepo = context.read<AuthRepository>();
+    final branchRepo = context.read<BranchesRepository>();
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => ConfigAppCubit()),
         BlocProvider(
           create: (context) => AuthCubit(
             authRepository: authRepo,
+            branchesRepository: branchRepo,
           ),
         ),
       ],

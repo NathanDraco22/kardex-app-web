@@ -2,6 +2,9 @@ class BaseClient {
   final String name;
   final String? cardId;
   final String? phone;
+  final String? address;
+  final String? location;
+  final String? email;
   final int balance;
   final int creditLimit;
   final bool isCreditActive;
@@ -11,6 +14,9 @@ class BaseClient {
     required this.name,
     this.cardId,
     this.phone,
+    this.address,
+    this.location,
+    this.email,
     this.balance = 0,
     this.creditLimit = 0,
     this.isCreditActive = false,
@@ -22,6 +28,9 @@ class BaseClient {
       name: json['name'] as String,
       cardId: json['cardId'] as String?,
       phone: json['phone'] as String?,
+      address: json['address'] as String?,
+      location: json['location'] as String?,
+      email: json['email'] as String?,
       balance: json['balance'] as int? ?? 0,
       creditLimit: json['creditLimit'] as int? ?? 0,
       isCreditActive: json['isCreditActive'] as bool? ?? false,
@@ -34,6 +43,9 @@ class BaseClient {
       'name': name,
       'cardId': cardId,
       'phone': phone,
+      'address': address,
+      'location': location,
+      'email': email,
       'balance': balance,
       'creditLimit': creditLimit,
       'isCreditActive': isCreditActive,
@@ -47,6 +59,9 @@ class CreateClient extends BaseClient {
     required super.name,
     super.cardId,
     super.phone,
+    super.address,
+    super.location,
+    super.email,
     super.balance,
     super.creditLimit,
     super.isCreditActive,
@@ -58,6 +73,9 @@ class CreateClient extends BaseClient {
       name: json['name'] as String,
       cardId: json['cardId'] as String?,
       phone: json['phone'] as String?,
+      address: json['address'] as String?,
+      location: json['location'] as String?,
+      email: json['email'] as String?,
       balance: json['balance'] as int? ?? 0,
       creditLimit: json['creditLimit'] as int? ?? 0,
       isCreditActive: json['isCreditActive'] as bool? ?? false,
@@ -70,6 +88,9 @@ class UpdateClient {
   final String? name;
   final String? cardId;
   final String? phone;
+  final String? address;
+  final String? location;
+  final String? email;
   final bool? isActive;
   final bool? isCreditActive;
   final int? creditLimit;
@@ -78,6 +99,9 @@ class UpdateClient {
     this.name,
     this.cardId,
     this.phone,
+    this.address,
+    this.location,
+    this.email,
     this.isActive,
     this.isCreditActive,
     this.creditLimit,
@@ -88,6 +112,9 @@ class UpdateClient {
       name: json['name'] as String?,
       cardId: json['cardId'] as String?,
       phone: json['phone'] as String?,
+      address: json['address'] as String?,
+      location: json['location'] as String?,
+      email: json['email'] as String?,
       isActive: json['isActive'] as bool?,
       isCreditActive: json['isCreditActive'] as bool?,
       creditLimit: json['creditLimit'] as int?,
@@ -99,6 +126,9 @@ class UpdateClient {
       'name': name,
       'cardId': cardId,
       'phone': phone,
+      'address': address,
+      'location': location,
+      'email': email,
       'isActive': isActive,
       'isCreditActive': isCreditActive,
       'creditLimit': creditLimit,
@@ -119,6 +149,9 @@ class ClientInDb extends BaseClient {
     required super.name,
     super.cardId,
     super.phone,
+    super.address,
+    super.location,
+    super.email,
     super.balance,
     super.creditLimit,
     super.isCreditActive,
@@ -134,6 +167,9 @@ class ClientInDb extends BaseClient {
       name: json['name'] as String,
       cardId: json['cardId'] as String?,
       phone: json['phone'] as String?,
+      address: json['address'] as String?,
+      location: json['location'] as String?,
+      email: json['email'] as String?,
       balance: json['balance'] as int? ?? 0,
       creditLimit: json['creditLimit'] as int? ?? 0,
       isCreditActive: json['isCreditActive'] as bool? ?? false,

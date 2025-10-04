@@ -8,7 +8,8 @@ final class AuthLoading extends AuthState {}
 
 final class Authenticated extends AuthState {
   final LoginResponse session;
-  Authenticated(this.session);
+  final BranchInDb branch;
+  Authenticated(this.session, this.branch);
 }
 
 final class Unauthenticated extends AuthState {}

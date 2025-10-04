@@ -1,15 +1,22 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/core/session_manager.dart';
 import 'package:kardex_app_front/src/core/token_manager.dart';
+import 'package:kardex_app_front/src/domain/models/branch/branch.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/domain/responses/login_responses.dart';
+import 'package:kardex_app_front/src/services/exceptions/http_exceptions.dart';
+import 'package:kardex_app_front/src/tools/branches_tool.dart';
 
 part 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
-  AuthCubit({required this.authRepository}) : super(AuthInitial());
+  AuthCubit({
+    required this.authRepository,
+    required this.branchesRepository,
+  }) : super(AuthInitial());
 
   final AuthRepository authRepository;
+  final BranchesRepository branchesRepository;
 
   Future<void> checkSession() async {
     emit(AuthLoading());
@@ -24,13 +31,27 @@ class AuthCubit extends Cubit<AuthState> {
         }
 
         TokenManager().storeToken(loginResponse.accessToken);
-        emit(Authenticated(loginResponse));
+
+        final branch = await branchesRepository.getBranchById(BranchesTool.getCurrentBranchId());
+
+        if (branch == null) {
+          throw Exception("Branch not found");
+        }
+        emit(Authenticated(loginResponse, branch));
         return;
       }
       emit(Unauthenticated());
-    } catch (error) {
+    } on HttpServiceException catch (error) {
+      if (error is UnauthorizedException) {
+        if (isClosed) return;
+        emit(Unauthenticated());
+      }
+
       if (isClosed) return;
       emit(AuthError(error.toString()));
+    } catch (error) {
+      if (isClosed) return;
+      emit(Unauthenticated());
     }
   }
 
@@ -38,11 +59,18 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
     try {
       final loginResponse = await authRepository.login(userId, password);
+
       if (isClosed) return;
 
       TokenManager().storeToken(loginResponse.accessToken);
 
-      emit(Authenticated(loginResponse));
+      final branch = await branchesRepository.getBranchById(BranchesTool.getCurrentBranchId());
+
+      if (branch == null) {
+        throw Exception("Branch not found");
+      }
+
+      emit(Authenticated(loginResponse, branch));
     } catch (error) {
       if (isClosed) return;
       emit(AuthError(error.toString()));

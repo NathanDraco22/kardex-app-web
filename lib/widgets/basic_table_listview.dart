@@ -21,11 +21,13 @@ class BasicTableCell {
 class BasicTableRow {
   BasicTableRow({
     required this.cells,
+    this.onTap,
     this.color = Colors.white,
   });
 
   List<BasicTableCell> cells;
   Color color;
+  VoidCallback? onTap;
 }
 
 class BasicTableListView extends StatelessWidget {
@@ -101,17 +103,20 @@ class BasicTableListView extends StatelessWidget {
 
                 return Material(
                   color: Colors.transparent,
-                  child: Ink(
-                    color: tableRow.color,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    child: Row(
-                      children: [
-                        for (var i = 0; i < tableRow.cells.length; i++)
-                          Expanded(
-                            flex: columns[i].flex,
-                            child: tableRow.cells[i].content,
-                          ),
-                      ],
+                  child: InkWell(
+                    onTap: tableRow.onTap,
+                    child: Ink(
+                      color: tableRow.color,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      child: Row(
+                        children: [
+                          for (var i = 0; i < tableRow.cells.length; i++)
+                            Expanded(
+                              flex: columns[i].flex,
+                              child: tableRow.cells[i].content,
+                            ),
+                        ],
+                      ),
                     ),
                   ),
                 );

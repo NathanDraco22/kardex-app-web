@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/src/domain/models/common/client_info.dart';
 import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
 
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
@@ -143,7 +144,7 @@ class _Body extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SizedBox(
-              height: 150,
+              height: 160,
               child: _HeaderSection(),
             ),
             SizedBox(height: 8),

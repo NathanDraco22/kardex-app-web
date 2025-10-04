@@ -134,11 +134,6 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
                           widget.controller.addRow(ClientInvoiceItem(res));
                           if (!context.mounted) return;
                           ClientInvoiceWebMediator.of(context).viewController.refresh();
-                          scrollController.animateTo(
-                            scrollController.position.maxScrollExtent + 32,
-                            duration: const Duration(milliseconds: 500),
-                            curve: Curves.easeInOut,
-                          );
                         },
                         icon: const Icon(Icons.add),
                         label: const Text("Agregar Producto"),

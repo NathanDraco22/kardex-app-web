@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:kardex_app_front/src/domain/models/client/client.dart';
+import 'package:kardex_app_front/src/domain/models/common/client_info.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
 import 'package:kardex_app_front/src/domain/models/receipt/receipt_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/receipt_repository.dart';
@@ -67,7 +68,9 @@ class _RootScaffold extends StatelessWidget {
     final mediator = CreateReceiptMediator.of(context);
     final client = mediator.client;
     final invoices = mediator.invoices;
-    final total = invoices.fold(0, (int previousValue, invoice) => previousValue + invoice.total);
+    final total = invoices.fold(0, (int previousValue, invoice) {
+      return previousValue + invoice.total;
+    });
     final totalFormatted = NumberFormatter.convertToMoneyLike(total);
 
     return BlocListener<WriteReceiptCubit, WriteReceiptState>(
@@ -122,6 +125,14 @@ class _RootScaffold extends StatelessWidget {
 
                   final createReceipt = CreateReceipt(
                     branchId: BranchesTool.getCurrentBranchId(),
+                    clientInfo: ClientInfo(
+                      name: client.name,
+                      address: client.address,
+                      phone: client.phone,
+                      email: client.email,
+                      cardId: client.cardId,
+                      location: client.location,
+                    ),
                     clientId: client.id,
                     appliedInvoices: appliedInvoices,
                     paymentMethod: PaymentMethod.cash,
@@ -148,7 +159,9 @@ class _Body extends StatelessWidget {
     final mediator = CreateReceiptMediator.of(context);
     final client = mediator.client;
     final invoices = mediator.invoices;
-    final total = invoices.fold(0, (int previousValue, invoice) => previousValue + invoice.total);
+    final total = invoices.fold(0, (int previousValue, invoice) {
+      return previousValue + invoice.total;
+    });
     final totalFormatted = NumberFormatter.convertToMoneyLike(total);
     return Center(
       child: ConstrainedBox(
@@ -167,22 +180,29 @@ class _Body extends StatelessWidget {
                       Text(
                         client.name,
                         style: const TextStyle(
-                          fontSize: 24,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        client.location ?? "--",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey,
                         ),
                       ),
 
                       Text(
                         "Facturas a Cancelar: ${invoices.length}",
                         style: const TextStyle(
-                          fontSize: 18,
+                          fontSize: 16,
                         ),
                       ),
 
                       Text(
                         "Total a Pagar: $totalFormatted",
                         style: const TextStyle(
-                          fontSize: 18,
+                          fontSize: 16,
                         ),
                       ),
                     ],

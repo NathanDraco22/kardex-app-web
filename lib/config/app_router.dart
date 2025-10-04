@@ -25,7 +25,7 @@ import 'package:kardex_app_front/src/modules/product_catalog/view/product_catalo
 import 'package:kardex_app_front/src/modules/settings/view/branches/branches_screen.dart';
 import 'package:kardex_app_front/src/modules/settings/view/price_to_product/price_to_product_screen.dart';
 import 'package:kardex_app_front/src/modules/settings/view/settings_screen.dart';
-import 'package:kardex_app_front/src/modules/settings/view/units/units_screen.dart';
+import 'package:kardex_app_front/src/modules/product_catalog/units/units_screen.dart';
 import 'package:kardex_app_front/src/modules/settings/view/users/users_screen.dart';
 import 'package:kardex_app_front/src/modules/splash/splash_screen.dart';
 import 'package:kardex_app_front/src/modules/suppliers_catalog/view/suppliers_catalog_screen.dart';

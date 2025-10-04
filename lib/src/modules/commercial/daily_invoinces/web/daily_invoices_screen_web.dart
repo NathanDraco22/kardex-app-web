@@ -5,6 +5,7 @@ import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/basic_table_listview.dart';
 import 'package:kardex_app_front/widgets/date_picker_listile.dart';
+import 'package:kardex_app_front/widgets/dialogs/invoice_viewer.dart';
 import 'package:kardex_app_front/widgets/title_label.dart';
 
 part 'sections/content_section.dart';

@@ -66,25 +66,25 @@ class _WebBody extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-            Row(
-              children: [
-                const Spacer(),
-                SizedBox(
-                  height: 40,
-                  child: ElevatedButton.icon(
-                    onPressed: () async {
-                      final res = await showCreateBranchPriceDialog(context);
-                      if (res == null) return;
-                      if (!context.mounted) return;
-                      await context.read<ReadBranchCubit>().refreshBranch();
-                    },
-                    icon: const Icon(Icons.add),
-                    label: const Text("Agregar Nueva Rama/Sucursal"),
-                  ),
-                ),
-              ],
-            ),
 
+            // Row(
+            //   children: [
+            //     const Spacer(),
+            //     SizedBox(
+            //       height: 40,
+            //       child: ElevatedButton.icon(
+            //         onPressed: () async {
+            //           final res = await showCreateBranchPriceDialog(context);
+            //           if (res == null) return;
+            //           if (!context.mounted) return;
+            //           await context.read<ReadBranchCubit>().refreshBranch();
+            //         },
+            //         icon: const Icon(Icons.add),
+            //         label: const Text("Agregar Nueva Rama/Sucursal"),
+            //       ),
+            //     ),
+            //   ],
+            // ),
             const SizedBox(height: 12),
 
             Card(

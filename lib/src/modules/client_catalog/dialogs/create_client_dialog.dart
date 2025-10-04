@@ -84,42 +84,51 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
       },
       child: Form(
         key: formKey,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AlertDialog(
-              insetPadding: EdgeInsets.zero,
-              constraints: const BoxConstraints(
-                maxWidth: 600,
-                minWidth: 550,
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text("$wordPrefix Cliente"),
+          ),
+          bottomNavigationBar: BottomAppBar(
+            child: SizedBox(
+              height: 60,
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 600),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      OutlinedButton(
+                        onPressed: () {
+                          context.pop();
+                        },
+                        child: const Text("Cancelar"),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          if (!formKey.currentState!.validate()) return;
+
+                          if (widget.client == null) {
+                            final createClient = CreateClient.fromJson(creationMap);
+                            writeCubit.createNewClient(createClient);
+                          } else {
+                            final updateClient = UpdateClient.fromJson(creationMap);
+                            writeCubit.updateClient(widget.client!.id, updateClient);
+                          }
+                        },
+                        child: Text("$wordPrefix Cliente"),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              title: Text("$wordPrefix Cliente"),
-              actions: [
-                OutlinedButton(
-                  onPressed: () {
-                    context.pop();
-                  },
-                  child: const Text("Cancelar"),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    if (!formKey.currentState!.validate()) return;
-
-                    if (widget.client == null) {
-                      final createClient = CreateClient.fromJson(creationMap);
-                      writeCubit.createNewClient(createClient);
-                    } else {
-                      final updateClient = UpdateClient.fromJson(creationMap);
-                      writeCubit.updateClient(widget.client!.id, updateClient);
-                    }
-                  },
-                  child: Text("$wordPrefix Cliente"),
-                ),
-              ],
-              content: SizedBox(
-                width: 350,
-
-                child: Column(
+            ),
+          ),
+          body: Center(
+            child: Card(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 600),
+                child: ListView(
+                  padding: const EdgeInsets.all(16),
                   children: [
                     TitleTextField(
                       key: const ValueKey("name_field"),
@@ -161,17 +170,56 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
                             initialValue: widget.client?.phone,
                             title: "Telefono",
                             onEditingComplete: () => FocusScope.of(context).nextFocus(),
-
                             validator: (value) {
-                              if (value == null) {
-                                return null;
-                              }
-                              creationMap["phone"] = value.trim();
+                              creationMap["phone"] = value?.trim();
                               return null;
                             },
                           ),
                         ),
                       ],
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    TitleTextField(
+                      key: const ValueKey("location_field"),
+                      title: "Ubicacion (Ciudad)*",
+                      textInputAction: TextInputAction.next,
+                      initialValue: widget.client?.location,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "El campo es requerido";
+                        }
+
+                        creationMap["location"] = value.trim();
+                        return null;
+                      },
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    TitleTextField(
+                      key: const ValueKey("address_field"),
+                      title: "Direccion",
+                      textInputAction: TextInputAction.next,
+                      initialValue: widget.client?.address,
+                      validator: (value) {
+                        creationMap["address"] = value?.trim();
+                        return null;
+                      },
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    TitleTextField(
+                      key: const ValueKey("email_field"),
+                      title: "Correo Electronico (Email)",
+                      textInputAction: TextInputAction.next,
+                      initialValue: widget.client?.address,
+                      validator: (value) {
+                        creationMap["email"] = value?.trim();
+                        return null;
+                      },
                     ),
 
                     const SizedBox(height: 12),
@@ -261,7 +309,7 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
                 ),
               ),
             ),
-          ],
+          ),
         ),
       ),
     );

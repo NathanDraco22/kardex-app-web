@@ -57,6 +57,7 @@ class _FormContentState extends State<_FormContent> {
   late CommercialProductResult commercialProductResult;
   late Iterable<DropdownMenuItem<Discount>> discountsAvailable;
   FocusNode focusNode = FocusNode();
+  FocusNode acceptFocusNode = FocusNode();
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   @override
   void initState() {
@@ -146,6 +147,9 @@ class _FormContentState extends State<_FormContent> {
                                   height: 90,
                                   child: TitleTextField(
                                     focusNode: focusNode,
+                                    onEditingComplete: () {
+                                      FocusScope.of(context).requestFocus(acceptFocusNode);
+                                    },
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return "";
@@ -309,6 +313,7 @@ class _FormContentState extends State<_FormContent> {
                       ),
                     ),
                     ElevatedButton(
+                      focusNode: acceptFocusNode,
                       onPressed: () {
                         if (product.saleProfile.salePrice == 0) {
                           DialogManager.showErrorDialog(context, "El producto tiene un precio 0, no se puede vender");

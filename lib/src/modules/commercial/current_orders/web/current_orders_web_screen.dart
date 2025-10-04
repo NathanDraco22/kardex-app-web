@@ -42,10 +42,11 @@ class _Body extends StatelessWidget {
         padding: EdgeInsets.all(8.0),
         child: Column(
           spacing: 8,
+
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SizedBox(
-              height: 150,
+              height: 160,
               child: _HeaderSection(),
             ),
             Expanded(

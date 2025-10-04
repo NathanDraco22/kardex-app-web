@@ -1,15 +1,33 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 class BaseBranch {
   final String name;
+  final String idCard;
+  final String address;
+  final String email;
+  final String phone;
   final String description;
+  final Uint8List? image;
 
   BaseBranch({
     required this.name,
+    required this.idCard,
+    required this.address,
+    required this.email,
+    required this.phone,
     this.description = "",
+    this.image,
   });
 
   factory BaseBranch.fromJson(Map<String, dynamic> json) {
     return BaseBranch(
       name: json['name'] as String,
+      idCard: json['idCard'] as String,
+      address: json['address'] as String,
+      email: json['email'] as String,
+      phone: json['phone'] as String,
+      image: (json['image'] as String?) == null ? null : base64Decode(json['image']),
       description: json['description'] as String? ?? "",
     );
   }
@@ -17,6 +35,11 @@ class BaseBranch {
   Map<String, dynamic> toJson() {
     return {
       'name': name,
+      'idCard': idCard,
+      'address': address,
+      'email': email,
+      'phone': phone,
+      'image': image != null ? base64Encode(image!) : null,
       'description': description,
     };
   }
@@ -26,29 +49,54 @@ class CreateBranch extends BaseBranch {
   CreateBranch({
     required super.name,
     super.description,
+    required super.idCard,
+    required super.address,
+    required super.email,
+    required super.phone,
+    super.image,
   });
 
   factory CreateBranch.fromJson(Map<String, dynamic> json) {
     return CreateBranch(
       name: json['name'] as String,
+      idCard: json['idCard'] as String,
+      address: json['address'] as String,
+      email: json['email'] as String,
+      phone: json['phone'] as String,
+      image: (json['image'] as String?) == null ? null : base64Decode(json['image']),
       description: json['description'] as String? ?? "",
     );
   }
 }
 
 class UpdateBranch {
-  final String? name;
-  final String? description;
+  String? name;
+  String? idCard;
+  String? address;
+  String? email;
+  String? phone;
+  String? description;
+  String? image;
 
   UpdateBranch({
     this.name,
     this.description,
+    this.idCard,
+    this.address,
+    this.email,
+    this.phone,
+    this.image,
   });
 
   factory UpdateBranch.fromJson(Map<String, dynamic> json) {
     return UpdateBranch(
       name: json['name'] as String?,
       description: json['description'] as String?,
+      idCard: json['idCard'] as String?,
+      address: json['address'] as String?,
+      email: json['email'] as String?,
+      phone: json['phone'] as String?,
+      image: json['image'] as String?,
     );
   }
 
@@ -56,6 +104,11 @@ class UpdateBranch {
     final Map<String, dynamic> data = {
       'name': name,
       'description': description,
+      'idCard': idCard,
+      'address': address,
+      'email': email,
+      'phone': phone,
+      'image': image,
     };
     data.removeWhere((key, value) => value == null);
     return data;
@@ -73,12 +126,22 @@ class BranchInDb extends BaseBranch {
     super.description,
     required this.createdAt,
     this.updatedAt,
+    required super.idCard,
+    required super.address,
+    required super.email,
+    required super.phone,
+    super.image,
   });
 
   factory BranchInDb.fromJson(Map<String, dynamic> json) {
     return BranchInDb(
       id: json['id'] as String,
       name: json['name'] as String,
+      idCard: json['idCard'] as String,
+      address: json['address'] as String,
+      email: json['email'] as String,
+      phone: json['phone'] as String,
+      image: (json['image'] as String?) == null ? null : base64Decode(json['image']),
       description: json['description'] as String? ?? "",
       createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
       updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt'] as int) : null,

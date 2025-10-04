@@ -1,11 +1,12 @@
+import 'package:kardex_app_front/src/domain/models/common/client_info.dart';
 import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
 
 enum InvoiceStatus { open, paid, parciallyPaid, cancelled }
 
-// --- Modelos Principales de Factura ---
 class BaseInvoice {
   final String branchId;
   final String clientId;
+  final ClientInfo clientInfo;
   final String docNumber;
   final List<SaleItem> saleItems;
   final String description;
@@ -19,6 +20,7 @@ class BaseInvoice {
   BaseInvoice({
     required this.branchId,
     required this.clientId,
+    required this.clientInfo,
     required this.docNumber,
     required this.saleItems,
     this.description = "",
@@ -33,6 +35,7 @@ class BaseInvoice {
   factory BaseInvoice.fromJson(Map<String, dynamic> json) => BaseInvoice(
     branchId: json['branchId'],
     clientId: json['clientId'],
+    clientInfo: ClientInfo.fromJson(json['clientInfo']),
     docNumber: json['docNumber'],
     saleItems: (json['saleItems'] as List).map((e) => SaleItem.fromJson(e)).toList(),
     description: json['description'] ?? "",
@@ -62,6 +65,7 @@ class CreateInvoice extends BaseInvoice {
   CreateInvoice({
     required super.branchId,
     required super.clientId,
+    required super.clientInfo,
     required super.docNumber,
     required super.saleItems,
     super.description,
@@ -75,6 +79,7 @@ class CreateInvoice extends BaseInvoice {
   factory CreateInvoice.fromJson(Map<String, dynamic> json) => CreateInvoice(
     branchId: json['branchId'],
     clientId: json['clientId'],
+    clientInfo: ClientInfo.fromJson(json['clientInfo']),
     docNumber: json['docNumber'],
     saleItems: (json['saleItems'] as List).map((e) => SaleItem.fromJson(e)).toList(),
     description: json['description'] ?? "",
@@ -111,6 +116,7 @@ class InvoiceInDb extends BaseInvoice {
     required this.id,
     required super.branchId,
     required super.clientId,
+    required super.clientInfo,
     required super.docNumber,
     required super.saleItems,
     super.description,
@@ -128,6 +134,7 @@ class InvoiceInDb extends BaseInvoice {
     id: json['id'],
     branchId: json['branchId'],
     clientId: json['clientId'],
+    clientInfo: ClientInfo.fromJson(json['clientInfo']),
     docNumber: json['docNumber'],
     saleItems: (json['saleItems'] as List).map((e) => SaleItem.fromJson(e)).toList(),
     description: json['description'] ?? "",

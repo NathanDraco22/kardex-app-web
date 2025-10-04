@@ -1,3 +1,5 @@
+import 'package:kardex_app_front/src/domain/models/common/client_info.dart';
+
 enum PaymentMethod {
   cash,
   transfer,
@@ -31,6 +33,7 @@ class AppliedInvoice {
 class BaseReceipt {
   final String branchId;
   final String clientId;
+  final ClientInfo clientInfo;
   final String docNumber;
   final List<AppliedInvoice> appliedInvoices;
   final PaymentMethod paymentMethod;
@@ -40,6 +43,7 @@ class BaseReceipt {
   BaseReceipt({
     required this.branchId,
     required this.clientId,
+    required this.clientInfo,
     this.docNumber = "",
     required this.appliedInvoices,
     required this.paymentMethod,
@@ -50,6 +54,7 @@ class BaseReceipt {
   factory BaseReceipt.fromJson(Map<String, dynamic> json) => BaseReceipt(
     branchId: json['branchId'],
     clientId: json['clientId'],
+    clientInfo: ClientInfo.fromJson(json['clientInfo']),
     docNumber: json['docNumber'] ?? "",
     appliedInvoices: (json['appliedInvoices'] as List).map((e) => AppliedInvoice.fromJson(e)).toList(),
     paymentMethod: PaymentMethod.values.byName(json['paymentMethod']),
@@ -60,6 +65,7 @@ class BaseReceipt {
   Map<String, dynamic> toJson() => {
     'branchId': branchId,
     'clientId': clientId,
+    'clientInfo': clientInfo.toJson(),
     'docNumber': docNumber,
     'appliedInvoices': appliedInvoices.map((e) => e.toJson()).toList(),
     'paymentMethod': paymentMethod.name,
@@ -72,6 +78,7 @@ class CreateReceipt extends BaseReceipt {
   CreateReceipt({
     required super.branchId,
     required super.clientId,
+    required super.clientInfo,
     super.docNumber,
     required super.appliedInvoices,
     required super.paymentMethod,
@@ -82,6 +89,7 @@ class CreateReceipt extends BaseReceipt {
   factory CreateReceipt.fromJson(Map<String, dynamic> json) => CreateReceipt(
     branchId: json['branchId'],
     clientId: json['clientId'],
+    clientInfo: ClientInfo.fromJson(json['clientInfo']),
     docNumber: json['docNumber'] ?? "",
     appliedInvoices: (json['appliedInvoices'] as List).map((e) => AppliedInvoice.fromJson(e)).toList(),
     paymentMethod: PaymentMethod.values.byName(json['paymentMethod']),
@@ -90,7 +98,6 @@ class CreateReceipt extends BaseReceipt {
   );
 }
 
-// Este modelo está vacío, tal como en el original.
 class UpdateReceipt {
   UpdateReceipt();
 }
@@ -104,6 +111,7 @@ class ReceiptInDb extends BaseReceipt {
     required this.id,
     required super.branchId,
     required super.clientId,
+    required super.clientInfo,
     super.docNumber,
     required super.appliedInvoices,
     required super.paymentMethod,
@@ -117,6 +125,7 @@ class ReceiptInDb extends BaseReceipt {
     id: json['id'],
     branchId: json['branchId'],
     clientId: json['clientId'],
+    clientInfo: ClientInfo.fromJson(json['clientInfo']),
     docNumber: json['docNumber'] ?? "",
     appliedInvoices: (json['appliedInvoices'] as List).map((e) => AppliedInvoice.fromJson(e)).toList(),
     paymentMethod: PaymentMethod.values.byName(json['paymentMethod']),

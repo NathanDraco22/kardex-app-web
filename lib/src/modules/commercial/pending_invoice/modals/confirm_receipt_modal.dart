@@ -13,9 +13,13 @@ Future<bool?> showConfirmReceiptModal(
   bool? result;
   result = await showModalBottomSheet(
     context: context,
-    scrollControlDisabledMaxHeightRatio: 0.4,
+    scrollControlDisabledMaxHeightRatio: 0.5,
     backgroundColor: Colors.transparent,
-    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(12))),
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(
+        top: Radius.circular(12),
+      ),
+    ),
     builder: (context) {
       return Center(
         child: ConstrainedBox(
@@ -34,6 +38,14 @@ Future<bool?> showConfirmReceiptModal(
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                Text(
+                  client.location ?? "--",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -66,10 +78,16 @@ Future<bool?> showConfirmReceiptModal(
                     Expanded(
                       child: Container(
                         padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(border: Border.all(color: Colors.amber.shade900)),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.amber.shade900,
+                          ),
+                        ),
                         child: Text(
                           "Se liquidarán el monto y las facturas seleccionadas en el estado de cuenta de cliente, esta accion no se puede revertir",
-                          style: TextStyle(color: Colors.amber.shade900),
+                          style: TextStyle(
+                            color: Colors.amber.shade900,
+                          ),
                         ),
                       ),
                     ),

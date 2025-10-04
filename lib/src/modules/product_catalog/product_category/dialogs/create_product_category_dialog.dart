@@ -110,6 +110,7 @@ class _CreateProductCategoryDialogState extends State<CreateProductCategoryDialo
                 children: [
                   TitleTextField(
                     initialValue: currentCategory?.name,
+                    autofocus: true,
                     title: "Nombre de la Categoria*",
                     textCapitalization: TextCapitalization.words,
                     validator: (value) {

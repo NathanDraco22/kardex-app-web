@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:kardex_app_front/src/domain/models/branch/branch_model.dart';
+import 'package:kardex_app_front/src/modules/settings/view/branches/cubit/read_branch_cubit.dart';
 import 'package:kardex_app_front/src/modules/settings/view/branches/cubit/write_branch_cubit.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
+import 'package:kardex_app_front/widgets/pick_img_widget.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
 
 Future<BranchInDb?> showCreateBranchPriceDialog(
@@ -12,17 +15,23 @@ Future<BranchInDb?> showCreateBranchPriceDialog(
   BranchInDb? branch,
 }) async {
   final writeCubit = context.read<WriteBranchCubit>();
+  final readCubit = context.read<ReadBranchCubit>();
 
-  return await showDialog<BranchInDb?>(
-    context: context,
-    builder: (context) {
-      return BlocProvider.value(
-        value: writeCubit,
-        child: CreateProductPriceDialog(
-          branch: branch,
-        ),
-      );
-    },
+  return Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) {
+        return MultiBlocProvider(
+          providers: [
+            BlocProvider.value(value: writeCubit),
+            BlocProvider.value(value: readCubit),
+          ],
+          child: CreateProductPriceDialog(
+            branch: branch,
+          ),
+        );
+      },
+    ),
   );
 }
 
@@ -38,12 +47,18 @@ class CreateProductPriceDialog extends StatefulWidget {
 class _CreateProductPriceDialogState extends State<CreateProductPriceDialog> {
   final formKey = GlobalKey<FormState>();
 
+  XFile? _imageFile;
+
   final creationMap = <String, dynamic>{};
 
   @override
   Widget build(BuildContext context) {
     final currenBranch = widget.branch;
-    final prefixTitle = currenBranch == null ? "Agregar" : "Actualizar";
+
+    ImageProvider? currentImageProvider;
+    if (currenBranch?.image != null && currenBranch!.image!.isNotEmpty) {
+      currentImageProvider = MemoryImage(currenBranch.image!);
+    }
     return BlocListener<WriteBranchCubit, WriteBranchState>(
       listener: (context, state) {
         if (state is WriteBranchInProgress) {
@@ -62,76 +77,157 @@ class _CreateProductPriceDialogState extends State<CreateProductPriceDialog> {
       },
       child: Form(
         key: formKey,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AlertDialog(
-              title: Text("$prefixTitle Rama/Sucursal"),
-              actions: [
-                OutlinedButton(
-                  onPressed: () {
-                    context.pop();
-                  },
-                  child: const Text("Cancelar"),
-                ),
-                ElevatedButton(
-                  onPressed: () async {
-                    if (!formKey.currentState!.validate()) return;
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text(
+              "Actualizar Rama/Sucursal",
+            ),
+          ),
+          body: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 600),
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    children: [
+                      PickImgWidget(
+                        initialImage: currentImageProvider,
+                        onImageSelected: (image) {
+                          _imageFile = image;
+                        },
+                      ),
 
-                    if (currenBranch == null) {
-                      final newProductPrice = CreateBranch.fromJson(creationMap);
+                      const SizedBox(height: 12),
 
-                      final isConfirmed = await DialogManager.slideToConfirmActionDialog(
-                        context,
-                        "¿Desea agregar Rama/Sucursal ${newProductPrice.name}?",
-                      );
-                      if (!isConfirmed) return;
-                      if (!context.mounted) return;
-                      context.read<WriteBranchCubit>().createNewBranch(newProductPrice);
-                    } else {
-                      final isConfirmed = await DialogManager.slideToConfirmActionDialog(
-                        context,
-                        "¿Desea actualizar Rama/Sucursal ${currenBranch.name}?",
-                      );
-                      if (!isConfirmed) return;
-                      if (!context.mounted) return;
-                      context.read<WriteBranchCubit>().updateBranch(
-                        currenBranch.id,
-                        UpdateBranch.fromJson(creationMap),
-                      );
-                    }
-                  },
-                  child: const Text("Agregar Rama/Sucursal"),
+                      Expanded(
+                        child: ListView(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          children: [
+                            TitleTextField(
+                              title: "Nombre de Rama/Sucursal*",
+                              textCapitalization: TextCapitalization.words,
+                              initialValue: currenBranch?.name,
+                              onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) return 'Campo requerido';
+                                creationMap['name'] = value.trim();
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 12),
+                            TitleTextField(
+                              title: "Numero Ruc/Cedula",
+                              initialValue: currenBranch?.idCard,
+                              textCapitalization: TextCapitalization.sentences,
+                              textInputAction: TextInputAction.next,
+                              validator: (value) {
+                                if (value == null) return null;
+                                creationMap['idCard'] = value.trim();
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 12),
+
+                            TitleTextField(
+                              title: "Direccion",
+                              initialValue: currenBranch?.address,
+                              textInputAction: TextInputAction.next,
+                              textCapitalization: TextCapitalization.sentences,
+                              validator: (value) {
+                                if (value == null) return null;
+                                creationMap['address'] = value.trim();
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 12),
+
+                            TitleTextField(
+                              title: "Telefono",
+                              initialValue: currenBranch?.phone,
+                              textInputAction: TextInputAction.next,
+                              textCapitalization: TextCapitalization.sentences,
+                              validator: (value) {
+                                if (value == null) return null;
+                                creationMap['phone'] = value.trim();
+                                return null;
+                              },
+                            ),
+
+                            const SizedBox(height: 12),
+
+                            TitleTextField(
+                              title: "Correo Electronico",
+                              initialValue: currenBranch?.email,
+                              textInputAction: TextInputAction.next,
+
+                              textCapitalization: TextCapitalization.sentences,
+                              validator: (value) {
+                                if (value == null) return null;
+                                creationMap['email'] = value.trim();
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 12),
+                            TitleTextField(
+                              title: "Descripción de Rama/Sucursal",
+                              initialValue: currenBranch?.description,
+                              textInputAction: TextInputAction.next,
+
+                              textCapitalization: TextCapitalization.sentences,
+                              validator: (value) {
+                                if (value == null) return null;
+                                creationMap['description'] = value.trim();
+                                return null;
+                              },
+                            ),
+
+                            const SizedBox(height: 12),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-              content: Column(
-                children: [
-                  TitleTextField(
-                    title: "Nombre de Rama/Sucursal*",
-                    textCapitalization: TextCapitalization.words,
-                    initialValue: currenBranch?.name,
-                    onEditingComplete: () => FocusScope.of(context).nextFocus(),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) return 'Campo requerido';
-                      creationMap['name'] = value.trim();
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  TitleTextField(
-                    title: "Descripción de Rama/Sucursal",
-                    initialValue: currenBranch?.description,
-                    textCapitalization: TextCapitalization.sentences,
-                    validator: (value) {
-                      if (value == null) return null;
-                      creationMap['description'] = value.trim();
-                      return null;
-                    },
-                  ),
-                ],
               ),
             ),
-          ],
+          ),
+
+          bottomNavigationBar: BottomAppBar(
+            child: SizedBox(
+              height: 50,
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 600),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      OutlinedButton(
+                        child: const Text("Cancelar"),
+                        onPressed: () => context.pop(),
+                      ),
+
+                      ElevatedButton(
+                        child: const Text("Guardar"),
+                        onPressed: () {
+                          if (!formKey.currentState!.validate()) return;
+                          if (widget.branch == null) return;
+
+                          final updateBranch = UpdateBranch.fromJson(creationMap);
+
+                          context.read<WriteBranchCubit>().updateBranch(
+                            widget.branch!.id,
+                            updateBranch,
+                            _imageFile,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );

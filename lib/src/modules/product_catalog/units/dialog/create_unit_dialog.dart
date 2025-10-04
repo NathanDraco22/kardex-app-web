@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/src/domain/models/unit/unit_model.dart';
-import 'package:kardex_app_front/src/modules/settings/view/units/cubit/write_unit_cubit.dart';
+import 'package:kardex_app_front/src/modules/product_catalog/units/cubit/write_unit_cubit.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
@@ -80,6 +80,7 @@ class _CreateUnitDialogState extends State<CreateUnitDialog> {
                   TitleTextField(
                     title: "Nombre de la Unidad*",
                     textCapitalization: TextCapitalization.words,
+                    autofocus: true,
                     validator: (value) {
                       if (value == null || value.isEmpty) return "El nombre de la unidad es requerido";
                       creationMap['name'] = value.trim();
