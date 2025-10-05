@@ -8,7 +8,6 @@ import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/cubits/write_invoice_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/web/widgets/anon_invoice_table.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/widgets/dialogs/confirm_invoice_dialog.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
 import 'package:kardex_app_front/src/tools/session_tool.dart';
