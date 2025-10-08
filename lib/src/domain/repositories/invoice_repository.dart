@@ -65,6 +65,38 @@ class InvoicesRepository {
     return result;
   }
 
+  Future<ListResponse<InvoiceInDb>> getClientInvoices({
+    String? clientId,
+    int? startDate,
+    int? endDate,
+    required int offset,
+  }) async {
+    final res = await invoicesDataSource.getClientInvoices(
+      clientId: clientId,
+      startDate: startDate,
+      endDate: endDate,
+      offset: offset,
+    );
+    final result = ListResponse<InvoiceInDb>.fromJson(res, InvoiceInDb.fromJson);
+    return result;
+  }
+
+  Future<InvoiceTotals> getTotalFromClientInvoices({
+    String? clientId,
+    int? startDate,
+    int? endDate,
+    required int offset,
+  }) async {
+    final res = await invoicesDataSource.getTotalFromClientInvoices(
+      clientId: clientId,
+      startDate: startDate,
+      endDate: endDate,
+      offset: offset,
+    );
+    final result = InvoiceTotals.fromJson(res);
+    return result;
+  }
+
   Future<InvoiceInDb?> getInvoiceById(String invoiceId) async {
     final result = await invoicesDataSource.getInvoiceById(invoiceId);
     if (result == null) return null;

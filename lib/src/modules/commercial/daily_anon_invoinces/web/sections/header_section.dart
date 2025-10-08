@@ -30,7 +30,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                       defaultDate: readCubit.startDate,
                       title: "Fecha",
                       onSelected: (value) {
-                        readCubit.loadPaidInvoices(startDate: value);
+                        readCubit.loadDailyPaidAnonInvoices(startDate: value);
                       },
                     ),
                   ),

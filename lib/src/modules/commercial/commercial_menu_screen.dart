@@ -129,11 +129,12 @@ class _Body extends StatelessWidget {
                 size: 32,
                 color: Colors.teal.shade600,
               ),
-              title: const Text("Historial de Facturacion a Clientes"),
+              title: const Text("Historial de Facturacion a Clientes por dia"),
               onTap: () {
-                context.pushNamed("invoice-history");
+                context.pushNamed("daily-invoice-history");
               },
             ),
+
           const Divider(height: 0.0),
 
           const Divider(

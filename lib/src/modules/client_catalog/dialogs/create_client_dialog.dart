@@ -9,16 +9,19 @@ import 'package:kardex_app_front/widgets/title_texfield.dart';
 
 Future<ClientInDb?> showCreateClientDialog(BuildContext context, {ClientInDb? client}) async {
   final writeCubit = context.read<WriteClientCubit>();
-  final res = await showDialog(
-    context: context,
-    builder: (context) {
-      return BlocProvider.value(
-        value: writeCubit,
-        child: WriteClientDialog(
-          client: client,
-        ),
-      );
-    },
+
+  final res = await Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) {
+        return BlocProvider.value(
+          value: writeCubit,
+          child: WriteClientDialog(
+            client: client,
+          ),
+        );
+      },
+    ),
   );
 
   return res;

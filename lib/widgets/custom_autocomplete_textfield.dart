@@ -133,7 +133,7 @@ class _CustomAutocompleteTextfieldState<T> extends State<CustomAutocompleteTextf
     globalPosOffset = renderBox.localToGlobal(Offset.zero);
 
     if (context.isMobile()) {
-      globalPosOffset = Offset(globalPosOffset.dx, globalPosOffset.dy);
+      globalPosOffset = Offset(globalPosOffset.dx, globalPosOffset.dy - kToolbarHeight);
     }
 
     setState(() {

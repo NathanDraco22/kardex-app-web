@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/src/modules/commercial/daily_invoinces/cubit/read_daily_anon_invoices_cubit.dart';
+import 'package:kardex_app_front/src/modules/commercial/daily_anon_invoinces/cubit/read_daily_anon_invoices_cubit.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/basic_table_listview.dart';
@@ -69,10 +69,16 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    EdgeInsets mainPadding = const EdgeInsets.all(8.0);
+
+    if (context.isMobile()) {
+      mainPadding = EdgeInsets.zero;
+    }
+
+    return Center(
       child: Padding(
-        padding: EdgeInsets.all(8.0),
-        child: Column(
+        padding: mainPadding,
+        child: const Column(
           spacing: 8,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [

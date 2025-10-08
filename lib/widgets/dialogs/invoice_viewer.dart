@@ -25,6 +25,13 @@ class _InvoiceViewer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
+    final totalDiscount = invoice.saleItems.fold(
+      0,
+      (previousValue, element) {
+        return previousValue + element.totalDiscount;
+      },
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Factura #${invoice.docNumber}"),
@@ -206,45 +213,64 @@ class _InvoiceViewer extends StatelessWidget {
                         ),
                       ),
                       SizedBox(
-                        height: 70,
+                        height: 90,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             const Row(
                               mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Text(
-                                  "Descuentos: C\$0",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Text(
-                                  "Descuentos: C\$0",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
+                              children: [],
                             ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                Text(
-                                  "Total: ${NumberFormatter.convertToMoneyLike(invoice.total)}",
-                                  style: const TextStyle(
+                                const Text(
+                                  "Total Descuento:",
+                                  style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 14,
                                   ),
                                 ),
+                                SizedBox(
+                                  width: 90,
+                                  child: Text(
+                                    NumberFormatter.convertToMoneyLike(totalDiscount),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                    ),
+                                    textAlign: TextAlign.end,
+                                  ),
+                                ),
                               ],
+                            ),
+                            DecoratedBox(
+                              decoration: BoxDecoration(color: Colors.grey.shade200),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  const Text(
+                                    "Total:",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+
+                                  SizedBox(
+                                    width: 100,
+                                    child: Text(
+                                      NumberFormatter.convertToMoneyLike(invoice.total),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
+                                      textAlign: TextAlign.end,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),

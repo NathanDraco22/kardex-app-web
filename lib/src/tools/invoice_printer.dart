@@ -41,7 +41,7 @@ Future<Uint8List> generateTicketPdfFromInvoice(InvoiceInDb invoice, BranchInDb b
         return pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.stretch,
           children: [
-            if (branchImage != null)
+            if (branchImage != null && branchImage.isNotEmpty)
               pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.center,
                 children: [
@@ -140,6 +140,21 @@ Future<Uint8List> generateTicketPdfFromInvoice(InvoiceInDb invoice, BranchInDb b
                   fontSize: TicketSettings.contentFontSize,
                 ),
               ),
+            pw.Divider(color: PdfColors.grey),
+
+            pw.Text(
+              "Elaborado por:",
+              style: pw.TextStyle(
+                fontSize: TicketSettings.contentFontSize,
+              ),
+            ),
+
+            pw.Text(
+              invoice.createdBy.name,
+              style: pw.TextStyle(
+                fontSize: TicketSettings.contentFontSize,
+              ),
+            ),
             pw.Divider(color: PdfColors.grey),
 
             pw.Row(

@@ -4,8 +4,8 @@ import 'package:kardex_app_front/src/modules/commercial/anon_invoices/anon_invoi
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/client_invoices_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/commercial_menu_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/current_orders/current_orders_screen.dart';
-import 'package:kardex_app_front/src/modules/commercial/daily_invoinces/daily_invoices_screen.dart';
-import 'package:kardex_app_front/src/modules/commercial/invoice_history/invoice_history_screen.dart';
+import 'package:kardex_app_front/src/modules/commercial/daily_anon_invoinces/daily_anon_invoices_screen.dart';
+import 'package:kardex_app_front/src/modules/commercial/daily_client_invoices/daily_client_invoices.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/pending_invoice_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/product_price_setting/product_price_setting.dart';
 import 'package:kardex_app_front/src/modules/finance/client_accounts/view/client_account_screen.dart';
@@ -129,9 +129,9 @@ class AppRouter {
             builder: (context, state) => const PendingInvoiceScreen(),
           ),
           GoRoute(
-            path: "invoice-history",
-            name: "invoice-history",
-            builder: (context, state) => const InvoiceHistoryScreen(),
+            path: "daily-invoice-history",
+            name: "daily-invoice-history",
+            builder: (context, state) => const DailyClientInvoices(),
           ),
           GoRoute(
             path: "product-price-setting",

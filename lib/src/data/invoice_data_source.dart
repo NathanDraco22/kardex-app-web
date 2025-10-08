@@ -87,6 +87,49 @@ class InvoicesDataSource with HttpService {
     return res;
   }
 
+  Future<Map<String, dynamic>> getClientInvoices({
+    String? clientId,
+    int? startDate,
+    int? endDate,
+    required int offset,
+  }) async {
+    final currentBranch = BranchesTool.getCurrentBranchId();
+    final uri = HttpTools.generateUri(
+      _endpoint,
+      queryParameters: {
+        "branchId": currentBranch,
+        "clientId": ?clientId,
+        "startDate": ?startDate?.toString(),
+        "endDate": ?endDate?.toString(),
+        "offset": offset.toString(),
+      },
+    );
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
+    return res;
+  }
+
+  Future<Map<String, dynamic>> getTotalFromClientInvoices({
+    String? clientId,
+    int? startDate,
+    int? endDate,
+    required int offset,
+  }) async {
+    final currentBranch = BranchesTool.getCurrentBranchId();
+    final uri = HttpTools.generateUri(
+      "$_endpoint/totals",
+      queryParameters: {
+        "branchId": currentBranch,
+        "clientId": ?clientId,
+        "startDate": ?startDate?.toString(),
+        "endDate": ?endDate?.toString(),
+      },
+    );
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
+    return res;
+  }
+
   Future<Map<String, dynamic>?> getInvoiceById(String invoiceId) async {
     final uri = HttpTools.generateUri("$_endpoint/$invoiceId");
     final headers = HttpTools.generateAuthHeaders();

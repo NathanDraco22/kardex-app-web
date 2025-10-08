@@ -18,7 +18,7 @@ class ReadDailyAnonInvoicesCubit extends Cubit<ReadDailyAnonInvoicesState> {
 
   final InvoicesRepository invoicesRepository;
 
-  Future<void> loadPaidInvoices({DateTime? startDate}) async {
+  Future<void> loadDailyPaidAnonInvoices({DateTime? startDate}) async {
     emit(ReadDailyAnonInvoicesLoading());
     this.startDate = startDate;
     offset = 0;
