@@ -10,6 +10,7 @@ class CustomAutocompleteTextfield<T> extends StatefulWidget {
     required this.onSearch,
     required this.suggestionBuilder,
     required this.titleBuilder,
+    this.hintText,
     this.validator,
     this.readOnly = false,
     this.onFieldSubmitted,
@@ -19,6 +20,8 @@ class CustomAutocompleteTextfield<T> extends StatefulWidget {
   final T? initValue;
 
   final String Function(T value) titleBuilder;
+
+  final String? hintText;
 
   final Future<List<T>> Function(String value) onSearch;
 
@@ -75,6 +78,7 @@ class _CustomAutocompleteTextfieldState<T> extends State<CustomAutocompleteTextf
       key: textFieldKey,
       readOnly: widget.readOnly,
       onFieldSubmitted: widget.onFieldSubmitted,
+      decoration: InputDecoration(hintText: widget.hintText),
       onChanged: (value) async {
         await displaySuggestions(context);
         mainTextFieldFocus.requestFocus();

@@ -50,6 +50,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                 Expanded(
                   flex: 2,
                   child: CustomAutocompleteTextfield<ClientInDb>(
+                    hintText: "Nombre del cliente",
                     key: ValueKey(readCubit.currentClientId),
                     onClose: (value) {
                       readCubit.currentClientId = value.id;

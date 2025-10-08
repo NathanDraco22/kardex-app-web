@@ -18,7 +18,7 @@ class _HeaderSection extends StatelessWidget {
               child: Row(
                 children: [
                   Flexible(
-                    flex: 2,
+                    flex: 3,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -29,6 +29,7 @@ class _HeaderSection extends StatelessWidget {
                         const SizedBox(height: 6),
 
                         CustomAutocompleteTextfield<ClientInDb>(
+                          hintText: "Buscar Cliente",
                           onClose: (value) {
                             readCubit.loadPaginatedInvoices(value.id);
                             viewController.changeClient(value);

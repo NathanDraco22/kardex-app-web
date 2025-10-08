@@ -108,7 +108,10 @@ class _Body extends StatelessWidget {
             ),
           const Divider(height: 0.0),
 
-          if (accessManager.hasCurrentAccess(context, CommercialSubModules.pendingInvoices))
+          if (accessManager.hasCurrentAccess(
+            context,
+            CommercialSubModules.pendingInvoices,
+          ))
             ListTile(
               leading: Icon(
                 FluentIcons.document_endnote_24_filled,
