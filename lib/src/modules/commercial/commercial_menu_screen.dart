@@ -138,6 +138,19 @@ class _Body extends StatelessWidget {
               },
             ),
 
+          if (accessManager.hasCurrentAccess(context, CommercialSubModules.invoiceHistory))
+            ListTile(
+              leading: Icon(
+                FluentIcons.history_28_filled,
+                size: 32,
+                color: Colors.amber.shade600,
+              ),
+              title: const Text("Historial de Recibos por dia"),
+              onTap: () {
+                context.pushNamed("daily-receipt-history");
+              },
+            ),
+
           const Divider(height: 0.0),
 
           const Divider(

@@ -11,20 +11,24 @@ enum PaymentMethod {
 
 class AppliedInvoice {
   final String invoiceId;
+  final String docNumber;
   final int amountApplied;
 
   AppliedInvoice({
     required this.invoiceId,
+    required this.docNumber,
     required this.amountApplied,
   });
 
   factory AppliedInvoice.fromJson(Map<String, dynamic> json) => AppliedInvoice(
     invoiceId: json['invoiceId'],
+    docNumber: json['docNumber'],
     amountApplied: json['amountApplied'],
   );
 
   Map<String, dynamic> toJson() => {
     'invoiceId': invoiceId,
+    'docNumber': docNumber,
     'amountApplied': amountApplied,
   };
 }

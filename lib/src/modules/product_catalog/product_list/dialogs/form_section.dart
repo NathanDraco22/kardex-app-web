@@ -75,6 +75,7 @@ class _FormContentState extends State<_FormContent> {
         ),
         backgroundColor: Colors.white,
         body: ListView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           padding: const EdgeInsets.all(16),
           children: [
             _InnerContent(

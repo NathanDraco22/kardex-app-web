@@ -120,6 +120,7 @@ class _RootScaffold extends StatelessWidget {
                   final appliedInvoices = invoices.map((invoice) {
                     return AppliedInvoice(
                       invoiceId: invoice.id,
+                      docNumber: invoice.docNumber,
                       amountApplied: invoice.total,
                     );
                   }).toList();

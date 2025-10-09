@@ -131,6 +131,7 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 600),
                 child: ListView(
+                  keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                   padding: const EdgeInsets.all(16),
                   children: [
                     TitleTextField(
