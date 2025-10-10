@@ -13,6 +13,7 @@ import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/session_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
+import 'package:kardex_app_front/widgets/dialogs/receipt_viewer.dart';
 
 class CreateReceiptMediator extends InheritedWidget {
   const CreateReceiptMediator({
@@ -93,6 +94,9 @@ class _RootScaffold extends StatelessWidget {
             "Recibo creado con éxito",
           );
           if (!context.mounted) return;
+          await showReceiptViewerDialog(context, state.receipt);
+          if (!context.mounted) return;
+          Navigator.pop(context);
           Navigator.pop(context);
           Navigator.pop(context);
         }
