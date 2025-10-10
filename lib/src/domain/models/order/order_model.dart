@@ -16,6 +16,7 @@ class BaseOrder {
   final String clientId;
   final ClientInfo clientInfo;
   final String docNumber;
+  final String invoiceId;
   final List<SaleItem> saleItems;
   final String description;
   final int amountPaid;
@@ -30,6 +31,7 @@ class BaseOrder {
     required this.clientId,
     required this.clientInfo,
     this.docNumber = "",
+    this.invoiceId = "",
     required this.saleItems,
     this.description = "",
     this.amountPaid = 0,
@@ -45,6 +47,7 @@ class BaseOrder {
     clientId: json['clientId'],
     clientInfo: ClientInfo.fromJson(json['clientInfo']),
     docNumber: json['docNumber'] ?? "",
+    invoiceId: json['invoiceId'] ?? "",
     saleItems: (json['saleItems'] as List).map((e) => SaleItem.fromJson(e)).toList(),
     description: json['description'] ?? "",
     amountPaid: json['amountPaid'] ?? 0,
@@ -128,6 +131,7 @@ class OrderInDb extends BaseOrder {
     required super.clientId,
     required super.clientInfo, // Campo añadido
     super.docNumber,
+    super.invoiceId,
     required super.saleItems,
     super.description,
     super.amountPaid,
@@ -146,6 +150,7 @@ class OrderInDb extends BaseOrder {
     clientId: json['clientId'],
     clientInfo: ClientInfo.fromJson(json['clientInfo']), // Campo añadido
     docNumber: json['docNumber'] ?? "",
+    invoiceId: json['invoiceId'] ?? "",
     saleItems: (json['saleItems'] as List).map((e) => SaleItem.fromJson(e)).toList(),
     description: json['description'] ?? "",
     amountPaid: json['amountPaid'] ?? 0,

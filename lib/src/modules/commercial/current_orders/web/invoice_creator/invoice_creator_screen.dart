@@ -10,6 +10,7 @@ import 'package:kardex_app_front/src/modules/commercial/current_orders/modals/co
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
+import 'package:kardex_app_front/widgets/dialogs/invoice_viewer.dart';
 
 Future<OrderInDb?> showOrderInvoiceCreatorDialog(BuildContext context, OrderInDb order) async {
   final readCubit = context.read<ReadOrderCubit>();
@@ -89,10 +90,44 @@ class _RootScaffold extends StatelessWidget {
           if (!context.mounted) return;
           Navigator.pop(context, state.order);
         }
+
+        if (state is WriteOrderToInvoiceSuccess) {
+          LoadingDialogManager.closeLoadingDialog(context);
+          String message = "Orden facturada con éxito";
+          await DialogManager.showInfoDialog(context, message);
+          if (!context.mounted) return;
+          final readCubit = context.read<ReadOrderCubit>();
+          await readCubit.updateOrderCache(state.order);
+
+          if (!context.mounted) return;
+          await showInvoiceViewerDialog(context, state.invoice);
+          if (!context.mounted) return;
+          Navigator.pop(context, state.order);
+        }
       },
       child: Scaffold(
         appBar: AppBar(title: const Text("Facturar Orden")),
         body: const _Body(),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButton: Builder(
+          builder: (context) {
+            if (order.status == OrderStatus.open) {
+              return const SizedBox.shrink();
+            }
+
+            if (order.invoiceId.isEmpty) {
+              return const SizedBox.shrink();
+            }
+
+            return ElevatedButton.icon(
+              onPressed: () {
+                showInvoiceViewerDialogFromId(context, order.invoiceId);
+              },
+              label: const Text("Ver Factura"),
+              icon: const Icon(Icons.picture_as_pdf),
+            );
+          },
+        ),
         bottomNavigationBar: BottomAppBar(
           height: 60,
           child: Builder(

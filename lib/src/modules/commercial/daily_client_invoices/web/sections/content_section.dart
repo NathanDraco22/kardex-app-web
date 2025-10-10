@@ -65,8 +65,8 @@ class _ContentSection extends StatelessWidget {
                     final currentInvoice = invoices[index];
                     final totalPaid = NumberFormatter.convertToMoneyLike(currentInvoice.total);
 
-                    final paidAtFormatted = DateTimeTool.formatHHmm(
-                      currentInvoice.paidAt ?? DateTime.now(),
+                    final createdAtFormatted = DateTimeTool.formatHHmm(
+                      currentInvoice.createdAt,
                     );
 
                     return BasicTableRow(
@@ -76,7 +76,7 @@ class _ContentSection extends StatelessWidget {
                       color: rowColor,
                       cells: [
                         BasicTableCell(
-                          content: Text(paidAtFormatted),
+                          content: Text(createdAtFormatted),
                         ),
                         BasicTableCell(
                           content: Text("#${currentInvoice.docNumber}"),

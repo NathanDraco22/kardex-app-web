@@ -13,7 +13,7 @@ class DateTimeTool {
   }
 
   static String formatHHmm(DateTime datetime) {
-    final formatter = DateFormat('HH:mm');
+    final formatter = DateFormat('hh:mm a');
     return formatter.format(datetime);
   }
 

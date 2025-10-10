@@ -1,6 +1,7 @@
 import 'package:kardex_app_front/src/data/data.dart';
 import 'package:kardex_app_front/src/domain/models/order/order_model.dart';
 import 'package:kardex_app_front/src/domain/responses/list_responses.dart';
+import 'package:kardex_app_front/src/domain/responses/order_to_invoice_response.dart';
 
 class OrdersRepository {
   final OrdersDataSource ordersDataSource;
@@ -42,10 +43,11 @@ class OrdersRepository {
     return OrderInDb.fromJson(result);
   }
 
-  Future<OrderInDb?> convertOrderToInvoice(String orderId) async {
+  Future<OrderToInvoiceResponse?> convertOrderToInvoice(String orderId) async {
     final result = await ordersDataSource.convertOrderToInvoice(orderId);
     if (result == null) return null;
-    return OrderInDb.fromJson(result);
+    final response = OrderToInvoiceResponse.fromJson(result);
+    return response;
   }
 
   Future<OrderInDb?> cancelOrderById(String orderId) async {

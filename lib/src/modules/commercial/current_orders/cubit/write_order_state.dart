@@ -11,6 +11,12 @@ final class WriteOrderSuccess extends WriteOrderState {
   WriteOrderSuccess(this.order);
 }
 
+final class WriteOrderToInvoiceSuccess extends WriteOrderState {
+  final InvoiceInDb invoice;
+  final OrderInDb order;
+  WriteOrderToInvoiceSuccess(this.invoice, this.order);
+}
+
 final class WriteOrderError extends WriteOrderState {
   final String error;
   WriteOrderError(this.error);
