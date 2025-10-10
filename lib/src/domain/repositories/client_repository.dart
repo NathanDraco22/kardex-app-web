@@ -1,5 +1,6 @@
 import 'package:kardex_app_front/src/data/client_data_source.dart';
 import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
+import 'package:kardex_app_front/src/domain/query_params/client_query_params.dart';
 import 'package:kardex_app_front/src/domain/responses/list_responses.dart';
 
 class ClientsRepository {
@@ -33,6 +34,15 @@ class ClientsRepository {
       ),
     );
     return _clients;
+  }
+
+  Future<List<ClientInDb>> getClientWithBalance(ClientQueryParams params) async {
+    final results = await clientsDataSource.getClientsWithBalance(params.toMap());
+    final responseModel = ListResponse<ClientInDb>.fromJson(
+      results,
+      ClientInDb.fromJson,
+    );
+    return responseModel.data;
   }
 
   Future<ClientInDb?> getClientById(String clientId) async {

@@ -6,7 +6,6 @@ import 'package:kardex_app_front/src/modules/commercial/pending_invoice/cubit/re
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/web/receipt_creator/receipt_creator_screen.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
-import 'package:kardex_app_front/widgets/custom_autocomplete_textfield.dart';
 
 import 'mediator.dart';
 
@@ -14,7 +13,9 @@ part 'sections/content_section.dart';
 part 'sections/header_section.dart';
 
 class PendingInvoiceWebScreen extends StatefulWidget {
-  const PendingInvoiceWebScreen({super.key});
+  const PendingInvoiceWebScreen({super.key, required this.client});
+
+  final ClientInDb client;
 
   @override
   State<PendingInvoiceWebScreen> createState() => _PendingInvoiceWebScreenState();
@@ -22,24 +23,52 @@ class PendingInvoiceWebScreen extends StatefulWidget {
 
 class _PendingInvoiceWebScreenState extends State<PendingInvoiceWebScreen> {
   final viewController = ViewController();
+
+  @override
+  void initState() {
+    viewController.changeClient(widget.client);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return PendingInvoiceMediator(
-      notifier: viewController,
-      child: const _RootScaffold(),
+    final invoiceREpo = context.read<InvoicesRepository>();
+    return BlocProvider(
+      create: (context) => ReadPendingInvoiceCubit(
+        invoicesRepository: invoiceREpo,
+      ),
+      child: PendingInvoiceMediator(
+        notifier: viewController,
+        child: const _RootScaffold(),
+      ),
     );
   }
 }
 
-class _RootScaffold extends StatelessWidget {
+class _RootScaffold extends StatefulWidget {
   const _RootScaffold();
 
   @override
+  State<_RootScaffold> createState() => _RootScaffoldState();
+}
+
+class _RootScaffoldState extends State<_RootScaffold> {
+  bool hasInitLoading = false;
+
+  @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      floatingActionButton: _PendingInvoiceFloatingButtons(),
-      body: _Body(),
-      bottomNavigationBar: _BottomPendingInvoice(),
+    final selectedClient = PendingInvoiceMediator.of(context).notifier?.selectedClient;
+    if (selectedClient != null && !hasInitLoading) {
+      context.read<ReadPendingInvoiceCubit>().loadPaginatedInvoices(
+        selectedClient.id,
+      );
+      hasInitLoading = true;
+    }
+    return Scaffold(
+      floatingActionButton: const _PendingInvoiceFloatingButtons(),
+      appBar: AppBar(title: const Text("Facturas por Cobrar de Cliente")),
+      body: const _Body(),
+      bottomNavigationBar: const _BottomPendingInvoice(),
     );
   }
 }
@@ -139,7 +168,7 @@ class _Body extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SizedBox(
-              height: 100,
+              height: 120,
               child: _HeaderSection(),
             ),
             Expanded(

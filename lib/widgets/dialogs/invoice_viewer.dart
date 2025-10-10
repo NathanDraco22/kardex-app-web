@@ -1,35 +1,91 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/src/domain/models/branch/branch.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
+import 'package:kardex_app_front/src/domain/repositories/invoice_repository.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/printers/invoice_printer.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
 
 Future<void> showInvoiceViewerDialog(BuildContext context, InvoiceInDb invoice) async {
+  final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
   await Navigator.push(
     context,
     MaterialPageRoute(
-      builder: (context) => _InvoiceViewer(invoice),
+      builder: (context) {
+        return _InvoiceViewer(
+          invoice: invoice,
+          branch: currentBranch,
+          onShare: () => shareInvoice(invoice, currentBranch),
+          onPrint: () => printInvoice(invoice, currentBranch),
+        );
+      },
+    ),
+  );
+}
+
+Future<void> showInvoiceViewerDialogFromId(BuildContext context, String invoiceId) async {
+  final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
+
+  await Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) {
+        return FutureBuilder(
+          future: context.read<InvoicesRepository>().getInvoiceById(invoiceId),
+          builder: (context, asyncSnapshot) {
+            if (asyncSnapshot.connectionState != ConnectionState.done) {
+              return Scaffold(
+                appBar: AppBar(),
+                body: const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            }
+
+            if (asyncSnapshot.hasError) {
+              return Scaffold(
+                appBar: AppBar(),
+                body: Center(
+                  child: Text("Error al cargar la factura \n ${asyncSnapshot.error}"),
+                ),
+              );
+            }
+
+            final invoice = asyncSnapshot.data!;
+
+            return _InvoiceViewer(
+              invoice: invoice,
+              branch: currentBranch,
+              onShare: () => shareInvoice(invoice, currentBranch),
+              onPrint: () => printInvoice(invoice, currentBranch),
+            );
+          },
+        );
+      },
     ),
   );
 }
 
 class _InvoiceViewer extends StatelessWidget {
-  const _InvoiceViewer(
-    this.invoice,
-  );
+  const _InvoiceViewer({
+    required this.invoice,
+    required this.branch,
+    this.onShare,
+    this.onPrint,
+  });
 
   final InvoiceInDb invoice;
+  final BranchInDb branch;
+  final VoidCallback? onShare;
+  final VoidCallback? onPrint;
 
   @override
   Widget build(BuildContext context) {
-    final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
     final totalDiscount = invoice.saleItems.fold(
       0,
-      (previousValue, element) {
-        return previousValue + element.totalDiscount;
-      },
+      (previousValue, element) => previousValue + element.totalDiscount,
     );
 
     return Scaffold(
@@ -38,17 +94,12 @@ class _InvoiceViewer extends StatelessWidget {
         actions: [
           IconButton(
             tooltip: "Compartir Factura",
-            onPressed: () {
-              shareInvoice(invoice, currentBranch);
-            },
+            onPressed: onShare,
             icon: const Icon(Icons.share),
           ),
-
           IconButton(
             tooltip: "Imprimir Factura",
-            onPressed: () {
-              printInvoice(invoice, currentBranch);
-            },
+            onPressed: onPrint,
             icon: const Icon(Icons.print),
           ),
         ],
@@ -61,77 +112,50 @@ class _InvoiceViewer extends StatelessWidget {
             constraints: const BoxConstraints(maxWidth: 600),
             child: Column(
               children: [
-                Flexible(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              const Text(
-                                "Factura",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              Text(
-                                "No. ${invoice.docNumber}",
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          Column(
-                            children: [
-                              const Text(
-                                "Fecha",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              Text(
-                                DateTimeTool.formatddMMyy(invoice.createdAt),
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-
-                      Text(
-                        currentBranch.name,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            const Text(
+                              "Factura",
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                            const SizedBox(width: 16),
+                            Text(
+                              "No. ${invoice.docNumber}",
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                          ],
                         ),
-                      ),
-
-                      Text(
-                        invoice.clientInfo.name,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                        Column(
+                          children: [
+                            const Text(
+                              "Fecha",
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                            Text(
+                              DateTimeTool.formatddMMyy(invoice.createdAt),
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
+                    Text(
+                      branch.name,
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                    Text(
+                      invoice.clientInfo.name,
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                  ],
                 ),
-
+                const Divider(),
                 Flexible(
                   flex: 3,
                   child: Column(
@@ -144,37 +168,25 @@ class _InvoiceViewer extends StatelessWidget {
                               flex: 2,
                               child: Text(
                                 "Producto",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                               ),
                             ),
                             Expanded(
                               child: Text(
                                 "Cantidad",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                               ),
                             ),
                             Expanded(
                               child: Text(
                                 "Precio",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                               ),
                             ),
                             Expanded(
                               child: Text(
                                 "Total",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                               ),
                             ),
                           ],
@@ -185,26 +197,18 @@ class _InvoiceViewer extends StatelessWidget {
                           itemCount: invoice.saleItems.length,
                           itemBuilder: (context, index) {
                             final saleItem = invoice.saleItems[index];
-
                             return Row(
                               children: [
-                                Expanded(
-                                  flex: 2,
-                                  child: Text(saleItem.product.name),
-                                ),
+                                Expanded(flex: 2, child: Text(saleItem.product.name)),
                                 Expanded(child: Text(saleItem.quantity.toString())),
                                 Expanded(
                                   child: Text(
-                                    NumberFormatter.convertToMoneyLike(
-                                      saleItem.price,
-                                    ),
+                                    NumberFormatter.convertToMoneyLike(saleItem.price),
                                   ),
                                 ),
                                 Expanded(
                                   child: Text(
-                                    NumberFormatter.convertToMoneyLike(
-                                      saleItem.subTotal,
-                                    ),
+                                    NumberFormatter.convertToMoneyLike(saleItem.subTotal),
                                   ),
                                 ),
                               ],
@@ -217,28 +221,19 @@ class _InvoiceViewer extends StatelessWidget {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            const Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [],
-                            ),
+                            const Spacer(),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 const Text(
                                   "Total Descuento:",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                  ),
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                                 ),
                                 SizedBox(
                                   width: 90,
                                   child: Text(
                                     NumberFormatter.convertToMoneyLike(totalDiscount),
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                    ),
+                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                                     textAlign: TextAlign.end,
                                   ),
                                 ),
@@ -251,21 +246,13 @@ class _InvoiceViewer extends StatelessWidget {
                                 children: [
                                   const Text(
                                     "Total:",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                      color: Colors.grey,
-                                    ),
+                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.grey),
                                   ),
-
                                   SizedBox(
                                     width: 100,
                                     child: Text(
                                       NumberFormatter.convertToMoneyLike(invoice.total),
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14,
-                                      ),
+                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                                       textAlign: TextAlign.end,
                                     ),
                                   ),

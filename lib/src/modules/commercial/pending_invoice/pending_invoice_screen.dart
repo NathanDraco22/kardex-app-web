@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
-import 'package:kardex_app_front/src/modules/commercial/pending_invoice/cubit/read_invoice_cubit.dart';
-import 'package:kardex_app_front/src/modules/commercial/pending_invoice/web/pending_invoice_web_screen.dart';
+import 'package:kardex_app_front/src/modules/commercial/pending_invoice/cubit/read_pending_client_cubit.dart';
+import 'package:kardex_app_front/src/modules/commercial/pending_invoice/web/pending_client_screen_web.dart';
 
 class PendingInvoiceScreen extends StatelessWidget {
   const PendingInvoiceScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final invoiceRepo = context.read<InvoicesRepository>();
-    return BlocProvider(
-      create: (context) => ReadPendingInvoiceCubit(
-        invoicesRepository: invoiceRepo,
-      ),
+    final clientRepo = context.read<ClientsRepository>();
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => ReadPendingClientCubit(
+            clientRepo,
+          )..loadPendingClients(),
+        ),
+      ],
       child: const _RootScaffold(),
     );
   }
@@ -38,6 +42,6 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const PendingInvoiceWebScreen();
+    return const PendingClientScreenWeb();
   }
 }

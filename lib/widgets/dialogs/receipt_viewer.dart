@@ -5,6 +5,7 @@ import 'package:kardex_app_front/src/domain/models/receipt/receipt_model.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/printers/receipt_printer.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_app_front/widgets/dialogs/invoice_viewer.dart';
 
 Future<void> showReceiptViewerDialog(BuildContext context, ReceiptInDb receipt) async {
   await Navigator.push(
@@ -46,7 +47,7 @@ class _ReceiptViewer extends StatelessWidget {
         ],
       ),
       body: Center(
-        child: Container(
+        child: Ink(
           color: Colors.white,
           padding: const EdgeInsets.all(16),
           child: ConstrainedBox(
@@ -80,6 +81,9 @@ class _ReceiptViewer extends StatelessWidget {
                     itemBuilder: (context, index) {
                       final appliedInvoice = receipt.appliedInvoices[index];
                       return ListTile(
+                        onTap: () {
+                          showInvoiceViewerDialogFromId(context, appliedInvoice.invoiceId);
+                        },
                         title: Text("#${appliedInvoice.docNumber}"),
                         trailing: Text(NumberFormatter.convertToMoneyLike(appliedInvoice.amountApplied)),
                       );
