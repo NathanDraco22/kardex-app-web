@@ -115,9 +115,13 @@ class _MobileHeaderSection extends StatefulWidget {
   State<_MobileHeaderSection> createState() => _MobileHeaderSectionState();
 }
 
-class _MobileHeaderSectionState extends State<_MobileHeaderSection> {
+class _MobileHeaderSectionState extends State<_MobileHeaderSection> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final mediator = InventoryExitMediator.read(context)!;
     final headerData = mediator.headerData;
     return Card(
@@ -134,6 +138,7 @@ class _MobileHeaderSectionState extends State<_MobileHeaderSection> {
                 ),
                 const SizedBox(height: 6),
                 CustomAutocompleteTextfield<ClientInDb>(
+                  initValue: headerData.client,
                   onClose: (value) => headerData.client = value,
                   titleBuilder: (value) => value.name,
                   onSearch: (value) async {
@@ -168,6 +173,7 @@ class _MobileHeaderSectionState extends State<_MobileHeaderSection> {
                     Flexible(
                       child: TitleTextField(
                         title: "Documento",
+                        initialValue: headerData.docNumber,
                         keyboardType: TextInputType.number,
                         onChanged: (value) {
                           headerData.docNumber = value;
@@ -186,6 +192,7 @@ class _MobileHeaderSectionState extends State<_MobileHeaderSection> {
                           const Text("Fecha Doc"),
                           const SizedBox(height: 6),
                           DateFieldSelector(
+                            initDate: headerData.docDate,
                             onSelectedDate: (value) {
                               headerData.docDate = value;
                               mediator.refresh();

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:kardex_app_front/widgets/calculator/numpad.dart';
 
 class CalculatorField extends StatefulWidget {
-  const CalculatorField({super.key});
+  const CalculatorField({super.key, this.onDone});
+
+  final void Function(String value)? onDone;
 
   @override
   State<CalculatorField> createState() => _CalculatorFieldState();
@@ -21,6 +23,7 @@ class _CalculatorFieldState extends State<CalculatorField> {
     if (result != null) {
       setState(() {
         _controller.text = result.toStringAsFixed(2);
+        widget.onDone?.call(result.toStringAsFixed(2));
       });
     }
   }
@@ -37,13 +40,7 @@ class _CalculatorFieldState extends State<CalculatorField> {
       controller: _controller,
       readOnly: true,
       onTap: _openCalculator,
-      textAlign: TextAlign.right,
-      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-      decoration: const InputDecoration(
-        labelText: 'Monto',
-        border: OutlineInputBorder(),
-        suffixIcon: Icon(Icons.calculate),
-      ),
+      textAlign: TextAlign.center,
     );
   }
 }

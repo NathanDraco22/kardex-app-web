@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_app_front/src/domain/models/models.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_app_front/widgets/calculator/calculator_field.dart';
 import 'package:kardex_app_front/widgets/dialogs/custom_product_search_delegate.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
 
@@ -165,9 +166,12 @@ class EntryRowCard extends StatefulWidget {
   State<EntryRowCard> createState() => _EntryRowCardState();
 }
 
-class _EntryRowCardState extends State<EntryRowCard> {
+class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClientMixin {
   final focusNode = FocusNode();
   final parentFocus = FocusNode();
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -181,6 +185,7 @@ class _EntryRowCardState extends State<EntryRowCard> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final product = widget.rowCardModel.product;
     final rowCard = widget.rowCardModel;
 
@@ -289,25 +294,25 @@ class _EntryRowCardState extends State<EntryRowCard> {
                           builder: (context) {
                             if (!rowCard.editableCost) return const Text("--");
 
-                            return TitleTextField(
-                              inputFormatters: [DecimalTextInputFormatter()],
-                              titleTextAlign: TextAlign.center,
-                              keyboardType: const TextInputType.numberWithOptions(
-                                decimal: true,
-                              ),
-                              title: "Costo Unitario",
-                              onChanged: (value) {
-                                if (value.isEmpty) {
-                                  rowCard.unitaryCost = 0;
-                                  setState(() {});
-                                  return;
-                                }
-                                final numValue = double.tryParse(value);
-                                if (numValue == null) return;
-                                final minimalUnit = (numValue * 100).round();
-                                rowCard.unitaryCost = minimalUnit;
-                                setState(() {});
-                              },
+                            return Column(
+                              spacing: 6,
+                              children: [
+                                Text("Costo Unitario"),
+                                CalculatorField(
+                                  onDone: (value) {
+                                    if (value.isEmpty) {
+                                      rowCard.unitaryCost = 0;
+                                      setState(() {});
+                                      return;
+                                    }
+                                    final numValue = double.tryParse(value);
+                                    if (numValue == null) return;
+                                    final minimalUnit = (numValue * 100).round();
+                                    rowCard.unitaryCost = minimalUnit;
+                                    setState(() {});
+                                  },
+                                ),
+                              ],
                             );
                           },
                         ),
