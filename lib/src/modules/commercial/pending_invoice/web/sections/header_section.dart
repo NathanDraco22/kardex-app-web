@@ -41,7 +41,7 @@ class _HeaderSection extends StatelessWidget {
                     fontSize: 16,
                   ),
                 ),
-                SizedBox(width: 16),
+                const SizedBox(width: 16),
                 Text(
                   'Correo: ${client.email ?? ''} ',
                   style: const TextStyle(

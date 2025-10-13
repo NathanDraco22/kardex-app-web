@@ -31,6 +31,7 @@ class ProviderContainer extends StatelessWidget {
     final usersDataSource = UsersDataSource();
     final userRolesDataSource = UserRolesDataSource();
     final authDataSource = AuthDataSource();
+    final servinDataSource = ServinDataSource();
 
     return MultiRepositoryProvider(
       providers: [
@@ -113,6 +114,12 @@ class ProviderContainer extends StatelessWidget {
         RepositoryProvider(
           create: (context) => AuthRepository(authDataSource),
         ),
+
+        RepositoryProvider(
+          create: (context) => ServinRepository(
+            servinDataSource: servinDataSource,
+          ),
+        ),
       ],
       child: GlobalCubitProvider(
         child: child,
@@ -130,6 +137,7 @@ class GlobalCubitProvider extends StatelessWidget {
   Widget build(BuildContext context) {
     final authRepo = context.read<AuthRepository>();
     final branchRepo = context.read<BranchesRepository>();
+    final servinRepo = context.read<ServinRepository>();
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => ConfigAppCubit()),
@@ -137,6 +145,7 @@ class GlobalCubitProvider extends StatelessWidget {
           create: (context) => AuthCubit(
             authRepository: authRepo,
             branchesRepository: branchRepo,
+            servinRepository: servinRepo,
           ),
         ),
       ],

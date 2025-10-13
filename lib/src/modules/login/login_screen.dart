@@ -25,6 +25,9 @@ class _RootScaffold extends StatelessWidget {
     return BlocListener(
       bloc: authCubit,
       listener: (context, state) {
+        if (state is AuthInactive) {
+          context.goNamed("activation");
+        }
         if (state is AuthLoading) {
           LoadingDialogManager.showLoadingDialog(context);
         }
@@ -65,43 +68,72 @@ class _BodyState extends State<_Body> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 400),
-        child: Card(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TitleTextField(
-                  title: "Codigo de Usuario",
-                  onEditingComplete: () => FocusScope.of(context).nextFocus(),
-                  keyboardType: TextInputType.number,
-                  onChanged: (value) {
-                    userId = value.trim();
-                  },
+    final screenSize = MediaQuery.of(context).size;
+    return Container(
+      height: screenSize.height,
+      width: screenSize.width,
+      decoration: const BoxDecoration(
+        color: Colors.black,
+        image: DecorationImage(
+          image: AssetImage("assets/bg/menu_bg.png"),
+          fit: BoxFit.cover,
+          opacity: 0.2,
+        ),
+      ),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 400),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "Iniciar Sesion",
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white.withAlpha(210),
                 ),
-                const SizedBox(height: 8),
-                PasswordTextField(
-                  title: "Contraseña",
-                  onEditingComplete: () {
-                    context.read<AuthCubit>().login(userId, password);
-                  },
-                  onChanged: (value) {
-                    password = value.trim();
-                  },
-                ),
+              ),
 
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    context.read<AuthCubit>().login(userId, password);
-                  },
-                  child: const Text("Iniciar Sesión"),
+              const SizedBox(height: 16),
+              Card(
+                color: Colors.white.withAlpha(230),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TitleTextField(
+                        title: "Codigo de Usuario",
+                        onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                        keyboardType: TextInputType.number,
+                        onChanged: (value) {
+                          userId = value.trim();
+                        },
+                      ),
+                      const SizedBox(height: 8),
+                      PasswordTextField(
+                        title: "Contraseña",
+                        onEditingComplete: () {
+                          context.read<AuthCubit>().login(userId, password);
+                        },
+                        onChanged: (value) {
+                          password = value.trim();
+                        },
+                      ),
+
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () {
+                          context.read<AuthCubit>().login(userId, password);
+                        },
+                        child: const Text("Iniciar Sesión"),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

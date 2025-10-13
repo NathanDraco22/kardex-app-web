@@ -37,6 +37,12 @@ class AuthDataSource with HttpService {
     return res;
   }
 
+  Future<void> changePassword(Map<String, dynamic> data) async {
+    final uri = HttpTools.generateUri("$_endpoint/change-password");
+    final headers = HttpTools.generateAuthHeaders();
+    await postQuery(uri, data, headers: headers);
+  }
+
   Future<Map?> getLocalSession() async {
     final session = await _sessionManager.getSession();
     return session;

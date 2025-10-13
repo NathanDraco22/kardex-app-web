@@ -5,8 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/constants/const_modules.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/core/access_manager.dart';
-import 'package:kardex_app_front/src/tools/loading_dialog.dart';
-import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
+
+import 'widgets/home_end_drawer.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -35,47 +35,7 @@ class _RootScaffold extends StatelessWidget {
 
     final user = authState.session.user;
     return Scaffold(
-      endDrawer: Drawer(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-              ),
-              child: Text(
-                user.username,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                ),
-              ),
-            ),
-            const Spacer(),
-            ListTile(
-              tileColor: Colors.red.shade100,
-              leading: Icon(Icons.exit_to_app, color: Colors.red.shade700),
-
-              title: Text(
-                "Cerrar Sesión",
-                style: TextStyle(
-                  color: Colors.red.shade700,
-                ),
-              ),
-              onTap: () async {
-                final res = await DialogManager.confirmActionDialog(context, "Deseas cerrar sesión?");
-                if (res != true) return;
-                if (!context.mounted) return;
-                LoadingDialogManager.showLoadingDialog(context);
-                await context.read<AuthCubit>().logout();
-                if (!context.mounted) return;
-                LoadingDialogManager.closeLoadingDialog(context);
-                context.goNamed("login");
-              },
-            ),
-          ],
-        ),
-      ),
+      endDrawer: HomeEndDrawer(user: user),
       appBar: AppBar(
         title: const Text("Sistema Neptuno"),
         actions: [

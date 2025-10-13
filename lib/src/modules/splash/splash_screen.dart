@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/config/app_theme.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 
 class SplashScreen extends StatelessWidget {
@@ -21,6 +22,10 @@ class _RootScaffold extends StatelessWidget {
     return BlocListener(
       bloc: authCubit,
       listener: (context, state) async {
+        if (state is AuthInactive) {
+          context.goNamed("activation");
+        }
+
         if (state is Authenticated) {
           context.goNamed("home");
         }
@@ -29,7 +34,8 @@ class _RootScaffold extends StatelessWidget {
           context.goNamed("login");
         }
       },
-      child: const Scaffold(
+      child: Scaffold(
+        backgroundColor: ColourPalette.deepBackground,
         body: _Body(),
       ),
     );

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 
 class ColourPalette {
-  static const Color primary = Color(0xFF162b4e);
+  static const Color deepBackground = Color(0xFF072a3c);
+  static const Color primary = Color(0xFF072a3c);
+  // static const Color primary = Color(0xFF162b4e);
   static const Color primaryVariant = Color(0xFF3B62A1);
   static const Color secondary = Color(0xFF3B62A1);
   static const Color primaryInverse = Colors.amber;
+  // static const Color softWhiteAliceBlue = Color(0xFFF0F8FF);
 }
 
 class AppTheme {

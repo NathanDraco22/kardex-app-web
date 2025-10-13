@@ -297,7 +297,7 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
                             return Column(
                               spacing: 6,
                               children: [
-                                Text("Costo Unitario"),
+                                const Text("Costo Unitario"),
                                 CalculatorField(
                                   onDone: (value) {
                                     if (value.isEmpty) {

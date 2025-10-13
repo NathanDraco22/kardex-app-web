@@ -1,9 +1,7 @@
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/client/client.dart';
 import 'package:kardex_app_front/src/domain/query_params/client_query_params.dart';
 import 'package:kardex_app_front/src/domain/repositories/client_repository.dart';
-
-import 'package:meta/meta.dart';
 
 part 'read_pending_client_state.dart';
 

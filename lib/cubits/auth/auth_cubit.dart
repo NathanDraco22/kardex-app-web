@@ -2,10 +2,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/core/session_manager.dart';
 import 'package:kardex_app_front/src/core/token_manager.dart';
 import 'package:kardex_app_front/src/domain/models/branch/branch.dart';
+import 'package:kardex_app_front/src/domain/models/servin/servin.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/domain/responses/login_responses.dart';
 import 'package:kardex_app_front/src/services/exceptions/http_exceptions.dart';
 import 'package:kardex_app_front/src/tools/branches_tool.dart';
+import 'package:kardex_app_front/src/tools/http_tool.dart';
 
 part 'auth_state.dart';
 
@@ -13,14 +15,24 @@ class AuthCubit extends Cubit<AuthState> {
   AuthCubit({
     required this.authRepository,
     required this.branchesRepository,
+    required this.servinRepository,
   }) : super(AuthInitial());
 
   final AuthRepository authRepository;
   final BranchesRepository branchesRepository;
+  final ServinRepository servinRepository;
 
   Future<void> checkSession() async {
     emit(AuthLoading());
     try {
+      final currentServin = await servinRepository.getCurrentServinFromLocal();
+
+      if (currentServin == null) {
+        emit(AuthInactive());
+        return;
+      }
+      HttpTools.baseUrl = currentServin.url;
+
       LoginResponse? loginResponse = await authRepository.getLocalSession();
       if (loginResponse != null) {
         final isTokenNearToExpiration = TokenManager().isTokenGotExpired(
@@ -37,7 +49,8 @@ class AuthCubit extends Cubit<AuthState> {
         if (branch == null) {
           throw Exception("Branch not found");
         }
-        emit(Authenticated(loginResponse, branch));
+        HttpTools.baseUrl = currentServin.url;
+        emit(Authenticated(loginResponse, branch, currentServin));
         return;
       }
       emit(Unauthenticated());
@@ -58,6 +71,15 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> login(String userId, String password) async {
     emit(AuthLoading());
     try {
+      final currentServin = await servinRepository.getCurrentServinFromLocal();
+
+      if (currentServin == null) {
+        emit(AuthInactive());
+        return;
+      }
+
+      HttpTools.baseUrl = currentServin.url;
+
       final loginResponse = await authRepository.login(userId, password);
 
       if (isClosed) return;
@@ -70,7 +92,8 @@ class AuthCubit extends Cubit<AuthState> {
         throw Exception("Branch not found");
       }
 
-      emit(Authenticated(loginResponse, branch));
+      HttpTools.baseUrl = currentServin.url;
+      emit(Authenticated(loginResponse, branch, currentServin));
     } catch (error) {
       if (isClosed) return;
       emit(AuthError(error.toString()));

@@ -1,6 +1,5 @@
 part of 'read_pending_client_cubit.dart';
 
-@immutable
 sealed class ReadPendingClientState {}
 
 final class ReadPendingClientInitial extends ReadPendingClientState {}

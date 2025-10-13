@@ -1,4 +1,5 @@
 import 'package:kardex_app_front/src/data/auth_data_source.dart';
+import 'package:kardex_app_front/src/domain/models/common/change_password.dart';
 import 'package:kardex_app_front/src/domain/responses/login_responses.dart';
 
 class AuthRepository {
@@ -14,6 +15,10 @@ class AuthRepository {
   Future<LoginResponse> refreshToken(String token) async {
     final result = await authDataSource.refreshToken(token);
     return LoginResponse.fromJson(result);
+  }
+
+  Future<void> changePassword(ChangePasswordBody data) async {
+    await authDataSource.changePassword(data.toJson());
   }
 
   Future<LoginResponse?> getLocalSession() async {

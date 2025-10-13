@@ -13,6 +13,7 @@ export 'product_price_repository.dart';
 export 'product_repository.dart';
 export 'product_sale_profile_repository.dart';
 export 'receipt_repository.dart';
+export 'servin_repository.dart';
 export 'supplier_repository.dart';
 export 'unit_repository.dart';
 export 'user_repository.dart';
