@@ -166,7 +166,7 @@ class _NumpadCalculatorState extends State<NumpadCalculator> {
 
   void _calculate() {
     if (_expression.isEmpty) return;
-    String expressionToParse = _expression;
+    String expressionToParse = _expression.replaceAll(",", "");
     num result;
 
     try {
