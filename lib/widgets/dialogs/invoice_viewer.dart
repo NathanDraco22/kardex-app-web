@@ -104,168 +104,170 @@ class _InvoiceViewer extends StatelessWidget {
           ),
         ],
       ),
-      body: Center(
-        child: Container(
-          color: Colors.white,
-          padding: const EdgeInsets.all(16),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 600),
-            child: Column(
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            const Text(
-                              "Factura",
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                            ),
-                            const SizedBox(width: 16),
-                            Text(
-                              "No. ${invoice.docNumber}",
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                            ),
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            const Text(
-                              "Fecha",
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                            ),
-                            Text(
-                              DateTimeTool.formatddMMyy(invoice.createdAt),
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Text(
-                      branch.name,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
-                    Text(
-                      invoice.clientInfo.name,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
-                  ],
-                ),
-                const Divider(),
-                Flexible(
-                  flex: 3,
-                  child: Column(
+      body: SafeArea(
+        child: Center(
+          child: Container(
+            color: Colors.white,
+            padding: const EdgeInsets.all(16),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 600),
+              child: Column(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const SizedBox(
-                        height: 30,
-                        child: Row(
-                          children: [
-                            Expanded(
-                              flex: 2,
-                              child: Text(
-                                "Producto",
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              const Text(
+                                "Factura",
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                               ),
-                            ),
-                            Expanded(
-                              child: Text(
-                                "Cantidad",
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                              const SizedBox(width: 16),
+                              Text(
+                                "No. ${invoice.docNumber}",
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                               ),
-                            ),
-                            Expanded(
-                              child: Text(
-                                "Precio",
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              const Text(
+                                "Fecha",
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                               ),
-                            ),
-                            Expanded(
-                              child: Text(
-                                "Total",
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                              Text(
+                                DateTimeTool.formatddMMyy(invoice.createdAt),
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                               ),
-                            ),
-                          ],
-                        ),
+                            ],
+                          ),
+                        ],
                       ),
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: invoice.saleItems.length,
-                          itemBuilder: (context, index) {
-                            final saleItem = invoice.saleItems[index];
-                            return Row(
-                              children: [
-                                Expanded(flex: 2, child: Text(saleItem.product.name)),
-                                Expanded(child: Text(saleItem.quantity.toString())),
-                                Expanded(
-                                  child: Text(
-                                    NumberFormatter.convertToMoneyLike(saleItem.price),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Text(
-                                    NumberFormatter.convertToMoneyLike(saleItem.subTotal),
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
-                        ),
+                      Text(
+                        branch.name,
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                       ),
-                      SizedBox(
-                        height: 90,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            const Spacer(),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                const Text(
-                                  "Total Descuento:",
+                      Text(
+                        invoice.clientInfo.name,
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                    ],
+                  ),
+                  const Divider(),
+                  Flexible(
+                    flex: 3,
+                    child: Column(
+                      children: [
+                        const SizedBox(
+                          height: 30,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  "Producto",
                                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                                 ),
-                                SizedBox(
-                                  width: 90,
-                                  child: Text(
-                                    NumberFormatter.convertToMoneyLike(totalDiscount),
-                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                                    textAlign: TextAlign.end,
-                                  ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  "Cantidad",
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                                 ),
-                              ],
-                            ),
-                            DecoratedBox(
-                              decoration: BoxDecoration(color: Colors.grey.shade200),
-                              child: Row(
+                              ),
+                              Expanded(
+                                child: Text(
+                                  "Precio",
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  "Total",
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: invoice.saleItems.length,
+                            itemBuilder: (context, index) {
+                              final saleItem = invoice.saleItems[index];
+                              return Row(
+                                children: [
+                                  Expanded(flex: 2, child: Text(saleItem.product.name)),
+                                  Expanded(child: Text(saleItem.quantity.toString())),
+                                  Expanded(
+                                    child: Text(
+                                      NumberFormatter.convertToMoneyLike(saleItem.price),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      NumberFormatter.convertToMoneyLike(saleItem.subTotal),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                        SizedBox(
+                          height: 90,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              const Spacer(),
+                              Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   const Text(
-                                    "Total:",
-                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.grey),
+                                    "Total Descuento:",
+                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                                   ),
                                   SizedBox(
-                                    width: 100,
+                                    width: 90,
                                     child: Text(
-                                      NumberFormatter.convertToMoneyLike(invoice.total),
-                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                      NumberFormatter.convertToMoneyLike(totalDiscount),
+                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                                       textAlign: TextAlign.end,
                                     ),
                                   ),
                                 ],
                               ),
-                            ),
-                          ],
+                              DecoratedBox(
+                                decoration: BoxDecoration(color: Colors.grey.shade200),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    const Text(
+                                      "Total:",
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.grey),
+                                    ),
+                                    SizedBox(
+                                      width: 100,
+                                      child: Text(
+                                        NumberFormatter.convertToMoneyLike(invoice.total),
+                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                        textAlign: TextAlign.end,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

@@ -130,14 +130,6 @@ class _BodyState extends State<_Body> {
                           ),
                         ],
                       ),
-
-                      const Divider(),
-
-                      TextButton.icon(
-                        onPressed: () {},
-                        icon: const Icon(Icons.numbers_rounded),
-                        label: const Text("Usar Codigo de Activacion"),
-                      ),
                     ],
                   ),
                 ),

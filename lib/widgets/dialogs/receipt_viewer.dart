@@ -46,64 +46,66 @@ class _ReceiptViewer extends StatelessWidget {
           ),
         ],
       ),
-      body: Center(
-        child: Ink(
-          color: Colors.white,
-          padding: const EdgeInsets.all(16),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 600),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Recibo No. ${receipt.docNumber}",
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
-                    Text(
-                      DateTimeTool.formatddMMyy(receipt.createdAt),
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Text(currentBranch.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                Text(receipt.clientInfo.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                const Divider(height: 24),
-
-                const Text("Facturas Aplicadas", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                const SizedBox(height: 8),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: receipt.appliedInvoices.length,
-                    itemBuilder: (context, index) {
-                      final appliedInvoice = receipt.appliedInvoices[index];
-                      return ListTile(
-                        onTap: () {
-                          showInvoiceViewerDialogFromId(context, appliedInvoice.invoiceId);
-                        },
-                        title: Text("#${appliedInvoice.docNumber}"),
-                        trailing: Text(NumberFormatter.convertToMoneyLike(appliedInvoice.amountApplied)),
-                      );
-                    },
+      body: SafeArea(
+        child: Center(
+          child: Ink(
+            color: Colors.white,
+            padding: const EdgeInsets.all(16),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 600),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Recibo No. ${receipt.docNumber}",
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                      Text(
+                        DateTimeTool.formatddMMyy(receipt.createdAt),
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                    ],
                   ),
-                ),
-                const Divider(height: 24),
+                  const SizedBox(height: 8),
+                  Text(currentBranch.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  Text(receipt.clientInfo.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  const Divider(height: 24),
 
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    const Text("Total Recibo:", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                    const SizedBox(width: 16),
-                    Text(
-                      NumberFormatter.convertToMoneyLike(receipt.total),
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  const Text("Facturas Aplicadas", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  const SizedBox(height: 8),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: receipt.appliedInvoices.length,
+                      itemBuilder: (context, index) {
+                        final appliedInvoice = receipt.appliedInvoices[index];
+                        return ListTile(
+                          onTap: () {
+                            showInvoiceViewerDialogFromId(context, appliedInvoice.invoiceId);
+                          },
+                          title: Text("#${appliedInvoice.docNumber}"),
+                          trailing: Text(NumberFormatter.convertToMoneyLike(appliedInvoice.amountApplied)),
+                        );
+                      },
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                  const Divider(height: 24),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      const Text("Total Recibo:", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                      const SizedBox(width: 16),
+                      Text(
+                        NumberFormatter.convertToMoneyLike(receipt.total),
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
