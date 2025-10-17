@@ -34,7 +34,7 @@ class _RootScaffold extends StatelessWidget {
           context.goNamed("login");
         }
       },
-      child: Scaffold(
+      child: const Scaffold(
         backgroundColor: ColourPalette.deepBackground,
         body: _Body(),
       ),

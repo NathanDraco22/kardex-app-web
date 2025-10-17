@@ -81,12 +81,21 @@ class _ReceiptViewer extends StatelessWidget {
                       itemCount: receipt.appliedInvoices.length,
                       itemBuilder: (context, index) {
                         final appliedInvoice = receipt.appliedInvoices[index];
+                        final tileColor = index.isOdd ? Colors.white : Colors.grey.shade200;
                         return ListTile(
+                          tileColor: tileColor,
+                          minTileHeight: 40,
                           onTap: () {
                             showInvoiceViewerDialogFromId(context, appliedInvoice.invoiceId);
                           },
-                          title: Text("#${appliedInvoice.docNumber}"),
-                          trailing: Text(NumberFormatter.convertToMoneyLike(appliedInvoice.amountApplied)),
+                          title: Text(
+                            "#${appliedInvoice.docNumber}",
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          trailing: Text(
+                            NumberFormatter.convertToMoneyLike(appliedInvoice.amountApplied),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
                         );
                       },
                     ),

@@ -235,6 +235,24 @@ class _BodyState extends State<_Body> {
                           ),
                         ],
                       ),
+                      Builder(
+                        builder: (context) {
+                          String paymentType = "CREDITO";
+
+                          if (order.paymentType == PaymentType.cash) {
+                            paymentType = "CONTADO";
+                          }
+
+                          return Text(
+                            paymentType,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          );
+                        },
+                      ),
+
                       Text(
                         order.clientInfo.name,
                         style: const TextStyle(

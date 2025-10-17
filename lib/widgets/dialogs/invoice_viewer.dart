@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/branch/branch.dart';
+import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/invoice_repository.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
@@ -123,12 +124,18 @@ class _InvoiceViewer extends StatelessWidget {
                             children: [
                               const Text(
                                 "Factura",
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
                               ),
                               const SizedBox(width: 16),
                               Text(
                                 "No. ${invoice.docNumber}",
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
                               ),
                             ],
                           ),
@@ -146,6 +153,26 @@ class _InvoiceViewer extends StatelessWidget {
                           ),
                         ],
                       ),
+
+                      Builder(
+                        builder: (context) {
+                          String paymentType = "CREDITO";
+
+                          if (invoice.paymentType == PaymentType.cash) {
+                            paymentType = "CONTADO";
+                          }
+
+                          return Text(
+                            paymentType,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          );
+                        },
+                      ),
+
+                      const SizedBox(height: 16),
                       Text(
                         branch.name,
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
@@ -198,27 +225,33 @@ class _InvoiceViewer extends StatelessWidget {
                             itemCount: invoice.saleItems.length,
                             itemBuilder: (context, index) {
                               final saleItem = invoice.saleItems[index];
-                              return Row(
-                                children: [
-                                  Expanded(flex: 2, child: Text(saleItem.product.name)),
-                                  Expanded(child: Text(saleItem.quantity.toString())),
-                                  Expanded(
-                                    child: Text(
-                                      NumberFormatter.convertToMoneyLike(saleItem.price),
+                              final rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+                              return Container(
+                                padding: const EdgeInsets.all(4),
+                                color: rowColor,
+                                child: Row(
+                                  children: [
+                                    Expanded(flex: 2, child: Text(saleItem.product.name)),
+                                    Expanded(child: Text(saleItem.quantity.toString())),
+                                    Expanded(
+                                      child: Text(
+                                        NumberFormatter.convertToMoneyLike(saleItem.price),
+                                      ),
                                     ),
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      NumberFormatter.convertToMoneyLike(saleItem.subTotal),
+                                    Expanded(
+                                      child: Text(
+                                        NumberFormatter.convertToMoneyLike(saleItem.subTotal),
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               );
                             },
                           ),
                         ),
+                        Divider(),
                         SizedBox(
-                          height: 90,
+                          height: 55,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
