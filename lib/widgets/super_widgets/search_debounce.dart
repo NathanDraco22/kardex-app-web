@@ -13,6 +13,8 @@ class SearchFieldDebounced extends StatefulWidget {
     this.textInputAction,
     this.onEditingComplete,
     this.onSubmitted,
+    this.hintText,
+    this.focusNode,
   });
 
   final Duration duration;
@@ -23,6 +25,8 @@ class SearchFieldDebounced extends StatefulWidget {
   final TextInputAction? textInputAction;
   final void Function()? onEditingComplete;
   final void Function(String)? onSubmitted;
+  final String? hintText;
+  final FocusNode? focusNode;
 
   @override
   State<SearchFieldDebounced> createState() => _SearchFieldDebouncedState();
@@ -34,6 +38,7 @@ class _SearchFieldDebouncedState extends State<SearchFieldDebounced> {
   @override
   Widget build(BuildContext context) {
     return TextField(
+      focusNode: widget.focusNode,
       controller: widget.controller,
       autofocus: widget.autoFocus,
       style: const TextStyle(fontWeight: FontWeight.w500),
@@ -51,6 +56,7 @@ class _SearchFieldDebouncedState extends State<SearchFieldDebounced> {
         border: const OutlineInputBorder(),
         prefixIcon: widget.hasPrefixIcon ? const Icon(Icons.search, size: 16) : null,
         label: const Text("Buscar..."),
+        hintText: widget.hintText,
       ),
     );
   }

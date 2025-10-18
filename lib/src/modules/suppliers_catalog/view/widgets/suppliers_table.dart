@@ -4,7 +4,7 @@ import 'package:kardex_app_front/src/domain/models/supplier/supplier_model.dart'
 import 'package:kardex_app_front/src/modules/suppliers_catalog/cubit/supplier_read_cubit.dart';
 import 'package:kardex_app_front/src/modules/suppliers_catalog/dialogs/create_supplier_dialog.dart';
 import 'package:kardex_app_front/widgets/no_item.dart';
-import 'package:kardex_app_front/widgets/search_debounce.dart';
+import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 import 'package:kardex_app_front/widgets/status_tag_label.dart';
 
 class SuppliersTable extends StatelessWidget {

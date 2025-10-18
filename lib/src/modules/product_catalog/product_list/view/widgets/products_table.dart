@@ -4,7 +4,7 @@ import 'package:kardex_app_front/src/domain/models/product/product_model.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/product_list/cubit/read_product_cubit.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/product_list/dialogs/create_product_dialog.dart';
 import 'package:kardex_app_front/widgets/no_item.dart';
-import 'package:kardex_app_front/widgets/search_debounce.dart';
+import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 import 'package:kardex_app_front/widgets/status_tag_label.dart';
 
 class ProductsTable extends StatelessWidget {

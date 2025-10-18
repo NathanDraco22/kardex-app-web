@@ -6,7 +6,7 @@ import 'package:kardex_app_front/src/domain/repositories/product_repository.dart
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/commercial_product_dialog.dart';
 import 'package:kardex_app_front/widgets/no_item.dart';
-import 'package:kardex_app_front/widgets/search_debounce.dart';
+import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 
 import 'models/commercial_product_result.dart';
 

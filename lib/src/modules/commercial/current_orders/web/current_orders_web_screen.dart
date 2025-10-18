@@ -7,7 +7,7 @@ import 'package:kardex_app_front/src/modules/commercial/current_orders/cubit/rea
 import 'package:kardex_app_front/src/modules/commercial/current_orders/web/invoice_creator/invoice_creator_screen.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
-import 'package:kardex_app_front/widgets/custom_autocomplete_textfield.dart';
+import 'package:kardex_app_front/widgets/super_widgets/custom_autocomplete_textfield.dart';
 
 part 'sections/header_section.dart';
 part 'sections/content_section.dart';

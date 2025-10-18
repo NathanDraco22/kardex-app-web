@@ -7,7 +7,7 @@ import 'package:kardex_app_front/src/modules/suppliers_catalog/cubit/supplier_wr
 import 'package:kardex_app_front/src/tools/constant.dart';
 import 'package:kardex_app_front/widgets/no_item.dart';
 import 'package:kardex_app_front/widgets/row_widgets/mobile_row.dart';
-import 'package:kardex_app_front/widgets/search_debounce.dart';
+import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 
 import '../dialogs/create_supplier_dialog.dart';
 import 'widgets/suppliers_table.dart';

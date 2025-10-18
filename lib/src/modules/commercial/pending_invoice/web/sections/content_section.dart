@@ -67,6 +67,7 @@ class _ContentSection extends StatelessWidget {
               final date = DateTimeTool.formatddMMyy(currentInvoices.createdAt);
 
               return CheckboxListTile(
+                contentPadding: EdgeInsets.zero,
                 value: viewController.isInSelected(currentInvoices),
                 tileColor: tileColor,
                 onChanged: (value) {
@@ -80,7 +81,9 @@ class _ContentSection extends StatelessWidget {
                 controlAffinity: ListTileControlAffinity.leading,
                 title: Row(
                   children: [
-                    Expanded(child: Text("Fact #${currentInvoices.docNumber}")),
+                    Expanded(
+                      child: Text("Fact #${currentInvoices.docNumber}"),
+                    ),
                     Expanded(
                       child: Text(
                         total,
@@ -89,7 +92,19 @@ class _ContentSection extends StatelessWidget {
                     ),
                   ],
                 ),
-                subtitle: Text(date),
+
+                subtitle: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(date),
+                  ],
+                ),
+                secondary: TextButton(
+                  onPressed: () {
+                    showInvoiceViewerDialog(context, currentInvoices);
+                  },
+                  child: const Text("Ver Factura"),
+                ),
               );
             },
           );

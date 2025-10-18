@@ -103,6 +103,9 @@ class _EntryHistoryViewer extends StatelessWidget {
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                         textAlign: TextAlign.center,
                       ),
+
+                      const SizedBox(height: 16),
+
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -120,11 +123,11 @@ class _EntryHistoryViewer extends StatelessWidget {
                       const SizedBox(height: 16),
                       Text(
                         "Sucursal: ${branch.name}",
-                        style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+                        style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
                       ),
                       Text(
                         "Proveedor: ${entryHistory.supplier.name}",
-                        style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+                        style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
                       ),
                       if (entryHistory.description.isNotEmpty)
                         Padding(
@@ -139,20 +142,36 @@ class _EntryHistoryViewer extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            "Elaborado por: ${entryHistory.createdBy.name}",
-                            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "Elaborado por:",
+                                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
+                              ),
+
+                              Text(
+                                entryHistory.createdBy.name,
+                                style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
+                              ),
+                            ],
                           ),
                           Row(
                             children: [
                               Text(
                                 DateTimeTool.formatddMMyy(entryHistory.createdAt),
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
                               ),
                               const Text(" | "),
                               Text(
                                 DateTimeTool.formatHHmm(entryHistory.createdAt),
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
                               ),
                             ],
                           ),
@@ -189,6 +208,7 @@ class _EntryHistoryViewer extends StatelessWidget {
                                     fontWeight: FontWeight.bold,
                                     fontSize: 14,
                                   ),
+                                  textAlign: TextAlign.center,
                                 ),
                               ),
                               Expanded(
@@ -198,6 +218,7 @@ class _EntryHistoryViewer extends StatelessWidget {
                                     fontWeight: FontWeight.bold,
                                     fontSize: 14,
                                   ),
+                                  textAlign: TextAlign.center,
                                 ),
                               ),
                               Expanded(
@@ -207,6 +228,7 @@ class _EntryHistoryViewer extends StatelessWidget {
                                     fontWeight: FontWeight.bold,
                                     fontSize: 14,
                                   ),
+                                  textAlign: TextAlign.center,
                                 ),
                               ),
                             ],
@@ -219,27 +241,35 @@ class _EntryHistoryViewer extends StatelessWidget {
                               final item = entryHistory.items[index];
                               final rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
                               return Container(
-                                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 4,
+                                  horizontal: 2,
+                                ),
                                 color: rowColor,
                                 child: Row(
                                   children: [
                                     Expanded(
                                       flex: 2,
-                                      child: Text(item.productName),
+                                      child: Text(
+                                        item.productName,
+                                      ),
                                     ), // Asumiendo que necesitas obtener el nombre
                                     Expanded(
                                       child: Text(
                                         item.quantity.toString(),
+                                        textAlign: TextAlign.center,
                                       ),
                                     ),
                                     Expanded(
                                       child: Text(
                                         NumberFormatter.convertToMoneyLike(item.cost),
+                                        textAlign: TextAlign.center,
                                       ),
                                     ),
                                     Expanded(
                                       child: Text(
                                         NumberFormatter.convertToMoneyLike(item.cost * item.quantity),
+                                        textAlign: TextAlign.center,
                                       ),
                                     ),
                                   ],
@@ -258,22 +288,33 @@ class _EntryHistoryViewer extends StatelessWidget {
                     height: 55,
                     child: DecoratedBox(
                       decoration: BoxDecoration(color: Colors.grey.shade200),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          const Text(
-                            "Total:",
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.grey),
-                          ),
-                          SizedBox(
-                            width: 100,
-                            child: Text(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            const SizedBox(
+                              width: 100,
+                              child: Text(
+                                "Total:",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: Colors.grey,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            Text(
                               NumberFormatter.convertToMoneyLike(entryHistory.total),
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
                               textAlign: TextAlign.end,
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),

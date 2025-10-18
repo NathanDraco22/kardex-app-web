@@ -10,7 +10,7 @@ import 'package:kardex_app_front/src/modules/commercial/client_invoices/cubit/wr
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/widgets/confirmation_send_modal.dart';
 import 'package:kardex_app_front/src/tools/session_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
-import 'package:kardex_app_front/widgets/custom_autocomplete_textfield.dart';
+import 'package:kardex_app_front/widgets/super_widgets/custom_autocomplete_textfield.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/text_field_date_selector.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';

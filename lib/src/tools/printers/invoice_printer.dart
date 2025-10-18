@@ -75,21 +75,23 @@ Future<Uint8List> generateTicketPdfFromInvoice(InvoiceInDb invoice, BranchInDb b
             pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
               children: [
-                pw.Text(
-                  "Telf: ${branch.phone}",
-                  style: pw.TextStyle(
-                    fontSize: TicketSettings.contentFontSize,
+                if (branch.phone.isNotEmpty)
+                  pw.Text(
+                    "Telf: ${branch.phone}",
+                    style: pw.TextStyle(
+                      fontSize: TicketSettings.contentFontSize,
+                    ),
+                    textAlign: pw.TextAlign.center,
                   ),
-                  textAlign: pw.TextAlign.center,
-                ),
 
-                pw.Text(
-                  "Email: ${branch.email}",
-                  style: pw.TextStyle(
-                    fontSize: TicketSettings.contentFontSize,
+                if (branch.email.isNotEmpty)
+                  pw.Text(
+                    "Email: ${branch.email}",
+                    style: pw.TextStyle(
+                      fontSize: TicketSettings.contentFontSize,
+                    ),
+                    textAlign: pw.TextAlign.center,
                   ),
-                  textAlign: pw.TextAlign.center,
-                ),
               ],
             ),
 

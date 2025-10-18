@@ -47,30 +47,38 @@ class ConfirmationSaveModal extends StatelessWidget {
           },
           icon: const Icon(Icons.close),
         ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title),
-            Text(
-              subtitle,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
+        title: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title),
+              Text(
+                subtitle,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 24),
-        child: CustomSlider(
-          hintText: "Desliza para Enviar",
-          hintIcon: Icons.save,
-          sliderColor: Colors.green,
-          sliderText: "Enviar",
-          onSubmit: () {
-            Navigator.pop(context, true);
-          },
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.only(
+            left: 16,
+            right: 16,
+            bottom: 12,
+          ),
+          child: CustomSlider(
+            hintText: "Desliza para Enviar",
+            hintIcon: Icons.save,
+            sliderColor: Colors.green,
+            sliderText: "Enviar",
+            onSubmit: () {
+              Navigator.pop(context, true);
+            },
+          ),
         ),
       ),
       body: content,

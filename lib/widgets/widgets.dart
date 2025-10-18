@@ -1,5 +1,5 @@
 export 'basic_table_listview.dart';
-export 'custom_autocomplete_textfield.dart';
+export 'super_widgets/custom_autocomplete_textfield.dart';
 export 'custom_listviews/confirmation_product_listview.dart';
 export 'custom_listviews/custom_listviews.dart';
 export 'custom_listviews/inventory_movement_product_list_view.dart';
@@ -12,7 +12,7 @@ export 'empty_scaffold.dart';
 export 'no_item.dart';
 export 'row_widgets/mobile_row.dart';
 export 'row_widgets/row_widgets.dart';
-export 'search_debounce.dart';
+export 'super_widgets/search_debounce.dart';
 export 'status_tag_label.dart';
 export 'tables/inventory_movement_product_table.dart';
 export 'tables/tables.dart';

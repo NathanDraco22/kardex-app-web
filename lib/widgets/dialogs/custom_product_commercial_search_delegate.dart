@@ -4,7 +4,7 @@ import 'package:kardex_app_front/src/domain/models/product/product_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/widgets/dialogs/commercial_product_modal.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
-import 'package:kardex_app_front/widgets/search_debounce.dart';
+import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 
 Future<CommercialProductResult?> showCommercialProductSearchDelegate(BuildContext context) async {
   return await Navigator.push<CommercialProductResult?>(

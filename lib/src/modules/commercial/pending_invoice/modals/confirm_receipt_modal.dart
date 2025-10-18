@@ -24,86 +24,88 @@ Future<bool?> showConfirmReceiptModal(
       return Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 600),
-          child: Container(
-            padding: const EdgeInsets.all(12.0),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              color: Colors.white,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  client.name,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                Text(
-                  client.location ?? "--",
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-
-                Text(
-                  "Facturas a Cancelar: ${invoices.length}",
-                  style: const TextStyle(
-                    fontSize: 18,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-
-                Text(
-                  "Total a Liquidar: $totalFormatted",
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(
-                  height: 16,
-                ),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.warning_amber_rounded,
-                      color: Colors.amber.shade900,
+          child: SafeArea(
+            child: Container(
+              padding: const EdgeInsets.all(12.0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: Colors.white,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    client.name,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
                     ),
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.amber.shade900,
+                    textAlign: TextAlign.center,
+                  ),
+                  Text(
+                    client.location ?? "--",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+
+                  Text(
+                    "Facturas a Cancelar: ${invoices.length}",
+                    style: const TextStyle(
+                      fontSize: 18,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+
+                  Text(
+                    "Total a Liquidar: $totalFormatted",
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(
+                    height: 16,
+                  ),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.warning_amber_rounded,
+                        color: Colors.amber.shade900,
+                      ),
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.amber.shade900,
+                            ),
                           ),
-                        ),
-                        child: Text(
-                          "Se liquidarán el monto y las facturas seleccionadas en el estado de cuenta de cliente, esta accion no se puede revertir",
-                          style: TextStyle(
-                            color: Colors.amber.shade900,
+                          child: Text(
+                            "Se liquidarán el monto y las facturas seleccionadas en el estado de cuenta de cliente, esta accion no se puede revertir",
+                            style: TextStyle(
+                              color: Colors.amber.shade900,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                const Spacer(),
-                CustomSlider(
-                  hintText: "Desliza para Liquidar",
-                  hintIcon: Icons.save_alt,
-                  sliderColor: Colors.teal.shade300,
-                  sliderText: "Liquidar",
-                  onSubmit: () {
-                    context.pop(true);
-                  },
-                ),
-              ],
+                    ],
+                  ),
+                  const Spacer(),
+                  CustomSlider(
+                    hintText: "Desliza para Liquidar",
+                    hintIcon: Icons.save_alt,
+                    sliderColor: Colors.teal.shade300,
+                    sliderText: "Liquidar",
+                    onSubmit: () {
+                      context.pop(true);
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),

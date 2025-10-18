@@ -99,6 +99,8 @@ class _ExitHistoryViewer extends StatelessWidget {
                     "Salida de Inventario",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
+
+                  const SizedBox(height: 16),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -107,22 +109,22 @@ class _ExitHistoryViewer extends StatelessWidget {
                         children: [
                           Text(
                             "Documento No. ${exitHistory.docNumber}",
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                           ),
                           Text(
                             DateTimeTool.formatddMMyy(exitHistory.docDate),
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                           ),
                         ],
                       ),
                       const SizedBox(height: 16),
                       Text(
                         "Sucursal: ${branch.name}",
-                        style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+                        style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
                       ),
                       Text(
                         "Cliente: ${exitHistory.client.name}",
-                        style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+                        style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
                       ),
                       if (exitHistory.description.isNotEmpty)
                         Padding(
@@ -136,20 +138,30 @@ class _ExitHistoryViewer extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            "Elaborado por: ${exitHistory.createdBy.name}",
-                            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "Elaborado por:",
+                                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
+                              ),
+
+                              Text(
+                                exitHistory.createdBy.name,
+                                style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
+                              ),
+                            ],
                           ),
                           Row(
                             children: [
                               Text(
                                 DateTimeTool.formatddMMyy(exitHistory.createdAt),
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                               ),
                               const Text(" | "),
                               Text(
                                 DateTimeTool.formatHHmm(exitHistory.createdAt),
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                               ),
                             ],
                           ),
@@ -185,6 +197,7 @@ class _ExitHistoryViewer extends StatelessWidget {
                                     fontWeight: FontWeight.bold,
                                     fontSize: 14,
                                   ),
+                                  textAlign: TextAlign.center,
                                 ),
                               ),
                               Expanded(
@@ -194,6 +207,7 @@ class _ExitHistoryViewer extends StatelessWidget {
                                     fontWeight: FontWeight.bold,
                                     fontSize: 14,
                                   ),
+                                  textAlign: TextAlign.center,
                                 ),
                               ),
                               Expanded(
@@ -203,6 +217,7 @@ class _ExitHistoryViewer extends StatelessWidget {
                                     fontWeight: FontWeight.bold,
                                     fontSize: 14,
                                   ),
+                                  textAlign: TextAlign.center,
                                 ),
                               ),
                             ],
@@ -231,11 +246,13 @@ class _ExitHistoryViewer extends StatelessWidget {
                                     Expanded(
                                       child: Text(
                                         item.quantity.toString(),
+                                        textAlign: TextAlign.center,
                                       ),
                                     ),
                                     Expanded(
                                       child: Text(
                                         NumberFormatter.convertToMoneyLike(item.cost ?? 0),
+                                        textAlign: TextAlign.center,
                                       ),
                                     ),
                                     Expanded(
@@ -243,6 +260,7 @@ class _ExitHistoryViewer extends StatelessWidget {
                                         NumberFormatter.convertToMoneyLike(
                                           (item.cost ?? 0) * item.quantity.abs(),
                                         ),
+                                        textAlign: TextAlign.center,
                                       ),
                                     ),
                                   ],
@@ -261,26 +279,30 @@ class _ExitHistoryViewer extends StatelessWidget {
                     height: 55,
                     child: DecoratedBox(
                       decoration: BoxDecoration(color: Colors.grey.shade200),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          const Text(
-                            "Total:",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              color: Colors.grey,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            const SizedBox(
+                              width: 100,
+                              child: Text(
+                                "Total:",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: Colors.grey,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
                             ),
-                          ),
-                          SizedBox(
-                            width: 100,
-                            child: Text(
+                            Text(
                               NumberFormatter.convertToMoneyLike(exitHistory.total),
                               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                               textAlign: TextAlign.end,
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
