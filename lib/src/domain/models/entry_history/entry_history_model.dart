@@ -1,3 +1,5 @@
+import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
+
 class EntryItem {
   final String productId;
   final String productName;
@@ -55,6 +57,7 @@ class EntryHistoryInDb {
   final String description;
   final List<EntryItem> items;
   final String id;
+  final UserInfo createdBy;
   final DateTime createdAt;
 
   int get total {
@@ -71,6 +74,7 @@ class EntryHistoryInDb {
     required this.items,
     required this.id,
     required this.createdAt,
+    required this.createdBy,
   });
 
   factory EntryHistoryInDb.fromJson(Map<String, dynamic> json) {
@@ -84,6 +88,7 @@ class EntryHistoryInDb {
       items: (json['items'] as List<dynamic>).map((item) => EntryItem.fromJson(item as Map<String, dynamic>)).toList(),
       id: json['id'] as String,
       createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
+      createdBy: UserInfo.fromJson(json['createdBy'] as Map<String, dynamic>),
     );
   }
 
@@ -98,6 +103,7 @@ class EntryHistoryInDb {
       'items': items.map((item) => item.toJson()).toList(),
       'id': id,
       'createdAt': createdAt.millisecondsSinceEpoch,
+      'createdBy': createdBy.toJson(),
     };
   }
 }

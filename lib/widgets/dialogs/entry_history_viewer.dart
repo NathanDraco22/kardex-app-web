@@ -98,8 +98,14 @@ class _EntryHistoryViewer extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      const Text(
+                        "Entrada de Inventario",
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        textAlign: TextAlign.center,
+                      ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             "Documento No. ${entryHistory.docNumber}",
@@ -128,8 +134,33 @@ class _EntryHistoryViewer extends StatelessWidget {
                             style: TextStyle(color: Colors.grey.shade700),
                           ),
                         ),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Elaborado por: ${entryHistory.createdBy.name}",
+                            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                DateTimeTool.formatddMMyy(entryHistory.createdAt),
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                              ),
+                              const Text(" | "),
+                              Text(
+                                DateTimeTool.formatHHmm(entryHistory.createdAt),
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ],
                   ),
+
                   const Divider(),
 
                   // --- SECCIÓN DE ITEMS ---

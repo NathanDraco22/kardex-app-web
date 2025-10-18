@@ -58,12 +58,14 @@ class _ContentSection extends StatelessWidget {
 
                     return BasicTableRow(
                       color: rowColor,
+                      onTap: () {
+                        showExitHistoryViewerDialog(context, currentExitHistory);
+                      },
                       cells: [
                         BasicTableCell(
                           content: Text(currentDocDate),
                         ),
                         BasicTableCell(
-                          // Cambiado a client.name
                           content: Text(currentExitHistory.client.name),
                         ),
                         BasicTableCell(

@@ -1,3 +1,5 @@
+import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
+
 class ExitItem {
   final String productId;
   final String productName;
@@ -56,6 +58,7 @@ class ExitHistoryInDb {
   final List<ExitItem> items;
   final String id;
   final DateTime createdAt;
+  final UserInfo createdBy;
 
   ExitHistoryInDb({
     required this.clientId,
@@ -67,6 +70,7 @@ class ExitHistoryInDb {
     required this.items,
     required this.id,
     required this.createdAt,
+    required this.createdBy,
   });
 
   int get total {
@@ -84,6 +88,7 @@ class ExitHistoryInDb {
       items: (json['items'] as List<dynamic>).map((item) => ExitItem.fromJson(item as Map<String, dynamic>)).toList(),
       id: json['id'] as String,
       createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
+      createdBy: UserInfo.fromJson(json['createdBy'] as Map<String, dynamic>),
     );
   }
 
@@ -98,6 +103,7 @@ class ExitHistoryInDb {
       'items': items.map((item) => item.toJson()).toList(),
       'id': id,
       'createdAt': createdAt.millisecondsSinceEpoch,
+      'createdBy': createdBy.toJson(),
     };
   }
 }

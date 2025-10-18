@@ -71,6 +71,9 @@ class _ContentSection extends StatelessWidget {
 
                     return BasicTableRow(
                       color: rowColor,
+                      onTap: () {
+                        showEntryHistoryViewerDialog(context, currentEntryHistory);
+                      },
                       cells: [
                         BasicTableCell(
                           content: Text(currentDocDate),

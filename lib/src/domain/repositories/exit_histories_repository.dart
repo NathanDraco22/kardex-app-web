@@ -25,4 +25,8 @@ class ExitHistoriesRepository {
     );
     return response;
   }
+
+  Future<ExitHistoryInDb?> getExitHistoryById(String exitHistoryId) async {
+    return null;
+  }
 }

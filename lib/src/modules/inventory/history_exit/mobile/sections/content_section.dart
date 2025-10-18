@@ -34,15 +34,30 @@ class _ContentSection extends StatelessWidget {
                   itemCount: exitHistories.length,
                   columns: [
                     BasicTableColumn(
-                      label: const Text("Fecha", style: TextStyle(fontWeight: FontWeight.bold)),
+                      label: const Text(
+                        "Fecha",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       flex: 1,
                     ),
                     BasicTableColumn(
-                      label: const Text("Cliente", style: TextStyle(fontWeight: FontWeight.bold)), // Cambiado
+                      label: const Text(
+                        "Cliente",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ), // Cambiado
                       flex: 1,
                     ),
                     BasicTableColumn(
-                      label: const Text("Documento", style: TextStyle(fontWeight: FontWeight.bold)),
+                      label: const Text(
+                        "Documento",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       flex: 1,
                     ),
                     BasicTableColumn(
@@ -63,6 +78,9 @@ class _ContentSection extends StatelessWidget {
 
                     return BasicTableRow(
                       color: rowColor,
+                      onTap: () {
+                        showExitHistoryViewerDialog(context, currentExitHistory);
+                      },
                       cells: [
                         BasicTableCell(
                           content: Text(currentDocDate),
