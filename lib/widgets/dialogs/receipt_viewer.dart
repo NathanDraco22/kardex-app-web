@@ -57,21 +57,50 @@ class _ReceiptViewer extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         "Recibo No. ${receipt.docNumber}",
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                       ),
-                      Text(
-                        DateTimeTool.formatddMMyy(receipt.createdAt),
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      Column(
+                        children: [
+                          Text(
+                            DateTimeTool.formatddMMyy(receipt.createdAt),
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                          ),
+                          Text(
+                            DateTimeTool.formatHHmm(receipt.createdAt),
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                          ),
+                        ],
                       ),
                     ],
                   ),
                   const SizedBox(height: 8),
-                  Text(currentBranch.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  Text(receipt.clientInfo.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  Text(
+                    currentBranch.name,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Text(
+                    "Cliente: ${receipt.clientInfo.name}",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+
+                  Text(
+                    "Elaborado por: ${receipt.createdBy.name}",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
                   const Divider(height: 24),
 
                   const Text("Facturas Aplicadas", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),

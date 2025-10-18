@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:kardex_app_front/src/domain/models/branch/branch.dart';
+import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
 import 'package:pdf/pdf.dart';
@@ -33,6 +34,8 @@ Future<Uint8List> generateTicketPdfFromInvoice(InvoiceInDb invoice, BranchInDb b
   );
 
   final branchImage = branch.image;
+
+  String paymentType = invoice.paymentType == PaymentType.credit ? "CREDITO" : "CONTADO";
 
   pdf.addPage(
     pw.Page(
@@ -90,71 +93,60 @@ Future<Uint8List> generateTicketPdfFromInvoice(InvoiceInDb invoice, BranchInDb b
               ],
             ),
 
+            pw.Text(
+              'FACTURA',
+              style: pw.TextStyle(
+                fontWeight: pw.FontWeight.bold,
+                fontSize: 12,
+              ),
+              textAlign: pw.TextAlign.center,
+            ),
+
             pw.Divider(color: PdfColors.grey),
 
             pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
               children: [
-                pw.Column(
-                  crossAxisAlignment: pw.CrossAxisAlignment.start,
-                  children: [
-                    pw.Text(
-                      'Factura:',
-                      style: pw.TextStyle(
-                        fontSize: TicketSettings.contentFontSize,
-                      ),
-                    ),
-                    pw.Text(
-                      invoice.docNumber,
-                      style: pw.TextStyle(
-                        fontSize: TicketSettings.contentFontSize,
-                      ),
-                    ),
-                  ],
+                pw.Text(
+                  'Factura: ${invoice.docNumber}',
+                  style: pw.TextStyle(
+                    fontSize: TicketSettings.contentFontSize,
+                  ),
                 ),
-                pw.Column(
-                  children: [
-                    pw.Text(
-                      'Fecha:',
-                      style: pw.TextStyle(
-                        fontSize: TicketSettings.contentFontSize,
-                      ),
-                    ),
-                    pw.Text(
-                      DateFormat('dd/MM/yyyy').format(invoice.createdAt),
-                      style: pw.TextStyle(
-                        fontSize: TicketSettings.contentFontSize,
-                      ),
-                    ),
-                  ],
+
+                pw.Text(
+                  DateFormat('dd/MM/yyyy').format(invoice.createdAt),
+                  style: pw.TextStyle(
+                    fontSize: TicketSettings.contentFontSize,
+                  ),
                 ),
               ],
+            ),
+
+            pw.Text(
+              paymentType,
+              style: pw.TextStyle(
+                fontSize: TicketSettings.contentFontSize,
+              ),
             ),
 
             pw.SizedBox(height: 6),
 
             if (invoice.clientInfo.name != "Sin Cliente")
               pw.Text(
-                invoice.clientInfo.name,
+                "Cliente: ${invoice.clientInfo.name}",
                 style: pw.TextStyle(
                   fontSize: TicketSettings.contentFontSize,
                 ),
               ),
-            pw.Divider(color: PdfColors.grey),
 
             pw.Text(
-              "Elaborado por:",
+              "Elaborado por: ${invoice.createdBy.name}",
               style: pw.TextStyle(
                 fontSize: TicketSettings.contentFontSize,
               ),
             ),
 
-            pw.Text(
-              invoice.createdBy.name,
-              style: pw.TextStyle(
-                fontSize: TicketSettings.contentFontSize,
-              ),
-            ),
             pw.Divider(color: PdfColors.grey),
 
             pw.Row(

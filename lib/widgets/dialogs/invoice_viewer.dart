@@ -119,8 +119,10 @@ class _InvoiceViewer extends StatelessWidget {
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text(
                                 "Factura",
@@ -141,12 +143,12 @@ class _InvoiceViewer extends StatelessWidget {
                           ),
                           Column(
                             children: [
-                              const Text(
-                                "Fecha",
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                              ),
                               Text(
                                 DateTimeTool.formatddMMyy(invoice.createdAt),
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                              ),
+                              Text(
+                                DateTimeTool.formatHHmm(invoice.createdAt),
                                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                               ),
                             ],
@@ -178,8 +180,17 @@ class _InvoiceViewer extends StatelessWidget {
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                       ),
                       Text(
-                        invoice.clientInfo.name,
+                        "Cliente: ${invoice.clientInfo.name}",
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+
+                      Row(
+                        children: [
+                          Text(
+                            "Elaborado por: ${invoice.createdBy.name}",
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                          ),
+                        ],
                       ),
                     ],
                   ),

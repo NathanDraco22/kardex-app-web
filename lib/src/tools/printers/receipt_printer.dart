@@ -60,18 +60,43 @@ Future<Uint8List> generateTicketPdfFromReceipt(ReceiptInDb receipt, BranchInDb b
             pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
               children: [
-                pw.Text("Telf: ${branch.phone}", style: pw.TextStyle(fontSize: TicketSettings.contentFontSize)),
-                pw.Text("Email: ${branch.email}", style: pw.TextStyle(fontSize: TicketSettings.contentFontSize)),
+                pw.Text(
+                  "Telf: ${branch.phone}",
+                  style: pw.TextStyle(
+                    fontSize: TicketSettings.contentFontSize,
+                  ),
+                ),
+                pw.Text(
+                  "Email: ${branch.email}",
+                  style: pw.TextStyle(
+                    fontSize: TicketSettings.contentFontSize,
+                  ),
+                ),
               ],
             ),
+
+            pw.Text(
+              'Recibo',
+              style: pw.TextStyle(
+                fontWeight: pw.FontWeight.bold,
+                fontSize: 10,
+              ),
+              textAlign: pw.TextAlign.center,
+            ),
+
             pw.Divider(color: PdfColors.grey),
 
             pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
               children: [
-                pw.Text('Recibo: ${receipt.docNumber}', style: pw.TextStyle(fontSize: TicketSettings.contentFontSize)),
                 pw.Text(
-                  'Fecha: ${DateFormat('dd/MM/yyyy').format(receipt.createdAt)}',
+                  'Recibo: ${receipt.docNumber}',
+                  style: pw.TextStyle(
+                    fontSize: TicketSettings.contentFontSize,
+                  ),
+                ),
+                pw.Text(
+                  DateFormat('dd/MM/yyyy').format(receipt.createdAt),
                   style: pw.TextStyle(fontSize: TicketSettings.contentFontSize),
                 ),
               ],
@@ -82,7 +107,6 @@ Future<Uint8List> generateTicketPdfFromReceipt(ReceiptInDb receipt, BranchInDb b
                 'Cliente: ${receipt.clientInfo.name}',
                 style: pw.TextStyle(fontSize: TicketSettings.contentFontSize),
               ),
-            pw.Divider(color: PdfColors.grey),
             pw.Text(
               'Elaborado por: ${receipt.createdBy.name}',
               style: pw.TextStyle(fontSize: TicketSettings.contentFontSize),
