@@ -79,13 +79,18 @@ class _ContentSection extends StatelessWidget {
                     final totalInMoney = NumberFormatter.convertToMoneyLike(currentEntryHistory.total);
 
                     return BasicTableRow(
+                      onTap: () {
+                        showEntryHistoryViewerDialog(context, currentEntryHistory);
+                      },
                       color: rowColor,
                       cells: [
                         BasicTableCell(
                           content: Text(currentDocDate),
                         ),
                         BasicTableCell(
-                          content: Text(currentEntryHistory.supplier.name),
+                          content: Text(
+                            currentEntryHistory.supplier.name,
+                          ),
                         ),
                         BasicTableCell(
                           content: Text(currentEntryHistory.docNumber),

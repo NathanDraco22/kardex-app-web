@@ -188,6 +188,7 @@ class MenuActions extends StatelessWidget {
                   final items = productTableController.rows.map((e) {
                     return ExitItem(
                       productId: e.product.id,
+                      productName: e.product.name,
                       quantity: (e.quantity * -1),
                     );
                   }).toList();

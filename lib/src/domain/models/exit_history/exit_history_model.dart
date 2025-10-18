@@ -1,10 +1,12 @@
 class ExitItem {
   final String productId;
+  final String productName;
   final int? cost;
   final int quantity;
 
   ExitItem({
     required this.productId,
+    required this.productName,
     this.cost,
     required this.quantity,
   });
@@ -12,6 +14,7 @@ class ExitItem {
   factory ExitItem.fromJson(Map<String, dynamic> json) {
     return ExitItem(
       productId: json['productId'] as String,
+      productName: json['productName'] as String,
       cost: json['cost'] as int?,
       quantity: json['quantity'] as int,
     );
@@ -20,6 +23,7 @@ class ExitItem {
   Map<String, dynamic> toJson() {
     return {
       'productId': productId,
+      'productName': productName,
       'cost': cost,
       'quantity': quantity,
     };

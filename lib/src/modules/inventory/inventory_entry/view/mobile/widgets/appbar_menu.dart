@@ -70,6 +70,7 @@ class _SaveButton extends StatelessWidget {
         final entryDocItems = mediator.productListViewController.rowCards.map((e) {
           return EntryItem(
             productId: e.product.id,
+            productName: e.product.name,
             quantity: e.quantity,
             cost: e.unitaryCost,
           );

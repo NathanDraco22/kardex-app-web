@@ -249,7 +249,7 @@ class _InvoiceViewer extends StatelessWidget {
                             },
                           ),
                         ),
-                        Divider(),
+                        const Divider(),
                         SizedBox(
                           height: 55,
                           child: Column(

@@ -70,6 +70,7 @@ class _SaveButton extends StatelessWidget {
         final exitDocItems = mediator.productListViewController.rowCards.map((e) {
           return ExitItem(
             productId: e.product.id,
+            productName: e.product.name,
             quantity: (e.quantity * -1),
           );
         });

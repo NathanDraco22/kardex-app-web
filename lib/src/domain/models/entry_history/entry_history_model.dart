@@ -1,10 +1,12 @@
 class EntryItem {
   final String productId;
+  final String productName;
   final int cost;
   final int quantity;
 
   EntryItem({
     required this.productId,
+    required this.productName,
     required this.cost,
     required this.quantity,
   });
@@ -12,6 +14,7 @@ class EntryItem {
   factory EntryItem.fromJson(Map<String, dynamic> json) {
     return EntryItem(
       productId: json['productId'] as String,
+      productName: json['productName'] as String,
       cost: json['cost'] as int,
       quantity: json['quantity'] as int,
     );
@@ -20,6 +23,7 @@ class EntryItem {
   Map<String, dynamic> toJson() {
     return {
       'productId': productId,
+      'productName': productName,
       'cost': cost,
       'quantity': quantity,
     };

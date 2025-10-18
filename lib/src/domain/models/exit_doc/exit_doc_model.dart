@@ -2,16 +2,19 @@ import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
 
 class ExitItem {
   final String productId;
+  final String productName;
   final int quantity;
 
   ExitItem({
     required this.productId,
+    required this.productName,
     required this.quantity,
   }) : assert(quantity < 0, 'La cantidad en una salida debe ser negativa.');
 
   factory ExitItem.fromJson(Map<String, dynamic> json) {
     return ExitItem(
       productId: json['productId'] as String,
+      productName: json['productName'] as String,
       quantity: json['quantity'] as int,
     );
   }
@@ -19,6 +22,7 @@ class ExitItem {
   Map<String, dynamic> toJson() {
     return {
       'productId': productId,
+      'productName': productName,
       'quantity': quantity,
     };
   }
