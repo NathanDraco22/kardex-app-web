@@ -88,6 +88,10 @@ class _InvoiceViewer extends StatelessWidget {
       0,
       (previousValue, element) => previousValue + element.totalDiscount,
     );
+    final invoiceSubTotal = invoice.saleItems.fold(
+      0,
+      (element, previousValue) => previousValue.subTotal + element,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -262,7 +266,7 @@ class _InvoiceViewer extends StatelessWidget {
                         ),
                         const Divider(),
                         SizedBox(
-                          height: 55,
+                          height: 65,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
@@ -271,11 +275,28 @@ class _InvoiceViewer extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   const Text(
+                                    "SubTotal:",
+                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                  ),
+                                  SizedBox(
+                                    width: 100,
+                                    child: Text(
+                                      NumberFormatter.convertToMoneyLike(invoiceSubTotal),
+                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                      textAlign: TextAlign.end,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  const Text(
                                     "Total Descuento:",
                                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                                   ),
                                   SizedBox(
-                                    width: 90,
+                                    width: 100,
                                     child: Text(
                                       NumberFormatter.convertToMoneyLike(totalDiscount),
                                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),

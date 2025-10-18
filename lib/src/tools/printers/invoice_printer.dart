@@ -37,6 +37,16 @@ Future<Uint8List> generateTicketPdfFromInvoice(InvoiceInDb invoice, BranchInDb b
 
   String paymentType = invoice.paymentType == PaymentType.credit ? "CREDITO" : "CONTADO";
 
+  final totalDiscount = invoice.saleItems.fold(
+    0,
+    (previousValue, element) => previousValue + element.totalDiscount,
+  );
+
+  final invoiceSubTotal = invoice.saleItems.fold(
+    0,
+    (element, previousValue) => previousValue.subTotal + element,
+  );
+
   pdf.addPage(
     pw.Page(
       pageFormat: pageFormat,
@@ -257,18 +267,85 @@ Future<Uint8List> generateTicketPdfFromInvoice(InvoiceInDb invoice, BranchInDb b
             pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.end,
               children: [
-                pw.Text(
-                  'TOTAL: ',
-                  style: pw.TextStyle(
-                    fontWeight: pw.FontWeight.bold,
-                    fontSize: TicketSettings.contentFontSize,
+                pw.SizedBox(
+                  width: 80,
+                  child: pw.Text(
+                    'SUBTOTAL: ',
+                    style: pw.TextStyle(
+                      fontWeight: pw.FontWeight.bold,
+                      fontSize: TicketSettings.contentFontSize,
+                    ),
+                    textAlign: pw.TextAlign.right,
                   ),
                 ),
-                pw.Text(
-                  currencyFormat.format(invoice.total / 100),
-                  style: pw.TextStyle(
-                    fontWeight: pw.FontWeight.bold,
-                    fontSize: TicketSettings.contentFontSize,
+
+                pw.SizedBox(
+                  width: 70,
+                  child: pw.Text(
+                    currencyFormat.format(invoiceSubTotal / 100),
+                    style: pw.TextStyle(
+                      fontWeight: pw.FontWeight.bold,
+                      fontSize: TicketSettings.contentFontSize,
+                    ),
+                    textAlign: pw.TextAlign.right,
+                  ),
+                ),
+              ],
+            ),
+
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.end,
+              children: [
+                pw.SizedBox(
+                  width: 80,
+                  child: pw.Text(
+                    'DESCUENTO: ',
+                    style: pw.TextStyle(
+                      fontWeight: pw.FontWeight.bold,
+                      fontSize: TicketSettings.contentFontSize,
+                    ),
+                    textAlign: pw.TextAlign.right,
+                  ),
+                ),
+
+                pw.SizedBox(
+                  width: 70,
+                  child: pw.Text(
+                    currencyFormat.format(totalDiscount / 100),
+                    style: pw.TextStyle(
+                      fontWeight: pw.FontWeight.bold,
+                      fontSize: TicketSettings.contentFontSize,
+                    ),
+                    textAlign: pw.TextAlign.right,
+                  ),
+                ),
+              ],
+            ),
+
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.end,
+              children: [
+                pw.SizedBox(
+                  width: 80,
+                  child: pw.Text(
+                    'TOTAL: ',
+                    style: pw.TextStyle(
+                      fontWeight: pw.FontWeight.bold,
+                      fontSize: TicketSettings.contentFontSize,
+                    ),
+                    textAlign: pw.TextAlign.right,
+                  ),
+                ),
+
+                pw.SizedBox(
+                  width: 70,
+                  child: pw.Text(
+                    currencyFormat.format(invoice.total / 100),
+                    style: pw.TextStyle(
+                      fontWeight: pw.FontWeight.bold,
+                      fontSize: TicketSettings.contentFontSize,
+                    ),
+                    textAlign: pw.TextAlign.right,
                   ),
                 ),
               ],
