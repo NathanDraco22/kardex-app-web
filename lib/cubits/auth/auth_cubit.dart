@@ -53,7 +53,7 @@ class AuthCubit extends Cubit<AuthState> {
         emit(Authenticated(loginResponse, branch, currentServin));
         return;
       }
-      emit(Unauthenticated());
+      emit(Unauthenticated(servin: currentServin));
     } on HttpServiceException catch (error) {
       if (error is UnauthorizedException) {
         if (isClosed) return;
@@ -101,8 +101,17 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> logout() async {
+    Servin? currentServin;
+    if (state is Authenticated) {
+      currentServin = (state as Authenticated).servin;
+    }
     TokenManager().removeToken();
     await SessionManager().removeSession();
-    emit(Unauthenticated());
+    emit(Unauthenticated(servin: currentServin));
+  }
+
+  Future<void> exitFromBusiness() async {
+    await servinRepository.clearCurrentServin();
+    emit(AuthInactive());
   }
 }

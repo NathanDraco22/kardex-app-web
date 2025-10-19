@@ -22,6 +22,7 @@ class _RootScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authCubit = context.read<AuthCubit>();
+    int secretCounter = 0;
     return BlocListener(
       bloc: authCubit,
       listener: (context, state) {
@@ -48,8 +49,41 @@ class _RootScaffold extends StatelessWidget {
           context.goNamed("login");
         }
       },
-      child: const Scaffold(
-        body: _Body(),
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0.0,
+          leading: IconButton(
+            onPressed: () {
+              secretCounter += 1;
+            },
+            onLongPress: () async {
+              if (secretCounter < 5) return;
+
+              String? buisinessName;
+              if (authCubit.state is Unauthenticated) {
+                buisinessName = (authCubit.state as Unauthenticated).servin?.name;
+              }
+
+              final res = await DialogManager.confirmActionDialog(
+                context,
+                "Deseas salir de ${buisinessName ?? "Este Negocio"}?",
+              );
+
+              if (!res) return;
+
+              await authCubit.exitFromBusiness();
+              if (!context.mounted) return;
+              context.goNamed("activation");
+            },
+            icon: const Icon(
+              Icons.close,
+              color: Colors.transparent,
+            ),
+          ),
+        ),
+        body: const _Body(),
       ),
     );
   }
@@ -69,6 +103,8 @@ class _BodyState extends State<_Body> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
+    final authCubit = context.read<AuthCubit>();
+
     return Container(
       height: screenSize.height,
       width: screenSize.width,
@@ -86,10 +122,28 @@ class _BodyState extends State<_Body> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Builder(
+                builder: (context) {
+                  final state = authCubit.state;
+                  if (state is Unauthenticated) {
+                    return Text(
+                      state.servin?.name ?? "",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white.withAlpha(210),
+                      ),
+                    );
+                  }
+
+                  return const SizedBox.shrink();
+                },
+              ),
+
               Text(
                 "Iniciar Sesion",
                 style: TextStyle(
-                  fontSize: 24,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Colors.white.withAlpha(210),
                 ),

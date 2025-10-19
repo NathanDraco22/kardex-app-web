@@ -15,7 +15,10 @@ final class Authenticated extends AuthState {
   Authenticated(this.session, this.branch, this.servin);
 }
 
-final class Unauthenticated extends AuthState {}
+final class Unauthenticated extends AuthState {
+  Servin? servin;
+  Unauthenticated({this.servin});
+}
 
 final class AuthError extends AuthState {
   final String message;

@@ -19,4 +19,8 @@ class ServinRepository {
     if (config == null) return null;
     return Servin.fromJson(config);
   }
+
+  Future<void> clearCurrentServin() async {
+    await AppConfigManager().clearConfig();
+  }
 }
