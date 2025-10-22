@@ -165,7 +165,11 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
           controller.updateRow(item, ClientInvoiceItem(res));
         },
         onEdit: (item) async {
-          final res = await showCommercialProductDialog(context, product: item.commercial.product);
+          final res = await showCommercialProductDialog(
+            context,
+            product: item.commercial.product,
+            commercialProductResult: item.commercial,
+          );
           if (res == null) return;
           if (res.quantity == 0) return;
           controller.updateRow(item, ClientInvoiceItem(res));
@@ -197,6 +201,7 @@ class InvoiceTableRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final product = item.commercial.product;
     final price = NumberFormatter.convertToMoneyLike(product.saleProfile.salePrice);
+    final edittedPrice = NumberFormatter.convertToMoneyLike(item.commercial.newPrice);
     final subTotal = NumberFormatter.convertToMoneyLike(item.commercial.subTotal);
     final totalDiscount = NumberFormatter.convertToMoneyLike(item.commercial.totalDiscount);
     final percenValue = item.commercial.discountPercent;
@@ -268,7 +273,6 @@ class InvoiceTableRow extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(item.commercial.quantity.toString()),
-                  // Text("1000 + 300"),
                 ],
               ),
             ),
@@ -277,7 +281,18 @@ class InvoiceTableRow extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(price),
+                  Text(
+                    price,
+                    style: TextStyle(
+                      decoration: price != edittedPrice ? TextDecoration.lineThrough : null,
+                    ),
+                  ),
+                  Text(
+                    edittedPrice,
+                    style: TextStyle(
+                      fontWeight: price != edittedPrice ? FontWeight.bold : null,
+                    ),
+                  ),
                 ],
               ),
             ),

@@ -24,9 +24,9 @@ class ProductInvoiceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final priceFormatted = NumberFormatter.convertFromCentsToDouble(item.product.saleProfile.salePrice);
+    final priceFormatted = NumberFormatter.convertFromCentsToDouble(item.newPrice);
     final discountFormatted = NumberFormatter.convertFromCentsToDouble(item.totalDiscount);
-    final totalFormatted = NumberFormatter.convertFromCentsToDouble(item.total);
+    final totalFormatted = NumberFormatter.convertToMoneyLike(item.total);
 
     Offset? offset;
 

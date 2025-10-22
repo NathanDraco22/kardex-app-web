@@ -271,7 +271,7 @@ CreateInvoice createInvoiceFromControllers(
       return SaleItem(
         product: ProductItem.fromJson(product.toJson()),
         cost: product.account.averageCost,
-        price: product.saleProfile.salePrice,
+        price: e.commercial.newPrice,
         quantity: e.commercial.quantity,
         discountPercentage: e.commercial.discountPercent,
         totalDiscount: e.commercial.totalDiscount,

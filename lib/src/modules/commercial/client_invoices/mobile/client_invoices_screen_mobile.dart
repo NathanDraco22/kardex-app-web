@@ -81,8 +81,13 @@ class _RootScaffold extends StatelessWidget {
                     onPressed: isEmptyItems
                         ? null
                         : () async {
-                            final saleItems = createSaleItemFromCommercial(viewController.items);
-                            await showInvoiceClientMenuScreen(context, saleItems);
+                            final saleItems = createSaleItemFromCommercial(
+                              viewController.items,
+                            );
+                            await showInvoiceClientMenuScreen(
+                              context,
+                              saleItems,
+                            );
                           },
                     label: Text(saveButton),
                     icon: Icon(saveIcon),
@@ -118,7 +123,9 @@ class _Body extends StatelessWidget {
                 child: ListenableBuilder(
                   listenable: viewController,
                   builder: (context, _) {
-                    final formattedTotal = NumberFormatter.convertToMoneyLike(viewController.totalAmount);
+                    final formattedTotal = NumberFormatter.convertToMoneyLike(
+                      viewController.totalAmount,
+                    );
 
                     return Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -201,7 +208,11 @@ class _Body extends StatelessWidget {
                         percentDiscount: currentCommercial.selectedDisocunt?.percentValue ?? 0,
                         onRemove: () => viewController.removeItem(currentCommercial),
                         onEdit: () async {
-                          final res = await showCommercialProductModal(context, product: currentCommercial.product);
+                          final res = await showCommercialProductModal(
+                            context,
+                            product: currentCommercial.product,
+                            commercialProductResult: currentCommercial,
+                          );
                           if (res == null) return;
                           viewController.updateItem(
                             currentCommercial,
@@ -235,7 +246,7 @@ List<SaleItem> createSaleItemFromCommercial(List<CommercialProductResult> items)
     return SaleItem(
       product: ProductItem.fromJson(product.toJson()),
       cost: product.account.averageCost,
-      price: product.saleProfile.salePrice,
+      price: commercial.newPrice,
       quantity: commercial.quantity,
       discountPercentage: commercial.discountPercent,
       totalDiscount: commercial.totalDiscount,

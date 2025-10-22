@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/models.dart';
 import 'package:kardex_app_front/src/domain/models/product_sale_profile/product_sale_profile_model.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
@@ -10,19 +12,26 @@ import 'models/commercial_product_result.dart';
 Future<CommercialProductResult?> showCommercialProductDialog(
   BuildContext context, {
   required ProductInDbInBranch product,
+  CommercialProductResult? commercialProductResult,
 }) async {
   return await showDialog<CommercialProductResult?>(
     barrierDismissible: false,
     context: context,
     builder: (context) => CommercialProductDialog(
       product: product,
+      commercialProductResult: commercialProductResult,
     ),
   );
 }
 
 class CommercialProductDialog extends StatelessWidget {
-  const CommercialProductDialog({super.key, required this.product});
+  const CommercialProductDialog({
+    super.key,
+    required this.product,
+    this.commercialProductResult,
+  });
   final ProductInDbInBranch product;
+  final CommercialProductResult? commercialProductResult;
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +44,7 @@ class CommercialProductDialog extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           child: _FormContent(
             product: product,
+            commercialProductResult: commercialProductResult,
           ),
         ),
       ),
@@ -45,9 +55,11 @@ class CommercialProductDialog extends StatelessWidget {
 class _FormContent extends StatefulWidget {
   const _FormContent({
     required this.product,
+    this.commercialProductResult,
   });
 
   final ProductInDbInBranch product;
+  final CommercialProductResult? commercialProductResult;
 
   @override
   State<_FormContent> createState() => _FormContentState();
@@ -62,7 +74,12 @@ class _FormContentState extends State<_FormContent> {
   @override
   void initState() {
     super.initState();
-    commercialProductResult = CommercialProductResult(product: widget.product);
+    if (widget.commercialProductResult != null) {
+      commercialProductResult = widget.commercialProductResult!;
+    } else {
+      commercialProductResult = CommercialProductResult(product: widget.product);
+    }
+
     discountsAvailable = widget.product.saleProfile.discounts.map(
       (e) {
         return DropdownMenuItem(
@@ -82,8 +99,11 @@ class _FormContentState extends State<_FormContent> {
 
   @override
   Widget build(BuildContext context) {
+    final authState = context.read<AuthCubit>().state;
+    if (authState is! Authenticated) return const SizedBox.shrink();
+    final isUserAdmin = authState.session.user.role == "Admin";
     final product = commercialProductResult.product;
-    final price = NumberFormatter.convertToMoneyLike(product.saleProfile.salePrice);
+    double price = NumberFormatter.convertFromCentsToDouble(commercialProductResult.newPrice);
     final subtotal = NumberFormatter.convertToMoneyLike(commercialProductResult.subTotal);
     final totalDiscount = NumberFormatter.convertToMoneyLike(commercialProductResult.totalDiscount);
     final total = NumberFormatter.convertToMoneyLike(commercialProductResult.total);
@@ -182,11 +202,23 @@ class _FormContentState extends State<_FormContent> {
                               Flexible(
                                 fit: FlexFit.tight,
 
-                                child: TitleLabel(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  spacing: 12,
-                                  title: "Precio",
-                                  bigTitle: price,
+                                child: SizedBox(
+                                  height: 90,
+                                  child: TitleTextField(
+                                    readOnly: isUserAdmin ? false : true,
+                                    titleTextAlign: TextAlign.center,
+                                    initialValue: price.toString(),
+                                    inputFormatters: [DecimalTextInputFormatter()],
+                                    keyboardType: TextInputType.number,
+                                    onChanged: (value) {
+                                      final rowDecimal = double.tryParse(value) ?? 0.0;
+                                      final rowInteger = NumberFormatter.convertFromDoubleToCents(rowDecimal);
+
+                                      commercialProductResult.newPrice = int.tryParse(rowInteger.toString()) ?? 0;
+                                      setState(() {});
+                                    },
+                                    title: "Precio",
+                                  ),
                                 ),
                               ),
                               Flexible(
@@ -211,22 +243,27 @@ class _FormContentState extends State<_FormContent> {
 
                           const SizedBox(height: 12),
 
-                          DropdownButtonFormField(
-                            initialValue: commercialProductResult.selectedDisocunt,
-                            items: discountsAvailable.toList(),
-                            decoration: InputDecoration(
-                              suffixIcon: IconButton(
-                                onPressed: () {
-                                  commercialProductResult.selectedDisocunt = null;
-                                  setState(() {});
-                                },
-                                icon: const Icon(Icons.close),
+                          AbsorbPointer(
+                            absorbing:
+                                commercialProductResult.newPrice !=
+                                commercialProductResult.product.saleProfile.salePrice,
+                            child: DropdownButtonFormField(
+                              initialValue: commercialProductResult.selectedDisocunt,
+                              items: discountsAvailable.toList(),
+                              decoration: InputDecoration(
+                                suffixIcon: IconButton(
+                                  onPressed: () {
+                                    commercialProductResult.selectedDisocunt = null;
+                                    setState(() {});
+                                  },
+                                  icon: const Icon(Icons.close),
+                                ),
                               ),
+                              onChanged: (value) {
+                                commercialProductResult.selectedDisocunt = value;
+                                setState(() {});
+                              },
                             ),
-                            onChanged: (value) {
-                              commercialProductResult.selectedDisocunt = value;
-                              setState(() {});
-                            },
                           ),
                         ],
                       ),

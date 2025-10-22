@@ -44,7 +44,9 @@ class AuthCubit extends Cubit<AuthState> {
 
         TokenManager().storeToken(loginResponse.accessToken);
 
-        final branch = await branchesRepository.getBranchById(BranchesTool.getCurrentBranchId());
+        final branch = await branchesRepository.getBranchById(
+          BranchesTool.getCurrentBranchId(),
+        );
 
         if (branch == null) {
           throw Exception("Branch not found");
@@ -86,7 +88,9 @@ class AuthCubit extends Cubit<AuthState> {
 
       TokenManager().storeToken(loginResponse.accessToken);
 
-      final branch = await branchesRepository.getBranchById(BranchesTool.getCurrentBranchId());
+      final branch = await branchesRepository.getBranchById(
+        BranchesTool.getCurrentBranchId(),
+      );
 
       if (branch == null) {
         throw Exception("Branch not found");
