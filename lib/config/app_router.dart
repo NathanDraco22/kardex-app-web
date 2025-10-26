@@ -20,6 +20,7 @@ import 'package:kardex_app_front/src/modules/inventory/history_exit/history_exit
 import 'package:kardex_app_front/src/modules/inventory/inventory_entry/view/inventory_entry_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_exit/view/inventory_exit_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_menu_screen.dart';
+import 'package:kardex_app_front/src/modules/inventory/product_movements/view/product_movements_screen.dart';
 import 'package:kardex_app_front/src/modules/login/login_screen.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/product_category/view/product_category_screen.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/product_list/view/product_list_screen.dart';
@@ -183,6 +184,11 @@ class AppRouter {
             path: "history-exit",
             name: "history-exit",
             builder: (context, state) => const HistoryExitScreen(),
+          ),
+          GoRoute(
+            path: "product-movements",
+            name: "product-movements",
+            builder: (context, state) => const ProductMovementsScreen(),
           ),
         ],
       ),

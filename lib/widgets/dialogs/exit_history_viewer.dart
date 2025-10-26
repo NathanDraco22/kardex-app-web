@@ -89,7 +89,7 @@ class _ExitHistoryViewer extends StatelessWidget {
         child: Center(
           child: Container(
             color: Colors.white,
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 600),
               child: Column(
@@ -108,7 +108,7 @@ class _ExitHistoryViewer extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "Documento No. ${exitHistory.docNumber}",
+                            "No. ${exitHistory.docNumber}",
                             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                           ),
                           Text(

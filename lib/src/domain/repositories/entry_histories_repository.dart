@@ -28,7 +28,9 @@ class EntryHistoriesRepository {
     return response;
   }
 
-  Future<EntryHistoryInDb?> getEntryHistoryById(String entryHistoryId) async {
-    return null;
+  Future<EntryHistoryInDb> getEntryHistoryById(String entryHistoryId) async {
+    final results = await entryHistoriesDataSource.getEntryHistoryById(entryHistoryId);
+    final response = EntryHistoryInDb.fromJson(results);
+    return response;
   }
 }

@@ -50,18 +50,23 @@ class _ReceiptViewer extends StatelessWidget {
         child: Center(
           child: Ink(
             color: Colors.white,
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 600),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  const Text(
+                    "Recibo",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    textAlign: TextAlign.center,
+                  ),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "Recibo No. ${receipt.docNumber}",
+                        "No. ${receipt.docNumber}",
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                       ),
                       Column(

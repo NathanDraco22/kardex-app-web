@@ -84,6 +84,20 @@ class _Body extends StatelessWidget {
             onTap: () => context.pushNamed("history-exit"),
           ),
           const Divider(height: 0.0),
+          const Divider(
+            height: 4.0,
+            thickness: 2,
+          ),
+          ListTile(
+            leading: const Icon(
+              Icons.sync,
+              color: Colors.teal,
+            ),
+            title: const Text("Movimientos de un Producto"),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.pushNamed("product-movements"),
+          ),
+          const Divider(height: 0.0),
         ],
       ),
     );

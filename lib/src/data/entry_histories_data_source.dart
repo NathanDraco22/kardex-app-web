@@ -34,4 +34,11 @@ class EntryHistoriesDataSource with HttpService {
     final res = await getQuery(uri, headers: headers);
     return res;
   }
+
+  Future<Map<String, dynamic>> getEntryHistoryById(String id) async {
+    final uri = HttpTools.generateUri("$_endpoint/$id");
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
+    return res;
+  }
 }

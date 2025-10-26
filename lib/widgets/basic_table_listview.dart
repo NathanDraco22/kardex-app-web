@@ -104,6 +104,7 @@ class BasicTableListView extends StatelessWidget {
                 return Material(
                   color: Colors.transparent,
                   child: InkWell(
+                    hoverColor: Colors.amber.shade100,
                     onTap: tableRow.onTap,
                     child: Ink(
                       color: tableRow.color,

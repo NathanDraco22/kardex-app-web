@@ -33,4 +33,11 @@ class ExitHistoriesDataSource with HttpService {
     final res = await getQuery(uri, headers: headers);
     return res;
   }
+
+  Future<Map<String, dynamic>> getExitHistoryById(String id) async {
+    final uri = HttpTools.generateUri("$_endpoint/$id");
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
+    return res;
+  }
 }

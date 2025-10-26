@@ -26,7 +26,9 @@ class ExitHistoriesRepository {
     return response;
   }
 
-  Future<ExitHistoryInDb?> getExitHistoryById(String exitHistoryId) async {
-    return null;
+  Future<ExitHistoryInDb> getExitHistoryById(String exitHistoryId) async {
+    final results = await exitHistoriesDataSource.getExitHistoryById(exitHistoryId);
+    final response = ExitHistoryInDb.fromJson(results);
+    return response;
   }
 }

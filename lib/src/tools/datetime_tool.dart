@@ -22,3 +22,14 @@ class DateTimeTool {
     return DateTime(now.year, now.month, now.day);
   }
 }
+
+extension DateTimeExtension on DateTime {
+  DateTime startOfDay() => DateTime(year, month, day);
+  DateTime endOfDay() {
+    final tomorrow = DateTime(year, month, day).add(
+      const Duration(days: 1),
+    );
+
+    return tomorrow.subtract(const Duration(milliseconds: 1));
+  }
+}
