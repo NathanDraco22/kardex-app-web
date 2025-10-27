@@ -171,6 +171,21 @@ class _Body extends StatelessWidget {
               },
             ),
           const Divider(height: 0.0),
+
+          const Divider(
+            height: 4.0,
+            thickness: 2,
+          ),
+
+          ListTile(
+            leading: const Icon(
+              Icons.timer_sharp,
+              color: Colors.amber,
+            ),
+            title: const Text("Bitacora de Vencimientos"),
+            onTap: () => context.pushNamed("expiration-logs"),
+          ),
+          const Divider(height: 0.0),
         ],
       ),
     );

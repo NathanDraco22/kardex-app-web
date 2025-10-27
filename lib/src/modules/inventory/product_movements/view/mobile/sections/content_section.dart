@@ -78,18 +78,18 @@ class _ContentSection extends StatelessWidget {
                       Expanded(
                         flex: 2,
                         child: Text(
-                          "Tipo Documento",
+                          "Documento",
                           style: TextStyle(
                             fontWeight: FontWeight.w500,
                           ),
-                          textAlign: TextAlign.center,
+                          textAlign: TextAlign.start,
                         ),
                       ),
                       Expanded(
                         flex: 2,
 
                         child: Text(
-                          "Costo Unitario",
+                          "Costo",
                           style: TextStyle(
                             fontWeight: FontWeight.w500,
                           ),
@@ -260,14 +260,25 @@ class MovementMobileRow extends StatelessWidget {
                 flex: 2,
                 child: Row(
                   spacing: 4,
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     icon,
-                    Text(
-                      currentTransaction.subtype.value,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w500,
-                      ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          currentTransaction.subtype.value,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Text(
+                          "#${currentTransaction.docNumber}",
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

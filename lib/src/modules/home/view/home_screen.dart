@@ -4,7 +4,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/constants/const_modules.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/cubits/toast/toast_cubit.dart';
 import 'package:kardex_app_front/src/core/access_manager.dart';
+import 'package:kardex_app_front/src/tools/branches_tool.dart';
+import 'package:toastification/toastification.dart';
 
 import 'widgets/home_end_drawer.dart';
 
@@ -34,25 +37,52 @@ class _RootScaffold extends StatelessWidget {
     }
 
     final user = authState.session.user;
-    return Scaffold(
-      endDrawer: HomeEndDrawer(user: user),
-      appBar: AppBar(
-        title: const Text("Sistema Neptuno"),
-        actions: [
-          const AvatarButton(),
-          const SizedBox(width: 12),
-        ],
+
+    return BlocListener<ToastCubit, ToastState>(
+      listener: (context, state) {
+        if (state is! ToastMessage) {
+          return;
+        }
+        toastification.show(
+          context: context,
+          type: ToastificationType.warning,
+          title: Text(state.message),
+          backgroundColor: Colors.amber.shade100,
+        );
+      },
+      child: Scaffold(
+        endDrawer: HomeEndDrawer(user: user),
+        appBar: AppBar(
+          title: const Text("Sistema Neptuno"),
+          actions: [
+            const AvatarButton(),
+            const SizedBox(width: 12),
+          ],
+        ),
+        backgroundColor: Colors.white,
+        body: const _Body(),
       ),
-      backgroundColor: Colors.white,
-      body: const _Body(),
     );
   }
 }
 
-class AvatarButton extends StatelessWidget {
+class AvatarButton extends StatefulWidget {
   const AvatarButton({
     super.key,
   });
+
+  @override
+  State<AvatarButton> createState() => _AvatarButtonState();
+}
+
+class _AvatarButtonState extends State<AvatarButton> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    context.read<ToastCubit>().hasNearExpiration(
+      BranchesTool.getCurrentBranchId(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

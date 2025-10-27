@@ -12,10 +12,17 @@ class DateTimeTool {
     return formatter.format(datetime);
   }
 
+  static String formatMMyy(DateTime datetime) {
+    final formatter = DateFormat('MM-yy');
+    return formatter.format(datetime);
+  }
+
   static String formatHHmm(DateTime datetime) {
     final formatter = DateFormat('hh:mm a');
     return formatter.format(datetime);
   }
+
+  static DateTime fromMMYY(String date) => DateFormat('M/yy').parse(date);
 
   static DateTime getTodayMidnight() {
     final now = DateTime.now();

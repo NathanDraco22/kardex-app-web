@@ -5,6 +5,7 @@ export 'entry_doc_repository.dart';
 export 'entry_histories_repository.dart';
 export 'exit_doc_repository.dart';
 export 'exit_histories_repository.dart';
+export 'expiration_logs_repository.dart';
 export 'inventories_repository.dart';
 export 'invoice_repository.dart';
 export 'order_repository.dart';

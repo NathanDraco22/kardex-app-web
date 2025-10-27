@@ -77,7 +77,7 @@ class _ContentSection extends StatelessWidget {
                       Expanded(
                         flex: 2,
                         child: Text(
-                          "Tipo Documento",
+                          "Documento",
                           style: TextStyle(
                             fontWeight: FontWeight.w500,
                           ),
@@ -261,14 +261,26 @@ class MovementWebRow extends StatelessWidget {
               Expanded(
                 flex: 2,
                 child: Row(
-                  spacing: 4,
+                  spacing: 8,
                   children: [
                     icon,
-                    Text(
-                      currentTransaction.subtype.value,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w500,
-                      ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          currentTransaction.subtype.value,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Text(
+                          "#${currentTransaction.docNumber}",
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                          ),
+                          textAlign: TextAlign.start,
+                        ),
+                      ],
                     ),
                   ],
                 ),

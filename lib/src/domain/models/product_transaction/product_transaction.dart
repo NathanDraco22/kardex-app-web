@@ -13,6 +13,7 @@ enum TransactionSubType {
 
 class BaseProductTransaction {
   final String documentId;
+  final String docNumber;
   final TransactionType type;
   final TransactionSubType subtype;
   final String productId;
@@ -23,6 +24,7 @@ class BaseProductTransaction {
 
   BaseProductTransaction({
     required this.documentId,
+    required this.docNumber,
     required this.type,
     required this.subtype,
     required this.productId,
@@ -34,6 +36,7 @@ class BaseProductTransaction {
 
   factory BaseProductTransaction.fromJson(Map<String, dynamic> json) => BaseProductTransaction(
     documentId: json['documentId'],
+    docNumber: json['docNumber'],
     type: TransactionType.values.byName(json['type']),
     subtype: TransactionSubType.values.byName(json['subtype']),
     productId: json['productId'],
@@ -45,6 +48,7 @@ class BaseProductTransaction {
 
   Map<String, dynamic> toJson() => {
     'documentId': documentId,
+    'docNumber': docNumber,
     'type': type.name,
     'subtype': subtype.name,
     'productId': productId,
@@ -62,6 +66,7 @@ class ProductTransactionInDb extends BaseProductTransaction {
   ProductTransactionInDb({
     required this.id,
     required super.documentId,
+    required super.docNumber,
     required super.type,
     required super.subtype,
     required super.productId,
@@ -75,6 +80,7 @@ class ProductTransactionInDb extends BaseProductTransaction {
   factory ProductTransactionInDb.fromJson(Map<String, dynamic> json) => ProductTransactionInDb(
     id: json['id'],
     documentId: json['documentId'],
+    docNumber: json['docNumber'],
     type: TransactionType.values.byName(json['type']),
     subtype: TransactionSubType.values.byName(json['subtype']),
     productId: json['productId'],

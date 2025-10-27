@@ -15,6 +15,7 @@ import 'package:kardex_app_front/src/modules/finance/finances_menu_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/paid_invoices/paid_invoices_screen.dart';
 import 'package:kardex_app_front/src/modules/home/view/home_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/current_inventory/current_inventory_screen.dart';
+import 'package:kardex_app_front/src/modules/inventory/expiration_logs/expiration_logs_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/history_entry/history_entry_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/history_exit/history_exit_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_entry/view/inventory_entry_screen.dart';
@@ -189,6 +190,11 @@ class AppRouter {
             path: "product-movements",
             name: "product-movements",
             builder: (context, state) => const ProductMovementsScreen(),
+          ),
+          GoRoute(
+            path: "expiration-logs",
+            name: "expiration-logs",
+            builder: (context, state) => const ExpirationLogsScreen(),
           ),
         ],
       ),

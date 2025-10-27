@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/cubits/config_app/config_app_cubit.dart';
+import 'package:kardex_app_front/cubits/toast/toast_cubit.dart';
 import 'package:kardex_app_front/src/data/data.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 
@@ -33,6 +34,7 @@ class ProviderContainer extends StatelessWidget {
     final authDataSource = AuthDataSource();
     final servinDataSource = ServinDataSource();
     final productTransactionDataSource = ProductTransactionsDataSource();
+    final expirationLogsDataSource = ExpirationLogsDataSource();
 
     return MultiRepositoryProvider(
       providers: [
@@ -127,6 +129,12 @@ class ProviderContainer extends StatelessWidget {
             productTransactionDataSource,
           ),
         ),
+
+        RepositoryProvider(
+          create: (context) => ExpirationLogsRepository(
+            expirationLogsDataSource,
+          ),
+        ),
       ],
       child: GlobalCubitProvider(
         child: child,
@@ -145,6 +153,7 @@ class GlobalCubitProvider extends StatelessWidget {
     final authRepo = context.read<AuthRepository>();
     final branchRepo = context.read<BranchesRepository>();
     final servinRepo = context.read<ServinRepository>();
+    final expirationLogRepo = context.read<ExpirationLogsRepository>();
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => ConfigAppCubit()),
@@ -153,6 +162,11 @@ class GlobalCubitProvider extends StatelessWidget {
             authRepository: authRepo,
             branchesRepository: branchRepo,
             servinRepository: servinRepo,
+          ),
+        ),
+        BlocProvider(
+          create: (context) => ToastCubit(
+            expirationLogsRepository: expirationLogRepo,
           ),
         ),
       ],
