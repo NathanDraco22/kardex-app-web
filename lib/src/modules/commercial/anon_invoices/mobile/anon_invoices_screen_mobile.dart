@@ -223,7 +223,7 @@ List<SaleItem> createSaleItemFromCommercial(List<CommercialProductResult> items)
     return SaleItem(
       product: ProductItem.fromJson(product.toJson()),
       cost: product.account.averageCost,
-      price: product.saleProfile.salePrice,
+      price: commercial.newPrice,
       quantity: commercial.quantity,
       discountPercentage: commercial.discountPercent,
       totalDiscount: commercial.totalDiscount,
