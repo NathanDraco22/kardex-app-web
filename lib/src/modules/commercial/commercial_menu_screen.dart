@@ -93,19 +93,19 @@ class _Body extends StatelessWidget {
                 context.pushNamed("sale-order");
               },
             ),
-          const Divider(height: 0.0),
-          if (accessManager.hasCurrentAccess(context, CommercialSubModules.createInvoice))
-            ListTile(
-              leading: Icon(
-                FluentIcons.person_money_20_filled,
-                size: 32,
-                color: Colors.green.shade600,
-              ),
-              title: const Text("Facturacion a Clientes"),
-              onTap: () {
-                context.pushNamed("client-invoice");
-              },
-            ),
+          // const Divider(height: 0.0),
+          // if (accessManager.hasCurrentAccess(context, CommercialSubModules.createInvoice))
+          //   ListTile(
+          //     leading: Icon(
+          //       FluentIcons.person_money_20_filled,
+          //       size: 32,
+          //       color: Colors.green.shade600,
+          //     ),
+          //     title: const Text("Facturacion a Clientes"),
+          //     onTap: () {
+          //       context.pushNamed("client-invoice");
+          //     },
+          //   ),
           const Divider(height: 0.0),
 
           if (accessManager.hasCurrentAccess(
@@ -157,12 +157,13 @@ class _Body extends StatelessWidget {
             thickness: 2,
           ),
 
-          if (accessManager.hasCurrentAccess(context, CommercialSubModules.priceSetting))
+          if (accessManager.hasCurrentAccess(context, CommercialSubModules.processDevolution))
             ListTile(
               leading: Icon(
-                FluentIcons.money_calculator_20_filled,
+                Icons.file_open_rounded,
+
                 size: 32,
-                color: Colors.blue.shade600,
+                color: Colors.orange.shade600,
               ),
               title: const Text("Devoluciones"),
               onTap: () {
@@ -171,10 +172,10 @@ class _Body extends StatelessWidget {
             ),
           const Divider(height: 0.0),
 
-          if (accessManager.hasCurrentAccess(context, CommercialSubModules.priceSetting))
+          if (accessManager.hasCurrentAccess(context, CommercialSubModules.createDevolution))
             ListTile(
               leading: Icon(
-                FluentIcons.money_calculator_20_filled,
+                Icons.file_open_rounded,
                 size: 32,
                 color: Colors.blue.shade600,
               ),

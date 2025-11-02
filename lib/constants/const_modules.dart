@@ -16,4 +16,7 @@ class CommercialSubModules {
   static const String pendingInvoices = "pendingInvoices";
   static const String invoiceHistory = "invoiceHistory";
   static const String priceSetting = "priceSetting";
+  static const String createDevolution = "createDevolution";
+  static const String deviationHistory = "devolutionHistory";
+  static const String processDevolution = "processDevolution";
 }

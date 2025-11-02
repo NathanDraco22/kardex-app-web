@@ -7,6 +7,7 @@ import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_app_front/src/tools/printers/devolution_printer.dart';
 
 Future<void> showDevolutionViewerDialog(BuildContext context, DevolutionInDb devolution) async {
   final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
@@ -17,8 +18,8 @@ Future<void> showDevolutionViewerDialog(BuildContext context, DevolutionInDb dev
         return _DevolutionViewer(
           devolution: devolution,
           branch: currentBranch,
-          onShare: () {},
-          onPrint: () {},
+          onShare: () => shareDevolution(devolution, currentBranch),
+          onPrint: () => printDevolution(devolution, currentBranch),
         );
       },
     ),
@@ -55,8 +56,8 @@ Future<void> showDevolutionViewerDialogFromId(BuildContext context, String devol
             return _DevolutionViewer(
               devolution: devolution,
               branch: currentBranch,
-              onShare: () {},
-              onPrint: () {},
+              onShare: () => shareDevolution(devolution, currentBranch),
+              onPrint: () => printDevolution(devolution, currentBranch),
             );
           },
         );
@@ -123,14 +124,24 @@ class _DevolutionViewer extends StatelessWidget {
                           ),
                         ],
                       ),
+
+                      Text(
+                        "Factura No. ${devolution.originalInvoiceDocNumber}",
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
                       const SizedBox(height: 16),
                       Text(branch.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                       Text(
                         devolution.clientInfo.name,
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                       ),
+                      Text(
+                        "Descripcion: ${devolution.description}",
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
                     ],
                   ),
+
                   const Divider(),
 
                   // --- SECCIÓN DE ITEMS DEVUELTOS ---

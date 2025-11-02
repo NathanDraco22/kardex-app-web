@@ -6,6 +6,8 @@ class DevolutionSelectionViewController extends ChangeNotifier {
 
   List<SaleItem> get selectedItems => _selectedItems;
 
+  String devolutionDescription = '';
+
   void addToSelected(SaleItem item) {
     _selectedItems.add(item);
     notifyListeners();

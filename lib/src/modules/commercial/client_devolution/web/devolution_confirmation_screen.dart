@@ -21,10 +21,12 @@ class DevolutionConfirmationScreen extends StatelessWidget {
     super.key,
     required this.invoice,
     required this.selectedItems,
+    required this.description,
   });
 
   final InvoiceInDb invoice;
   final List<SaleItem> selectedItems;
+  final String description;
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +36,7 @@ class DevolutionConfirmationScreen extends StatelessWidget {
       child: _RootScaffold(
         invoice: invoice,
         selectedItems: selectedItems,
+        description: description,
       ),
     );
   }
@@ -43,10 +46,12 @@ class _RootScaffold extends StatelessWidget {
   const _RootScaffold({
     required this.invoice,
     required this.selectedItems,
+    required this.description,
   });
 
   final InvoiceInDb invoice;
   final List<SaleItem> selectedItems;
+  final String description;
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +94,11 @@ class _RootScaffold extends StatelessWidget {
         appBar: AppBar(
           title: const Text("Confirmar Devolución"),
         ),
-        body: _Body(invoice: invoice, selectedItems: selectedItems),
+        body: _Body(
+          invoice: invoice,
+          selectedItems: selectedItems,
+          description: description,
+        ),
         floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
         floatingActionButton: FloatingActionButton.extended(
           icon: const Icon(Icons.check),
@@ -112,8 +121,9 @@ class _RootScaffold extends StatelessWidget {
               clientId: invoice.clientId,
               clientInfo: invoice.clientInfo,
               originalInvoiceId: invoice.id,
+              originalInvoiceDocNumber: invoice.docNumber,
               returnedItems: selectedItems,
-              description: "",
+              description: description,
               totalCost: totalCost,
               total: total,
               createdBy: userInfo,
@@ -135,10 +145,12 @@ class _Body extends StatelessWidget {
   const _Body({
     required this.invoice,
     required this.selectedItems,
+    required this.description,
   });
 
   final InvoiceInDb invoice;
   final List<SaleItem> selectedItems;
+  final String description;
 
   @override
   Widget build(BuildContext context) {
@@ -150,7 +162,10 @@ class _Body extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _HeaderSection(invoice: invoice),
+              _HeaderSection(
+                invoice: invoice,
+                description: description,
+              ),
               const SizedBox(height: 8),
               Expanded(
                 child: _ContentSection(items: selectedItems),

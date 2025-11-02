@@ -1,8 +1,12 @@
 part of '../devolution_confirmation_screen.dart';
 
 class _HeaderSection extends StatelessWidget {
-  const _HeaderSection({required this.invoice});
+  const _HeaderSection({
+    required this.invoice,
+    required this.description,
+  });
   final InvoiceInDb invoice;
+  final String description;
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +24,7 @@ class _HeaderSection extends StatelessWidget {
             Text('Cliente: $clientName'),
             Text('Factura: ${invoice.docNumber}'),
             Text('Fecha de Factura: $invoiceDate'),
+            Text('Descripción: $description'),
           ],
         ),
       ),

@@ -9,6 +9,13 @@ class _ContentSection extends StatelessWidget {
       DevolutionStatus.open: Colors.blue.shade400,
       DevolutionStatus.confirmed: Colors.green.shade400,
       DevolutionStatus.cancelled: Colors.red.shade400,
+      DevolutionStatus.applied: Colors.grey.shade700,
+    };
+    final tagMap = {
+      DevolutionStatus.open: "Abierta",
+      DevolutionStatus.confirmed: "Confirmada",
+      DevolutionStatus.cancelled: "Cancelada",
+      DevolutionStatus.applied: "Aplicada",
     };
     return Card(
       child: BlocBuilder<ReadDevolutionCubit, ReadDevolutionState>(
@@ -49,7 +56,7 @@ class _ContentSection extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    currentDevolution.status.name.toUpperCase(),
+                    tagMap[currentDevolution.status] ?? "",
                     style: const TextStyle(
                       color: Colors.white,
                     ),

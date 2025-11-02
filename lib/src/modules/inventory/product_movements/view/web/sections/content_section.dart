@@ -227,6 +227,7 @@ class MovementWebRow extends StatelessWidget {
               showInvoiceViewerDialogFromId(context, currentTransaction.documentId);
               break;
             case TransactionSubType.devolution:
+              showDevolutionViewerDialogFromId(context, currentTransaction.documentId);
               break;
           }
         },

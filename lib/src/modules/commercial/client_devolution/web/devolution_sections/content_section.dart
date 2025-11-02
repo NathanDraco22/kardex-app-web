@@ -6,7 +6,13 @@ class _ContentSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final invoice = context.findAncestorWidgetOfExactType<_Body>()!.invoice;
+    final devolutions = context.findAncestorWidgetOfExactType<_Body>()!.devolutions;
     final viewController = DevolutionSelectionMediator.of(context).notifier!;
+    final targetDevolutions = devolutions.where((devolution) => devolution.originalInvoiceId == invoice.id).toList();
+    final returnedItems = targetDevolutions.fold<List<SaleItem>>(
+      [],
+      (previousValue, devolution) => [...previousValue, ...devolution.returnedItems],
+    );
 
     return Card(
       child: Column(
@@ -27,7 +33,9 @@ class _ContentSection extends StatelessWidget {
               itemCount: invoice.saleItems.length,
               itemBuilder: (context, index) {
                 final item = invoice.saleItems[index];
+                final hasItemReturned = returnedItems.any((returnedItem) => returnedItem.product.id == item.product.id);
                 return CheckboxListTile(
+                  enabled: !hasItemReturned,
                   controlAffinity: ListTileControlAffinity.leading,
                   title: Text(item.product.name),
                   subtitle: Row(

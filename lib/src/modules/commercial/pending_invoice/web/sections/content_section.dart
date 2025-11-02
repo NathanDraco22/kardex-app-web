@@ -59,145 +59,109 @@ class _ContentSection extends StatelessWidget {
             );
           }
 
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            spacing: 4,
-            children: [
-              const SizedBox(),
-              ElevatedButton.icon(
-                onPressed: () {
+          return ListView.separated(
+            separatorBuilder: (context, index) => const Divider(height: 2.0, thickness: 2),
+            padding: const EdgeInsets.only(bottom: 40, left: 8, right: 8),
+            itemCount: invoices.length,
+            itemBuilder: (context, index) {
+              final tileColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+
+              final currentInvoice = invoices[index];
+
+              return InvoiceDevolutionTile(
+                tileColor: tileColor,
+                invoice: currentInvoice,
+                devolutions: devolutions,
+                isSelected: viewController.isInSelected(currentInvoice),
+                onChanged: (value) {
+                  if (value == true) {
+                    viewController.addToSelected(currentInvoice);
+                    return;
+                  }
+
+                  viewController.removeFromSelected(currentInvoice);
+                },
+
+                onViewInvoice: () {
+                  showInvoiceViewerDialog(context, currentInvoice);
+                },
+                onViewDevolutions: () {
+                  final targetDevolution = devolutions.where((d) => d.originalInvoiceId == currentInvoice.id).toList();
                   showDialog(
                     context: context,
                     builder: (context) {
                       final devolutions = state.devolutions;
-                      final total = devolutions.fold<int>(0, (previousValue, element) => previousValue + element.total);
-                      return AlertDialog(
-                        title: const Text("Devoluciones"),
-                        actions: [
-                          Row(
-                            spacing: 8,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text(
-                                "Total",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                NumberFormatter.convertToMoneyLike(total),
-                                style: const TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                        ],
-                        content: SizedBox(
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: devolutions.length,
-                            itemBuilder: (context, index) {
-                              final currentDevolutions = devolutions[index];
-                              return ListTile(
-                                title: Text("#${currentDevolutions.docNumber}"),
-                                onTap: () {
-                                  showDevolutionViewerDialog(context, currentDevolutions);
-                                },
-                                subtitle: Text(
-                                  DateTimeTool.formatddMMyy(currentDevolutions.createdAt),
-                                ),
-                                trailing: Text(
-                                  NumberFormatter.convertToMoneyLike(currentDevolutions.total),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
+                      final total = devolutions.fold<int>(
+                        0,
+                        (previousValue, element) => previousValue + element.total,
                       );
+                      return _DevolutionDialog(total: total, devolutions: targetDevolution);
                     },
                   );
                 },
-                icon: Icon(Icons.circle, color: devolutions.isEmpty ? Colors.grey : Colors.green),
-                label: const Text("Devoluciones"),
-              ),
-
-              Expanded(
-                child: ListView.builder(
-                  padding: const EdgeInsets.only(bottom: 40),
-                  itemCount: invoices.length,
-                  itemBuilder: (context, index) {
-                    final tileColor = index.isOdd ? Colors.white : Colors.grey.shade200;
-
-                    final currentInvoices = invoices[index];
-                    final total = NumberFormatter.convertToMoneyLike(currentInvoices.total);
-                    final date = DateTimeTool.formatddMMyy(currentInvoices.createdAt);
-
-                    return CheckboxListTile(
-                      contentPadding: EdgeInsets.zero,
-                      value: viewController.isInSelected(currentInvoices),
-                      tileColor: tileColor,
-                      onChanged: (value) {
-                        if (value == true) {
-                          viewController.addToSelected(currentInvoices);
-                          return;
-                        }
-
-                        viewController.removeFromSelected(currentInvoices);
-                      },
-                      controlAffinity: ListTileControlAffinity.leading,
-                      title: Row(
-                        children: [
-                          Expanded(
-                            child: Row(
-                              children: [
-                                Builder(
-                                  builder: (context) {
-                                    final hasDevolution = devolutions.any((element) {
-                                      return element.originalInvoiceId == currentInvoices.id;
-                                    });
-
-                                    if (hasDevolution) {
-                                      return const Icon(
-                                        Icons.circle,
-                                        color: Colors.green,
-                                        size: 18,
-                                      );
-                                    }
-
-                                    return const SizedBox.shrink();
-                                  },
-                                ),
-                                Text("Fact #${currentInvoices.docNumber}"),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: Text(
-                              total,
-                              textAlign: TextAlign.start,
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      subtitle: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(date),
-                        ],
-                      ),
-                      secondary: TextButton(
-                        onPressed: () {
-                          showInvoiceViewerDialog(context, currentInvoices);
-                        },
-                        child: const Text("Ver Factura"),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
+              );
+            },
           );
         },
+      ),
+    );
+  }
+}
+
+class _DevolutionDialog extends StatelessWidget {
+  const _DevolutionDialog({
+    required this.total,
+    required this.devolutions,
+  });
+
+  final int total;
+  final List<DevolutionInDb> devolutions;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text("Devoluciones"),
+      actions: [
+        Row(
+          spacing: 8,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              "Total",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              NumberFormatter.convertToMoneyLike(total),
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      ],
+      content: SizedBox(
+        child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: devolutions.length,
+          itemBuilder: (context, index) {
+            final currentDevolutions = devolutions[index];
+            final circleColor = currentDevolutions.status == DevolutionStatus.confirmed ? Colors.green : Colors.blue;
+            return ListTile(
+              leading: Icon(Icons.circle, color: circleColor),
+              tileColor: index.isOdd ? Colors.white : Colors.grey.shade200,
+              title: Text("#${currentDevolutions.docNumber}"),
+              onTap: () {
+                showDevolutionViewerDialog(context, currentDevolutions);
+              },
+              subtitle: Text(
+                DateTimeTool.formatddMMyy(currentDevolutions.createdAt),
+              ),
+              trailing: Text(
+                NumberFormatter.convertToMoneyLike(currentDevolutions.total),
+              ),
+            );
+          },
+        ),
       ),
     );
   }

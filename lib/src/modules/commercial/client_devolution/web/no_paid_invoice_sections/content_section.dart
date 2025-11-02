@@ -43,6 +43,7 @@ class _ContentSection extends StatelessWidget {
           state as ReadInvoiceSuccess;
 
           final invoices = state.invoices;
+          final devolutions = state.devolutions;
 
           if (invoices.isEmpty) {
             return const Center(
@@ -73,7 +74,7 @@ class _ContentSection extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) {
-                        return DevolutionSelectionScreen(invoice: currentInvoice);
+                        return DevolutionSelectionScreen(invoice: currentInvoice, devolutions: devolutions);
                       },
                     ),
                   );

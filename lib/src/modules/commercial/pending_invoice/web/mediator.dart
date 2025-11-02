@@ -5,7 +5,7 @@ import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
 
 class ViewController extends ChangeNotifier {
   List<InvoiceInDb> _selectedInvoices = [];
-  List<DevolutionInDb> _selectedDevolutions = [];
+  final List<DevolutionInDb> _selectedDevolutions = [];
 
   ClientInDb? _selectedClient;
 

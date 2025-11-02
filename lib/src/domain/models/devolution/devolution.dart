@@ -10,6 +10,7 @@ class BaseDevolution {
   final ClientInfo clientInfo;
   final String docNumber;
   final String originalInvoiceId;
+  final String originalInvoiceDocNumber;
   final List<SaleItem> returnedItems;
   final String description;
   final DevolutionStatus status;
@@ -22,7 +23,8 @@ class BaseDevolution {
     required this.clientId,
     required this.clientInfo,
     this.docNumber = "",
-    this.originalInvoiceId = "",
+    required this.originalInvoiceId,
+    required this.originalInvoiceDocNumber,
     required this.returnedItems,
     required this.description,
     this.status = DevolutionStatus.open,
@@ -37,6 +39,7 @@ class BaseDevolution {
     clientInfo: ClientInfo.fromJson(json['clientInfo']),
     docNumber: json['docNumber'] ?? "",
     originalInvoiceId: json['originalInvoiceId'] ?? "",
+    originalInvoiceDocNumber: json['originalInvoiceDocNumber'] ?? "",
     returnedItems: (json['returnedItems'] as List).map((e) => SaleItem.fromJson(e)).toList(),
     description: json['description'],
     status: DevolutionStatus.values.byName(json['status']),
@@ -51,6 +54,7 @@ class BaseDevolution {
     'clientInfo': clientInfo.toJson(),
     'docNumber': docNumber,
     'originalInvoiceId': originalInvoiceId,
+    'originalInvoiceDocNumber': originalInvoiceDocNumber,
     'returnedItems': returnedItems.map((e) => e.toJson()).toList(),
     'description': description,
     'status': status.name,
@@ -66,7 +70,8 @@ class CreateDevolution extends BaseDevolution {
     required super.clientId,
     required super.clientInfo,
     super.docNumber,
-    super.originalInvoiceId,
+    required super.originalInvoiceId,
+    required super.originalInvoiceDocNumber,
     required super.returnedItems,
     required super.description,
     super.status,
@@ -81,6 +86,7 @@ class CreateDevolution extends BaseDevolution {
     clientInfo: ClientInfo.fromJson(json['clientInfo']),
     docNumber: json['docNumber'] ?? "",
     originalInvoiceId: json['originalInvoiceId'] ?? "",
+    originalInvoiceDocNumber: json['originalInvoiceDocNumber'] ?? "",
     returnedItems: (json['returnedItems'] as List).map((e) => SaleItem.fromJson(e)).toList(),
     description: json['description'],
     status: DevolutionStatus.values.byName(json['status']),
@@ -113,7 +119,8 @@ class DevolutionInDb extends BaseDevolution {
     required super.clientId,
     required super.clientInfo,
     super.docNumber,
-    super.originalInvoiceId,
+    required super.originalInvoiceId,
+    required super.originalInvoiceDocNumber,
     required super.returnedItems,
     required super.description,
     super.status,
@@ -131,6 +138,7 @@ class DevolutionInDb extends BaseDevolution {
     clientInfo: ClientInfo.fromJson(json['clientInfo']),
     docNumber: json['docNumber'] ?? "",
     originalInvoiceId: json['originalInvoiceId'] ?? "",
+    originalInvoiceDocNumber: json['originalInvoiceDocNumber'] ?? "",
     returnedItems: (json['returnedItems'] as List).map((e) => SaleItem.fromJson(e)).toList(),
     description: json['description'],
     status: DevolutionStatus.values.byName(json['status']),

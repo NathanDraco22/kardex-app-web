@@ -24,7 +24,6 @@ Future<bool> shareReceipt(ReceiptInDb receipt, BranchInDb branch) async {
 
 Future<Uint8List> generateTicketPdfFromReceipt(ReceiptInDb receipt, BranchInDb branch) async {
   final pdf = pw.Document();
-  final NumberFormat currencyFormat = NumberFormat.currency(symbol: 'C\$');
 
   const pageFormat = PdfPageFormat(
     80 * PdfPageFormat.mm,
@@ -33,6 +32,15 @@ Future<Uint8List> generateTicketPdfFromReceipt(ReceiptInDb receipt, BranchInDb b
   );
 
   final branchImage = branch.image;
+
+  final totalInvoice = receipt.appliedInvoices.fold(
+    0,
+    (previousValue, element) => previousValue + element.amountApplied,
+  );
+  final totalDevolution = receipt.appliedDevolutions.fold(
+    0,
+    (previousValue, element) => previousValue + element.amountApplied,
+  );
 
   pdf.addPage(
     pw.Page(
@@ -117,11 +125,12 @@ Future<Uint8List> generateTicketPdfFromReceipt(ReceiptInDb receipt, BranchInDb b
               'Detalles del Pago',
               style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: TicketSettings.contentFontSize),
             ),
+            pw.Divider(color: PdfColors.grey800),
             pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
               children: [
                 pw.Text(
-                  'Factura',
+                  'Fact.',
                   style: pw.TextStyle(fontSize: TicketSettings.contentFontSize),
                 ),
                 pw.Text(
@@ -130,7 +139,7 @@ Future<Uint8List> generateTicketPdfFromReceipt(ReceiptInDb receipt, BranchInDb b
                 ),
               ],
             ),
-            pw.Divider(color: PdfColors.grey800),
+
             pw.Column(
               children: receipt.appliedInvoices.map((invoice) {
                 return pw.Padding(
@@ -151,18 +160,100 @@ Future<Uint8List> generateTicketPdfFromReceipt(ReceiptInDb receipt, BranchInDb b
                 );
               }).toList(),
             ),
+            if (receipt.appliedDevolutions.isNotEmpty) pw.Divider(color: PdfColors.grey800),
+
+            if (receipt.appliedDevolutions.isNotEmpty)
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Text(
+                    'Devol.',
+                    style: pw.TextStyle(fontSize: TicketSettings.contentFontSize),
+                  ),
+                  pw.Text(
+                    "Monto",
+                    style: pw.TextStyle(fontSize: TicketSettings.contentFontSize),
+                  ),
+                ],
+              ),
+            pw.Column(
+              children: receipt.appliedDevolutions.map((devolution) {
+                return pw.Padding(
+                  padding: const pw.EdgeInsets.symmetric(vertical: 2),
+                  child: pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    children: [
+                      pw.Text(
+                        '#${devolution.docNumber}',
+                        style: pw.TextStyle(fontSize: TicketSettings.contentFontSize),
+                      ),
+                      pw.Text(
+                        NumberFormatter.convertToMoneyLike(devolution.amountApplied),
+                        style: pw.TextStyle(fontSize: TicketSettings.contentFontSize),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+
             pw.Divider(color: PdfColors.grey800),
 
             pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.end,
               children: [
                 pw.Text(
-                  'TOTAL RECIBO: ',
+                  'Facts: ',
                   style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: TicketSettings.contentFontSize),
                 ),
+
+                pw.SizedBox(
+                  width: 80,
+                  child: pw.Text(
+                    NumberFormatter.convertToMoneyLike(totalInvoice),
+                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: TicketSettings.contentFontSize),
+                    textAlign: pw.TextAlign.right,
+                  ),
+                ),
+              ],
+            ),
+
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.end,
+              children: [
                 pw.Text(
-                  currencyFormat.format(receipt.total / 100),
+                  'Devol.: ',
                   style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: TicketSettings.contentFontSize),
+                ),
+
+                pw.SizedBox(
+                  width: 80,
+                  child: pw.Text(
+                    NumberFormatter.convertToMoneyLike(totalDevolution),
+                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: TicketSettings.contentFontSize),
+                    textAlign: pw.TextAlign.right,
+                  ),
+                ),
+              ],
+            ),
+
+            pw.SizedBox(height: 4),
+
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.end,
+              children: [
+                pw.Text(
+                  'Total: ',
+                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: TicketSettings.contentFontSize),
+                ),
+
+                pw.SizedBox(
+                  width: 80,
+                  child: pw.Text(
+                    NumberFormatter.convertToMoneyLike(receipt.total),
+                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: TicketSettings.contentFontSize),
+                    textAlign: pw.TextAlign.right,
+                  ),
                 ),
               ],
             ),

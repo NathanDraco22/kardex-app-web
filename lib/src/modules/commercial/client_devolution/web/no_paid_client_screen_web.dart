@@ -26,7 +26,7 @@ class _RootScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Devoluciones de Clientes")),
-      body: _Body(),
+      body: const _Body(),
     );
   }
 }

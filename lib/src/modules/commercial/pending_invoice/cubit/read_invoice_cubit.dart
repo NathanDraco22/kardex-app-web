@@ -22,9 +22,15 @@ class ReadPendingInvoiceCubit extends Cubit<ReadInvoiceState> {
         clientId,
       );
 
-      final devolutions = await devolutionsRepository.getConfirmedDevolutions(
-        clientId,
-      );
+      final requestedDevolutions = Future.wait([
+        devolutionsRepository.getConfirmedDevolutions(clientId),
+        devolutionsRepository.getOpenDevolutions(clientId),
+      ]);
+      final results = await requestedDevolutions;
+      final confirmedDevolutions = results[0];
+      final openDevolutions = results[1];
+
+      final devolutions = [...confirmedDevolutions, ...openDevolutions];
 
       _invoicesCache = response.data;
       if (_invoicesCache.length >= response.count) {

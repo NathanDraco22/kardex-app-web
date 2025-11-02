@@ -10,6 +10,7 @@ import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/devolution_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
+import 'package:kardex_app_front/widgets/dialogs/invoice_viewer.dart';
 
 Future<DevolutionInDb?> showDevolutionProcessorDialog(BuildContext context, DevolutionInDb devolution) async {
   final readCubit = context.read<ReadDevolutionCubit>();
@@ -64,6 +65,18 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorsMap = {
+      DevolutionStatus.open: Colors.blue.shade400,
+      DevolutionStatus.confirmed: Colors.green.shade400,
+      DevolutionStatus.cancelled: Colors.red.shade400,
+      DevolutionStatus.applied: Colors.grey.shade700,
+    };
+    final tagMap = {
+      DevolutionStatus.open: "Abierta",
+      DevolutionStatus.confirmed: "Confirmada",
+      DevolutionStatus.cancelled: "Cancelada",
+      DevolutionStatus.applied: "Aplicada",
+    };
     final devolution = DevolutionProcessorMediator.of(context).devolution;
     final writeCubit = context.read<WriteDevolutionCubit>();
     return BlocListener<WriteDevolutionCubit, WriteDevolutionState>(
@@ -99,10 +112,10 @@ class _RootScaffold extends StatelessWidget {
           child: Builder(
             builder: (context) {
               if (devolution.status != DevolutionStatus.open) {
-                final textColor = devolution.status == DevolutionStatus.confirmed ? Colors.green : Colors.red;
+                final textColor = colorsMap[devolution.status] ?? Colors.black;
                 return Center(
                   child: Text(
-                    devolution.status.name.toUpperCase(),
+                    tagMap[devolution.status] ?? "",
                     style: TextStyle(
                       color: textColor,
                       fontSize: 20,
@@ -178,12 +191,30 @@ class _Body extends StatelessWidget {
                         "Devolución: #${devolution.docNumber}",
                         style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                       ),
+                      Row(
+                        children: [
+                          Text(
+                            "Factura: #${devolution.originalInvoiceDocNumber}",
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              showInvoiceViewerDialogFromId(context, devolution.originalInvoiceId);
+                            },
+                            child: const Text("Ver Factura"),
+                          ),
+                        ],
+                      ),
                       Text(
                         DateTimeTool.formatddMMyy(devolution.createdAt),
                         style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                       ),
                       Text(
                         devolution.clientInfo.name,
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                      ),
+                      Text(
+                        "Descripción: ${devolution.description}",
                         style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                       ),
                       Text(

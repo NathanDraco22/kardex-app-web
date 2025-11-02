@@ -5,6 +5,7 @@ import 'package:kardex_app_front/src/domain/models/receipt/receipt_model.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/printers/receipt_printer.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_app_front/widgets/dialogs/devolution_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/invoice_viewer.dart';
 
 Future<void> showReceiptViewerDialog(BuildContext context, ReceiptInDb receipt) async {
@@ -111,28 +112,21 @@ class _ReceiptViewer extends StatelessWidget {
                   const Text("Facturas Aplicadas", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                   const SizedBox(height: 8),
                   Expanded(
-                    // TODO: show devolutions
-                    child: ListView.builder(
-                      itemCount: receipt.appliedInvoices.length,
-                      itemBuilder: (context, index) {
-                        final appliedInvoice = receipt.appliedInvoices[index];
-                        final tileColor = index.isOdd ? Colors.white : Colors.grey.shade200;
-                        return ListTile(
-                          tileColor: tileColor,
-                          minTileHeight: 40,
-                          onTap: () {
-                            showInvoiceViewerDialogFromId(context, appliedInvoice.invoiceId);
-                          },
-                          title: Text(
-                            "#${appliedInvoice.docNumber}",
-                            style: const TextStyle(fontWeight: FontWeight.bold),
+                    child: ListView(
+                      children: [
+                        const Divider(height: 2, thickness: 2),
+                        ..._buildInvoiceRows(context, receipt.appliedInvoices),
+                        const SizedBox(height: 8),
+
+                        if (receipt.appliedDevolutions.isNotEmpty)
+                          const Text(
+                            "Devoluciones Aplicadas",
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                           ),
-                          trailing: Text(
-                            NumberFormatter.convertToMoneyLike(appliedInvoice.amountApplied),
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        );
-                      },
+                        const SizedBox(height: 8),
+                        if (receipt.appliedDevolutions.isNotEmpty) const Divider(height: 2, thickness: 2),
+                        ..._buildDevolutionsRows(context, receipt.appliedDevolutions),
+                      ],
                     ),
                   ),
                   const Divider(height: 24),
@@ -153,6 +147,50 @@ class _ReceiptViewer extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+Iterable<Widget> _buildInvoiceRows(BuildContext context, List<AppliedInvoice> invoices) sync* {
+  for (var i = 0; i < invoices.length; i++) {
+    final currentInvoice = invoices[i];
+    final tileColor = i.isOdd ? Colors.white : Colors.grey.shade200;
+    yield ListTile(
+      tileColor: tileColor,
+      minTileHeight: 40,
+      onTap: () {
+        showInvoiceViewerDialogFromId(context, currentInvoice.invoiceId);
+      },
+      title: Text(
+        "#${currentInvoice.docNumber}",
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ),
+      trailing: Text(
+        NumberFormatter.convertToMoneyLike(currentInvoice.amountApplied),
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+}
+
+Iterable<Widget> _buildDevolutionsRows(BuildContext context, List<AppliedDevolution> devolutions) sync* {
+  for (var i = 0; i < devolutions.length; i++) {
+    final currentDevolutions = devolutions[i];
+    final tileColor = i.isOdd ? Colors.white : Colors.grey.shade200;
+    yield ListTile(
+      tileColor: tileColor,
+      minTileHeight: 40,
+      onTap: () {
+        showDevolutionViewerDialogFromId(context, currentDevolutions.devolutionId);
+      },
+      title: Text(
+        "#${currentDevolutions.docNumber}",
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ),
+      trailing: Text(
+        NumberFormatter.convertToMoneyLike(currentDevolutions.amountApplied),
+        style: const TextStyle(fontWeight: FontWeight.bold),
       ),
     );
   }
