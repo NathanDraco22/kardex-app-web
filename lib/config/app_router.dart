@@ -2,8 +2,10 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/src/modules/activation/activation_screen.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/view/client_catalog_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/anon_invoices_screen.dart';
+import 'package:kardex_app_front/src/modules/commercial/client_devolution/client_devolution_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/client_invoices_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/commercial_menu_screen.dart';
+import 'package:kardex_app_front/src/modules/commercial/current_devolutions/current_devolutions_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/current_orders/current_orders_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/daily_anon_invoinces/daily_anon_invoices_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/daily_client_invoices/daily_client_invoices.dart';
@@ -148,6 +150,19 @@ class AppRouter {
             name: "daily-receipt-history",
             builder: (context, state) => const DailyReceiptScreen(),
           ),
+
+          GoRoute(
+            path: "current-devolution",
+            name: "current-devolution",
+            builder: (context, state) => const CurrentDevolutionsScreen(),
+          ),
+
+          GoRoute(
+            path: "client-devolution",
+            name: "client-devolution",
+            builder: (context, state) => const ClientDevolutionScreen(),
+          ),
+
           GoRoute(
             path: "product-price-setting",
             name: "product-price-setting",

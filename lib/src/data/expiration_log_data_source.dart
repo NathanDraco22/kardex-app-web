@@ -12,27 +12,32 @@ class ExpirationLogsDataSource with HttpService {
 
   Future<Map<String, dynamic>> createExpirationLog(Map<String, dynamic> expirationLog) async {
     final uri = HttpTools.generateUri(_endpoint);
-    return await postQuery(uri, expirationLog);
+    final header = HttpTools.generateAuthHeaders();
+    return await postQuery(uri, expirationLog, headers: header);
   }
 
   Future<Map<String, dynamic>> getAllExpirationLogs(Map<String, String> params) async {
     final uri = HttpTools.generateUri(_endpoint, queryParameters: params);
-    return await getQuery(uri);
+    final header = HttpTools.generateAuthHeaders();
+    return await getQuery(uri, headers: header);
   }
 
   Future<Map<String, dynamic>?> getExpirationLogById(String logId) async {
     final uri = HttpTools.generateUri("$_endpoint/$logId");
-    return await getQuery(uri);
+    final header = HttpTools.generateAuthHeaders();
+    return await getQuery(uri, headers: header);
   }
 
   Future<Map<String, dynamic>?> deleteExpirationLogById(String logId) async {
     final uri = HttpTools.generateUri("$_endpoint/$logId");
-    return await deleteQuery(uri);
+    final header = HttpTools.generateAuthHeaders();
+    return await deleteQuery(uri, headers: header);
   }
 
   Future<bool> hasNearExpiration(String branchId) async {
     final uri = HttpTools.generateUri("$_endpoint/near/$branchId");
-    final res = await getQuery(uri);
+    final header = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: header);
 
     return res['hasExpiration'] ?? false;
   }

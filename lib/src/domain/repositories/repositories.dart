@@ -1,6 +1,7 @@
 export 'auth_repository.dart';
 export 'branch_repository.dart';
 export 'client_repository.dart';
+export 'devolution_repository.dart';
 export 'entry_doc_repository.dart';
 export 'entry_histories_repository.dart';
 export 'exit_doc_repository.dart';

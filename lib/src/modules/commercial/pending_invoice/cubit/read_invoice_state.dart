@@ -8,8 +8,9 @@ final class ReadInvoiceLoading extends ReadInvoiceState {}
 
 final class ReadInvoiceSuccess extends ReadInvoiceState {
   final List<InvoiceInDb> invoices;
+  final List<DevolutionInDb> devolutions;
   final int totalCount;
-  ReadInvoiceSuccess(this.invoices, this.totalCount);
+  ReadInvoiceSuccess(this.invoices, this.totalCount, {required this.devolutions});
 }
 
 final class ReadInvoiceError extends ReadInvoiceState {

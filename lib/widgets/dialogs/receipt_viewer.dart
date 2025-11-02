@@ -111,6 +111,7 @@ class _ReceiptViewer extends StatelessWidget {
                   const Text("Facturas Aplicadas", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                   const SizedBox(height: 8),
                   Expanded(
+                    // TODO: show devolutions
                     child: ListView.builder(
                       itemCount: receipt.appliedInvoices.length,
                       itemBuilder: (context, index) {

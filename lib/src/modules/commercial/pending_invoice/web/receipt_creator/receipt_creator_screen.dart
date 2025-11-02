@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/client/client.dart';
 import 'package:kardex_app_front/src/domain/models/common/client_info.dart';
 import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
+import 'package:kardex_app_front/src/domain/models/devolution/devolution.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
 import 'package:kardex_app_front/src/domain/models/receipt/receipt_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/receipt_repository.dart';
@@ -21,10 +22,12 @@ class CreateReceiptMediator extends InheritedWidget {
     required super.child,
     required this.client,
     required this.invoices,
+    required this.devolutions,
   });
 
   final ClientInDb client;
   final List<InvoiceInDb> invoices;
+  final List<DevolutionInDb> devolutions;
 
   static CreateReceiptMediator of(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<CreateReceiptMediator>()!;
@@ -41,10 +44,12 @@ class ReceiptCreatorScreen extends StatelessWidget {
     super.key,
     required this.client,
     required this.invoices,
+    required this.devolutions,
   });
 
   final ClientInDb client;
   final List<InvoiceInDb> invoices;
+  final List<DevolutionInDb> devolutions;
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +57,7 @@ class ReceiptCreatorScreen extends StatelessWidget {
     return CreateReceiptMediator(
       client: client,
       invoices: invoices,
+      devolutions: devolutions,
       child: BlocProvider(
         create: (context) => WriteReceiptCubit(
           receiptsRepository: receiptRepo,
@@ -70,10 +76,16 @@ class _RootScaffold extends StatelessWidget {
     final mediator = CreateReceiptMediator.of(context);
     final client = mediator.client;
     final invoices = mediator.invoices;
+    final devolutions = mediator.devolutions;
     final total = invoices.fold(0, (int previousValue, invoice) {
       return previousValue + invoice.total;
     });
-    final totalFormatted = NumberFormatter.convertToMoneyLike(total);
+
+    final devolutionTotal = devolutions.fold(0, (int previousValue, devolution) {
+      return previousValue + devolution.total;
+    });
+    final totalWithDevolutions = total - devolutionTotal;
+    final totalWithDevolutionsFormatted = NumberFormatter.convertToMoneyLike(totalWithDevolutions);
 
     return BlocListener<WriteReceiptCubit, WriteReceiptState>(
       listener: (context, state) async {
@@ -117,7 +129,7 @@ class _RootScaffold extends StatelessWidget {
                     context,
                     client,
                     invoices,
-                    totalFormatted,
+                    totalWithDevolutionsFormatted,
                   );
                   if (res != true) return;
 
@@ -126,6 +138,14 @@ class _RootScaffold extends StatelessWidget {
                       invoiceId: invoice.id,
                       docNumber: invoice.docNumber,
                       amountApplied: invoice.total,
+                    );
+                  }).toList();
+
+                  final appliedDevolutions = devolutions.map((devolution) {
+                    return AppliedDevolution(
+                      devolutionId: devolution.id,
+                      docNumber: devolution.docNumber,
+                      amountApplied: devolution.total,
                     );
                   }).toList();
 
@@ -145,8 +165,9 @@ class _RootScaffold extends StatelessWidget {
                     ),
                     clientId: client.id,
                     appliedInvoices: appliedInvoices,
+                    appliedDevolutions: appliedDevolutions,
                     paymentMethod: PaymentMethod.cash,
-                    total: total,
+                    total: totalWithDevolutions,
                     createdBy: UserInfo(
                       id: currentUser.id,
                       name: currentUser.username,
@@ -174,10 +195,17 @@ class _Body extends StatelessWidget {
     final mediator = CreateReceiptMediator.of(context);
     final client = mediator.client;
     final invoices = mediator.invoices;
+    final devolutions = mediator.devolutions;
     final total = invoices.fold(0, (int previousValue, invoice) {
       return previousValue + invoice.total;
     });
+    final devolutionTotal = devolutions.fold(0, (int previousValue, devolution) {
+      return previousValue + devolution.total;
+    });
     final totalFormatted = NumberFormatter.convertToMoneyLike(total);
+    final devolutionTotalFormatted = NumberFormatter.convertToMoneyLike(devolutionTotal);
+    final totalWithDevolutions = total - devolutionTotal;
+    final totalWithDevolutionsFormatted = NumberFormatter.convertToMoneyLike(totalWithDevolutions);
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 600),
@@ -207,17 +235,31 @@ class _Body extends StatelessWidget {
                         ),
                       ),
 
-                      Text(
-                        "Facturas a Cancelar: ${invoices.length}",
-                        style: const TextStyle(
-                          fontSize: 16,
-                        ),
+                      Row(
+                        spacing: 8,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Facturas: ${invoices.length}",
+                            style: const TextStyle(
+                              fontSize: 16,
+                            ),
+                          ),
+
+                          Text(
+                            "Devoluciones: ${devolutions.length}",
+                            style: const TextStyle(
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
                       ),
 
                       Text(
-                        "Total a Pagar: $totalFormatted",
+                        "Total a Pagar: $totalWithDevolutionsFormatted",
                         style: const TextStyle(
                           fontSize: 16,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
@@ -245,9 +287,87 @@ class _Body extends StatelessWidget {
                           child: ListView(
                             children: [
                               const Divider(),
+                              const Text("Facturas", style: TextStyle(fontWeight: FontWeight.bold)),
                               ..._buildInvoiceRows(invoices),
+                              const Divider(),
+                              const Text("Devoluciones", style: TextStyle(fontWeight: FontWeight.bold)),
+                              ..._buildDevolutionsRows(devolutions),
                             ],
                           ),
+                        ),
+                        Column(
+                          children: [
+                            const Divider(),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                const Text(
+                                  "Facturas: ",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 100,
+                                  child: Text(
+                                    totalFormatted,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                    textAlign: TextAlign.end,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                const Text(
+                                  "Devoluciones: ",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 100,
+                                  child: Text(
+                                    devolutionTotalFormatted,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                    textAlign: TextAlign.end,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                const Text(
+                                  "Total a Pagar: ",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 100,
+                                  child: Text(
+                                    totalWithDevolutionsFormatted,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                    textAlign: TextAlign.end,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -281,6 +401,36 @@ Iterable<Widget> _buildInvoiceRows(List<InvoiceInDb> invoices) sync* {
         subtitle: Text(
           DateTimeTool.formatddMMyy(
             currentInvoice.createdAt,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+Iterable<Widget> _buildDevolutionsRows(List<DevolutionInDb> devolutions) sync* {
+  for (var i = 0; i < devolutions.length; i++) {
+    final currentDevolutions = devolutions[i];
+    final color = i.isOdd ? Colors.white : Colors.grey.shade200;
+
+    yield Material(
+      color: Colors.transparent,
+      child: ListTile(
+        tileColor: color,
+        title: Row(
+          children: [
+            Text("Devol #${currentDevolutions.docNumber}"),
+            const Spacer(),
+            Text(
+              NumberFormatter.convertToMoneyLike(
+                currentDevolutions.total,
+              ),
+            ),
+          ],
+        ),
+        subtitle: Text(
+          DateTimeTool.formatddMMyy(
+            currentDevolutions.createdAt,
           ),
         ),
       ),

@@ -6,6 +6,8 @@ import 'package:kardex_app_front/src/modules/commercial/pending_invoice/cubit/re
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/web/receipt_creator/receipt_creator_screen.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_app_front/widgets/dialogs/devolution_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/invoice_viewer.dart';
 
 import 'mediator.dart';
@@ -34,9 +36,11 @@ class _PendingInvoiceWebScreenState extends State<PendingInvoiceWebScreen> {
   @override
   Widget build(BuildContext context) {
     final invoiceREpo = context.read<InvoicesRepository>();
+    final devolutionRepo = context.read<DevolutionsRepository>();
     return BlocProvider(
       create: (context) => ReadPendingInvoiceCubit(
         invoicesRepository: invoiceREpo,
+        devolutionsRepository: devolutionRepo,
       ),
       child: PendingInvoiceMediator(
         notifier: viewController,
@@ -99,6 +103,7 @@ class _PendingInvoiceFloatingButtons extends StatelessWidget {
                 builder: (_) => ReceiptCreatorScreen(
                   client: viewController.selectedClient!,
                   invoices: viewController.selectedInvoices,
+                  devolutions: viewController.selectedDevolutions,
                 ),
               ),
             );
@@ -122,19 +127,26 @@ class _BottomPendingInvoice extends StatelessWidget {
       child: Builder(
         builder: (context) {
           int total = 0;
+          int totalDevolutions = 0;
           if (state is ReadInvoiceSuccess) {
             total = state.invoices.fold(0, (int previousValue, invoice) {
               total += invoice.total;
               return total;
             });
+
+            totalDevolutions = state.devolutions.fold(0, (int previousValue, devolution) {
+              totalDevolutions += devolution.total;
+              return totalDevolutions;
+            });
           }
 
           final totalFormatted = NumberFormatter.convertToMoneyLike(total);
+
           return Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(
-                "Total:",
+                "Total: ",
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

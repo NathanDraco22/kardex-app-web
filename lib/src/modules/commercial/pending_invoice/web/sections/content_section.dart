@@ -43,6 +43,9 @@ class _ContentSection extends StatelessWidget {
           state as ReadInvoiceSuccess;
 
           final invoices = state.invoices;
+          final devolutions = state.devolutions;
+
+          viewController.devolutions = devolutions;
 
           if (invoices.isEmpty) {
             return const Center(
@@ -56,57 +59,143 @@ class _ContentSection extends StatelessWidget {
             );
           }
 
-          return ListView.builder(
-            padding: const EdgeInsets.only(bottom: 40),
-            itemCount: invoices.length,
-            itemBuilder: (context, index) {
-              final tileColor = index.isOdd ? Colors.white : Colors.grey.shade200;
-
-              final currentInvoices = invoices[index];
-              final total = NumberFormatter.convertToMoneyLike(currentInvoices.total);
-              final date = DateTimeTool.formatddMMyy(currentInvoices.createdAt);
-
-              return CheckboxListTile(
-                contentPadding: EdgeInsets.zero,
-                value: viewController.isInSelected(currentInvoices),
-                tileColor: tileColor,
-                onChanged: (value) {
-                  if (value == true) {
-                    viewController.addToSelected(currentInvoices);
-                    return;
-                  }
-
-                  viewController.removeFromSelected(currentInvoices);
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            spacing: 4,
+            children: [
+              const SizedBox(),
+              ElevatedButton.icon(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      final devolutions = state.devolutions;
+                      final total = devolutions.fold<int>(0, (previousValue, element) => previousValue + element.total);
+                      return AlertDialog(
+                        title: const Text("Devoluciones"),
+                        actions: [
+                          Row(
+                            spacing: 8,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text(
+                                "Total",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                NumberFormatter.convertToMoneyLike(total),
+                                style: const TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        ],
+                        content: SizedBox(
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: devolutions.length,
+                            itemBuilder: (context, index) {
+                              final currentDevolutions = devolutions[index];
+                              return ListTile(
+                                title: Text("#${currentDevolutions.docNumber}"),
+                                onTap: () {
+                                  showDevolutionViewerDialog(context, currentDevolutions);
+                                },
+                                subtitle: Text(
+                                  DateTimeTool.formatddMMyy(currentDevolutions.createdAt),
+                                ),
+                                trailing: Text(
+                                  NumberFormatter.convertToMoneyLike(currentDevolutions.total),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                  );
                 },
-                controlAffinity: ListTileControlAffinity.leading,
-                title: Row(
-                  children: [
-                    Expanded(
-                      child: Text("Fact #${currentInvoices.docNumber}"),
-                    ),
-                    Expanded(
-                      child: Text(
-                        total,
-                        textAlign: TextAlign.start,
-                      ),
-                    ),
-                  ],
-                ),
+                icon: Icon(Icons.circle, color: devolutions.isEmpty ? Colors.grey : Colors.green),
+                label: const Text("Devoluciones"),
+              ),
 
-                subtitle: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(date),
-                  ],
-                ),
-                secondary: TextButton(
-                  onPressed: () {
-                    showInvoiceViewerDialog(context, currentInvoices);
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.only(bottom: 40),
+                  itemCount: invoices.length,
+                  itemBuilder: (context, index) {
+                    final tileColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+
+                    final currentInvoices = invoices[index];
+                    final total = NumberFormatter.convertToMoneyLike(currentInvoices.total);
+                    final date = DateTimeTool.formatddMMyy(currentInvoices.createdAt);
+
+                    return CheckboxListTile(
+                      contentPadding: EdgeInsets.zero,
+                      value: viewController.isInSelected(currentInvoices),
+                      tileColor: tileColor,
+                      onChanged: (value) {
+                        if (value == true) {
+                          viewController.addToSelected(currentInvoices);
+                          return;
+                        }
+
+                        viewController.removeFromSelected(currentInvoices);
+                      },
+                      controlAffinity: ListTileControlAffinity.leading,
+                      title: Row(
+                        children: [
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Builder(
+                                  builder: (context) {
+                                    final hasDevolution = devolutions.any((element) {
+                                      return element.originalInvoiceId == currentInvoices.id;
+                                    });
+
+                                    if (hasDevolution) {
+                                      return const Icon(
+                                        Icons.circle,
+                                        color: Colors.green,
+                                        size: 18,
+                                      );
+                                    }
+
+                                    return const SizedBox.shrink();
+                                  },
+                                ),
+                                Text("Fact #${currentInvoices.docNumber}"),
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            child: Text(
+                              total,
+                              textAlign: TextAlign.start,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      subtitle: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(date),
+                        ],
+                      ),
+                      secondary: TextButton(
+                        onPressed: () {
+                          showInvoiceViewerDialog(context, currentInvoices);
+                        },
+                        child: const Text("Ver Factura"),
+                      ),
+                    );
                   },
-                  child: const Text("Ver Factura"),
                 ),
-              );
-            },
+              ),
+            ],
           );
         },
       ),

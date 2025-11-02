@@ -16,7 +16,8 @@ class ProductTransactionsDataSource with HttpService {
       _endpoint,
       queryParameters: queryParams.toMap(),
     );
-    final res = await getQuery(uri);
+    final header = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: header);
     return res;
   }
 }

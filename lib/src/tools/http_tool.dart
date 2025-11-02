@@ -8,6 +8,8 @@ class HttpTools {
   static Uri generateUri(String path, {int version = 1, Map<String, String>? queryParameters}) {
     assert(path.startsWith("/"));
 
+    baseUrl = "http://localhost:8000";
+
     final decodedBase = Uri.parse(baseUrl);
     final fullPath = "$_api/v$version$path";
 

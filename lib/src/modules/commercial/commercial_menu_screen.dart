@@ -152,6 +152,38 @@ class _Body extends StatelessWidget {
             ),
 
           const Divider(height: 0.0),
+          const Divider(
+            height: 4.0,
+            thickness: 2,
+          ),
+
+          if (accessManager.hasCurrentAccess(context, CommercialSubModules.priceSetting))
+            ListTile(
+              leading: Icon(
+                FluentIcons.money_calculator_20_filled,
+                size: 32,
+                color: Colors.blue.shade600,
+              ),
+              title: const Text("Devoluciones"),
+              onTap: () {
+                context.pushNamed("current-devolution");
+              },
+            ),
+          const Divider(height: 0.0),
+
+          if (accessManager.hasCurrentAccess(context, CommercialSubModules.priceSetting))
+            ListTile(
+              leading: Icon(
+                FluentIcons.money_calculator_20_filled,
+                size: 32,
+                color: Colors.blue.shade600,
+              ),
+              title: const Text("Crear Devolucion de Productos a Clientes"),
+              onTap: () {
+                context.pushNamed("client-devolution");
+              },
+            ),
+          const Divider(height: 0.0),
 
           const Divider(
             height: 4.0,

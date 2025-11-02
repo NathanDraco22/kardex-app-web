@@ -33,12 +33,37 @@ class AppliedInvoice {
   };
 }
 
+class AppliedDevolution {
+  final String devolutionId;
+  final String docNumber;
+  final int amountApplied;
+
+  AppliedDevolution({
+    required this.devolutionId,
+    required this.docNumber,
+    required this.amountApplied,
+  });
+
+  factory AppliedDevolution.fromJson(Map<String, dynamic> json) => AppliedDevolution(
+    devolutionId: json['devolutionId'],
+    docNumber: json['docNumber'],
+    amountApplied: json['amountApplied'],
+  );
+
+  Map<String, dynamic> toJson() => {
+    'devolutionId': devolutionId,
+    'docNumber': docNumber,
+    'amountApplied': amountApplied,
+  };
+}
+
 class BaseReceipt {
   final String branchId;
   final String clientId;
   final ClientInfo clientInfo;
   final String docNumber;
   final List<AppliedInvoice> appliedInvoices;
+  final List<AppliedDevolution> appliedDevolutions;
   final PaymentMethod paymentMethod;
   final String bankReference;
   final int total;
@@ -50,6 +75,7 @@ class BaseReceipt {
     required this.clientInfo,
     this.docNumber = "",
     required this.appliedInvoices,
+    required this.appliedDevolutions,
     required this.paymentMethod,
     this.bankReference = "",
     required this.total,
@@ -62,6 +88,7 @@ class BaseReceipt {
     clientInfo: ClientInfo.fromJson(json['clientInfo']),
     docNumber: json['docNumber'] ?? "",
     appliedInvoices: (json['appliedInvoices'] as List).map((e) => AppliedInvoice.fromJson(e)).toList(),
+    appliedDevolutions: (json['appliedDevolutions'] as List).map((e) => AppliedDevolution.fromJson(e)).toList(),
     paymentMethod: PaymentMethod.values.byName(json['paymentMethod']),
     bankReference: json['bankReference'] ?? "",
     total: json['total'],
@@ -74,6 +101,7 @@ class BaseReceipt {
     'clientInfo': clientInfo.toJson(),
     'docNumber': docNumber,
     'appliedInvoices': appliedInvoices.map((e) => e.toJson()).toList(),
+    'appliedDevolutions': appliedDevolutions.map((e) => e.toJson()).toList(),
     'paymentMethod': paymentMethod.name,
     'bankReference': bankReference,
     'total': total,
@@ -88,6 +116,7 @@ class CreateReceipt extends BaseReceipt {
     required super.clientInfo,
     super.docNumber,
     required super.appliedInvoices,
+    required super.appliedDevolutions,
     required super.paymentMethod,
     super.bankReference,
     required super.total,
@@ -100,6 +129,7 @@ class CreateReceipt extends BaseReceipt {
     clientInfo: ClientInfo.fromJson(json['clientInfo']),
     docNumber: json['docNumber'] ?? "",
     appliedInvoices: (json['appliedInvoices'] as List).map((e) => AppliedInvoice.fromJson(e)).toList(),
+    appliedDevolutions: (json['appliedDevolutions'] as List).map((e) => AppliedDevolution.fromJson(e)).toList(),
     paymentMethod: PaymentMethod.values.byName(json['paymentMethod']),
     bankReference: json['bankReference'] ?? "",
     total: json['total'],
@@ -123,6 +153,7 @@ class ReceiptInDb extends BaseReceipt {
     required super.clientInfo,
     super.docNumber,
     required super.appliedInvoices,
+    required super.appliedDevolutions,
     required super.paymentMethod,
     super.bankReference,
     required super.total,
@@ -138,6 +169,7 @@ class ReceiptInDb extends BaseReceipt {
     clientInfo: ClientInfo.fromJson(json['clientInfo']),
     docNumber: json['docNumber'] ?? "",
     appliedInvoices: (json['appliedInvoices'] as List).map((e) => AppliedInvoice.fromJson(e)).toList(),
+    appliedDevolutions: (json['appliedDevolutions'] as List).map((e) => AppliedDevolution.fromJson(e)).toList(),
     paymentMethod: PaymentMethod.values.byName(json['paymentMethod']),
     bankReference: json['bankReference'] ?? "",
     total: json['total'],
