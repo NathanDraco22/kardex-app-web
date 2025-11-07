@@ -43,14 +43,20 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
   final formKey = GlobalKey<FormState>();
   final creationMap = {};
 
+  bool isActive = true;
+  bool isCreditActive = true;
+  int creditLimit = 0;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final writeCubit = context.read<WriteClientCubit>();
 
     final wordPrefix = widget.client == null ? "Agregar" : "Actualizar";
-
-    bool isActive = true;
-    bool isCreditActive = false;
 
     if (widget.client != null) {
       isActive = widget.client!.isActive;
@@ -58,6 +64,8 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
     }
 
     creationMap['isActive'] = isActive;
+    creationMap['isCreditActive'] = isCreditActive;
+    creationMap['creditLimit'] = creditLimit;
 
     final currentClient = widget.client;
 
@@ -226,31 +234,30 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
                       },
                     ),
 
-                    const SizedBox(height: 12),
+                    // const SizedBox(height: 12),
 
-                    TitleTextField(
-                      key: const ValueKey("credit_field"),
-                      title: "Limite de Credito(C\$)*",
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [IntegerThousandsFormatter()],
-                      initialValue: widget.client?.creditLimit.toString(),
-                      validator: (value) {
-                        final formattedValue = value?.replaceAll(RegExp(r'[^0-9]'), "");
-                        if (formattedValue == null || formattedValue.isEmpty) {
-                          return "El campo es requerido";
-                        }
+                    // TitleTextField(
+                    //   key: const ValueKey("credit_field"),
+                    //   title: "Limite de Credito(C\$)*",
+                    //   keyboardType: TextInputType.number,
+                    //   inputFormatters: [IntegerThousandsFormatter()],
+                    //   initialValue: (widget.client?.creditLimit ?? 0).toString(),
+                    //   validator: (value) {
+                    //     final formattedValue = value?.replaceAll(RegExp(r'[^0-9]'), "");
+                    //     if (formattedValue == null || formattedValue.isEmpty) {
+                    //       return "El campo es requerido";
+                    //     }
 
-                        final number = int.tryParse(formattedValue.trim());
+                    //     final number = int.tryParse(formattedValue.trim());
 
-                        if (number == null) {
-                          return "Numero incorrecto";
-                        }
+                    //     if (number == null) {
+                    //       return "Numero incorrecto";
+                    //     }
 
-                        creationMap["creditLimit"] = number;
-                        return null;
-                      },
-                    ),
-
+                    //     creationMap["creditLimit"] = number * 100;
+                    //     return null;
+                    //   },
+                    // ),
                     const SizedBox(height: 12),
 
                     StatefulBuilder(
