@@ -26,7 +26,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
               children: [
                 TextButton.icon(
                   onPressed: () async {
-                    selectedProduct ??= await showProductSearchDelegate(context);
+                    selectedProduct = await showProductSearchDelegate(context);
                     if (selectedProduct == null) return;
 
                     readCubit.loadPaginatedTransactions(

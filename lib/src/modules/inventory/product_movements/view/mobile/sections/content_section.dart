@@ -126,51 +126,55 @@ class _ContentSection extends StatelessWidget {
                 ),
 
                 Expanded(
-                  child: ListView.builder(
-                    reverse: true,
-                    itemCount: state.transactions.length,
-                    itemBuilder: (context, index) {
-                      final currentTransaction = state.transactions[index];
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: ListView.builder(
+                      reverse: true,
+                      shrinkWrap: true,
+                      itemCount: state.transactions.length,
+                      itemBuilder: (context, index) {
+                        final currentTransaction = state.transactions[index];
 
-                      final rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+                        final rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
 
-                      if (index < state.transactions.length - 1) {
-                        final nextTransaction = state.transactions[index + 1];
-                        if (currentTransaction.createdAt.day != nextTransaction.createdAt.day) {
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(4),
-                                decoration: BoxDecoration(
-                                  color: Colors.amber.shade100,
-                                ),
-                                child: Text(
-                                  DateTimeTool.formatddMMyy(currentTransaction.createdAt),
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12,
+                        if (index < state.transactions.length - 1) {
+                          final nextTransaction = state.transactions[index + 1];
+                          if (currentTransaction.createdAt.day != nextTransaction.createdAt.day) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.amber.shade100,
+                                  ),
+                                  child: Text(
+                                    DateTimeTool.formatddMMyy(currentTransaction.createdAt),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Divider(
-                                height: 0.0,
-                                thickness: 2.0,
-                                color: Colors.amber.shade100,
-                              ),
-                              MovementMobileRow(
-                                currentTransaction: currentTransaction,
-                                rowColor: rowColor,
-                              ),
-                            ],
-                          );
+                                Divider(
+                                  height: 0.0,
+                                  thickness: 2.0,
+                                  color: Colors.amber.shade100,
+                                ),
+                                MovementMobileRow(
+                                  currentTransaction: currentTransaction,
+                                  rowColor: rowColor,
+                                ),
+                              ],
+                            );
+                          }
                         }
-                      }
-                      return MovementMobileRow(
-                        currentTransaction: currentTransaction,
-                        rowColor: rowColor,
-                      );
-                    },
+                        return MovementMobileRow(
+                          currentTransaction: currentTransaction,
+                          rowColor: rowColor,
+                        );
+                      },
+                    ),
                   ),
                 ),
               ],

@@ -121,10 +121,7 @@ class _Body extends StatelessWidget {
           //   ),
           const Divider(height: 0.0),
 
-          if (accessManager.hasCurrentAccess(
-            context,
-            CommercialSubModules.pendingInvoices,
-          ))
+          if (accessManager.hasCurrentAccess(context, CommercialSubModules.pendingInvoices))
             ListTile(
               leading: Icon(
                 FluentIcons.document_endnote_24_filled,
@@ -138,46 +135,20 @@ class _Body extends StatelessWidget {
             ),
           const Divider(height: 0.0),
 
-          if (accessManager.hasCurrentAccess(context, CommercialSubModules.invoiceHistory))
-            ListTile(
-              leading: Icon(
-                FluentIcons.history_28_filled,
-                size: 32,
-                color: Colors.teal.shade600,
-              ),
-              title: const Text("Historial de Facturacion a Clientes por dia"),
-              onTap: () {
-                context.pushNamed("daily-invoice-history");
-              },
-            ),
-
-          if (accessManager.hasCurrentAccess(context, CommercialSubModules.invoiceHistory))
-            ListTile(
-              leading: Icon(
-                FluentIcons.history_28_filled,
-                size: 32,
-                color: Colors.amber.shade600,
-              ),
-              title: const Text("Historial de Recibos por dia"),
-              onTap: () {
-                context.pushNamed("daily-receipt-history");
-              },
-            ),
-
-          if (accessManager.hasCurrentAccess(context, CommercialSubModules.invoiceHistory))
+          if (accessManager.hasCurrentAccess(context, CommercialSubModules.pendingInvoices))
             ListTile(
               leading: Icon(
                 Icons.content_paste_search_rounded,
                 size: 32,
-                color: Colors.amber.shade600,
+                color: Colors.teal.shade600,
               ),
               title: const Text("Historial de Recibos"),
               onTap: () {
                 context.pushNamed("receipt-history");
               },
             ),
-
           const Divider(height: 0.0),
+
           const Divider(
             height: 4.0,
             thickness: 2,
@@ -218,7 +189,7 @@ class _Body extends StatelessWidget {
               leading: Icon(
                 Icons.content_paste_search_rounded,
                 size: 32,
-                color: Colors.amber.shade600,
+                color: Colors.orange.shade600,
               ),
               title: const Text("Historial de Devoluciones"),
               onTap: () {
