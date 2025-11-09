@@ -146,4 +146,18 @@ class InvoicesDataSource with HttpService {
     final res = await patchQuery(uri, body: invoice, headers: headers);
     return res;
   }
+
+  Future<Map<String, dynamic>> getInvoicesHistory(Map<String, String> params) async {
+    final uri = HttpTools.generateUri("$_endpoint/history", queryParameters: params);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
+    return res;
+  }
+
+  Future<Map<String, dynamic>> getInvoiceByDocNumber(String docNumber) async {
+    final uri = HttpTools.generateUri("$_endpoint/doc/$docNumber");
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
+    return res;
+  }
 }

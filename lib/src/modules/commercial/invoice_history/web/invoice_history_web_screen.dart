@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'package:kardex_app_front/src/cubits/invoice_history/read_invoice_history_cubit.dart';
+import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
 import 'package:kardex_app_front/src/domain/models/models.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_app_front/widgets/date_picker_button.dart';
+import 'package:kardex_app_front/widgets/dialogs/invoice_viewer.dart';
+import 'package:kardex_app_front/widgets/dialogs/simple_search_dialog.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
-
-import '../cubit/read_invoice_cubit.dart';
 
 part 'sections/content_section.dart';
 part 'sections/header_section.dart';
@@ -47,7 +51,7 @@ class _Body extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SizedBox(
-              height: 160,
+              height: 180,
               child: _HeaderSection(),
             ),
             Expanded(

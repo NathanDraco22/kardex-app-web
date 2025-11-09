@@ -30,4 +30,18 @@ class ReceiptsDataSource with HttpService {
     final res = await getQuery(uri, headers: headers);
     return res;
   }
+
+  Future<Map<String, dynamic>> getReceiptByDocNumber(String docNumber) async {
+    final uri = HttpTools.generateUri("$_endpoint/doc/$docNumber");
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
+    return res;
+  }
+
+  Future<Map<String, dynamic>> getReceiptHistory(Map<String, String> queryParams) async {
+    final uri = HttpTools.generateUri("$_endpoint/history", queryParameters: queryParams);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
+    return res;
+  }
 }

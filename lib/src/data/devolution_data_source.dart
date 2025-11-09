@@ -51,4 +51,16 @@ class DevolutionsDataSource with HttpService {
     final header = HttpTools.generateAuthHeaders();
     return await deleteQuery(uri, headers: header);
   }
+
+  Future<Map<String, dynamic>> getDevolutionHistory(Map<String, String> params) async {
+    final uri = HttpTools.generateUri("$_endpoint/history", queryParameters: params);
+    final headers = HttpTools.generateAuthHeaders();
+    return await getQuery(uri, headers: headers);
+  }
+
+  Future<Map<String, dynamic>> getDevolutionByDocNumber(String docNumber) async {
+    final uri = HttpTools.generateUri("$_endpoint/doc/$docNumber");
+    final headers = HttpTools.generateAuthHeaders();
+    return await getQuery(uri, headers: headers);
+  }
 }

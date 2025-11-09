@@ -2,6 +2,7 @@ import 'package:kardex_app_front/constants/default_values.dart';
 import 'package:kardex_app_front/src/data/data.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_totals.dart';
+import 'package:kardex_app_front/src/domain/query_params/history_params.dart';
 import 'package:kardex_app_front/src/domain/responses/list_responses.dart';
 
 class InvoicesRepository {
@@ -109,6 +110,17 @@ class InvoicesRepository {
   ) async {
     final result = await invoicesDataSource.updateInvoiceById(invoiceId, invoice.toJson());
     if (result == null) return null;
+    return InvoiceInDb.fromJson(result);
+  }
+
+  Future<List<InvoiceInDb>> getInvoicesHistory(ClientHistoryParams params) async {
+    final res = await invoicesDataSource.getInvoicesHistory(params.toMap());
+    final result = ListResponse<InvoiceInDb>.fromJson(res, InvoiceInDb.fromJson);
+    return result.data;
+  }
+
+  Future<InvoiceInDb> getInvoiceByDocNumber(String docNumber) async {
+    final result = await invoicesDataSource.getInvoiceByDocNumber(docNumber);
     return InvoiceInDb.fromJson(result);
   }
 }

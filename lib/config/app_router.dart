@@ -10,8 +10,11 @@ import 'package:kardex_app_front/src/modules/commercial/current_orders/current_o
 import 'package:kardex_app_front/src/modules/commercial/daily_anon_invoinces/daily_anon_invoices_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/daily_client_invoices/daily_client_invoices.dart';
 import 'package:kardex_app_front/src/modules/commercial/daily_receipt/daily_receipt_screen.dart';
+import 'package:kardex_app_front/src/modules/commercial/devolution_history/devolution_history_screen.dart';
+import 'package:kardex_app_front/src/modules/commercial/invoice_history/invoice_history_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/pending_invoice_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/product_price_setting/product_price_setting.dart';
+import 'package:kardex_app_front/src/modules/commercial/receipt_history/receipt_history_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/client_accounts/view/client_account_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/finances_menu_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/paid_invoices/paid_invoices_screen.dart';
@@ -117,6 +120,12 @@ class AppRouter {
           ),
 
           GoRoute(
+            path: "invoice-history",
+            name: "invoice-history",
+            builder: (context, state) => const InvoiceHistoryScreen(),
+          ),
+
+          GoRoute(
             path: "current-orders",
             name: "current-orders",
             builder: (context, state) => const CurrentOrdersScreen(),
@@ -152,6 +161,12 @@ class AppRouter {
           ),
 
           GoRoute(
+            path: "receipt-history",
+            name: "receipt-history",
+            builder: (context, state) => const ReceiptHistoryScreen(),
+          ),
+
+          GoRoute(
             path: "current-devolution",
             name: "current-devolution",
             builder: (context, state) => const CurrentDevolutionsScreen(),
@@ -161,6 +176,12 @@ class AppRouter {
             path: "client-devolution",
             name: "client-devolution",
             builder: (context, state) => const ClientDevolutionScreen(),
+          ),
+
+          GoRoute(
+            path: "devolution-history",
+            name: "devolution-history",
+            builder: (context, state) => const DevolutionHistoryScreen(),
           ),
 
           GoRoute(

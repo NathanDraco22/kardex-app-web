@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/src/cubits/invoice_history/read_invoice_history_cubit.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
-import 'package:kardex_app_front/src/modules/commercial/invoice_history/cubit/read_invoice_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/invoice_history/web/invoice_history_web_screen.dart';
 
 class InvoiceHistoryScreen extends StatelessWidget {
@@ -12,9 +12,7 @@ class InvoiceHistoryScreen extends StatelessWidget {
     final invoiceRepo = context.read<InvoicesRepository>();
 
     return BlocProvider(
-      create: (context) => ReadInvoiceCubit(
-        invoicesRepository: invoiceRepo,
-      ),
+      create: (context) => ReadInvoiceHistoryCubit(invoiceRepo)..loadInvoicesHistory(),
       child: const _RootScaffold(),
     );
   }

@@ -62,6 +62,19 @@ class _Body extends StatelessWidget {
               },
             ),
 
+          if (accessManager.hasCurrentAccess(context, CommercialSubModules.createInvoice))
+            ListTile(
+              leading: Icon(
+                Icons.content_paste_search_rounded,
+                size: 32,
+                color: Colors.blueGrey.shade600,
+              ),
+              title: const Text("Historial de Facturas"),
+              onTap: () {
+                context.pushNamed("invoice-history");
+              },
+            ),
+
           const Divider(
             height: 4.0,
             thickness: 2,
@@ -151,6 +164,19 @@ class _Body extends StatelessWidget {
               },
             ),
 
+          if (accessManager.hasCurrentAccess(context, CommercialSubModules.invoiceHistory))
+            ListTile(
+              leading: Icon(
+                Icons.content_paste_search_rounded,
+                size: 32,
+                color: Colors.amber.shade600,
+              ),
+              title: const Text("Historial de Recibos"),
+              onTap: () {
+                context.pushNamed("receipt-history");
+              },
+            ),
+
           const Divider(height: 0.0),
           const Divider(
             height: 4.0,
@@ -184,6 +210,22 @@ class _Body extends StatelessWidget {
                 context.pushNamed("client-devolution");
               },
             ),
+
+          const Divider(height: 0.0),
+
+          if (accessManager.hasCurrentAccess(context, CommercialSubModules.createDevolution))
+            ListTile(
+              leading: Icon(
+                Icons.content_paste_search_rounded,
+                size: 32,
+                color: Colors.amber.shade600,
+              ),
+              title: const Text("Historial de Devoluciones"),
+              onTap: () {
+                context.pushNamed("devolution-history");
+              },
+            ),
+
           const Divider(height: 0.0),
 
           const Divider(
