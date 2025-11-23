@@ -92,7 +92,7 @@ class _RootScaffold extends StatelessWidget {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Confirmar Devolución"),
+          title: const Text("Confirmar"),
         ),
         body: _Body(
           invoice: invoice,

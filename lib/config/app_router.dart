@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/src/modules/activation/activation_screen.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/view/client_catalog_screen.dart';
+import 'package:kardex_app_front/src/modules/commercial/anon_devolution/anon_devolution_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/anon_invoices_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_devolution/client_devolution_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/client_invoices_screen.dart';
@@ -111,6 +112,12 @@ class AppRouter {
             path: "anon-invoice",
             name: "anon-invoice",
             builder: (context, state) => const AnonInvoicesScreen(),
+          ),
+
+          GoRoute(
+            path: "anon-devolution",
+            name: "anon-devolution",
+            builder: (context, state) => const AnonDevolutionScreen(),
           ),
 
           GoRoute(

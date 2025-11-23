@@ -138,7 +138,7 @@ class _RootScaffold extends StatelessWidget {
                       writeCubit.cancelDevolution(devolution.id);
                     },
                     icon: const Icon(Icons.cancel),
-                    label: const Text("Cancelar Devolución"),
+                    label: const Text("Cancelar"),
                   ),
                   const SizedBox(width: 32),
                   ElevatedButton.icon(
@@ -148,10 +148,10 @@ class _RootScaffold extends StatelessWidget {
                     onPressed: () async {
                       final res = await showConfirmDevolutionModal(context, devolution);
                       if (res != true) return;
-                      writeCubit.confirmDevolution(devolution.id);
+                      writeCubit.confirmDevolution(devolution);
                     },
                     icon: const Icon(Icons.check),
-                    label: const Text("Confirmar Devolución"),
+                    label: const Text("Confirmar"),
                   ),
                 ],
               );

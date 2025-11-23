@@ -7,8 +7,8 @@ import 'package:kardex_app_front/src/domain/models/devolution/devolution.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
-import 'package:kardex_app_front/src/modules/commercial/client_devolution/web/devolution_confirmation_screen.dart';
-import 'package:kardex_app_front/src/modules/commercial/client_devolution/web/mediators/devolution_selection_mediator.dart';
+import 'devolution_confirmation_screen.dart';
+import 'mediators/devolution_selection_mediator.dart';
 
 part 'devolution_sections/content_section.dart';
 part 'devolution_sections/header_section.dart';

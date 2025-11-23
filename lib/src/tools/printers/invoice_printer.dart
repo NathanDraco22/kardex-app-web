@@ -152,6 +152,22 @@ Future<Uint8List> generateTicketPdfFromInvoice(InvoiceInDb invoice, BranchInDb b
                 ),
               ),
 
+            if (invoice.clientInfo.location != null && invoice.clientInfo.location!.isNotEmpty)
+              pw.Text(
+                "${invoice.clientInfo.location}",
+                style: pw.TextStyle(
+                  fontSize: TicketSettings.contentFontSize,
+                ),
+              ),
+
+            if (invoice.clientInfo.address != null && invoice.clientInfo.address!.isNotEmpty)
+              pw.Text(
+                "${invoice.clientInfo.address}",
+                style: pw.TextStyle(
+                  fontSize: TicketSettings.contentFontSize,
+                ),
+              ),
+
             pw.Text(
               "Elaborado por: ${invoice.createdBy.name}",
               style: pw.TextStyle(

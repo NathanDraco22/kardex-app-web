@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/constants/default_values.dart';
 import 'package:kardex_app_front/src/domain/models/devolution/devolution.dart';
 
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
@@ -21,11 +22,20 @@ class WriteDevolutionCubit extends Cubit<WriteDevolutionState> {
     }
   }
 
-  Future<void> confirmDevolution(String devolutionId) async {
+  Future<void> confirmDevolution(DevolutionInDb devolution) async {
     emit(WriteDevolutionInProgress());
+    DevolutionInDb? updatedDevolution;
     try {
-      final devolution = await devolutionsRepository.confirmDevolutionById(devolutionId);
-      emit(WriteDevolutionSuccess(devolution!));
+      if (devolution.clientId == kSaleClientId) {
+        updatedDevolution = await devolutionsRepository.confirmAnonDevolutionById(devolution.id);
+      } else {
+        updatedDevolution = await devolutionsRepository.confirmDevolutionById(devolution.id);
+      }
+      if (updatedDevolution == null) {
+        emit(WriteDevolutionError('Error al confirmar la devolución'));
+        return;
+      }
+      emit(WriteDevolutionSuccess(updatedDevolution));
       emit(WriteDevolutionInitial());
     } catch (error) {
       emit(WriteDevolutionError(error.toString()));
@@ -34,9 +44,14 @@ class WriteDevolutionCubit extends Cubit<WriteDevolutionState> {
 
   Future<void> confirmAnonDevolution(String devolutionId) async {
     emit(WriteDevolutionInProgress());
+    DevolutionInDb? updatedDevolution;
     try {
-      final devolution = await devolutionsRepository.confirmAnonDevolutionById(devolutionId);
-      emit(WriteDevolutionSuccess(devolution!));
+      updatedDevolution = await devolutionsRepository.confirmAnonDevolutionById(devolutionId);
+      if (updatedDevolution == null) {
+        emit(WriteDevolutionError('Error al confirmar la devolución'));
+        return;
+      }
+      emit(WriteDevolutionSuccess(updatedDevolution));
       emit(WriteDevolutionInitial());
     } catch (error) {
       emit(WriteDevolutionError(error.toString()));

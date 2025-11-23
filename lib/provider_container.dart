@@ -36,6 +36,7 @@ class ProviderContainer extends StatelessWidget {
     final productTransactionDataSource = ProductTransactionsDataSource();
     final expirationLogsDataSource = ExpirationLogsDataSource();
     final devolutionDataSource = DevolutionsDataSource();
+    final invoiceDevolutionDataSource = InvoiceDevolutionsDataSource();
 
     return MultiRepositoryProvider(
       providers: [
@@ -96,7 +97,10 @@ class ProviderContainer extends StatelessWidget {
         ),
 
         RepositoryProvider(
-          create: (context) => InvoicesRepository(invoiceDataSource),
+          create: (context) => InvoicesRepository(
+            invoiceDataSource,
+            invoiceDevolutionDataSource,
+          ),
         ),
 
         RepositoryProvider(

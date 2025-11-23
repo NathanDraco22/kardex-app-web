@@ -3,12 +3,14 @@ import 'package:kardex_app_front/src/data/data.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_totals.dart';
 import 'package:kardex_app_front/src/domain/query_params/history_params.dart';
+import 'package:kardex_app_front/src/domain/responses/invoice_devolution_response.dart';
 import 'package:kardex_app_front/src/domain/responses/list_responses.dart';
 
 class InvoicesRepository {
   final InvoicesDataSource invoicesDataSource;
+  final InvoiceDevolutionsDataSource invoiceDevolutionsDataSource;
 
-  InvoicesRepository(this.invoicesDataSource);
+  InvoicesRepository(this.invoicesDataSource, this.invoiceDevolutionsDataSource);
 
   Future<InvoiceInDb> createInvoice(CreateInvoice createInvoice) async {
     late Map<String, dynamic> result;
@@ -122,5 +124,10 @@ class InvoicesRepository {
   Future<InvoiceInDb> getInvoiceByDocNumber(String docNumber) async {
     final result = await invoicesDataSource.getInvoiceByDocNumber(docNumber);
     return InvoiceInDb.fromJson(result);
+  }
+
+  Future<InvoiceDevolutionResponse> getAnonInvoiceDevolutionByDocNumber(String docNumber) async {
+    final result = await invoiceDevolutionsDataSource.getAnonInvoicesWithDevlutions(docNumber);
+    return InvoiceDevolutionResponse.fromJson(result);
   }
 }

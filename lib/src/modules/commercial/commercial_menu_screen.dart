@@ -52,15 +52,20 @@ class _Body extends StatelessWidget {
           if (accessManager.hasCurrentAccess(context, CommercialSubModules.createInvoice))
             ListTile(
               leading: Icon(
-                FluentIcons.history_28_filled,
+                Icons.file_open_rounded,
                 size: 32,
                 color: Colors.blueGrey.shade600,
               ),
-              title: const Text("Historial de Facturacion por dia"),
+              title: const Text("Devolucion de productos"),
               onTap: () {
-                context.pushNamed("daily-invoice");
+                context.pushNamed("anon-devolution");
               },
             ),
+
+          const Divider(
+            height: 4.0,
+            thickness: 2,
+          ),
 
           if (accessManager.hasCurrentAccess(context, CommercialSubModules.createInvoice))
             ListTile(
@@ -74,11 +79,6 @@ class _Body extends StatelessWidget {
                 context.pushNamed("invoice-history");
               },
             ),
-
-          const Divider(
-            height: 4.0,
-            thickness: 2,
-          ),
 
           const Divider(height: 0.0),
           if (accessManager.hasCurrentAccess(context, CommercialSubModules.orders))

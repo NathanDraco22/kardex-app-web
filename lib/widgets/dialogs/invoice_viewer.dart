@@ -84,15 +84,6 @@ class _InvoiceViewer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final totalDiscount = invoice.saleItems.fold(
-      0,
-      (previousValue, element) => previousValue + element.totalDiscount,
-    );
-    final invoiceSubTotal = invoice.saleItems.fold(
-      0,
-      (element, previousValue) => previousValue.subTotal + element,
-    );
-
     return Scaffold(
       appBar: AppBar(
         title: Text("Factura #${invoice.docNumber}"),
@@ -116,226 +107,265 @@ class _InvoiceViewer extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 600),
-              child: Column(
-                children: [
-                  const Text(
-                    "Factura",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "No. ${invoice.docNumber}",
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              Text(
-                                DateTimeTool.formatddMMyy(invoice.createdAt),
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                              ),
-                              Text(
-                                DateTimeTool.formatHHmm(invoice.createdAt),
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-
-                      Builder(
-                        builder: (context) {
-                          String paymentType = "CREDITO";
-
-                          if (invoice.paymentType == PaymentType.cash) {
-                            paymentType = "CONTADO";
-                          }
-
-                          return Text(
-                            paymentType,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          );
-                        },
-                      ),
-
-                      const SizedBox(height: 16),
-                      Text(
-                        branch.name,
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                      ),
-                      Text(
-                        "Cliente: ${invoice.clientInfo.name}",
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                      ),
-
-                      Row(
-                        children: [
-                          Text(
-                            "Elaborado por: ${invoice.createdBy.name}",
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  const Divider(),
-                  Flexible(
-                    flex: 3,
-                    child: Column(
-                      children: [
-                        const SizedBox(
-                          height: 30,
-                          child: Row(
-                            children: [
-                              Expanded(
-                                flex: 2,
-                                child: Text(
-                                  "Producto",
-                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                                ),
-                              ),
-                              Expanded(
-                                child: Text(
-                                  "Cantidad",
-                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                                ),
-                              ),
-                              Expanded(
-                                child: Text(
-                                  "Precio",
-                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                                ),
-                              ),
-                              Expanded(
-                                child: Text(
-                                  "Total",
-                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: ListView.builder(
-                            itemCount: invoice.saleItems.length,
-                            itemBuilder: (context, index) {
-                              final saleItem = invoice.saleItems[index];
-                              final rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
-                              return Container(
-                                padding: const EdgeInsets.all(4),
-                                color: rowColor,
-                                child: Row(
-                                  children: [
-                                    Expanded(flex: 2, child: Text(saleItem.product.name)),
-                                    Expanded(child: Text(saleItem.quantity.toString())),
-                                    Expanded(
-                                      child: Text(
-                                        NumberFormatter.convertToMoneyLike(saleItem.price),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Text(
-                                        NumberFormatter.convertToMoneyLike(saleItem.subTotal),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                        const Divider(),
-                        SizedBox(
-                          height: 65,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              const Spacer(),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  const Text(
-                                    "SubTotal:",
-                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                                  ),
-                                  SizedBox(
-                                    width: 100,
-                                    child: Text(
-                                      NumberFormatter.convertToMoneyLike(invoiceSubTotal),
-                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                                      textAlign: TextAlign.end,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  const Text(
-                                    "Total Descuento:",
-                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                                  ),
-                                  SizedBox(
-                                    width: 100,
-                                    child: Text(
-                                      NumberFormatter.convertToMoneyLike(totalDiscount),
-                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                                      textAlign: TextAlign.end,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              DecoratedBox(
-                                decoration: BoxDecoration(color: Colors.grey.shade200),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    const Text(
-                                      "Total:",
-                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.grey),
-                                    ),
-                                    SizedBox(
-                                      width: 100,
-                                      child: Text(
-                                        NumberFormatter.convertToMoneyLike(invoice.total),
-                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                                        textAlign: TextAlign.end,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+              child: InvoiceViewerContent(
+                invoice: invoice,
+                branch: branch,
               ),
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+class InvoiceViewerContent extends StatelessWidget {
+  const InvoiceViewerContent({
+    super.key,
+    required this.invoice,
+    required this.branch,
+  });
+
+  final InvoiceInDb invoice;
+  final BranchInDb branch;
+
+  @override
+  Widget build(BuildContext context) {
+    final totalDiscount = invoice.saleItems.fold(
+      0,
+      (previousValue, element) => previousValue + element.totalDiscount,
+    );
+    final invoiceSubTotal = invoice.saleItems.fold(
+      0,
+      (element, previousValue) => previousValue.subTotal + element,
+    );
+    return Column(
+      children: [
+        const Text(
+          "Factura",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "No. ${invoice.docNumber}",
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+                Column(
+                  children: [
+                    Text(
+                      DateTimeTool.formatddMMyy(invoice.createdAt),
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                    Text(
+                      DateTimeTool.formatHHmm(invoice.createdAt),
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+
+            Builder(
+              builder: (context) {
+                String paymentType = "CREDITO";
+
+                if (invoice.paymentType == PaymentType.cash) {
+                  paymentType = "CONTADO";
+                }
+
+                return Text(
+                  paymentType,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                );
+              },
+            ),
+
+            const SizedBox(height: 16),
+            Text(
+              branch.name,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            Text(
+              "Cliente: ${invoice.clientInfo.name}",
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+
+            if (invoice.clientInfo.location != null && invoice.clientInfo.location!.isNotEmpty)
+              Text(
+                "${invoice.clientInfo.location}",
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+
+            if (invoice.clientInfo.address != null && invoice.clientInfo.address!.isNotEmpty)
+              Text(
+                "${invoice.clientInfo.address}",
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+
+            Row(
+              children: [
+                Text(
+                  "Elaborado por: ${invoice.createdBy.name}",
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const Divider(),
+        Flexible(
+          flex: 3,
+          child: Column(
+            children: [
+              const SizedBox(
+                height: 30,
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: Text(
+                        "Producto",
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        "Cantidad",
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        "Precio",
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        "Total",
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: invoice.saleItems.length,
+                  itemBuilder: (context, index) {
+                    final saleItem = invoice.saleItems[index];
+                    final rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+                    return Container(
+                      padding: const EdgeInsets.all(4),
+                      color: rowColor,
+                      child: Row(
+                        children: [
+                          Expanded(flex: 2, child: Text(saleItem.product.name)),
+                          Expanded(child: Text(saleItem.quantity.toString())),
+                          Expanded(
+                            child: Text(
+                              NumberFormatter.convertToMoneyLike(saleItem.price),
+                            ),
+                          ),
+                          Expanded(
+                            child: Text(
+                              NumberFormatter.convertToMoneyLike(saleItem.subTotal),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const Divider(),
+              SizedBox(
+                height: 65,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    const Spacer(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        const Text(
+                          "SubTotal:",
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                        SizedBox(
+                          width: 100,
+                          child: Text(
+                            NumberFormatter.convertToMoneyLike(invoiceSubTotal),
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            textAlign: TextAlign.end,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        const Text(
+                          "Total Descuento:",
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                        SizedBox(
+                          width: 100,
+                          child: Text(
+                            NumberFormatter.convertToMoneyLike(totalDiscount),
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            textAlign: TextAlign.end,
+                          ),
+                        ),
+                      ],
+                    ),
+                    DecoratedBox(
+                      decoration: BoxDecoration(color: Colors.grey.shade200),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          const Text(
+                            "Total:",
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.grey),
+                          ),
+                          SizedBox(
+                            width: 100,
+                            child: Text(
+                              NumberFormatter.convertToMoneyLike(invoice.total),
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                              textAlign: TextAlign.end,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

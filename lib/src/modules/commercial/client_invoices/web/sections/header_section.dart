@@ -295,17 +295,19 @@ CreateInvoice createInvoiceFromControllers(
 
   final (currentUser, currentBranch) = SessionTool.getFullUserFrom(context);
 
+  final clientInfo = ClientInfo(
+    name: selectedClient.name,
+    address: selectedClient.address,
+    cardId: selectedClient.cardId,
+    location: selectedClient.location,
+    phone: selectedClient.phone,
+    email: selectedClient.email,
+  );
+
   final createClientInvoice = CreateInvoice(
     branchId: currentBranch.id,
     clientId: selectedClient.id,
-    clientInfo: ClientInfo(
-      name: selectedClient.name,
-      address: selectedClient.address,
-      cardId: selectedClient.cardId,
-      location: selectedClient.location,
-      phone: selectedClient.phone,
-      email: selectedClient.email,
-    ),
+    clientInfo: clientInfo,
     docNumber: "",
     description: viewController.description,
     saleItems: salesItems.toList(),
