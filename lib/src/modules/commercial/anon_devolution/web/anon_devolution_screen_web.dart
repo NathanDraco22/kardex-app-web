@@ -15,12 +15,18 @@ class AnonDevolutionScreenWeb extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final readCubit = context.watch<ReadAnonInvoicesCubit>();
+    final viewInsets = MediaQuery.viewInsetsOf(context);
     return Scaffold(
       floatingActionButton: Builder(
         builder: (context) {
           if (readCubit.state is! ReadAnonInvoicesSuccess) {
             return const SizedBox.shrink();
           }
+
+          if (viewInsets.bottom > 0) {
+            return const SizedBox.shrink();
+          }
+
           return FloatingActionButton.extended(
             onPressed: () {
               final state = readCubit.state as ReadAnonInvoicesSuccess;
@@ -54,12 +60,12 @@ class _Body extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Padding(
-      padding: EdgeInsets.all(8.0),
+      padding: EdgeInsets.all(4.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _HeaderSection(),
-          SizedBox(height: 8),
+          SizedBox(height: 4),
           Expanded(
             child: _ContentSection(),
           ),

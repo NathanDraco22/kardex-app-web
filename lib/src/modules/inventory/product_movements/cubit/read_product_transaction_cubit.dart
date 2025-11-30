@@ -38,8 +38,10 @@ class ReadProductTransactionCubit extends Cubit<ReadProductTransactionState> {
 
       final response = await transactionsRepository.getAllProductTransactions(queryParams);
 
+      queryParams.offset += response.data.length;
+
       _transactionsCache = response.data;
-      if (_transactionsCache.length >= response.count) {
+      if (paginationItems > response.count) {
         isLastPage = true;
       } else {
         isLastPage = false;
@@ -59,14 +61,25 @@ class ReadProductTransactionCubit extends Cubit<ReadProductTransactionState> {
   }
 
   Future<void> getNextPage() async {
+    if (state is FetchingNextPage) return;
     if (isLastPage) return;
+    final currentState = state;
+    if (currentState is! ReadProductTransactionSuccess) return;
+    emit(
+      FetchingNextPage(
+        currentState.transactions,
+        currentState.totalCount,
+        product: currentState.product,
+      ),
+    );
     try {
-      queryParams.offset = _transactionsCache.length;
-
       final response = await transactionsRepository.getAllProductTransactions(queryParams);
 
+      queryParams.offset += paginationItems;
+
       _transactionsCache.addAll(response.data);
-      if (_transactionsCache.length >= response.count) {
+
+      if (response.count < paginationItems) {
         isLastPage = true;
       }
       if (isClosed) return;

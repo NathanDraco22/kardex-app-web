@@ -69,10 +69,25 @@ class _Body extends StatelessWidget {
 
           if (accessManager.hasCurrentAccess(context, CommercialSubModules.createInvoice))
             ListTile(
+              leading: const Icon(
+                Icons.sync,
+                size: 32,
+                color: Colors.teal,
+              ),
+              title: const Text("Movimientos de un Producto"),
+              onTap: () {
+                context.pushNamed("commercial-product-movements");
+              },
+            ),
+
+          const Divider(height: 0.0),
+
+          if (accessManager.hasCurrentAccess(context, CommercialSubModules.createInvoice))
+            ListTile(
               leading: Icon(
                 Icons.content_paste_search_rounded,
                 size: 32,
-                color: Colors.blueGrey.shade600,
+                color: Colors.green.shade600,
               ),
               title: const Text("Historial de Facturas"),
               onTap: () {

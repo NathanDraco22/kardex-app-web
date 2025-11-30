@@ -42,23 +42,35 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Padding(
-        padding: EdgeInsets.all(4.0),
-        child: Column(
-          spacing: 8,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(
-              height: 100,
-              child: _HeaderSection(),
-            ),
-            Expanded(
-              child: Card(
-                child: _ContentSection(),
+    return NotificationListener<ScrollNotification>(
+      onNotification: (notification) {
+        final maxScrollExtend = notification.metrics.maxScrollExtent;
+        final scrollOffset = notification.metrics.pixels;
+        final nextPageThreshold = maxScrollExtend * 0.65;
+
+        if (scrollOffset >= nextPageThreshold) {
+          context.read<ReadProductTransactionCubit>().getNextPage();
+        }
+        return false;
+      },
+      child: const Center(
+        child: Padding(
+          padding: EdgeInsets.all(4.0),
+          child: Column(
+            spacing: 8,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(
+                height: 100,
+                child: _HeaderSection(),
               ),
-            ),
-          ],
+              Expanded(
+                child: Card(
+                  child: _ContentSection(),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

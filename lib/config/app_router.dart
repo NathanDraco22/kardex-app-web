@@ -15,6 +15,7 @@ import 'package:kardex_app_front/src/modules/commercial/devolution_history/devol
 import 'package:kardex_app_front/src/modules/commercial/invoice_history/invoice_history_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/pending_invoice_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/product_price_setting/product_price_setting.dart';
+import 'package:kardex_app_front/src/modules/commercial/product_movements/view/commercial_product_movements_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/receipt_history/receipt_history_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/client_accounts/view/client_account_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/finances_menu_screen.dart';
@@ -195,6 +196,11 @@ class AppRouter {
             path: "product-price-setting",
             name: "product-price-setting",
             builder: (context, state) => const ProductPriceSettingScreen(),
+          ),
+          GoRoute(
+            path: "product-movements",
+            name: "commercial-product-movements",
+            builder: (context, state) => const CommercialProductMovementsScreen(),
           ),
         ],
       ),
