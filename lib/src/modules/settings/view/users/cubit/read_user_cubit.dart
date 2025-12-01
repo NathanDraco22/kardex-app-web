@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/src/domain/models/branch/branch_model.dart';
 import 'package:kardex_app_front/src/domain/models/user/user_model.dart';
 import 'package:kardex_app_front/src/domain/models/user_role/user_role_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
@@ -11,10 +12,12 @@ class ReadUserCubit extends Cubit<ReadUserState> {
   ReadUserCubit({
     required this.usersRepository,
     required this.userRolesRepository,
+    required this.branchesRepository,
   }) : super(ReadUserInitial());
 
   final UsersRepository usersRepository;
   final UserRolesRepository userRolesRepository;
+  final BranchesRepository branchesRepository;
 
   bool isLastPage = false;
   List<UserInDbWithRole> _usersCache = [];
@@ -24,10 +27,11 @@ class ReadUserCubit extends Cubit<ReadUserState> {
     try {
       final users = await usersRepository.getPaginatedUsers(_usersCache.length);
       final userRoles = await userRolesRepository.getAllUserRoles();
+      final branches = await branchesRepository.getAllBranches();
       if (users.length < paginationItems) isLastPage = true;
       _usersCache = [..._usersCache, ...users];
       if (isClosed) return;
-      emit(ReadUserSuccess(_usersCache, userRoles));
+      emit(ReadUserSuccess(_usersCache, userRoles, branches));
     } catch (error) {
       if (isClosed) return;
       emit(ReadUserError(error.toString()));
@@ -47,6 +51,7 @@ class ReadUserCubit extends Cubit<ReadUserState> {
         ReadUserSuccess(
           _usersCache,
           currentState.roles,
+          currentState.branches,
         ),
       );
     } catch (e) {
@@ -63,6 +68,7 @@ class ReadUserCubit extends Cubit<ReadUserState> {
         HighlightedUser(
           freshList,
           currentState.roles,
+          currentState.branches,
           newUsers: [user, ...currentState.newUsers],
           updatedUsers: currentState.updatedUsers,
         ),
@@ -73,6 +79,7 @@ class ReadUserCubit extends Cubit<ReadUserState> {
       HighlightedUser(
         freshList,
         currentState.roles,
+        currentState.branches,
         newUsers: [user],
       ),
     );
@@ -91,6 +98,7 @@ class ReadUserCubit extends Cubit<ReadUserState> {
         HighlightedUser(
           freshList,
           currentState.roles,
+          currentState.branches,
           newUsers: currentState.newUsers,
           updatedUsers: [user, ...currentState.updatedUsers],
         ),
@@ -101,6 +109,7 @@ class ReadUserCubit extends Cubit<ReadUserState> {
       HighlightedUser(
         freshList,
         currentState.roles,
+        currentState.branches,
         updatedUsers: [user],
       ),
     );
@@ -110,6 +119,12 @@ class ReadUserCubit extends Cubit<ReadUserState> {
     final currentState = state as ReadUserSuccess;
     _usersCache.removeWhere((element) => element.id == user.id);
     final freshList = _usersCache;
-    emit(ReadUserSuccess(freshList, currentState.roles));
+    emit(
+      ReadUserSuccess(
+        freshList,
+        currentState.roles,
+        currentState.branches,
+      ),
+    );
   }
 }

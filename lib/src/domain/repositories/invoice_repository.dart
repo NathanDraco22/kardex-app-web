@@ -40,12 +40,14 @@ class InvoicesRepository {
     String? clientId,
     int? startDate,
     int? endDate,
+    String? userCreatorId,
     required int offset,
   }) async {
     final res = await invoicesDataSource.getPaidInvoices(
       clientId: clientId,
       startDate: startDate,
       endDate: endDate,
+      userCreatorId: userCreatorId,
       offset: offset,
     );
     final result = ListResponse<InvoiceInDb>.fromJson(res, InvoiceInDb.fromJson);
@@ -56,13 +58,13 @@ class InvoicesRepository {
     String? clientId,
     int? startDate,
     int? endDate,
-    required int offset,
+    String? userCreatorId,
   }) async {
     final res = await invoicesDataSource.getTotalFromPaidInvoices(
       clientId: clientId,
       startDate: startDate,
       endDate: endDate,
-      offset: offset,
+      userCreatorId: userCreatorId,
     );
     final result = InvoiceTotals.fromJson(res);
     return result;
@@ -84,18 +86,8 @@ class InvoicesRepository {
     return result;
   }
 
-  Future<InvoiceTotals> getTotalFromClientInvoices({
-    String? clientId,
-    int? startDate,
-    int? endDate,
-    required int offset,
-  }) async {
-    final res = await invoicesDataSource.getTotalFromClientInvoices(
-      clientId: clientId,
-      startDate: startDate,
-      endDate: endDate,
-      offset: offset,
-    );
+  Future<InvoiceTotals> getTotalFromInvoices(InvoiceQueryParams params) async {
+    final res = await invoicesDataSource.getTotalFromClientInvoices(params.toMap());
     final result = InvoiceTotals.fromJson(res);
     return result;
   }
@@ -115,7 +107,7 @@ class InvoicesRepository {
     return InvoiceInDb.fromJson(result);
   }
 
-  Future<List<InvoiceInDb>> getInvoicesHistory(ClientHistoryParams params) async {
+  Future<List<InvoiceInDb>> getInvoicesHistory(InvoiceQueryParams params) async {
     final res = await invoicesDataSource.getInvoicesHistory(params.toMap());
     final result = ListResponse<InvoiceInDb>.fromJson(res, InvoiceInDb.fromJson);
     return result.data;

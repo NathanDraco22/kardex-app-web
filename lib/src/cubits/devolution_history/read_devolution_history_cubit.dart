@@ -11,7 +11,7 @@ class ReadDevolutionHistoryCubit extends Cubit<ReadDevolutionHistoryState> {
 
   final DevolutionsRepository devolutionsRepository;
 
-  ClientHistoryParams params = ClientHistoryParams();
+  InvoiceQueryParams params = InvoiceQueryParams();
   bool _isLastPage = false;
 
   Future<void> loadDevolutionsHistory() async {
@@ -53,7 +53,7 @@ class ReadDevolutionHistoryCubit extends Cubit<ReadDevolutionHistoryState> {
   }
 
   void setDefaultParams() {
-    params = ClientHistoryParams();
+    params = InvoiceQueryParams();
     _isLastPage = false;
     loadDevolutionsHistory();
   }

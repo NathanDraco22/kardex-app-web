@@ -21,6 +21,15 @@ class UsersRepository {
     return response.data;
   }
 
+  Future<List<UserInDbWithRole>> getAllActiveUsers({String? branchId}) async {
+    final results = await usersDataSource.getAllActiveUsers(branchId: branchId);
+    final response = ListResponse<UserInDbWithRole>.fromJson(
+      results,
+      UserInDbWithRole.fromJson,
+    );
+    return response.data;
+  }
+
   Future<UserInDb?> getUserById(String userId) async {
     final result = await usersDataSource.getUserById(userId);
     if (result == null) return null;

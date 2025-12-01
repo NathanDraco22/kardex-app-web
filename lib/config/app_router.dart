@@ -9,7 +9,6 @@ import 'package:kardex_app_front/src/modules/commercial/commercial_menu_screen.d
 import 'package:kardex_app_front/src/modules/commercial/current_devolutions/current_devolutions_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/current_orders/current_orders_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/daily_anon_invoinces/daily_anon_invoices_screen.dart';
-import 'package:kardex_app_front/src/modules/commercial/daily_client_invoices/daily_client_invoices.dart';
 import 'package:kardex_app_front/src/modules/commercial/daily_receipt/daily_receipt_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/devolution_history/devolution_history_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/invoice_history/invoice_history_screen.dart';
@@ -156,11 +155,6 @@ class AppRouter {
             path: "pending-invoices",
             name: "pending-invoices",
             builder: (context, state) => const PendingInvoiceScreen(),
-          ),
-          GoRoute(
-            path: "daily-invoice-history",
-            name: "daily-invoice-history",
-            builder: (context, state) => const DailyClientInvoices(),
           ),
           GoRoute(
             path: "daily-receipt-history",

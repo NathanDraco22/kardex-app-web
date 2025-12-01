@@ -8,6 +8,8 @@ class _HeaderSection extends StatefulWidget {
 }
 
 class _HeaderSectionState extends State<_HeaderSection> {
+  UserInDb? currentSelectedUser;
+
   @override
   Widget build(BuildContext context) {
     final readCubit = context.read<ReadDailyAnonInvoicesCubit>();
@@ -21,11 +23,11 @@ class _HeaderSectionState extends State<_HeaderSection> {
           children: [
             SizedBox(
               height: 70,
-              width: 220,
+              width: 300,
               child: Row(
                 children: [
                   Flexible(
-                    child: DatePickerListTile(
+                    child: DatePickerButton(
                       key: ValueKey(readCubit.startDate),
                       defaultDate: readCubit.startDate,
                       title: "Fecha",
@@ -35,9 +37,37 @@ class _HeaderSectionState extends State<_HeaderSection> {
                     ),
                   ),
                   const VerticalDivider(),
+                  TextButton.icon(
+                    onPressed: () {
+                      readCubit.clearFilters();
+                      currentSelectedUser = null;
+                      setState(() {});
+                    },
+                    icon: const Icon(Icons.clear),
+                    label: const Text("Limpiar Filtros"),
+                  ),
                 ],
               ),
             ),
+            TextButton(
+              onPressed: () async {
+                final user = await showActiveUserSelectionDialog(context);
+                if (user == null) return;
+                readCubit.loadDailyPaidAnonInvoices(userCreatorId: user.id);
+                currentSelectedUser = user;
+                setState(() {});
+              },
+              child: const Text("Seleccionar Usuario"),
+            ),
+
+            if (currentSelectedUser != null)
+              Text(
+                currentSelectedUser!.username,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 16,
+                ),
+              ),
           ],
         ),
       ),

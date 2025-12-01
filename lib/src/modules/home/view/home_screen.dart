@@ -53,7 +53,7 @@ class _RootScaffold extends StatelessWidget {
       child: Scaffold(
         endDrawer: HomeEndDrawer(user: user),
         appBar: AppBar(
-          title: const Text("Sistema Neptuno"),
+          title: const Text("Neptuno App"),
           actions: [
             const AvatarButton(),
             const SizedBox(width: 12),

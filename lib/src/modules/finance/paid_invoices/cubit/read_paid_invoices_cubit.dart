@@ -16,7 +16,7 @@ class ReadPaidInvoicesCubit extends Cubit<ReadPaidInvoicesState> {
 
   final InvoicesRepository invoicesRepository;
 
-  InvoiceQueryParams invoiceQueryParams = InvoiceQueryParams();
+  InvoicePayAtQueryParams invoiceQueryParams = InvoicePayAtQueryParams();
 
   set endDate(DateTime? value) {
     invoiceQueryParams.endDate = value;
@@ -61,7 +61,6 @@ class ReadPaidInvoicesCubit extends Cubit<ReadPaidInvoicesState> {
         clientId: invoiceQueryParams.clientId,
         startDate: invoiceQueryParams.startDate!.millisecondsSinceEpoch,
         endDate: topEndDate.millisecondsSinceEpoch,
-        offset: invoiceQueryParams.offset,
       );
 
       emit(ReadPaidInvoicesSuccess(result.data, invoiceQueryParams.offset, totals));

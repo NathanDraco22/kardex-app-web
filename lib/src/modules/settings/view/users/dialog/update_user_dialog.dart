@@ -85,6 +85,7 @@ class _UpdateUserDialogState extends State<UpdateUserDialog> {
             role: selectedRole,
             createdAt: state.user.createdAt,
             isActive: isActive,
+            branches: state.user.branches,
             userRole: UserRole(
               name: currentRol.name,
               access: currentRol.access,

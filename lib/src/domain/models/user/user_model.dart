@@ -27,12 +27,14 @@ class BaseUser {
   final String password;
   final bool isActive;
   final String role;
+  final List<String> branches;
 
   BaseUser({
     required this.username,
     required this.password,
     this.isActive = true,
     required this.role,
+    required this.branches,
   });
 
   factory BaseUser.fromJson(Map<String, dynamic> json) {
@@ -41,6 +43,7 @@ class BaseUser {
       password: json['password'] as String,
       isActive: json['isActive'] as bool? ?? true,
       role: json['role'] as String,
+      branches: List<String>.from(json['branches'] as List),
     );
   }
 
@@ -50,6 +53,7 @@ class BaseUser {
       'password': password,
       'isActive': isActive,
       'role': role,
+      'branches': branches,
     };
   }
 }
@@ -60,6 +64,7 @@ class CreateUser extends BaseUser {
     required super.password,
     super.isActive,
     required super.role,
+    required super.branches,
   });
 
   factory CreateUser.fromJson(Map<String, dynamic> json) {
@@ -68,6 +73,7 @@ class CreateUser extends BaseUser {
       password: json['password'] as String,
       isActive: json['isActive'] as bool? ?? true,
       role: json['role'] as String,
+      branches: List<String>.from(json['branches'] as List),
     );
   }
 }
@@ -106,6 +112,7 @@ class UserInDb extends BaseUser {
     required super.password,
     super.isActive,
     required super.role,
+    required super.branches,
     this.isDeleted = false,
     required this.createdAt,
     this.updatedAt,
@@ -118,6 +125,7 @@ class UserInDb extends BaseUser {
       password: json['password'] as String,
       isActive: json['isActive'] as bool? ?? true,
       role: json['role'] as String,
+      branches: List<String>.from(json['branches'] as List),
       isDeleted: json['isDeleted'] as bool? ?? false,
       createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
       updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt'] as int) : null,
@@ -145,6 +153,7 @@ class UserInDbWithRole extends UserInDb {
     required super.username,
     required super.password,
     required super.role,
+    required super.branches,
     super.isActive,
     super.isDeleted,
     required super.createdAt,
@@ -159,6 +168,7 @@ class UserInDbWithRole extends UserInDb {
       password: json['password'] as String,
       isActive: json['isActive'] as bool? ?? true,
       role: json['role'] as String,
+      branches: List<String>.from(json['branches'] as List),
       isDeleted: json['isDeleted'] as bool? ?? false,
       createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
       updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt'] as int) : null,

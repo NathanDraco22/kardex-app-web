@@ -11,7 +11,7 @@ class ReadReceiptHistoryCubit extends Cubit<ReadReceiptHistoryState> {
 
   final ReceiptsRepository receiptsRepository;
 
-  ClientHistoryParams params = ClientHistoryParams();
+  InvoiceQueryParams params = InvoiceQueryParams();
   bool _isLastPage = false;
 
   Future<void> loadReceiptsHistory() async {
@@ -54,7 +54,7 @@ class ReadReceiptHistoryCubit extends Cubit<ReadReceiptHistoryState> {
   }
 
   void setDefaultParams() {
-    params = ClientHistoryParams();
+    params = InvoiceQueryParams();
     _isLastPage = false;
     loadReceiptsHistory();
   }

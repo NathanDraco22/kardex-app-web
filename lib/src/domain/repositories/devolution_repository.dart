@@ -75,7 +75,7 @@ class DevolutionsRepository {
     return DevolutionInDb.fromJson(result);
   }
 
-  Future<List<DevolutionInDb>> getDevolutionHistory(ClientHistoryParams params) async {
+  Future<List<DevolutionInDb>> getDevolutionHistory(InvoiceQueryParams params) async {
     final results = await devolutionsDataSource.getDevolutionHistory(params.toMap());
     final response = ListResponse<DevolutionInDb>.fromJson(results, DevolutionInDb.fromJson);
     return response.data;

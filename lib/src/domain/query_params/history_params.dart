@@ -1,4 +1,4 @@
-class ClientHistoryParams {
+class InvoiceQueryParams {
   int offset = 0;
   int limit = 50;
   String? clientId;

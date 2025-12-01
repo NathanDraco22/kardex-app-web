@@ -9,11 +9,12 @@ final class ReadUserLoading extends ReadUserState {}
 class ReadUserSuccess extends ReadUserState {
   final List<UserInDbWithRole> users;
   final List<UserRoleInDb> roles;
-  ReadUserSuccess(this.users, this.roles);
+  final List<BranchInDb> branches;
+  ReadUserSuccess(this.users, this.roles, this.branches);
 }
 
 final class ReadUserSearching extends ReadUserSuccess {
-  ReadUserSearching(super.users, super.roles);
+  ReadUserSearching(super.users, super.roles, super.branches);
 }
 
 class HighlightedUser extends ReadUserSuccess {
@@ -21,7 +22,8 @@ class HighlightedUser extends ReadUserSuccess {
   List<UserInDb> updatedUsers;
   HighlightedUser(
     super.users,
-    super.roles, {
+    super.roles,
+    super.branches, {
     this.newUsers = const [],
     this.updatedUsers = const [],
   });

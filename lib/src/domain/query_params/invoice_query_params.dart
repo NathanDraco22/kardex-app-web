@@ -1,6 +1,6 @@
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
 
-class InvoiceQueryParams {
+class InvoicePayAtQueryParams {
   int offset = 0;
   int limit = 50;
   String? clientId;

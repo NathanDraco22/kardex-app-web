@@ -8,11 +8,12 @@ final class ReadInvoiceHistoryLoading extends ReadInvoiceHistoryState {}
 
 class ReadInvoiceHistorySuccess extends ReadInvoiceHistoryState {
   final List<InvoiceInDb> invoices;
-  ReadInvoiceHistorySuccess(this.invoices);
+  final InvoiceTotals totals;
+  ReadInvoiceHistorySuccess(this.invoices, this.totals);
 }
 
 final class FetchingNextPage extends ReadInvoiceHistorySuccess {
-  FetchingNextPage(super.invoices);
+  FetchingNextPage(super.invoices, super.totals);
 }
 
 final class ReadInvoiceHistoryError extends ReadInvoiceHistoryState {

@@ -12,12 +12,14 @@ class UsersScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final userRepo = context.read<UsersRepository>();
     final roleRepo = context.read<UserRolesRepository>();
+    final branchRepo = context.read<BranchesRepository>();
     return MultiBlocProvider(
       providers: [
         BlocProvider(
           create: (context) => ReadUserCubit(
             usersRepository: userRepo,
             userRolesRepository: roleRepo,
+            branchesRepository: branchRepo,
           )..loadPaginatedUsers(),
         ),
         BlocProvider(

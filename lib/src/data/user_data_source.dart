@@ -31,6 +31,18 @@ class UsersDataSource with HttpService {
     return res;
   }
 
+  Future<Map<String, dynamic>> getAllActiveUsers({String? branchId}) async {
+    final uri = HttpTools.generateUri(
+      "$_endpoint/active",
+      queryParameters: {
+        "branchId": ?branchId,
+      },
+    );
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
+    return res;
+  }
+
   Future<Map<String, dynamic>?> getUserById(String userId) async {
     final uri = HttpTools.generateUri("$_endpoint/$userId");
     final headers = HttpTools.generateAuthHeaders();

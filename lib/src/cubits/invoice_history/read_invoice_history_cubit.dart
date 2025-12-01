@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
+import 'package:kardex_app_front/src/domain/models/invoice/invoice_totals.dart';
 import 'package:kardex_app_front/src/domain/query_params/history_params.dart';
 import 'package:kardex_app_front/src/domain/repositories/invoice_repository.dart';
 import 'package:kardex_app_front/src/tools/branches_tool.dart';
@@ -11,7 +12,7 @@ class ReadInvoiceHistoryCubit extends Cubit<ReadInvoiceHistoryState> {
 
   final InvoicesRepository invoicesRepository;
 
-  ClientHistoryParams params = ClientHistoryParams();
+  InvoiceQueryParams params = InvoiceQueryParams();
   bool _isLastPage = false;
 
   Future<void> loadInvoicesHistory() async {
@@ -21,11 +22,13 @@ class ReadInvoiceHistoryCubit extends Cubit<ReadInvoiceHistoryState> {
 
     try {
       final invoices = await invoicesRepository.getInvoicesHistory(params);
+      final totals = await invoicesRepository.getTotalFromInvoices(params);
+
       _isLastPage = invoices.length < params.limit;
 
       params.offset += invoices.length;
 
-      emit(ReadInvoiceHistorySuccess(invoices));
+      emit(ReadInvoiceHistorySuccess(invoices, totals));
     } catch (error) {
       emit(ReadInvoiceHistoryError(error.toString()));
     }
@@ -38,8 +41,9 @@ class ReadInvoiceHistoryCubit extends Cubit<ReadInvoiceHistoryState> {
     if (currentState is FetchingNextPage) return;
 
     try {
-      emit(FetchingNextPage(currentState.invoices));
+      emit(FetchingNextPage(currentState.invoices, currentState.totals));
       final invoices = await invoicesRepository.getInvoicesHistory(params);
+
       _isLastPage = invoices.length < params.limit;
 
       params.offset += invoices.length;
@@ -47,6 +51,7 @@ class ReadInvoiceHistoryCubit extends Cubit<ReadInvoiceHistoryState> {
       emit(
         ReadInvoiceHistorySuccess(
           [...currentState.invoices, ...invoices],
+          currentState.totals,
         ),
       );
     } catch (e) {
@@ -55,7 +60,7 @@ class ReadInvoiceHistoryCubit extends Cubit<ReadInvoiceHistoryState> {
   }
 
   void setDefaultParams() {
-    params = ClientHistoryParams();
+    params = InvoiceQueryParams();
     _isLastPage = false;
     loadInvoicesHistory();
   }

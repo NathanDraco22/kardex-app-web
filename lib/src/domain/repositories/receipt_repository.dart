@@ -34,7 +34,7 @@ class ReceiptsRepository {
     return ReceiptInDb.fromJson(results);
   }
 
-  Future<List<ReceiptInDb>> getReceiptHistory(ClientHistoryParams queryParams) async {
+  Future<List<ReceiptInDb>> getReceiptHistory(InvoiceQueryParams queryParams) async {
     final results = await receiptsDataSource.getReceiptHistory(queryParams.toMap());
     final response = ListResponse<ReceiptInDb>.fromJson(
       results,

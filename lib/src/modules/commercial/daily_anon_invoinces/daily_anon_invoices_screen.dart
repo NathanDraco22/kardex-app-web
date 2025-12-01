@@ -29,9 +29,19 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Facturas Diarias")),
-      body: const _Body(),
+    return NotificationListener<ScrollNotification>(
+      onNotification: (notification) {
+        final scrollOffset = notification.metrics.pixels;
+        final maxScrollExtent = notification.metrics.maxScrollExtent;
+        if (scrollOffset >= maxScrollExtent * 0.65) {
+          context.read<ReadDailyAnonInvoicesCubit>().nextPage();
+        }
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(title: const Text("Facturas Diarias")),
+        body: const _Body(),
+      ),
     );
   }
 }

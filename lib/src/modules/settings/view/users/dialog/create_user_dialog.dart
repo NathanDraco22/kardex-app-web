@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/src/domain/models/user/user_model.dart';
 import 'package:kardex_app_front/src/domain/models/user_role/user_role_model.dart';
+import 'package:kardex_app_front/src/tools/branches_tool.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
@@ -64,6 +65,7 @@ class _CreateUserDialogState extends State<CreateUserDialog> {
             password: "password",
             role: selectedRole!.id,
             createdAt: state.user.createdAt,
+            branches: state.user.branches,
             userRole: UserRole(
               name: selectedRole!.name,
               access: selectedRole!.access,
@@ -91,6 +93,7 @@ class _CreateUserDialogState extends State<CreateUserDialog> {
             password: password,
             role: selectedRole!.id,
             createdAt: state.user.createdAt,
+            branches: state.user.branches,
             userRole: UserRole(
               name: selectedRole!.name,
               access: selectedRole!.access,
@@ -200,6 +203,7 @@ class _CreateUserDialogState extends State<CreateUserDialog> {
                 username: username,
                 password: password,
                 role: selectedRole!.id,
+                branches: [BranchesTool.getCurrentBranchId()],
               );
 
               writeCubit.createNewUser(createUser);

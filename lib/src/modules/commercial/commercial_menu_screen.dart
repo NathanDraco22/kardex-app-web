@@ -49,6 +49,23 @@ class _Body extends StatelessWidget {
               },
             ),
 
+          const Divider(height: 0.0),
+
+          if (accessManager.hasCurrentAccess(context, CommercialSubModules.createInvoice))
+            ListTile(
+              leading: Icon(
+                Icons.date_range,
+                size: 32,
+                color: Colors.amber.shade600,
+              ),
+              title: const Text("Ventas diarias"),
+              onTap: () {
+                context.pushNamed("daily-invoice");
+              },
+            ),
+
+          const Divider(height: 0.0),
+
           if (accessManager.hasCurrentAccess(context, CommercialSubModules.createInvoice))
             ListTile(
               leading: Icon(
