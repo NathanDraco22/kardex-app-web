@@ -17,6 +17,8 @@ import 'package:kardex_app_front/src/modules/commercial/product_price_setting/pr
 import 'package:kardex_app_front/src/modules/commercial/product_movements/view/commercial_product_movements_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/receipt_history/receipt_history_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/client_accounts/view/client_account_screen.dart';
+import 'package:kardex_app_front/src/modules/finance/client_movements/view/client_movements_screen.dart';
+import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
 import 'package:kardex_app_front/src/modules/finance/finances_menu_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/paid_invoices/paid_invoices_screen.dart';
 import 'package:kardex_app_front/src/modules/home/view/home_screen.dart';
@@ -256,6 +258,14 @@ class AppRouter {
             path: "paid-invoices",
             name: "paid-invoices",
             builder: (context, state) => const PaidInvoicesScreen(),
+          ),
+          GoRoute(
+            path: "client-movements",
+            name: "client-movements",
+            builder: (context, state) {
+              final client = state.extra as ClientInDb?;
+              return ClientMovementsScreen(initialClient: client);
+            },
           ),
         ],
       ),

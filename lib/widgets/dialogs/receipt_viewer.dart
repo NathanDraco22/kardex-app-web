@@ -7,12 +7,49 @@ import 'package:kardex_app_front/src/tools/printers/receipt_printer.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/devolution_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/invoice_viewer.dart';
+import 'package:kardex_app_front/src/domain/repositories/receipt_repository.dart';
 
 Future<void> showReceiptViewerDialog(BuildContext context, ReceiptInDb receipt) async {
   await Navigator.push(
     context,
     MaterialPageRoute(
       builder: (context) => _ReceiptViewer(receipt),
+    ),
+  );
+}
+
+Future<void> showReceiptViewerDialogFromDocNumber(BuildContext context, String docNumber) async {
+  await Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) {
+        return FutureBuilder<ReceiptInDb>(
+          future: context.read<ReceiptsRepository>().getReceiptByDocNumber(docNumber),
+          builder: (context, asyncSnapshot) {
+            if (asyncSnapshot.connectionState != ConnectionState.done) {
+              return Scaffold(
+                appBar: AppBar(),
+                body: const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            }
+
+            if (asyncSnapshot.hasError) {
+              return Scaffold(
+                appBar: AppBar(),
+                body: Center(
+                  child: Text("Error al cargar el recibo \n ${asyncSnapshot.error}"),
+                ),
+              );
+            }
+
+            final receipt = asyncSnapshot.data!;
+
+            return _ReceiptViewer(receipt);
+          },
+        );
+      },
     ),
   );
 }

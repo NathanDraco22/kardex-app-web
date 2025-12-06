@@ -21,3 +21,4 @@ export 'supplier_repository.dart';
 export 'unit_repository.dart';
 export 'user_repository.dart';
 export 'user_roles_repository.dart';
+export 'client_transaction_repository.dart';

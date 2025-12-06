@@ -27,44 +27,37 @@ class ReadProductTransactionCubit extends Cubit<ReadProductTransactionState> {
   }) async {
     emit(ReadProductTransactionLoading());
     this.product = product;
-    try {
-      queryParams = TransactionQueryParams(
-        offset: 0,
-        limit: paginationItems,
-        branchId: BranchesTool.getCurrentBranchId(),
-        productId: product.id,
-        endDate: endDate.endOfDay().millisecondsSinceEpoch,
-      );
 
-      final response = await transactionsRepository.getAllProductTransactions(queryParams);
+    queryParams = TransactionQueryParams(
+      offset: 0,
+      limit: paginationItems,
+      branchId: BranchesTool.getCurrentBranchId(),
+      productId: product.id,
+      endDate: endDate.endOfDay().millisecondsSinceEpoch,
+    );
 
-      queryParams.offset += response.data.length;
+    _transactionsCache = [];
+    isLastPage = false;
 
-      _transactionsCache = response.data;
-      if (paginationItems > response.count) {
-        isLastPage = true;
-      } else {
-        isLastPage = false;
-      }
-      if (isClosed) return;
-      emit(
-        ReadProductTransactionSuccess(
-          _transactionsCache,
-          response.count,
-          product: product,
-        ),
-      );
-    } catch (error) {
-      if (isClosed) return;
-      emit(ReadProductTransactionError(error.toString()));
-    }
+    await _fetchData();
+  }
+
+  Future<void> refresh() async {
+    queryParams.offset = 0;
+    _transactionsCache = [];
+    isLastPage = false;
+
+    emit(ReadProductTransactionLoading());
+    await _fetchData();
   }
 
   Future<void> getNextPage() async {
     if (state is FetchingNextPage) return;
     if (isLastPage) return;
+
     final currentState = state;
     if (currentState is! ReadProductTransactionSuccess) return;
+
     emit(
       FetchingNextPage(
         currentState.transactions,
@@ -72,16 +65,20 @@ class ReadProductTransactionCubit extends Cubit<ReadProductTransactionState> {
         product: currentState.product,
       ),
     );
-    try {
-      final response = await transactionsRepository.getAllProductTransactions(queryParams);
 
-      queryParams.offset += paginationItems;
+    try {
+      queryParams.offset = _transactionsCache.length;
+
+      final response = await transactionsRepository.getAllProductTransactions(queryParams);
 
       _transactionsCache.addAll(response.data);
 
-      if (response.count < paginationItems) {
+      if (paginationItems > response.data.length) {
         isLastPage = true;
+      } else {
+        isLastPage = false;
       }
+
       if (isClosed) return;
       emit(
         ReadProductTransactionSuccess(
@@ -100,10 +97,39 @@ class ReadProductTransactionCubit extends Cubit<ReadProductTransactionState> {
     TransactionType? type,
     TransactionSubType? subtype,
   }) {
-    queryParams.endDate = endDate?.millisecondsSinceEpoch;
+    if (endDate != null) {
+      queryParams.endDate = endDate.endOfDay().millisecondsSinceEpoch;
+    }
     queryParams.type = type?.name;
     queryParams.subtype = subtype?.name;
+
     _transactionsCache = [];
     isLastPage = false;
+  }
+
+  Future<void> _fetchData() async {
+    try {
+      final response = await transactionsRepository.getAllProductTransactions(queryParams);
+
+      _transactionsCache = response.data;
+
+      if (paginationItems > response.data.length) {
+        isLastPage = true;
+      } else {
+        isLastPage = false;
+      }
+
+      if (isClosed) return;
+      emit(
+        ReadProductTransactionSuccess(
+          _transactionsCache,
+          response.count,
+          product: product,
+        ),
+      );
+    } catch (error) {
+      if (isClosed) return;
+      emit(ReadProductTransactionError(error.toString()));
+    }
   }
 }

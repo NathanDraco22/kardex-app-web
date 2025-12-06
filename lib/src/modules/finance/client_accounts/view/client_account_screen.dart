@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/repositories/client_repository.dart';
+import 'package:kardex_app_front/src/modules/finance/client_movements/view/client_movements_screen.dart';
 
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/no_item.dart';

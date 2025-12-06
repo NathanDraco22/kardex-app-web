@@ -130,7 +130,16 @@ class MobileClientsTable extends StatelessWidget {
                       title: currentClient.name,
                       isActive: currentClient.isActive,
                       subtitle1: "Saldo: $balanceFormatted",
-                      onTab: () {},
+                      onTab: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return ClientMovementsScreen(initialClient: currentClient);
+                            },
+                          ),
+                        );
+                      },
                     );
                   },
                 ),
