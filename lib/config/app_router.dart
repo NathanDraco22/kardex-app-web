@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/admin_panel/admin_panel_screen.dart';
 import 'package:kardex_app_front/src/modules/activation/activation_screen.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/view/client_catalog_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_devolution/anon_devolution_screen.dart';
@@ -31,6 +32,7 @@ import 'package:kardex_app_front/src/modules/inventory/inventory_exit/view/inven
 import 'package:kardex_app_front/src/modules/inventory/inventory_menu_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/product_movements/view/product_movements_screen.dart';
 import 'package:kardex_app_front/src/modules/login/login_screen.dart';
+import 'package:kardex_app_front/src/modules/multi_branch_home/multibranch_home_screen.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/product_category/view/product_category_screen.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/product_list/view/product_list_screen.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/view/product_catalog_menu_screen.dart';
@@ -68,6 +70,18 @@ class AppRouter {
         path: '/home',
         name: 'home',
         builder: (context, state) => const HomeScreen(),
+      ),
+
+      GoRoute(
+        path: '/multibranch-home',
+        name: 'multibranch-home',
+        builder: (context, state) => const MultibranchHomeScreen(),
+      ),
+
+      GoRoute(
+        path: '/admin-panel',
+        name: 'admin-panel',
+        builder: (context, state) => const AdminPanelScreen(),
       ),
 
       GoRoute(
