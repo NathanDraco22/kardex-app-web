@@ -1,4 +1,5 @@
 import 'package:kardex_app_front/src/services/http_service.dart';
+import 'package:kardex_app_front/src/tools/http_tool.dart';
 
 class ServinDataSource with HttpService {
   final _activatorEndpoint = '/api/v1/activators';
@@ -14,6 +15,14 @@ class ServinDataSource with HttpService {
 
     final res = await getQuery(url, headers: {'X-API-KEY': apiKey});
 
+    return res;
+  }
+
+  final _endpoint = "/auths/servin-status";
+
+  Future<Map<String, dynamic>> getServinStatus() async {
+    final uri = HttpTools.generateUri(_endpoint);
+    final res = await getQuery(uri);
     return res;
   }
 }

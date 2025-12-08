@@ -1,6 +1,7 @@
 import 'package:kardex_app_front/src/core/app_config_manager.dart';
 import 'package:kardex_app_front/src/data/servin_data_source.dart';
 import 'package:kardex_app_front/src/domain/models/servin/servin.dart';
+import 'package:kardex_app_front/src/domain/responses/servin_status_response.dart';
 
 class ServinRepository {
   ServinRepository({required this.servinDataSource});
@@ -22,5 +23,22 @@ class ServinRepository {
 
   Future<void> clearCurrentServin() async {
     await AppConfigManager().clearConfig();
+  }
+
+  Future<Servin?> refreshServinStatus() async {
+    final res = await servinDataSource.getServinStatus();
+    final servinResponse = ServinStatusResponse.fromJson(res);
+
+    final localServin = await getCurrentServinFromLocal();
+    if (localServin == null) return null;
+
+    final updatedServin = localServin.copyWith(
+      isActive: servinResponse.isActive,
+      isMultiBranch: servinResponse.isMultiBranch,
+    );
+
+    await AppConfigManager().setConfig(updatedServin.toJson());
+
+    return updatedServin;
   }
 }

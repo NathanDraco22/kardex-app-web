@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/cubits/app_mode/app_mode_cubit.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
@@ -187,9 +188,54 @@ class _BodyState extends State<_Body> {
                   ),
                 ),
               ),
+
+              const SizedBox(height: 8),
+
+              const _ModeButton(),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _ModeButton extends StatelessWidget {
+  const _ModeButton();
+
+  @override
+  Widget build(BuildContext context) {
+    final appModeCubit = context.watch<AppModeCubit>();
+    return TextButton(
+      style: TextButton.styleFrom(
+        foregroundColor: Colors.cyan,
+      ),
+      onPressed: () async {
+        if (appModeCubit.state is NormalModeState) {
+          final res = await DialogManager.confirmActionDialog(
+            context,
+            "Deseas cambiar a Modo Practica?",
+          );
+          if (!res) return;
+          appModeCubit.switchToPracticeMode();
+        } else {
+          final res = await DialogManager.confirmActionDialog(
+            context,
+            "Deseas cambiar a Modo Normal?",
+          );
+
+          if (!res) return;
+          appModeCubit.switchToNormalMode();
+        }
+      },
+      child: Builder(
+        builder: (context) {
+          final state = appModeCubit.state;
+          if (state is NormalModeState) {
+            return const Text("Cambiar a Modo Practica");
+          }
+          return const Text("Cambiar a Modo Normal");
+        },
       ),
     );
   }

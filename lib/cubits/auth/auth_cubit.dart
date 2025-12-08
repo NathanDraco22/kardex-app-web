@@ -33,7 +33,13 @@ class AuthCubit extends Cubit<AuthState> {
       }
       HttpTools.baseUrl = currentServin.url;
 
-      LoginResponse? loginResponse = await authRepository.getLocalSession();
+      final result = await Future.wait([
+        authRepository.getLocalSession(),
+        servinRepository.refreshServinStatus(),
+      ]);
+      LoginResponse? loginResponse = result[0] as LoginResponse?;
+      final servin = result[1] as Servin?;
+
       if (loginResponse != null) {
         final isTokenNearToExpiration = TokenManager().isTokenGotExpired(
           loginResponse.accessToken,
@@ -52,7 +58,13 @@ class AuthCubit extends Cubit<AuthState> {
           throw Exception("Branch not found");
         }
         HttpTools.baseUrl = currentServin.url;
-        emit(Authenticated(loginResponse, branch, currentServin));
+        emit(
+          Authenticated(
+            loginResponse,
+            branch,
+            servin ?? currentServin,
+          ),
+        );
         return;
       }
       emit(Unauthenticated(servin: currentServin));
@@ -82,7 +94,12 @@ class AuthCubit extends Cubit<AuthState> {
 
       HttpTools.baseUrl = currentServin.url;
 
-      final loginResponse = await authRepository.login(userId, password);
+      final result = await Future.wait([
+        authRepository.login(userId, password),
+        servinRepository.refreshServinStatus(),
+      ]);
+      final loginResponse = result[0] as LoginResponse;
+      final servin = result[1] as Servin?;
 
       if (isClosed) return;
 
@@ -97,7 +114,13 @@ class AuthCubit extends Cubit<AuthState> {
       }
 
       HttpTools.baseUrl = currentServin.url;
-      emit(Authenticated(loginResponse, branch, currentServin));
+      emit(
+        Authenticated(
+          loginResponse,
+          branch,
+          servin ?? currentServin,
+        ),
+      );
     } catch (error) {
       if (isClosed) return;
       emit(AuthError(error.toString()));

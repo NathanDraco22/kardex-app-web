@@ -5,10 +5,14 @@ class HttpTools {
   static String baseUrl = AppEnv.serverUrl;
   static const String _api = "/api";
 
+  static String practiceUrl = "";
+
   static Uri generateUri(String path, {int version = 1, Map<String, String>? queryParameters}) {
     assert(path.startsWith("/"));
 
-    baseUrl = "http://localhost:8000";
+    if (practiceUrl.isNotEmpty) {
+      baseUrl = practiceUrl;
+    }
 
     final decodedBase = Uri.parse(baseUrl);
     final fullPath = "$_api/v$version$path";

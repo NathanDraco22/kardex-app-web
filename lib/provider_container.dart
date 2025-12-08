@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/cubits/app_mode/app_mode_cubit.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/cubits/config_app/config_app_cubit.dart';
 import 'package:kardex_app_front/cubits/toast/toast_cubit.dart';
@@ -38,6 +39,7 @@ class ProviderContainer extends StatelessWidget {
     final devolutionDataSource = DevolutionsDataSource();
     final invoiceDevolutionDataSource = InvoiceDevolutionsDataSource();
     final clientTransDataSource = ClientTransactionsDataSource();
+    final servinStatusDataSource = ServinStatusDataSource();
 
     return MultiRepositoryProvider(
       providers: [
@@ -121,7 +123,10 @@ class ProviderContainer extends StatelessWidget {
         ),
 
         RepositoryProvider(
-          create: (context) => AuthRepository(authDataSource),
+          create: (context) => AuthRepository(
+            authDataSource,
+            servinStatusDataSource,
+          ),
         ),
 
         RepositoryProvider(
@@ -174,6 +179,7 @@ class GlobalCubitProvider extends StatelessWidget {
     final expirationLogRepo = context.read<ExpirationLogsRepository>();
     return MultiBlocProvider(
       providers: [
+        BlocProvider(create: (context) => AppModeCubit()),
         BlocProvider(create: (context) => ConfigAppCubit()),
         BlocProvider(
           create: (context) => AuthCubit(
