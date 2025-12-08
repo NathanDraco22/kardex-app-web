@@ -23,10 +23,11 @@ class _RootScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authCubit = context.read<AuthCubit>();
+    final appModeCubit = context.read<AppModeCubit>();
     int secretCounter = 0;
     return BlocListener(
       bloc: authCubit,
-      listener: (context, state) {
+      listener: (context, state) async {
         if (state is AuthInactive) {
           context.goNamed("activation");
         }
@@ -39,6 +40,10 @@ class _RootScaffold extends StatelessWidget {
         }
 
         if (state is Authenticated) {
+          if (appModeCubit.state is PracticeModeState) {
+            await appModeCubit.clearSession();
+          }
+          if (!context.mounted) return;
           context.goNamed("home");
         }
 

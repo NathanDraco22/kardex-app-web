@@ -48,21 +48,23 @@ class AppRoot extends StatelessWidget {
           childWidget = Stack(
             children: [
               child,
-              Align(
-                alignment: Alignment.topCenter,
-                child: Material(
-                  color: Colors.transparent,
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.red.withAlpha(90),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Text(
-                      "Modo Practica",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+              SafeArea(
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withAlpha(90),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Text(
+                        "Modo Practica",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
