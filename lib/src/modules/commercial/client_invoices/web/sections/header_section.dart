@@ -214,8 +214,13 @@ class MenuActions extends StatelessWidget {
       throw Exception("User not found in Client Invoices");
     }
 
-    String saveButtonTitle = "Facturar";
-    if (cubit.isOrder) saveButtonTitle = "Enviar Orden";
+    final webScreenWidget = context.findAncestorWidgetOfExactType<ClientInvoicesScreenWeb>();
+
+    String saveButtonTitle = webScreenWidget?.actionButtonLabel ?? "Facturar";
+    if (webScreenWidget?.actionButtonLabel == null) {
+      if (cubit.documentType == CommercialDocumentType.order) saveButtonTitle = "Enviar Orden";
+      if (cubit.documentType == CommercialDocumentType.quote) saveButtonTitle = "Guardar Cotización";
+    }
 
     IconData saveIcon = Icons.save;
     if (cubit.isOrder) saveIcon = Icons.send;

@@ -26,7 +26,11 @@ Future<CommercialProductResult?> showSearchProductCommercialDialog(
 }
 
 class SearchProductCommercialDialog extends StatefulWidget {
-  const SearchProductCommercialDialog({super.key, this.product, required this.isDirectSale});
+  const SearchProductCommercialDialog({
+    super.key,
+    this.product,
+    required this.isDirectSale,
+  });
 
   final ProductInDb? product;
   final bool isDirectSale;

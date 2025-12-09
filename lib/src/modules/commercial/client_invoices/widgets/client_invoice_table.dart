@@ -3,6 +3,7 @@ import 'package:kardex_app_front/src/modules/commercial/client_invoices/web/medi
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/widgets/more_action_row_button.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
 import 'package:kardex_app_front/widgets/dialogs/commercial_product_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_product_commercial_dialog.dart';
 
@@ -45,9 +46,11 @@ class ClientInvoiceTable extends StatefulWidget {
   const ClientInvoiceTable({
     super.key,
     required this.controller,
+    required this.restrictQuantity,
   });
 
   final ClientInvoiceTableController controller;
+  final bool restrictQuantity;
 
   @override
   State<ClientInvoiceTable> createState() => _ClientInvoiceTableState();
@@ -128,9 +131,21 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
                       ElevatedButton.icon(
                         focusNode: FocusNode()..requestFocus(),
                         onPressed: () async {
-                          final res = await showSearchProductCommercialDialog(context);
+                          final res = await showSearchProductCommercialDialog(
+                            context,
+                          );
+
                           if (res == null) return;
                           if (res.quantity == 0) return;
+                          if (widget.restrictQuantity && res.quantity > res.product.account.availableStock) {
+                            if (!context.mounted) return;
+                            await DialogManager.showErrorDialog(
+                              context,
+                              "No se puede agregar mas de ${res.product.account.availableStock} unidades",
+                            );
+                            return;
+                          }
+
                           widget.controller.addRow(ClientInvoiceItem(res));
                           if (!context.mounted) return;
                           ClientInvoiceWebMediator.of(context).viewController.refresh();
@@ -161,6 +176,14 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
         onChange: (item) async {
           final res = await showSearchProductCommercialDialog(context, product: item.commercial.product);
           if (res == null) return;
+          if (widget.restrictQuantity && res.quantity > res.product.account.availableStock) {
+            if (!context.mounted) return;
+            await DialogManager.showErrorDialog(
+              context,
+              "No se puede agregar mas de ${res.product.account.availableStock} unidades",
+            );
+            return;
+          }
           if (res.quantity == 0) return;
           controller.updateRow(item, ClientInvoiceItem(res));
         },
@@ -171,6 +194,14 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
             commercialProductResult: item.commercial,
           );
           if (res == null) return;
+          if (widget.restrictQuantity && res.quantity > res.product.account.availableStock) {
+            if (!context.mounted) return;
+            await DialogManager.showErrorDialog(
+              context,
+              "No se puede agregar mas de ${res.product.account.availableStock} unidades",
+            );
+            return;
+          }
           if (res.quantity == 0) return;
           controller.updateRow(item, ClientInvoiceItem(res));
         },

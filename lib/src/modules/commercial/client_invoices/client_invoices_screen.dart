@@ -23,7 +23,7 @@ class ClientInvoiceScreen extends StatelessWidget {
           create: (context) => WriteInvoiceCubit(
             invoicesRepository: invoiceRepo,
             ordersRepository: orderRepo,
-            isOrder: isOrder,
+            documentType: isOrder ? CommercialDocumentType.order : CommercialDocumentType.invoice,
           ),
         ),
       ],

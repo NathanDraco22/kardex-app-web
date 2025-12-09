@@ -290,6 +290,21 @@ class _SendButton extends StatelessWidget {
     return ListenableBuilder(
       listenable: viewController,
       builder: (context, _) {
+        final cubit = context.read<WriteInvoiceCubit>();
+        String label = "Enviar Orden de Compra";
+        String dialogTitle = "Enviar Orden";
+        String dialogSubtitle = "¿Desea enviar la orden de compra?";
+
+        if (cubit.documentType == CommercialDocumentType.invoice) {
+          label = "Crear Factura";
+          dialogTitle = "Crear Factura";
+          dialogSubtitle = "¿Desea crear la factura?";
+        } else if (cubit.documentType == CommercialDocumentType.quote) {
+          label = "Guardar Cotización";
+          dialogTitle = "Guardar Cotización";
+          dialogSubtitle = "¿Desea guardar la cotización?";
+        }
+
         return ElevatedButton.icon(
           onPressed: viewController.selectedClient == null
               ? null
@@ -334,8 +349,8 @@ class _SendButton extends StatelessWidget {
 
                   final res = await showConfirmationSendBottomModal(
                     context,
-                    title: "Enviar Orden",
-                    subtitle: "¿Desea enviar la orden de compra?",
+                    title: dialogTitle,
+                    subtitle: dialogSubtitle,
                     content: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -396,7 +411,7 @@ class _SendButton extends StatelessWidget {
                   );
                 },
           icon: const Icon(Icons.send),
-          label: const Text("Enviar Orden de Compra"),
+          label: Text(label),
         );
       },
     );

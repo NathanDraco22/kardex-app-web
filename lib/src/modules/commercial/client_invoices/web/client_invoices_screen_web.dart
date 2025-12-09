@@ -22,7 +22,14 @@ part 'sections/header_section.dart';
 part 'sections/content_section.dart';
 
 class ClientInvoicesScreenWeb extends StatefulWidget {
-  const ClientInvoicesScreenWeb({super.key});
+  const ClientInvoicesScreenWeb({
+    super.key,
+    this.pageTitle,
+    this.actionButtonLabel,
+  });
+
+  final String? pageTitle;
+  final String? actionButtonLabel;
 
   @override
   State<ClientInvoicesScreenWeb> createState() => _ClientInvoicesScreenWebState();
@@ -58,6 +65,8 @@ class _ClientInvoicesScreenWebState extends State<ClientInvoicesScreenWeb> {
           final cubit = context.read<WriteInvoiceCubit>();
           String message = "Factura guardada con éxito";
           if (cubit.isOrder) message = "Orden de compra enviada con éxito";
+          if (cubit.documentType == CommercialDocumentType.quote) message = "Cotización guardada con éxito";
+
           await DialogManager.showInfoDialog(context, message);
           if (!context.mounted) return;
           rebuild = true;
@@ -81,9 +90,10 @@ class _RootScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = ClientInvoiceWebMediator.of(context).tableController;
     final cubit = context.read<WriteInvoiceCubit>();
+    final webScreenWidget = context.findAncestorWidgetOfExactType<ClientInvoicesScreenWeb>();
 
-    String title = "Facturacion a Clientes";
-    if (cubit.isOrder) title = "Orden de compra";
+    String title = webScreenWidget?.pageTitle ?? "Facturacion a Clientes";
+    if (webScreenWidget?.pageTitle == null && cubit.isOrder) title = "Orden de compra";
 
     return Scaffold(
       appBar: AppBar(

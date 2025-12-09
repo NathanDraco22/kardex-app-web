@@ -20,22 +20,11 @@ class OrdersDataSource with HttpService {
   }
 
   Future<Map<String, dynamic>> getPaginatedOrders({
-    required int offset,
-    String? clientId,
-    String? startDate,
-    String? endDate,
+    required Map<String, String> queryParams,
   }) async {
-    final currentBranch = BranchesTool.getCurrentBranchId();
     final uri = HttpTools.generateUri(
       _endpoint,
-      queryParameters: {
-        "skip": offset.toString(),
-        "limit": paginationItems.toString(),
-        "clientId": ?clientId,
-        "startDate": ?startDate,
-        "endDate": ?endDate,
-        "branchId": currentBranch,
-      },
+      queryParameters: queryParams,
     );
     final headers = HttpTools.generateAuthHeaders();
     final res = await getQuery(uri, headers: headers);

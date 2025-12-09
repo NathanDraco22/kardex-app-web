@@ -1,14 +1,21 @@
 part of '../current_orders_web_screen.dart';
 
-class _HeaderSection extends StatelessWidget {
+class _HeaderSection extends StatefulWidget {
   const _HeaderSection();
 
   @override
+  State<_HeaderSection> createState() => _HeaderSectionState();
+}
+
+class _HeaderSectionState extends State<_HeaderSection> {
+  @override
   Widget build(BuildContext context) {
+    final readCubit = context.read<ReadOrderCubit>();
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Flexible(fit: FlexFit.tight, child: Row()),
             SizedBox(
@@ -26,7 +33,12 @@ class _HeaderSection extends StatelessWidget {
                         const SizedBox(height: 6),
 
                         CustomAutocompleteTextfield<ClientInDb>(
+                          key: UniqueKey(),
                           titleBuilder: (value) => value.name,
+                          onClose: (value) {
+                            readCubit.setFilterParams(clientId: value.id);
+                            readCubit.loadPaginatedOrders();
+                          },
                           onSearch: (value) async {
                             final repo = context.read<ClientsRepository>();
                             try {
@@ -58,6 +70,14 @@ class _HeaderSection extends StatelessWidget {
                   const Spacer(),
                 ],
               ),
+            ),
+            TextButton.icon(
+              onPressed: () {
+                readCubit.clearFilterParams();
+                setState(() {});
+              },
+              icon: const Icon(Icons.clear),
+              label: const Text("Limpiar"),
             ),
           ],
         ),
