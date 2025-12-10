@@ -58,4 +58,15 @@ class WriteOrderCubit extends Cubit<WriteOrderState> {
       emit(WriteOrderError(error.toString()));
     }
   }
+
+  Future<void> deleteOrderDraft(String orderId) async {
+    emit(WriteOrderInProgress());
+    try {
+      final order = await ordersRepository.deleteOrderDraft(orderId);
+      emit(WriteOrderDraftDeleted(order));
+      emit(WriteOrderInitial());
+    } catch (error) {
+      emit(WriteOrderError(error.toString()));
+    }
+  }
 }

@@ -59,4 +59,11 @@ class OrdersDataSource with HttpService {
     final res = await patchQuery(uri, headers: headers);
     return res;
   }
+
+  Future<Map<String, dynamic>> deleteOrderDraft(String orderId) async {
+    final uri = HttpTools.generateUri("$_endpoint/draft/$orderId");
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await deleteQuery(uri, headers: headers);
+    return res;
+  }
 }

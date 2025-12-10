@@ -41,7 +41,9 @@ class _ContentSection extends StatelessWidget {
               final currentOrder = orders[index];
               return ListTile(
                 tileColor: tileColor,
-                onTap: () async {},
+                onTap: () async {
+                  await showProformaInvoiceCreatorDialog(context, currentOrder);
+                },
                 leading: Container(
                   width: 85,
                   height: 30,

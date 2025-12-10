@@ -109,12 +109,29 @@ class CreateOrder extends BaseOrder {
 
 class UpdateOrder {
   final OrderStatus? status;
+  final List<SaleItem>? saleItems;
+  final String? description;
+  final PaymentType? paymentType;
+  final int? totalCost;
+  final int? total;
 
-  UpdateOrder({this.status});
+  UpdateOrder({
+    this.status,
+    this.saleItems,
+    this.description,
+    this.paymentType,
+    this.totalCost,
+    this.total,
+  });
 
   Map<String, dynamic> toJson() {
     final data = {
       'status': status?.name,
+      'saleItems': saleItems?.map((e) => e.toJson()).toList(),
+      'description': description,
+      'paymentType': paymentType?.name,
+      'totalCost': totalCost,
+      'total': total,
     };
     data.removeWhere((key, value) => value == null);
     return data;

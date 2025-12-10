@@ -11,6 +11,11 @@ final class WriteOrderSuccess extends WriteOrderState {
   WriteOrderSuccess(this.order);
 }
 
+final class WriteOrderDraftDeleted extends WriteOrderState {
+  final OrderInDb order;
+  WriteOrderDraftDeleted(this.order);
+}
+
 final class WriteOrderToInvoiceSuccess extends WriteOrderState {
   final InvoiceInDb invoice;
   final OrderInDb order;

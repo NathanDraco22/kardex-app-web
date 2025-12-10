@@ -68,4 +68,12 @@ class ReadProformaCubit extends Cubit<ReadProformaState> {
       emit(ReadProformaSuccess(_ordersCache, _ordersCache.length));
     }
   }
+
+  Future<void> deleteOrderDraft(String orderId) async {
+    final index = _ordersCache.indexWhere((element) => element.id == orderId);
+    if (index != -1) {
+      _ordersCache.removeAt(index);
+      emit(ReadProformaSuccess(_ordersCache, _ordersCache.length));
+    }
+  }
 }

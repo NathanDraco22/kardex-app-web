@@ -8,6 +8,8 @@ import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/super_widgets/custom_autocomplete_textfield.dart';
 
+import 'invoice_creator/invoice_creator_screen.dart';
+
 part 'sections/header_section.dart';
 part 'sections/content_section.dart';
 

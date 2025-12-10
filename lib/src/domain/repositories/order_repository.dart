@@ -54,4 +54,9 @@ class OrdersRepository {
     if (result == null) return null;
     return OrderInDb.fromJson(result);
   }
+
+  Future<OrderInDb> deleteOrderDraft(String orderId) async {
+    final result = await ordersDataSource.deleteOrderDraft(orderId);
+    return OrderInDb.fromJson(result);
+  }
 }
