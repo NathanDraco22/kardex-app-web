@@ -23,47 +23,51 @@ class _HeaderSectionState extends State<_HeaderSection> {
               child: Row(
                 children: [
                   Flexible(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const Text(
-                          "Cliente",
-                          textAlign: TextAlign.left,
-                        ),
-                        const SizedBox(height: 6),
+                    flex: 2,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 600),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const Text(
+                            "Cliente",
+                            textAlign: TextAlign.left,
+                          ),
+                          const SizedBox(height: 6),
 
-                        CustomAutocompleteTextfield<ClientInDb>(
-                          key: UniqueKey(),
-                          titleBuilder: (value) => value.name,
-                          onClose: (value) {
-                            readCubit.setFilterParams(clientId: value.id);
-                            readCubit.loadPaginatedOrders();
-                          },
-                          onSearch: (value) async {
-                            final repo = context.read<ClientsRepository>();
-                            try {
-                              final res = await repo.searchClientByKeyword(value);
-                              return res;
-                            } catch (e) {
-                              return [];
-                            }
-                          },
-                          suggestionBuilder: (value, close) {
-                            return ListView.builder(
-                              itemCount: value.length,
-                              itemBuilder: (context, index) {
-                                final client = value[index];
-                                return ListTile(
-                                  title: Text(client.name),
-                                  onTap: () {
-                                    close(client);
-                                  },
-                                );
-                              },
-                            );
-                          },
-                        ),
-                      ],
+                          CustomAutocompleteTextfield<ClientInDb>(
+                            key: UniqueKey(),
+                            titleBuilder: (value) => value.name,
+                            onClose: (value) {
+                              readCubit.setFilterParams(clientId: value.id);
+                              readCubit.loadPaginatedOrders();
+                            },
+                            onSearch: (value) async {
+                              final repo = context.read<ClientsRepository>();
+                              try {
+                                final res = await repo.searchClientByKeyword(value);
+                                return res;
+                              } catch (e) {
+                                return [];
+                              }
+                            },
+                            suggestionBuilder: (value, close) {
+                              return ListView.builder(
+                                itemCount: value.length,
+                                itemBuilder: (context, index) {
+                                  final client = value[index];
+                                  return ListTile(
+                                    title: Text(client.name),
+                                    onTap: () {
+                                      close(client);
+                                    },
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
 
