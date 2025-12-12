@@ -25,75 +25,77 @@ class _NumpadCalculatorState extends State<NumpadCalculator> {
   @override
   Widget build(BuildContext context) {
     final isOperation = _expression.contains(RegExp(r'(?<!^)[+\-*/]'));
-    return Container(
-      padding: const EdgeInsets.all(8),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-            alignment: Alignment.centerRight,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
+    return SafeArea(
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+              alignment: Alignment.centerRight,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    _previousExpression,
+                    style: TextStyle(fontSize: 20, color: Colors.grey.shade600),
+                    maxLines: 1,
+                  ),
+                  Text(
+                    _expression.isEmpty ? '0' : _expression,
+                    style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                    maxLines: 1,
+                  ),
+                ],
+              ),
+            ),
+            Row(
               children: [
-                Text(
-                  _previousExpression,
-                  style: TextStyle(fontSize: 20, color: Colors.grey.shade600),
-                  maxLines: 1,
-                ),
-                Text(
-                  _expression.isEmpty ? '0' : _expression,
-                  style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-                  maxLines: 1,
+                _buildButton('C', onPressed: _onClear, color: Colors.red),
+                _buildButton('⌫', onPressed: _onBackspace),
+                _buildButton('%'),
+                _buildButton('/'),
+              ],
+            ),
+            Row(
+              children: [
+                _buildButton('7'),
+                _buildButton('8'),
+                _buildButton('9'),
+                _buildButton('*'),
+              ],
+            ),
+            Row(
+              children: [
+                _buildButton('4'),
+                _buildButton('5'),
+                _buildButton('6'),
+                _buildButton('-'),
+              ],
+            ),
+            Row(
+              children: [
+                _buildButton('1'),
+                _buildButton('2'),
+                _buildButton('3'),
+                _buildButton('+'),
+              ],
+            ),
+            Row(
+              children: [
+                _buildButton('0'),
+                _buildButton('.'),
+                _buildButton('=', onPressed: _calculate),
+                _buildDoneButton(
+                  '✓',
+                  onPressed: isOperation ? null : _onDone,
+                  color: isOperation ? Colors.grey : Colors.green,
                 ),
               ],
             ),
-          ),
-          Row(
-            children: [
-              _buildButton('C', onPressed: _onClear, color: Colors.red),
-              _buildButton('⌫', onPressed: _onBackspace),
-              _buildButton('%'),
-              _buildButton('/'),
-            ],
-          ),
-          Row(
-            children: [
-              _buildButton('7'),
-              _buildButton('8'),
-              _buildButton('9'),
-              _buildButton('*'),
-            ],
-          ),
-          Row(
-            children: [
-              _buildButton('4'),
-              _buildButton('5'),
-              _buildButton('6'),
-              _buildButton('-'),
-            ],
-          ),
-          Row(
-            children: [
-              _buildButton('1'),
-              _buildButton('2'),
-              _buildButton('3'),
-              _buildButton('+'),
-            ],
-          ),
-          Row(
-            children: [
-              _buildButton('0'),
-              _buildButton('.'),
-              _buildButton('=', onPressed: _calculate),
-              _buildDoneButton(
-                '✓',
-                onPressed: isOperation ? null : _onDone,
-                color: isOperation ? Colors.grey : Colors.green,
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

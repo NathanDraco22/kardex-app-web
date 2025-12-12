@@ -4,6 +4,7 @@ class OrderQueryParams {
   final int skip;
   final int limit;
   final OrderStatus? status;
+  final OrderStatus? neStatus;
   final String? clientId;
   final String? branchId;
 
@@ -11,6 +12,7 @@ class OrderQueryParams {
     this.skip = 0,
     this.limit = 50,
     this.status,
+    this.neStatus,
     this.clientId,
     this.branchId,
   });
@@ -20,6 +22,7 @@ class OrderQueryParams {
       "skip": skip.toString(),
       "limit": limit.toString(),
       "status": ?status?.name,
+      "neStatus": ?neStatus?.name,
       "clientId": ?clientId,
       "branchId": ?branchId,
     };

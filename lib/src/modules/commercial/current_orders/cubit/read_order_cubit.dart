@@ -28,6 +28,7 @@ class ReadOrderCubit extends Cubit<ReadOrderState> {
           limit: 100,
           branchId: currentBranch,
           clientId: clientId,
+          neStatus: OrderStatus.draft,
         ),
       );
 
