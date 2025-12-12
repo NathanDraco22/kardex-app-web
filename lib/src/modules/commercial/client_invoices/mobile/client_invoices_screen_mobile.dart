@@ -6,13 +6,21 @@ import 'package:kardex_app_front/src/modules/commercial/client_invoices/mobile/m
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/commercial_product_modal.dart';
 import 'package:kardex_app_front/widgets/dialogs/custom_product_commercial_search_delegate.dart';
+import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 
 import '../widgets/product_invoice_card.dart';
 import 'invoice_client_menu_screen.dart';
 
 class ClientInvoicesScreenMobile extends StatefulWidget {
-  const ClientInvoicesScreenMobile({super.key});
+  const ClientInvoicesScreenMobile({
+    super.key,
+    this.pageTitle,
+    this.actionButtonLabel,
+  });
+
+  final String? pageTitle;
+  final String? actionButtonLabel;
 
   @override
   State<ClientInvoicesScreenMobile> createState() => _ClientInvoicesScreenMobileState();
@@ -34,19 +42,21 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cubit = context.read<WriteInvoiceCubit>();
+    final writeCubit = context.read<WriteInvoiceCubit>();
 
     final mediator = InvoiceMobileMediator.of(context);
     final viewController = mediator.viewController;
 
-    String title = "Facturacion a Clientes";
-    if (cubit.isOrder) title = "Orden de compra";
+    final mobileScreenWidget = context.findAncestorWidgetOfExactType<ClientInvoicesScreenMobile>();
 
-    String saveButton = "Facturar";
-    if (cubit.isOrder) saveButton = "Enviar Orden";
+    String title = mobileScreenWidget?.pageTitle ?? "Facturacion a Clientes";
+    if (mobileScreenWidget?.pageTitle == null && writeCubit.isOrder) title = "Orden de compra";
+
+    String saveButton = mobileScreenWidget?.actionButtonLabel ?? "Facturar";
+    if (mobileScreenWidget?.actionButtonLabel == null && writeCubit.isOrder) saveButton = "Enviar Orden";
 
     IconData saveIcon = Icons.save;
-    if (cubit.isOrder) saveIcon = Icons.send;
+    if (writeCubit.isOrder) saveIcon = Icons.send;
 
     return Scaffold(
       floatingActionButton: Visibility(
@@ -55,6 +65,16 @@ class _RootScaffold extends StatelessWidget {
           onPressed: () async {
             final res = await showCommercialProductSearchDelegate(context);
             if (res == null) return;
+            if (writeCubit.documentType != CommercialDocumentType.quote &&
+                res.quantity > res.product.account.availableStock) {
+              if (!context.mounted) return;
+              await DialogManager.showErrorDialog(
+                context,
+                "No se puede agregar mas de ${res.product.account.availableStock} unidades",
+              );
+              return;
+            }
+            if (res.quantity == 0) return;
 
             viewController.addItem(res);
           },
@@ -110,6 +130,7 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) {
     final mediator = InvoiceMobileMediator.of(context);
     final viewController = mediator.viewController;
+    final writeCubit = context.read<WriteInvoiceCubit>();
     return Center(
       child: Column(
         spacing: 8,
@@ -214,6 +235,16 @@ class _Body extends StatelessWidget {
                             commercialProductResult: currentCommercial,
                           );
                           if (res == null) return;
+                          if (writeCubit.documentType != CommercialDocumentType.quote &&
+                              res.quantity > res.product.account.availableStock) {
+                            if (!context.mounted) return;
+                            await DialogManager.showErrorDialog(
+                              context,
+                              "No se puede agregar mas de ${res.product.account.availableStock} unidades",
+                            );
+                            return;
+                          }
+                          if (res.quantity == 0) return;
                           viewController.updateItem(
                             currentCommercial,
                             res,
@@ -222,6 +253,16 @@ class _Body extends StatelessWidget {
                         onChange: () async {
                           final res = await showCommercialProductSearchDelegate(context);
                           if (res == null) return;
+                          if (writeCubit.documentType != CommercialDocumentType.quote &&
+                              res.quantity > res.product.account.availableStock) {
+                            if (!context.mounted) return;
+                            await DialogManager.showErrorDialog(
+                              context,
+                              "No se puede agregar mas de ${res.product.account.availableStock} unidades",
+                            );
+                            return;
+                          }
+                          if (res.quantity == 0) return;
                           viewController.updateItem(
                             currentCommercial,
                             res,

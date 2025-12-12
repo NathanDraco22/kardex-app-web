@@ -1,5 +1,6 @@
 import 'package:kardex_app_front/src/data/data.dart';
 import 'package:kardex_app_front/src/domain/models/order/order_model.dart';
+import 'package:kardex_app_front/src/domain/query_params/order_query_params.dart';
 import 'package:kardex_app_front/src/domain/responses/list_responses.dart';
 import 'package:kardex_app_front/src/domain/responses/order_to_invoice_response.dart';
 
@@ -14,12 +15,10 @@ class OrdersRepository {
   }
 
   Future<ListResponse<OrderInDb>> getPaginatedOrders({
-    required int offset,
-    String? clientId,
+    required OrderQueryParams queryParams,
   }) async {
     final results = await ordersDataSource.getPaginatedOrders(
-      offset: offset,
-      clientId: clientId,
+      queryParams: queryParams.toQueryParameters(),
     );
     final response = ListResponse<OrderInDb>.fromJson(
       results,
@@ -53,6 +52,11 @@ class OrdersRepository {
   Future<OrderInDb?> cancelOrderById(String orderId) async {
     final result = await ordersDataSource.cancelOrderById(orderId);
     if (result == null) return null;
+    return OrderInDb.fromJson(result);
+  }
+
+  Future<OrderInDb> deleteOrderDraft(String orderId) async {
+    final result = await ordersDataSource.deleteOrderDraft(orderId);
     return OrderInDb.fromJson(result);
   }
 }

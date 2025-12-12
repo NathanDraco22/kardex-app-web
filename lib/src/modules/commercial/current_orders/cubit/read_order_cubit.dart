@@ -1,12 +1,15 @@
-import 'dart:developer';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/order/order_model.dart';
+import 'package:kardex_app_front/src/domain/query_params/order_query_params.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
+import 'package:kardex_app_front/src/tools/branches_tool.dart';
 
 part 'read_order_state.dart';
 
 class ReadOrderCubit extends Cubit<ReadOrderState> {
-  ReadOrderCubit({required this.ordersRepository}) : super(ReadOrderInitial());
+  ReadOrderCubit({
+    required this.ordersRepository,
+  }) : super(ReadOrderInitial());
 
   final OrdersRepository ordersRepository;
 
@@ -17,10 +20,16 @@ class ReadOrderCubit extends Cubit<ReadOrderState> {
 
   Future<void> loadPaginatedOrders() async {
     emit(ReadOrderLoading());
+    final currentBranch = BranchesTool.getCurrentBranchId();
     try {
       final response = await ordersRepository.getPaginatedOrders(
-        offset: 0,
-        clientId: clientId,
+        queryParams: OrderQueryParams(
+          skip: 0,
+          limit: 100,
+          branchId: currentBranch,
+          clientId: clientId,
+          neStatus: OrderStatus.draft,
+        ),
       );
 
       _ordersCache = response.data;
@@ -37,29 +46,8 @@ class ReadOrderCubit extends Cubit<ReadOrderState> {
     }
   }
 
-  Future<void> getNextPage() async {
-    if (isLastPage) return;
-    try {
-      final response = await ordersRepository.getPaginatedOrders(
-        offset: _ordersCache.length,
-        clientId: clientId,
-      );
-
-      _ordersCache.addAll(response.data);
-      if (_ordersCache.length >= response.count) {
-        isLastPage = true;
-      }
-      if (isClosed) return;
-      emit(ReadOrderSuccess(_ordersCache, response.count));
-    } catch (e) {
-      log(e.toString());
-    }
-  }
-
   Future<void> setFilterParams({
     String? clientId,
-    String? startDate,
-    String? endDate,
   }) async {
     this.clientId = clientId;
     _ordersCache = [];

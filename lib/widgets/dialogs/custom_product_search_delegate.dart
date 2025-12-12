@@ -68,13 +68,26 @@ class _CustomProductSearchDelegateState extends State<CustomProductSearchDelegat
         itemBuilder: (context, index) {
           final product = products[index];
           return ListTile(
-            title: Text(product.name),
+            title: Text(
+              product.name,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
             subtitle: Row(
               children: [
-                Text(product.brandName),
+                Text(
+                  product.brandName,
+                ),
               ],
             ),
-            trailing: Text(product.unitName),
+            trailing: Text(
+              product.unitName,
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
+              ),
+            ),
             onTap: () => Navigator.pop(context, product),
           );
         },

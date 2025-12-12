@@ -113,6 +113,43 @@ class _Body extends StatelessWidget {
             ),
 
           const Divider(height: 0.0),
+          const Divider(
+            height: 4.0,
+            thickness: 2,
+          ),
+
+          if (accessManager.hasCurrentAccess(context, CommercialSubModules.orders))
+            ListTile(
+              leading: Icon(
+                FluentIcons.clipboard_search_24_filled,
+                size: 32,
+                color: Colors.blue.shade600,
+              ),
+              title: const Text("Cotizaciones"),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.pushNamed("proforma-history"),
+            ),
+
+          const Divider(height: 0.0),
+
+          if (accessManager.hasCurrentAccess(context, CommercialSubModules.createOrder))
+            ListTile(
+              leading: Icon(
+                FluentIcons.document_text_24_filled,
+                size: 32,
+                color: Colors.blue.shade600,
+              ),
+              title: const Text("Crear Cotización"),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.pushNamed("proforma"),
+            ),
+
+          const Divider(height: 0.0),
+          const Divider(
+            height: 4.0,
+            thickness: 2,
+          ),
+
           if (accessManager.hasCurrentAccess(context, CommercialSubModules.orders))
             ListTile(
               leading: Icon(
@@ -138,6 +175,7 @@ class _Body extends StatelessWidget {
                 context.pushNamed("sale-order");
               },
             ),
+
           // const Divider(height: 0.0),
           // if (accessManager.hasCurrentAccess(context, CommercialSubModules.createInvoice))
           //   ListTile(

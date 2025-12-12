@@ -11,6 +11,7 @@ import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/invoice_viewer.dart';
+import 'package:kardex_app_front/widgets/row_widgets/sale_item_row.dart';
 
 Future<OrderInDb?> showOrderInvoiceCreatorDialog(BuildContext context, OrderInDb order) async {
   final readCubit = context.read<ReadOrderCubit>();
@@ -320,53 +321,9 @@ class _BodyState extends State<_Body> {
       final saleItem = saleItems[i];
       final color = i.isOdd ? Colors.white : Colors.grey.shade200;
 
-      TextStyle style = const TextStyle(
-        fontWeight: FontWeight.w500,
-      );
-      if (markedItems.contains(saleItem)) {
-        style = const TextStyle(decoration: TextDecoration.lineThrough);
-      }
-
-      yield Material(
-        color: Colors.transparent,
-        child: ListTile(
-          minLeadingWidth: 10,
-          tileColor: color,
-          onLongPress: () {
-            setState(() {
-              if (markedItems.contains(saleItem)) {
-                markedItems.remove(saleItem);
-              } else {
-                markedItems.add(saleItem);
-              }
-            });
-          },
-          leading: Text(
-            "${saleItem.quantity} x ",
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-
-          title: Row(
-            children: [
-              Text(saleItem.product.name, style: style),
-            ],
-          ),
-          subtitle: Row(
-            children: [
-              SizedBox(
-                width: 120,
-                child: Text(saleItem.product.brandName),
-              ),
-              const SizedBox(width: 16),
-              Text(saleItem.product.unitName),
-            ],
-          ),
-          trailing: Text(
-            NumberFormatter.convertToMoneyLike(saleItem.total),
-          ),
-        ),
+      yield SaleItemRow(
+        saleItem: saleItem,
+        color: color,
       );
     }
   }

@@ -26,7 +26,11 @@ Future<CommercialProductResult?> showSearchProductCommercialDialog(
 }
 
 class SearchProductCommercialDialog extends StatefulWidget {
-  const SearchProductCommercialDialog({super.key, this.product, required this.isDirectSale});
+  const SearchProductCommercialDialog({
+    super.key,
+    this.product,
+    required this.isDirectSale,
+  });
 
   final ProductInDb? product;
   final bool isDirectSale;
@@ -38,7 +42,7 @@ class SearchProductCommercialDialog extends StatefulWidget {
 class _SearchProductCommercialDialogState extends State<SearchProductCommercialDialog> {
   late ProductsRepository _productsRepository;
 
-  String title = "Buscar producto";
+  String title = "Buscar Producto";
 
   @override
   void didChangeDependencies() {
@@ -273,6 +277,7 @@ class ProductResultRow extends StatelessWidget {
                       product.name,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
+                        fontSize: 15,
                       ),
                     ),
                     Row(
@@ -296,6 +301,10 @@ class ProductResultRow extends StatelessWidget {
                 fit: FlexFit.tight,
                 child: Text(
                   product.account.availableStock.toString(),
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
               Flexible(
@@ -306,7 +315,13 @@ class ProductResultRow extends StatelessWidget {
                       final price = NumberFormatter.convertToMoneyLike(
                         product.saleProfile.salePrice,
                       );
-                      return Text(price);
+                      return Text(
+                        price,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      );
                     },
                   ),
                 ),
