@@ -75,7 +75,7 @@ class _FormContentState extends State<_FormContent> {
   void initState() {
     super.initState();
     if (widget.commercialProductResult != null) {
-      commercialProductResult = widget.commercialProductResult!;
+      commercialProductResult = widget.commercialProductResult!.copyWith();
     } else {
       commercialProductResult = CommercialProductResult(product: widget.product);
     }
@@ -178,10 +178,6 @@ class _FormContentState extends State<_FormContent> {
                                       final numberValue = int.tryParse(value) ?? 0;
 
                                       if (numberValue == 0) {
-                                        return "Cantidad invalida";
-                                      }
-
-                                      if (numberValue > widget.product.account.availableStock) {
                                         return "Cantidad invalida";
                                       }
 

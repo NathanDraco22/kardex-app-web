@@ -5,6 +5,8 @@ import 'package:kardex_app_front/src/modules/client_catalog/view/client_catalog_
 import 'package:kardex_app_front/src/modules/commercial/anon_devolution/anon_devolution_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/anon_invoices_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_devolution/client_devolution_screen.dart';
+
+import 'package:kardex_app_front/src/modules/commercial/current_proforma/current_proforma_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/client_invoices_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/commercial_menu_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/current_devolutions/current_devolutions_screen.dart';
@@ -15,6 +17,8 @@ import 'package:kardex_app_front/src/modules/commercial/devolution_history/devol
 import 'package:kardex_app_front/src/modules/commercial/invoice_history/invoice_history_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/pending_invoice_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/product_price_setting/product_price_setting.dart';
+
+import 'package:kardex_app_front/src/modules/commercial/proforma/proforma_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/product_movements/view/commercial_product_movements_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/receipt_history/receipt_history_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/client_accounts/view/client_account_screen.dart';
@@ -211,6 +215,16 @@ class AppRouter {
             path: "product-movements",
             name: "commercial-product-movements",
             builder: (context, state) => const CommercialProductMovementsScreen(),
+          ),
+          GoRoute(
+            path: "proforma-history",
+            name: "proforma-history",
+            builder: (context, state) => const CurrentProformaScreen(),
+          ),
+          GoRoute(
+            path: "proforma",
+            name: "proforma",
+            builder: (context, state) => const ProformaScreen(),
           ),
         ],
       ),

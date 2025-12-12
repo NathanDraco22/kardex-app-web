@@ -2,7 +2,7 @@ import 'package:kardex_app_front/src/domain/models/common/client_info.dart';
 import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
 import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
 
-enum InvoiceStatus { open, paid, parciallyPaid, cancelled }
+enum InvoiceStatus { draft, open, paid, parciallyPaid, cancelled }
 
 class BaseInvoice {
   final String branchId;

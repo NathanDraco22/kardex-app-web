@@ -10,17 +10,25 @@ import 'package:kardex_app_front/src/tools/branches_tool.dart';
 
 part 'write_invoice_state.dart';
 
+enum CommercialDocumentType {
+  invoice,
+  order,
+  quote,
+}
+
 class WriteInvoiceCubit extends Cubit<WriteInvoiceState> {
   WriteInvoiceCubit({
     required this.invoicesRepository,
     required this.ordersRepository,
-    this.isOrder = false,
+    this.documentType = CommercialDocumentType.invoice,
   }) : super(WriteInvoiceInitial());
 
   final InvoicesRepository invoicesRepository;
   final OrdersRepository ordersRepository;
 
-  final bool isOrder;
+  final CommercialDocumentType documentType;
+
+  bool get isOrder => documentType == CommercialDocumentType.order || documentType == CommercialDocumentType.quote;
 
   Future<void> createNewInvoice(
     CreateInvoice createInvoice,
@@ -39,6 +47,7 @@ class WriteInvoiceCubit extends Cubit<WriteInvoiceState> {
       }
 
       if (isOrder) {
+        final status = documentType == CommercialDocumentType.quote ? OrderStatus.draft : OrderStatus.open;
         final createOrder = CreateOrder(
           branchId: BranchesTool.getCurrentBranchId(),
           clientId: createInvoice.clientId,
@@ -48,7 +57,7 @@ class WriteInvoiceCubit extends Cubit<WriteInvoiceState> {
           paymentType: createInvoice.paymentType,
           totalCost: createInvoice.totalCost,
           total: createInvoice.total,
-          status: OrderStatus.open,
+          status: status,
           amountPaid: createInvoice.amountPaid,
           createdBy: UserInfo(
             id: user.id,

@@ -1,6 +1,4 @@
 import 'package:kardex_app_front/src/services/http_service.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
-import 'package:kardex_app_front/src/tools/constant.dart';
 import 'package:kardex_app_front/src/tools/http_tool.dart';
 
 class OrdersDataSource with HttpService {
@@ -20,22 +18,11 @@ class OrdersDataSource with HttpService {
   }
 
   Future<Map<String, dynamic>> getPaginatedOrders({
-    required int offset,
-    String? clientId,
-    String? startDate,
-    String? endDate,
+    required Map<String, String> queryParams,
   }) async {
-    final currentBranch = BranchesTool.getCurrentBranchId();
     final uri = HttpTools.generateUri(
       _endpoint,
-      queryParameters: {
-        "skip": offset.toString(),
-        "limit": paginationItems.toString(),
-        "clientId": ?clientId,
-        "startDate": ?startDate,
-        "endDate": ?endDate,
-        "branchId": currentBranch,
-      },
+      queryParameters: queryParams,
     );
     final headers = HttpTools.generateAuthHeaders();
     final res = await getQuery(uri, headers: headers);
@@ -70,6 +57,13 @@ class OrdersDataSource with HttpService {
     final uri = HttpTools.generateUri("$_endpoint/cancel/$orderId");
     final headers = HttpTools.generateAuthHeaders();
     final res = await patchQuery(uri, headers: headers);
+    return res;
+  }
+
+  Future<Map<String, dynamic>> deleteOrderDraft(String orderId) async {
+    final uri = HttpTools.generateUri("$_endpoint/draft/$orderId");
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await deleteQuery(uri, headers: headers);
     return res;
   }
 }
