@@ -12,6 +12,11 @@ class DateTimeTool {
     return formatter.format(datetime);
   }
 
+  static String formatddMM(DateTime datetime) {
+    final formatter = DateFormat('dd-MM');
+    return formatter.format(datetime);
+  }
+
   static String formatMMyy(DateTime datetime) {
     final formatter = DateFormat('MM-yy');
     return formatter.format(datetime);

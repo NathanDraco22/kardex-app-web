@@ -48,6 +48,18 @@ class _WebBody extends StatelessWidget {
     final state = cubit.state as ReadBranchSuccess;
     final branches = state.branches;
 
+    final authCubit = context.watch<AuthCubit>();
+    final authState = authCubit.state;
+
+    if (authState is! Authenticated) {
+      return const Center(
+        child: Text("No autenticado"),
+      );
+    }
+
+    final user = authState.session.user;
+    final isMultiBranch = authState.servin.isMultiBranch;
+
     return Center(
       child: Padding(
         padding: const EdgeInsetsGeometry.all(8.0),
@@ -67,24 +79,32 @@ class _WebBody extends StatelessWidget {
             ),
             const SizedBox(height: 12),
 
-            // Row(
-            //   children: [
-            //     const Spacer(),
-            //     SizedBox(
-            //       height: 40,
-            //       child: ElevatedButton.icon(
-            //         onPressed: () async {
-            //           final res = await showCreateBranchPriceDialog(context);
-            //           if (res == null) return;
-            //           if (!context.mounted) return;
-            //           await context.read<ReadBranchCubit>().refreshBranch();
-            //         },
-            //         icon: const Icon(Icons.add),
-            //         label: const Text("Agregar Nueva Rama/Sucursal"),
-            //       ),
-            //     ),
-            //   ],
-            // ),
+            Builder(
+              builder: (context) {
+                if (!isMultiBranch || user.role != "Admin") {
+                  return const SizedBox.shrink();
+                }
+
+                return Row(
+                  children: [
+                    const Spacer(),
+                    SizedBox(
+                      height: 40,
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          final res = await showCreateBranchPriceDialog(context);
+                          if (res == null) return;
+                          if (!context.mounted) return;
+                          await context.read<ReadBranchCubit>().refreshBranch();
+                        },
+                        icon: const Icon(Icons.add),
+                        label: const Text("Agregar Nueva Rama/Sucursal"),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
             const SizedBox(height: 12),
 
             Card(

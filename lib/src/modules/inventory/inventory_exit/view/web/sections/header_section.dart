@@ -158,7 +158,6 @@ class MenuActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final configState = context.read<ConfigAppCubit>().state;
     final mediator = InventoryExitMediator.watch(context)!;
     final headerData = mediator.headerData;
     final productTableController = mediator.productTableController;
@@ -201,7 +200,7 @@ class MenuActions extends StatelessWidget {
                     clientId: headerData.client!.id,
                     docNumber: headerData.docNumber!,
                     docDate: headerData.docDate!,
-                    branchId: configState.currentBranch,
+                    branchId: BranchesTool.getCurrentBranchId(),
                     items: items,
                     createdBy: UserInfo(
                       id: currentUser.id,
