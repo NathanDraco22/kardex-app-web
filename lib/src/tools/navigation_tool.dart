@@ -7,16 +7,12 @@ class NavigationTool {
       return "home";
     }
 
-    if (user.branches.length <= 1) {
-      return "home";
-    }
-
     final multiBranchRoles = ["Admin"];
 
-    if (!multiBranchRoles.contains(user.role)) {
-      return "home";
+    if (multiBranchRoles.contains(user.role)) {
+      return "multibranch-home";
     }
 
-    return "multibranch-home";
+    return "home";
   }
 }

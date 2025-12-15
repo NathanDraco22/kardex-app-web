@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/cubits/config_app/config_app_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
 import 'package:kardex_app_front/src/domain/models/models.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_entry/modals/confirmation_save_modal.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_exit/cubit/write_exit_doc_cubit.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_exit/view/mediator.dart';
+import 'package:kardex_app_front/src/tools/branches_tool.dart';
 import 'package:kardex_app_front/src/tools/session_tool.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
@@ -28,7 +28,6 @@ class _SaveButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final configState = context.read<ConfigAppCubit>().state;
     final mediator = InventoryExitMediator.watch(context)!;
     final headerData = mediator.headerData;
 
@@ -83,7 +82,7 @@ class _SaveButton extends StatelessWidget {
           clientId: headerData.client!.id,
           docNumber: headerData.docNumber!,
           docDate: headerData.docDate!,
-          branchId: configState.currentBranch,
+          branchId: BranchesTool.getCurrentBranchId(),
           items: exitDocItems.toList(),
           createdBy: UserInfo(
             id: currentUser.id,
