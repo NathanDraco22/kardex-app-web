@@ -3,7 +3,12 @@ import 'package:flutter/material.dart';
 class TitleAmount extends StatelessWidget {
   const TitleAmount({
     super.key,
+    required this.title,
+    required this.amount,
   });
+
+  final String title;
+  final String amount;
 
   @override
   Widget build(BuildContext context) {
@@ -14,19 +19,19 @@ class TitleAmount extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         color: Colors.grey.shade100,
       ),
-      child: const Column(
+      child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            "Ventas Hoy",
-            style: TextStyle(
+            title,
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
           ),
           Text(
-            "C\$ 1,000.00",
-            style: TextStyle(
+            amount,
+            style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
             ),
