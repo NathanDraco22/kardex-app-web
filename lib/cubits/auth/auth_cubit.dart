@@ -49,15 +49,19 @@ class AuthCubit extends Cubit<AuthState> {
         }
 
         TokenManager().storeToken(loginResponse.accessToken);
+        final initBranchId = loginResponse.user.branches.firstOrNull ?? BranchesTool.getCurrentBranchId();
 
-        final branch = await branchesRepository.getBranchById(
-          BranchesTool.getCurrentBranchId(),
-        );
+        final results = await Future.wait([
+          branchesRepository.getBranchById(initBranchId),
+          branchesRepository.getAllBranches(),
+        ]);
+        final branch = results[0] as BranchInDb?;
 
         if (branch == null) {
           throw Exception("Branch not found");
         }
         HttpTools.baseUrl = currentServin.url;
+        BranchesTool.setCurrentBranch(branch);
         emit(
           Authenticated(
             loginResponse,
@@ -105,15 +109,20 @@ class AuthCubit extends Cubit<AuthState> {
 
       TokenManager().storeToken(loginResponse.accessToken);
 
-      final branch = await branchesRepository.getBranchById(
-        BranchesTool.getCurrentBranchId(),
-      );
+      final initBranchId = loginResponse.user.branches.firstOrNull ?? BranchesTool.getCurrentBranchId();
+
+      final results = await Future.wait([
+        branchesRepository.getBranchById(initBranchId),
+        branchesRepository.getAllBranches(),
+      ]);
+      final branch = results[0] as BranchInDb?;
 
       if (branch == null) {
         throw Exception("Branch not found");
       }
 
       HttpTools.baseUrl = currentServin.url;
+      BranchesTool.setCurrentBranch(branch);
       emit(
         Authenticated(
           loginResponse,
@@ -123,6 +132,30 @@ class AuthCubit extends Cubit<AuthState> {
       );
     } catch (error) {
       if (isClosed) return;
+      emit(AuthError(error.toString()));
+    }
+  }
+
+  Future<void> changeBranch(String branchId) async {
+    final currentState = state;
+    if (currentState is! Authenticated) return;
+    emit(AuthLoading());
+    try {
+      final branch = await branchesRepository.getBranchById(branchId);
+
+      if (branch == null) {
+        throw Exception("Branch not found");
+      }
+
+      BranchesTool.setCurrentBranch(branch);
+      emit(
+        Authenticated(
+          currentState.session,
+          branch,
+          currentState.servin,
+        ),
+      );
+    } catch (error) {
       emit(AuthError(error.toString()));
     }
   }

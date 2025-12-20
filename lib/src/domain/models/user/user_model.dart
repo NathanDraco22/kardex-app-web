@@ -82,11 +82,13 @@ class UpdateUser {
   final String? username;
   final bool? isActive;
   final String? role;
+  final List<String> branches;
 
   UpdateUser({
     this.username,
     this.isActive,
     this.role,
+    required this.branches,
   });
 
   Map<String, dynamic> toJson() {
@@ -94,6 +96,7 @@ class UpdateUser {
       'username': username,
       'isActive': isActive,
       'role': role,
+      'branches': branches,
     };
     data.removeWhere((key, value) => value == null);
     return data;

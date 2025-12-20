@@ -80,7 +80,7 @@ class _CreateProductPriceDialogState extends State<CreateProductPriceDialog> {
         child: Scaffold(
           appBar: AppBar(
             title: const Text(
-              "Actualizar Rama/Sucursal",
+              "Rama/Sucursal",
             ),
           ),
           body: Center(
@@ -209,9 +209,23 @@ class _CreateProductPriceDialogState extends State<CreateProductPriceDialog> {
 
                       ElevatedButton(
                         child: const Text("Guardar"),
-                        onPressed: () {
+                        onPressed: () async {
                           if (!formKey.currentState!.validate()) return;
-                          if (widget.branch == null) return;
+
+                          if (widget.branch == null) {
+                            final res = await DialogManager.slideToConfirmActionDialog(
+                              context,
+                              "Deseas Crear la Rama/Sucursal?",
+                            );
+
+                            if (!res) return;
+
+                            if (!context.mounted) return;
+
+                            final createBranch = CreateBranch.fromJson(creationMap);
+                            context.read<WriteBranchCubit>().createNewBranch(createBranch, _imageFile);
+                            return;
+                          }
 
                           final updateBranch = UpdateBranch.fromJson(creationMap);
 

@@ -8,7 +8,7 @@ class BaseBranch {
   final String email;
   final String phone;
   final String description;
-  final Uint8List? image;
+  Uint8List? image;
 
   BaseBranch({
     required this.name,
@@ -39,7 +39,7 @@ class BaseBranch {
       'address': address,
       'email': email,
       'phone': phone,
-      'image': image != null ? base64Encode(image!) : null,
+      'image': image != null ? base64Encode(image!) : "",
       'description': description,
     };
   }
