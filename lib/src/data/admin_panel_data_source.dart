@@ -20,4 +20,17 @@ class AdminPanelDataSource with HttpService, DioHttpService {
     final res = await getCachedQuery(uri, headers: headers);
     return res;
   }
+
+  Future<Map<String, dynamic>> getAdminChartsByBranch({
+    required String branchId,
+    required int endDate,
+  }) async {
+    final uri = HttpTools.generateUri(
+      "$_endpoint/charts/$branchId",
+      queryParameters: {"endDate": endDate.toString()},
+    );
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getCachedQuery(uri, headers: headers);
+    return res;
+  }
 }
