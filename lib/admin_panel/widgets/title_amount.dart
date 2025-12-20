@@ -13,8 +13,8 @@ class TitleAmount extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 230,
-      height: 100,
+      width: 180,
+      height: 60,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
         color: Colors.grey.shade100,
@@ -32,7 +32,7 @@ class TitleAmount extends StatelessWidget {
           Text(
             amount,
             style: const TextStyle(
-              fontSize: 24,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
