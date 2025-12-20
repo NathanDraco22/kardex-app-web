@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/cubits/app_mode/app_mode_cubit.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
+import 'package:kardex_app_front/src/tools/navigation_tool.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/password_title_textfield.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
@@ -44,7 +45,11 @@ class _RootScaffold extends StatelessWidget {
             await appModeCubit.clearSession();
           }
           if (!context.mounted) return;
-          context.goNamed("home");
+          final routeName = NavigationTool.getNavigationAuthenticatedDestination(
+            state.servin,
+            state.session.user,
+          );
+          context.goNamed(routeName);
         }
 
         if (state is AuthError) {

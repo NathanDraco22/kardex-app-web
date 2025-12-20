@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/user/user_model.dart';
 import 'package:kardex_app_front/src/domain/models/user_role/user_role_model.dart';
 import 'package:kardex_app_front/src/tools/branches_tool.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/multi_branch_selection_dialog.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
 import '../cubit/read_user_cubit.dart';
@@ -41,14 +43,21 @@ class _CreateUserDialogState extends State<CreateUserDialog> {
 
   UserRoleInDb? selectedRole;
 
+  List<String> selectedBranchIds = [];
+
   final formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
+    final authCubit = context.read<AuthCubit>();
+    final authState = authCubit.state as Authenticated;
+    final isMultiBranch = authState.servin.isMultiBranch;
+
     final writeCubit = context.read<WriteUserCubit>();
     final readCubit = context.read<ReadUserCubit>();
     final readState = readCubit.state as ReadUserSuccess;
     final roles = readState.roles;
+    final allBranches = readState.branches;
 
     return BlocListener(
       bloc: writeCubit,
@@ -183,6 +192,35 @@ class _CreateUserDialogState extends State<CreateUserDialog> {
                     ),
                   ],
                 ),
+
+                const SizedBox(height: 12),
+
+                Builder(
+                  builder: (context) {
+                    if (!isMultiBranch) {
+                      selectedBranchIds = [BranchesTool.getCurrentBranchId()];
+                      return const SizedBox.shrink();
+                    }
+                    return Row(
+                      children: [
+                        TextButton(
+                          onPressed: () async {
+                            final selectedBranches = await showMultiBranchSelectionDialog(
+                              context,
+                              allBranches: allBranches,
+                              initialSelectedBranchIds: selectedBranchIds,
+                            );
+                            if (!context.mounted) return;
+                            if (selectedBranches == null) return;
+                            selectedBranchIds = selectedBranches;
+                            setState(() {});
+                          },
+                          child: Text("Seleccionar Ramas/Sucursales (${selectedBranchIds.length})"),
+                        ),
+                      ],
+                    );
+                  },
+                ),
               ],
             ),
           ),
@@ -198,12 +236,16 @@ class _CreateUserDialogState extends State<CreateUserDialog> {
             onPressed: () {
               if (!formKey.currentState!.validate()) return;
               if (selectedRole == null) return;
+              if (selectedBranchIds.isEmpty) {
+                DialogManager.showErrorDialog(context, "Debe seleccionar al menos una rama/sucursal");
+                return;
+              }
 
               final createUser = CreateUser(
                 username: username,
                 password: password,
                 role: selectedRole!.id,
-                branches: [BranchesTool.getCurrentBranchId()],
+                branches: selectedBranchIds,
               );
 
               writeCubit.createNewUser(createUser);

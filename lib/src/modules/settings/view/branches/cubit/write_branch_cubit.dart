@@ -11,9 +11,14 @@ class WriteBranchCubit extends Cubit<WriteBranchState> {
 
   final BranchesRepository branchesRepository;
 
-  Future<void> createNewBranch(CreateBranch createBranch) async {
+  Future<void> createNewBranch(CreateBranch createBranch, XFile? image) async {
     emit(WriteBranchInProgress());
     try {
+      if (image != null) {
+        final base64Image = await xFileToBase64(image);
+        createBranch.image = base64ToBytes(base64Image);
+      }
+
       final branch = await branchesRepository.createBranch(createBranch);
       emit(WriteBranchSuccess(branch));
       emit(WriteBranchInitial());

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/config/app_theme.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/src/tools/navigation_tool.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
@@ -27,7 +28,8 @@ class _RootScaffold extends StatelessWidget {
         }
 
         if (state is Authenticated) {
-          context.goNamed("home");
+          final routeName = NavigationTool.getNavigationAuthenticatedDestination(state.servin, state.session.user);
+          context.goNamed(routeName);
         }
 
         if (state is Unauthenticated) {

@@ -25,14 +25,42 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authState = context.read<AuthCubit>().state;
+    final authCubit = context.watch<AuthCubit>();
+    final authState = authCubit.state;
+    if (authState is AuthLoading) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    if (authState is AuthError) {
+      return Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () {
+              authCubit.logout();
+            },
+          ),
+          title: const Text("Error"),
+        ),
+        body: Center(
+          child: Text(authState.message),
+        ),
+      );
+    }
+
     if (authState is! Authenticated) {
       Future(() {
         if (!context.mounted) return;
         context.goNamed("login");
       });
-      return const Center(
-        child: CircularProgressIndicator(),
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
       );
     }
 
@@ -86,15 +114,30 @@ class _AvatarButtonState extends State<AvatarButton> {
 
   @override
   Widget build(BuildContext context) {
+    final authState = context.read<AuthCubit>().state;
+    if (authState is! Authenticated) {
+      return const SizedBox.shrink();
+    }
+
+    final currentUser = authState.session.user;
+
+    final firstLetter = currentUser.username[0];
+
     return GestureDetector(
       onTap: () async {
         Scaffold.of(context).openEndDrawer();
       },
       child: CircleAvatar(
         backgroundColor: Colors.amber.shade100,
-        child: Icon(
-          Icons.person,
-          color: Colors.grey.shade800,
+        child: Center(
+          child: Text(
+            firstLetter,
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.black54,
+            ),
+          ),
         ),
       ),
     );
@@ -130,10 +173,19 @@ class _Body extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 24),
         children: [
           Text(
+            BranchesTool.getCurrentBranchName(),
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
             "Bienvenido/a, $firstName",
             style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
+              color: Colors.grey,
             ),
           ),
           const SizedBox(height: 12),
@@ -238,7 +290,7 @@ class HomeOptionCard extends StatelessWidget {
         height: 120,
         width: 300,
         decoration: BoxDecoration(
-          color: Colors.grey.shade200,
+          color: Colors.indigo.shade50,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
