@@ -13,7 +13,7 @@ class PieChartRow extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         color: Colors.green.shade100,
       ),
-      child: Row(
+      child: const Row(
         spacing: 8,
         children: [
           Icon(Icons.circle, color: Colors.green),

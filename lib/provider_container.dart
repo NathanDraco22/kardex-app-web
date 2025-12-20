@@ -39,6 +39,7 @@ class ProviderContainer extends StatelessWidget {
     final invoiceDevolutionDataSource = InvoiceDevolutionsDataSource();
     final clientTransDataSource = ClientTransactionsDataSource();
     final servinStatusDataSource = ServinStatusDataSource();
+    final adminPanelDataSource = AdminPanelDataSource();
 
     return MultiRepositoryProvider(
       providers: [
@@ -155,6 +156,12 @@ class ProviderContainer extends StatelessWidget {
         RepositoryProvider(
           create: (context) => ClientTransactionsRepository(
             clientTransDataSource,
+          ),
+        ),
+
+        RepositoryProvider(
+          create: (context) => AdminPanelRepository(
+            adminPanelDataSource,
           ),
         ),
       ],

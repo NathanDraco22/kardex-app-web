@@ -2,19 +2,45 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 
+class CustomChartData {
+  double value;
+
+  CustomChartData({
+    required this.value,
+  });
+}
+
 class Custom7DaysLineChart extends StatelessWidget {
   const Custom7DaysLineChart({
     super.key,
+    required this.data,
   });
+
+  final List<CustomChartData> data;
 
   @override
   Widget build(BuildContext context) {
+    if (data.isEmpty) {
+      return const Center(child: Text("No hay datos disponibles"));
+    }
+
     return SizedBox(
       height: 250,
       child: LineChart(
         LineChartData(
-          lineTouchData: const LineTouchData(
+          lineTouchData: LineTouchData(
             enabled: true,
+            touchTooltipData: LineTouchTooltipData(
+              getTooltipColor: (touchedSpot) => Colors.blueAccent.withValues(alpha: 0.8),
+              getTooltipItems: (List<LineBarSpot> touchedSpots) {
+                return touchedSpots.map((spot) {
+                  return LineTooltipItem(
+                    "C\$ ${spot.y.toStringAsFixed(2)}",
+                    const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  );
+                }).toList();
+              },
+            ),
           ),
           gridData: const FlGridData(
             show: true,
@@ -56,15 +82,10 @@ class Custom7DaysLineChart extends StatelessWidget {
           ),
           lineBarsData: [
             LineChartBarData(
-              spots: [
-                const FlSpot(0, 27000),
-                const FlSpot(1, 32000),
-                const FlSpot(2, 25000),
-                const FlSpot(3, 28000),
-                const FlSpot(4, 30000),
-                const FlSpot(5, 22000),
-                const FlSpot(6, 27000),
-              ],
+              spots: List.generate(
+                data.length,
+                (index) => FlSpot(index.toDouble(), data[index].value),
+              ),
               belowBarData: BarAreaData(
                 show: true,
                 color: Colors.blue.withValues(alpha: 0.2),

@@ -5,10 +5,12 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/admin_panel/widgets/custom_7_charts.dart';
 import 'package:kardex_app_front/admin_panel/widgets/panel_drawer.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
-import 'package:kardex_app_front/src/domain/repositories/branch_repository.dart';
+import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/tools/branches_tool.dart';
+import 'package:kardex_app_front/src/tools/number_formatter.dart';
 import 'package:kardex_app_front/widgets/dialogs/branch_selection_dialog.dart';
 
+import 'cubit/read_admin_panel_cubit.dart';
 import 'widgets/title_amount.dart';
 
 class AdminPanelScreen extends StatelessWidget {
@@ -16,7 +18,11 @@ class AdminPanelScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const _RootScaffold();
+    final adminPanelRepo = context.read<AdminPanelRepository>();
+    return BlocProvider(
+      create: (context) => ReadAdminPanelCubit(adminPanelRepo)..getCharts(),
+      child: const _RootScaffold(),
+    );
   }
 }
 
@@ -60,24 +66,34 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authState = context.read<AuthCubit>().state;
-    if (authState is AuthLoading) {
+    final authState = context.read<AuthCubit>().state as Authenticated;
+    final adminPanelState = context.watch<ReadAdminPanelCubit>().state;
+
+    if (adminPanelState is ReadAdminPanelLoading) {
       return const Center(
         child: CircularProgressIndicator(),
       );
     }
-    if (authState is! Authenticated) {
-      Future(() {
-        if (!context.mounted) return;
-        context.goNamed("login");
-      });
-      return const Center(
-        child: CircularProgressIndicator(),
+    if (adminPanelState is ReadAdminPanelFailure) {
+      return Center(
+        child: Text(adminPanelState.message),
       );
     }
+
+    adminPanelState as ReadAdminPanelSuccess;
+
     final user = authState.session.user;
     final userName = user.username;
     final firstName = userName.split(" ")[0];
+
+    final charts = adminPanelState.charts;
+
+    final yesterdayTotal = charts.last7DaysTotals.last;
+    final last7DaysTotalAmount = charts.last7DaysTotals.fold(
+      0,
+      (previousValue, element) => previousValue + element.total,
+    );
+
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 800),
@@ -101,22 +117,35 @@ class _Body extends StatelessWidget {
                     Container(
                       height: 130,
                       padding: const EdgeInsets.all(8),
-                      child: const Row(
+                      child: Row(
                         spacing: 8,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          TitleAmount(),
+                          TitleAmount(
+                            title: "Ventas Ayer",
+                            amount: NumberFormatter.convertToMoneyLike(yesterdayTotal.total),
+                          ),
                           // TitleAmount(),
                         ],
                       ),
                     ),
                     const Divider(),
-                    const Column(
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       spacing: 8,
                       children: [
-                        TitleAmount(),
-                        Custom7DaysLineChart(),
+                        TitleAmount(
+                          title: "Ultimos 7 dias",
+                          amount: NumberFormatter.convertToMoneyLike(last7DaysTotalAmount),
+                        ),
+                        Custom7DaysLineChart(
+                          data: List.generate(
+                            charts.last7DaysTotals.length,
+                            (index) => CustomChartData(
+                              value: NumberFormatter.convertFromCentsToDouble(charts.last7DaysTotals[index].total),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ],

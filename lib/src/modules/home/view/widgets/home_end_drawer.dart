@@ -20,6 +20,9 @@ class HomeEndDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authCubit = context.read<AuthCubit>();
+    final authState = authCubit.state as Authenticated;
+
     final allBranches = context.read<BranchesRepository>().branches;
     List<BranchInDb> branches = allBranches.where((element) {
       return user.branches.contains(element.id);
@@ -29,6 +32,10 @@ class HomeEndDrawer extends StatelessWidget {
     if (isAdmin) {
       branches = allBranches;
     }
+
+    final isMultiBranch = authState.servin.isMultiBranch;
+    final hasUserMultiBranch = user.branches.length > 1;
+
     return SafeArea(
       child: Drawer(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -56,20 +63,22 @@ class HomeEndDrawer extends StatelessWidget {
 
             const Divider(),
 
-            ListTile(
-              leading: const Icon(Icons.store),
-              title: const Text("Cambiar Sucursal"),
-              onTap: () async {
-                final res = await showBranchSelectionDialog(context, branches);
-                if (res == null) return;
-                if (!context.mounted) return;
-                context.read<AuthCubit>().changeBranch(res.id);
-              },
-            ),
+            if (isMultiBranch && hasUserMultiBranch) ...[
+              ListTile(
+                leading: const Icon(Icons.store),
+                title: const Text("Cambiar Sucursal"),
+                onTap: () async {
+                  final res = await showBranchSelectionDialog(context, branches);
+                  if (res == null) return;
+                  if (!context.mounted) return;
+                  context.read<AuthCubit>().changeBranch(res.id);
+                },
+              ),
 
-            const Divider(),
+              const Divider(),
+            ],
 
-            if (isAdmin)
+            if (isAdmin && isMultiBranch)
               ListTile(
                 leading: const Icon(Icons.admin_panel_settings),
                 title: const Text("Ir a Panel Administrativo"),
