@@ -44,6 +44,11 @@ class Custom7DaysBarChart extends StatelessWidget {
                 showTitles: false,
               ),
             ),
+            rightTitles: const AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: false,
+              ),
+            ),
             bottomTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
