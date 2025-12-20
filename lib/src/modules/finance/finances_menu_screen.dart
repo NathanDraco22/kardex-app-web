@@ -19,7 +19,9 @@ class FinancesMenuScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final adminPanelRepo = context.read<AdminPanelRepository>();
     return BlocProvider(
-      create: (context) => ReadFinanceChartsCubit(adminPanelRepo)..getCharts(),
+      create: (context) {
+        return ReadFinanceChartsCubit(adminPanelRepo)..getChartsCurrentBranch();
+      },
       child: const _RootScaffold(),
     );
   }
@@ -43,24 +45,24 @@ class _Body extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<ReadFinanceChartsCubit>().state;
+    if (state is ReadFinanceChartsLoading || state is ReadFinanceChartsInitial) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+    if (state is ReadFinanceChartsFailure) {
+      return Center(child: Text(state.message));
+    }
+
+    state as ReadFinanceChartsSuccess;
 
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 800),
         child: ListView(
-          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 12),
           children: [
-            if (state is ReadFinanceChartsLoading)
-              const SizedBox(
-                height: 200,
-                child: Center(child: CircularProgressIndicator()),
-              )
-            else if (state is ReadFinanceChartsFailure)
-              Center(child: Text(state.message))
-            else if (state is ReadFinanceChartsSuccess) ...[
-              _ChartsCard(state: state),
-              const SizedBox(height: 12),
-            ],
+            _ChartsCard(state: state),
+            const SizedBox(height: 12),
             const Divider(height: 0.0),
             ListTile(
               leading: const Icon(
@@ -110,7 +112,7 @@ class _ChartsCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              height: 130,
+              height: 80,
               padding: const EdgeInsets.all(8),
               child: Row(
                 spacing: 8,
@@ -126,7 +128,7 @@ class _ChartsCard extends StatelessWidget {
             const Divider(),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: 8,
+              spacing: 16,
               children: [
                 TitleAmount(
                   title: "Ultimos 7 dias",
