@@ -82,13 +82,14 @@ class Custom7DaysLineChart extends StatelessWidget {
           ),
           lineBarsData: [
             LineChartBarData(
+              color: Colors.teal,
               spots: List.generate(
                 data.length,
                 (index) => FlSpot(index.toDouble(), data[index].value),
               ),
               belowBarData: BarAreaData(
                 show: true,
-                color: Colors.blue.withValues(alpha: 0.2),
+                color: Colors.teal.withValues(alpha: 0.2),
               ),
             ),
           ],

@@ -86,7 +86,7 @@ class Custom7DaysBarChart extends StatelessWidget {
               barRods: [
                 BarChartRodData(
                   toY: data[index].value,
-                  color: Colors.blue,
+                  color: Colors.teal,
                   width: 16,
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(4),

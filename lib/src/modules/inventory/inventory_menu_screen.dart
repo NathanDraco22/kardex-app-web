@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/constants/const_modules.dart';
 import 'package:kardex_app_front/src/tools/icon_widgets.dart';
+import 'package:kardex_app_front/widgets/menu_app_bar.dart';
 
 class InventoryMenuScreen extends StatelessWidget {
   const InventoryMenuScreen({super.key});
@@ -20,9 +21,9 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Inventario")),
-      body: const _Body(),
+    return const Scaffold(
+      appBar: MenuAppBar(title: "Inventario"),
+      body: _Body(),
     );
   }
 }

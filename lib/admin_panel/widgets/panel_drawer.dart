@@ -19,7 +19,9 @@ class PanelEndDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Drawer(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -47,7 +49,10 @@ class PanelEndDrawer extends StatelessWidget {
             const Spacer(),
             ListTile(
               tileColor: Colors.red.shade100,
-              leading: Icon(Icons.exit_to_app, color: Colors.red.shade700),
+              leading: Icon(
+                Icons.exit_to_app,
+                color: Colors.red.shade700,
+              ),
 
               title: Text(
                 "Cerrar Sesión",
@@ -56,7 +61,10 @@ class PanelEndDrawer extends StatelessWidget {
                 ),
               ),
               onTap: () async {
-                final res = await DialogManager.confirmActionDialog(context, "Deseas cerrar sesión?");
+                final res = await DialogManager.confirmActionDialog(
+                  context,
+                  "Deseas cerrar sesión?",
+                );
                 if (res != true) return;
                 if (!context.mounted) return;
                 LoadingDialogManager.showLoadingDialog(context);
