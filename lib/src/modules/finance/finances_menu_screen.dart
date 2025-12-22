@@ -9,6 +9,7 @@ import 'package:kardex_app_front/constants/const_modules.dart';
 import 'package:kardex_app_front/src/cubits/finance/read_finance_charts_cubit.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_app_front/widgets/menu_app_bar.dart';
 
 class FinancesMenuScreen extends StatelessWidget {
   const FinancesMenuScreen({super.key});
@@ -32,9 +33,9 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Finanzas")),
-      body: const _Body(),
+    return const Scaffold(
+      appBar: MenuAppBar(title: "Finanzas"),
+      body: _Body(),
     );
   }
 }

@@ -175,7 +175,7 @@ class _Body extends StatelessWidget {
           Text(
             BranchesTool.getCurrentBranchName(),
             style: const TextStyle(
-              fontSize: 24,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -183,14 +183,17 @@ class _Body extends StatelessWidget {
           Text(
             "Bienvenido/a, $firstName",
             style: const TextStyle(
-              fontSize: 24,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Colors.grey,
             ),
           ),
           const SizedBox(height: 12),
 
-          const Text("Elige una opcion", style: TextStyle(fontSize: 18)),
+          const Text(
+            "Elige una opcion",
+            style: TextStyle(fontSize: 16),
+          ),
 
           const SizedBox(height: 12),
 
