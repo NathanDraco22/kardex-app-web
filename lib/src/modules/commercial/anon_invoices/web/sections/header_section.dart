@@ -120,8 +120,18 @@ class MenuActions extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             ElevatedButton.icon(
+              onPressed: () => showGlobalStockSearchModal(context),
+              label: const Text("Existencias Global"),
+              icon: const Icon(Icons.search),
+            ),
+
+            ElevatedButton.icon(
               onPressed: () async {
-                final newInvoice = createAnonInvoiceFromControllers(viewController, tableController, context);
+                final newInvoice = createAnonInvoiceFromControllers(
+                  viewController,
+                  tableController,
+                  context,
+                );
 
                 final res = await showConfirmationAnonInvoiceDialog(
                   context,
