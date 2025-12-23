@@ -4,6 +4,7 @@ import 'package:kardex_app_front/src/modules/commercial/anon_invoices/mobile/inv
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/commercial_product_modal.dart';
 import 'package:kardex_app_front/widgets/dialogs/custom_product_commercial_search_delegate.dart';
+import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 
 import '../../client_invoices/widgets/product_invoice_card.dart';
@@ -190,7 +191,16 @@ class _Body extends StatelessWidget {
                         onRemove: () => viewController.removeItem(currentCommercial),
                         onEdit: () async {
                           final res = await showCommercialProductModal(context, product: currentCommercial.product);
+                          if (!context.mounted) return;
                           if (res == null) return;
+                          if (res.product.account.availableStock == 0 ||
+                              res.product.account.availableStock < res.quantity) {
+                            DialogManager.showInfoDialog(
+                              context,
+                              "No hay stock disponible",
+                            );
+                            return;
+                          }
                           viewController.updateItem(
                             currentCommercial,
                             res,

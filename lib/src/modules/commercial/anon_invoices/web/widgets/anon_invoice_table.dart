@@ -3,6 +3,7 @@ import 'package:kardex_app_front/src/modules/commercial/anon_invoices/web/mediat
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/widgets/more_action_row_button.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
 import 'package:kardex_app_front/widgets/dialogs/commercial_product_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_product_commercial_dialog.dart';
 import 'package:kardex_app_front/widgets/incremental_textfield.dart';
@@ -124,7 +125,16 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
                             context,
                             isDirectSale: true,
                           );
+                          if (!context.mounted) return;
                           if (res == null) return;
+                          if (res.product.account.availableStock == 0 ||
+                              res.product.account.availableStock < res.quantity) {
+                            DialogManager.showInfoDialog(
+                              context,
+                              "No hay stock disponible",
+                            );
+                            return;
+                          }
                           widget.controller.addRowIfNotExists(AnonInvoiceItem(res));
                           if (!context.mounted) return;
                           // ClientInvoiceWebMediator.of(context).viewController.refresh();
@@ -159,13 +169,27 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
             isDirectSale: true,
           );
           if (res == null) return;
-          if (res.quantity == 0) return;
+          if (res.product.account.availableStock == 0 || res.product.account.availableStock < res.quantity) {
+            if (!context.mounted) return;
+            await DialogManager.showErrorDialog(
+              context,
+              "No hay stock disponible",
+            );
+            return;
+          }
           controller.updateRow(item, AnonInvoiceItem(res));
         },
         onEdit: (item) async {
           final res = await showCommercialProductDialog(context, product: item.commercial.product);
           if (res == null) return;
-          if (res.quantity == 0) return;
+          if (res.product.account.availableStock == 0 || res.product.account.availableStock < res.quantity) {
+            if (!context.mounted) return;
+            await DialogManager.showErrorDialog(
+              context,
+              "No hay stock disponible",
+            );
+            return;
+          }
           controller.updateRow(item, AnonInvoiceItem(res));
         },
       );

@@ -23,3 +23,6 @@ export 'user_repository.dart';
 export 'user_roles_repository.dart';
 export 'client_transaction_repository.dart';
 export 'admin_panel_repository.dart';
+export 'daily_summaries_repository.dart';
+export 'executive_summaries_repository.dart';
+export 'product_accounts_repository.dart';
