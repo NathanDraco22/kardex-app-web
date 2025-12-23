@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/constants/const_modules.dart';
 import 'package:kardex_app_front/src/core/access_manager.dart';
+import 'package:kardex_app_front/widgets/dialogs/global_stock_search_modal.dart';
 import 'package:kardex_app_front/widgets/menu_app_bar.dart';
 
 class CommercialMenuScreen extends StatelessWidget {
@@ -98,6 +99,13 @@ class _Body extends StatelessWidget {
               onTap: () {
                 context.pushNamed("commercial-product-movements");
               },
+            ),
+          if (accessManager.hasCurrentAccess(context, CommercialSubModules.createInvoice))
+            ListTile(
+              leading: const Icon(Icons.search, color: Colors.purple),
+              title: const Text("Consulta de Existencias Globales"),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => showGlobalStockSearchModal(context),
             ),
 
           const Divider(height: 0.0),

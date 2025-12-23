@@ -1,6 +1,5 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:kardex_app_front/admin_panel/widgets/pie_chart_row.dart';
 
 class CustomPieChart extends StatelessWidget {
   const CustomPieChart({
@@ -62,18 +61,18 @@ class CustomPieChart extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: ListView(
                   children: [
-                    const PieChartRow(),
-                    const SizedBox(height: 8),
-                    const PieChartRow(),
-                    const SizedBox(height: 8),
+                    // const PieChartRow(),
+                    // const SizedBox(height: 8),
+                    // const PieChartRow(),
+                    // const SizedBox(height: 8),
 
-                    const PieChartRow(),
-                    const SizedBox(height: 8),
+                    // const PieChartRow(),
+                    // const SizedBox(height: 8),
 
-                    const PieChartRow(),
-                    const SizedBox(height: 8),
+                    // const PieChartRow(),
+                    // const SizedBox(height: 8),
 
-                    const PieChartRow(),
+                    // const PieChartRow(),
                   ],
                 ),
               ),
