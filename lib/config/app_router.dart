@@ -1,4 +1,7 @@
 import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/admin_panel/admin_modules/admin_reports/admin_reports_menu.dart';
+import 'package:kardex_app_front/admin_panel/admin_modules/admin_reports/daily_summary/daily_summary_screen.dart';
+import 'package:kardex_app_front/admin_panel/admin_modules/admin_reports/executive_summary/executive_summary_screen.dart';
 import 'package:kardex_app_front/admin_panel/admin_panel_screen.dart';
 import 'package:kardex_app_front/src/modules/activation/activation_screen.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/view/client_catalog_screen.dart';
@@ -86,6 +89,25 @@ class AppRouter {
         path: '/admin-panel',
         name: 'admin-panel',
         builder: (context, state) => const AdminPanelScreen(),
+        routes: [
+          GoRoute(
+            path: "admin-reports",
+            name: "admin-reports",
+            builder: (context, state) => const AdminReportsMenuScreen(),
+            routes: [
+              GoRoute(
+                path: "daily-summary",
+                name: "daily-summary",
+                builder: (context, state) => const DailySummaryScreen(),
+              ),
+              GoRoute(
+                path: "executive-summary",
+                name: "executive-summary",
+                builder: (context, state) => const ExecutiveSummaryScreen(),
+              ),
+            ],
+          ),
+        ],
       ),
 
       GoRoute(

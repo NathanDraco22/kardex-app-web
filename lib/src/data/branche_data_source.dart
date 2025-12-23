@@ -1,7 +1,8 @@
+import 'package:kardex_app_front/src/services/dio_http_service.dart';
 import 'package:kardex_app_front/src/services/http_service.dart';
 import 'package:kardex_app_front/src/tools/http_tool.dart';
 
-class BranchesDataSource with HttpService {
+class BranchesDataSource with HttpService, DioHttpService {
   BranchesDataSource._();
   static final BranchesDataSource instance = BranchesDataSource._();
   factory BranchesDataSource() {
@@ -20,7 +21,7 @@ class BranchesDataSource with HttpService {
   Future<Map<String, dynamic>> getAllBranches() async {
     final headers = HttpTools.generateAuthHeaders();
     final uri = HttpTools.generateUri(_endpoint);
-    final res = await getQuery(uri, headers: headers);
+    final res = await getCachedQuery(uri, headers: headers);
     return res;
   }
 

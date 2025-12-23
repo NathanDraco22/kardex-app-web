@@ -62,6 +62,7 @@ class AuthCubit extends Cubit<AuthState> {
         }
         HttpTools.baseUrl = currentServin.url;
         BranchesTool.setCurrentBranch(branch);
+        BranchesTool.setBranches(results[1] as List<BranchInDb>);
         emit(
           Authenticated(
             loginResponse,
@@ -123,6 +124,7 @@ class AuthCubit extends Cubit<AuthState> {
 
       HttpTools.baseUrl = currentServin.url;
       BranchesTool.setCurrentBranch(branch);
+      BranchesTool.setBranches(results[1] as List<BranchInDb>);
       emit(
         Authenticated(
           loginResponse,

@@ -48,6 +48,58 @@
         }
       }
     },
+    "/api/v1/admin-panels/charts/{branchId}": {
+      "get": {
+        "tags": [
+          "apiV1",
+          "admin_panelsV1"
+        ],
+        "summary": "Get Admin Panels Charts By Branch",
+        "operationId": "get_admin_panels_charts_by_branch_api_v1_admin_panels_charts__branchId__get",
+        "parameters": [
+          {
+            "name": "branchId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Branchid"
+            }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Enddate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminChartsResponses"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/auths/login": {
       "post": {
         "tags": [
@@ -901,7 +953,7 @@
         },
         "security": [
           {
-            "APIKeyHeader": [            ]
+            "APIKeyHeader": []
           }
         ]
       },
@@ -946,7 +998,7 @@
         },
         "security": [
           {
-            "APIKeyHeader": [            ]
+            "APIKeyHeader": []
           }
         ]
       }
@@ -961,7 +1013,7 @@
         "operationId": "get_core_setting_by_id_api_v1_core_settings__core_setting_id__get",
         "security": [
           {
-            "APIKeyHeader": [            ]
+            "APIKeyHeader": []
           }
         ],
         "parameters": [
@@ -1007,7 +1059,7 @@
         "operationId": "delete_core_setting_by_id_api_v1_core_settings__core_setting_id__delete",
         "security": [
           {
-            "APIKeyHeader": [            ]
+            "APIKeyHeader": []
           }
         ],
         "parameters": [
@@ -1055,7 +1107,7 @@
         "operationId": "update_core_setting_by_nickname_api_v1_core_settings__core_setting_nickname__patch",
         "security": [
           {
-            "APIKeyHeader": [            ]
+            "APIKeyHeader": []
           }
         ],
         "parameters": [
@@ -1086,6 +1138,191 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CoreSettingInDb"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/daily-summaries": {
+      "post": {
+        "tags": [
+          "apiV1",
+          "daily_summariesV1"
+        ],
+        "summary": "Create Daily Summary",
+        "operationId": "create_daily_summary_api_v1_daily_summaries_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDailySummary"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DailySummaryInDb"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "apiV1",
+          "daily_summariesV1"
+        ],
+        "summary": "Get All Daily Summaries",
+        "operationId": "get_all_daily_summaries_api_v1_daily_summaries_get",
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "dateId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Dateid"
+            }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Startdate"
+            }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Enddate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListResponse_DailySummaryInDb_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/daily-summaries/{daily_summary_id}": {
+      "get": {
+        "tags": [
+          "apiV1",
+          "daily_summariesV1"
+        ],
+        "summary": "Get Daily Summary By Id",
+        "operationId": "get_daily_summary_by_id_api_v1_daily_summaries__daily_summary_id__get",
+        "parameters": [
+          {
+            "name": "daily_summary_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Daily Summary Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DailySummaryInDb"
                 }
               }
             }
@@ -1979,6 +2216,175 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/EntryHistoryInDb"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/executive-summaries": {
+      "post": {
+        "tags": [
+          "apiV1",
+          "executive_summariesV1"
+        ],
+        "summary": "Create Executive Summary",
+        "operationId": "create_executive_summary_api_v1_executive_summaries_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateExecutiveSummary"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutiveSummaryInDb"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "apiV1",
+          "executive_summariesV1"
+        ],
+        "summary": "Get All Executive Summaries",
+        "operationId": "get_all_executive_summaries_api_v1_executive_summaries_get",
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Startdate"
+            }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Enddate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListResponse_ExecutiveSummaryInDb_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/executive-summaries/{executive_summary_id}": {
+      "get": {
+        "tags": [
+          "apiV1",
+          "executive_summariesV1"
+        ],
+        "summary": "Get Executive Summary By Id",
+        "operationId": "get_executive_summary_by_id_api_v1_executive_summaries__executive_summary_id__get",
+        "parameters": [
+          {
+            "name": "executive_summary_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Executive Summary Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutiveSummaryInDb"
                 }
               }
             }
@@ -3907,22 +4313,22 @@
         }
       }
     },
-    "/api/v1/product-accounts/{branch_id}": {
+    "/api/v1/product-accounts/products/{product_id}/accounts": {
       "get": {
         "tags": [
           "apiV1",
           "product_accountsV1"
         ],
-        "summary": "Get All Product Accounts",
-        "operationId": "get_all_product_accounts_api_v1_product_accounts__branch_id__get",
+        "summary": "Get Product Accounts By Product",
+        "operationId": "get_product_accounts_by_product_api_v1_product_accounts_products__product_id__accounts_get",
         "parameters": [
           {
-            "name": "current_pos",
-            "in": "query",
+            "name": "product_id",
+            "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "title": "Current Pos"
+              "type": "string",
+              "title": "Product Id"
             }
           }
         ],
@@ -3932,7 +4338,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ListResponse_ProductInDbWithAccounts_"
+                  "$ref": "#/components/schemas/ListResponse_ProductAccountInDb_"
                 }
               }
             }
@@ -6734,6 +7140,34 @@
         ],
         "title": "ClientTransactionInDb"
       },
+      "CommercialBranchDetail": {
+        "properties": {
+          "branchId": {
+            "type": "string",
+            "title": "Branchid"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "totalCost": {
+            "type": "integer",
+            "title": "Totalcost"
+          },
+          "totalInvoices": {
+            "type": "integer",
+            "title": "Totalinvoices"
+          }
+        },
+        "type": "object",
+        "required": [
+          "branchId",
+          "total",
+          "totalCost",
+          "totalInvoices"
+        ],
+        "title": "CommercialBranchDetail"
+      },
       "ConvertOrderToInvoiceResponse": {
         "properties": {
           "invoice": {
@@ -6943,6 +7377,52 @@
         ],
         "title": "CreateCoreSetting"
       },
+      "CreateDailySummary": {
+        "properties": {
+          "dateId": {
+            "type": "string",
+            "title": "Dateid"
+          },
+          "startDate": {
+            "type": "integer",
+            "title": "Startdate"
+          },
+          "endDate": {
+            "type": "integer",
+            "title": "Enddate"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "totalCost": {
+            "type": "integer",
+            "title": "Totalcost"
+          },
+          "totalInvoices": {
+            "type": "integer",
+            "title": "Totalinvoices"
+          },
+          "branches": {
+            "items": {
+              "$ref": "#/components/schemas/CommercialBranchDetail"
+            },
+            "type": "array",
+            "title": "Branches"
+          }
+        },
+        "type": "object",
+        "required": [
+          "dateId",
+          "startDate",
+          "endDate",
+          "total",
+          "totalCost",
+          "totalInvoices",
+          "branches"
+        ],
+        "title": "CreateDailySummary"
+      },
       "CreateDevolution": {
         "properties": {
           "branchId": {
@@ -7062,6 +7542,85 @@
           "createdBy"
         ],
         "title": "CreateEntryDoc"
+      },
+      "CreateExecutiveSummary": {
+        "properties": {
+          "dateId": {
+            "type": "string",
+            "title": "Dateid"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "weekly",
+              "monthly",
+              "yearly"
+            ],
+            "title": "Type"
+          },
+          "year": {
+            "type": "integer",
+            "title": "Year"
+          },
+          "month": {
+            "type": "integer",
+            "title": "Month"
+          },
+          "startDate": {
+            "type": "integer",
+            "title": "Startdate"
+          },
+          "endDate": {
+            "type": "integer",
+            "title": "Enddate"
+          },
+          "salesTotal": {
+            "type": "integer",
+            "title": "Salestotal"
+          },
+          "salesTotalCost": {
+            "type": "integer",
+            "title": "Salestotalcost"
+          },
+          "totalInvoices": {
+            "type": "integer",
+            "title": "Totalinvoices"
+          },
+          "commercialBranches": {
+            "items": {
+              "$ref": "#/components/schemas/CommercialBranchDetail"
+            },
+            "type": "array",
+            "title": "Commercialbranches"
+          },
+          "inventoryTotalCost": {
+            "type": "integer",
+            "title": "Inventorytotalcost"
+          },
+          "inventoryBranches": {
+            "items": {
+              "$ref": "#/components/schemas/InventoryBranchDetail"
+            },
+            "type": "array",
+            "title": "Inventorybranches"
+          }
+        },
+        "type": "object",
+        "required": [
+          "dateId",
+          "type",
+          "year",
+          "month",
+          "startDate",
+          "endDate",
+          "salesTotal",
+          "salesTotalCost",
+          "totalInvoices",
+          "commercialBranches",
+          "inventoryTotalCost",
+          "inventoryBranches"
+        ],
+        "title": "CreateExecutiveSummary"
       },
       "CreateExitDoc": {
         "properties": {
@@ -7579,7 +8138,7 @@
             },
             "type": "array",
             "title": "Branches",
-            "default": [            ]
+            "default": []
           }
         },
         "type": "object",
@@ -7610,6 +8169,62 @@
           "access"
         ],
         "title": "CreateUserRole"
+      },
+      "DailySummaryInDb": {
+        "properties": {
+          "dateId": {
+            "type": "string",
+            "title": "Dateid"
+          },
+          "startDate": {
+            "type": "integer",
+            "title": "Startdate"
+          },
+          "endDate": {
+            "type": "integer",
+            "title": "Enddate"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "totalCost": {
+            "type": "integer",
+            "title": "Totalcost"
+          },
+          "totalInvoices": {
+            "type": "integer",
+            "title": "Totalinvoices"
+          },
+          "branches": {
+            "items": {
+              "$ref": "#/components/schemas/CommercialBranchDetail"
+            },
+            "type": "array",
+            "title": "Branches"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "createdAt": {
+            "type": "integer",
+            "title": "Createdat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "dateId",
+          "startDate",
+          "endDate",
+          "total",
+          "totalCost",
+          "totalInvoices",
+          "branches",
+          "id",
+          "createdAt"
+        ],
+        "title": "DailySummaryInDb"
       },
       "DecodedCoreSetting": {
         "properties": {
@@ -7889,6 +8504,106 @@
         ],
         "title": "EntryHistoryInDb"
       },
+      "ExecutiveSummaryInDb": {
+        "properties": {
+          "dateId": {
+            "type": "string",
+            "title": "Dateid"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "weekly",
+              "monthly",
+              "yearly"
+            ],
+            "title": "Type"
+          },
+          "year": {
+            "type": "integer",
+            "title": "Year"
+          },
+          "month": {
+            "type": "integer",
+            "title": "Month"
+          },
+          "startDate": {
+            "type": "integer",
+            "title": "Startdate"
+          },
+          "endDate": {
+            "type": "integer",
+            "title": "Enddate"
+          },
+          "salesTotal": {
+            "type": "integer",
+            "title": "Salestotal"
+          },
+          "salesTotalCost": {
+            "type": "integer",
+            "title": "Salestotalcost"
+          },
+          "totalInvoices": {
+            "type": "integer",
+            "title": "Totalinvoices"
+          },
+          "commercialBranches": {
+            "items": {
+              "$ref": "#/components/schemas/CommercialBranchDetail"
+            },
+            "type": "array",
+            "title": "Commercialbranches"
+          },
+          "inventoryTotalCost": {
+            "type": "integer",
+            "title": "Inventorytotalcost"
+          },
+          "inventoryBranches": {
+            "items": {
+              "$ref": "#/components/schemas/InventoryBranchDetail"
+            },
+            "type": "array",
+            "title": "Inventorybranches"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "createdAt": {
+            "type": "integer",
+            "title": "Createdat"
+          },
+          "updatedAt": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updatedat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "dateId",
+          "type",
+          "year",
+          "month",
+          "startDate",
+          "endDate",
+          "salesTotal",
+          "salesTotalCost",
+          "totalInvoices",
+          "commercialBranches",
+          "inventoryTotalCost",
+          "inventoryBranches",
+          "id",
+          "createdAt"
+        ],
+        "title": "ExecutiveSummaryInDb"
+      },
       "ExitDocInDb": {
         "properties": {
           "clientId": {
@@ -8070,6 +8785,24 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
+      "InventoryBranchDetail": {
+        "properties": {
+          "branchId": {
+            "type": "string",
+            "title": "Branchid"
+          },
+          "inventoryTotalCost": {
+            "type": "integer",
+            "title": "Inventorytotalcost"
+          }
+        },
+        "type": "object",
+        "required": [
+          "branchId",
+          "inventoryTotalCost"
+        ],
+        "title": "InventoryBranchDetail"
+      },
       "InventoryInDb": {
         "properties": {
           "branchId": {
@@ -8077,7 +8810,7 @@
             "title": "Branchid"
           },
           "product": {
-            "$ref": "#/components/schemas/repos__v1__product_sale_profiles__models__product_sale_profile_model__InventoryProduct"
+            "$ref": "#/components/schemas/repos__v1__inventories__models__inventory_model__InventoryProduct"
           },
           "currentStock": {
             "type": "integer",
@@ -8292,6 +9025,11 @@
           "totalCost": {
             "type": "integer",
             "title": "Totalcost"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count",
+            "default": 0
           }
         },
         "type": "object",
@@ -8364,6 +9102,27 @@
         ],
         "title": "ListResponse[ClientTransactionInDb]"
       },
+      "ListResponse_DailySummaryInDb_": {
+        "properties": {
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/DailySummaryInDb"
+            },
+            "type": "array",
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "count",
+          "data"
+        ],
+        "title": "ListResponse[DailySummaryInDb]"
+      },
       "ListResponse_DevolutionInDb_": {
         "properties": {
           "count": {
@@ -8426,6 +9185,27 @@
           "data"
         ],
         "title": "ListResponse[EntryHistoryInDb]"
+      },
+      "ListResponse_ExecutiveSummaryInDb_": {
+        "properties": {
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/ExecutiveSummaryInDb"
+            },
+            "type": "array",
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "count",
+          "data"
+        ],
+        "title": "ListResponse[ExecutiveSummaryInDb]"
       },
       "ListResponse_ExitDocInDb_": {
         "properties": {
@@ -8553,6 +9333,27 @@
         ],
         "title": "ListResponse[OrderInDb]"
       },
+      "ListResponse_ProductAccountInDb_": {
+        "properties": {
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/ProductAccountInDb"
+            },
+            "type": "array",
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "count",
+          "data"
+        ],
+        "title": "ListResponse[ProductAccountInDb]"
+      },
       "ListResponse_ProductCategoryInDb_": {
         "properties": {
           "count": {
@@ -8594,27 +9395,6 @@
           "data"
         ],
         "title": "ListResponse[ProductInDbInBranch]"
-      },
-      "ListResponse_ProductInDbWithAccounts_": {
-        "properties": {
-          "count": {
-            "type": "integer",
-            "title": "Count"
-          },
-          "data": {
-            "items": {
-              "$ref": "#/components/schemas/ProductInDbWithAccounts"
-            },
-            "type": "array",
-            "title": "Data"
-          }
-        },
-        "type": "object",
-        "required": [
-          "count",
-          "data"
-        ],
-        "title": "ListResponse[ProductInDbWithAccounts]"
       },
       "ListResponse_ProductInDb_": {
         "properties": {
@@ -9372,114 +10152,6 @@
         ],
         "title": "ProductInDbInBranch"
       },
-      "ProductInDbWithAccounts": {
-        "properties": {
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Description"
-          },
-          "code": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Code"
-          },
-          "brandName": {
-            "type": "string",
-            "title": "Brandname"
-          },
-          "unitName": {
-            "type": "string",
-            "title": "Unitname"
-          },
-          "categoryName": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Categoryname"
-          },
-          "tags": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Tags"
-          },
-          "hasIva": {
-            "type": "boolean",
-            "title": "Hasiva",
-            "default": false
-          },
-          "isActive": {
-            "type": "boolean",
-            "title": "Isactive",
-            "default": true
-          },
-          "id": {
-            "type": "string",
-            "title": "Id"
-          },
-          "isDeleted": {
-            "type": "boolean",
-            "title": "Isdeleted",
-            "default": false
-          },
-          "createdAt": {
-            "type": "integer",
-            "title": "Createdat"
-          },
-          "updatedAt": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Updatedat"
-          },
-          "accounts": {
-            "items": {
-              "$ref": "#/components/schemas/ProductAccountInDb"
-            },
-            "type": "array",
-            "title": "Accounts"
-          }
-        },
-        "type": "object",
-        "required": [
-          "name",
-          "brandName",
-          "unitName",
-          "tags",
-          "id",
-          "createdAt",
-          "accounts"
-        ],
-        "title": "ProductInDbWithAccounts"
-      },
       "ProductInfo": {
         "properties": {
           "id": {
@@ -9587,7 +10259,7 @@
             },
             "type": "array",
             "title": "Tags",
-            "default": [            ]
+            "default": []
           }
         },
         "type": "object",
@@ -9653,7 +10325,7 @@
             },
             "type": "array",
             "title": "Discounts",
-            "default": [            ]
+            "default": []
           },
           "updatedAt": {
             "anyOf": [
@@ -9695,7 +10367,7 @@
             },
             "type": "array",
             "title": "Discounts",
-            "default": [            ]
+            "default": []
           },
           "updated_at": {
             "anyOf": [
@@ -9709,7 +10381,7 @@
             "title": "Updated At"
           },
           "product": {
-            "$ref": "#/components/schemas/repos__v1__product_sale_profiles__models__product_sale_profile_model__InventoryProduct"
+            "$ref": "#/components/schemas/repos__v1__inventories__models__inventory_model__InventoryProduct"
           },
           "account": {
             "$ref": "#/components/schemas/ProductAccount"
@@ -10601,7 +11273,7 @@
         "title": "UpdateProductSaleProfile"
       },
       "UpdateReceipt": {
-        "properties": {        },
+        "properties": {},
         "type": "object",
         "title": "UpdateReceipt"
       },
@@ -10792,7 +11464,7 @@
             },
             "type": "array",
             "title": "Branches",
-            "default": [            ]
+            "default": []
           },
           "id": {
             "type": "string",
@@ -10854,7 +11526,7 @@
             },
             "type": "array",
             "title": "Branches",
-            "default": [            ]
+            "default": []
           },
           "id": {
             "type": "string",
@@ -11135,7 +11807,7 @@
         ],
         "title": "ExitItem"
       },
-      "repos__v1__product_sale_profiles__models__product_sale_profile_model__InventoryProduct": {
+      "repos__v1__inventories__models__inventory_model__InventoryProduct": {
         "properties": {
           "id": {
             "type": "string",

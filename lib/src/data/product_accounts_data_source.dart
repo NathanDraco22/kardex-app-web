@@ -1,0 +1,20 @@
+import 'package:kardex_app_front/src/services/dio_http_service.dart';
+import 'package:kardex_app_front/src/services/http_service.dart';
+import 'package:kardex_app_front/src/tools/http_tool.dart';
+
+class ProductAccountsDataSource with HttpService, DioHttpService {
+  ProductAccountsDataSource._();
+  static final ProductAccountsDataSource instance = ProductAccountsDataSource._();
+  factory ProductAccountsDataSource() {
+    return instance;
+  }
+
+  final _endpoint = "/product-accounts";
+
+  Future<Map<String, dynamic>> getProductAccountsByProduct(String productId) async {
+    final uri = HttpTools.generateUri("$_endpoint/products/$productId/accounts");
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
+    return res;
+  }
+}
