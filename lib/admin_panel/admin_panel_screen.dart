@@ -9,6 +9,7 @@ import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/tools/branches_tool.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
 import 'package:kardex_app_front/widgets/dialogs/branch_selection_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/global_stock_search_modal.dart';
 
 import 'cubit/read_admin_panel_cubit.dart';
 import 'widgets/title_amount.dart';
@@ -109,7 +110,7 @@ class _Body extends StatelessWidget {
                     Text(
                       "Bienvenido/a, $firstName",
                       style: const TextStyle(
-                        fontSize: 24,
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: Colors.grey,
                       ),
@@ -123,7 +124,9 @@ class _Body extends StatelessWidget {
                         children: [
                           TitleAmount(
                             title: "Ventas Ayer",
-                            amount: NumberFormatter.convertToMoneyLike(yesterdayTotal.total),
+                            amount: NumberFormatter.convertToMoneyLike(
+                              yesterdayTotal.total,
+                            ),
                           ),
                           // TitleAmount(),
                         ],
@@ -136,7 +139,9 @@ class _Body extends StatelessWidget {
                       children: [
                         TitleAmount(
                           title: "Ultimos 7 dias",
-                          amount: NumberFormatter.convertToMoneyLike(last7DaysTotalAmount),
+                          amount: NumberFormatter.convertToMoneyLike(
+                            last7DaysTotalAmount,
+                          ),
                         ),
                         Custom7DaysLineChart(
                           data: List.generate(
@@ -158,15 +163,34 @@ class _Body extends StatelessWidget {
                 children: [
                   const Divider(),
                   ListTile(
-                    leading: const Icon(Icons.bar_chart_rounded, color: Colors.blue),
+                    leading: const Icon(
+                      Icons.bar_chart_rounded,
+                      color: Colors.blue,
+                    ),
                     trailing: const Icon(Icons.arrow_forward_ios_rounded),
-                    title: const Text("Reportes"),
-                    onTap: () async {},
+                    title: const Text("Finanzas (Reportes)"),
+                    onTap: () async {
+                      context.pushNamed("admin-reports");
+                    },
                   ),
                   const Divider(),
 
                   ListTile(
-                    leading: const Icon(Icons.store_rounded, color: Colors.blue),
+                    leading: const Icon(
+                      Icons.search,
+                      color: Colors.blue,
+                    ),
+                    title: const Text("Consulta de Existencias Globales"),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => showGlobalStockSearchModal(context),
+                  ),
+                  const Divider(height: 0.0),
+
+                  ListTile(
+                    leading: const Icon(
+                      Icons.store_rounded,
+                      color: Colors.blue,
+                    ),
                     trailing: const Icon(Icons.arrow_forward_ios_rounded),
                     title: const Text("Ir a Sucursal"),
                     onTap: () async {
@@ -196,7 +220,10 @@ class _Body extends StatelessWidget {
 
                   const Divider(),
                   ListTile(
-                    leading: const Icon(FluentIcons.contact_card_16_filled, color: Colors.blue),
+                    leading: const Icon(
+                      FluentIcons.contact_card_16_filled,
+                      color: Colors.blue,
+                    ),
                     trailing: const Icon(Icons.arrow_forward_ios_rounded),
                     title: const Text("Catalogo de Clientes"),
                     onTap: () async {
@@ -205,7 +232,10 @@ class _Body extends StatelessWidget {
                   ),
                   const Divider(),
                   ListTile(
-                    leading: const Icon(Icons.settings_rounded, color: Colors.blue),
+                    leading: const Icon(
+                      Icons.settings_rounded,
+                      color: Colors.blue,
+                    ),
                     trailing: const Icon(Icons.arrow_forward_ios_rounded),
                     title: const Text("Configuracion"),
                     onTap: () async {

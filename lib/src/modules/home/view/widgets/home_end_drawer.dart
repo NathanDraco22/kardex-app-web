@@ -34,7 +34,7 @@ class HomeEndDrawer extends StatelessWidget {
     }
 
     final isMultiBranch = authState.servin.isMultiBranch;
-    final hasUserMultiBranch = user.branches.length > 1;
+    final hasUserMultiBranch = user.branches.length > 1 || isAdmin;
 
     return SafeArea(
       child: Drawer(

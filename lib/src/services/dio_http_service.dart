@@ -20,11 +20,19 @@ mixin DioHttpService {
     return _dio!;
   }
 
-  Future<dynamic> getCachedQuery(Uri url, {Map<String, String>? headers}) async {
+  Future<dynamic> getCachedQuery(Uri url, {Map<String, String>? headers, Duration? maxStale}) async {
     late Response response;
 
     try {
-      response = await dio.get(url.toString(), options: Options(headers: headers));
+      Options? options;
+      if (maxStale != null) {
+        options = _cacheOptions.copyWith(maxStale: maxStale).toOptions();
+        options.headers = headers;
+      }
+
+      options ??= Options(headers: headers);
+
+      response = await dio.get(url.toString(), options: options);
     } catch (error) {
       throw NoInternetException({"message": error.toString()});
     }
