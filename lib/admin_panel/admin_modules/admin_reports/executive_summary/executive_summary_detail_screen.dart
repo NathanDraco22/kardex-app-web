@@ -22,39 +22,41 @@ class ExecutiveSummaryDetailScreen extends StatelessWidget {
           )}",
         ),
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 600),
-          child: ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              _SummaryCard(summary: summary),
-              const SizedBox(height: 12),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 600),
+            child: ListView(
+              padding: const EdgeInsets.only(bottom: 32),
+              children: [
+                _SummaryCard(summary: summary),
+                const SizedBox(height: 12),
 
-              // Sección Ventas
-              const Text(
-                "Distribución de Ventas por Sucursal",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 12),
-              if (summary.commercialBranches.isNotEmpty)
-                _SalesPieChartCard(summary: summary)
-              else
-                const Center(child: Text("No hay datos de ventas por sucursal")),
+                // Sección Ventas
+                const Text(
+                  "Distribución de Ventas por Sucursal",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 12),
+                if (summary.commercialBranches.isNotEmpty)
+                  _SalesPieChartCard(summary: summary)
+                else
+                  const Center(child: Text("No hay datos de ventas por sucursal")),
 
-              const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-              // Sección Inventario
-              const Text(
-                "Distribución de Inventario por Sucursal",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 12),
-              if (summary.inventoryBranches.isNotEmpty)
-                _InventoryPieChartCard(summary: summary)
-              else
-                const Center(child: Text("No hay datos de inventario por sucursal")),
-            ],
+                // Sección Inventario
+                const Text(
+                  "Distribución de Inventario por Sucursal",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 12),
+                if (summary.inventoryBranches.isNotEmpty)
+                  _InventoryPieChartCard(summary: summary)
+                else
+                  const Center(child: Text("No hay datos de inventario por sucursal")),
+              ],
+            ),
           ),
         ),
       ),
@@ -78,7 +80,6 @@ class _SalesPieChartCard extends StatelessWidget {
         child: Row(
           children: [
             Flexible(
-              flex: 2,
               child: PieChart(
                 PieChartData(
                   sectionsSpace: 0,
@@ -144,7 +145,6 @@ class _InventoryPieChartCard extends StatelessWidget {
         child: Row(
           children: [
             Flexible(
-              flex: 2,
               child: PieChart(
                 PieChartData(
                   sectionsSpace: 0,

@@ -16,7 +16,7 @@ class MenuAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text("Menu Comercio"),
+          Text(title),
           Text(
             branchName,
             style: const TextStyle(

@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/repositories/branch_repository.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
 import 'package:kardex_app_front/widgets/dialogs/branch_selection_dialog.dart';
 
 class MultibranchHomeScreen extends StatelessWidget {
@@ -110,7 +109,7 @@ class _Body extends StatelessWidget {
                 if (res == null) return;
 
                 if (!context.mounted) return;
-                BranchesTool.setCurrentBranch(res);
+                context.read<AuthCubit>().changeBranch(res.id);
                 context.go("/home");
               },
               child: Ink(

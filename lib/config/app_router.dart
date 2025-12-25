@@ -4,6 +4,8 @@ import 'package:kardex_app_front/admin_panel/admin_modules/admin_reports/daily_s
 import 'package:kardex_app_front/admin_panel/admin_modules/admin_reports/executive_summary/executive_summary_screen.dart';
 import 'package:kardex_app_front/admin_panel/admin_panel_screen.dart';
 import 'package:kardex_app_front/src/modules/activation/activation_screen.dart';
+import 'package:kardex_app_front/src/modules/advanced_tools/advanced_tools_screen.dart';
+import 'package:kardex_app_front/src/modules/advanced_tools/product_stats/product_stats_screen.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/view/client_catalog_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_devolution/anon_devolution_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/anon_invoices_screen.dart';
@@ -290,6 +292,19 @@ class AppRouter {
             path: "expiration-logs",
             name: "expiration-logs",
             builder: (context, state) => const ExpirationLogsScreen(),
+          ),
+        ],
+      ),
+
+      GoRoute(
+        path: "/advanced-tools",
+        name: "advanced-tools",
+        builder: (context, state) => const AdvancedToolsScreen(),
+        routes: [
+          GoRoute(
+            path: "product-stats",
+            name: "product-stats",
+            builder: (context, state) => const ProductStatsScreen(),
           ),
         ],
       ),

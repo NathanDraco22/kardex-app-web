@@ -6,7 +6,6 @@ import 'package:kardex_app_front/admin_panel/widgets/custom_7_charts.dart';
 import 'package:kardex_app_front/admin_panel/widgets/panel_drawer.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
 import 'package:kardex_app_front/widgets/dialogs/branch_selection_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/global_stock_search_modal.dart';
@@ -147,7 +146,9 @@ class _Body extends StatelessWidget {
                           data: List.generate(
                             charts.last7DaysTotals.length,
                             (index) => CustomChartData(
-                              value: NumberFormatter.convertFromCentsToDouble(charts.last7DaysTotals[index].total),
+                              value: NumberFormatter.convertFromCentsToDouble(
+                                charts.last7DaysTotals[index].total,
+                              ),
                             ),
                           ),
                         ),
@@ -184,7 +185,7 @@ class _Body extends StatelessWidget {
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () => showGlobalStockSearchModal(context),
                   ),
-                  const Divider(height: 0.0),
+                  const Divider(),
 
                   ListTile(
                     leading: const Icon(
@@ -203,14 +204,17 @@ class _Body extends StatelessWidget {
                       if (res == null) return;
 
                       if (!context.mounted) return;
-                      BranchesTool.setCurrentBranch(res);
+                      context.read<AuthCubit>().changeBranch(res.id);
                       context.go("/home");
                     },
                   ),
 
                   const Divider(),
                   ListTile(
-                    leading: const Icon(FluentIcons.building_multiple_20_filled, color: Colors.blue),
+                    leading: const Icon(
+                      FluentIcons.building_multiple_20_filled,
+                      color: Colors.blue,
+                    ),
                     trailing: const Icon(Icons.arrow_forward_ios_rounded),
                     title: const Text("Catalogo de Proveedores"),
                     onTap: () async {

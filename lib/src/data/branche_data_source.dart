@@ -28,7 +28,7 @@ class BranchesDataSource with HttpService, DioHttpService {
   Future<Map<String, dynamic>?> getBranchById(String branchId) async {
     final headers = HttpTools.generateAuthHeaders();
     final uri = HttpTools.generateUri("$_endpoint/$branchId");
-    final res = await getQuery(uri, headers: headers);
+    final res = await getCachedQuery(uri, headers: headers);
     return res;
   }
 

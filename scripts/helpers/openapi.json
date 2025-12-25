@@ -1156,46 +1156,6 @@
       }
     },
     "/api/v1/daily-summaries": {
-      "post": {
-        "tags": [
-          "apiV1",
-          "daily_summariesV1"
-        ],
-        "summary": "Create Daily Summary",
-        "operationId": "create_daily_summary_api_v1_daily_summaries_post",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateDailySummary"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DailySummaryInDb"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
       "get": {
         "tags": [
           "apiV1",
@@ -4773,6 +4733,146 @@
         }
       }
     },
+    "/api/v1/product-stats": {
+      "get": {
+        "tags": [
+          "apiV1",
+          "product_statsV1"
+        ],
+        "summary": "Get All Product Stats",
+        "operationId": "get_all_product_stats_api_v1_product_stats_get",
+        "parameters": [
+          {
+            "name": "branchId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Branchid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListResponse_ProductStatInDb_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/product-stats/with-info": {
+      "get": {
+        "tags": [
+          "apiV1",
+          "product_statsV1"
+        ],
+        "summary": "Get All Product Stats With Info",
+        "operationId": "get_all_product_stats_with_info_api_v1_product_stats_with_info_get",
+        "parameters": [
+          {
+            "name": "branchId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Branchid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListResponse_ProductStatInDbWithInfo_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/product-stats/estimate": {
+      "post": {
+        "tags": [
+          "apiV1",
+          "product_statsV1"
+        ],
+        "summary": "Estimate Product Stats",
+        "operationId": "estimate_product_stats_api_v1_product_stats_estimate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductStatQueryParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/product-transactions": {
       "get": {
         "tags": [
@@ -7377,52 +7477,6 @@
         ],
         "title": "CreateCoreSetting"
       },
-      "CreateDailySummary": {
-        "properties": {
-          "dateId": {
-            "type": "string",
-            "title": "Dateid"
-          },
-          "startDate": {
-            "type": "integer",
-            "title": "Startdate"
-          },
-          "endDate": {
-            "type": "integer",
-            "title": "Enddate"
-          },
-          "total": {
-            "type": "integer",
-            "title": "Total"
-          },
-          "totalCost": {
-            "type": "integer",
-            "title": "Totalcost"
-          },
-          "totalInvoices": {
-            "type": "integer",
-            "title": "Totalinvoices"
-          },
-          "branches": {
-            "items": {
-              "$ref": "#/components/schemas/CommercialBranchDetail"
-            },
-            "type": "array",
-            "title": "Branches"
-          }
-        },
-        "type": "object",
-        "required": [
-          "dateId",
-          "startDate",
-          "endDate",
-          "total",
-          "totalCost",
-          "totalInvoices",
-          "branches"
-        ],
-        "title": "CreateDailySummary"
-      },
       "CreateDevolution": {
         "properties": {
           "branchId": {
@@ -8810,7 +8864,7 @@
             "title": "Branchid"
           },
           "product": {
-            "$ref": "#/components/schemas/repos__v1__inventories__models__inventory_model__InventoryProduct"
+            "$ref": "#/components/schemas/repos__v1__product_sale_profiles__models__product_sale_profile_model__InventoryProduct"
           },
           "currentStock": {
             "type": "integer",
@@ -9458,6 +9512,48 @@
           "data"
         ],
         "title": "ListResponse[ProductSaleProfileInDbWithProduct]"
+      },
+      "ListResponse_ProductStatInDbWithInfo_": {
+        "properties": {
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/ProductStatInDbWithInfo"
+            },
+            "type": "array",
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "count",
+          "data"
+        ],
+        "title": "ListResponse[ProductStatInDbWithInfo]"
+      },
+      "ListResponse_ProductStatInDb_": {
+        "properties": {
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/ProductStatInDb"
+            },
+            "type": "array",
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "count",
+          "data"
+        ],
+        "title": "ListResponse[ProductStatInDb]"
       },
       "ListResponse_ProductTransactionInDb_": {
         "properties": {
@@ -10381,7 +10477,7 @@
             "title": "Updated At"
           },
           "product": {
-            "$ref": "#/components/schemas/repos__v1__inventories__models__inventory_model__InventoryProduct"
+            "$ref": "#/components/schemas/repos__v1__product_sale_profiles__models__product_sale_profile_model__InventoryProduct"
           },
           "account": {
             "$ref": "#/components/schemas/ProductAccount"
@@ -10396,6 +10492,139 @@
           "account"
         ],
         "title": "ProductSaleProfileInDbWithProduct"
+      },
+      "ProductStatInDb": {
+        "properties": {
+          "productId": {
+            "type": "string",
+            "title": "Productid"
+          },
+          "branchId": {
+            "type": "string",
+            "title": "Branchid"
+          },
+          "startDate": {
+            "type": "integer",
+            "title": "Startdate"
+          },
+          "endDate": {
+            "type": "integer",
+            "title": "Enddate"
+          },
+          "totalUnits": {
+            "type": "integer",
+            "title": "Totalunits"
+          },
+          "totalTransactions": {
+            "type": "integer",
+            "title": "Totaltransactions"
+          },
+          "daysAnalyzed": {
+            "type": "integer",
+            "title": "Daysanalyzed"
+          },
+          "lastEstimation": {
+            "type": "integer",
+            "title": "Lastestimation"
+          },
+          "estimationLevel": {
+            "type": "integer",
+            "title": "Estimationlevel",
+            "default": 1
+          }
+        },
+        "type": "object",
+        "required": [
+          "productId",
+          "branchId",
+          "startDate",
+          "endDate",
+          "totalUnits",
+          "totalTransactions",
+          "daysAnalyzed",
+          "lastEstimation"
+        ],
+        "title": "ProductStatInDb"
+      },
+      "ProductStatInDbWithInfo": {
+        "properties": {
+          "productId": {
+            "type": "string",
+            "title": "Productid"
+          },
+          "branchId": {
+            "type": "string",
+            "title": "Branchid"
+          },
+          "startDate": {
+            "type": "integer",
+            "title": "Startdate"
+          },
+          "endDate": {
+            "type": "integer",
+            "title": "Enddate"
+          },
+          "totalUnits": {
+            "type": "integer",
+            "title": "Totalunits"
+          },
+          "totalTransactions": {
+            "type": "integer",
+            "title": "Totaltransactions"
+          },
+          "daysAnalyzed": {
+            "type": "integer",
+            "title": "Daysanalyzed"
+          },
+          "lastEstimation": {
+            "type": "integer",
+            "title": "Lastestimation"
+          },
+          "estimationLevel": {
+            "type": "integer",
+            "title": "Estimationlevel",
+            "default": 1
+          },
+          "product": {
+            "$ref": "#/components/schemas/ProductItem"
+          }
+        },
+        "type": "object",
+        "required": [
+          "productId",
+          "branchId",
+          "startDate",
+          "endDate",
+          "totalUnits",
+          "totalTransactions",
+          "daysAnalyzed",
+          "lastEstimation",
+          "product"
+        ],
+        "title": "ProductStatInDbWithInfo"
+      },
+      "ProductStatQueryParams": {
+        "properties": {
+          "startDate": {
+            "type": "integer",
+            "title": "Startdate"
+          },
+          "endDate": {
+            "type": "integer",
+            "title": "Enddate"
+          },
+          "daysAnalysis": {
+            "type": "integer",
+            "title": "Daysanalysis"
+          }
+        },
+        "type": "object",
+        "required": [
+          "startDate",
+          "endDate",
+          "daysAnalysis"
+        ],
+        "title": "ProductStatQueryParams"
       },
       "ProductTransactionInDb": {
         "properties": {
@@ -11807,7 +12036,7 @@
         ],
         "title": "ExitItem"
       },
-      "repos__v1__inventories__models__inventory_model__InventoryProduct": {
+      "repos__v1__product_sale_profiles__models__product_sale_profile_model__InventoryProduct": {
         "properties": {
           "id": {
             "type": "string",

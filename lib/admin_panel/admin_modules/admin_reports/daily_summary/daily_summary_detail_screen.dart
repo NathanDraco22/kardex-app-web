@@ -69,7 +69,6 @@ class PieChartCard extends StatelessWidget {
         child: Row(
           children: [
             Flexible(
-              flex: 2,
               child: PieChart(
                 PieChartData(
                   sectionsSpace: 0,

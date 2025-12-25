@@ -12,6 +12,8 @@ class BranchesTool {
 
   static String getCurrentBranchId() => _currentBranch?.id ?? _currentBranchId;
 
+  static BranchInDb? getCurrentBranch() => _currentBranch;
+
   static BranchInDb getBranchById(String branchId) => _branches.firstWhere((branch) => branch.id == branchId);
 
   static void setCurrentBranch(BranchInDb branch) {

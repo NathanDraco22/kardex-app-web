@@ -256,6 +256,14 @@ class _Body extends StatelessWidget {
                   },
                 ),
 
+              HomeOptionCard(
+                title: "Herramientas Avanzadas",
+                icon: Icons.schema_rounded,
+                onTap: () {
+                  context.pushNamed("advanced-tools");
+                },
+              ),
+
               if (accessManager.hasAccessTo(user, Modules.settings))
                 HomeOptionCard(
                   title: "Configuraciones",
