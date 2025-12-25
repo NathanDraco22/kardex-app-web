@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/executive_summary/executive_summary_in_db.dart';
 import 'package:kardex_app_front/src/domain/query_params/daily_summary_params.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
+import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 
 part 'read_executive_summary_state.dart';
 
@@ -18,6 +19,7 @@ class ReadExecutiveSummaryCubit extends Cubit<ReadExecutiveSummaryState> {
   Future<void> getExecutiveSummary({DailySummaryQueryParams? params}) async {
     emit(ReadExecutiveSummaryLoading());
     _params = params ?? _params;
+    _params.endDate = DateTimeTool.getTodayMidnight().add(const Duration(days: 1)).millisecondsSinceEpoch;
     try {
       final executiveSummaries = await executiveSummariesRepository.getAll(_params);
 

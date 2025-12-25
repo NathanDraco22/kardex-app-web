@@ -8,8 +8,7 @@ import 'exceptions/http_exceptions.dart';
 mixin DioHttpService {
   final _cacheOptions = CacheOptions(
     store: HiveCacheStore(null),
-    policy: CachePolicy.forceCache,
-    maxStale: const Duration(hours: 12),
+    policy: CachePolicy.request,
   );
 
   Dio? _dio;
@@ -60,5 +59,22 @@ mixin DioHttpService {
     if (statusCode >= 400) {
       throw BadRequestException(body, statusCode);
     }
+  }
+
+  Future<dynamic> post(Uri url, {Map<String, String>? headers, dynamic body}) async {
+    late Response response;
+    try {
+      response = await dio.post(
+        url.toString(),
+        data: body,
+        options: Options(headers: headers),
+      );
+    } catch (error) {
+      throw NoInternetException({"message": error.toString()});
+    }
+
+    final data = response.data;
+    _processStatusCode(response.statusCode ?? 500, data);
+    return data;
   }
 }
