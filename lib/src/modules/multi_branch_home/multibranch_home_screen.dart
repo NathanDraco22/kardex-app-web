@@ -37,8 +37,12 @@ class _Body extends StatelessWidget {
     final authState = authCubit.state;
 
     if (authState is! Authenticated) {
+      Future(() {
+        if (!context.mounted) return;
+        context.goNamed("login");
+      });
       return const Center(
-        child: Text("Error"),
+        child: Text("Error Unauthorized"),
       );
     }
 
