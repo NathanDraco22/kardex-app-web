@@ -43,6 +43,19 @@ class _Body extends StatelessWidget {
             },
           ),
           const Divider(height: 0.0),
+
+          ListTile(
+            leading: const Icon(
+              Icons.calculate,
+              color: Colors.green,
+              size: 28,
+            ),
+            title: const Text("Projecion de Ventas"),
+            onTap: () {
+              context.pushNamed("sale-projection");
+            },
+          ),
+          const Divider(height: 0.0),
         ],
       ),
     );

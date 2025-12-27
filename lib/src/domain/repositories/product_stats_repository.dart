@@ -20,6 +20,16 @@ class ProductStatsRepository {
     return response.data;
   }
 
+  Future<List<ProductStatInDbWithAccount>> getAllWithAccount({String? branchId}) async {
+    final res = await dataSource.getAllWithAccount(branchId: branchId);
+    final response = ListResponse<ProductStatInDbWithAccount>.fromJson(res, ProductStatInDbWithAccount.fromJson);
+    return response.data;
+  }
+
+  Future<void> generateExcel(int projectionDays) async {
+    await dataSource.generateExcel(projectionDays);
+  }
+
   Future<void> estimate(ProductStatQueryParams params) async {
     await dataSource.estimate(params.toQueryMap());
   }
