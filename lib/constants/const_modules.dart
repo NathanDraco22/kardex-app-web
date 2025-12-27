@@ -7,6 +7,7 @@ class Modules {
   static const String finance = "finance";
   static const String inventory = "inventory";
   static const String settings = "settings";
+  static const String advancedTools = "advancedTools";
 }
 
 class CommercialSubModules {
