@@ -1,11 +1,11 @@
 {
-    "name": "kardex_app_front",
-    "short_name": "kardex_app_front",
+    "name": "Neptuno App",
+    "short_name": "Neptuno",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0c2837",
     "theme_color": "#ffffff",
-    "description": "A new Flutter project.",
+    "description": "Neptuno App",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
