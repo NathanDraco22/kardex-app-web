@@ -37,6 +37,31 @@ class ProductStatsDataSource with HttpService, DioHttpService {
     return res;
   }
 
+  Future<Map<String, dynamic>> getAllWithAccount({String? branchId}) async {
+    final params = ReadProductStatQueryParams(branchId: branchId);
+    final uri = HttpTools.generateUri(
+      "$_endpoint/with-account",
+      queryParameters: params.toQueryMap(),
+    );
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(
+      uri,
+      headers: headers,
+    );
+    return res;
+  }
+
+  Future<Map<String, dynamic>> generateExcel(int projectionDays) async {
+    final uri = HttpTools.generateUri("$_endpoint/create-projection-xslx-file");
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await postQuery(
+      uri,
+      {"projectionDays": projectionDays},
+      headers: headers,
+    );
+    return res;
+  }
+
   Future<void> estimate(Map<String, String> params) async {
     final uri = HttpTools.generateUri("$_endpoint/estimate");
     final headers = HttpTools.generateAuthHeaders();

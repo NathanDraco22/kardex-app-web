@@ -20,6 +20,8 @@ class ProductAccountInDb {
   final DateTime? updatedAt;
 
   int get availableStock => currentStock - promiseStock;
+  double get averageCostMoney => averageCost / 100;
+  double get lasCostMoeny => lastCost / 100;
 
   factory ProductAccountInDb.fromJson(Map<String, dynamic> json) {
     return ProductAccountInDb(

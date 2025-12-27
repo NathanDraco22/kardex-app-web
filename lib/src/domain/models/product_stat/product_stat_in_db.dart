@@ -1,4 +1,5 @@
 import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
+import 'package:kardex_app_front/src/domain/models/product_account/product_account.dart';
 
 class ProductStatInDb {
   final String productId;
@@ -69,6 +70,40 @@ class ProductStatInDbWithInfo extends ProductStatInDb {
       lastEstimation: json['lastEstimation'],
       estimationLevel: json['estimationLevel'] ?? 1,
       product: ProductItem.fromJson(json['product']),
+    );
+  }
+}
+
+class ProductStatInDbWithAccount extends ProductStatInDbWithInfo {
+  final ProductAccountInDb account;
+
+  ProductStatInDbWithAccount({
+    required super.productId,
+    required super.branchId,
+    required super.startDate,
+    required super.endDate,
+    required super.totalUnits,
+    required super.totalTransactions,
+    required super.daysAnalyzed,
+    required super.lastEstimation,
+    super.estimationLevel,
+    required super.product,
+    required this.account,
+  });
+
+  factory ProductStatInDbWithAccount.fromJson(Map<String, dynamic> json) {
+    return ProductStatInDbWithAccount(
+      productId: json['productId'],
+      branchId: json['branchId'],
+      startDate: json['startDate'],
+      endDate: json['endDate'],
+      totalUnits: json['totalUnits'],
+      totalTransactions: json['totalTransactions'],
+      daysAnalyzed: json['daysAnalyzed'],
+      lastEstimation: json['lastEstimation'],
+      estimationLevel: json['estimationLevel'] ?? 1,
+      product: ProductItem.fromJson(json['product']),
+      account: ProductAccountInDb.fromJson(json['account']),
     );
   }
 }
