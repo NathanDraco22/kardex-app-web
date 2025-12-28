@@ -112,6 +112,15 @@ class _Body extends StatelessWidget {
             thickness: 2,
           ),
           ListTile(
+            leading: IconWidgets.exitInventoryIcon,
+            title: const Text("Crear Transferencia"),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.pushNamed("create-transfer"),
+          ),
+
+          const Divider(height: 0.0),
+
+          ListTile(
             leading: const Icon(
               Icons.timer_sharp,
               color: Colors.amber,
