@@ -4783,6 +4783,26 @@
         }
       }
     },
+    "/api/v1/product-stats/projection/file": {
+      "get": {
+        "tags": [
+          "apiV1",
+          "product_statsV1"
+        ],
+        "summary": "Get Current Projection File",
+        "operationId": "get_current_projection_file_api_v1_product_stats_projection_file_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/product-stats/with-info": {
       "get": {
         "tags": [
@@ -4816,6 +4836,99 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ListResponse_ProductStatInDbWithInfo_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/product-stats/with-account": {
+      "get": {
+        "tags": [
+          "apiV1",
+          "product_statsV1"
+        ],
+        "summary": "Get All Product Stats With Account",
+        "operationId": "get_all_product_stats_with_account_api_v1_product_stats_with_account_get",
+        "parameters": [
+          {
+            "name": "branchId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Branchid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListResponse_ProductStatInDbWithAccount_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/product-stats/create-projection-xslx-file": {
+      "post": {
+        "tags": [
+          "apiV1",
+          "product_statsV1"
+        ],
+        "summary": "Create Projection Xslx File",
+        "operationId": "create_projection_xslx_file_api_v1_product_stats_create_projection_xslx_file_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateXlsxFileBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Create Projection Xslx File Api V1 Product Stats Create Projection Xslx File Post"
                 }
               }
             }
@@ -6179,6 +6292,340 @@
         }
       }
     },
+    "/api/v1/transfers": {
+      "post": {
+        "tags": [
+          "apiV1",
+          "transfersV1"
+        ],
+        "summary": "Create Transfer",
+        "operationId": "create_transfer_api_v1_transfers_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTransfer"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransferInDb"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "apiV1",
+          "transfersV1"
+        ],
+        "summary": "Get All Transfers",
+        "operationId": "get_all_transfers_api_v1_transfers_get",
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "origin",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Origin"
+            }
+          },
+          {
+            "name": "destination",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Destination"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListResponse_TransferInDb_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/transfers/doc-number/{doc_number}": {
+      "get": {
+        "tags": [
+          "apiV1",
+          "transfersV1"
+        ],
+        "summary": "Get Transfer By Doc Number",
+        "operationId": "get_transfer_by_doc_number_api_v1_transfers_doc_number__doc_number__get",
+        "parameters": [
+          {
+            "name": "doc_number",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Doc Number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransferInDb"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/transfers/{transfer_id}": {
+      "get": {
+        "tags": [
+          "apiV1",
+          "transfersV1"
+        ],
+        "summary": "Get Transfer By Id",
+        "operationId": "get_transfer_by_id_api_v1_transfers__transfer_id__get",
+        "parameters": [
+          {
+            "name": "transfer_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Transfer Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransferInDb"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/transfers/{transfer_id}/receive": {
+      "post": {
+        "tags": [
+          "apiV1",
+          "transfersV1"
+        ],
+        "summary": "Receive Transfer",
+        "operationId": "receive_transfer_api_v1_transfers__transfer_id__receive_post",
+        "parameters": [
+          {
+            "name": "transfer_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Transfer Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReceiveTransferIntent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransferInDb"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/transfers/{transfer_id}/cancel": {
+      "post": {
+        "tags": [
+          "apiV1",
+          "transfersV1"
+        ],
+        "summary": "Cancel Transfer",
+        "operationId": "cancel_transfer_api_v1_transfers__transfer_id__cancel_post",
+        "parameters": [
+          {
+            "name": "transfer_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Transfer Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelTransferIntent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransferInDb"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/units": {
       "get": {
         "tags": [
@@ -6953,6 +7400,33 @@
           "createdAt"
         ],
         "title": "BranchInDb"
+      },
+      "CancelTransferIntent": {
+        "properties": {
+          "cancelledAt": {
+            "type": "integer",
+            "title": "Cancelledat"
+          },
+          "cancelledBy": {
+            "$ref": "#/components/schemas/UserInfo"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "inTransit",
+              "received",
+              "cancelled"
+            ],
+            "title": "Status",
+            "default": "cancelled"
+          }
+        },
+        "type": "object",
+        "required": [
+          "cancelledAt",
+          "cancelledBy"
+        ],
+        "title": "CancelTransferIntent"
       },
       "ChangePasswordBody": {
         "properties": {
@@ -8154,6 +8628,93 @@
         ],
         "title": "CreateSupplier"
       },
+      "CreateTransfer": {
+        "properties": {
+          "origin": {
+            "type": "string",
+            "title": "Origin"
+          },
+          "destination": {
+            "type": "string",
+            "title": "Destination"
+          },
+          "docNumber": {
+            "type": "string",
+            "title": "Docnumber",
+            "default": ""
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "inTransit",
+              "received",
+              "cancelled"
+            ],
+            "title": "Status"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/TransferItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "createdBy": {
+            "$ref": "#/components/schemas/UserInfo"
+          },
+          "receivedBy": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/UserInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "receivedAt": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Receivedat"
+          },
+          "cancelledBy": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/UserInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "cancelledAt": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cancelledat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "origin",
+          "destination",
+          "status",
+          "items",
+          "createdBy"
+        ],
+        "title": "CreateTransfer"
+      },
       "CreateUnit": {
         "properties": {
           "name": {
@@ -8223,6 +8784,19 @@
           "access"
         ],
         "title": "CreateUserRole"
+      },
+      "CreateXlsxFileBody": {
+        "properties": {
+          "projectionDays": {
+            "type": "integer",
+            "title": "Projectiondays"
+          }
+        },
+        "type": "object",
+        "required": [
+          "projectionDays"
+        ],
+        "title": "CreateXlsxFileBody"
       },
       "DailySummaryInDb": {
         "properties": {
@@ -9513,6 +10087,27 @@
         ],
         "title": "ListResponse[ProductSaleProfileInDbWithProduct]"
       },
+      "ListResponse_ProductStatInDbWithAccount_": {
+        "properties": {
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/ProductStatInDbWithAccount"
+            },
+            "type": "array",
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "count",
+          "data"
+        ],
+        "title": "ListResponse[ProductStatInDbWithAccount]"
+      },
       "ListResponse_ProductStatInDbWithInfo_": {
         "properties": {
           "count": {
@@ -9617,6 +10212,27 @@
           "data"
         ],
         "title": "ListResponse[SupplierInDb]"
+      },
+      "ListResponse_TransferInDb_": {
+        "properties": {
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/TransferInDb"
+            },
+            "type": "array",
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "count",
+          "data"
+        ],
+        "title": "ListResponse[TransferInDb]"
       },
       "ListResponse_UnitInDb_": {
         "properties": {
@@ -10546,6 +11162,67 @@
         ],
         "title": "ProductStatInDb"
       },
+      "ProductStatInDbWithAccount": {
+        "properties": {
+          "productId": {
+            "type": "string",
+            "title": "Productid"
+          },
+          "branchId": {
+            "type": "string",
+            "title": "Branchid"
+          },
+          "startDate": {
+            "type": "integer",
+            "title": "Startdate"
+          },
+          "endDate": {
+            "type": "integer",
+            "title": "Enddate"
+          },
+          "totalUnits": {
+            "type": "integer",
+            "title": "Totalunits"
+          },
+          "totalTransactions": {
+            "type": "integer",
+            "title": "Totaltransactions"
+          },
+          "daysAnalyzed": {
+            "type": "integer",
+            "title": "Daysanalyzed"
+          },
+          "lastEstimation": {
+            "type": "integer",
+            "title": "Lastestimation"
+          },
+          "estimationLevel": {
+            "type": "integer",
+            "title": "Estimationlevel",
+            "default": 1
+          },
+          "product": {
+            "$ref": "#/components/schemas/ProductItem"
+          },
+          "account": {
+            "$ref": "#/components/schemas/ProductAccountInDb"
+          }
+        },
+        "type": "object",
+        "required": [
+          "productId",
+          "branchId",
+          "startDate",
+          "endDate",
+          "totalUnits",
+          "totalTransactions",
+          "daysAnalyzed",
+          "lastEstimation",
+          "product",
+          "account"
+        ],
+        "title": "ProductStatInDbWithAccount"
+      },
       "ProductStatInDbWithInfo": {
         "properties": {
           "productId": {
@@ -10650,7 +11327,8 @@
               "entry",
               "exit",
               "invoice",
-              "devolution"
+              "devolution",
+              "transfer"
             ],
             "title": "Subtype"
           },
@@ -10801,6 +11479,33 @@
           "total"
         ],
         "title": "ReceiptTotal"
+      },
+      "ReceiveTransferIntent": {
+        "properties": {
+          "receivedAt": {
+            "type": "integer",
+            "title": "Receivedat"
+          },
+          "receivedBy": {
+            "$ref": "#/components/schemas/UserInfo"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "inTransit",
+              "received",
+              "cancelled"
+            ],
+            "title": "Status",
+            "default": "received"
+          }
+        },
+        "type": "object",
+        "required": [
+          "receivedAt",
+          "receivedBy"
+        ],
+        "title": "ReceiveTransferIntent"
       },
       "RefreshTokenBody": {
         "properties": {
@@ -10979,6 +11684,185 @@
           "createdAt"
         ],
         "title": "SupplierInDb"
+      },
+      "TransferInDb": {
+        "properties": {
+          "origin": {
+            "type": "string",
+            "title": "Origin"
+          },
+          "destination": {
+            "type": "string",
+            "title": "Destination"
+          },
+          "docNumber": {
+            "type": "string",
+            "title": "Docnumber",
+            "default": ""
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "inTransit",
+              "received",
+              "cancelled"
+            ],
+            "title": "Status"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/TransferItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "createdBy": {
+            "$ref": "#/components/schemas/UserInfo"
+          },
+          "receivedBy": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/UserInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "receivedAt": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Receivedat"
+          },
+          "cancelledBy": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/UserInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "cancelledAt": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cancelledat"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "createdAt": {
+            "type": "integer",
+            "title": "Createdat"
+          },
+          "updatedAt": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updatedat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "origin",
+          "destination",
+          "status",
+          "items",
+          "createdBy",
+          "id",
+          "createdAt"
+        ],
+        "title": "TransferInDb"
+      },
+      "TransferItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "unitName": {
+            "type": "string",
+            "title": "Unitname"
+          },
+          "brandName": {
+            "type": "string",
+            "title": "Brandname"
+          },
+          "code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Code"
+          },
+          "categoryName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Categoryname"
+          },
+          "quantity": {
+            "type": "integer",
+            "title": "Quantity"
+          },
+          "cost": {
+            "type": "integer",
+            "title": "Cost"
+          },
+          "expirationDate": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expirationdate"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "unitName",
+          "brandName",
+          "quantity",
+          "cost"
+        ],
+        "title": "TransferItem"
       },
       "UnitInDb": {
         "properties": {

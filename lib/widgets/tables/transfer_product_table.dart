@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:kardex_app_front/src/domain/models/product/product_model.dart';
+import 'package:kardex_app_front/src/tools/datetime_tool.dart';
+import 'package:kardex_app_front/src/tools/input_formatter/input_formatter.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 
 class TransferProductRow {
@@ -9,13 +11,13 @@ class TransferProductRow {
     required this.product,
     this.quantity = 0,
     this.unitaryCost = 0,
-    this.expirationDate = '',
+    this.expirationDate,
   });
 
   ProductInDb product;
   int quantity = 0;
   int unitaryCost = 0;
-  String expirationDate;
+  DateTime? expirationDate;
 
   int get subTotal => (quantity * unitaryCost);
 }
@@ -161,14 +163,7 @@ class _HeaderTable extends StatelessWidget {
             fit: FlexFit.tight,
             child: Text("Nombre del Producto"),
           ),
-          Flexible(
-            fit: FlexFit.tight,
-            child: Center(child: Text("Unidad")),
-          ),
-          Flexible(
-            fit: FlexFit.tight,
-            child: Center(child: Text("Marca")),
-          ),
+
           Flexible(
             fit: FlexFit.tight,
             child: Center(child: Text("F. Vencimiento")),
@@ -306,13 +301,14 @@ class EntryRow extends StatefulWidget {
 }
 
 class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin {
+  final expirationFocus = FocusNode();
   final focusNode = FocusNode();
   @override
   void initState() {
     super.initState();
     Future(
       () {
-        focusNode.requestFocus();
+        expirationFocus.requestFocus();
       },
     );
   }
@@ -336,7 +332,7 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
     return Ink(
       color: widget.color,
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      height: 48,
+      height: 56,
       child: Row(
         children: [
           Flexible(
@@ -345,30 +341,52 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
             child: Row(
               children: [
                 MoreActionRowButton(widget: widget),
-                Text(product.name),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      product.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Row(
+                      spacing: 8,
+                      children: [
+                        Text(product.brandName),
+                        Text(product.unitName),
+                      ],
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
           Flexible(
             fit: FlexFit.tight,
-            child: Center(child: Text(product.unitName)),
-          ),
-          Flexible(
-            fit: FlexFit.tight,
-            child: Center(child: Text(product.brandName)),
-          ),
-          Flexible(
-            fit: FlexFit.tight,
             child: Center(
               child: TextField(
+                focusNode: expirationFocus,
+                inputFormatters: [MonthYearInputFormatter()],
                 textAlign: TextAlign.center,
+                onEditingComplete: () {
+                  FocusScope.of(context).nextFocus();
+                },
                 decoration: const InputDecoration(
-                  hintText: "dd/mm/aaaa",
+                  hintText: "mm/aa",
                   isDense: true,
                   border: InputBorder.none,
                 ),
                 onChanged: (value) {
-                  widget.rowModel.expirationDate = value;
+                  try {
+                    final date = DateTimeTool.fromMMYY(value);
+                    widget.rowModel.expirationDate = date;
+                  } on Exception catch (_) {
+                    widget.rowModel.expirationDate = null;
+                  }
                 },
               ),
             ),
@@ -403,13 +421,17 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
             child: Center(
               child: Text(
                 NumberFormatter.convertToMoneyLike(widget.rowModel.unitaryCost),
+                style: const TextStyle(fontWeight: FontWeight.w500),
               ),
             ),
           ),
           Flexible(
             fit: FlexFit.tight,
             child: Center(
-              child: Text(NumberFormatter.convertToMoneyLike(subtotal)),
+              child: Text(
+                NumberFormatter.convertToMoneyLike(subtotal),
+                style: const TextStyle(fontWeight: FontWeight.w500),
+              ),
             ),
           ),
         ],
