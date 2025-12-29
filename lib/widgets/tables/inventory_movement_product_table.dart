@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:kardex_app_front/src/domain/models/product/product_model.dart';
+import 'package:kardex_app_front/src/tools/datetime_tool.dart';
+import 'package:kardex_app_front/src/tools/input_formatter/input_formatter.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 
 class ProductRow {
@@ -9,12 +11,14 @@ class ProductRow {
     required this.product,
     this.quantity = 0,
     this.unitaryCost = 0,
+    this.expirationDate,
     this.editableCost = false,
   });
 
   ProductInDb product;
   int quantity = 0;
   int unitaryCost = 0;
+  DateTime? expirationDate;
 
   bool editableCost;
 
@@ -157,17 +161,13 @@ class _HeaderTable extends StatelessWidget {
       child: Row(
         children: [
           Flexible(
-            flex: 2,
+            flex: 3,
             fit: FlexFit.tight,
             child: Text("Nombre del Producto"),
           ),
           Flexible(
             fit: FlexFit.tight,
-            child: Center(child: Text("Unidad")),
-          ),
-          Flexible(
-            fit: FlexFit.tight,
-            child: Center(child: Text("Marca")),
+            child: Center(child: Text("F. Vencimiento")),
           ),
           Flexible(
             fit: FlexFit.tight,
@@ -302,13 +302,14 @@ class EntryRow extends StatefulWidget {
 }
 
 class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin {
+  final expirationDateFocus = FocusNode();
   final focusNode = FocusNode();
   @override
   void initState() {
     super.initState();
     Future(
       () {
-        focusNode.requestFocus();
+        expirationDateFocus.requestFocus();
       },
     );
   }
@@ -332,33 +333,59 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
     return Ink(
       color: widget.color,
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      height: 48,
+      height: 56,
       child: Row(
         children: [
           Flexible(
-            flex: 2,
+            flex: 3,
             fit: FlexFit.tight,
             child: Row(
               children: [
                 MoreActionRowButton(widget: widget),
-                Text(product.name),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(product.name, style: const TextStyle(fontWeight: FontWeight.w500)),
+                    Row(
+                      spacing: 4,
+                      children: [
+                        Text(product.brandName),
+                        Text(product.unitName),
+                      ],
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
+
           Flexible(
             fit: FlexFit.tight,
-            child: Center(child: Text(product.unitName)),
-          ),
-          Flexible(
-            fit: FlexFit.tight,
-            child: Center(child: Text(product.brandName)),
+            child: Center(
+              child: TextField(
+                focusNode: expirationDateFocus,
+                keyboardType: const TextInputType.numberWithOptions(decimal: false),
+                inputFormatters: [MonthYearInputFormatter()],
+                textAlign: TextAlign.center,
+                onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                onChanged: (value) {
+                  try {
+                    final dateTime = DateTimeTool.fromMMYY(value);
+                    widget.rowModel.expirationDate = dateTime;
+                  } catch (e) {
+                    widget.rowModel.expirationDate = null;
+                  }
+                },
+              ),
+            ),
           ),
           Flexible(
             fit: FlexFit.tight,
             child: Center(
               child: TextField(
                 focusNode: focusNode,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(decimal: false),
                 inputFormatters: [IntegerTextInputFormatter()],
                 textAlign: TextAlign.center,
                 onEditingComplete: () => FocusScope.of(context).nextFocus(),

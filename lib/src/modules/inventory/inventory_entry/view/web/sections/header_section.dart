@@ -193,6 +193,10 @@ class MenuActions extends StatelessWidget {
                       productName: e.product.name,
                       quantity: e.quantity,
                       cost: e.unitaryCost,
+                      code: e.product.code,
+                      brandName: e.product.brandName,
+                      unitName: e.product.unitName,
+                      expirationDate: e.expirationDate?.millisecondsSinceEpoch,
                     );
                   }).toList();
 
