@@ -35,6 +35,7 @@ import 'package:kardex_app_front/src/modules/finance/paid_invoices/paid_invoices
 import 'package:kardex_app_front/src/modules/home/view/home_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/create_transfer/create_transfer_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/current_inventory/current_inventory_screen.dart';
+import 'package:kardex_app_front/src/modules/inventory/current_tranfers/current_tranfers_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/expiration_logs/expiration_logs_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/history_entry/history_entry_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/history_exit/history_exit_screen.dart';
@@ -286,10 +287,16 @@ class AppRouter {
             builder: (context, state) => const HistoryExitScreen(),
           ),
           GoRoute(
+            path: "current-tranfers",
+            name: "current-tranfers",
+            builder: (context, state) => const CurrentTranfersScreen(),
+          ),
+          GoRoute(
             path: "create-transfer",
             name: "create-transfer",
             builder: (context, state) => const CreateTransferScreen(),
           ),
+
           GoRoute(
             path: "product-movements",
             name: "product-movements",

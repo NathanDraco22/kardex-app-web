@@ -2,9 +2,13 @@ import 'package:kardex_app_front/src/domain/models/common/transfer_item.dart';
 import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
 
 enum TransferStatus {
-  inTransit,
-  received,
-  cancelled;
+  inTransit("Proceso"),
+  received("Recibido"),
+  cancelled("Cancelado")
+  ;
+
+  const TransferStatus(this.label);
+  final String label;
 
   String toJson() => name;
   static TransferStatus fromJson(String json) => TransferStatus.values.byName(json);
@@ -99,7 +103,7 @@ class ReceiveTransferIntent {
   Map<String, dynamic> toJson() => {
     'receivedAt': receivedAt,
     'receivedBy': receivedBy,
-    'status': status,
+    'status': status.name,
   };
 
   factory ReceiveTransferIntent.fromJson(Map<String, dynamic> json) => ReceiveTransferIntent(
@@ -123,7 +127,7 @@ class CancelTransferIntent {
   Map<String, dynamic> toJson() => {
     'cancelledAt': cancelledAt,
     'cancelledBy': cancelledBy,
-    'status': status,
+    'status': status.name,
   };
 
   factory CancelTransferIntent.fromJson(Map<String, dynamic> json) => CancelTransferIntent(
@@ -137,6 +141,14 @@ class TransferInDb extends BaseTransfer {
   final String id;
   final int createdAt;
   final int? updatedAt;
+
+  int get costTotal {
+    final total = items.fold(
+      0,
+      (previousValue, element) => previousValue + (element.cost * element.quantity),
+    );
+    return total;
+  }
 
   TransferInDb({
     required this.id,

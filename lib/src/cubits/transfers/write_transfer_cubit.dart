@@ -18,4 +18,24 @@ class WriteTransferCubit extends Cubit<WriteTransferState> {
       emit(WriteTransferFailure(e.toString()));
     }
   }
+
+  Future<void> receiveTransfer(String id, ReceiveTransferIntent intent) async {
+    emit(const WriteTransferLoading());
+    try {
+      final result = await repository.receiveTransfer(id, intent);
+      emit(WriteTransferSuccess(result));
+    } catch (e) {
+      emit(WriteTransferFailure(e.toString()));
+    }
+  }
+
+  Future<void> cancelTransfer(String id, CancelTransferIntent intent) async {
+    emit(const WriteTransferLoading());
+    try {
+      final result = await repository.cancelTransfer(id, intent);
+      emit(WriteTransferSuccess(result));
+    } catch (e) {
+      emit(WriteTransferFailure(e.toString()));
+    }
+  }
 }

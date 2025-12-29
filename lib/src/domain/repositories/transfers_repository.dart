@@ -9,7 +9,7 @@ class TransfersRepository {
   TransfersRepository(this.dataSource);
 
   Future<TransferInDb> createTransfer(CreateTransfer transfer) async {
-    final res = await dataSource.createTransfer(transfer);
+    final res = await dataSource.createTransfer(transfer.toJson());
 
     final model = TransferInDb.fromJson(res);
 
@@ -21,5 +21,15 @@ class TransfersRepository {
 
     final response = ListResponse<TransferInDb>.fromJson(res, TransferInDb.fromJson);
     return response.data;
+  }
+
+  Future<TransferInDb> receiveTransfer(String id, ReceiveTransferIntent intent) async {
+    final res = await dataSource.receiveTransfer(id, intent.toJson());
+    return TransferInDb.fromJson(res);
+  }
+
+  Future<TransferInDb> cancelTransfer(String id, CancelTransferIntent intent) async {
+    final res = await dataSource.cancelTransfer(id, intent.toJson());
+    return TransferInDb.fromJson(res);
   }
 }

@@ -62,7 +62,6 @@ class _RootScaffold extends StatelessWidget {
         }
 
         if (state is WriteTransferSuccess) {
-          LoadingDialogManager.closeLoadingDialog(context);
           DialogManager.showInfoDialog(context, "Transferencia ${state.transfer.docNumber} guardada");
           if (!context.mounted) return;
           RebuildTransferScreenNotification().dispatch(context);
