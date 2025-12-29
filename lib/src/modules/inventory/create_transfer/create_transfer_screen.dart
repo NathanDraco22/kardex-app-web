@@ -4,7 +4,9 @@ import 'package:kardex_app_front/src/cubits/transfers/write_transfer_cubit.dart'
 
 import 'package:kardex_app_front/src/domain/repositories/transfers_repository.dart';
 import 'package:kardex_app_front/src/modules/inventory/create_transfer/mediator.dart';
+import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
+import 'mobile/create_transfer_screen_mobile.dart';
 import 'web/create_transfer_screen_web.dart';
 
 class CreateTransferScreen extends StatefulWidget {
@@ -68,6 +70,9 @@ class _RootBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (context.isMobile()) {
+      return const CreateTransferScreenMobile();
+    }
     return const CreateTransferScreenWeb();
   }
 }
