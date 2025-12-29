@@ -221,7 +221,7 @@ class _MobileHeaderSectionState extends State<_MobileHeaderSection> with Automat
     final headerData = mediator.headerData;
 
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 4),
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
@@ -229,11 +229,17 @@ class _MobileHeaderSectionState extends State<_MobileHeaderSection> with Automat
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text("Sucursal Origen", style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text(
+                  "Sucursal Origen",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
                 Text(BranchesTool.getCurrentBranchName()),
                 const SizedBox(height: 12),
 
-                const Text("Sucursal Destino", style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text(
+                  "Sucursal Destino",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
                 InkWell(
                   onTap: () async {
                     final branches = BranchesTool.branches
@@ -244,6 +250,7 @@ class _MobileHeaderSectionState extends State<_MobileHeaderSection> with Automat
                     if (res == null) return;
                     headerData.destinationBranch = res;
                     mediator.refresh();
+                    setState(() {});
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 8),
@@ -288,7 +295,9 @@ class _MobileProductCard extends StatelessWidget {
     final mediator = CreateTransferMediator.read(context)!;
 
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      margin: const EdgeInsets.symmetric(
+        horizontal: 4,
+      ),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -300,7 +309,13 @@ class _MobileProductCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(row.product.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      Text(
+                        row.product.name,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
                       Text(
                         "${row.product.brandName} - ${row.product.unitName}",
                         style: const TextStyle(color: Colors.grey),
@@ -323,10 +338,15 @@ class _MobileProductCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("Vencimiento (mm/aa)", style: TextStyle(fontSize: 12)),
+                      const Text("Vencimiento"),
+                      const SizedBox(
+                        height: 6,
+                      ),
+
                       TextField(
                         inputFormatters: [MonthYearInputFormatter()],
                         textAlign: TextAlign.start,
+                        keyboardType: .number,
                         decoration: const InputDecoration(
                           hintText: "mm/aa",
                           isDense: true,
@@ -348,7 +368,10 @@ class _MobileProductCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("Cantidad", style: TextStyle(fontSize: 12)),
+                      const Text("Cantidad"),
+                      const SizedBox(
+                        height: 6,
+                      ),
                       TextField(
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
                         inputFormatters: [IntegerTextInputFormatter()],
@@ -362,8 +385,7 @@ class _MobileProductCard extends StatelessWidget {
                           } else {
                             row.quantity = int.tryParse(value) ?? 0;
                           }
-                          // We don't need to rebuild the whole list, object is mutated.
-                          // But to trigger "validations" (save button enable/disable potentially) we might need refresh
+
                           mediator.refresh();
                         },
                       ),

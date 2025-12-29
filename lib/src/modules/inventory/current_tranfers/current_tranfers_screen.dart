@@ -14,7 +14,7 @@ class CurrentTranfersScreen extends StatelessWidget {
     return BlocProvider(
       create: (context) => ReadTransfersCubit(
         transfersRepository: transferRepo,
-      )..loadPaginatedTransfers(),
+      ),
       child: const _RootScaffold(),
     );
   }

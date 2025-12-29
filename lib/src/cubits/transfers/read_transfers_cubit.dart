@@ -15,7 +15,7 @@ class ReadTransfersCubit extends Cubit<ReadTransfersState> {
 
   List<TransferInDb> _cache = [];
   bool isLastPage = false;
-  TransferFilterType _currentFilterType = TransferFilterType.sent;
+  TransferFilterType? _currentFilterType;
 
   TransferQueryParams _buildParams({int offset = 0}) {
     final currentBranchId = BranchesTool.getCurrentBranchId();
@@ -49,8 +49,12 @@ class ReadTransfersCubit extends Cubit<ReadTransfersState> {
         isLastPage = true;
       }
 
+      if (isClosed) return;
+
       emit(ReadTransfersSuccess(_cache, _cache.length));
     } catch (e) {
+      if (isClosed) return;
+
       emit(ReadTransfersError(e.toString()));
     }
   }
@@ -65,6 +69,8 @@ class ReadTransfersCubit extends Cubit<ReadTransfersState> {
       if (response.length < 50) {
         isLastPage = true;
       }
+      if (isClosed) return;
+
       emit(ReadTransfersSuccess(_cache, _cache.length));
     } catch (e) {
       // Silent error or notify? for pagination usually silent or snackbar
@@ -77,5 +83,5 @@ class ReadTransfersCubit extends Cubit<ReadTransfersState> {
     loadPaginatedTransfers();
   }
 
-  TransferFilterType get currentFilterType => _currentFilterType;
+  TransferFilterType? get currentFilterType => _currentFilterType;
 }
