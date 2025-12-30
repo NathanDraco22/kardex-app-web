@@ -4,7 +4,9 @@ import 'package:kardex_app_front/cubits/app_mode/app_mode_cubit.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/cubits/toast/toast_cubit.dart';
 import 'package:kardex_app_front/src/data/data.dart';
+import 'package:kardex_app_front/src/data/transfers_data_source.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
+import 'package:kardex_app_front/src/domain/repositories/transfers_repository.dart';
 
 class ProviderContainer extends StatelessWidget {
   const ProviderContainer({super.key, required this.child});
@@ -44,6 +46,7 @@ class ProviderContainer extends StatelessWidget {
     final executiveSummariesDataSource = ExecutiveSummariesDataSource();
     final productAccountsDataSource = ProductAccountsDataSource();
     final productStatsDataSource = ProductStatsDataSource();
+    final transferDataSource = TransfersDataSource();
 
     return MultiRepositoryProvider(
       providers: [
@@ -190,6 +193,11 @@ class ProviderContainer extends StatelessWidget {
         RepositoryProvider(
           create: (context) => ProductStatsRepository(
             productStatsDataSource,
+          ),
+        ),
+        RepositoryProvider(
+          create: (context) => TransfersRepository(
+            transferDataSource,
           ),
         ),
       ],

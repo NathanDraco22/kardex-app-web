@@ -159,8 +159,6 @@ class MenuActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mediator = InventoryExitMediator.watch(context)!;
-    final headerData = mediator.headerData;
-    final productTableController = mediator.productTableController;
 
     final isDisabled = !mediator.hasAllRequiredFields();
 
@@ -169,51 +167,61 @@ class MenuActions extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         ElevatedButton.icon(
-          onPressed: isDisabled
-              ? null
-              : () async {
-                  if (mediator.hasProductWithZeroValue()) {
-                    await DialogManager.showErrorDialog(context, "No se pueden guardar productos con valor 0");
-                    return;
-                  }
-
-                  final res = await DialogManager.slideToConfirmActionDialog(
-                    context,
-                    "Deseas Guardar el Documento? (No se puede deshacer)",
-                  );
-
-                  if (res != true) return;
-
-                  final items = productTableController.rows.map((e) {
-                    return ExitItem(
-                      productId: e.product.id,
-                      productName: e.product.name,
-                      quantity: (e.quantity * -1),
-                    );
-                  }).toList();
-
-                  if (!context.mounted) return;
-
-                  final (currentUser, _) = SessionTool.getFullUserFrom(context);
-
-                  final createExitDoct = CreateExitDoc(
-                    clientId: headerData.client!.id,
-                    docNumber: headerData.docNumber!,
-                    docDate: headerData.docDate!,
-                    branchId: BranchesTool.getCurrentBranchId(),
-                    items: items,
-                    createdBy: UserInfo(
-                      id: currentUser.id,
-                      name: currentUser.username,
-                    ),
-                  );
-
-                  context.read<WriteExitDocCubit>().createNewExitDoc(createExitDoct);
-                },
+          onPressed: isDisabled ? null : () => saveExit(context),
           icon: const Icon(Icons.save),
           label: const Text("Guardar"),
         ),
       ],
     );
   }
+}
+
+Future<void> saveExit(BuildContext context) async {
+  final mediator = InventoryExitMediator.read(context)!;
+  final headerData = mediator.headerData;
+  final productTableController = mediator.productTableController;
+
+  final isDisabled = !mediator.hasAllRequiredFields();
+  if (isDisabled) return;
+
+  if (mediator.hasProductWithZeroValue()) {
+    await DialogManager.showErrorDialog(context, "No se pueden guardar productos con valor 0");
+    return;
+  }
+
+  final res = await DialogManager.slideToConfirmActionDialog(
+    context,
+    "Deseas Guardar el Documento? (No se puede deshacer)",
+  );
+
+  if (res != true) return;
+
+  final items = productTableController.rows.map((e) {
+    return ExitItem(
+      productId: e.product.id,
+      productName: e.product.name,
+      quantity: (e.quantity * -1),
+      brandName: e.product.brandName,
+      unitName: e.product.unitName,
+      code: e.product.code,
+    );
+  }).toList();
+
+  if (!context.mounted) return;
+
+  final (currentUser, _) = SessionTool.getFullUserFrom(context);
+
+  final createExitDoct = CreateExitDoc(
+    clientId: headerData.client!.id,
+    docNumber: headerData.docNumber!,
+    docDate: headerData.docDate!,
+    branchId: BranchesTool.getCurrentBranchId(),
+    items: items,
+    createdBy: UserInfo(
+      id: currentUser.id,
+      name: currentUser.username,
+    ),
+  );
+
+  context.read<WriteExitDocCubit>().createNewExitDoc(createExitDoct);
 }

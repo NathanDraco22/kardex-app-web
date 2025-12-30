@@ -16,3 +16,5 @@ La arquitectura de un módulo en este proyecto Flutter incluye:
 4.  **Modelos:** `lib/src/domain/models/`.
 5.  **Navegación:** Registro en `lib/config/app_router.dart`.
 Esta estructura se ha seguido para módulos como 'Historial de Facturas', 'Historial de Recibos' y 'Historial de Devoluciones'.
+
+- He revisado y aprendido de `lib/widgets/tables/inventory_movement_product_table.dart`. Es una tabla interactiva para movimientos de inventario que usa `ProductTableController` (ChangeNotifier) y `InheritedNotifier` para el estado. Soporta agregar, editar (cantidad/costo) y eliminar filas (`ProductRow`). Usa `NotificationListener` para eventos personalizados.

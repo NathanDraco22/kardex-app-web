@@ -71,6 +71,9 @@ class _SaveButton extends StatelessWidget {
             productId: e.product.id,
             productName: e.product.name,
             quantity: (e.quantity * -1),
+            brandName: e.product.brandName,
+            unitName: e.product.unitName,
+            code: e.product.code,
           );
         });
 
