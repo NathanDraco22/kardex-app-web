@@ -32,4 +32,9 @@ class TransfersRepository {
     final res = await dataSource.cancelTransfer(id, intent.toJson());
     return TransferInDb.fromJson(res);
   }
+
+  Future<TransferInDb> getTransferById(String id) async {
+    final res = await dataSource.getTransferById(id);
+    return TransferInDb.fromJson(res);
+  }
 }

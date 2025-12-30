@@ -17,6 +17,8 @@ extension TransactionSubTypeExtension on TransactionSubType {
         return 'Factura';
       case TransactionSubType.devolution:
         return 'Devolución';
+      case TransactionSubType.transfer:
+        return 'Transferencia';
     }
   }
 }

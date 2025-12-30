@@ -16,7 +16,9 @@ enum TransferStatus {
 
 class BaseTransfer {
   final String origin;
+  final String originName;
   final String destination;
+  final String destinationName;
   final String docNumber;
   final String description;
   final TransferStatus status;
@@ -29,7 +31,9 @@ class BaseTransfer {
 
   BaseTransfer({
     required this.origin,
+    required this.originName,
     required this.destination,
+    required this.destinationName,
     this.docNumber = "",
     this.description = "",
     required this.status,
@@ -43,7 +47,9 @@ class BaseTransfer {
 
   factory BaseTransfer.fromJson(Map<String, dynamic> json) => BaseTransfer(
     origin: json['origin'],
+    originName: json['originName'],
     destination: json['destination'],
+    destinationName: json['destinationName'],
     docNumber: json['docNumber'],
     description: json["description"] ?? "",
     status: TransferStatus.fromJson(json['status']),
@@ -57,7 +63,9 @@ class BaseTransfer {
 
   Map<String, dynamic> toJson() => {
     'origin': origin,
+    'originName': originName,
     'destination': destination,
+    'destinationName': destinationName,
     'docNumber': docNumber,
     'status': status.toJson(),
     'items': items.map((e) => e.toJson()).toList(),
@@ -72,7 +80,9 @@ class BaseTransfer {
 class CreateTransfer extends BaseTransfer {
   CreateTransfer({
     required super.origin,
+    required super.originName,
     required super.destination,
+    required super.destinationName,
     super.docNumber = "",
     super.description = "",
     required super.status,
@@ -155,7 +165,9 @@ class TransferInDb extends BaseTransfer {
     required this.createdAt,
     this.updatedAt,
     required super.origin,
+    required super.originName,
     required super.destination,
+    required super.destinationName,
     super.description,
     super.docNumber = "",
     required super.status,
@@ -172,7 +184,9 @@ class TransferInDb extends BaseTransfer {
     createdAt: json['createdAt'],
     updatedAt: json['updatedAt'],
     origin: json['origin'],
+    originName: json['originName'],
     destination: json['destination'],
+    destinationName: json['destinationName'],
     description: json["description"] ?? "",
     docNumber: json['docNumber'],
     status: TransferStatus.fromJson(json['status']),

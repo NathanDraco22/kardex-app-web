@@ -147,9 +147,13 @@ class _SaveButton extends StatelessWidget {
               final userWithRole = SessionTool.getUserFrom(context);
               if (userWithRole == null) return;
 
+              final originBranch = BranchesTool.getCurrentBranch();
+
               final createTransfer = CreateTransfer(
-                origin: BranchesTool.getCurrentBranchId(),
+                origin: originBranch!.id,
+                originName: originBranch.name,
                 destination: headerData.destinationBranch!.id,
+                destinationName: headerData.destinationBranch!.name,
                 status: TransferStatus.inTransit,
                 description: headerData.observations ?? "",
                 items: items,
