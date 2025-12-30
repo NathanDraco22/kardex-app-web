@@ -53,4 +53,14 @@ class TransfersDataSource with HttpService, DioHttpService {
     );
     return res;
   }
+
+  Future<Map<String, dynamic>> getTransferById(String id) async {
+    final uri = HttpTools.generateUri("$_endpoint/$id");
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(
+      uri,
+      headers: headers,
+    );
+    return res;
+  }
 }

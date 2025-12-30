@@ -197,9 +197,13 @@ Future<void> saveTransfer(BuildContext context) async {
 
   final (currentUser, _) = SessionTool.getFullUserFrom(context);
 
+  final originBranch = BranchesTool.getCurrentBranch();
+
   final createTransfer = CreateTransfer(
-    origin: BranchesTool.getCurrentBranchId(),
+    origin: originBranch!.id,
+    originName: originBranch.name,
     destination: headerData.destinationBranch!.id,
+    destinationName: headerData.destinationBranch!.name,
     status: TransferStatus.inTransit,
     description: headerData.observations ?? "",
     items: items,

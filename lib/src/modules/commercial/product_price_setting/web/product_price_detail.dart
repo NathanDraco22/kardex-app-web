@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/product_sale_profile/product_sale_profile_model.dart';
 import 'package:kardex_app_front/src/modules/commercial/product_price_setting/dialogs/discount_dialog.dart';
@@ -56,11 +57,29 @@ class _RootScaffold extends StatefulWidget {
 class _RootScaffoldState extends State<_RootScaffold> {
   late ProductSaleProfileInDbWithProduct currentProfile;
 
+  FocusNode priceFocus = FocusNode();
+
   @override
   void initState() {
     super.initState();
     currentProfile = widget.profile.copyWith(
       discounts: [...widget.profile.discounts],
+    );
+    Future(
+      () {
+        priceFocus.requestFocus();
+      },
+    );
+  }
+
+  void _saveProduct() {
+    final updatedDto = UpdateProductSaleProfile(
+      salePrice: currentProfile.salePrice,
+      discounts: currentProfile.discounts,
+    );
+    context.read<WriteProductSaleProfileCubit>().updateProfile(
+      currentProfile.productId,
+      updatedDto,
     );
   }
 
@@ -82,176 +101,176 @@ class _RootScaffoldState extends State<_RootScaffold> {
 
         Navigator.pop(context);
       },
-      child: BlocListener<WriteProductSaleProfileCubit, WriteProductSaleProfileState>(
-        listener: (context, state) async {
-          if (state is WriteProductSaleProfileInProgress) {
-            LoadingDialogManager.showLoadingDialog(context);
-          }
-
-          if (state is WriteProductSaleProfileSuccess) {
-            context.read<ReadProductSaleProfileCubit>().markProductUpdated(state.profile);
-            LoadingDialogManager.closeLoadingDialog(context);
-            await DialogManager.showInfoDialog(context, "Guardado exitosamente");
-            if (!context.mounted) return;
-            Navigator.pop(context);
-          }
+      child: CallbackShortcuts(
+        bindings: {
+          const SingleActivator(LogicalKeyboardKey.keyG, control: true): () => _saveProduct(),
         },
-        child: Scaffold(
-          appBar: AppBar(
-            title: const Text("Configuracion de Precios"),
-          ),
-          bottomNavigationBar: BottomAppBar(
-            height: 48,
-            color: Colors.grey.shade200,
-            elevation: 2.4,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Center(
-                    child: SizedBox(
-                      width: 150,
-                      child: ElevatedButton(
-                        child: const Text(
-                          "Guardar",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        onPressed: () {
-                          final updatedDto = UpdateProductSaleProfile(
-                            salePrice: currentProfile.salePrice,
-                            discounts: currentProfile.discounts,
-                          );
-                          context.read<WriteProductSaleProfileCubit>().updateProfile(
-                            currentProfile.productId,
-                            updatedDto,
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          backgroundColor: Colors.white,
-          body: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 600),
-                child: ListView(
+        child: Focus(
+          autofocus: true,
+          child: BlocListener<WriteProductSaleProfileCubit, WriteProductSaleProfileState>(
+            listener: (context, state) async {
+              if (state is WriteProductSaleProfileInProgress) {
+                LoadingDialogManager.showLoadingDialog(context);
+              }
+
+              if (state is WriteProductSaleProfileSuccess) {
+                context.read<ReadProductSaleProfileCubit>().markProductUpdated(state.profile);
+                LoadingDialogManager.closeLoadingDialog(context);
+                await DialogManager.showInfoDialog(context, "Guardado exitosamente");
+                if (!context.mounted) return;
+                Navigator.pop(context);
+              }
+            },
+            child: Scaffold(
+              appBar: AppBar(
+                title: const Text("Configuracion de Precios"),
+              ),
+              bottomNavigationBar: BottomAppBar(
+                height: 48,
+                color: Colors.grey.shade200,
+                elevation: 2.4,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      currentProfile.product.name,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                    Expanded(
+                      child: Center(
+                        child: SizedBox(
+                          width: 150,
+                          child: ElevatedButton(
+                            onPressed: _saveProduct,
+                            child: const Text(
+                              "Guardar",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
                       ),
-                      textAlign: TextAlign.center,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                  ],
+                ),
+              ),
+              backgroundColor: Colors.white,
+              body: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 600),
+                    child: ListView(
                       children: [
                         Text(
-                          currentProfile.product.brandName,
+                          currentProfile.product.name,
                           style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
                           textAlign: TextAlign.center,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              currentProfile.product.brandName,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+
+                            const SizedBox(
+                              width: 12,
+                            ),
+
+                            Text(
+                              currentProfile.product.unitName,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
                         ),
 
                         const SizedBox(
-                          width: 12,
+                          height: 8,
                         ),
 
-                        Text(
-                          currentProfile.product.unitName,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
+                        Row(
+                          children: [
+                            TitleLabel(
+                              title: "Ultima Compra",
+                              bigTitle: NumberFormatter.convertToMoneyLike(
+                                currentProfile.account.lastCost,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            TitleLabel(
+                              title: "Costo",
+                              bigTitle: NumberFormatter.convertToMoneyLike(
+                                currentProfile.account.averageCost,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
 
-                    const SizedBox(
-                      height: 8,
-                    ),
-
-                    Row(
-                      children: [
-                        TitleLabel(
-                          title: "Ultima Compra",
-                          bigTitle: NumberFormatter.convertToMoneyLike(
-                            currentProfile.account.lastCost,
-                          ),
+                        const SizedBox(
+                          height: 12,
                         ),
-                        const SizedBox(width: 12),
-                        TitleLabel(
-                          title: "Costo",
-                          bigTitle: NumberFormatter.convertToMoneyLike(
-                            currentProfile.account.averageCost,
-                          ),
-                        ),
-                      ],
-                    ),
 
-                    const SizedBox(
-                      height: 12,
-                    ),
-
-                    TitleTextField(
-                      title: "Precio de Venta (C\$ )",
-                      keyboardType: TextInputType.number,
-                      onChanged: (value) {
-                        if (value.isEmpty) {
-                          currentProfile.salePrice = 0;
-                          setState(() {});
-                          return;
-                        }
-                        final formattedValue = value.replaceAll(",", "");
-                        final cents = (double.parse(formattedValue) * 100).round();
-                        currentProfile.salePrice = cents;
-                        setState(() {});
-                      },
-
-                      initialValue: NumberFormatter.convertFromCentsToDouble(
-                        widget.profile.salePrice,
-                      ).toString(),
-
-                      inputFormatters: [DoubleThousandsFormatter()],
-                    ),
-
-                    const Divider(),
-                    Row(
-                      children: [
-                        const Text(
-                          "Descuentos",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                        ),
-                        const Spacer(),
-                        TextButton(
-                          child: const Text("Agregar Descuento"),
-                          onPressed: () async {
-                            final res = await showDiscountDialog(context);
-                            if (res == null) return;
-
-                            currentProfile.discounts.add(res);
+                        TitleTextField(
+                          title: "Precio de Venta (C\$ )",
+                          focusNode: priceFocus,
+                          keyboardType: TextInputType.number,
+                          onChanged: (value) {
+                            if (value.isEmpty) {
+                              currentProfile.salePrice = 0;
+                              setState(() {});
+                              return;
+                            }
+                            final formattedValue = value.replaceAll(",", "");
+                            final cents = (double.parse(formattedValue) * 100).round();
+                            currentProfile.salePrice = cents;
                             setState(() {});
                           },
+
+                          initialValue: NumberFormatter.convertFromCentsToDouble(
+                            widget.profile.salePrice,
+                          ).toString(),
+
+                          inputFormatters: [DoubleThousandsFormatter()],
+                        ),
+
+                        const Divider(),
+                        Row(
+                          children: [
+                            const Text(
+                              "Descuentos",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            ),
+                            const Spacer(),
+                            TextButton(
+                              child: const Text("Agregar Descuento"),
+                              onPressed: () async {
+                                final res = await showDiscountDialog(context);
+                                if (res == null) return;
+
+                                currentProfile.discounts.add(res);
+                                setState(() {});
+                              },
+                            ),
+                          ],
+                        ),
+
+                        _DiscountListViewContainer(
+                          profile: currentProfile,
                         ),
                       ],
                     ),
-
-                    _DiscountListViewContainer(
-                      profile: currentProfile,
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),

@@ -233,6 +233,9 @@ class MovementWebRow extends StatelessWidget {
             case TransactionSubType.devolution:
               showDevolutionViewerDialogFromId(context, currentTransaction.documentId);
               break;
+            case TransactionSubType.transfer:
+              showTransferViewerDialogFromId(context, currentTransaction.documentId);
+              break;
           }
         },
         child: Ink(
