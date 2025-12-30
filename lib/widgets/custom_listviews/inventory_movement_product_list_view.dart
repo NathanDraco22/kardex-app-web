@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_app_front/src/domain/models/models.dart';
+import 'package:kardex_app_front/src/tools/datetime_tool.dart';
+import 'package:kardex_app_front/src/tools/input_formatter/input_formatter.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/calculator/calculator_field.dart';
 import 'package:kardex_app_front/widgets/dialogs/custom_product_search_delegate.dart';
@@ -11,11 +13,13 @@ class ProductRowCard {
     this.quantity = 0,
     this.unitaryCost = 0,
     this.editableCost = false,
+    this.expirationDate,
   });
 
   ProductInDb product;
   int quantity = 0;
   int unitaryCost = 0;
+  DateTime? expirationDate;
 
   bool editableCost;
 
@@ -168,6 +172,7 @@ class EntryRowCard extends StatefulWidget {
 
 class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClientMixin {
   final focusNode = FocusNode();
+  final expirationDateFocusNode = FocusNode();
   final parentFocus = FocusNode();
 
   @override
@@ -177,7 +182,7 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
   void initState() {
     super.initState();
     Future(() {
-      focusNode.requestFocus();
+      expirationDateFocusNode.requestFocus();
     });
   }
 
@@ -262,6 +267,32 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
                     height: 4.0,
                     thickness: 2,
                     color: Colors.black12,
+                  ),
+
+                  Row(
+                    children: [
+                      Flexible(
+                        fit: FlexFit.tight,
+                        child: TitleTextField(
+                          focusNode: expirationDateFocusNode,
+                          inputFormatters: [MonthYearInputFormatter()],
+                          titleTextAlign: TextAlign.center,
+                          keyboardType: TextInputType.number,
+                          textInputAction: .next,
+                          onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                          title: "F. Vencimiento",
+                          onChanged: (value) {
+                            try {
+                              final date = DateTimeTool.fromMMYY(value);
+                              rowCard.expirationDate = date;
+                            } catch (e) {
+                              rowCard.expirationDate = null;
+                            }
+                          },
+                        ),
+                      ),
+                      const Spacer(),
+                    ],
                   ),
 
                   Row(

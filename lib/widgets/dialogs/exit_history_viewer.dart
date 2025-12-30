@@ -89,7 +89,7 @@ class _ExitHistoryViewer extends StatelessWidget {
         child: Center(
           child: Container(
             color: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 4),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 600),
               child: Column(
@@ -239,8 +239,27 @@ class _ExitHistoryViewer extends StatelessWidget {
                                   children: [
                                     Expanded(
                                       flex: 2,
-                                      child: Text(
-                                        item.productName,
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+
+                                        children: [
+                                          Text(
+                                            item.productName,
+                                          ),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                item.code ?? "",
+                                              ),
+                                              Text(
+                                                item.brandName ?? "",
+                                              ),
+                                              Text(
+                                                item.unitName ?? "",
+                                              ),
+                                            ],
+                                          ),
+                                        ],
                                       ),
                                     ),
                                     Expanded(

@@ -6,6 +6,7 @@ import 'package:kardex_app_front/src/domain/models/branch/branch.dart';
 import 'package:kardex_app_front/src/domain/models/user/user_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/branch_repository.dart';
 import 'package:kardex_app_front/src/modules/change_password/change_password_screen.dart';
+import 'package:kardex_app_front/src/tools/branches_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/branch_selection_dialog.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
@@ -68,7 +69,10 @@ class HomeEndDrawer extends StatelessWidget {
                 leading: const Icon(Icons.store),
                 title: const Text("Cambiar Sucursal"),
                 onTap: () async {
-                  final res = await showBranchSelectionDialog(context, branches);
+                  final filteredBranches = branches.where((element) {
+                    return element.id != BranchesTool.getCurrentBranchId();
+                  }).toList();
+                  final res = await showBranchSelectionDialog(context, filteredBranches);
                   if (res == null) return;
                   if (!context.mounted) return;
                   context.read<AuthCubit>().changeBranch(res.id);

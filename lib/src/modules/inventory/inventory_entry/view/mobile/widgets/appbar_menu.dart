@@ -70,8 +70,12 @@ class _SaveButton extends StatelessWidget {
           return EntryItem(
             productId: e.product.id,
             productName: e.product.name,
+            brandName: e.product.brandName,
+            unitName: e.product.unitName,
+            code: e.product.code,
             quantity: e.quantity,
             cost: e.unitaryCost,
+            expirationDate: e.expirationDate?.millisecondsSinceEpoch,
           );
         });
 

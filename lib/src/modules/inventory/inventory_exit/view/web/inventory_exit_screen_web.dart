@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
@@ -22,28 +23,36 @@ class InventoryExitScreenWeb extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mediator = InventoryExitMediator.read(context)!;
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Salida de Inventario"),
-        leading: IconButton(
-          onPressed: () async {
-            final allFields = mediator.hasAllRequiredFields();
-            if (!allFields) {
-              context.pop();
-              return;
-            }
-            final res = await DialogManager.confirmActionDialog(
-              context,
-              "Deseas salir sin guardar? (Perderas los cambios)",
-            );
-            if (res != true) return;
-            if (!context.mounted) return;
-            context.pop();
-          },
-          icon: const Icon(Icons.arrow_back),
+    return CallbackShortcuts(
+      bindings: {
+        const SingleActivator(LogicalKeyboardKey.keyG, control: true): () => saveExit(context),
+      },
+      child: Focus(
+        autofocus: true,
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text("Salida de Inventario"),
+            leading: IconButton(
+              onPressed: () async {
+                final allFields = mediator.hasAllRequiredFields();
+                if (!allFields) {
+                  context.pop();
+                  return;
+                }
+                final res = await DialogManager.confirmActionDialog(
+                  context,
+                  "Deseas salir sin guardar? (Perderas los cambios)",
+                );
+                if (res != true) return;
+                if (!context.mounted) return;
+                context.pop();
+              },
+              icon: const Icon(Icons.arrow_back),
+            ),
+          ),
+          body: const _WebBody(),
         ),
       ),
-      body: const _WebBody(),
     );
   }
 }
