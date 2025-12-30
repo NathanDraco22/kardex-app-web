@@ -149,52 +149,7 @@ class MenuActions extends StatelessWidget {
           onPressed: isDisabled
               ? null
               : () async {
-                  if (mediator.hasProductWithZeroValue()) {
-                    await DialogManager.showErrorDialog(context, "No se pueden guardar productos con cantidad 0");
-                    return;
-                  }
-
-                  final res = await DialogManager.slideToConfirmActionDialog(
-                    context,
-                    "¿Deseas Guardar la Transferencia? (No se puede deshacer)",
-                  );
-
-                  if (res != true) return;
-
-                  if (!context.mounted) return;
-
-                  final mediatorRead = CreateTransferMediator.read(context)!;
-                  final headerData = mediatorRead.headerData;
-                  final productTableController = mediatorRead.productTableController;
-
-                  final items = productTableController.rows.map((e) {
-                    return TransferItem(
-                      id: e.product.id,
-                      name: e.product.name,
-                      unitName: e.product.unitName,
-                      brandName: e.product.brandName,
-                      quantity: e.quantity,
-                      cost: e.unitaryCost,
-                      expirationDate: e.expirationDate?.millisecondsSinceEpoch,
-                    );
-                  }).toList();
-
-                  final (currentUser, _) = SessionTool.getFullUserFrom(context);
-
-                  final createTransfer = CreateTransfer(
-                    origin: BranchesTool.getCurrentBranchId(),
-                    destination: headerData.destinationBranch!.id,
-                    status: TransferStatus.inTransit,
-                    description: headerData.observations ?? "",
-                    items: items,
-                    createdBy: UserInfo(
-                      id: currentUser.id,
-                      name: currentUser.username,
-                    ),
-                    docNumber: "",
-                  );
-
-                  context.read<WriteTransferCubit>().createTransfer(createTransfer);
+                  await saveTransfer(context);
                 },
           icon: const Icon(Icons.save),
           label: const Text("Guardar"),
@@ -202,4 +157,58 @@ class MenuActions extends StatelessWidget {
       ],
     );
   }
+}
+
+Future<void> saveTransfer(BuildContext context) async {
+  final mediator = CreateTransferMediator.read(context)!;
+  if (!mediator.hasAllRequiredFields()) {
+    return;
+  }
+
+  if (mediator.hasProductWithZeroValue()) {
+    await DialogManager.showErrorDialog(context, "No se pueden guardar productos con cantidad 0");
+    return;
+  }
+
+  final res = await DialogManager.slideToConfirmActionDialog(
+    context,
+    "¿Deseas Guardar la Transferencia? (No se puede deshacer)",
+  );
+
+  if (res != true) return;
+
+  if (!context.mounted) return;
+
+  final mediatorRead = CreateTransferMediator.read(context)!;
+  final headerData = mediatorRead.headerData;
+  final productTableController = mediatorRead.productTableController;
+
+  final items = productTableController.rows.map((e) {
+    return TransferItem(
+      id: e.product.id,
+      name: e.product.name,
+      unitName: e.product.unitName,
+      brandName: e.product.brandName,
+      quantity: e.quantity,
+      cost: e.unitaryCost,
+      expirationDate: e.expirationDate?.millisecondsSinceEpoch,
+    );
+  }).toList();
+
+  final (currentUser, _) = SessionTool.getFullUserFrom(context);
+
+  final createTransfer = CreateTransfer(
+    origin: BranchesTool.getCurrentBranchId(),
+    destination: headerData.destinationBranch!.id,
+    status: TransferStatus.inTransit,
+    description: headerData.observations ?? "",
+    items: items,
+    createdBy: UserInfo(
+      id: currentUser.id,
+      name: currentUser.username,
+    ),
+    docNumber: "",
+  );
+
+  context.read<WriteTransferCubit>().createTransfer(createTransfer);
 }

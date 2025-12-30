@@ -159,7 +159,7 @@ class _HeaderTable extends StatelessWidget {
       child: Row(
         children: [
           Flexible(
-            flex: 2,
+            flex: 3,
             fit: FlexFit.tight,
             child: Text("Nombre del Producto"),
           ),
@@ -336,7 +336,7 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
       child: Row(
         children: [
           Flexible(
-            flex: 2,
+            flex: 3,
             fit: FlexFit.tight,
             child: Row(
               children: [
@@ -378,7 +378,6 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
                 decoration: const InputDecoration(
                   hintText: "mm/aa",
                   isDense: true,
-                  border: InputBorder.none,
                 ),
                 onChanged: (value) {
                   try {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:kardex_app_front/src/tools/branches_tool.dart';
@@ -71,27 +72,35 @@ class _RootScaffold extends StatelessWidget {
           DialogManager.showErrorDialog(context, state.message);
         }
       },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Nueva Transferencia"),
-          leading: IconButton(
-            onPressed: () async {
-              final hasRows = mediator.productTableController.rows.isNotEmpty;
+      child: CallbackShortcuts(
+        bindings: {
+          const SingleActivator(LogicalKeyboardKey.keyG, control: true): () => saveTransfer(context),
+        },
+        child: Focus(
+          autofocus: true,
+          child: Scaffold(
+            appBar: AppBar(
+              title: const Text("Nueva Transferencia"),
+              leading: IconButton(
+                onPressed: () async {
+                  final hasRows = mediator.productTableController.rows.isNotEmpty;
 
-              if (hasRows) {
-                final res = await DialogManager.confirmActionDialog(
-                  context,
-                  "¿Deseas salir sin guardar? (Perderás los cambios)",
-                );
-                if (res != true) return;
-              }
-              if (!context.mounted) return;
-              context.pop();
-            },
-            icon: const Icon(Icons.arrow_back),
+                  if (hasRows) {
+                    final res = await DialogManager.confirmActionDialog(
+                      context,
+                      "¿Deseas salir sin guardar? (Perderás los cambios)",
+                    );
+                    if (res != true) return;
+                  }
+                  if (!context.mounted) return;
+                  context.pop();
+                },
+                icon: const Icon(Icons.arrow_back),
+              ),
+            ),
+            body: const _Body(),
           ),
         ),
-        body: const _Body(),
       ),
     );
   }

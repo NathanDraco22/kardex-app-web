@@ -162,8 +162,6 @@ class MenuActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mediator = InventoryEntryMediator.watch(context)!;
-    final headerData = mediator.headerData;
-    final productTableController = mediator.productTableController;
 
     final isDisabled = !mediator.hasAllRequiredFields();
 
@@ -172,55 +170,59 @@ class MenuActions extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         ElevatedButton.icon(
-          onPressed: isDisabled
-              ? null
-              : () async {
-                  if (mediator.hasProductWithZeroValue()) {
-                    await DialogManager.showErrorDialog(context, "No se pueden guardar productos con valor 0");
-                    return;
-                  }
-
-                  final res = await DialogManager.slideToConfirmActionDialog(
-                    context,
-                    "Deseas Guardar el Documento? (No se puede deshacer)",
-                  );
-
-                  if (res != true) return;
-
-                  final items = productTableController.rows.map((e) {
-                    return EntryItem(
-                      productId: e.product.id,
-                      productName: e.product.name,
-                      quantity: e.quantity,
-                      cost: e.unitaryCost,
-                      code: e.product.code,
-                      brandName: e.product.brandName,
-                      unitName: e.product.unitName,
-                      expirationDate: e.expirationDate?.millisecondsSinceEpoch,
-                    );
-                  }).toList();
-
-                  if (!context.mounted) return;
-
-                  final (currentUser, _) = SessionTool.getFullUserFrom(context);
-
-                  final createEntryDoct = CreateEntryDoc(
-                    supplierId: headerData.supplier!.id,
-                    docNumber: headerData.docNumber!,
-                    docDate: headerData.docDate!,
-                    branchId: BranchesTool.getCurrentBranchId(),
-                    items: items,
-                    createdBy: UserInfo(
-                      id: currentUser.id,
-                      name: currentUser.username,
-                    ),
-                  );
-                  context.read<WriteEntryDocCubit>().createNewEntryDoc(createEntryDoct);
-                },
+          onPressed: isDisabled ? null : () => saveAction(context),
           icon: const Icon(Icons.save),
           label: const Text("Guardar"),
         ),
       ],
     );
   }
+}
+
+Future<void> saveAction(BuildContext context) async {
+  final mediator = InventoryEntryMediator.read(context)!;
+  if (!mediator.hasAllRequiredFields()) return;
+  final headerData = mediator.headerData;
+  final productTableController = mediator.productTableController;
+  if (mediator.hasProductWithZeroValue()) {
+    await DialogManager.showErrorDialog(context, "No se pueden guardar productos con valor 0");
+    return;
+  }
+
+  final res = await DialogManager.slideToConfirmActionDialog(
+    context,
+    "Deseas Guardar el Documento? (No se puede deshacer)",
+  );
+
+  if (res != true) return;
+
+  final items = productTableController.rows.map((e) {
+    return EntryItem(
+      productId: e.product.id,
+      productName: e.product.name,
+      quantity: e.quantity,
+      cost: e.unitaryCost,
+      code: e.product.code,
+      brandName: e.product.brandName,
+      unitName: e.product.unitName,
+      expirationDate: e.expirationDate?.millisecondsSinceEpoch,
+    );
+  }).toList();
+
+  if (!context.mounted) return;
+
+  final (currentUser, _) = SessionTool.getFullUserFrom(context);
+
+  final createEntryDoct = CreateEntryDoc(
+    supplierId: headerData.supplier!.id,
+    docNumber: headerData.docNumber!,
+    docDate: headerData.docDate!,
+    branchId: BranchesTool.getCurrentBranchId(),
+    items: items,
+    createdBy: UserInfo(
+      id: currentUser.id,
+      name: currentUser.username,
+    ),
+  );
+  context.read<WriteEntryDocCubit>().createNewEntryDoc(createEntryDoct);
 }
