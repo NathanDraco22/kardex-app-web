@@ -4,7 +4,7 @@ import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/input_formatter/input_formatter.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/calculator/calculator_field.dart';
-import 'package:kardex_app_front/widgets/dialogs/custom_product_search_delegate.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/custom_product_search_delegate.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
 
 class ProductRowCard {
@@ -296,6 +296,7 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
                   ),
 
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Flexible(
                         fit: FlexFit.tight,
@@ -323,7 +324,25 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
                         fit: FlexFit.tight,
                         child: Builder(
                           builder: (context) {
-                            if (!rowCard.editableCost) return const Text("--");
+                            final formattedCost = (rowCard.unitaryCost / 100).toStringAsFixed(2);
+                            if (!rowCard.editableCost) {
+                              return Center(
+                                child: Column(
+                                  children: [
+                                    const Text("Costo Unitario"),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      formattedCost,
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
 
                             return Column(
                               spacing: 6,

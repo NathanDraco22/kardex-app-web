@@ -18,3 +18,10 @@ La arquitectura de un módulo en este proyecto Flutter incluye:
 Esta estructura se ha seguido para módulos como 'Historial de Facturas', 'Historial de Recibos' y 'Historial de Devoluciones'.
 
 - He revisado y aprendido de `lib/widgets/tables/inventory_movement_product_table.dart`. Es una tabla interactiva para movimientos de inventario que usa `ProductTableController` (ChangeNotifier) y `InheritedNotifier` para el estado. Soporta agregar, editar (cantidad/costo) y eliminar filas (`ProductRow`). Usa `NotificationListener` para eventos personalizados.
+
+## Learnings from Adjust Entries (Dec 2025)
+- **Product Search**: Use `showSearchProductInBranchDialog` (renamed from Commercial) for searching products within a branch context.
+- **Adjust Entries Cost**: For inventory adjustments (`AdjustEntry`), the cost is **not editable** (`editableCost: false`) and defaults to `product.account.averageCost`.
+- **Cost Display**: Non-editable costs in tables/lists should be formatted as `(value / 100).toStringAsFixed(2)` instead of showing "--".
+- **UserInfo**: When creating entries, prefer explicit construction of `UserInfo(id: user.id, name: user.name)` over passing the Auth User object directly.
+- **Confirmation**: Use `DialogManager.slideToConfirmActionDialog` for critical save actions.

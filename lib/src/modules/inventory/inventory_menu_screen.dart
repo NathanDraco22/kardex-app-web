@@ -66,6 +66,17 @@ class _Body extends StatelessWidget {
           ),
           const Divider(height: 0.0),
 
+          ListTile(
+            leading: const Icon(
+              Icons.timer_sharp,
+              color: Colors.amber,
+            ),
+            title: const Text("Bitacora de Vencimientos"),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.pushNamed("expiration-logs"),
+          ),
+          const Divider(height: 0.0),
+
           const Divider(
             height: 4.0,
             thickness: 2,
@@ -126,7 +137,11 @@ class _Body extends StatelessWidget {
           const Divider(height: 0.0),
 
           ListTile(
-            leading: IconWidgets.exitInventoryIcon,
+            leading: const Icon(
+              Icons.swap_vert_circle_outlined,
+              size: 28,
+              color: Colors.red,
+            ),
             title: const Text("Crear Transferencia"),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.pushNamed("create-transfer"),
@@ -134,16 +149,17 @@ class _Body extends StatelessWidget {
 
           const Divider(height: 0.0),
 
-          ListTile(
-            leading: const Icon(
-              Icons.timer_sharp,
-              color: Colors.amber,
-            ),
-            title: const Text("Bitacora de Vencimientos"),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => context.pushNamed("expiration-logs"),
+          const Divider(
+            height: 4.0,
+            thickness: 2,
           ),
-          const Divider(height: 0.0),
+
+          ListTile(
+            leading: IconWidgets.entryInventoryIcon,
+            title: const Text("Entrada por Ajuste de Inventario"),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.pushNamed("adjust-entry"),
+          ),
         ],
       ),
     );

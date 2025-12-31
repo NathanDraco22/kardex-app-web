@@ -1,0 +1,41 @@
+part of '../../adjust_entry_screen.dart';
+
+class _ContentSection extends StatelessWidget {
+  const _ContentSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final mediator = AdjustEntryMediator.read(context)!;
+    final tableController = mediator.productTableController;
+
+    return InventoryMovementProductTable(
+      controller: tableController,
+      onAddRowAction: (controller) async {
+        final res = await showSearchProductInBranchDialog(context);
+        if (res == null) return;
+        final productRow = ProductRow(
+          product: res,
+          quantity: 0,
+          unitaryCost: res.account.averageCost,
+          editableCost: false,
+        );
+        controller.addRow(productRow);
+        mediator.refresh();
+      },
+      onRemoveRowAction: (controller, row) {
+        controller.removeRow(row);
+      },
+      onUpdateRowAction: (controller, row) async {
+        final res = await showSearchProductInBranchDialog(context);
+        if (res == null) return;
+        final newProductRow = ProductRow(
+          product: res,
+          quantity: 0,
+          unitaryCost: res.account.averageCost,
+          editableCost: true,
+        );
+        controller.updateRow(row, newProductRow);
+      },
+    );
+  }
+}

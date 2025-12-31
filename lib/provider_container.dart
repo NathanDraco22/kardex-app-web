@@ -3,8 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/cubits/app_mode/app_mode_cubit.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/cubits/toast/toast_cubit.dart';
+import 'package:kardex_app_front/src/data/adjust_entries_data_source.dart';
 import 'package:kardex_app_front/src/data/data.dart';
 import 'package:kardex_app_front/src/data/transfers_data_source.dart';
+import 'package:kardex_app_front/src/domain/repositories/adjust_entries_repository.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/domain/repositories/transfers_repository.dart';
 
@@ -47,6 +49,7 @@ class ProviderContainer extends StatelessWidget {
     final productAccountsDataSource = ProductAccountsDataSource();
     final productStatsDataSource = ProductStatsDataSource();
     final transferDataSource = TransfersDataSource();
+    final adjustEntryDatasource = AdjustEntriesDataSource();
 
     return MultiRepositoryProvider(
       providers: [
@@ -198,6 +201,11 @@ class ProviderContainer extends StatelessWidget {
         RepositoryProvider(
           create: (context) => TransfersRepository(
             transferDataSource,
+          ),
+        ),
+        RepositoryProvider(
+          create: (context) => AdjustEntriesRepository(
+            adjustEntryDatasource,
           ),
         ),
       ],

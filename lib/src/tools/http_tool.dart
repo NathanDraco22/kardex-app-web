@@ -14,6 +14,8 @@ class HttpTools {
       baseUrl = practiceUrl;
     }
 
+    baseUrl = "http://localhost:8000";
+
     final decodedBase = Uri.parse(baseUrl);
     final fullPath = "$_api/v$version$path";
 
