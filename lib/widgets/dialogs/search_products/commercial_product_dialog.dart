@@ -7,7 +7,7 @@ import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/title_label.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
-import 'models/commercial_product_result.dart';
+import '../models/commercial_product_result.dart';
 
 Future<CommercialProductResult?> showCommercialProductDialog(
   BuildContext context, {

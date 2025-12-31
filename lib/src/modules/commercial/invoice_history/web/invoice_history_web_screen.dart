@@ -9,7 +9,7 @@ import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/date_picker_button.dart';
 import 'package:kardex_app_front/widgets/dialogs/invoice_viewer.dart';
-import 'package:kardex_app_front/widgets/dialogs/simple_search_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/simple_search_dialog.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
 part 'sections/content_section.dart';

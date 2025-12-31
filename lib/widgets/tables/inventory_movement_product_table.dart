@@ -410,11 +410,14 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
             child: Center(
               child: Builder(
                 builder: (context) {
+                  final formattedCost = (widget.rowModel.unitaryCost / 100).toStringAsFixed(2);
+
                   if (!widget.rowModel.editableCost) {
-                    return const Text("--");
+                    return Text(formattedCost);
                   }
 
-                  return TextField(
+                  return TextFormField(
+                    initialValue: formattedCost,
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
                     inputFormatters: [DecimalTextInputFormatter()],
                     textAlign: TextAlign.center,
@@ -488,6 +491,8 @@ class MoreActionRowButton extends StatelessWidget {
                     ),
 
                     onTap: () {
+                      Navigator.pop(context);
+
                       EntryRowChangeNotification(widget.rowModel).dispatch(context);
                     },
                   ),

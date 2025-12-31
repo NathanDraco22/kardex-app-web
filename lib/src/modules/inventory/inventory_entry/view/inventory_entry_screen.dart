@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
+import 'package:kardex_app_front/src/domain/models/entry_history/entry_history.dart';
 import 'package:kardex_app_front/src/domain/models/models.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_entry/cubit/write_entry_doc_cubit.dart';
