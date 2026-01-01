@@ -162,6 +162,17 @@ class _Body extends StatelessWidget {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.pushNamed("adjust-entry"),
           ),
+          const Divider(height: 0.0),
+
+          ListTile(
+            leading: const Icon(
+              FluentIcons.history_28_filled,
+              color: Colors.blue,
+            ),
+            title: const Text("Historial de Entradas por Ajuste"),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.pushNamed("history-adjust-entry"),
+          ),
 
           const Divider(height: 0.0),
 
