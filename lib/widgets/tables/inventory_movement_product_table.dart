@@ -13,6 +13,7 @@ class ProductRow {
     this.unitaryCost = 0,
     this.expirationDate,
     this.editableCost = false,
+    this.haveExpirationDate = true,
   });
 
   ProductInDb product;
@@ -21,6 +22,7 @@ class ProductRow {
   DateTime? expirationDate;
 
   bool editableCost;
+  bool haveExpirationDate;
 
   int get subTotal => (quantity * unitaryCost);
 }
@@ -82,6 +84,7 @@ class InventoryMovementProductTable extends StatefulWidget {
     this.onAddRowAction,
     this.onRemoveRowAction,
     this.onUpdateRowAction,
+    this.haveExpirationDate = true,
   });
 
   final ProductTableController? controller;
@@ -89,6 +92,7 @@ class InventoryMovementProductTable extends StatefulWidget {
   final FutureOr<void> Function(ProductTableController controller)? onAddRowAction;
   final FutureOr<void> Function(ProductTableController controller, ProductRow row)? onRemoveRowAction;
   final FutureOr<void> Function(ProductTableController controller, ProductRow newRow)? onUpdateRowAction;
+  final bool haveExpirationDate;
 
   @override
   State<InventoryMovementProductTable> createState() => _InventoryMovementProductTableState();
@@ -127,19 +131,19 @@ class _InventoryMovementProductTableState extends State<InventoryMovementProduct
       },
       child: _TableMediator(
         notifier: _tableController!,
-        child: const Card(
+        child: Card(
           margin: EdgeInsets.zero,
           child: Padding(
-            padding: EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
-                _HeaderTable(),
-                Divider(),
-                Expanded(
+                _HeaderTable(haveExpirationDate: widget.haveExpirationDate),
+                const Divider(),
+                const Expanded(
                   child: _InnerRows(),
                 ),
-                Divider(height: 0.0),
-                _TableFooter(),
+                const Divider(height: 0.0),
+                const _TableFooter(),
               ],
             ),
           ),
@@ -152,32 +156,37 @@ class _InventoryMovementProductTableState extends State<InventoryMovementProduct
 // MARK: - Header
 
 class _HeaderTable extends StatelessWidget {
-  const _HeaderTable();
+  const _HeaderTable({
+    required this.haveExpirationDate,
+  });
+
+  final bool haveExpirationDate;
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 8),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Row(
         children: [
-          Flexible(
+          const Flexible(
             flex: 3,
             fit: FlexFit.tight,
             child: Text("Nombre del Producto"),
           ),
-          Flexible(
-            fit: FlexFit.tight,
-            child: Center(child: Text("F. Vencimiento")),
-          ),
-          Flexible(
+          if (haveExpirationDate)
+            const Flexible(
+              fit: FlexFit.tight,
+              child: Center(child: Text("F. Vencimiento")),
+            ),
+          const Flexible(
             fit: FlexFit.tight,
             child: Center(child: Text("Cantidad")),
           ),
-          Flexible(
+          const Flexible(
             fit: FlexFit.tight,
             child: Center(child: Text("Costo Unitario")),
           ),
-          Flexible(
+          const Flexible(
             fit: FlexFit.tight,
             child: Center(child: Text("Subtotal")),
           ),
@@ -309,7 +318,11 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
     super.initState();
     Future(
       () {
-        expirationDateFocus.requestFocus();
+        if (widget.rowModel.haveExpirationDate) {
+          expirationDateFocus.requestFocus();
+        } else {
+          focusNode.requestFocus();
+        }
       },
     );
   }
@@ -359,27 +372,27 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
               ],
             ),
           ),
-
-          Flexible(
-            fit: FlexFit.tight,
-            child: Center(
-              child: TextField(
-                focusNode: expirationDateFocus,
-                keyboardType: const TextInputType.numberWithOptions(decimal: false),
-                inputFormatters: [MonthYearInputFormatter()],
-                textAlign: TextAlign.center,
-                onEditingComplete: () => FocusScope.of(context).nextFocus(),
-                onChanged: (value) {
-                  try {
-                    final dateTime = DateTimeTool.fromMMYY(value);
-                    widget.rowModel.expirationDate = dateTime;
-                  } catch (e) {
-                    widget.rowModel.expirationDate = null;
-                  }
-                },
+          if (widget.rowModel.haveExpirationDate)
+            Flexible(
+              fit: FlexFit.tight,
+              child: Center(
+                child: TextField(
+                  focusNode: expirationDateFocus,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: false),
+                  inputFormatters: [MonthYearInputFormatter()],
+                  textAlign: TextAlign.center,
+                  onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                  onChanged: (value) {
+                    try {
+                      final dateTime = DateTimeTool.fromMMYY(value);
+                      widget.rowModel.expirationDate = dateTime;
+                    } catch (e) {
+                      widget.rowModel.expirationDate = null;
+                    }
+                  },
+                ),
               ),
             ),
-          ),
           Flexible(
             fit: FlexFit.tight,
             child: Center(
@@ -492,7 +505,6 @@ class MoreActionRowButton extends StatelessWidget {
 
                     onTap: () {
                       Navigator.pop(context);
-
                       EntryRowChangeNotification(widget.rowModel).dispatch(context);
                     },
                   ),

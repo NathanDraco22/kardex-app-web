@@ -10,6 +10,7 @@ class _ContentSection extends StatelessWidget {
 
     return InventoryMovementProductTable(
       controller: tableController,
+      haveExpirationDate: false,
       onAddRowAction: (controller) async {
         final res = await showSearchProductInBranchDialog(context);
         if (res == null) return;
@@ -18,6 +19,7 @@ class _ContentSection extends StatelessWidget {
           quantity: 0,
           unitaryCost: res.account.averageCost,
           editableCost: false,
+          haveExpirationDate: false,
         );
         controller.addRow(productRow);
         mediator.refresh();
@@ -33,6 +35,7 @@ class _ContentSection extends StatelessWidget {
           quantity: 0,
           unitaryCost: res.account.averageCost,
           editableCost: true,
+          haveExpirationDate: false,
         );
         controller.updateRow(row, newProductRow);
       },

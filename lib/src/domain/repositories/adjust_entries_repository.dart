@@ -1,5 +1,5 @@
 import 'package:kardex_app_front/src/data/adjust_entries_data_source.dart';
-import 'package:kardex_app_front/src/domain/models/inventory/adjust_entry/adjust_entry_model.dart';
+import 'package:kardex_app_front/src/domain/models/adjust_entry/adjust_entry_model.dart';
 import 'package:kardex_app_front/src/domain/query_params/adjust_query_params.dart';
 import 'package:kardex_app_front/src/domain/responses/list_responses.dart';
 

@@ -1,0 +1,43 @@
+part of '../../adjust_exit_screen.dart';
+
+class _ContentSection extends StatelessWidget {
+  const _ContentSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final mediator = AdjustExitMediator.read(context)!;
+    final tableController = mediator.productTableController;
+
+    return InventoryMovementProductTable(
+      controller: tableController,
+      haveExpirationDate: false,
+      onAddRowAction: (controller) async {
+        final res = await showSearchProductInBranchDialog(context);
+        if (res == null) return;
+        final productRow = ProductRow(
+          product: res,
+          quantity: 0,
+          unitaryCost: res.account.averageCost,
+          editableCost: false,
+          haveExpirationDate: false,
+        );
+        controller.addRow(productRow);
+        mediator.refresh();
+      },
+      onRemoveRowAction: (controller, row) {
+        controller.removeRow(row);
+      },
+      onUpdateRowAction: (controller, row) async {
+        final res = await showSearchProductInBranchDialog(context);
+        if (res == null) return;
+        final newProductRow = ProductRow(
+          product: res,
+          quantity: 0,
+          unitaryCost: res.account.averageCost,
+          editableCost: false,
+        );
+        controller.updateRow(row, newProductRow);
+      },
+    );
+  }
+}

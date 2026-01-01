@@ -2,6 +2,8 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/constants/const_modules.dart';
+import 'package:kardex_app_front/src/modules/inventory/adjust_exit/adjust_exit_screen.dart';
+import 'package:kardex_app_front/src/domain/models/adjust_exit/adjust_exit_model.dart';
 import 'package:kardex_app_front/src/tools/icon_widgets.dart';
 import 'package:kardex_app_front/widgets/menu_app_bar.dart';
 
@@ -156,9 +158,51 @@ class _Body extends StatelessWidget {
 
           ListTile(
             leading: IconWidgets.entryInventoryIcon,
-            title: const Text("Entrada por Ajuste de Inventario"),
+            title: const Text("Entrada por Ajuste"),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.pushNamed("adjust-entry"),
+          ),
+
+          const Divider(height: 0.0),
+
+          ListTile(
+            leading: IconWidgets.exitInventoryIcon,
+            title: const Text("Salida por Ajuste"),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const AdjustExitScreen(type: AdjustExitType.adjust),
+              ),
+            ),
+          ),
+
+          const Divider(height: 0.0),
+
+          ListTile(
+            leading: IconWidgets.exitInventoryIcon,
+            title: const Text("Devoluciones"),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const AdjustExitScreen(type: AdjustExitType.devolution),
+              ),
+            ),
+          ),
+
+          const Divider(height: 0.0),
+
+          ListTile(
+            leading: IconWidgets.exitInventoryIcon,
+            title: const Text("Mermas"),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const AdjustExitScreen(type: AdjustExitType.loss),
+              ),
+            ),
           ),
         ],
       ),
