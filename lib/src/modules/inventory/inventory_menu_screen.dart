@@ -193,6 +193,18 @@ class _Body extends StatelessWidget {
           const Divider(height: 0.0),
 
           ListTile(
+            leading: const Icon(
+              FluentIcons.history_28_filled,
+              color: Colors.red,
+            ),
+            title: const Text("Historial de Salidas por Ajuste"),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.pushNamed("history-adjust-exit"),
+          ),
+
+          const Divider(height: 0.0),
+
+          ListTile(
             leading: IconWidgets.exitInventoryIcon,
             title: const Text("Mermas"),
             trailing: const Icon(Icons.chevron_right),
@@ -205,6 +217,8 @@ class _Body extends StatelessWidget {
               ),
             ),
           ),
+
+          const Divider(height: 0.0),
         ],
       ),
     );

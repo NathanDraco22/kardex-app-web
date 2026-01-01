@@ -44,6 +44,7 @@ import 'package:kardex_app_front/src/modules/inventory/inventory_entry/view/inve
 import 'package:kardex_app_front/src/modules/inventory/inventory_exit/view/inventory_exit_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_menu_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/adjust_entry/history/adjust_entry_history_screen.dart';
+import 'package:kardex_app_front/src/modules/inventory/adjust_exit/history/adjust_exit_history_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/product_movements/view/product_movements_screen.dart';
 import 'package:kardex_app_front/src/modules/login/login_screen.dart';
 import 'package:kardex_app_front/src/modules/multi_branch_home/multibranch_home_screen.dart';
@@ -318,6 +319,11 @@ class AppRouter {
             path: "history-adjust-entry",
             name: "history-adjust-entry",
             builder: (context, state) => const AdjustEntryHistoryScreen(),
+          ),
+          GoRoute(
+            path: "history-adjust-exit",
+            name: "history-adjust-exit",
+            builder: (context, state) => const AdjustExitHistoryScreen(),
           ),
         ],
       ),
