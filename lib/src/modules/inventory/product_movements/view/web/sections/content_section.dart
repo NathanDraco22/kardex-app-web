@@ -219,25 +219,7 @@ class MovementWebRow extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         hoverColor: Colors.amber.shade100,
-        onTap: () {
-          switch (currentTransaction.subtype) {
-            case TransactionSubType.entry:
-              showEntryHistoryViewerDialogFromId(context, currentTransaction.documentId);
-              break;
-            case TransactionSubType.exit:
-              showExitHistoryViewerDialogFromId(context, currentTransaction.documentId);
-              break;
-            case TransactionSubType.invoice:
-              showInvoiceViewerDialogFromId(context, currentTransaction.documentId);
-              break;
-            case TransactionSubType.devolution:
-              showDevolutionViewerDialogFromId(context, currentTransaction.documentId);
-              break;
-            case TransactionSubType.transfer:
-              showTransferViewerDialogFromId(context, currentTransaction.documentId);
-              break;
-          }
-        },
+        onTap: () => showDocumentViewer(context, currentTransaction),
         child: Ink(
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(

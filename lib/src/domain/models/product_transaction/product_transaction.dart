@@ -3,7 +3,7 @@ enum TransactionType {
   exit,
 }
 
-enum TransactionSubType { entry, exit, invoice, devolution, transfer }
+enum TransactionSubType { entry, exit, invoice, devolution, transfer, adjustment, loss }
 
 class BaseProductTransaction {
   final String documentId;

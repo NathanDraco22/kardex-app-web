@@ -19,6 +19,10 @@ extension TransactionSubTypeExtension on TransactionSubType {
         return 'Devolución';
       case TransactionSubType.transfer:
         return 'Transferencia';
+      case TransactionSubType.adjustment:
+        return 'Ajuste';
+      case TransactionSubType.loss:
+        return 'Pérdida';
     }
   }
 }

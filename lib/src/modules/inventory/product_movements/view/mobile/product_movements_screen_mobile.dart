@@ -7,11 +7,8 @@ import 'package:kardex_app_front/src/modules/inventory/product_movements/cubit/r
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/extensiones.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
-import 'package:kardex_app_front/widgets/dialogs/devolution_viewer.dart';
-import 'package:kardex_app_front/widgets/dialogs/entry_history_viewer.dart';
-import 'package:kardex_app_front/widgets/dialogs/exit_history_viewer.dart';
-import 'package:kardex_app_front/widgets/dialogs/invoice_viewer.dart';
-import 'package:kardex_app_front/widgets/dialogs/transfer_viewer.dart';
+import 'package:kardex_app_front/src/tools/show_doc_viewer.dart';
+
 import 'package:kardex_app_front/widgets/widgets.dart';
 
 part 'sections/header_section.dart';

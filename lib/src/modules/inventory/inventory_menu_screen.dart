@@ -172,21 +172,9 @@ class _Body extends StatelessWidget {
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const AdjustExitScreen(type: AdjustExitType.adjust),
-              ),
-            ),
-          ),
-
-          const Divider(height: 0.0),
-
-          ListTile(
-            leading: IconWidgets.exitInventoryIcon,
-            title: const Text("Devoluciones"),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const AdjustExitScreen(type: AdjustExitType.devolution),
+                builder: (context) => const AdjustExitScreen(
+                  type: AdjustExitType.adjust,
+                ),
               ),
             ),
           ),
@@ -200,7 +188,9 @@ class _Body extends StatelessWidget {
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const AdjustExitScreen(type: AdjustExitType.loss),
+                builder: (context) => const AdjustExitScreen(
+                  type: AdjustExitType.loss,
+                ),
               ),
             ),
           ),
