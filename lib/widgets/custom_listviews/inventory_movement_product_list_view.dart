@@ -14,6 +14,7 @@ class ProductRowCard {
     this.unitaryCost = 0,
     this.editableCost = false,
     this.expirationDate,
+    this.haveExpirationDate = true,
   });
 
   ProductInDb product;
@@ -22,6 +23,7 @@ class ProductRowCard {
   DateTime? expirationDate;
 
   bool editableCost;
+  bool haveExpirationDate;
 
   int get subTotal => (quantity * unitaryCost);
 }
@@ -268,32 +270,32 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
                     thickness: 2,
                     color: Colors.black12,
                   ),
-
-                  Row(
-                    children: [
-                      Flexible(
-                        fit: FlexFit.tight,
-                        child: TitleTextField(
-                          focusNode: expirationDateFocusNode,
-                          inputFormatters: [MonthYearInputFormatter()],
-                          titleTextAlign: TextAlign.center,
-                          keyboardType: TextInputType.number,
-                          textInputAction: .next,
-                          onEditingComplete: () => FocusScope.of(context).nextFocus(),
-                          title: "F. Vencimiento",
-                          onChanged: (value) {
-                            try {
-                              final date = DateTimeTool.fromMMYY(value);
-                              rowCard.expirationDate = date;
-                            } catch (e) {
-                              rowCard.expirationDate = null;
-                            }
-                          },
+                  if (rowCard.haveExpirationDate)
+                    Row(
+                      children: [
+                        Flexible(
+                          fit: FlexFit.tight,
+                          child: TitleTextField(
+                            focusNode: expirationDateFocusNode,
+                            inputFormatters: [MonthYearInputFormatter()],
+                            titleTextAlign: TextAlign.center,
+                            keyboardType: TextInputType.number,
+                            textInputAction: .next,
+                            onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                            title: "F. Vencimiento",
+                            onChanged: (value) {
+                              try {
+                                final date = DateTimeTool.fromMMYY(value);
+                                rowCard.expirationDate = date;
+                              } catch (e) {
+                                rowCard.expirationDate = null;
+                              }
+                            },
+                          ),
                         ),
-                      ),
-                      const Spacer(),
-                    ],
-                  ),
+                        const Spacer(),
+                      ],
+                    ),
 
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,

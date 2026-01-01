@@ -9,13 +9,16 @@ class _ContentSection extends StatelessWidget {
     final tableController = mediator.productTableController;
     return InventoryMovementProductTable(
       controller: tableController,
+      haveExpirationDate: false,
       onAddRowAction: (controller) async {
-        final res = await showSearchProductDialog(context);
+        final res = await showSearchProductInBranchDialog(context);
         if (res == null) return;
         final productRow = ProductRow(
           product: res,
           quantity: 0,
-          unitaryCost: 0,
+          unitaryCost: res.account.averageCost,
+          editableCost: false,
+          haveExpirationDate: false,
         );
         controller.addRow(productRow);
         mediator.refresh();

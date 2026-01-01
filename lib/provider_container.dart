@@ -4,9 +4,11 @@ import 'package:kardex_app_front/cubits/app_mode/app_mode_cubit.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/cubits/toast/toast_cubit.dart';
 import 'package:kardex_app_front/src/data/adjust_entries_data_source.dart';
+import 'package:kardex_app_front/src/data/adjust_exits_data_source.dart';
 import 'package:kardex_app_front/src/data/data.dart';
 import 'package:kardex_app_front/src/data/transfers_data_source.dart';
 import 'package:kardex_app_front/src/domain/repositories/adjust_entries_repository.dart';
+import 'package:kardex_app_front/src/domain/repositories/adjust_exits_repository.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/domain/repositories/transfers_repository.dart';
 
@@ -50,6 +52,7 @@ class ProviderContainer extends StatelessWidget {
     final productStatsDataSource = ProductStatsDataSource();
     final transferDataSource = TransfersDataSource();
     final adjustEntryDatasource = AdjustEntriesDataSource();
+    final adjustExitDatasource = AdjustExitsDataSource();
 
     return MultiRepositoryProvider(
       providers: [
@@ -207,6 +210,10 @@ class ProviderContainer extends StatelessWidget {
           create: (context) => AdjustEntriesRepository(
             adjustEntryDatasource,
           ),
+        ),
+
+        RepositoryProvider(
+          create: (context) => AdjustExitsRepository(adjustExitDatasource),
         ),
       ],
       child: GlobalCubitProvider(

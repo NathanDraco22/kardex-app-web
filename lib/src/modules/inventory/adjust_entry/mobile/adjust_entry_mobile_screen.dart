@@ -27,6 +27,7 @@ class _MobileScaffold extends StatelessWidget {
               quantity: 0,
               unitaryCost: res.account.averageCost,
               editableCost: false,
+              haveExpirationDate: false,
             );
             mediator.productListViewController.addRowCard(newRow);
             mediator.refresh();

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/src/domain/models/models.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_exit/view/mediator.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/search_product_in_branch_delegate.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
 import 'widgets/app_bar_menu.dart';
@@ -28,13 +29,14 @@ class _MobileScaffold extends StatelessWidget {
         visible: MediaQuery.viewInsetsOf(context).bottom == 0.0,
         child: FloatingActionButton.extended(
           onPressed: () async {
-            final res = await showProductSearchDelegate(context);
+            final res = await showSearchProductInBranchDelegate(context);
             if (res == null) return;
             final newRow = ProductRowCard(
               product: res,
               quantity: 0,
-              unitaryCost: 0,
+              unitaryCost: res.account.averageCost,
               editableCost: false,
+              haveExpirationDate: false,
             );
             mediator.productListViewController.addRowCard(newRow);
             mediator.refresh();
