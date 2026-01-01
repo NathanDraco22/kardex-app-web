@@ -13,7 +13,6 @@ class _HeaderSection extends StatelessWidget {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 600),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               DatePickerButton(
                 defaultDate: DateTime.now().endOfDay(),

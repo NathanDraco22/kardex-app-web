@@ -3,6 +3,7 @@ import 'package:kardex_app_front/src/domain/models/adjust_entry/adjust_entry_mod
 import 'package:kardex_app_front/src/domain/query_params/adjust_query_params.dart';
 import 'package:kardex_app_front/src/domain/repositories/adjust_entries_repository.dart';
 import 'package:kardex_app_front/src/tools/branches_tool.dart';
+import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 
 part 'read_adjust_entry_history_state.dart';
 
@@ -11,7 +12,9 @@ class ReadAdjustEntryHistoryCubit extends Cubit<ReadAdjustEntryHistoryState> {
 
   final AdjustEntriesRepository adjustEntriesRepository;
 
-  AdjustQueryParams params = const AdjustQueryParams();
+  AdjustQueryParams params = AdjustQueryParams(
+    endDate: DateTime.now().endOfDay().millisecondsSinceEpoch,
+  );
   bool _isLastPage = false;
 
   Future<void> loadAdjustEntriesHistory() async {
