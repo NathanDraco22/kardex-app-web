@@ -10,11 +10,13 @@ import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 Future<ProductInDbInBranch?> showSearchProductInBranchDialog(
   BuildContext context, {
   ProductInDbInBranch? product,
+  bool useAverageCost = false,
 }) async {
   final res = await showDialog<ProductInDbInBranch?>(
     context: context,
     builder: (context) => SearchProductInBranchDialog(
       product: product,
+      useAverageCost: useAverageCost,
     ),
   );
   return res;
@@ -24,9 +26,11 @@ class SearchProductInBranchDialog extends StatefulWidget {
   const SearchProductInBranchDialog({
     super.key,
     this.product,
+    this.useAverageCost = false,
   });
 
   final ProductInDbInBranch? product;
+  final bool useAverageCost;
 
   @override
   State<SearchProductInBranchDialog> createState() => _SearchProductInBranchDialogState();
@@ -75,6 +79,7 @@ class _SearchProductInBranchDialogState extends State<SearchProductInBranchDialo
                 Row(
                   children: [
                     Flexible(
+                      flex: 2,
                       child: Focus(
                         onKeyEvent: (node, event) {
                           if (event is KeyDownEvent) {
@@ -128,7 +133,7 @@ class _SearchProductInBranchDialogState extends State<SearchProductInBranchDialo
                 const Divider(),
                 isSearching ? const LinearProgressIndicator() : const SizedBox(),
                 SizedBox(
-                  height: 300,
+                  height: 320,
                   child: Builder(
                     builder: (context) {
                       if (products.isEmpty) {
@@ -191,7 +196,7 @@ class _ResultTableState extends State<ResultTable> {
           color = Colors.yellow.shade100;
         }
 
-        return ProductResultRow(
+        return ProductInBranchResultRow(
           product: product,
           onTap: () async {
             Navigator.pop(context, product);
@@ -203,8 +208,8 @@ class _ResultTableState extends State<ResultTable> {
   }
 }
 
-class ProductResultRow extends StatelessWidget {
-  const ProductResultRow({
+class ProductInBranchResultRow extends StatelessWidget {
+  const ProductInBranchResultRow({
     super.key,
     required this.product,
     this.color,
@@ -217,6 +222,19 @@ class ProductResultRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final parentWidget = context.findAncestorWidgetOfExactType<SearchProductInBranchDialog>()!;
+    int value = product.saleProfile.salePrice;
+
+    if (parentWidget.useAverageCost == true) {
+      value = product.account.averageCost;
+    }
+
+    String valueToDisplay = NumberFormatter.convertToMoneyLike(value);
+
+    if (parentWidget.useAverageCost == true) {
+      valueToDisplay = NumberFormatter.convertFromCentsToDouble(product.account.averageCost).toString();
+    }
+
     return SizedBox(
       height: 40,
       child: InkWell(
@@ -270,19 +288,12 @@ class ProductResultRow extends StatelessWidget {
               Flexible(
                 fit: FlexFit.tight,
                 child: Center(
-                  child: Builder(
-                    builder: (context) {
-                      final price = NumberFormatter.convertToMoneyLike(
-                        product.saleProfile.salePrice,
-                      );
-                      return Text(
-                        price,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      );
-                    },
+                  child: Text(
+                    valueToDisplay,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ),

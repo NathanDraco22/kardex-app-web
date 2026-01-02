@@ -26,7 +26,7 @@ class _MobileScaffold extends StatelessWidget {
         visible: MediaQuery.viewInsetsOf(context).bottom == 0.0,
         child: FloatingActionButton.extended(
           onPressed: () async {
-            final res = await showSearchProductInBranchDialog(context);
+            final res = await showSearchProductInBranchDelegate(context, true);
             if (res == null) return;
             final newRow = ProductRowCard(
               product: res,
@@ -66,7 +66,11 @@ class _MobileScaffold extends StatelessWidget {
             icon: const Icon(Icons.save),
             onPressed: () async {
               if (!mediator.hasMobileAllRequiredFields()) {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Complete todos los campos")));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Complete todos los campos"),
+                  ),
+                );
                 return;
               }
 
@@ -97,7 +101,10 @@ class _MobileScaffold extends StatelessWidget {
                 description: mediator.headerData.description ?? "",
                 type: mediator.headerData.type,
                 items: items,
-                createdBy: UserInfo(id: currentUser.id, name: currentUser.username),
+                createdBy: UserInfo(
+                  id: currentUser.id,
+                  name: currentUser.username,
+                ),
               );
 
               context.read<WriteAdjustExitCubit>().createAdjustExit(createDto);

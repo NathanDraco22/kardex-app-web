@@ -11,6 +11,7 @@ import 'package:kardex_app_front/src/domain/repositories/adjust_entries_reposito
 import 'package:kardex_app_front/src/modules/inventory/adjust_entry/cubit/write_adjust_entry_cubit.dart';
 import 'package:kardex_app_front/src/tools/branches_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/search_product_in_branch_delegate.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/search_product_in_branch_dialog.dart';
 
 import 'package:kardex_app_front/widgets/widgets.dart';
