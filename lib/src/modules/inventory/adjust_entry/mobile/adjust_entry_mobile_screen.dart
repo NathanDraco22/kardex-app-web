@@ -20,7 +20,7 @@ class _MobileScaffold extends StatelessWidget {
         visible: MediaQuery.viewInsetsOf(context).bottom == 0.0,
         child: FloatingActionButton.extended(
           onPressed: () async {
-            final res = await showSearchProductInBranchDialog(context);
+            final res = await showSearchProductInBranchDelegate(context, true);
             if (res == null) return;
             final newRow = ProductRowCard(
               product: res,

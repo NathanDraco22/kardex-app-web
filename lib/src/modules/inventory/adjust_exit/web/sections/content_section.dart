@@ -12,7 +12,7 @@ class _ContentSection extends StatelessWidget {
       controller: tableController,
       haveExpirationDate: false,
       onAddRowAction: (controller) async {
-        final res = await showSearchProductInBranchDialog(context);
+        final res = await showSearchProductInBranchDialog(context, useAverageCost: true);
         if (res == null) return;
         final productRow = ProductRow(
           product: res,
