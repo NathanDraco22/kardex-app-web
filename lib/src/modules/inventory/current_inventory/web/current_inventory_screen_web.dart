@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/modules/inventory/current_inventory/cubit/read_current_inventory_cubit.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/basic_table_listview.dart';
+import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 
 part 'sections/content_section.dart';
 part 'sections/header_section.dart';
@@ -49,7 +50,7 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final readCubit = context.read<ReadCurrentInventoryCubit>();
+    final readCubit = context.watch<ReadCurrentInventoryCubit>();
     final state = readCubit.state as ReadCurrentInventorySuccess;
 
     return Center(
