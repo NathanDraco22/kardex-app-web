@@ -5,37 +5,54 @@ class _HeaderSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final readCubit = context.read<ReadCurrentInventoryCubit>();
+    final readCubit = context.watch<ReadCurrentInventoryCubit>();
     final state = readCubit.state as ReadCurrentInventorySuccess;
     final totalInventory = NumberFormatter.convertToMoneyLike(state.total);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
+        child: Column(
           children: [
-            Text.rich(
-              TextSpan(
-                children: [
-                  const TextSpan(
-                    text: 'Productos: ',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      const TextSpan(
+                        text: 'Productos: ',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      TextSpan(text: state.inventories.length.toString()),
+                    ],
                   ),
-                  TextSpan(text: state.inventories.length.toString()),
-                ],
-              ),
+                ),
+                const SizedBox(width: 12),
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      const TextSpan(
+                        text: 'Total: ',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      TextSpan(text: totalInventory),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 12),
-            Text.rich(
-              TextSpan(
-                children: [
-                  const TextSpan(
-                    text: 'Total: ',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+
+            Row(
+              children: [
+                Expanded(
+                  child: SearchFieldDebounced(
+                    onSearch: (value) {
+                      readCubit.searchInventoryByKeyword(value);
+                    },
                   ),
-                  TextSpan(text: totalInventory),
-                ],
-              ),
+                ),
+                const Spacer(),
+              ],
             ),
           ],
         ),

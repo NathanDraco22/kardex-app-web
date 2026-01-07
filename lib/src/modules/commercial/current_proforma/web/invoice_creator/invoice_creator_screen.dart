@@ -251,6 +251,14 @@ class _BodyState extends State<_Body> {
                       ),
 
                       Text(
+                        order.description,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey,
+                        ),
+                      ),
+
+                      Text(
                         "Total: $totalFormatted",
                         style: const TextStyle(
                           fontSize: 16,
