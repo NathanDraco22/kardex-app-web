@@ -3,14 +3,10 @@ import 'package:intl/intl.dart';
 import 'package:kardex_app_front/src/domain/models/branch/branch.dart';
 import 'package:kardex_app_front/src/domain/models/devolution/devolution.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_app_front/src/tools/printers/paper_settings.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
-
-class TicketSettings {
-  static double get titleFontSize => 8.5;
-  static double get contentFontSize => 9;
-}
 
 Future<bool> printDevolution(DevolutionInDb devolution, BranchInDb branch) async {
   final bytes = await generateTicketPdfFromDevolution(devolution, branch);
@@ -26,10 +22,10 @@ Future<Uint8List> generateTicketPdfFromDevolution(DevolutionInDb devolution, Bra
   final pdf = pw.Document();
   final NumberFormat currencyFormat = NumberFormat.currency(symbol: 'C\$');
 
-  const pageFormat = PdfPageFormat(
-    80 * PdfPageFormat.mm,
+  final pageFormat = PdfPageFormat(
+    TicketSettings.ticketWidth * PdfPageFormat.mm,
     double.infinity,
-    marginAll: 2.5 * PdfPageFormat.mm,
+    marginAll: TicketSettings.ticketMargin * PdfPageFormat.mm,
   );
 
   final branchImage = branch.image;
@@ -121,7 +117,7 @@ Future<Uint8List> generateTicketPdfFromDevolution(DevolutionInDb devolution, Bra
                 ),
               ],
             ),
-            
+
             pw.SizedBox(height: 6),
 
             if (devolution.clientInfo.name != "Sin Cliente")
