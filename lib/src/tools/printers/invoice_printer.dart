@@ -4,14 +4,10 @@ import 'package:kardex_app_front/src/domain/models/branch/branch.dart';
 import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_app_front/src/tools/printers/paper_settings.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
-
-class TicketSettings {
-  static double get titleFontSize => 8.5;
-  static double get contentFontSize => 9;
-}
 
 Future<bool> printInvoice(InvoiceInDb invoice, BranchInDb branch) async {
   final bytes = await generateTicketPdfFromInvoice(invoice, branch);
@@ -30,9 +26,9 @@ Future<Uint8List> generateTicketPdfFromInvoice(InvoiceInDb invoice, BranchInDb b
   double estimatedHeight = 40 + (invoice.saleItems.length * 15) + 20;
 
   final pageFormat = PdfPageFormat(
-    80 * PdfPageFormat.mm,
+    TicketSettings.ticketWidth * PdfPageFormat.mm,
     estimatedHeight * PdfPageFormat.mm,
-    marginAll: 2.5 * PdfPageFormat.mm,
+    marginAll: TicketSettings.ticketMargin * PdfPageFormat.mm,
   );
 
   final branchImage = branch.image;
@@ -275,7 +271,7 @@ Future<Uint8List> generateTicketPdfFromInvoice(InvoiceInDb invoice, BranchInDb b
                 ],
               ),
             );
-          }).toList(),
+          }),
 
           pw.Divider(color: PdfColors.grey800),
 

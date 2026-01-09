@@ -3,14 +3,10 @@ import 'package:intl/intl.dart';
 import 'package:kardex_app_front/src/domain/models/branch/branch.dart';
 import 'package:kardex_app_front/src/domain/models/receipt/receipt_model.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_app_front/src/tools/printers/paper_settings.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
-
-class TicketSettings {
-  static double get titleFontSize => 8.5;
-  static double get contentFontSize => 9;
-}
 
 Future<bool> printReceipt(ReceiptInDb receipt, BranchInDb branch) async {
   final bytes = await generateTicketPdfFromReceipt(receipt, branch);
@@ -25,10 +21,10 @@ Future<bool> shareReceipt(ReceiptInDb receipt, BranchInDb branch) async {
 Future<Uint8List> generateTicketPdfFromReceipt(ReceiptInDb receipt, BranchInDb branch) async {
   final pdf = pw.Document();
 
-  const pageFormat = PdfPageFormat(
-    80 * PdfPageFormat.mm,
+  final pageFormat = PdfPageFormat(
+    TicketSettings.ticketWidth * PdfPageFormat.mm,
     double.infinity,
-    marginAll: 2.5 * PdfPageFormat.mm,
+    marginAll: TicketSettings.ticketMargin * PdfPageFormat.mm,
   );
 
   final branchImage = branch.image;
