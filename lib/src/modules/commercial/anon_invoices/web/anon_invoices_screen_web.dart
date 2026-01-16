@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/constants/default_values.dart';
 import 'package:kardex_app_front/src/domain/models/common/client_info.dart';
@@ -77,10 +78,22 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Facturacion de Productos")),
-      body: const _Body(),
-      bottomNavigationBar: const _AnonBottomAppBar(),
+    return CallbackShortcuts(
+      bindings: {
+        const SingleActivator(
+          LogicalKeyboardKey.keyG,
+          control: true,
+        ): () =>
+            saveAnonInvoiceAction(context),
+      },
+      child: Focus(
+        autofocus: true,
+        child: Scaffold(
+          appBar: AppBar(title: const Text("Facturacion de Productos")),
+          body: const _Body(),
+          bottomNavigationBar: const _AnonBottomAppBar(),
+        ),
+      ),
     );
   }
 }

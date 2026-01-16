@@ -106,7 +106,6 @@ class MenuActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewController = AnonInvoiceWebMediator.of(context).viewController;
-    final tableController = AnonInvoiceWebMediator.of(context).tableController;
 
     String saveButtonTitle = "Facturar";
 
@@ -126,25 +125,7 @@ class MenuActions extends StatelessWidget {
             ),
 
             ElevatedButton.icon(
-              onPressed: () async {
-                final newInvoice = createAnonInvoiceFromControllers(
-                  viewController,
-                  tableController,
-                  context,
-                );
-
-                final res = await showConfirmationAnonInvoiceDialog(
-                  context,
-                  newInvoice,
-                );
-
-                if (res != true) return;
-
-                if (!context.mounted) return;
-                context.read<WriteAnonInvoiceCubit>().createNewAnonInvoice(
-                  newInvoice,
-                );
-              },
+              onPressed: () => saveAnonInvoiceAction(context),
               icon: Icon(saveIcon),
               label: Text(saveButtonTitle),
             ),
@@ -153,6 +134,30 @@ class MenuActions extends StatelessWidget {
       },
     );
   }
+}
+
+Future<void> saveAnonInvoiceAction(
+  BuildContext context,
+) async {
+  final viewController = AnonInvoiceWebMediator.of(context).viewController;
+  final tableController = AnonInvoiceWebMediator.of(context).tableController;
+  final newInvoice = createAnonInvoiceFromControllers(
+    viewController,
+    tableController,
+    context,
+  );
+
+  final res = await showConfirmationAnonInvoiceDialog(
+    context,
+    newInvoice,
+  );
+
+  if (res != true) return;
+
+  if (!context.mounted) return;
+  context.read<WriteAnonInvoiceCubit>().createNewAnonInvoice(
+    newInvoice,
+  );
 }
 
 CreateInvoice createAnonInvoiceFromControllers(
