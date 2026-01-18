@@ -24,6 +24,15 @@ class ReceiptsRepository {
     return response;
   }
 
+  Future<ListResponse<ReceiptInDb>> getAllReceiptsByInvoiceId(String invoiceId) async {
+    final results = await receiptsDataSource.getReceiptsByInvoiceId(invoiceId);
+    final response = ListResponse<ReceiptInDb>.fromJson(
+      results,
+      ReceiptInDb.fromJson,
+    );
+    return response;
+  }
+
   Future<ReceiptTotal> getReceiptTotal(ReceiptQueryParams queryParams) async {
     final results = await receiptsDataSource.getReceiptTotal(queryParams.toMap());
     return ReceiptTotal.fromJson(results);

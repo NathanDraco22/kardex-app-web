@@ -10,6 +10,7 @@ import 'package:kardex_app_front/src/domain/models/receipt/receipt_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/receipt_repository.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/cubit/write_receipt_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/modals/confirm_receipt_modal.dart';
+import 'package:kardex_app_front/src/modules/commercial/pending_invoice/web/receipt_creator/modals/partial_payment_modal.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/session_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
@@ -120,7 +121,7 @@ class _CreateReceiptBottomBar extends StatelessWidget {
     final invoices = mediator.invoices;
     final devolutions = mediator.devolutions;
     final total = invoices.fold(0, (int previousValue, invoice) {
-      return previousValue + invoice.total;
+      return previousValue + invoice.totalRemaining;
     });
 
     final devolutionTotal = devolutions.fold(0, (int previousValue, devolution) {
@@ -130,66 +131,159 @@ class _CreateReceiptBottomBar extends StatelessWidget {
     final totalWithDevolutionsFormatted = NumberFormatter.convertToMoneyLike(totalWithDevolutions);
     return BottomAppBar(
       height: 60,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ElevatedButton(
-            onPressed: () async {
-              final res = await showConfirmReceiptModal(
-                context,
-                client,
-                invoices,
-                totalWithDevolutionsFormatted,
-              );
-              if (res != true) return;
-
-              final appliedInvoices = invoices.map((invoice) {
-                return AppliedInvoice(
-                  invoiceId: invoice.id,
-                  docNumber: invoice.docNumber,
-                  amountApplied: invoice.total,
-                );
-              }).toList();
-
-              final appliedDevolutions = devolutions.map((devolution) {
-                return AppliedDevolution(
-                  devolutionId: devolution.id,
-                  docNumber: devolution.docNumber,
-                  amountApplied: devolution.total,
-                );
-              }).toList();
-
-              if (!context.mounted) return;
-
-              final (currentUser, currentBranch) = SessionTool.getFullUserFrom(context);
-
-              final createReceipt = CreateReceipt(
-                branchId: currentBranch.id,
-                clientInfo: ClientInfo(
-                  name: client.name,
-                  address: client.address,
-                  phone: client.phone,
-                  email: client.email,
-                  cardId: client.cardId,
-                  location: client.location,
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 600),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue.shade700,
+                  foregroundColor: Colors.white,
                 ),
-                clientId: client.id,
-                appliedInvoices: appliedInvoices,
-                appliedDevolutions: appliedDevolutions,
-                paymentMethod: PaymentMethod.cash,
-                total: totalWithDevolutions,
-                createdBy: UserInfo(
-                  id: currentUser.id,
-                  name: currentUser.username,
-                ),
-              );
+                onPressed: () async {
+                  final result = await showPartialPaymentModal(
+                    context,
+                    client: client,
+                    invoices: invoices,
+                    devolutions: devolutions,
+                  );
 
-              if (!context.mounted) return;
-              context.read<WriteReceiptCubit>().createNewReceipt(createReceipt);
-            },
-            child: const Text("Liquidar Facturas"),
+                  if (result == null) return;
+                  if (!context.mounted) return;
+
+                  final (currentUser, currentBranch) = SessionTool.getFullUserFrom(context);
+
+                  // 1. Calculate Applied Invoices (Cash Input + Linked Devolutions)
+                  final appliedInvoices = <AppliedInvoice>[];
+                  int receiptTotalCents = 0;
+
+                  for (var invoice in invoices) {
+                    final cashInput = result.payments[invoice.id] ?? 0.0;
+                    final cashInputCents = (cashInput * 100).round();
+
+                    // Find linked devolutions for this invoice
+                    final linkedDevolutions = devolutions.where((d) => d.originalInvoiceId == invoice.id).toList();
+
+                    final linkedDevolutionTotal = linkedDevolutions.fold(0, (sum, d) => sum + d.total);
+
+                    final totalAppliedCents = cashInputCents + linkedDevolutionTotal;
+
+                    if (totalAppliedCents > 0) {
+                      appliedInvoices.add(
+                        AppliedInvoice(
+                          invoiceId: invoice.id,
+                          docNumber: invoice.docNumber,
+                          amountApplied: totalAppliedCents,
+                        ),
+                      );
+                      receiptTotalCents += cashInputCents;
+                    }
+                  }
+
+                  // 2. Calculate Applied Devolutions
+                  final appliedDevolutions = result.usedDevolutions.map((devolution) {
+                    return AppliedDevolution(
+                      devolutionId: devolution.id,
+                      docNumber: devolution.docNumber,
+                      amountApplied: devolution.total,
+                    );
+                  }).toList();
+
+                  // Confirm before proceeding
+
+                  // 3. Create Receipt
+                  final createReceipt = CreateReceipt(
+                    branchId: currentBranch.id,
+                    clientInfo: ClientInfo(
+                      name: client.name,
+                      address: client.address,
+                      phone: client.phone,
+                      email: client.email,
+                      cardId: client.cardId,
+                      location: client.location,
+                    ),
+                    clientId: client.id,
+                    appliedInvoices: appliedInvoices,
+                    appliedDevolutions: appliedDevolutions,
+                    paymentMethod: PaymentMethod.cash,
+                    total: receiptTotalCents, // Only the cash amount is the receipt total
+                    createdBy: UserInfo(
+                      id: currentUser.id,
+                      name: currentUser.username,
+                    ),
+                  );
+
+                  if (!context.mounted) return;
+                  // Use the same cubit to create the receipt
+                  context.read<WriteReceiptCubit>().createNewReceipt(createReceipt);
+                },
+                child: const Text("Abonar"),
+              ),
+
+              const SizedBox(width: 24),
+
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                onPressed: () async {
+                  final res = await showConfirmReceiptModal(
+                    context,
+                    client,
+                    invoices,
+                    totalWithDevolutionsFormatted,
+                  );
+                  if (res != true) return;
+
+                  final appliedInvoices = invoices.map((invoice) {
+                    return AppliedInvoice(
+                      invoiceId: invoice.id,
+                      docNumber: invoice.docNumber,
+                      amountApplied: invoice.totalRemaining,
+                    );
+                  }).toList();
+
+                  final appliedDevolutions = devolutions.map((devolution) {
+                    return AppliedDevolution(
+                      devolutionId: devolution.id,
+                      docNumber: devolution.docNumber,
+                      amountApplied: devolution.total,
+                    );
+                  }).toList();
+
+                  if (!context.mounted) return;
+
+                  final (currentUser, currentBranch) = SessionTool.getFullUserFrom(context);
+
+                  final createReceipt = CreateReceipt(
+                    branchId: currentBranch.id,
+                    clientInfo: ClientInfo(
+                      name: client.name,
+                      address: client.address,
+                      phone: client.phone,
+                      email: client.email,
+                      cardId: client.cardId,
+                      location: client.location,
+                    ),
+                    clientId: client.id,
+                    appliedInvoices: appliedInvoices,
+                    appliedDevolutions: appliedDevolutions,
+                    paymentMethod: PaymentMethod.cash,
+                    total: totalWithDevolutions,
+                    createdBy: UserInfo(
+                      id: currentUser.id,
+                      name: currentUser.username,
+                    ),
+                  );
+
+                  if (!context.mounted) return;
+                  context.read<WriteReceiptCubit>().createNewReceipt(createReceipt);
+                },
+                child: const Text("Liquidar"),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -205,7 +299,7 @@ class _Body extends StatelessWidget {
     final invoices = mediator.invoices;
     final devolutions = mediator.devolutions;
     final total = invoices.fold(0, (int previousValue, invoice) {
-      return previousValue + invoice.total;
+      return previousValue + invoice.totalRemaining;
     });
     final devolutionTotal = devolutions.fold(0, (int previousValue, devolution) {
       return previousValue + devolution.total;
@@ -403,7 +497,7 @@ Iterable<Widget> _buildInvoiceRows(List<InvoiceInDb> invoices) sync* {
           children: [
             Text("Fact #${currentInvoice.docNumber}"),
             const Spacer(),
-            Text(NumberFormatter.convertToMoneyLike(currentInvoice.total)),
+            Text(NumberFormatter.convertToMoneyLike(currentInvoice.totalRemaining)),
           ],
         ),
         subtitle: Text(

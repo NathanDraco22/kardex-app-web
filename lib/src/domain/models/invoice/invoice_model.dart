@@ -2,7 +2,7 @@ import 'package:kardex_app_front/src/domain/models/common/client_info.dart';
 import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
 import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
 
-enum InvoiceStatus { draft, open, paid, parciallyPaid, cancelled }
+enum InvoiceStatus { draft, open, paid, partiallypaid, cancelled }
 
 class BaseInvoice {
   final String branchId;
@@ -34,6 +34,8 @@ class BaseInvoice {
     this.paidAt,
     required this.createdBy,
   });
+
+  int get totalRemaining => total - amountPaid;
 
   factory BaseInvoice.fromJson(Map<String, dynamic> json) => BaseInvoice(
     branchId: json['branchId'],

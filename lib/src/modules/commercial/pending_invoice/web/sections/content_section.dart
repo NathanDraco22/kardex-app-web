@@ -86,7 +86,11 @@ class _ContentSection extends StatelessWidget {
                   showInvoiceViewerDialog(context, currentInvoice);
                 },
                 onViewDevolutions: () {
-                  final targetDevolution = devolutions.where((d) => d.originalInvoiceId == currentInvoice.id).toList();
+                  final targetDevolution = devolutions
+                      .where(
+                        (d) => d.originalInvoiceId == currentInvoice.id,
+                      )
+                      .toList();
                   showDialog(
                     context: context,
                     builder: (context) {
@@ -98,6 +102,10 @@ class _ContentSection extends StatelessWidget {
                       return _DevolutionDialog(total: total, devolutions: targetDevolution);
                     },
                   );
+                },
+
+                onViewReceipts: () {
+                  showInvoiceReceiptsHistoryModal(context, currentInvoice);
                 },
               );
             },
