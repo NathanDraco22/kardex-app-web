@@ -12,6 +12,7 @@ class InvoiceDevolutionTile extends StatelessWidget {
     required this.onChanged,
     required this.onViewInvoice,
     required this.onViewDevolutions,
+    required this.onViewReceipts,
     this.tileColor,
   });
 
@@ -21,6 +22,7 @@ class InvoiceDevolutionTile extends StatelessWidget {
   final ValueChanged<bool?> onChanged;
   final VoidCallback onViewInvoice;
   final VoidCallback onViewDevolutions;
+  final VoidCallback onViewReceipts;
   final Color? tileColor;
 
   @override
@@ -32,7 +34,7 @@ class InvoiceDevolutionTile extends StatelessWidget {
     final bool isDisabled = hasOpenDevolutions;
 
     final int devolutionsTotal = targetDevolution.fold(0, (sum, d) => sum + d.total);
-    final int adjustedTotal = invoice.total - devolutionsTotal;
+    final int adjustedTotal = invoice.totalRemaining - devolutionsTotal;
 
     return Ink(
       color: tileColor,
@@ -63,7 +65,21 @@ class InvoiceDevolutionTile extends StatelessWidget {
 
                     return TextButton(
                       onPressed: onPressed,
-                      child: const Text("Ver dev."),
+                      child: const Text("Devoluciones"),
+                    );
+                  },
+                ),
+                Builder(
+                  builder: (context) {
+                    void Function()? onPressed;
+
+                    if (invoice.amountPaid > 0) {
+                      onPressed = () => onViewReceipts();
+                    }
+
+                    return TextButton(
+                      onPressed: onPressed,
+                      child: const Text("Recibos"),
                     );
                   },
                 ),
@@ -84,7 +100,7 @@ class InvoiceDevolutionTile extends StatelessWidget {
 
                   if (targetDevolution.isNotEmpty)
                     Text(
-                      '${NumberFormatter.convertToMoneyLike(invoice.total)} - ${NumberFormatter.convertToMoneyLike(devolutionsTotal)} = ${NumberFormatter.convertToMoneyLike(adjustedTotal)}',
+                      '${NumberFormatter.convertToMoneyLike(invoice.totalRemaining)} - ${NumberFormatter.convertToMoneyLike(devolutionsTotal)} = ${NumberFormatter.convertToMoneyLike(adjustedTotal)}',
                       style: TextStyle(
                         color: Theme.of(context).primaryColor,
                         fontWeight: FontWeight.w500,
@@ -92,7 +108,7 @@ class InvoiceDevolutionTile extends StatelessWidget {
                     )
                   else
                     Text(
-                      NumberFormatter.convertToMoneyLike(invoice.total),
+                      NumberFormatter.convertToMoneyLike(invoice.totalRemaining),
                       style: const TextStyle(
                         fontWeight: FontWeight.w500,
                       ),

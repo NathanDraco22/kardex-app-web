@@ -70,11 +70,18 @@ class _ContentSection extends StatelessWidget {
               return ListTile(
                 tileColor: tileColor,
                 onTap: () {
+                  if (currentInvoice.amountPaid > 0) {
+                    DialogManager.showInfoDialog(context, "No puedes devolver una factura con pagos");
+                    return;
+                  }
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) {
-                        return DevolutionSelectionScreen(invoice: currentInvoice, devolutions: devolutions);
+                        return DevolutionSelectionScreen(
+                          invoice: currentInvoice,
+                          devolutions: devolutions,
+                        );
                       },
                     ),
                   );
