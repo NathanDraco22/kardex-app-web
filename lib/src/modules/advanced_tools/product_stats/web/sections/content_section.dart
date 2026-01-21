@@ -61,8 +61,8 @@ class _ContentSectionState extends State<_ContentSection> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text("Ultima Estimación: ${DateTimeTool.formatddMMyy(lastEstimationDate)}"),
-                  Text("Periodo: ${DateTimeTool.formatddMMyy(startDate)} - ${DateTimeTool.formatddMMyy(endDate)}"),
+                  Text("Ultima Estimación: ${DateTimeTool.formatddMMyyEs(lastEstimationDate)}"),
+                  Text("Periodo: ${DateTimeTool.formatddMMyyEs(startDate)} - ${DateTimeTool.formatddMMyyEs(endDate)}"),
                   Text("Dias Analizados: ${first.daysAnalyzed}"),
                   const Divider(),
                   const Padding(

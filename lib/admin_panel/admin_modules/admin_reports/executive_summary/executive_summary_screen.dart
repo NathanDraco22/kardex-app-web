@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:kardex_app_front/admin_panel/admin_modules/admin_reports/executive_summary/cubit/read_executive_summary_cubit.dart';
 import 'package:kardex_app_front/admin_panel/admin_modules/admin_reports/executive_summary/executive_summary_detail_screen.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
@@ -69,7 +70,15 @@ class _Body extends StatelessWidget {
                   final summary = state.executiveSummaries[index];
                   final startDate = DateTime.fromMillisecondsSinceEpoch(summary.startDate);
                   final endDate = DateTime.fromMillisecondsSinceEpoch(summary.endDate);
-                  final dateText = "${DateTimeTool.formatddMM(startDate)} - ${DateTimeTool.formatddMM(endDate)}";
+                  String dateText = "${DateTimeTool.formatdMMeS(startDate)} - ${DateTimeTool.formatdMMeS(endDate)}";
+
+                  if (summary.type == .yearly) {
+                    dateText = "(${startDate.year})";
+                  }
+                  if (summary.type == .monthly) {
+                    final monthName = DateFormat("MMM", "es").format(startDate);
+                    dateText = "$monthName/${startDate.year}";
+                  }
 
                   return ListTile(
                     title: Text(

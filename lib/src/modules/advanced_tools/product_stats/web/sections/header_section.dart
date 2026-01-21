@@ -22,7 +22,12 @@ class _HeaderSectionState extends State<_HeaderSection> {
   @override
   Widget build(BuildContext context) {
     return BlocListener<EstimateProductStatsCubit, EstimateProductStatsState>(
-      listener: (context, state) {
+      listener: (context, state) async {
+        if (state is EstimateProductStatsLoading) {
+          LoadingDialogManager.showLoadingDialog(context);
+        } else {
+          LoadingDialogManager.closeLoadingDialog(context);
+        }
         if (state is EstimateProductStatsSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("Estimación completada")),

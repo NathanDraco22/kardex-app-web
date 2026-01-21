@@ -73,7 +73,7 @@ class _ConfirmEstimateDialogState extends State<ConfirmEstimateDialog> {
           ),
           const SizedBox(height: 16),
           Text(
-            "Periodo afectado:\n${DateTimeTool.formatddMMyy(widget.startDate)} | ${DateTimeTool.formatddMMyy(widget.endDate)}",
+            "Periodo afectado:\n${DateTimeTool.formatddMMyyEs(widget.startDate)} | ${DateTimeTool.formatddMMyyEs(widget.endDate)}",
             textAlign: TextAlign.center,
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
