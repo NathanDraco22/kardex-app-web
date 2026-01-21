@@ -34,7 +34,7 @@ class _Body extends StatelessWidget {
           ListTile(
             leading: const Icon(
               Icons.calculate,
-              color: Colors.green,
+              color: Colors.blue,
               size: 28,
             ),
             title: const Text("Estimación de Productos por Ventas"),

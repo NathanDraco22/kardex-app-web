@@ -12,8 +12,18 @@ class DateTimeTool {
     return formatter.format(datetime);
   }
 
+  static String formatddMMyyEs(DateTime datetime) {
+    final formatter = DateFormat('dd-MMM-yy', 'es');
+    return formatter.format(datetime);
+  }
+
   static String formatddMM(DateTime datetime) {
     final formatter = DateFormat('dd-MM');
+    return formatter.format(datetime);
+  }
+
+  static String formatdMMeS(DateTime datetime) {
+    final formatter = DateFormat('d-MMM', 'es');
     return formatter.format(datetime);
   }
 

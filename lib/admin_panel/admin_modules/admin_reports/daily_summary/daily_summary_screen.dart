@@ -69,7 +69,7 @@ class _Body extends StatelessWidget {
                   final summary = state.dailySummaries[index];
                   return ListTile(
                     title: Text(
-                      "Fecha: ${DateTimeTool.formatddMM(DateTime.fromMillisecondsSinceEpoch(summary.startDate))}",
+                      "Fecha: ${DateTimeTool.formatdMMeS(DateTime.fromMillisecondsSinceEpoch(summary.startDate))}",
                     ),
                     subtitle: Text("Total: ${NumberFormatter.convertToMoneyLike(summary.total)}"),
                     trailing: const Icon(Icons.arrow_forward_ios_rounded),
