@@ -182,6 +182,14 @@ class _InnerContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final unitsRepo = context.read<UnitsRepository>();
+    UnitInDb? currentUnit;
+    for (var element in unitsRepo.units) {
+      if (element.name == widget.currentProduct?.unitName) {
+        currentUnit = element;
+        break;
+      }
+    }
     return SizedBox(
       width: 350,
       child: Column(
@@ -250,6 +258,7 @@ class _InnerContent extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     CustomAutocompleteTextfield<UnitInDb>(
+                      initValue: currentUnit,
                       onClose: (value) => widget.creationMap['unitName'] = value.name,
                       onFieldSubmitted: (value) {
                         FocusScope.of(context).nextFocus();
