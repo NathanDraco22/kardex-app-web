@@ -374,14 +374,6 @@ Future<Uint8List> generateTicketPdfFromInvoice(InvoiceInDb invoice, BranchInDb b
               ),
             ),
             pw.SizedBox(height: 10),
-            pw.Center(
-              child: pw.BarcodeWidget(
-                barcode: pw.Barcode.qrCode(),
-                data: invoice.id,
-                width: 60,
-                height: 60,
-              ),
-            ),
           ],
         );
       },
