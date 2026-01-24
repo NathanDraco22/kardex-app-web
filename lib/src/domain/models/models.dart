@@ -21,3 +21,5 @@ export 'supplier/supplier.dart';
 export 'supplier/supplier_model.dart';
 export 'unit/unit.dart';
 export 'unit/unit_model.dart';
+export 'integration/integration_model.dart';
+export 'integration/telegram_integration.dart';

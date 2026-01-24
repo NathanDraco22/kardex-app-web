@@ -54,6 +54,17 @@ class _Body extends StatelessWidget {
             },
           ),
           const Divider(height: 0.0),
+          const Divider(height: 0.0),
+
+          ListTile(
+            leading: const Icon(Icons.integration_instructions),
+            title: const Text("Integraciones"),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              context.pushNamed("integrations");
+            },
+          ),
+          const Divider(height: 0.0),
         ],
       ),
     );
