@@ -58,6 +58,7 @@ import 'package:kardex_app_front/src/modules/product_catalog/units/units_screen.
 import 'package:kardex_app_front/src/modules/settings/view/users/users_screen.dart';
 import 'package:kardex_app_front/src/modules/splash/splash_screen.dart';
 import 'package:kardex_app_front/src/modules/suppliers_catalog/view/suppliers_catalog_screen.dart';
+import 'package:kardex_app_front/src/modules/settings/view/integrations/integrations_screen.dart';
 
 class AppRouter {
   static GoRouter router = GoRouter(
@@ -392,6 +393,11 @@ class AppRouter {
             path: "branches",
             name: "branches",
             builder: (context, state) => const BranchesScreen(),
+          ),
+          GoRoute(
+            path: "integrations",
+            name: "integrations",
+            builder: (context, state) => const IntegrationsScreen(),
           ),
         ],
       ),
