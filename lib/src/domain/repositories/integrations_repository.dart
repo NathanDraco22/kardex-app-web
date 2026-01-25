@@ -45,4 +45,8 @@ class IntegrationsRepository {
     }
     return updatedIntegration;
   }
+
+  Future<void> sendTelegramTestNotification() async {
+    await integrationsDataSource.sendTelegramTestNotification();
+  }
 }

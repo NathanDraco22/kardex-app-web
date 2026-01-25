@@ -34,4 +34,10 @@ class IntegrationsDataSource with HttpService, DioHttpService {
     final res = await patchQuery(uri, body: body, headers: headers);
     return res;
   }
+
+  Future<void> sendTelegramTestNotification() async {
+    final headers = HttpTools.generateAuthHeaders();
+    final uri = HttpTools.generateUri("$_endpoint/telegram/test");
+    await postQuery(uri, {}, headers: headers);
+  }
 }
