@@ -142,6 +142,8 @@ class _Body extends StatelessWidget {
                             value: telegram.adjustmentId,
                             icon: Icons.tune,
                           ),
+                          const Divider(),
+                          const _TestButton(),
                         ],
                       ),
                     ),
@@ -153,6 +155,43 @@ class _Body extends StatelessWidget {
           return const SizedBox.shrink();
         },
       ),
+    );
+  }
+}
+
+class _TestButton extends StatelessWidget {
+  const _TestButton();
+
+  @override
+  Widget build(BuildContext context) {
+    bool isLoading = false;
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return SizedBox(
+          width: 120,
+          child: ElevatedButton(
+            onPressed: () async {
+              if (isLoading) return;
+              setState(() {
+                isLoading = true;
+              });
+
+              try {
+                await context.read<IntegrationsRepository>().sendTelegramTestNotification();
+              } catch (e) {
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+                );
+              }
+              setState(() {
+                isLoading = false;
+              });
+            },
+            child: isLoading ? const LinearProgressIndicator() : const Text("Enviar Prueba"),
+          ),
+        );
+      },
     );
   }
 }
