@@ -54,7 +54,7 @@ class _MobileScaffold extends StatelessWidget {
           },
           icon: const Icon(Icons.arrow_back),
         ),
-        title: const Text("Ajuste de Inventario"),
+        title: const Text("Entrada por Ajuste de Inventario"),
         actions: [
           IconButton(
             icon: const Icon(Icons.save),
