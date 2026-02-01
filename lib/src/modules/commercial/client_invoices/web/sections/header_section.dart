@@ -318,6 +318,7 @@ CreateInvoice createInvoiceFromControllers(
     saleItems: salesItems.toList(),
     status: InvoiceStatus.open,
     paymentType: viewController.selectedPaymentType,
+    bankReference: "",
     totalCost: totalCost,
     total: total,
     createdBy: UserInfo(

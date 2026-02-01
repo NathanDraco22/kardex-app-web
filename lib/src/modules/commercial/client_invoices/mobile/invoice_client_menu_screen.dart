@@ -339,6 +339,7 @@ class _SendButton extends StatelessWidget {
                     saleItems: widget.saleItems,
                     status: InvoiceStatus.open,
                     paymentType: viewController.selectedPaymentType!,
+                    bankReference: "",
                     totalCost: totalCost,
                     total: total,
                     createdBy: UserInfo(

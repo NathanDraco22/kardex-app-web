@@ -6,7 +6,7 @@ import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
 import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/cubits/write_invoice_cubit.dart';
-import 'package:kardex_app_front/src/modules/commercial/client_invoices/widgets/confirmation_send_modal.dart';
+import 'package:kardex_app_front/src/modules/commercial/client_invoices/widgets/dialogs/payment_confirmation_dialog.dart';
 import 'package:kardex_app_front/src/tools/session_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
@@ -235,7 +235,7 @@ class _SendButton extends StatelessWidget {
 
             final (currentUser, currentBranch) = SessionTool.getFullUserFrom(context);
 
-            final newInvoice = CreateInvoice(
+            CreateInvoice newInvoice = CreateInvoice(
               branchId: currentBranch.id,
               clientId: kSaleClientId,
               clientInfo: ClientInfo(name: "Sin Cliente"),
@@ -244,6 +244,7 @@ class _SendButton extends StatelessWidget {
               saleItems: widget.saleItems,
               status: InvoiceStatus.paid,
               paymentType: PaymentType.cash,
+              bankReference: "",
               totalCost: totalCost,
               amountPaid: total,
               total: total,
@@ -253,62 +254,16 @@ class _SendButton extends StatelessWidget {
               ),
             );
 
-            final res = await showConfirmationSendBottomModal(
+            final paymentResult = await showPaymentConfirmationDialog(
               context,
-              title: "Facturar Productos",
-              subtitle: "¿Desea facturar estos productos?",
-              content: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Text(
-                    "Factura De Productos sin Cliente",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-
-                  Expanded(
-                    child: ListView(
-                      children: [
-                        for (final item in newInvoice.saleItems)
-                          ListTile(
-                            title: Text(item.product.name),
-                            subtitle: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  item.quantity.toString(),
-                                ),
-                                Text(NumberFormatter.convertToMoneyLike(item.price).toString()),
-                                Text(
-                                  NumberFormatter.convertToMoneyLike(
-                                    item.totalDiscount,
-                                  ).toString(),
-                                ),
-                                Text(NumberFormatter.convertToMoneyLike(item.total).toString()),
-                              ],
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                  const Divider(),
-                  Text(
-                    "Total: ${NumberFormatter.convertToMoneyLike(newInvoice.total)}",
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                ],
-              ),
+              total,
             );
 
-            if (res != true) return;
+            if (paymentResult == null) return;
+            newInvoice = newInvoice.copyWithPaymentMethod(
+              paymentResult.method,
+              paymentResult.reference,
+            );
             if (!context.mounted) return;
             context.read<WriteAnonInvoiceCubit>().createNewAnonInvoice(
               newInvoice,
