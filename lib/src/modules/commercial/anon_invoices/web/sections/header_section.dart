@@ -141,18 +141,23 @@ Future<void> saveAnonInvoiceAction(
 ) async {
   final viewController = AnonInvoiceWebMediator.of(context).viewController;
   final tableController = AnonInvoiceWebMediator.of(context).tableController;
-  final newInvoice = createAnonInvoiceFromControllers(
+  CreateInvoice newInvoice = createAnonInvoiceFromControllers(
     viewController,
     tableController,
     context,
   );
 
-  final res = await showConfirmationAnonInvoiceDialog(
+  final paymentMethodSelected = await showPaymentConfirmationDialog(
     context,
-    newInvoice,
+    newInvoice.total,
   );
 
-  if (res != true) return;
+  if (paymentMethodSelected == null) return;
+
+  newInvoice = newInvoice.copyWithPaymentMethod(
+    paymentMethodSelected.method,
+    paymentMethodSelected.reference,
+  );
 
   if (!context.mounted) return;
   context.read<WriteAnonInvoiceCubit>().createNewAnonInvoice(
@@ -202,6 +207,7 @@ CreateInvoice createAnonInvoiceFromControllers(
     saleItems: salesItems.toList(),
     status: InvoiceStatus.paid,
     paymentType: PaymentType.cash,
+    bankReference: "",
     amountPaid: total,
     totalCost: totalCost,
     total: total,

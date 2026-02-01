@@ -1,4 +1,4 @@
-enum PaymentType { cash, credit }
+enum PaymentType { cash, credit, transfer, card, check, other }
 
 class ProductItem {
   final String id;

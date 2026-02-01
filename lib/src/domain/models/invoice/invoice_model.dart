@@ -14,6 +14,7 @@ class BaseInvoice {
   final int amountPaid;
   final InvoiceStatus status;
   final PaymentType paymentType;
+  final String bankReference;
   final int totalCost;
   final int total;
   final DateTime? paidAt;
@@ -29,6 +30,7 @@ class BaseInvoice {
     this.amountPaid = 0,
     required this.status,
     required this.paymentType,
+    required this.bankReference,
     required this.totalCost,
     required this.total,
     this.paidAt,
@@ -47,6 +49,7 @@ class BaseInvoice {
     amountPaid: json['amountPaid'] ?? 0,
     status: InvoiceStatus.values.byName(json['status'].toString().toLowerCase()),
     paymentType: PaymentType.values.byName(json['paymentType'].toString().toLowerCase()),
+    bankReference: json['bankReference'] ?? "",
     totalCost: json['totalCost'],
     total: json['total'],
     paidAt: json['paidAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['paidAt']) : null,
@@ -63,6 +66,7 @@ class BaseInvoice {
     'amountPaid': amountPaid,
     'status': status.name,
     'paymentType': paymentType.name,
+    'bankReference': bankReference,
     'totalCost': totalCost,
     'total': total,
     'paidAt': paidAt?.millisecondsSinceEpoch,
@@ -81,6 +85,7 @@ class CreateInvoice extends BaseInvoice {
     super.amountPaid,
     required super.status,
     required super.paymentType,
+    required super.bankReference,
     required super.totalCost,
     required super.total,
     required super.createdBy,
@@ -96,10 +101,29 @@ class CreateInvoice extends BaseInvoice {
     amountPaid: json['amountPaid'] ?? 0,
     status: InvoiceStatus.values.byName(json['status'].toString().toLowerCase()),
     paymentType: PaymentType.values.byName(json['paymentType'].toString().toLowerCase()),
+    bankReference: json['bankReference'] ?? "",
     totalCost: json['totalCost'],
     total: json['total'],
     createdBy: UserInfo.fromJson(json['createdBy']),
   );
+
+  CreateInvoice copyWithPaymentMethod(PaymentType paymentType, String? bankReference) {
+    return CreateInvoice(
+      branchId: branchId,
+      clientId: clientId,
+      clientInfo: clientInfo,
+      docNumber: docNumber,
+      saleItems: saleItems,
+      description: description,
+      amountPaid: amountPaid,
+      status: status,
+      paymentType: paymentType,
+      bankReference: bankReference ?? "",
+      totalCost: totalCost,
+      total: total,
+      createdBy: createdBy,
+    );
+  }
 }
 
 class UpdateInvoice {
@@ -134,6 +158,7 @@ class InvoiceInDb extends BaseInvoice {
     super.amountPaid,
     required super.status,
     required super.paymentType,
+    required super.bankReference,
     required super.totalCost,
     required super.total,
     required this.createdAt,
@@ -153,6 +178,7 @@ class InvoiceInDb extends BaseInvoice {
     amountPaid: json['amountPaid'] ?? 0,
     status: InvoiceStatus.values.byName(json['status'].toString().toLowerCase()),
     paymentType: PaymentType.values.byName(json['paymentType'].toString().toLowerCase()),
+    bankReference: json['bankReference'] ?? "",
     totalCost: json['totalCost'],
     total: json['total'],
     paidAt: json['paidAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['paidAt']) : null,
