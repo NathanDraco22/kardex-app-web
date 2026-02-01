@@ -104,7 +104,6 @@ class _Body extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.search, color: Colors.purple),
               title: const Text("Consulta de Existencias Globales"),
-              trailing: const Icon(Icons.chevron_right),
               onTap: () => showGlobalStockSearchModal(context),
             ),
 
@@ -137,7 +136,6 @@ class _Body extends StatelessWidget {
                 color: Colors.blue.shade600,
               ),
               title: const Text("Cotizaciones"),
-              trailing: const Icon(Icons.chevron_right),
               onTap: () => context.pushNamed("proforma-history"),
             ),
 
@@ -151,7 +149,6 @@ class _Body extends StatelessWidget {
                 color: Colors.blue.shade600,
               ),
               title: const Text("Crear Cotización"),
-              trailing: const Icon(Icons.chevron_right),
               onTap: () => context.pushNamed("proforma"),
             ),
 
