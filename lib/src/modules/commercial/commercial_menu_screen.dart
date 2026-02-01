@@ -128,6 +128,21 @@ class _Body extends StatelessWidget {
             thickness: 2,
           ),
 
+          if (accessManager.hasCurrentAccess(context, CommercialSubModules.createInvoice))
+            ListTile(
+              leading: Icon(
+                FluentIcons.person_money_20_filled,
+                size: 32,
+                color: Colors.green.shade600,
+              ),
+              title: const Text("Facturacion a Clientes"),
+              onTap: () {
+                context.pushNamed("client-invoice");
+              },
+            ),
+
+          const Divider(height: 0.0),
+
           if (accessManager.hasCurrentAccess(context, CommercialSubModules.orders))
             ListTile(
               leading: Icon(
@@ -184,19 +199,6 @@ class _Body extends StatelessWidget {
               },
             ),
 
-          // const Divider(height: 0.0),
-          // if (accessManager.hasCurrentAccess(context, CommercialSubModules.createInvoice))
-          //   ListTile(
-          //     leading: Icon(
-          //       FluentIcons.person_money_20_filled,
-          //       size: 32,
-          //       color: Colors.green.shade600,
-          //     ),
-          //     title: const Text("Facturacion a Clientes"),
-          //     onTap: () {
-          //       context.pushNamed("client-invoice");
-          //     },
-          //   ),
           const Divider(height: 0.0),
 
           if (accessManager.hasCurrentAccess(context, CommercialSubModules.pendingInvoices))
