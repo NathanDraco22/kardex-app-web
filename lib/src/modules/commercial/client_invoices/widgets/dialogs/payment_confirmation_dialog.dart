@@ -74,6 +74,7 @@ class _PaymentDialogState extends State<_PaymentDialog> {
       content: SizedBox(
         width: 400,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
@@ -82,20 +83,31 @@ class _PaymentDialogState extends State<_PaymentDialog> {
             ),
             const SizedBox(height: 20),
             SegmentedButton<PaymentType>(
+              style: ButtonStyle(
+                foregroundColor: WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
+                  if (states.contains(WidgetState.selected)) {
+                    return Colors.white;
+                  }
+                  return Colors.black;
+                }),
+              ),
               segments: const [
                 ButtonSegment(
                   value: PaymentType.cash,
-                  label: Text("Efectivo"),
+                  label: Text("Efectivo", style: TextStyle(fontSize: 16)),
                   icon: Icon(Icons.money),
                 ),
                 ButtonSegment(
                   value: PaymentType.card,
-                  label: Text("Tarjeta"),
+                  label: Text("Tarjeta", style: TextStyle(fontSize: 16)),
                   icon: Icon(Icons.credit_card),
                 ),
                 ButtonSegment(
                   value: PaymentType.transfer,
-                  label: Text("Transf."),
+                  label: Padding(
+                    padding: EdgeInsets.all(4.0),
+                    child: Text("Transf.", style: TextStyle(fontSize: 16)),
+                  ),
                   icon: Icon(Icons.account_balance),
                 ),
               ],
@@ -110,11 +122,16 @@ class _PaymentDialogState extends State<_PaymentDialog> {
             if (_selectedMethod == PaymentType.cash) ...[
               TextField(
                 controller: _receivedController,
+                autofocus: true,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                ),
                 inputFormatters: [DecimalTextInputFormatter()],
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(
                   labelText: "Dinero Recibido",
-                  prefixText: "\$",
+                  prefixText: "C\$",
                   border: OutlineInputBorder(),
                 ),
                 onChanged: (value) {
@@ -129,12 +146,17 @@ class _PaymentDialogState extends State<_PaymentDialog> {
                 style: TextStyle(
                   fontSize: 18,
                   color: _change >= 0 ? Colors.green : Colors.red,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ] else ...[
               TextField(
                 controller: _refController,
+                autofocus: true,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                ),
                 inputFormatters: [IntegerTextInputFormatter()],
                 decoration: const InputDecoration(
                   labelText: "Número de Referencia",
@@ -144,29 +166,32 @@ class _PaymentDialogState extends State<_PaymentDialog> {
               ),
             ],
             const SizedBox(height: 30),
-            Row(
-              children: [
-                Expanded(
-                  child: CustomSlider(
-                    hintText: "Desliza para Confirmar",
-                    hintIcon: Icons.check_circle,
-                    sliderColor: _canConfirm ? Colors.green : Colors.grey,
-                    sliderText: "Confirmar",
-                    onSubmit: () {
-                      if (!_canConfirm) {
-                        return;
-                      }
-                      context.pop(
-                        PaymentResult(
-                          method: _selectedMethod,
-                          amountReceived: _selectedMethod == PaymentType.cash ? _receivedAmount : widget.total,
-                          reference: _selectedMethod == PaymentType.cash ? null : _refController.text,
-                        ),
-                      );
-                    },
+            AbsorbPointer(
+              absorbing: !_canConfirm,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: CustomSlider(
+                      hintText: "Desliza para Confirmar",
+                      hintIcon: Icons.check_circle,
+                      sliderColor: _canConfirm ? Colors.green : Colors.grey,
+                      sliderText: "Confirmar",
+                      onSubmit: () {
+                        if (!_canConfirm) {
+                          return;
+                        }
+                        context.pop(
+                          PaymentResult(
+                            method: _selectedMethod,
+                            amountReceived: _selectedMethod == PaymentType.cash ? _receivedAmount : widget.total,
+                            reference: _selectedMethod == PaymentType.cash ? null : _refController.text,
+                          ),
+                        );
+                      },
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
