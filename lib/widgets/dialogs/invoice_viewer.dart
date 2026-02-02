@@ -182,29 +182,41 @@ class InvoiceViewerContent extends StatelessWidget {
               ],
             ),
 
-            Builder(
-              builder: (context) {
-                String paymentType = "CREDITO";
-
-                if (invoice.paymentType == PaymentType.cash) {
-                  paymentType = "CONTADO";
-                }
-
-                return Text(
-                  paymentType,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                );
-              },
-            ),
-
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
             Text(
               branch.name,
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
+            Builder(
+              builder: (context) {
+                final label = Text(
+                  invoice.paymentType.typeLabel,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                );
+
+                if (<PaymentType>[.card, .transfer].contains(invoice.paymentType)) {
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      label,
+                      Text(
+                        " - Ref: ${invoice.bankReference}",
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  );
+                }
+
+                return label;
+              },
+            ),
+
             Text(
               "Cliente: ${invoice.clientInfo.name}",
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),

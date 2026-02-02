@@ -1,4 +1,29 @@
-enum PaymentType { cash, credit, transfer, card, check, other }
+enum PaymentType {
+  cash,
+  credit,
+  transfer,
+  card,
+  check,
+  other
+  ;
+
+  String get typeLabel {
+    switch (this) {
+      case PaymentType.cash:
+        return "Contado";
+      case PaymentType.credit:
+        return "Crédito";
+      case PaymentType.transfer:
+        return "Transferencia";
+      case PaymentType.card:
+        return "Tarjeta";
+      case PaymentType.check:
+        return "Cheque";
+      case PaymentType.other:
+        return "Otro";
+    }
+  }
+}
 
 class ProductItem {
   final String id;
