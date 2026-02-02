@@ -153,7 +153,7 @@ class _PaymentDialogState extends State<_PaymentDialog> {
                     sliderColor: _canConfirm ? Colors.green : Colors.grey,
                     sliderText: "Confirmar",
                     onSubmit: () {
-                      if (_canConfirm) {
+                      if (!_canConfirm) {
                         return;
                       }
                       context.pop(
