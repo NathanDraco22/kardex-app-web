@@ -12,6 +12,11 @@ class _ContentSection extends StatelessWidget {
       onAddRowAction: (controller) async {
         final res = await showSearchProductDialog(context);
         if (res == null) return;
+        if (controller.rows.length > 99) {
+          if (!context.mounted) return;
+          await DialogManager.showErrorDialog(context, "No se pueden agregar mas de 100 productos");
+          return;
+        }
         final productRow = ProductRow(
           product: res,
           quantity: 0,

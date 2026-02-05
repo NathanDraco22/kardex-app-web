@@ -10,13 +10,20 @@ class _ContentSection extends StatelessWidget {
     return TransferProductTable(
       controller: tableController,
       onAddRowAction: (controller) async {
-        final res = await showSearchProductDialog(context);
+        final res = await showSearchProductInBranchDialog(context);
         if (res == null) return;
+
+        final currentTotalRow = controller.totalRow;
+        if (currentTotalRow > 99) {
+          if (!context.mounted) return;
+          await DialogManager.showErrorDialog(context, "No se pueden agregar mas de 100 productos");
+          return;
+        }
 
         final productRow = TransferProductRow(
           product: res,
           quantity: 0,
-          unitaryCost: 0,
+          unitaryCost: res.account.averageCost,
         );
         controller.addRow(productRow);
         mediator.refresh();
@@ -27,7 +34,7 @@ class _ContentSection extends StatelessWidget {
         mediator.refresh();
       },
       onUpdateRowAction: (controller, row) async {
-        final res = await showSearchProductDialog(context, product: row.product);
+        final res = await showSearchProductInBranchDialog(context, product: row.product);
         if (res == null) return;
         final newProductRow = TransferProductRow(
           product: res,
