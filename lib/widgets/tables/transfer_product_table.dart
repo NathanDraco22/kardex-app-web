@@ -14,7 +14,7 @@ class TransferProductRow {
     this.expirationDate,
   });
 
-  ProductInDb product;
+  ProductInDbInBranch product;
   int quantity = 0;
   int unitaryCost = 0;
   DateTime? expirationDate;
@@ -31,6 +31,7 @@ class TransferProductTableController extends ChangeNotifier {
   );
 
   bool get hasRows => rows.isNotEmpty;
+  int get totalRow => rows.length;
 
   void refresh() => notifyListeners();
 

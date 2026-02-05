@@ -31,6 +31,11 @@ class _MobileScaffold extends StatelessWidget {
           onPressed: () async {
             final res = await showSearchProductInBranchDelegate(context, true);
             if (res == null) return;
+            if (mediator.productListViewController.rowCards.length > 99) {
+              if (!context.mounted) return;
+              await DialogManager.showErrorDialog(context, "No se pueden agregar mas de 100 productos");
+              return;
+            }
             final newRow = ProductRowCard(
               product: res,
               quantity: 0,

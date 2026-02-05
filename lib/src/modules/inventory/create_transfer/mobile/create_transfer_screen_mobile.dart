@@ -13,6 +13,7 @@ import 'package:kardex_app_front/src/tools/input_formatters.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
 import 'package:kardex_app_front/src/tools/session_tool.dart';
 import 'package:kardex_app_front/widgets/dialogs/branch_selection_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/search_product_in_branch_delegate.dart';
 
 import 'package:kardex_app_front/widgets/tables/transfer_product_table.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
@@ -57,12 +58,17 @@ class _MobileScaffold extends StatelessWidget {
           visible: MediaQuery.viewInsetsOf(context).bottom == 0.0,
           child: FloatingActionButton.extended(
             onPressed: () async {
-              final res = await showProductSearchDelegate(context);
+              final res = await showSearchProductInBranchDelegate(context, true);
               if (res == null) return;
+              if (mediator.productTableController.rows.length > 99) {
+                if (!context.mounted) return;
+                await DialogManager.showErrorDialog(context, "No se pueden agregar mas de 100 productos");
+                return;
+              }
               final newRow = TransferProductRow(
                 product: res,
                 quantity: 0,
-                unitaryCost: 0,
+                unitaryCost: res.account.averageCost,
               );
               mediator.productTableController.addRow(newRow);
               mediator.refresh();
