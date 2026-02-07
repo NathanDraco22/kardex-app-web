@@ -51,6 +51,17 @@ class _RootScaffold extends StatelessWidget {
       ),
       appBar: AppBar(
         title: const Text("Facturacion de Productos"),
+        leading: IconButton(
+          onPressed: () async {
+            if (mediator.viewController.items.isNotEmpty) {
+              final res = await DialogManager.confirmActionDialog(context, "Deseas salir sin guardar?");
+              if (res != true) return;
+            }
+            if (!context.mounted) return;
+            Navigator.pop(context);
+          },
+          icon: const Icon(Icons.arrow_back),
+        ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(kToolbarHeight),
           child: ListenableBuilder(
