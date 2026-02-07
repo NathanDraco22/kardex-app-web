@@ -354,9 +354,11 @@ class _MobileProductCard extends StatelessWidget {
                       ),
 
                       TextField(
+                        autofocus: true,
                         inputFormatters: [MonthYearInputFormatter()],
                         textAlign: TextAlign.start,
                         keyboardType: .number,
+                        textInputAction: .next,
                         decoration: const InputDecoration(
                           hintText: "mm/aa",
                           isDense: true,
@@ -386,6 +388,7 @@ class _MobileProductCard extends StatelessWidget {
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
                         inputFormatters: [IntegerTextInputFormatter()],
                         textAlign: TextAlign.center,
+                        textInputAction: .next,
                         decoration: const InputDecoration(
                           isDense: true,
                         ),

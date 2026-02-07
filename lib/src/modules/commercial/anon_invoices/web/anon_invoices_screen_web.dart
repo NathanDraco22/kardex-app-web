@@ -89,7 +89,23 @@ class _RootScaffold extends StatelessWidget {
       child: Focus(
         autofocus: true,
         child: Scaffold(
-          appBar: AppBar(title: const Text("Facturacion de Productos")),
+          appBar: AppBar(
+            leading: BackButton(
+              onPressed: () {
+                if (AnonInvoiceWebMediator.of(context).tableController.items.isNotEmpty) {
+                  DialogManager.confirmActionDialog(context, "Deseas salir sin guardar?").then((value) {
+                    if (value != true) {
+                      return;
+                    }
+                  });
+                }
+
+                if (!context.mounted) return;
+                Navigator.pop(context);
+              },
+            ),
+            title: const Text("Facturacion de Productos"),
+          ),
           body: const _Body(),
           bottomNavigationBar: const _AnonBottomAppBar(),
         ),
