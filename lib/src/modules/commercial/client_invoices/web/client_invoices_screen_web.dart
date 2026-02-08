@@ -7,8 +7,7 @@ import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
 import 'package:kardex_app_front/src/domain/models/models.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
-import 'package:kardex_app_front/src/modules/commercial/client_invoices/cubit/write_invoice_cubit.dart';
-import 'package:kardex_app_front/src/modules/commercial/client_invoices/web/mediator.dart';
+
 import 'package:kardex_app_front/src/tools/session_tool.dart';
 
 import 'package:kardex_app_front/src/tools/tools.dart';
@@ -17,6 +16,8 @@ import 'package:kardex_app_front/widgets/widgets.dart';
 
 import '../widgets/client_invoice_table.dart';
 import '../widgets/dialogs/confirm_invoice_dialog.dart';
+import '../cubit/write_invoice_cubit.dart';
+import 'mediator.dart';
 
 part 'sections/header_section.dart';
 part 'sections/content_section.dart';

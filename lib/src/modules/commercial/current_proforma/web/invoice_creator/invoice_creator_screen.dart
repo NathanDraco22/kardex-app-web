@@ -12,6 +12,7 @@ import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/invoice_viewer.dart';
 import 'package:kardex_app_front/widgets/row_widgets/sale_item_row.dart';
+import 'package:kardex_app_front/src/modules/commercial/current_proforma/web/invoice_creator/widgets/edit_sale_item_dialog.dart';
 
 Future<OrderInDb?> showProformaInvoiceCreatorDialog(BuildContext context, OrderInDb order) async {
   final readCubit = context.read<ReadProformaCubit>();
@@ -181,128 +182,141 @@ class _Body extends StatefulWidget {
 }
 
 class _BodyState extends State<_Body> {
-  List<SaleItem> markedItems = [];
+  OrderInDb? _currentOrder;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_currentOrder == null) {
+      _currentOrder = InvoiceCreateMediator.of(context).order;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final mediator = InvoiceCreateMediator.of(context);
-    final order = mediator.order;
+    if (_currentOrder == null) return const SizedBox.shrink();
+
+    final order = _currentOrder!;
     final saleItems = order.saleItems;
     final totalFormatted = NumberFormatter.convertToMoneyLike(order.total);
-    return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 600),
-        child: Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Card(
-                margin: EdgeInsets.zero,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Orden: ${order.docNumber}",
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
 
-                          Text(
-                            DateTimeTool.formatddMMyy(order.createdAt),
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Builder(
-                        builder: (context) {
-                          String paymentType = "CREDITO";
-
-                          if (order.paymentType == PaymentType.cash) {
-                            paymentType = "CONTADO";
-                          }
-
-                          return Text(
-                            paymentType,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          );
-                        },
-                      ),
-
-                      Text(
-                        order.clientInfo.name,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-
-                      Text(
-                        order.description,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w500,
-                          color: Colors.grey,
-                        ),
-                      ),
-
-                      Text(
-                        "Total: $totalFormatted",
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        textAlign: TextAlign.end,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 8),
-
-              Expanded(
-                child: Card(
+    return BlocListener<WriteOrderCubit, WriteOrderState>(
+      listener: (context, state) {
+        if (state is WriteOrderSuccess) {
+          setState(() {
+            _currentOrder = state.order;
+          });
+          LoadingDialogManager.closeLoadingDialog(context);
+        }
+      },
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 600),
+          child: Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Card(
                   margin: EdgeInsets.zero,
-
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        const Text(
-                          "Detalle:",
-                          style: TextStyle(
-                            fontSize: 18,
-                          ),
-                          textAlign: TextAlign.start,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Orden: ${order.docNumber}",
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            Text(
+                              DateTimeTool.formatddMMyy(order.createdAt),
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
                         ),
-                        Expanded(
-                          child: ListView(
-                            children: [
-                              const Divider(),
-                              ..._buildSaleItemRows(saleItems, markedItems),
-                            ],
+                        Builder(
+                          builder: (context) {
+                            String paymentType = "CREDITO";
+
+                            if (order.paymentType == PaymentType.cash) {
+                              paymentType = "CONTADO";
+                            }
+
+                            return Text(
+                              paymentType,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            );
+                          },
+                        ),
+                        Text(
+                          order.clientInfo.name,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
                           ),
+                        ),
+                        Text(
+                          order.description,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        Text(
+                          "Total: $totalFormatted",
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          textAlign: TextAlign.end,
                         ),
                       ],
                     ),
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 8),
+                Expanded(
+                  child: Card(
+                    margin: EdgeInsets.zero,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const Text(
+                            "Detalle:",
+                            style: TextStyle(
+                              fontSize: 18,
+                            ),
+                            textAlign: TextAlign.start,
+                          ),
+                          Expanded(
+                            child: ListView(
+                              children: [
+                                const Divider(),
+                                ..._buildSaleItemRows(context, saleItems),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -310,14 +324,41 @@ class _BodyState extends State<_Body> {
   }
 
   Iterable<Widget> _buildSaleItemRows(
+    BuildContext context,
     List<SaleItem> saleItems,
-    List<SaleItem> markedItems,
   ) sync* {
     for (var i = 0; i < saleItems.length; i++) {
       final saleItem = saleItems[i];
       final color = i.isOdd ? Colors.white : Colors.grey.shade200;
 
       yield SaleItemRow(
+        onLongPress: () async {
+          final newItem = await showEditSaleItemDialog(context, saleItem);
+          if (newItem == null) return;
+
+          if (!context.mounted) return;
+
+          if (_currentOrder == null) return;
+
+          List<SaleItem> newItems = List.from(saleItems);
+          newItems[i] = newItem;
+
+          int newTotal = 0;
+          int newTotalCost = 0;
+
+          for (var item in newItems) {
+            newTotal += item.total;
+            newTotalCost += (item.cost * item.quantity);
+          }
+
+          final updateOrder = UpdateOrder(
+            saleItems: newItems,
+            total: newTotal,
+            totalCost: newTotalCost,
+          );
+
+          context.read<WriteOrderCubit>().updateOrder(_currentOrder!.id, updateOrder);
+        },
         saleItem: saleItem,
         color: color,
       );
