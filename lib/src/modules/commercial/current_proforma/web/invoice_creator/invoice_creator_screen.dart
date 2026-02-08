@@ -27,10 +27,20 @@ Future<OrderInDb?> showProformaInvoiceCreatorDialog(BuildContext context, OrderI
   );
 }
 
-class InvoiceCreateMediator extends InheritedWidget {
-  const InvoiceCreateMediator({super.key, required super.child, required this.order});
+class OrderContainer {
+  OrderInDb order;
 
-  final OrderInDb order;
+  OrderContainer({required this.order});
+
+  void updateOrder(OrderInDb order) {
+    this.order = order;
+  }
+}
+
+class InvoiceCreateMediator extends InheritedWidget {
+  const InvoiceCreateMediator({super.key, required super.child, required this.orderContainer});
+
+  final OrderContainer orderContainer;
 
   static InvoiceCreateMediator of(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<InvoiceCreateMediator>()!;
@@ -51,7 +61,7 @@ class InvoiceCreatorScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final orderRepo = context.read<OrdersRepository>();
     return InvoiceCreateMediator(
-      order: order,
+      orderContainer: OrderContainer(order: order),
       child: BlocProvider(
         create: (context) => WriteOrderCubit(
           ordersRepository: orderRepo,
@@ -67,12 +77,20 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final order = InvoiceCreateMediator.of(context).order;
+    final orderContainer = InvoiceCreateMediator.of(context).orderContainer;
     final writeCubit = context.read<WriteOrderCubit>();
     return BlocListener<WriteOrderCubit, WriteOrderState>(
       listener: (context, state) async {
         if (state is WriteOrderInProgress) {
           LoadingDialogManager.showLoadingDialog(context);
+        }
+
+        if (state is WriteOrderSuccess) {
+          orderContainer.updateOrder(state.order);
+          if (!context.mounted) return;
+          final readCubit = context.read<ReadProformaCubit>();
+          await readCubit.updateOrderCache(state.order);
+          return;
         }
 
         if (state is WriteOrderError) {
@@ -111,17 +129,17 @@ class _RootScaffold extends StatelessWidget {
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: Builder(
           builder: (context) {
-            if (order.status == OrderStatus.open) {
+            if (orderContainer.order.status == OrderStatus.open) {
               return const SizedBox.shrink();
             }
 
-            if (order.invoiceId.isEmpty) {
+            if (orderContainer.order.invoiceId.isEmpty) {
               return const SizedBox.shrink();
             }
 
             return ElevatedButton.icon(
               onPressed: () {
-                showInvoiceViewerDialogFromId(context, order.invoiceId);
+                showInvoiceViewerDialogFromId(context, orderContainer.order.invoiceId);
               },
               label: const Text("Ver Factura"),
               icon: const Icon(Icons.picture_as_pdf),
@@ -132,7 +150,7 @@ class _RootScaffold extends StatelessWidget {
           height: 60,
           child: Builder(
             builder: (context) {
-              if (order.status != OrderStatus.draft) {
+              if (orderContainer.order.status != OrderStatus.draft) {
                 return const SizedBox.shrink();
               }
 
@@ -144,9 +162,9 @@ class _RootScaffold extends StatelessWidget {
                       backgroundColor: Colors.red.shade300,
                     ),
                     onPressed: () async {
-                      final res = await showCancelOrderInvoiceModal(context, order);
+                      final res = await showCancelOrderInvoiceModal(context, orderContainer.order);
                       if (res != true) return;
-                      writeCubit.deleteOrderDraft(order.id);
+                      writeCubit.deleteOrderDraft(orderContainer.order.id);
                     },
                     icon: const Icon(Icons.cancel),
                     label: const Text("Borrar Proforma"),
@@ -157,9 +175,9 @@ class _RootScaffold extends StatelessWidget {
                       backgroundColor: Colors.green.shade300,
                     ),
                     onPressed: () async {
-                      final res = await showConfirmOrderInvoiceModal(context, order);
+                      final res = await showConfirmOrderInvoiceModal(context, orderContainer.order);
                       if (res != true) return;
-                      writeCubit.convertOrderToInvoice(order.id);
+                      writeCubit.convertOrderToInvoice(orderContainer.order.id);
                     },
                     icon: const Icon(Icons.check),
                     label: const Text("Facturar Proforma"),
@@ -187,7 +205,7 @@ class _BodyState extends State<_Body> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _currentOrder ??= InvoiceCreateMediator.of(context).order;
+    _currentOrder ??= InvoiceCreateMediator.of(context).orderContainer.order;
   }
 
   @override
