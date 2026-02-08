@@ -187,9 +187,7 @@ class _BodyState extends State<_Body> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (_currentOrder == null) {
-      _currentOrder = InvoiceCreateMediator.of(context).order;
-    }
+    _currentOrder ??= InvoiceCreateMediator.of(context).order;
   }
 
   @override
