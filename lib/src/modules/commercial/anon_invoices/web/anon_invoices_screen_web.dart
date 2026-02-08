@@ -91,13 +91,12 @@ class _RootScaffold extends StatelessWidget {
         child: Scaffold(
           appBar: AppBar(
             leading: BackButton(
-              onPressed: () {
+              onPressed: () async {
                 if (AnonInvoiceWebMediator.of(context).tableController.items.isNotEmpty) {
-                  DialogManager.confirmActionDialog(context, "Deseas salir sin guardar?").then((value) {
-                    if (value != true) {
-                      return;
-                    }
-                  });
+                  final res = await DialogManager.confirmActionDialog(context, "Deseas salir sin guardar?");
+                  if (res != true) {
+                    return;
+                  }
                 }
 
                 if (!context.mounted) return;

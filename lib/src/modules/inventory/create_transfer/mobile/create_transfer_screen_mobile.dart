@@ -295,13 +295,22 @@ class _MobileHeaderSectionState extends State<_MobileHeaderSection> with Automat
   }
 }
 
-class _MobileProductCard extends StatelessWidget {
+class _MobileProductCard extends StatefulWidget {
   const _MobileProductCard({required this.row, super.key});
 
   final TransferProductRow row;
 
   @override
+  State<_MobileProductCard> createState() => _MobileProductCardState();
+}
+
+class _MobileProductCardState extends State<_MobileProductCard> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     final mediator = CreateTransferMediator.read(context)!;
 
     return Card(
@@ -320,14 +329,14 @@ class _MobileProductCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        row.product.name,
+                        widget.row.product.name,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
                       ),
                       Text(
-                        "${row.product.brandName} - ${row.product.unitName}",
+                        "${widget.row.product.brandName} - ${widget.row.product.unitName}",
                         style: const TextStyle(color: Colors.grey),
                       ),
                     ],
@@ -335,7 +344,7 @@ class _MobileProductCard extends StatelessWidget {
                 ),
                 IconButton(
                   onPressed: () {
-                    mediator.productTableController.removeRow(row);
+                    mediator.productTableController.removeRow(widget.row);
                   },
                   icon: const Icon(Icons.delete, color: Colors.red),
                 ),
@@ -366,9 +375,9 @@ class _MobileProductCard extends StatelessWidget {
                         onChanged: (value) {
                           try {
                             final date = DateTimeTool.fromMMYY(value);
-                            row.expirationDate = date;
+                            widget.row.expirationDate = date;
                           } on Exception catch (_) {
-                            row.expirationDate = null;
+                            widget.row.expirationDate = null;
                           }
                         },
                       ),
@@ -394,9 +403,9 @@ class _MobileProductCard extends StatelessWidget {
                         ),
                         onChanged: (value) {
                           if (value.isEmpty) {
-                            row.quantity = 0;
+                            widget.row.quantity = 0;
                           } else {
-                            row.quantity = int.tryParse(value) ?? 0;
+                            widget.row.quantity = int.tryParse(value) ?? 0;
                           }
 
                           mediator.refresh();
