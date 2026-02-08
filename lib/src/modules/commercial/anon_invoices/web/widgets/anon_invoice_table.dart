@@ -219,9 +219,13 @@ class InvoiceTableRow extends StatefulWidget {
   State<InvoiceTableRow> createState() => _InvoiceTableRowState();
 }
 
-class _InvoiceTableRowState extends State<InvoiceTableRow> {
+class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final product = widget.item.commercial.product;
     final price = NumberFormatter.convertToMoneyLike(product.saleProfile.salePrice);
     final totalDiscount = NumberFormatter.convertToMoneyLike(widget.item.commercial.totalDiscount);
