@@ -42,6 +42,13 @@ class ClientsDataSource with HttpService {
     return res;
   }
 
+  Future<Map<String, dynamic>> searchClientWithBalance(String keyword) async {
+    final headers = HttpTools.generateAuthHeaders();
+    final uri = HttpTools.generateUri("$_clientEndpoint/search/balance/$keyword");
+    final res = await getQuery(uri, headers: headers);
+    return res;
+  }
+
   Future<Map<String, dynamic>?> updateClientById(
     String clientId,
     Map<String, dynamic> client,

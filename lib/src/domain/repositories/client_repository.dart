@@ -65,6 +65,12 @@ class ClientsRepository {
     return responseModel.data;
   }
 
+  Future<List<ClientInDb>> searchClientWithBalance(String keyword) async {
+    final result = await clientsDataSource.searchClientWithBalance(keyword);
+    final responseModel = ListResponse<ClientInDb>.fromJson(result, ClientInDb.fromJson);
+    return responseModel.data;
+  }
+
   Future<ClientInDb?> updateClientById(
     String clientId,
     UpdateClient client,
