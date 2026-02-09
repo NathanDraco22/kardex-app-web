@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/cubit/read_pending_client_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/web/pending_invoice_web_screen.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_app_front/widgets/dialogs/show_client_with_balance_search_dialog.dart';
 
 class PendingClientScreenWeb extends StatelessWidget {
   const PendingClientScreenWeb({super.key});
@@ -29,9 +30,9 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
       child: Padding(
-        padding: EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(8.0),
         child: Column(
           spacing: 8,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -40,19 +41,46 @@ class _Body extends StatelessWidget {
               height: 100,
               child: Card(
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Text(
+                    const Text(
                       "Clientes con Facturas Pendientes",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
                       ),
                     ),
+                    TextButton.icon(
+                      icon: const Icon(Icons.search),
+                      onPressed: () async {
+                        final client = await showClientWithBalanceSearch(context);
+
+                        if (client == null) return;
+                        if (!context.mounted) return;
+
+                        final readPendingInvoiceCubit = context.read<ReadPendingClientCubit>();
+
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return BlocProvider.value(
+                                value: readPendingInvoiceCubit,
+                                child: PendingInvoiceWebScreen(
+                                  client: client,
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      },
+                      label: const Text("Buscar Cliente con Saldo"),
+                    ),
                   ],
                 ),
               ),
             ),
-            Expanded(
+            const Expanded(
               child: _Content(),
             ),
           ],
