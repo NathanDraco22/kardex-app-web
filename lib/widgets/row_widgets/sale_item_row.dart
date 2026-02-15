@@ -2,19 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
 
-class SaleItemRow extends StatelessWidget {
+class SaleItemRow extends StatefulWidget {
   const SaleItemRow({
     super.key,
     required this.saleItem,
     this.color,
     this.onTap,
-    this.onLongPress,
+    @Deprecated("Use other opcions") this.onLongPress,
+    this.onEdit,
+    this.onRemove,
   });
 
   final SaleItem saleItem;
   final Color? color;
   final void Function()? onTap;
+
   final void Function()? onLongPress;
+  final void Function()? onEdit;
+  final void Function()? onRemove;
+
+  @override
+  State<SaleItemRow> createState() => _SaleItemRowState();
+}
+
+class _SaleItemRowState extends State<SaleItemRow> {
+  Offset offset = Offset.zero;
 
   @override
   Widget build(BuildContext context) {
@@ -23,10 +35,22 @@ class SaleItemRow extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: onTap,
-          onLongPress: onLongPress,
+          onTap: widget.onTap,
+          onLongPress: () async {
+            final res = await _showContextMenu(context, offset);
+            if (res == null) return;
+            switch (res) {
+              case _MenuOptions.edit:
+                widget.onEdit?.call();
+              case _MenuOptions.delete:
+                widget.onRemove?.call();
+            }
+          },
+          onTapDown: (details) {
+            offset = details.globalPosition;
+          },
           child: Ink(
-            decoration: BoxDecoration(color: color),
+            decoration: BoxDecoration(color: widget.color),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -34,7 +58,7 @@ class SaleItemRow extends StatelessWidget {
                   fit: FlexFit.tight,
                   child: Center(
                     child: Text(
-                      saleItem.quantity.toString(),
+                      widget.saleItem.quantity.toString(),
                       style: const TextStyle(
                         fontWeight: FontWeight.w500,
                       ),
@@ -49,7 +73,7 @@ class SaleItemRow extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        saleItem.product.name,
+                        widget.saleItem.product.name,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
@@ -58,12 +82,12 @@ class SaleItemRow extends StatelessWidget {
                         children: [
                           Flexible(
                             fit: FlexFit.tight,
-                            child: Text(saleItem.product.brandName),
+                            child: Text(widget.saleItem.product.brandName),
                           ),
 
                           Flexible(
                             fit: FlexFit.tight,
-                            child: Text(saleItem.product.unitName),
+                            child: Text(widget.saleItem.product.unitName),
                           ),
                         ],
                       ),
@@ -78,7 +102,7 @@ class SaleItemRow extends StatelessWidget {
                     child: Builder(
                       builder: (context) {
                         final price = NumberFormatter.convertToMoneyLike(
-                          saleItem.total,
+                          widget.saleItem.total,
                         );
                         return Text(
                           price,
@@ -97,4 +121,35 @@ class SaleItemRow extends StatelessWidget {
       ),
     );
   }
+}
+
+enum _MenuOptions { edit, delete }
+
+Future<_MenuOptions?> _showContextMenu(BuildContext context, Offset position) async {
+  final result = await showMenu<_MenuOptions>(
+    context: context,
+    position: RelativeRect.fromLTRB(position.dx, position.dy, position.dx, position.dy),
+    items: [
+      const PopupMenuItem(
+        value: _MenuOptions.edit,
+        child: ListTile(
+          leading: Icon(Icons.edit),
+          title: Text('Editar'),
+        ),
+      ),
+      const PopupMenuItem(
+        value: _MenuOptions.delete,
+        child: ListTile(
+          leading: Icon(Icons.delete),
+          title: Text('Eliminar'),
+        ),
+      ),
+    ],
+  );
+
+  if (result != null) {
+    return result;
+  }
+
+  return null;
 }

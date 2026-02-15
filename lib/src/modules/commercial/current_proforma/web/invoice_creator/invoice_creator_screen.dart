@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
 import 'package:kardex_app_front/src/domain/models/order/order_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/order_repository.dart';
@@ -8,9 +9,13 @@ import 'package:kardex_app_front/src/modules/commercial/current_orders/modals/ca
 import 'package:kardex_app_front/src/modules/commercial/current_orders/modals/confirm_order_invoice_modal.dart';
 import 'package:kardex_app_front/src/modules/commercial/current_proforma/cubit/read_proforma_cubit.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
+import 'package:kardex_app_front/src/tools/printers/order_printer.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/invoice_viewer.dart';
+import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/custom_product_commercial_search_delegate.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/search_product_commercial_dialog.dart';
 import 'package:kardex_app_front/widgets/row_widgets/sale_item_row.dart';
 import 'package:kardex_app_front/src/modules/commercial/current_proforma/web/invoice_creator/widgets/edit_sale_item_dialog.dart';
 
@@ -77,8 +82,18 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authCubit = context.read<AuthCubit>();
+    final authState = authCubit.state;
+    if (authState is! Authenticated) {
+      return const Scaffold(
+        body: Center(
+          child: Text("Error"),
+        ),
+      );
+    }
     final orderContainer = InvoiceCreateMediator.of(context).orderContainer;
     final writeCubit = context.read<WriteOrderCubit>();
+
     return BlocListener<WriteOrderCubit, WriteOrderState>(
       listener: (context, state) async {
         if (state is WriteOrderInProgress) {
@@ -124,7 +139,23 @@ class _RootScaffold extends StatelessWidget {
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text("Facturar Orden")),
+        appBar: AppBar(
+          title: const Text("Facturar Orden"),
+          actions: [
+            IconButton(
+              onPressed: () {
+                shareOrder(orderContainer.order, authState.branch);
+              },
+              icon: const Icon(Icons.share),
+            ),
+            IconButton(
+              onPressed: () {
+                printOrder(orderContainer.order, authState.branch);
+              },
+              icon: const Icon(Icons.print),
+            ),
+          ],
+        ),
         body: const _Body(),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: Builder(
@@ -348,7 +379,7 @@ class _BodyState extends State<_Body> {
       final color = i.isOdd ? Colors.white : Colors.grey.shade200;
 
       yield SaleItemRow(
-        onLongPress: () async {
+        onEdit: () async {
           final newItem = await showEditSaleItemDialog(context, saleItem);
           if (newItem == null) return;
 
@@ -375,9 +406,96 @@ class _BodyState extends State<_Body> {
 
           context.read<WriteOrderCubit>().updateOrder(_currentOrder!.id, updateOrder);
         },
+        onRemove: () async {
+          final res = await DialogManager.confirmActionDialog(context, "Eliminar ${saleItem.product.name}");
+          if (res != true) return;
+
+          if (!context.mounted) return;
+
+          if (_currentOrder == null) return;
+
+          List<SaleItem> newItems = List.from(saleItems);
+          newItems.removeAt(i);
+
+          int newTotal = 0;
+          int newTotalCost = 0;
+
+          for (var item in newItems) {
+            newTotal += item.total;
+            newTotalCost += (item.cost * item.quantity);
+          }
+
+          final updateOrder = UpdateOrder(
+            saleItems: newItems,
+            total: newTotal,
+            totalCost: newTotalCost,
+          );
+
+          context.read<WriteOrderCubit>().updateOrder(
+            _currentOrder!.id,
+            updateOrder,
+          );
+        },
         saleItem: saleItem,
         color: color,
       );
     }
+
+    yield const Divider();
+    yield Row(
+      children: [
+        ElevatedButton.icon(
+          icon: const Icon(Icons.add),
+          label: const Text("Agregar producto"),
+          onPressed: () async {
+            CommercialProductResult? commercial;
+            if (context.isMobile()) {
+              commercial = await showCommercialProductSearchDelegate(context);
+            } else {
+              commercial = await showSearchProductCommercialDialog(context);
+            }
+
+            if (commercial == null) return;
+
+            if (!context.mounted) return;
+
+            if (_currentOrder == null) return;
+
+            List<SaleItem> newItems = List.from(saleItems);
+            newItems.add(
+              SaleItem(
+                product: ProductItem.fromJson(commercial.product.toJson()),
+                cost: commercial.product.account.averageCost,
+                price: commercial.newPrice,
+                quantity: commercial.quantity,
+                discountPercentage: commercial.discountPercent,
+                totalDiscount: commercial.totalDiscount,
+                subTotal: commercial.subTotal,
+                total: commercial.total,
+              ),
+            );
+
+            int newTotal = 0;
+            int newTotalCost = 0;
+
+            for (var item in newItems) {
+              newTotal += item.total;
+              newTotalCost += (item.cost * item.quantity);
+            }
+
+            final updateOrder = UpdateOrder(
+              saleItems: newItems,
+              total: newTotal,
+              totalCost: newTotalCost,
+            );
+
+            context.read<WriteOrderCubit>().updateOrder(
+              _currentOrder!.id,
+              updateOrder,
+            );
+          },
+        ),
+      ],
+    );
   }
 }
