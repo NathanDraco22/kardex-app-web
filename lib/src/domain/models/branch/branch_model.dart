@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:kardex_app_front/src/domain/models/common/coordinates.dart';
+
 class BaseBranch {
   final String name;
   final String idCard;
@@ -9,6 +11,7 @@ class BaseBranch {
   final String phone;
   final String description;
   Uint8List? image;
+  Coordinates? coordinates;
 
   BaseBranch({
     required this.name,
@@ -18,6 +21,7 @@ class BaseBranch {
     required this.phone,
     this.description = "",
     this.image,
+    this.coordinates,
   });
 
   factory BaseBranch.fromJson(Map<String, dynamic> json) {
@@ -29,6 +33,7 @@ class BaseBranch {
       phone: json['phone'] as String,
       image: (json['image'] as String?) == null ? null : base64Decode(json['image']),
       description: json['description'] as String? ?? "",
+      coordinates: json['coordinates'] != null ? Coordinates.fromJson(json['coordinates']) : null,
     );
   }
 
@@ -41,6 +46,7 @@ class BaseBranch {
       'phone': phone,
       'image': image != null ? base64Encode(image!) : "",
       'description': description,
+      'coordinates': coordinates?.toJson(),
     };
   }
 }
@@ -77,6 +83,7 @@ class UpdateBranch {
   String? phone;
   String? description;
   String? image;
+  Coordinates? coordinates;
 
   UpdateBranch({
     this.name,
@@ -86,6 +93,7 @@ class UpdateBranch {
     this.email,
     this.phone,
     this.image,
+    this.coordinates,
   });
 
   factory UpdateBranch.fromJson(Map<String, dynamic> json) {
@@ -97,6 +105,7 @@ class UpdateBranch {
       email: json['email'] as String?,
       phone: json['phone'] as String?,
       image: json['image'] as String?,
+      coordinates: json['coordinates'] != null ? Coordinates.fromJson(json['coordinates']) : null,
     );
   }
 
@@ -109,6 +118,7 @@ class UpdateBranch {
       'email': email,
       'phone': phone,
       'image': image,
+      'coordinates': coordinates?.toJson(),
     };
     data.removeWhere((key, value) => value == null);
     return data;
@@ -131,6 +141,7 @@ class BranchInDb extends BaseBranch {
     required super.email,
     required super.phone,
     super.image,
+    super.coordinates,
   });
 
   factory BranchInDb.fromJson(Map<String, dynamic> json) {
@@ -142,6 +153,7 @@ class BranchInDb extends BaseBranch {
       email: json['email'] as String,
       phone: json['phone'] as String,
       image: (json['image'] as String?) == null ? null : base64Decode(json['image']),
+      coordinates: json['coordinates'] != null ? Coordinates.fromJson(json['coordinates']) : null,
       description: json['description'] as String? ?? "",
       createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
       updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt'] as int) : null,
