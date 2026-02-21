@@ -76,7 +76,7 @@ class _WebBody extends StatelessWidget {
                   height: 40,
                   child: ElevatedButton.icon(
                     onPressed: () async {
-                      final res = await showCreateClientGroupDialog(context);
+                      final res = await showClientGroupFormDialog(context);
                       if (res == null) return;
                       if (!context.mounted) return;
                       await context.read<ReadClientGroupCubit>().putGroupFirst(res);
@@ -99,6 +99,12 @@ class _WebBody extends StatelessWidget {
                       title: Text(group.name),
                       subtitle: group.description.isNotEmpty ? Text(group.description) : null,
                       trailing: const Icon(Icons.chevron_right),
+                      onTap: () async {
+                        final res = await showClientGroupFormDialog(context, group: group);
+                        if (res == null) return;
+                        if (!context.mounted) return;
+                        await context.read<ReadClientGroupCubit>().markGroupUpdated(res);
+                      },
                     );
                   },
                 ),

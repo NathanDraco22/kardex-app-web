@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
+import 'package:kardex_app_front/src/domain/models/client_group/client_group_model.dart';
+import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/client_list/cubit/client_write_cubit.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_app_front/widgets/super_widgets/custom_autocomplete_textfield.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
 
@@ -227,37 +230,65 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
                       key: const ValueKey("email_field"),
                       title: "Correo Electronico (Email)",
                       textInputAction: TextInputAction.next,
-                      initialValue: widget.client?.address,
+                      initialValue: widget.client?.email,
                       validator: (value) {
                         creationMap["email"] = value?.trim();
                         return null;
                       },
                     ),
 
-                    // const SizedBox(height: 12),
+                    const SizedBox(height: 12),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const Text(
+                          "Grupo de Clientes",
+                          textAlign: TextAlign.start,
+                        ),
+                        const SizedBox(height: 6),
+                        Builder(
+                          builder: (context) {
+                            final groupsRepo = context.read<ClientGroupsRepository>();
+                            ClientGroupInDb? currentGroup;
+                            if (widget.client != null) {
+                              for (var g in groupsRepo.clientGroups) {
+                                if (g.name == widget.client!.group) {
+                                  currentGroup = g;
+                                  break;
+                                }
+                              }
+                            }
 
-                    // TitleTextField(
-                    //   key: const ValueKey("credit_field"),
-                    //   title: "Limite de Credito(C\$)*",
-                    //   keyboardType: TextInputType.number,
-                    //   inputFormatters: [IntegerThousandsFormatter()],
-                    //   initialValue: (widget.client?.creditLimit ?? 0).toString(),
-                    //   validator: (value) {
-                    //     final formattedValue = value?.replaceAll(RegExp(r'[^0-9]'), "");
-                    //     if (formattedValue == null || formattedValue.isEmpty) {
-                    //       return "El campo es requerido";
-                    //     }
+                            return CustomAutocompleteTextfield<ClientGroupInDb>(
+                              initValue: currentGroup,
+                              onClose: (value) => creationMap['group'] = value.name,
+                              onFieldSubmitted: (value) {
+                                FocusScope.of(context).nextFocus();
+                              },
+                              onSearch: (value) {
+                                return groupsRepo.searchClientGroupByKeywordLocal(value);
+                              },
+                              suggestionBuilder: (value, close) {
+                                return ListView.builder(
+                                  itemCount: value.length,
+                                  shrinkWrap: true,
+                                  itemBuilder: (context, index) => ListTile(
+                                    title: Text(value[index].name),
+                                    onTap: () {
+                                      creationMap['group'] = value[index].name;
+                                      close(value[index]);
+                                      FocusScope.of(context).nextFocus();
+                                    },
+                                  ),
+                                );
+                              },
+                              titleBuilder: (value) => value.name,
+                            );
+                          },
+                        ),
+                      ],
+                    ),
 
-                    //     final number = int.tryParse(formattedValue.trim());
-
-                    //     if (number == null) {
-                    //       return "Numero incorrecto";
-                    //     }
-
-                    //     creationMap["creditLimit"] = number * 100;
-                    //     return null;
-                    //   },
-                    // ),
                     const SizedBox(height: 12),
 
                     StatefulBuilder(

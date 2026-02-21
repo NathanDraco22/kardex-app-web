@@ -7,7 +7,7 @@ import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
 
-Future<ClientGroupInDb?> showCreateClientGroupDialog(BuildContext context) async {
+Future<ClientGroupInDb?> showClientGroupFormDialog(BuildContext context, {ClientGroupInDb? group}) async {
   final cubit = context.read<WriteClientGroupCubit>();
 
   return await showDialog<ClientGroupInDb?>(
@@ -15,25 +15,30 @@ Future<ClientGroupInDb?> showCreateClientGroupDialog(BuildContext context) async
     builder: (context) {
       return BlocProvider.value(
         value: cubit,
-        child: const CreateClientGroupDialog(),
+        child: ClientGroupFormDialog(group: group),
       );
     },
   );
 }
 
-class CreateClientGroupDialog extends StatefulWidget {
-  const CreateClientGroupDialog({super.key});
+class ClientGroupFormDialog extends StatefulWidget {
+  const ClientGroupFormDialog({super.key, this.group});
+
+  final ClientGroupInDb? group;
 
   @override
-  State<CreateClientGroupDialog> createState() => _CreateClientGroupDialogState();
+  State<ClientGroupFormDialog> createState() => _ClientGroupFormDialogState();
 }
 
-class _CreateClientGroupDialogState extends State<CreateClientGroupDialog> {
+class _ClientGroupFormDialogState extends State<ClientGroupFormDialog> {
   final formKey = GlobalKey<FormState>();
   final creationMap = <String, dynamic>{};
 
   @override
   Widget build(BuildContext context) {
+    final isEditing = widget.group != null;
+    final wordPrefix = isEditing ? "Actualizar" : "Agregar";
+
     return BlocListener<WriteClientGroupCubit, WriteClientGroupState>(
       listener: (context, state) {
         if (state is WriteClientGroupInProgress) {
@@ -56,7 +61,7 @@ class _CreateClientGroupDialogState extends State<CreateClientGroupDialog> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             AlertDialog(
-              title: const Text("Agregar Nuevo Grupo de Clientes"),
+              title: Text("$wordPrefix Grupo de Clientes"),
               actions: [
                 OutlinedButton(
                   onPressed: () {
@@ -67,11 +72,16 @@ class _CreateClientGroupDialogState extends State<CreateClientGroupDialog> {
                 ElevatedButton(
                   onPressed: () {
                     if (formKey.currentState!.validate()) {
-                      final newGroup = CreateClientGroup.fromJson(creationMap);
-                      context.read<WriteClientGroupCubit>().createNewGroup(newGroup);
+                      if (isEditing) {
+                        final updateGroupData = UpdateClientGroup.fromJson(creationMap);
+                        context.read<WriteClientGroupCubit>().updateGroup(widget.group!.id, updateGroupData);
+                      } else {
+                        final newGroup = CreateClientGroup.fromJson(creationMap);
+                        context.read<WriteClientGroupCubit>().createNewGroup(newGroup);
+                      }
                     }
                   },
-                  child: const Text("Agregar Grupo"),
+                  child: Text(wordPrefix),
                 ),
               ],
               content: SizedBox(
@@ -83,6 +93,7 @@ class _CreateClientGroupDialogState extends State<CreateClientGroupDialog> {
                       title: "Nombre del Grupo*",
                       textCapitalization: TextCapitalization.words,
                       autofocus: true,
+                      initialValue: widget.group?.name,
                       validator: (value) {
                         if (value == null || value.isEmpty) return "El nombre es requerido";
                         creationMap['name'] = value.trim();
@@ -94,6 +105,7 @@ class _CreateClientGroupDialogState extends State<CreateClientGroupDialog> {
                       title: "Descripción",
                       textCapitalization: TextCapitalization.sentences,
                       maxLines: 3,
+                      initialValue: widget.group?.description,
                       validator: (value) {
                         creationMap['description'] = value?.trim() ?? "";
                         return null;

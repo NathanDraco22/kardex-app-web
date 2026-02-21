@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/constants/const_modules.dart';
+import 'package:kardex_app_front/src/domain/repositories/client_group_repository.dart';
 import 'package:kardex_app_front/src/domain/repositories/client_repository.dart';
 
 import 'package:kardex_app_front/src/tools/constant.dart';
@@ -24,9 +25,10 @@ class ClientCatalogScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final clientRepo = context.read<ClientsRepository>();
+    final clientGroupRepo = context.read<ClientGroupsRepository>();
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => ReadClientCubit(clientRepo)..loadAllClients()),
+        BlocProvider(create: (context) => ReadClientCubit(clientRepo, clientGroupRepo)..loadAllClients()),
         BlocProvider(create: (context) => WriteClientCubit(clientRepo)),
       ],
       child: const _BaseScaffold(),

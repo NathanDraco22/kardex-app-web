@@ -1,18 +1,21 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
+import 'package:kardex_app_front/src/domain/repositories/client_group_repository.dart';
 import 'package:kardex_app_front/src/domain/repositories/client_repository.dart';
 
 part 'client_read_state.dart';
 
 class ReadClientCubit extends Cubit<ReadClientState> {
-  ReadClientCubit(this.clientsRepository) : super(ReadClientInitial());
+  ReadClientCubit(this.clientsRepository, this.clientGroupsRepository) : super(ReadClientInitial());
 
   final ClientsRepository clientsRepository;
+  final ClientGroupsRepository clientGroupsRepository;
 
   Future<void> loadAllClients() async {
     emit(ReadClientLoading());
     try {
       final clients = await clientsRepository.getAllClients();
+      clientGroupsRepository.getAllClientGroups();
       emit(ReadClientSuccess(clients));
     } catch (error) {
       emit(ClientReadError(error.toString()));
