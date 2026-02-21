@@ -52,7 +52,7 @@ class ClientsTable extends StatelessWidget {
                 ),
                 Flexible(
                   fit: FlexFit.tight,
-                  child: Text("Cedula"),
+                  child: Text("Grupo"),
                 ),
 
                 Flexible(
@@ -148,7 +148,7 @@ class _RowWidget extends StatelessWidget {
             ),
             Flexible(
               fit: FlexFit.tight,
-              child: Text(client.cardId ?? "--"),
+              child: Text(client.group),
             ),
             Flexible(
               fit: FlexFit.tight,
