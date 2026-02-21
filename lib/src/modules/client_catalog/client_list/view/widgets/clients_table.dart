@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
-import 'package:kardex_app_front/src/modules/client_catalog/cubit/client_read_cubit.dart';
-import 'package:kardex_app_front/src/modules/client_catalog/dialogs/create_client_dialog.dart';
+import 'package:kardex_app_front/src/modules/client_catalog/client_list/cubit/client_read_cubit.dart';
+import 'package:kardex_app_front/src/modules/client_catalog/client_list/dialogs/create_client_dialog.dart';
 import 'package:kardex_app_front/widgets/no_item.dart';
 import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 import 'package:kardex_app_front/widgets/status_tag_label.dart';

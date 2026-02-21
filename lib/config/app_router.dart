@@ -7,7 +7,10 @@ import 'package:kardex_app_front/src/modules/activation/activation_screen.dart';
 import 'package:kardex_app_front/src/modules/advanced_tools/advanced_tools_screen.dart';
 import 'package:kardex_app_front/src/modules/advanced_tools/product_stats/product_stats_screen.dart';
 import 'package:kardex_app_front/src/modules/advanced_tools/sale_projection/sale_projection_screen.dart';
-import 'package:kardex_app_front/src/modules/client_catalog/view/client_catalog_screen.dart';
+import 'package:kardex_app_front/src/modules/client_catalog/client_catalog_menu_screen.dart';
+import 'package:kardex_app_front/src/modules/client_catalog/client_groups/client_groups_screen.dart';
+import 'package:kardex_app_front/src/modules/client_catalog/client_list/view/client_catalog_screen.dart';
+
 import 'package:kardex_app_front/src/modules/commercial/anon_devolution/anon_devolution_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/anon_invoices_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_devolution/client_devolution_screen.dart';
@@ -145,7 +148,19 @@ class AppRouter {
       GoRoute(
         path: '/client-catalog',
         name: 'client-catalog',
-        builder: (context, state) => const ClientCatalogScreen(),
+        builder: (context, state) => const ClientCatalogMenuScreen(),
+        routes: [
+          GoRoute(
+            path: "client-list",
+            name: "client-list",
+            builder: (context, state) => const ClientCatalogScreen(),
+          ),
+          GoRoute(
+            path: "client-groups",
+            name: "client-groups",
+            builder: (context, state) => const ClientGroupsScreen(),
+          ),
+        ],
       ),
 
       GoRoute(

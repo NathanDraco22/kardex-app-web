@@ -34,70 +34,76 @@ class _ContentSection extends StatelessWidget {
             return const Center(child: Text("No hay cotizaciones"));
           }
 
-          return ListView.builder(
-            itemCount: orders.length,
-            itemBuilder: (context, index) {
-              final tileColor = index.isOdd ? Colors.white : Colors.grey.shade200;
-              final currentOrder = orders[index];
-              return ListTile(
-                tileColor: tileColor,
-                onTap: () async {
-                  await showProformaInvoiceCreatorDialog(context, currentOrder);
-                },
-                leading: Container(
-                  width: 85,
-                  height: 30,
-                  alignment: Alignment.center,
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: colorsMap[currentOrder.status],
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    currentOrder.status.tag,
-                    style: const TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                title: Row(
-                  children: [
-                    Text(
-                      currentOrder.clientInfo.name,
-                      style: TextStyle(
-                        decoration: currentOrder.status == OrderStatus.cancelled ? TextDecoration.lineThrough : null,
-                      ),
-                    ),
-
-                    const Spacer(),
-                    Text(
-                      NumberFormatter.convertToMoneyLike(
-                        currentOrder.total,
-                      ),
-                      style: TextStyle(
-                        decoration: currentOrder.status == OrderStatus.cancelled ? TextDecoration.lineThrough : null,
-                      ),
-                    ),
-                  ],
-                ),
-                subtitle: Row(
-                  children: [
-                    Text(
-                      DateTimeTool.formatddMMyy(
-                        currentOrder.createdAt,
-                      ),
-                      style: const TextStyle(fontWeight: FontWeight.w500),
-                    ),
-
-                    const SizedBox(width: 12),
-                    Text(
-                      "# ${currentOrder.docNumber}",
-                      style: const TextStyle(fontWeight: FontWeight.w500),
-                    ),
-                  ],
-                ),
-              );
+          return RefreshIndicator(
+            onRefresh: () {
+              final cubit = context.read<ReadProformaCubit>();
+              return cubit.loadPaginatedOrders();
             },
+            child: ListView.builder(
+              itemCount: orders.length,
+              itemBuilder: (context, index) {
+                final tileColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+                final currentOrder = orders[index];
+                return ListTile(
+                  tileColor: tileColor,
+                  onTap: () async {
+                    await showProformaInvoiceCreatorDialog(context, currentOrder);
+                  },
+                  leading: Container(
+                    width: 85,
+                    height: 30,
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: colorsMap[currentOrder.status],
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      currentOrder.status.tag,
+                      style: const TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  title: Row(
+                    children: [
+                      Text(
+                        currentOrder.clientInfo.name,
+                        style: TextStyle(
+                          decoration: currentOrder.status == OrderStatus.cancelled ? TextDecoration.lineThrough : null,
+                        ),
+                      ),
+
+                      const Spacer(),
+                      Text(
+                        NumberFormatter.convertToMoneyLike(
+                          currentOrder.total,
+                        ),
+                        style: TextStyle(
+                          decoration: currentOrder.status == OrderStatus.cancelled ? TextDecoration.lineThrough : null,
+                        ),
+                      ),
+                    ],
+                  ),
+                  subtitle: Row(
+                    children: [
+                      Text(
+                        DateTimeTool.formatddMMyy(
+                          currentOrder.createdAt,
+                        ),
+                        style: const TextStyle(fontWeight: FontWeight.w500),
+                      ),
+
+                      const SizedBox(width: 12),
+                      Text(
+                        "# ${currentOrder.docNumber}",
+                        style: const TextStyle(fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           );
         },
       ),

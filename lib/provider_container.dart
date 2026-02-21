@@ -56,6 +56,7 @@ class ProviderContainer extends StatelessWidget {
     final adjustEntryDatasource = AdjustEntriesDataSource();
     final adjustExitDatasource = AdjustExitsDataSource();
     final integrationsDataSource = IntegrationsDataSource();
+    final clientGroupsDataSource = ClientGroupDataSource();
 
     return MultiRepositoryProvider(
       providers: [
@@ -220,6 +221,9 @@ class ProviderContainer extends StatelessWidget {
         ),
         RepositoryProvider(
           create: (context) => IntegrationsRepository(integrationsDataSource),
+        ),
+        RepositoryProvider(
+          create: (context) => ClientGroupsRepository(clientGroupsDataSource),
         ),
       ],
       child: GlobalCubitProvider(

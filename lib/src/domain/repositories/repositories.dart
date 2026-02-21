@@ -27,3 +27,4 @@ export 'daily_summaries_repository.dart';
 export 'executive_summaries_repository.dart';
 export 'product_accounts_repository.dart';
 export 'product_stats_repository.dart';
+export 'client_group_repository.dart';

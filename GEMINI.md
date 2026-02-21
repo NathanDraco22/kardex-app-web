@@ -19,6 +19,12 @@ Esta estructura se ha seguido para módulos como 'Historial de Facturas', 'Histo
 
 - He revisado y aprendido de `lib/widgets/tables/inventory_movement_product_table.dart`. Es una tabla interactiva para movimientos de inventario que usa `ProductTableController` (ChangeNotifier) y `InheritedNotifier` para el estado. Soporta agregar, editar (cantidad/costo) y eliminar filas (`ProductRow`). Usa `NotificationListener` para eventos personalizados.
 
+## Módulo de Unidades
+- **Data & Repository**: Sigue la arquitectura estándar. `UnitsDataSource` maneja el CRUD y `UnitsRepository` gestiona el estado local y el mapeo a modelos.
+- **Modelos**: `CreateUnit`, `UpdateUnit` y `UnitInDb`. Existe paridad total con el backend FastAPI.
+- **Sincronización Backend**: Los endpoints de FastAPI (`POST`, `GET`, `PATCH`, `DELETE` en `/units`) están correctamente mapeados en el frontend.
+- **UI & Lógica**: El módulo se encuentra en `lib/src/modules/product_catalog/units/` con sus respectivos Cubits para lectura (`ReadUnitCubit`) y escritura (`WriteUnitCubit`).
+
 ## Learnings from Adjust Entries (Dec 2025)
 - **Product Search**: Use `showSearchProductInBranchDialog` (renamed from Commercial) for searching products within a branch context.
 - **Adjust Entries Cost**: For inventory adjustments (`AdjustEntry`), the cost is **not editable** (`editableCost: false`) and defaults to `product.account.averageCost`.
