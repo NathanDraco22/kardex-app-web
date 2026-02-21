@@ -27,6 +27,7 @@ class _NumpadCalculatorState extends State<NumpadCalculator> {
     final isOperation = _expression.contains(RegExp(r'(?<!^)[+\-*/]'));
     return SafeArea(
       child: Container(
+        height: 450,
         padding: const EdgeInsets.all(8),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -39,7 +40,7 @@ class _NumpadCalculatorState extends State<NumpadCalculator> {
                 children: [
                   Text(
                     _previousExpression,
-                    style: TextStyle(fontSize: 20, color: Colors.grey.shade600),
+                    style: TextStyle(fontSize: 24, color: Colors.grey.shade600),
                     maxLines: 1,
                   ),
                   Text(
@@ -113,29 +114,80 @@ class _NumpadCalculatorState extends State<NumpadCalculator> {
   Widget _buildButton(String text, {VoidCallback? onPressed, Color? color, int flex = 1}) {
     return Expanded(
       flex: flex,
-      child: TextButton(
-        style: TextButton.styleFrom(
-          foregroundColor: color ?? Theme.of(context).textTheme.bodyLarge?.color,
-          padding: const EdgeInsets.symmetric(vertical: 16),
+      child: InkWell(
+        onTapUp: (details) {
+          if (onPressed == null) {
+            _onButtonPressed(text);
+          } else {
+            onPressed.call();
+          }
+        },
+        child: Ink(
+          width: 120,
+          height: 60,
+          child: Center(
+            child: Text(
+              text,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
         ),
-        onPressed: onPressed ?? () => _onButtonPressed(text),
-        child: Text(text, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w500)),
       ),
     );
+    // return Expanded(
+    //   flex: flex,
+    //   child: TextButton(
+    //     style: TextButton.styleFrom(
+    //       foregroundColor: color ?? Theme.of(context).textTheme.bodyLarge?.color,
+    //       padding: const EdgeInsets.symmetric(vertical: 16),
+    //     ),
+    //     onPressed: onPressed ?? () => _onButtonPressed(text),
+    //     child: Text(text, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w500)),
+    //   ),
+    // );
   }
 
   Widget _buildDoneButton(String text, {VoidCallback? onPressed, Color? color, int flex = 1}) {
     return Expanded(
       flex: flex,
-      child: TextButton(
-        style: TextButton.styleFrom(
-          foregroundColor: color ?? Theme.of(context).textTheme.bodyLarge?.color,
-          padding: const EdgeInsets.symmetric(vertical: 16),
+      child: InkWell(
+        onTapUp: (details) {
+          if (onPressed == null) {
+            _onButtonPressed(text);
+          } else {
+            onPressed.call();
+          }
+        },
+        child: Ink(
+          width: 120,
+          height: 50,
+          child: Center(
+            child: Text(
+              text,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.green,
+              ),
+            ),
+          ),
         ),
-        onPressed: onPressed,
-        child: Text(text, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w500)),
       ),
     );
+    // return Expanded(
+    //   flex: flex,
+    //   child: TextButton(
+    //     style: TextButton.styleFrom(
+    //       foregroundColor: color ?? Theme.of(context).textTheme.bodyLarge?.color,
+    //       padding: const EdgeInsets.symmetric(vertical: 16),
+    //     ),
+    //     onPressed: onPressed,
+    //     child: Text(text, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w500)),
+    //   ),
+    // );
   }
 
   void _onButtonPressed(String char) {

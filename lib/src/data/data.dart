@@ -29,3 +29,4 @@ export 'daily_summaries_data_source.dart';
 export 'executive_summaries_data_source.dart';
 export 'product_accounts_data_source.dart';
 export 'product_stats_data_source.dart';
+export 'client_group_data_source.dart';
