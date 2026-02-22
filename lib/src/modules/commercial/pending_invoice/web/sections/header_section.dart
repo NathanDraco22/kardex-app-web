@@ -22,15 +22,26 @@ class _HeaderSection extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            Text(
-              client.location ?? '',
-              style: const TextStyle(
-                fontSize: 16,
+            if (client.location != null) ...[
+              Text(
+                client.location!,
+                style: const TextStyle(
+                  fontSize: 16,
+                ),
               ),
-            ),
-            Text(
-              client.address ?? '',
-            ),
+            ],
+            if (client.address != null) ...[
+              Text(
+                client.address!,
+              ),
+            ],
+
+            if (client.coordinates != null) ...[
+              LaunchMapButton(
+                latitude: client.coordinates!.latitude,
+                longitude: client.coordinates!.longitude,
+              ),
+            ],
 
             Row(
               mainAxisAlignment: MainAxisAlignment.center,

@@ -3,12 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
 import 'package:kardex_app_front/src/domain/models/client_group/client_group_model.dart';
+import 'package:kardex_app_front/src/domain/models/common/coordinates.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/client_list/cubit/client_write_cubit.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/super_widgets/custom_autocomplete_textfield.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 
 Future<ClientInDb?> showCreateClientDialog(BuildContext context, {ClientInDb? client}) async {
   final writeCubit = context.read<WriteClientCubit>();
@@ -52,6 +54,9 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
 
   @override
   void initState() {
+    if (widget.client != null) {
+      creationMap['coordinates'] = widget.client!.coordinates;
+    }
     super.initState();
   }
 
@@ -238,52 +243,101 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
                     ),
 
                     const SizedBox(height: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        const Text(
-                          "Grupo de Clientes",
-                          textAlign: TextAlign.start,
-                        ),
-                        const SizedBox(height: 6),
-                        Builder(
-                          builder: (context) {
-                            final groupsRepo = context.read<ClientGroupsRepository>();
-                            ClientGroupInDb? currentGroup;
-                            if (widget.client != null) {
-                              for (var g in groupsRepo.clientGroups) {
-                                if (g.name == widget.client!.group) {
-                                  currentGroup = g;
-                                  break;
-                                }
-                              }
-                            }
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              const Text(
+                                "Grupo de Clientes",
+                                textAlign: TextAlign.start,
+                              ),
+                              const SizedBox(height: 6),
+                              Builder(
+                                builder: (context) {
+                                  final groupsRepo = context.read<ClientGroupsRepository>();
+                                  ClientGroupInDb? currentGroup;
+                                  if (widget.client != null) {
+                                    for (var g in groupsRepo.clientGroups) {
+                                      if (g.name == widget.client!.group) {
+                                        currentGroup = g;
+                                        break;
+                                      }
+                                    }
+                                  }
 
-                            return CustomAutocompleteTextfield<ClientGroupInDb>(
-                              initValue: currentGroup,
-                              onClose: (value) => creationMap['group'] = value.name,
-                              onFieldSubmitted: (value) {
-                                FocusScope.of(context).nextFocus();
-                              },
-                              onSearch: (value) {
-                                return groupsRepo.searchClientGroupByKeywordLocal(value);
-                              },
-                              suggestionBuilder: (value, close) {
-                                return ListView.builder(
-                                  itemCount: value.length,
-                                  shrinkWrap: true,
-                                  itemBuilder: (context, index) => ListTile(
-                                    title: Text(value[index].name),
-                                    onTap: () {
-                                      creationMap['group'] = value[index].name;
-                                      close(value[index]);
+                                  return CustomAutocompleteTextfield<ClientGroupInDb>(
+                                    initValue: currentGroup,
+                                    onClose: (value) => creationMap['group'] = value.name,
+                                    onFieldSubmitted: (value) {
                                       FocusScope.of(context).nextFocus();
                                     },
-                                  ),
-                                );
-                              },
-                              titleBuilder: (value) => value.name,
-                            );
+                                    onSearch: (value) {
+                                      return groupsRepo.searchClientGroupByKeywordLocal(value);
+                                    },
+                                    suggestionBuilder: (value, close) {
+                                      return ListView.builder(
+                                        itemCount: value.length,
+                                        shrinkWrap: true,
+                                        itemBuilder: (context, index) => ListTile(
+                                          title: Text(value[index].name),
+                                          onTap: () {
+                                            creationMap['group'] = value[index].name;
+                                            close(value[index]);
+                                            FocusScope.of(context).nextFocus();
+                                          },
+                                        ),
+                                      );
+                                    },
+                                    titleBuilder: (value) => value.name,
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                        TextButton.icon(
+                          label: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text("Coordenadas"),
+                              Builder(
+                                builder: (context) {
+                                  final coordinates = creationMap['coordinates'] as Coordinates?;
+                                  String text = "-----";
+
+                                  if (coordinates != null) {
+                                    text = "Ver coordenadas";
+                                  }
+                                  return Text(
+                                    text,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                          icon: Builder(
+                            builder: (context) {
+                              final coordinates = creationMap['coordinates'] as Coordinates?;
+                              if (coordinates != null) {
+                                return const Icon(Icons.location_on);
+                              }
+                              return const Icon(Icons.location_off);
+                            },
+                          ),
+                          onPressed: () async {
+                            final result = await showMapBottomModal(context, title: "Coordenadas");
+                            if (result != null) {
+                              setState(() {
+                                creationMap['coordinates'] = result;
+                              });
+                            }
                           },
                         ),
                       ],

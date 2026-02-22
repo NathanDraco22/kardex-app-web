@@ -18,3 +18,5 @@ export 'tables/inventory_movement_product_table.dart';
 export 'tables/tables.dart';
 export 'text_field_date_selector.dart';
 export 'title_texfield.dart';
+export 'modals/basic_bottom_modal.dart';
+export 'modals/map_bottom_modal.dart';
