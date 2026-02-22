@@ -2,10 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:flutter_map_cache/flutter_map_cache.dart';
 import 'package:go_router/go_router.dart';
-import 'package:http_cache_hive_store/http_cache_hive_store.dart';
 import 'package:kardex_app_front/src/domain/models/common/coordinates.dart';
+import 'package:kardex_app_front/widgets/map/map_nic_widget.dart';
 import 'package:kardex_app_front/widgets/map/marker_point.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -174,56 +173,17 @@ class _MapBottomModalState extends State<MapBottomModal> {
             ),
           ),
         ),
-        body: FlutterMap(
+        body: MapNicWidget(
           mapController: mapController,
-          options: MapOptions(
-            initialCenter: widget.initialCenter,
-            initialZoom: widget.initialZoom,
-            maxZoom: 18,
-            minZoom: 8.5,
-            cameraConstraint: CameraConstraint.contain(
-              bounds: LatLngBounds.unsafe(
-                north: 15.239139868243477,
-                south: 10.414884501204694,
-                east: -79.71130371093751,
-                west: -90.25817871093751,
-              ),
-            ),
-          ),
-          children: [
-            TileLayer(
-              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-              userAgentPackageName: 'com.kardex_app.app',
-              panBuffer: 2,
-              tileProvider: CachedTileProvider(
-                maxStale: const Duration(days: 30),
-                store: HiveCacheStore(
-                  null,
-                  hiveBoxName: "tile_maps",
-                ),
-              ),
-            ),
-            MarkerLayer(
-              markers: widget.markers.map((marker) {
-                final coords = marker.coordinates;
-                final data = marker.title;
-                return Marker(
-                  point: LatLng(coords.latitude, coords.longitude),
-                  child: MarkerPoing(title: data),
-                );
-              }).toList(),
-            ),
-            Center(
-              child: Transform.translate(
-                offset: const Offset(0, -25),
-                child: const Icon(
-                  Icons.location_pin,
-                  color: Colors.red,
-                  size: 50,
-                ),
-              ),
-            ),
-          ],
+          showCenterPin: true,
+          markers: widget.markers.map((marker) {
+            return Marker(
+              point: LatLng(marker.coordinates.latitude, marker.coordinates.longitude),
+              child: MarkerPoing(title: marker.title),
+            );
+          }).toList(),
+          initialCenter: widget.initialCenter,
+          initialZoom: widget.initialZoom,
         ),
       ),
     );
