@@ -244,6 +244,7 @@ class GlobalCubitProvider extends StatelessWidget {
     final branchRepo = context.read<BranchesRepository>();
     final servinRepo = context.read<ServinRepository>();
     final expirationLogRepo = context.read<ExpirationLogsRepository>();
+    final clientGroupRepo = context.read<ClientGroupsRepository>();
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => AppModeCubit()),
@@ -252,6 +253,7 @@ class GlobalCubitProvider extends StatelessWidget {
             authRepository: authRepo,
             branchesRepository: branchRepo,
             servinRepository: servinRepo,
+            clientGroupRepository: clientGroupRepo,
           ),
         ),
         BlocProvider(

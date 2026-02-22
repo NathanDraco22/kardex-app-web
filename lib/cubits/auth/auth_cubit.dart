@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/core/session_manager.dart';
 import 'package:kardex_app_front/src/core/token_manager.dart';
@@ -16,11 +18,13 @@ class AuthCubit extends Cubit<AuthState> {
     required this.authRepository,
     required this.branchesRepository,
     required this.servinRepository,
+    required this.clientGroupRepository,
   }) : super(AuthInitial());
 
   final AuthRepository authRepository;
   final BranchesRepository branchesRepository;
   final ServinRepository servinRepository;
+  final ClientGroupsRepository clientGroupRepository;
 
   Future<void> checkSession() async {
     emit(AuthLoading());
@@ -63,6 +67,13 @@ class AuthCubit extends Cubit<AuthState> {
         HttpTools.baseUrl = currentServin.url;
         BranchesTool.setCurrentBranch(branch);
         BranchesTool.setBranches(results[1] as List<BranchInDb>);
+
+        try {
+          clientGroupRepository.getAllClientGroups();
+        } catch (e) {
+          log(e.toString());
+        }
+
         emit(
           Authenticated(
             loginResponse,
@@ -125,6 +136,12 @@ class AuthCubit extends Cubit<AuthState> {
       HttpTools.baseUrl = currentServin.url;
       BranchesTool.setCurrentBranch(branch);
       BranchesTool.setBranches(results[1] as List<BranchInDb>);
+
+      try {
+        clientGroupRepository.getAllClientGroups();
+      } catch (e) {
+        log(e.toString());
+      }
       emit(
         Authenticated(
           loginResponse,

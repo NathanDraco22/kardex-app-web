@@ -11,6 +11,7 @@ import 'package:kardex_app_front/widgets/super_widgets/custom_autocomplete_textf
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
+import 'package:latlong2/latlong.dart';
 
 Future<ClientInDb?> showCreateClientDialog(BuildContext context, {ClientInDb? client}) async {
   final writeCubit = context.read<WriteClientCubit>();
@@ -332,7 +333,25 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
                             },
                           ),
                           onPressed: () async {
-                            final result = await showMapBottomModal(context, title: "Coordenadas");
+                            LatLng initCoords = const LatLng(12.130717, -86.253267);
+                            if (creationMap['coordinates'] != null) {
+                              final coords = creationMap['coordinates'] as Coordinates;
+                              initCoords = LatLng(coords.latitude, coords.longitude);
+                            }
+
+                            final result = await showMapBottomModal(
+                              context,
+                              title: "Coordenadas",
+                              initialCenter: initCoords,
+                              markers: [
+                                if (creationMap['coordinates'] != null) ...[
+                                  MarkerData(
+                                    title: widget.client?.name ?? "Sin Nombre",
+                                    coordinates: creationMap['coordinates'] as Coordinates,
+                                  ),
+                                ],
+                              ],
+                            );
                             if (result != null) {
                               setState(() {
                                 creationMap['coordinates'] = result;
