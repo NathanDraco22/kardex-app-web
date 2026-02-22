@@ -1,9 +1,12 @@
+import 'package:kardex_app_front/src/domain/models/common/coordinates.dart';
+
 class BaseClient {
   final String name;
   final String? cardId;
   final String? phone;
   final String? address;
   final String? location;
+  final Coordinates? coordinates;
   final String? email;
   final String group;
   final int balance;
@@ -23,6 +26,7 @@ class BaseClient {
     this.creditLimit = 0,
     this.isCreditActive = false,
     this.isActive = true,
+    this.coordinates,
   });
 
   factory BaseClient.fromJson(Map json) {
@@ -38,6 +42,9 @@ class BaseClient {
       creditLimit: json['creditLimit'] as int? ?? 0,
       isCreditActive: json['isCreditActive'] as bool? ?? false,
       isActive: json['isActive'] as bool? ?? true,
+      coordinates: json['coordinates'] != null
+          ? Coordinates.fromJson(json['coordinates'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -54,6 +61,7 @@ class BaseClient {
       'creditLimit': creditLimit,
       'isCreditActive': isCreditActive,
       'isActive': isActive,
+      'coordinates': coordinates?.toJson(),
     };
   }
 }
@@ -71,6 +79,7 @@ class CreateClient extends BaseClient {
     super.creditLimit,
     super.isCreditActive,
     super.isActive,
+    super.coordinates,
   });
 
   factory CreateClient.fromJson(Map json) {
@@ -86,6 +95,9 @@ class CreateClient extends BaseClient {
       creditLimit: json['creditLimit'] as int? ?? 0,
       isCreditActive: json['isCreditActive'] as bool? ?? false,
       isActive: json['isActive'] as bool? ?? true,
+      coordinates: json['coordinates'] != null
+          ? Coordinates.fromJson(json['coordinates'] as Map<String, dynamic>)
+          : null,
     );
   }
 }
@@ -101,6 +113,7 @@ class UpdateClient {
   final bool? isActive;
   final bool? isCreditActive;
   final int? creditLimit;
+  final Coordinates? coordinates;
 
   UpdateClient({
     this.name,
@@ -113,9 +126,21 @@ class UpdateClient {
     this.isActive,
     this.isCreditActive,
     this.creditLimit,
+    this.coordinates,
   });
 
   factory UpdateClient.fromJson(Map json) {
+    final currentCoordinateValue = json['coordinates'];
+    Coordinates? coordinates;
+    if (currentCoordinateValue != null) {
+      if (currentCoordinateValue is Map<String, dynamic>) {
+        coordinates = Coordinates.fromJson(currentCoordinateValue);
+      }
+    }
+    if (currentCoordinateValue is Coordinates) {
+      coordinates = currentCoordinateValue;
+    }
+
     return UpdateClient(
       name: json['name'] as String?,
       cardId: json['cardId'] as String?,
@@ -127,6 +152,7 @@ class UpdateClient {
       isActive: json['isActive'] as bool?,
       isCreditActive: json['isCreditActive'] as bool?,
       creditLimit: json['creditLimit'] as int?,
+      coordinates: coordinates,
     );
   }
 
@@ -142,6 +168,7 @@ class UpdateClient {
       'isActive': isActive,
       'isCreditActive': isCreditActive,
       'creditLimit': creditLimit,
+      'coordinates': coordinates?.toJson(),
     };
     data.removeWhere((key, value) => value == null);
     return data;
@@ -170,6 +197,7 @@ class ClientInDb extends BaseClient {
     this.isDeleted = false,
     required this.createdAt,
     this.updatedAt,
+    super.coordinates,
   });
 
   factory ClientInDb.fromJson(Map json) {
@@ -189,6 +217,9 @@ class ClientInDb extends BaseClient {
       isDeleted: json['isDeleted'] as bool? ?? false,
       createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
       updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt'] as int) : null,
+      coordinates: json['coordinates'] != null
+          ? Coordinates.fromJson(json['coordinates'] as Map<String, dynamic>)
+          : null,
     );
   }
 

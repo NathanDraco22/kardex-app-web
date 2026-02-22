@@ -12,6 +12,7 @@ import 'package:kardex_app_front/src/tools/number_formatter.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/devolution_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/invoice_viewer.dart';
+import 'package:kardex_app_front/widgets/super_widgets/launch_map_button.dart';
 
 import 'mediator.dart';
 
@@ -184,7 +185,7 @@ class _Body extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SizedBox(
-              height: 120,
+              height: 140,
               child: _HeaderSection(),
             ),
             Expanded(

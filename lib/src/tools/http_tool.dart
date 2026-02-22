@@ -5,7 +5,7 @@ class HttpTools {
   static String baseUrl = AppEnv.serverUrl;
   static const String _api = "/api";
 
-  static String practiceUrl = "";
+  static String practiceUrl = "http://localhost:8000";
 
   static Uri generateUri(String path, {int version = 1, Map<String, String>? queryParameters}) {
     assert(path.startsWith("/"));
