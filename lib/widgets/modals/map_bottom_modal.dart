@@ -6,9 +6,16 @@ import 'package:flutter_map_cache/flutter_map_cache.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http_cache_hive_store/http_cache_hive_store.dart';
 import 'package:kardex_app_front/src/domain/models/common/coordinates.dart';
+import 'package:kardex_app_front/widgets/map/marker_point.dart';
 import 'package:latlong2/latlong.dart';
 
-/// Muestra un modal inferior con un mapa de OpenStreetMap.
+class MarkerData {
+  final String title;
+  final Coordinates coordinates;
+
+  MarkerData({required this.title, required this.coordinates});
+}
+
 Future<Coordinates?> showMapBottomModal(
   BuildContext context, {
   required String title,
@@ -17,6 +24,7 @@ Future<Coordinates?> showMapBottomModal(
   double initialZoom = 13.0,
   String acceptText = 'Aceptar',
   String cancelText = 'Cancelar',
+  List<MarkerData> markers = const [],
   Color? acceptColor,
   Color? cancelColor,
 }) async {
@@ -34,6 +42,7 @@ Future<Coordinates?> showMapBottomModal(
         cancelText: cancelText,
         acceptColor: acceptColor,
         cancelColor: cancelColor,
+        markers: markers,
       );
     },
   );
@@ -50,6 +59,7 @@ class MapBottomModal extends StatefulWidget {
     this.cancelText = 'Cancelar',
     this.acceptColor,
     this.cancelColor,
+    required this.markers,
   });
 
   final String title;
@@ -60,6 +70,7 @@ class MapBottomModal extends StatefulWidget {
   final String cancelText;
   final Color? acceptColor;
   final Color? cancelColor;
+  final List<MarkerData> markers;
 
   @override
   State<MapBottomModal> createState() => _MapBottomModalState();
@@ -191,6 +202,16 @@ class _MapBottomModalState extends State<MapBottomModal> {
                   hiveBoxName: "tile_maps",
                 ),
               ),
+            ),
+            MarkerLayer(
+              markers: widget.markers.map((marker) {
+                final coords = marker.coordinates;
+                final data = marker.title;
+                return Marker(
+                  point: LatLng(coords.latitude, coords.longitude),
+                  child: MarkerPoing(title: data),
+                );
+              }).toList(),
             ),
             Center(
               child: Transform.translate(
