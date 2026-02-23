@@ -46,6 +46,17 @@ class _Body extends StatelessWidget {
             height: 0.0,
           ),
           ListTile(
+            leading: const Icon(Icons.map_rounded),
+            title: const Text("Mapa de Clientes"),
+            onTap: () {
+              context.pushNamed("client-map");
+            },
+            trailing: const Icon(Icons.chevron_right),
+          ),
+          const Divider(
+            height: 0.0,
+          ),
+          ListTile(
             leading: const Icon(Icons.group_work_rounded),
             title: const Text("Grupos de Clientes"),
             onTap: () {

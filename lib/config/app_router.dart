@@ -10,6 +10,7 @@ import 'package:kardex_app_front/src/modules/advanced_tools/sale_projection/sale
 import 'package:kardex_app_front/src/modules/client_catalog/client_catalog_menu_screen.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/client_groups/client_groups_screen.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/client_list/view/client_catalog_screen.dart';
+import 'package:kardex_app_front/src/modules/client_catalog/cllient_map/client_map_screen.dart';
 
 import 'package:kardex_app_front/src/modules/commercial/anon_devolution/anon_devolution_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/anon_invoices_screen.dart';
@@ -154,6 +155,11 @@ class AppRouter {
             path: "client-list",
             name: "client-list",
             builder: (context, state) => const ClientCatalogScreen(),
+          ),
+          GoRoute(
+            path: "client-map",
+            name: "client-map",
+            builder: (context, state) => const ClientMapScreen(),
           ),
           GoRoute(
             path: "client-groups",

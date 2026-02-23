@@ -14,8 +14,13 @@ class ReadClientCubit extends Cubit<ReadClientState> {
   Future<void> loadAllClients() async {
     emit(ReadClientLoading());
     try {
-      final clients = await clientsRepository.getAllClients();
-      clientGroupsRepository.getAllClientGroups();
+      final result = await Future.wait([
+        clientGroupsRepository.getAllClientGroups(),
+        clientsRepository.getAllClients(),
+      ]);
+
+      final clients = result[1] as List<ClientInDb>;
+
       emit(ReadClientSuccess(clients));
     } catch (error) {
       emit(ClientReadError(error.toString()));
