@@ -179,7 +179,7 @@ class _MapBottomModalState extends State<MapBottomModal> {
           markers: widget.markers.map((marker) {
             return Marker(
               point: LatLng(marker.coordinates.latitude, marker.coordinates.longitude),
-              child: MarkerPoing(title: marker.title),
+              child: MarkerPoint(title: marker.title),
             );
           }).toList(),
           initialCenter: widget.initialCenter,

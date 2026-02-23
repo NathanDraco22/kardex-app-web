@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
-class MarkerPoing extends StatelessWidget {
-  const MarkerPoing({super.key, required this.title});
+class MarkerPoint extends StatelessWidget {
+  const MarkerPoint({super.key, required this.title, this.onTap});
 
   final String title;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -11,15 +12,18 @@ class MarkerPoing extends StatelessWidget {
     final primaryColor = Theme.of(context).colorScheme.primary;
     return Tooltip(
       message: title,
-      child: CircleAvatar(
-        backgroundColor: primaryColor,
-        child: Center(
-          child: Text(
-            firstLetter,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w500,
-              fontSize: 20,
+      child: GestureDetector(
+        onTap: onTap,
+        child: CircleAvatar(
+          backgroundColor: primaryColor,
+          child: Center(
+            child: Text(
+              firstLetter,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+                fontSize: 20,
+              ),
             ),
           ),
         ),

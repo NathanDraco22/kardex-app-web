@@ -7,17 +7,17 @@ import 'package:latlong2/latlong.dart';
 class MapNicWidget extends StatelessWidget {
   const MapNicWidget({
     super.key,
-    required this.mapController,
+    this.mapController,
     required this.markers,
-    required this.initialCenter,
-    required this.initialZoom,
+    this.initialCenter,
+    this.initialZoom,
     required this.showCenterPin,
   });
 
-  final MapController mapController;
+  final MapController? mapController;
   final List<Marker> markers;
-  final LatLng initialCenter;
-  final double initialZoom;
+  final LatLng? initialCenter;
+  final double? initialZoom;
   final bool showCenterPin;
 
   @override
@@ -25,8 +25,8 @@ class MapNicWidget extends StatelessWidget {
     return FlutterMap(
       mapController: mapController,
       options: MapOptions(
-        initialCenter: initialCenter,
-        initialZoom: initialZoom,
+        initialCenter: initialCenter ?? const LatLng(12.130717, -86.253267),
+        initialZoom: initialZoom ?? 13,
         maxZoom: 18,
         minZoom: 8.5,
         cameraConstraint: CameraConstraint.contain(
