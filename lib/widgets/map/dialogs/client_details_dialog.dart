@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_app_front/src/domain/models/client/client.dart';
 import 'package:intl/intl.dart';
+import 'package:kardex_app_front/widgets/map/launch_map_button.dart';
 
 Future<void> showClientDetailsDialog(BuildContext context, ClientInDb client) async {
   await showDialog(
@@ -62,6 +63,12 @@ class ClientDetailsDialog extends StatelessWidget {
         ),
       ),
       actions: [
+        if (client.coordinates != null)
+          LaunchMapButton(
+            latitude: client.coordinates!.latitude,
+            longitude: client.coordinates!.longitude,
+            label: 'Google Maps',
+          ),
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
           child: const Text('Cerrar'),
