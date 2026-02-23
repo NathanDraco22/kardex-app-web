@@ -83,6 +83,16 @@ class CreateClient extends BaseClient {
   });
 
   factory CreateClient.fromJson(Map json) {
+    final currentCoordinateValue = json['coordinates'];
+    Coordinates? coordinates;
+    if (currentCoordinateValue != null) {
+      if (currentCoordinateValue is Map<String, dynamic>) {
+        coordinates = Coordinates.fromJson(currentCoordinateValue);
+      }
+    }
+    if (currentCoordinateValue is Coordinates) {
+      coordinates = currentCoordinateValue;
+    }
     return CreateClient(
       name: json['name'] as String,
       cardId: json['cardId'] as String?,
@@ -95,9 +105,7 @@ class CreateClient extends BaseClient {
       creditLimit: json['creditLimit'] as int? ?? 0,
       isCreditActive: json['isCreditActive'] as bool? ?? false,
       isActive: json['isActive'] as bool? ?? true,
-      coordinates: json['coordinates'] != null
-          ? Coordinates.fromJson(json['coordinates'] as Map<String, dynamic>)
-          : null,
+      coordinates: coordinates,
     );
   }
 }

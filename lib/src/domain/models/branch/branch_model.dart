@@ -60,9 +60,20 @@ class CreateBranch extends BaseBranch {
     required super.email,
     required super.phone,
     super.image,
+    super.coordinates,
   });
 
   factory CreateBranch.fromJson(Map<String, dynamic> json) {
+    final currentCoordinateValue = json['coordinates'];
+    Coordinates? coordinates;
+    if (currentCoordinateValue != null) {
+      if (currentCoordinateValue is Map<String, dynamic>) {
+        coordinates = Coordinates.fromJson(currentCoordinateValue);
+      }
+    }
+    if (currentCoordinateValue is Coordinates) {
+      coordinates = currentCoordinateValue;
+    }
     return CreateBranch(
       name: json['name'] as String,
       idCard: json['idCard'] as String,
@@ -71,6 +82,7 @@ class CreateBranch extends BaseBranch {
       phone: json['phone'] as String,
       image: (json['image'] as String?) == null ? null : base64Decode(json['image']),
       description: json['description'] as String? ?? "",
+      coordinates: coordinates,
     );
   }
 }
@@ -97,6 +109,16 @@ class UpdateBranch {
   });
 
   factory UpdateBranch.fromJson(Map<String, dynamic> json) {
+    final currentCoordinateValue = json['coordinates'];
+    Coordinates? coordinates;
+    if (currentCoordinateValue != null) {
+      if (currentCoordinateValue is Map<String, dynamic>) {
+        coordinates = Coordinates.fromJson(currentCoordinateValue);
+      }
+    }
+    if (currentCoordinateValue is Coordinates) {
+      coordinates = currentCoordinateValue;
+    }
     return UpdateBranch(
       name: json['name'] as String?,
       description: json['description'] as String?,
@@ -105,7 +127,7 @@ class UpdateBranch {
       email: json['email'] as String?,
       phone: json['phone'] as String?,
       image: json['image'] as String?,
-      coordinates: json['coordinates'] != null ? Coordinates.fromJson(json['coordinates']) : null,
+      coordinates: coordinates,
     );
   }
 

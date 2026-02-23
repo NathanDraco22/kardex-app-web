@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/client/client.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/client_list/cubit/client_read_cubit.dart';
 import 'package:kardex_app_front/widgets/map/map_nic_widget.dart';
@@ -64,12 +65,29 @@ class _Map extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authCubit = context.read<AuthCubit>();
+    final authState = authCubit.state;
+
+    if (authState is! Authenticated) {
+      return const Center(child: Text("No autorizado"));
+    }
+
+    final currentBranch = authState.branch;
+
+    final branchCoords = currentBranch.coordinates;
+
     final readClientCubit = context.watch<ReadClientCubit>();
     final state = readClientCubit.state as ReadClientSuccess;
 
     final clientMarkers = _buildMarkers(context, state.clients);
 
+    LatLng? initCenter;
+    if (branchCoords != null) {
+      initCenter = LatLng(branchCoords.latitude, branchCoords.longitude);
+    }
+
     return MapNicWidget(
+      initialCenter: initCenter,
       markers: [...clientMarkers],
       showCenterPin: false,
     );
