@@ -25,6 +25,9 @@ class MapNicWidget extends StatelessWidget {
     return FlutterMap(
       mapController: mapController,
       options: MapOptions(
+        interactionOptions: const InteractionOptions(
+          flags: InteractiveFlag.all & ~InteractiveFlag.flingAnimation,
+        ),
         initialCenter: initialCenter ?? const LatLng(12.130717, -86.253267),
         initialZoom: initialZoom ?? 13,
         maxZoom: 18,

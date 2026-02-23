@@ -3,12 +3,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kardex_app_front/src/domain/models/branch/branch_model.dart';
+import 'package:kardex_app_front/src/domain/models/common/coordinates.dart';
 import 'package:kardex_app_front/src/modules/settings/view/branches/cubit/read_branch_cubit.dart';
 import 'package:kardex_app_front/src/modules/settings/view/branches/cubit/write_branch_cubit.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
+import 'package:kardex_app_front/widgets/modals/map_bottom_modal.dart';
 import 'package:kardex_app_front/widgets/pick_img_widget.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
+import 'package:latlong2/latlong.dart';
 
 Future<BranchInDb?> showCreateBranchPriceDialog(
   BuildContext context, {
@@ -50,6 +53,11 @@ class _CreateProductPriceDialogState extends State<CreateProductPriceDialog> {
   XFile? _imageFile;
 
   final creationMap = <String, dynamic>{};
+  @override
+  void initState() {
+    super.initState();
+    creationMap['coordinates'] = widget.branch?.coordinates;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -142,16 +150,83 @@ class _CreateProductPriceDialogState extends State<CreateProductPriceDialog> {
                             ),
                             const SizedBox(height: 12),
 
-                            TitleTextField(
-                              title: "Telefono",
-                              initialValue: currenBranch?.phone,
-                              textInputAction: TextInputAction.next,
-                              textCapitalization: TextCapitalization.sentences,
-                              validator: (value) {
-                                if (value == null) return null;
-                                creationMap['phone'] = value.trim();
-                                return null;
-                              },
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Expanded(
+                                  child: TitleTextField(
+                                    title: "Telefono",
+                                    initialValue: currenBranch?.phone,
+                                    textInputAction: TextInputAction.next,
+                                    textCapitalization: TextCapitalization.sentences,
+                                    validator: (value) {
+                                      if (value == null) return null;
+                                      creationMap['phone'] = value.trim();
+                                      return null;
+                                    },
+                                  ),
+                                ),
+                                TextButton.icon(
+                                  label: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Text("Coordenadas"),
+                                      Builder(
+                                        builder: (context) {
+                                          final coordinates = creationMap['coordinates'] as Coordinates?;
+                                          String text = "-----";
+
+                                          if (coordinates != null) {
+                                            text = "Ver coordenadas";
+                                          }
+                                          return Text(
+                                            text,
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.grey,
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                  icon: Builder(
+                                    builder: (context) {
+                                      final coordinates = creationMap['coordinates'] as Coordinates?;
+                                      if (coordinates != null) {
+                                        return const Icon(Icons.location_on);
+                                      }
+                                      return const Icon(Icons.location_off);
+                                    },
+                                  ),
+                                  onPressed: () async {
+                                    LatLng initCoords = const LatLng(12.130717, -86.253267);
+                                    if (creationMap['coordinates'] != null) {
+                                      final coords = creationMap['coordinates'] as Coordinates;
+                                      initCoords = LatLng(coords.latitude, coords.longitude);
+                                    }
+
+                                    final result = await showMapBottomModal(
+                                      context,
+                                      title: "Coordenadas",
+                                      initialCenter: initCoords,
+                                      markers: [
+                                        if (creationMap['coordinates'] != null) ...[
+                                          MarkerData(
+                                            title: currenBranch?.name ?? "Sin Nombre",
+                                            coordinates: creationMap['coordinates'] as Coordinates,
+                                          ),
+                                        ],
+                                      ],
+                                    );
+                                    if (result != null) {
+                                      setState(() {
+                                        creationMap['coordinates'] = result;
+                                      });
+                                    }
+                                  },
+                                ),
+                              ],
                             ),
 
                             const SizedBox(height: 12),
