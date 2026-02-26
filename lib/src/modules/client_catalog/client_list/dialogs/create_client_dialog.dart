@@ -7,9 +7,6 @@ import 'package:kardex_app_front/src/domain/models/common/coordinates.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/client_list/cubit/client_write_cubit.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
-import 'package:kardex_app_front/widgets/super_widgets/custom_autocomplete_textfield.dart';
-import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
-import 'package:kardex_app_front/widgets/title_texfield.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:latlong2/latlong.dart';
 
