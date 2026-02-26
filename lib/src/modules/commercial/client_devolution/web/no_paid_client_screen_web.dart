@@ -87,7 +87,7 @@ class _Body extends StatelessWidget {
                 ),
               ),
             ),
-            Expanded(
+            const Expanded(
               child: _Content(),
             ),
           ],
