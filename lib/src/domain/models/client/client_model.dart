@@ -11,6 +11,7 @@ class BaseClient {
   final String group;
   final int balance;
   final int creditLimit;
+  final DateTime? lastCreditStart;
   final bool isCreditActive;
   final bool isActive;
 
@@ -26,6 +27,7 @@ class BaseClient {
     this.creditLimit = 0,
     this.isCreditActive = false,
     this.isActive = true,
+    this.lastCreditStart,
     this.coordinates,
   });
 
@@ -42,6 +44,9 @@ class BaseClient {
       creditLimit: json['creditLimit'] as int? ?? 0,
       isCreditActive: json['isCreditActive'] as bool? ?? false,
       isActive: json['isActive'] as bool? ?? true,
+      lastCreditStart: json['lastCreditStart'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(json['lastCreditStart'] as int)
+          : null,
       coordinates: json['coordinates'] != null
           ? Coordinates.fromJson(json['coordinates'] as Map<String, dynamic>)
           : null,
@@ -61,6 +66,7 @@ class BaseClient {
       'creditLimit': creditLimit,
       'isCreditActive': isCreditActive,
       'isActive': isActive,
+      'lastCreditStart': lastCreditStart?.millisecondsSinceEpoch,
       'coordinates': coordinates?.toJson(),
     };
   }
@@ -201,6 +207,7 @@ class ClientInDb extends BaseClient {
     super.balance,
     super.creditLimit,
     super.isCreditActive,
+    super.lastCreditStart,
     super.isActive,
     this.isDeleted = false,
     required this.createdAt,

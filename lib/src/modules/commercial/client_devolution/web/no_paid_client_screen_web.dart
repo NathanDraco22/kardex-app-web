@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_app_front/widgets/dialogs/show_client_with_balance_search_dialog.dart';
 
 import '../cubits/read_pending_client_cubit.dart';
 import 'no_paid_invoice_web_screen.dart';
@@ -36,7 +37,7 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
       child: Padding(
         padding: EdgeInsets.all(8.0),
         child: Column(
@@ -48,12 +49,39 @@ class _Body extends StatelessWidget {
               child: Card(
                 child: Column(
                   children: [
-                    Text(
+                    const Text(
                       "Devoluciones a Clientes de Facturas Sin Cobrar",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
                       ),
+                    ),
+
+                    TextButton.icon(
+                      icon: const Icon(Icons.search),
+                      onPressed: () async {
+                        final client = await showClientWithBalanceSearch(context);
+
+                        if (client == null) return;
+                        if (!context.mounted) return;
+
+                        final readPendingInvoiceCubit = context.read<ReadPendingClientCubit>();
+
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return BlocProvider.value(
+                                value: readPendingInvoiceCubit,
+                                child: NoPaidInvoiceWebScreen(
+                                  client: client,
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      },
+                      label: const Text("Buscar Cliente con Saldo"),
                     ),
                   ],
                 ),
