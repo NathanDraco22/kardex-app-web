@@ -122,6 +122,13 @@ class InvoicesDataSource with HttpService {
     return res;
   }
 
+  Future<Map<String, dynamic>> getAllProductSales(Map<String, String> params) async {
+    final uri = HttpTools.generateUri("$_endpoint/product-sales", queryParameters: params);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
+    return res;
+  }
+
   Future<Map<String, dynamic>?> getInvoiceById(String invoiceId) async {
     final uri = HttpTools.generateUri("$_endpoint/$invoiceId");
     final headers = HttpTools.generateAuthHeaders();
