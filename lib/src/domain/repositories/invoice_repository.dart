@@ -2,6 +2,7 @@ import 'package:kardex_app_front/constants/default_values.dart';
 import 'package:kardex_app_front/src/data/data.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_totals.dart';
+import 'package:kardex_app_front/src/domain/models/invoice/product_sale_total.dart';
 import 'package:kardex_app_front/src/domain/query_params/history_params.dart';
 import 'package:kardex_app_front/src/domain/responses/invoice_devolution_response.dart';
 import 'package:kardex_app_front/src/domain/responses/list_responses.dart';
@@ -90,6 +91,12 @@ class InvoicesRepository {
     final res = await invoicesDataSource.getTotalFromClientInvoices(params.toMap());
     final result = InvoiceTotals.fromJson(res);
     return result;
+  }
+
+  Future<List<ProductSalesTotal>> getAllProductSales(InvoiceQueryParams params) async {
+    final res = await invoicesDataSource.getAllProductSales(params.toMap());
+    final result = ListResponse<ProductSalesTotal>.fromJson(res, ProductSalesTotal.fromJson);
+    return result.data;
   }
 
   Future<InvoiceInDb?> getInvoiceById(String invoiceId) async {
