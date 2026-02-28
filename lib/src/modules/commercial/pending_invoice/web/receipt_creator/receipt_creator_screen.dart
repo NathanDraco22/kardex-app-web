@@ -198,6 +198,7 @@ class _CreateReceiptBottomBar extends StatelessWidget {
                     branchId: currentBranch.id,
                     clientInfo: ClientInfo(
                       name: client.name,
+                      group: client.group,
                       address: client.address,
                       phone: client.phone,
                       email: client.email,
@@ -259,6 +260,7 @@ class _CreateReceiptBottomBar extends StatelessWidget {
                     branchId: currentBranch.id,
                     clientInfo: ClientInfo(
                       name: client.name,
+                      group: client.group,
                       address: client.address,
                       phone: client.phone,
                       email: client.email,

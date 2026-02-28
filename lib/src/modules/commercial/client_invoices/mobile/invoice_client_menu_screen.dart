@@ -329,6 +329,7 @@ class _SendButton extends StatelessWidget {
                     clientId: selectedClient.id,
                     clientInfo: ClientInfo(
                       name: selectedClient.name,
+                      group: selectedClient.group,
                       address: selectedClient.address,
                       cardId: selectedClient.cardId,
                       location: selectedClient.location,

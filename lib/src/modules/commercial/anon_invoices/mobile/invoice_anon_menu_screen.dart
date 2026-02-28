@@ -238,7 +238,7 @@ class _SendButton extends StatelessWidget {
             CreateInvoice newInvoice = CreateInvoice(
               branchId: currentBranch.id,
               clientId: kSaleClientId,
-              clientInfo: ClientInfo(name: "Sin Cliente"),
+              clientInfo: ClientInfo(name: "Sin Cliente", group: ""),
               description: viewController.description,
               docNumber: "",
               saleItems: widget.saleItems,
