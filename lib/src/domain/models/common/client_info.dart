@@ -1,5 +1,6 @@
 class ClientInfo {
   String name;
+  String group;
   String? cardId;
   String? phone;
   String? address;
@@ -8,6 +9,7 @@ class ClientInfo {
 
   ClientInfo({
     required this.name,
+    required this.group,
     this.cardId,
     this.phone,
     this.address,
@@ -17,6 +19,7 @@ class ClientInfo {
 
   factory ClientInfo.fromJson(Map<String, dynamic> json) => ClientInfo(
     name: json['name'],
+    group: json['group'] ?? '',
     cardId: json['cardId'],
     phone: json['phone'],
     address: json['address'],
@@ -26,6 +29,7 @@ class ClientInfo {
 
   Map<String, dynamic> toJson() => {
     'name': name,
+    'group': group,
     'cardId': cardId,
     'phone': phone,
     'address': address,
