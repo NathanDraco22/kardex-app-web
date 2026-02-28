@@ -12,6 +12,7 @@ class BaseClient {
   final int balance;
   final int creditLimit;
   final DateTime? lastCreditStart;
+  final DateTime? lastReceiptDate;
   final bool isCreditActive;
   final bool isActive;
 
@@ -28,6 +29,7 @@ class BaseClient {
     this.isCreditActive = false,
     this.isActive = true,
     this.lastCreditStart,
+    this.lastReceiptDate,
     this.coordinates,
   });
 
@@ -46,6 +48,9 @@ class BaseClient {
       isActive: json['isActive'] as bool? ?? true,
       lastCreditStart: json['lastCreditStart'] != null
           ? DateTime.fromMillisecondsSinceEpoch(json['lastCreditStart'] as int)
+          : null,
+      lastReceiptDate: json['lastReceiptDate'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(json['lastReceiptDate'] as int)
           : null,
       coordinates: json['coordinates'] != null
           ? Coordinates.fromJson(json['coordinates'] as Map<String, dynamic>)
@@ -67,6 +72,7 @@ class BaseClient {
       'isCreditActive': isCreditActive,
       'isActive': isActive,
       'lastCreditStart': lastCreditStart?.millisecondsSinceEpoch,
+      'lastReceiptDate': lastReceiptDate?.millisecondsSinceEpoch,
       'coordinates': coordinates?.toJson(),
     };
   }
