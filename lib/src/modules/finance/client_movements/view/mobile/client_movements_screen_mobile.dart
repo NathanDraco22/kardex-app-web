@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/src/cubits/client_transaction/read_client_transaction_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
-import 'package:kardex_app_front/src/modules/finance/client_movements/cubits/read_client_transaction_cubit.dart';
 import 'package:kardex_app_front/src/modules/finance/client_movements/view/widgets/movement_mobile_row.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 
