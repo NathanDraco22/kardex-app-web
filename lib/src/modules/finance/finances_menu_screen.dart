@@ -85,6 +85,26 @@ class _Body extends StatelessWidget {
               onTap: () => context.pushNamed("paid-invoices"),
             ),
             const Divider(height: 0.0),
+            ListTile(
+              leading: const Icon(
+                Icons.bar_chart_rounded,
+                color: Colors.blue,
+              ),
+              title: const Text("Resumen Diario"),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.pushNamed("branch-daily-summary"),
+            ),
+            const Divider(height: 0.0),
+            ListTile(
+              leading: const Icon(
+                Icons.pie_chart_rounded,
+                color: Colors.purple,
+              ),
+              title: const Text("Resumen Ejecutivo"),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.pushNamed("branch-executive-summary"),
+            ),
+            const Divider(height: 0.0),
           ],
         ),
       ),
