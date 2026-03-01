@@ -37,6 +37,8 @@ import 'package:kardex_app_front/src/modules/finance/client_movements/view/clien
 import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
 import 'package:kardex_app_front/src/modules/finance/finances_menu_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/paid_invoices/paid_invoices_screen.dart';
+import 'package:kardex_app_front/src/modules/finance/branch_daily_summary/branch_daily_summary_screen.dart';
+import 'package:kardex_app_front/src/modules/finance/branch_executive_summary/branch_executive_summary_screen.dart';
 import 'package:kardex_app_front/src/modules/home/view/home_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/adjust_entry/adjust_entry_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/create_transfer/create_transfer_screen.dart';
@@ -424,6 +426,16 @@ class AppRouter {
               final client = state.extra as ClientInDb?;
               return ClientMovementsScreen(initialClient: client);
             },
+          ),
+          GoRoute(
+            path: "branch-daily-summary",
+            name: "branch-daily-summary",
+            builder: (context, state) => const BranchDailySummaryScreen(),
+          ),
+          GoRoute(
+            path: "branch-executive-summary",
+            name: "branch-executive-summary",
+            builder: (context, state) => const BranchExecutiveSummaryScreen(),
           ),
         ],
       ),
