@@ -24,6 +24,7 @@ class ReadClientTransactionCubit extends Cubit<ReadClientTransactionState> {
   Future<void> loadPaginatedTransactions({
     required ClientInDb client,
     DateTime? endDate,
+    DateTime? startDate,
   }) async {
     emit(ReadClientTransactionLoading());
     this.client = client;
@@ -33,6 +34,7 @@ class ReadClientTransactionCubit extends Cubit<ReadClientTransactionState> {
       limit: paginationItems,
       clientId: client.id,
       endDate: endDate?.endOfDay().millisecondsSinceEpoch,
+      startDate: startDate?.startOfDay().millisecondsSinceEpoch,
     );
 
     _transactionsCache = [];

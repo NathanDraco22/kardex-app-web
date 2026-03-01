@@ -219,20 +219,6 @@ class _Body extends StatelessWidget {
           if (accessManager.hasCurrentAccess(context, CommercialSubModules.pendingInvoices))
             ListTile(
               leading: Icon(
-                FluentIcons.document_endnote_24_filled,
-                size: 32,
-                color: Colors.amber.shade600,
-              ),
-              title: const Text("Facturas por Cobrar"),
-              onTap: () {
-                context.pushNamed("pending-invoices");
-              },
-            ),
-          const Divider(height: 0.0),
-
-          if (accessManager.hasCurrentAccess(context, CommercialSubModules.pendingInvoices))
-            ListTile(
-              leading: Icon(
                 Icons.content_paste_search_rounded,
                 size: 32,
                 color: Colors.teal.shade600,

@@ -53,6 +53,9 @@ import 'package:kardex_app_front/src/modules/inventory/adjust_exit/history/adjus
 import 'package:kardex_app_front/src/modules/inventory/product_movements/view/product_movements_screen.dart';
 import 'package:kardex_app_front/src/modules/login/login_screen.dart';
 import 'package:kardex_app_front/src/modules/multi_branch_home/multibranch_home_screen.dart';
+import 'package:kardex_app_front/src/modules/pending_accounts/pending_client_transactions/credit_session_transactions_screen.dart';
+import 'package:kardex_app_front/src/modules/pending_accounts/pending_accounts_menu_screen.dart';
+import 'package:kardex_app_front/src/modules/pending_accounts/pending_client_transactions/pending_client_transactions_menu_screen.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/product_category/view/product_category_screen.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/product_list/view/product_list_screen.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/view/product_catalog_menu_screen.dart';
@@ -230,11 +233,7 @@ class AppRouter {
             name: "client-invoice",
             builder: (context, state) => const ClientInvoiceScreen(),
           ),
-          GoRoute(
-            path: "pending-invoices",
-            name: "pending-invoices",
-            builder: (context, state) => const PendingInvoiceScreen(),
-          ),
+
           GoRoute(
             path: "daily-receipt-history",
             name: "daily-receipt-history",
@@ -284,6 +283,34 @@ class AppRouter {
             path: "proforma",
             name: "proforma",
             builder: (context, state) => const ProformaScreen(),
+          ),
+        ],
+      ),
+
+      GoRoute(
+        path: '/pending-accounts',
+        name: 'pending-accounts',
+        builder: (context, state) => const PendingAccountsMenuScreen(),
+        routes: [
+          GoRoute(
+            path: "pending-invoices",
+            name: "pending-invoices",
+            builder: (context, state) => const PendingInvoiceScreen(),
+          ),
+          GoRoute(
+            path: "pending-client-transactions",
+            name: "pending-client-transactions",
+            builder: (context, state) => const PendingClientTransactionsMenuScreen(),
+            routes: [
+              GoRoute(
+                path: "credit-session-transactions",
+                name: "credit-session-transactions",
+                builder: (context, state) {
+                  final client = state.extra as ClientInDb;
+                  return CreditSessionTransactionsScreen(client: client);
+                },
+              ),
+            ],
           ),
         ],
       ),

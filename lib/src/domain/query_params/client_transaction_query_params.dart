@@ -4,6 +4,7 @@ class ClientTransactionQueryParams {
   String? branchId;
   String? clientId;
   int? endDate;
+  int? startDate;
   TransactionType? type;
   TransactionSubType? subtype;
   int offset;
@@ -13,6 +14,7 @@ class ClientTransactionQueryParams {
     this.branchId,
     this.clientId,
     this.endDate,
+    this.startDate,
     this.type,
     this.subtype,
     this.offset = 0,
@@ -24,6 +26,7 @@ class ClientTransactionQueryParams {
       if (branchId != null) 'branchId': branchId!,
       if (clientId != null) 'clientId': clientId!,
       if (endDate != null) 'endDate': endDate!.toString(),
+      if (startDate != null) 'startDate': startDate!.toString(),
       if (type != null) 'type': type!.name,
       if (subtype != null) 'subtype': subtype!.name,
       'offset': offset.toString(),

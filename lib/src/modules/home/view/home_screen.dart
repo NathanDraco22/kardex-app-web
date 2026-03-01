@@ -238,6 +238,15 @@ class _Body extends StatelessWidget {
                   },
                 ),
 
+              if (accessManager.hasAccessTo(user, Modules.commercial))
+                HomeOptionCard(
+                  title: "Cuentas por Cobrar",
+                  icon: FluentIcons.receipt_money_24_filled,
+                  onTap: () {
+                    context.pushNamed("pending-accounts");
+                  },
+                ),
+
               if (accessManager.hasAccessTo(user, Modules.inventory))
                 HomeOptionCard(
                   title: "Inventario",
