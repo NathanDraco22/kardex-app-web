@@ -56,11 +56,13 @@ class ProductAccount {
   final int currentStock;
   final int averageCost;
   final int lastCost;
+  final int maximumCost;
 
   ProductAccount({
     required this.currentStock,
     required this.averageCost,
     required this.lastCost,
+    required this.maximumCost,
   });
 
   factory ProductAccount.fromJson(Map<String, dynamic> json) {
@@ -68,6 +70,7 @@ class ProductAccount {
       currentStock: json['currentStock'] as int,
       averageCost: json['averageCost'] as int,
       lastCost: json['lastCost'] as int,
+      maximumCost: (json['maximumCost'] as int?) ?? 0,
     );
   }
 
@@ -76,6 +79,7 @@ class ProductAccount {
       'currentStock': currentStock,
       'averageCost': averageCost,
       'lastCost': lastCost,
+      'maximumCost': maximumCost,
     };
   }
 }

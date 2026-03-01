@@ -6,6 +6,7 @@ class ProductAccountInDb {
     this.promiseStock = 0,
     required this.averageCost,
     required this.lastCost,
+    required this.maximumCost,
     required this.createdAt,
     this.updatedAt,
   });
@@ -16,6 +17,7 @@ class ProductAccountInDb {
   final int promiseStock;
   final int averageCost;
   final int lastCost;
+  final int maximumCost;
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -31,6 +33,7 @@ class ProductAccountInDb {
       promiseStock: json['promiseStock'] as int? ?? 0,
       averageCost: json['averageCost'] as int,
       lastCost: json['lastCost'] as int,
+      maximumCost: json['maximumCost'] as int,
       createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
       updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt'] as int) : null,
     );
@@ -44,6 +47,7 @@ class ProductAccountInDb {
       'promiseStock': promiseStock,
       'averageCost': averageCost,
       'lastCost': lastCost,
+      'maximumCost': maximumCost,
       'createdAt': createdAt.millisecondsSinceEpoch,
       'updatedAt': updatedAt?.millisecondsSinceEpoch,
     };
