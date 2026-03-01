@@ -214,6 +214,7 @@ class ClientInDb extends BaseClient {
     super.creditLimit,
     super.isCreditActive,
     super.lastCreditStart,
+    super.lastReceiptDate,
     super.isActive,
     this.isDeleted = false,
     required this.createdAt,
@@ -240,6 +241,12 @@ class ClientInDb extends BaseClient {
       updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt'] as int) : null,
       coordinates: json['coordinates'] != null
           ? Coordinates.fromJson(json['coordinates'] as Map<String, dynamic>)
+          : null,
+      lastReceiptDate: json['lastReceiptDate'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(json['lastReceiptDate'] as int)
+          : null,
+      lastCreditStart: json['lastCreditStart'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(json['lastCreditStart'] as int)
           : null,
     );
   }
