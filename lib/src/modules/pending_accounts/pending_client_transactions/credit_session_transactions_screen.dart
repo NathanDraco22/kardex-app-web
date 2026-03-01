@@ -21,6 +21,7 @@ class CreditSessionTransactionsScreen extends StatelessWidget {
         cubit.loadPaginatedTransactions(
           client: client,
           startDate: client.lastCreditStart,
+          endDate: client.updatedAt,
         );
 
         return cubit;
@@ -143,7 +144,7 @@ class _ContentSection extends StatelessWidget {
 
             return ListView.separated(
               padding: const EdgeInsets.all(8.0),
-
+              reverse: true,
               itemCount: transactions.length + (state is FetchingNextPage ? 1 : 0),
               separatorBuilder: (context, index) => const Divider(height: 1),
               itemBuilder: (context, index) {

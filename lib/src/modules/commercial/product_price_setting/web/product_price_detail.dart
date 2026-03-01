@@ -196,22 +196,34 @@ class _RootScaffoldState extends State<_RootScaffold> {
                           height: 8,
                         ),
 
-                        Row(
-                          children: [
-                            TitleLabel(
-                              title: "Ultima Compra",
-                              bigTitle: NumberFormatter.convertToMoneyLike(
-                                currentProfile.account.lastCost,
+                        SizedBox(
+                          height: 40,
+                          child: Row(
+                            children: [
+                              TitleLabel(
+                                title: "Costo",
+                                bigTitle: NumberFormatter.convertToMoneyLike(
+                                  currentProfile.account.averageCost,
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            TitleLabel(
-                              title: "Costo",
-                              bigTitle: NumberFormatter.convertToMoneyLike(
-                                currentProfile.account.averageCost,
+                              const VerticalDivider(),
+
+                              TitleLabel(
+                                title: "Ultima Compra",
+                                bigTitle: NumberFormatter.convertToMoneyLike(
+                                  currentProfile.account.lastCost,
+                                ),
                               ),
-                            ),
-                          ],
+                              const VerticalDivider(),
+
+                              TitleLabel(
+                                title: "Costo Maximo",
+                                bigTitle: NumberFormatter.convertToMoneyLike(
+                                  currentProfile.account.maximumCost,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
 
                         const SizedBox(
