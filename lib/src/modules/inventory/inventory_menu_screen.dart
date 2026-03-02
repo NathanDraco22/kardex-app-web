@@ -70,6 +70,17 @@ class _Body extends StatelessWidget {
 
           ListTile(
             leading: const Icon(
+              Icons.monetization_on,
+              color: Colors.green,
+            ),
+            title: const Text("Precios de productos"),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.pushNamed("product-price-catalog"),
+          ),
+          const Divider(height: 0.0),
+
+          ListTile(
+            leading: const Icon(
               Icons.timer_sharp,
               color: Colors.amber,
             ),

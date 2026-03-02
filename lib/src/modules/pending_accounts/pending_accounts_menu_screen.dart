@@ -56,6 +56,18 @@ class _Body extends StatelessWidget {
               context.pushNamed("pending-client-transactions");
             },
           ),
+          const Divider(height: 0.0),
+          ListTile(
+            leading: Icon(
+              FluentIcons.calendar_error_24_filled,
+              size: 32,
+              color: Colors.red.shade400,
+            ),
+            title: const Text("Días de Impago"),
+            onTap: () {
+              context.pushNamed("unpaid-clients");
+            },
+          ),
         ],
       ),
     );

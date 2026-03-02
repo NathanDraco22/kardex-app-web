@@ -27,7 +27,7 @@ class _RootScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Resumen Ejecutivo (Mi Sucursal)"),
+        title: const Text("Resumen Ejecutivo"),
       ),
       body: const _Body(),
     );

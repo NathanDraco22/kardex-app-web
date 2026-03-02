@@ -236,4 +236,40 @@ class ProductInDbInBranch extends ProductInDb {
     data['saleProfile'] = saleProfile.toJson();
     return data;
   }
+
+  ProductInDbInBranch copyWith({
+    String? id,
+    String? name,
+    String? description,
+    String? code,
+    String? brandName,
+    String? unitName,
+    String? categoryName,
+    List<String>? tags,
+    bool? hasIva,
+    bool? isActive,
+    bool? isDeleted,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    ProductAccountInDb? account,
+    ProductSaleProfileInDb? saleProfile,
+  }) {
+    return ProductInDbInBranch(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      code: code ?? this.code,
+      brandName: brandName ?? this.brandName,
+      unitName: unitName ?? this.unitName,
+      categoryName: categoryName ?? this.categoryName,
+      tags: tags ?? this.tags,
+      hasIva: hasIva ?? this.hasIva,
+      isActive: isActive ?? this.isActive,
+      isDeleted: isDeleted ?? this.isDeleted,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      account: account ?? this.account,
+      saleProfile: saleProfile ?? this.saleProfile,
+    );
+  }
 }
