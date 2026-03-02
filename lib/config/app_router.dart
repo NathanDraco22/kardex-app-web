@@ -52,12 +52,14 @@ import 'package:kardex_app_front/src/modules/inventory/inventory_exit/view/inven
 import 'package:kardex_app_front/src/modules/inventory/inventory_menu_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/adjust_entry/history/adjust_entry_history_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/adjust_exit/history/adjust_exit_history_screen.dart';
+import 'package:kardex_app_front/src/modules/inventory/product_price_catalog/product_price_catalog_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/product_movements/view/product_movements_screen.dart';
 import 'package:kardex_app_front/src/modules/login/login_screen.dart';
 import 'package:kardex_app_front/src/modules/multi_branch_home/multibranch_home_screen.dart';
 import 'package:kardex_app_front/src/modules/pending_accounts/pending_client_transactions/credit_session_transactions_screen.dart';
 import 'package:kardex_app_front/src/modules/pending_accounts/pending_accounts_menu_screen.dart';
 import 'package:kardex_app_front/src/modules/pending_accounts/pending_client_transactions/pending_client_transactions_menu_screen.dart';
+import 'package:kardex_app_front/src/modules/pending_accounts/unpaid_clients/unpaid_clients_screen.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/product_category/view/product_category_screen.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/product_list/view/product_list_screen.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/view/product_catalog_menu_screen.dart';
@@ -314,6 +316,11 @@ class AppRouter {
               ),
             ],
           ),
+          GoRoute(
+            path: "unpaid-clients",
+            name: "unpaid-clients",
+            builder: (context, state) => const UnpaidClientsScreen(),
+          ),
         ],
       ),
 
@@ -382,6 +389,11 @@ class AppRouter {
             path: "history-adjust-exit",
             name: "history-adjust-exit",
             builder: (context, state) => const AdjustExitHistoryScreen(),
+          ),
+          GoRoute(
+            path: "product-price-catalog",
+            name: "product-price-catalog",
+            builder: (context, state) => const ProductPriceCatalogScreen(),
           ),
         ],
       ),

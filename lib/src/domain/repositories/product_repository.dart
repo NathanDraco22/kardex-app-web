@@ -1,5 +1,6 @@
 import 'package:kardex_app_front/src/data/data.dart';
 import 'package:kardex_app_front/src/domain/models/product/product_model.dart';
+import 'package:kardex_app_front/src/domain/query_params/product_query_params.dart';
 import 'package:kardex_app_front/src/domain/responses/list_responses.dart';
 
 class ProductsRepository {
@@ -32,6 +33,20 @@ class ProductsRepository {
       ProductInDb.fromJson,
     );
     return response.data;
+  }
+
+  Future<List<ProductInDbInBranch>> getAllProductsInBranch(ProductQueryParams queryParams) async {
+    final results = await productsDataSource.getAllProductInBranch(queryParams.toQueryParameters());
+    final response = ListResponse<ProductInDbInBranch>.fromJson(
+      results,
+      ProductInDbInBranch.fromJson,
+    );
+    return response.data;
+  }
+
+  Future<ProductInDbInBranch> getProductInBranchById(String productId) async {
+    final result = await productsDataSource.getProductInBranchById(productId);
+    return ProductInDbInBranch.fromJson(result);
   }
 
   Future<List<ProductInDbInBranch>> searchProductInBranch(String keyword) async {

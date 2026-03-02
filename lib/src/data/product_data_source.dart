@@ -63,6 +63,24 @@ class ProductsDataSource with HttpService {
     return res;
   }
 
+  Future<Map<String, dynamic>> getAllProductInBranch(
+    Map<String, String> queryParams,
+  ) async {
+    final currentBranch = BranchesTool.getCurrentBranchId();
+    final uri = HttpTools.generateUri("$_endpoint/branch/$currentBranch", queryParameters: queryParams);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
+    return res;
+  }
+
+  Future<Map<String, dynamic>> getProductInBranchById(String productId) async {
+    final currentBranch = BranchesTool.getCurrentBranchId();
+    final uri = HttpTools.generateUri("$_endpoint/$productId/branch/$currentBranch");
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
+    return res;
+  }
+
   Future<Map<String, dynamic>?> updateProductById(
     String productId,
     Map<String, dynamic> product,
