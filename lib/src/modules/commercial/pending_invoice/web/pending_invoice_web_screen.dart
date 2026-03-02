@@ -222,13 +222,13 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Center(
       child: Padding(
-        padding: EdgeInsets.all(8.0),
+        padding: EdgeInsets.all(4.0),
         child: Column(
           spacing: 8,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SizedBox(
-              height: 140,
+              height: 180,
               child: _HeaderSection(),
             ),
             Expanded(

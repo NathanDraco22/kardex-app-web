@@ -15,55 +15,52 @@ class _HeaderSection extends StatelessWidget {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              width: 320,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "${client.id}-${client.name}",
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  if (client.location != null) ...[
-                    Text(
-                      client.location!,
-                      style: const TextStyle(
-                        fontSize: 16,
-                      ),
-                    ),
-                  ],
-                  if (client.address != null) ...[
-                    Text(
-                      client.address!,
-                    ),
-                  ],
-
-                  Text(
-                    'Telefono: ${client.phone ?? ''} ',
-                    style: const TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Text(
-                    'Correo: ${client.email ?? ''} ',
-                    style: const TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                ],
-              ),
-            ),
             Column(
-              spacing: 8,
-              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "${client.id}-${client.name}",
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                if (client.location != null) ...[
+                  Text(
+                    client.location!,
+                    style: const TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+                if (client.address != null) ...[
+                  Text(
+                    client.address!,
+                  ),
+                ],
+
+                Text(
+                  'Telefono: ${client.phone ?? ''} ',
+                  style: const TextStyle(
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Text(
+                  'Correo: ${client.email ?? ''} ',
+                  style: const TextStyle(
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 8),
+              ],
+            ),
+            Row(
+              spacing: 4,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 if (client.coordinates != null) ...[
                   LaunchMapButton(
@@ -77,7 +74,7 @@ class _HeaderSection extends StatelessWidget {
                     showCreditSessionHistoryDialog(context, client);
                   },
                   icon: const Icon(Icons.history, size: 18),
-                  label: const Text("Historial de Crédito"),
+                  label: const Text("Historial"),
                 ),
                 Builder(
                   builder: (context) {
@@ -144,7 +141,7 @@ class _HeaderSection extends StatelessWidget {
                         backgroundColor: Colors.amber.shade700,
                         foregroundColor: Colors.white,
                       ),
-                      label: const Text("Abono Rápido"),
+                      label: const Text("Abono"),
                     );
                   },
                 ),
