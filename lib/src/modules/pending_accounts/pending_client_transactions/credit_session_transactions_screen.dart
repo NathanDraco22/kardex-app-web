@@ -142,29 +142,32 @@ class _ContentSection extends StatelessWidget {
               return const Center(child: Text("No se encontraron movimientos registrados en esta sesión de crédito."));
             }
 
-            return ListView.separated(
-              padding: const EdgeInsets.all(8.0),
-              reverse: true,
-              shrinkWrap: true,
-              itemCount: transactions.length + (state is FetchingNextPage ? 1 : 0),
-              separatorBuilder: (context, index) => const Divider(height: 1),
-              itemBuilder: (context, index) {
-                if (index >= transactions.length) {
-                  return const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: CircularProgressIndicator(),
-                    ),
-                  );
-                }
-                final transaction = transactions[index];
-                final rowColor = index.isOdd ? Colors.grey.shade100 : Colors.white;
+            return Align(
+              alignment: Alignment.topCenter,
+              child: ListView.separated(
+                padding: const EdgeInsets.all(8.0),
+                reverse: true,
+                shrinkWrap: true,
+                itemCount: transactions.length + (state is FetchingNextPage ? 1 : 0),
+                separatorBuilder: (context, index) => const Divider(height: 1),
+                itemBuilder: (context, index) {
+                  if (index >= transactions.length) {
+                    return const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                  }
+                  final transaction = transactions[index];
+                  final rowColor = index.isOdd ? Colors.grey.shade100 : Colors.white;
 
-                return MovementMobileRow(
-                  currentTransaction: transaction,
-                  rowColor: rowColor,
-                );
-              },
+                  return MovementMobileRow(
+                    currentTransaction: transaction,
+                    rowColor: rowColor,
+                  );
+                },
+              ),
             );
           }
           return const SizedBox.shrink();
