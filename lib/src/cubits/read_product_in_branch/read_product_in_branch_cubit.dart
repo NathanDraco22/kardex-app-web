@@ -43,6 +43,7 @@ class ReadProductInBranchCubit extends Cubit<ReadProductInBranchState> {
     if (isLastPage) return;
     final currentState = state;
     if (currentState is! ReadProductInBranchSuccess) return;
+    if (currentState is ReadProductInBranchFetchingMore) return;
 
     emit(
       ReadProductInBranchFetchingMore(
