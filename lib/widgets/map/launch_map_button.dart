@@ -10,7 +10,7 @@ class LaunchMapButton extends StatelessWidget {
     super.key,
     required this.latitude,
     required this.longitude,
-    this.label = 'Ver Mapa',
+    this.label = 'Mapa',
   });
 
   Future<void> _launchMap() async {
