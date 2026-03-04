@@ -1,5 +1,41 @@
 import 'package:kardex_app_front/src/domain/models/common/coordinates.dart';
 
+class PersonalReference {
+  final String name;
+  final String phone;
+  final String address;
+  final String location;
+  final String? email;
+
+  PersonalReference({
+    required this.name,
+    required this.phone,
+    required this.address,
+    required this.location,
+    this.email,
+  });
+
+  factory PersonalReference.fromJson(Map json) {
+    return PersonalReference(
+      name: json['name'] as String,
+      phone: json['phone'] as String,
+      address: json['address'] as String,
+      location: json['location'] as String,
+      email: json['email'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'phone': phone,
+      'address': address,
+      'location': location,
+      'email': email,
+    };
+  }
+}
+
 class BaseClient {
   final String name;
   final String? cardId;
@@ -15,6 +51,7 @@ class BaseClient {
   final DateTime? lastReceiptDate;
   final bool isCreditActive;
   final bool isActive;
+  final List<PersonalReference> personalReferences;
 
   BaseClient({
     required this.name,
@@ -31,6 +68,7 @@ class BaseClient {
     this.lastCreditStart,
     this.lastReceiptDate,
     this.coordinates,
+    this.personalReferences = const [],
   });
 
   factory BaseClient.fromJson(Map json) {
@@ -55,6 +93,11 @@ class BaseClient {
       coordinates: json['coordinates'] != null
           ? Coordinates.fromJson(json['coordinates'] as Map<String, dynamic>)
           : null,
+      personalReferences: json['personalReferences'] != null
+          ? (json['personalReferences'] as List<dynamic>)
+                .map((e) => PersonalReference.fromJson(e as Map<String, dynamic>))
+                .toList()
+          : [],
     );
   }
 
@@ -74,6 +117,7 @@ class BaseClient {
       'lastCreditStart': lastCreditStart?.millisecondsSinceEpoch,
       'lastReceiptDate': lastReceiptDate?.millisecondsSinceEpoch,
       'coordinates': coordinates?.toJson(),
+      'personalReferences': personalReferences.map((e) => e.toJson()).toList(),
     };
   }
 }
@@ -92,6 +136,7 @@ class CreateClient extends BaseClient {
     super.isCreditActive,
     super.isActive,
     super.coordinates,
+    super.personalReferences,
   });
 
   factory CreateClient.fromJson(Map json) {
@@ -118,6 +163,11 @@ class CreateClient extends BaseClient {
       isCreditActive: json['isCreditActive'] as bool? ?? false,
       isActive: json['isActive'] as bool? ?? true,
       coordinates: coordinates,
+      personalReferences: json['personalReferences'] != null
+          ? (json['personalReferences'] as List<dynamic>)
+                .map((e) => PersonalReference.fromJson(e as Map<String, dynamic>))
+                .toList()
+          : [],
     );
   }
 }
@@ -134,6 +184,7 @@ class UpdateClient {
   final bool? isCreditActive;
   final int? creditLimit;
   final Coordinates? coordinates;
+  final List<PersonalReference>? personalReferences;
 
   UpdateClient({
     this.name,
@@ -147,6 +198,7 @@ class UpdateClient {
     this.isCreditActive,
     this.creditLimit,
     this.coordinates,
+    this.personalReferences,
   });
 
   factory UpdateClient.fromJson(Map json) {
@@ -161,6 +213,16 @@ class UpdateClient {
       coordinates = currentCoordinateValue;
     }
 
+    final currentPersonalReferencesValue = json['personalReferences'];
+    List<PersonalReference> personalReferences = [];
+    if (currentPersonalReferencesValue is List<PersonalReference>) {
+      personalReferences = currentPersonalReferencesValue;
+    } else if (currentPersonalReferencesValue != null) {
+      personalReferences = currentPersonalReferencesValue
+          .map((e) => PersonalReference.fromJson(e as Map<String, dynamic>))
+          .toList();
+    }
+
     return UpdateClient(
       name: json['name'] as String?,
       cardId: json['cardId'] as String?,
@@ -173,6 +235,7 @@ class UpdateClient {
       isCreditActive: json['isCreditActive'] as bool?,
       creditLimit: json['creditLimit'] as int?,
       coordinates: coordinates,
+      personalReferences: personalReferences,
     );
   }
 
@@ -189,6 +252,7 @@ class UpdateClient {
       'isCreditActive': isCreditActive,
       'creditLimit': creditLimit,
       'coordinates': coordinates?.toJson(),
+      'personalReferences': personalReferences?.map((e) => e.toJson()).toList(),
     };
     data.removeWhere((key, value) => value == null);
     return data;
@@ -220,6 +284,7 @@ class ClientInDb extends BaseClient {
     required this.createdAt,
     this.updatedAt,
     super.coordinates,
+    super.personalReferences,
   });
 
   factory ClientInDb.fromJson(Map json) {
@@ -248,6 +313,11 @@ class ClientInDb extends BaseClient {
       lastCreditStart: json['lastCreditStart'] != null
           ? DateTime.fromMillisecondsSinceEpoch(json['lastCreditStart'] as int)
           : null,
+      personalReferences: json['personalReferences'] != null
+          ? (json['personalReferences'] as List<dynamic>)
+                .map((e) => PersonalReference.fromJson(e as Map<String, dynamic>))
+                .toList()
+          : [],
     );
   }
 

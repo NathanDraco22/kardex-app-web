@@ -44,9 +44,9 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: EdgeInsets.all(8.0),
         child: Column(
           spacing: 8,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -57,7 +57,7 @@ class _Body extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
+                    Text(
                       "Clientes con Atraso de Pago",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -68,7 +68,7 @@ class _Body extends StatelessWidget {
                 ),
               ),
             ),
-            const Expanded(
+            Expanded(
               child: _Content(),
             ),
           ],

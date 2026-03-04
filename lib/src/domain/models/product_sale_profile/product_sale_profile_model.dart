@@ -43,12 +43,16 @@ class BaseProductSaleProfile {
   final String branchId;
   final String productId;
   int salePrice;
+  int salePrice2;
+  int salePrice3;
   final List<Discount> discounts;
 
   BaseProductSaleProfile({
     required this.branchId,
     required this.productId,
     required this.salePrice,
+    required this.salePrice2,
+    required this.salePrice3,
     this.discounts = const [],
   });
 
@@ -57,6 +61,8 @@ class BaseProductSaleProfile {
       branchId: json['branchId'] as String,
       productId: json['productId'] as String,
       salePrice: json['salePrice'] as int,
+      salePrice2: json['salePrice2'] as int,
+      salePrice3: json['salePrice3'] as int,
       discounts:
           (json['discounts'] as List<dynamic>?)?.map((e) => Discount.fromJson(e as Map<String, dynamic>)).toList() ??
           [],
@@ -68,6 +74,8 @@ class BaseProductSaleProfile {
       'branchId': branchId,
       'productId': productId,
       'salePrice': salePrice,
+      'salePrice2': salePrice2,
+      'salePrice3': salePrice3,
       'discounts': discounts.map((e) => e.toJson()).toList(),
     };
   }
@@ -79,6 +87,8 @@ class CreateProductSaleProfile extends BaseProductSaleProfile {
     required super.branchId,
     required super.productId,
     required super.salePrice,
+    required super.salePrice2,
+    required super.salePrice3,
     super.discounts,
   });
 
@@ -87,6 +97,8 @@ class CreateProductSaleProfile extends BaseProductSaleProfile {
       branchId: json['branchId'] as String,
       productId: json['productId'] as String,
       salePrice: json['salePrice'] as int,
+      salePrice2: json['salePrice2'] as int,
+      salePrice3: json['salePrice3'] as int,
       discounts:
           (json['discounts'] as List<dynamic>?)?.map((e) => Discount.fromJson(e as Map<String, dynamic>)).toList() ??
           [],
@@ -97,13 +109,17 @@ class CreateProductSaleProfile extends BaseProductSaleProfile {
 // Modelo para actualizar
 class UpdateProductSaleProfile {
   final int? salePrice;
+  final int? salePrice2;
+  final int? salePrice3;
   final List<Discount>? discounts;
 
-  UpdateProductSaleProfile({this.salePrice, this.discounts});
+  UpdateProductSaleProfile({this.salePrice, this.salePrice2, this.salePrice3, this.discounts});
 
   factory UpdateProductSaleProfile.fromJson(Map<String, dynamic> json) {
     return UpdateProductSaleProfile(
       salePrice: json['salePrice'] as int?,
+      salePrice2: json['salePrice2'] as int?,
+      salePrice3: json['salePrice3'] as int?,
       discounts: (json['discounts'] as List<dynamic>?)
           ?.map((e) => Discount.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -112,7 +128,9 @@ class UpdateProductSaleProfile {
 
   Map<String, dynamic> toJson() {
     final data = {
-      'salePrice': salePrice,
+      'salePrice': ?salePrice,
+      'salePrice2': ?salePrice2,
+      'salePrice3': ?salePrice3,
       'discounts': discounts?.map((e) => e.toJson()).toList(),
     };
     data.removeWhere((key, value) => value == null);
@@ -128,6 +146,8 @@ class ProductSaleProfileInDb extends BaseProductSaleProfile {
     required super.branchId,
     required super.productId,
     required super.salePrice,
+    required super.salePrice2,
+    required super.salePrice3,
     super.discounts,
     this.updatedAt,
   });
@@ -137,6 +157,8 @@ class ProductSaleProfileInDb extends BaseProductSaleProfile {
       branchId: json['branchId'] as String,
       productId: json['productId'] as String,
       salePrice: json['salePrice'] as int,
+      salePrice2: json['salePrice2'] as int,
+      salePrice3: json['salePrice3'] as int,
       discounts:
           (json['discounts'] as List<dynamic>?)?.map((e) => Discount.fromJson(e as Map<String, dynamic>)).toList() ??
           [],
@@ -163,6 +185,8 @@ class ProductSaleProfileInDbWithProduct extends BaseProductSaleProfile {
     required super.branchId,
     required super.productId,
     required super.salePrice,
+    required super.salePrice2,
+    required super.salePrice3,
     super.discounts,
     this.updatedAt,
     required this.product,
@@ -174,6 +198,8 @@ class ProductSaleProfileInDbWithProduct extends BaseProductSaleProfile {
       branchId: json['branchId'] as String,
       productId: json['productId'] as String,
       salePrice: json['salePrice'] as int,
+      salePrice2: json['salePrice2'] as int,
+      salePrice3: json['salePrice3'] as int,
       discounts:
           (json['discounts'] as List<dynamic>?)?.map((e) => Discount.fromJson(e as Map<String, dynamic>)).toList() ??
           [],
@@ -197,6 +223,8 @@ class ProductSaleProfileInDbWithProduct extends BaseProductSaleProfile {
     String? branchId,
     String? productId,
     int? salePrice,
+    int? salePrice2,
+    int? salePrice3,
     List<Discount>? discounts,
     DateTime? updatedAt,
     InventoryProduct? product,
@@ -206,6 +234,8 @@ class ProductSaleProfileInDbWithProduct extends BaseProductSaleProfile {
       branchId: branchId ?? this.branchId,
       productId: productId ?? this.productId,
       salePrice: salePrice ?? this.salePrice,
+      salePrice2: salePrice2 ?? this.salePrice2,
+      salePrice3: salePrice3 ?? this.salePrice3,
       discounts: discounts ?? this.discounts,
       updatedAt: updatedAt ?? this.updatedAt,
       product: product ?? this.product,
