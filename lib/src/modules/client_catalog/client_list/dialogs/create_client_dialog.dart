@@ -54,6 +54,9 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
   void initState() {
     if (widget.client != null) {
       creationMap['coordinates'] = widget.client!.coordinates;
+      creationMap['personalReferences'] = List<PersonalReference>.from(widget.client!.personalReferences);
+    } else {
+      creationMap['personalReferences'] = <PersonalReference>[];
     }
     super.initState();
   }
@@ -354,6 +357,38 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
                                 creationMap['coordinates'] = result;
                               });
                             }
+                          },
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Builder(
+                          builder: (context) {
+                            final refs = creationMap['personalReferences'] as List<PersonalReference>? ?? [];
+                            return OutlinedButton.icon(
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Theme.of(context).colorScheme.primary,
+                              ),
+                              onPressed: () async {
+                                final updatedRefs = await showClientPersonalReferenceEditor(
+                                  context,
+                                  refs,
+                                );
+
+                                if (updatedRefs != null) {
+                                  setState(() {
+                                    creationMap['personalReferences'] = updatedRefs;
+                                  });
+                                }
+                              },
+                              icon: const Icon(Icons.group),
+                              label: Text("Referencias Personales (${refs.length})"),
+                            );
                           },
                         ),
                       ],

@@ -72,14 +72,20 @@ class _RootScaffold extends StatefulWidget {
 
 class _RootScaffoldState extends State<_RootScaffold> {
   late int currentSalePrice;
+  late int currentSalePrice2;
+  late int currentSalePrice3;
   late List<Discount> currentDiscounts;
 
   FocusNode priceFocus = FocusNode();
+  FocusNode priceFocus2 = FocusNode();
+  FocusNode priceFocus3 = FocusNode();
 
   @override
   void initState() {
     super.initState();
     currentSalePrice = widget.product.saleProfile.salePrice;
+    currentSalePrice2 = widget.product.saleProfile.salePrice2;
+    currentSalePrice3 = widget.product.saleProfile.salePrice3;
     currentDiscounts = [...widget.product.saleProfile.discounts];
     Future(
       () {
@@ -91,6 +97,8 @@ class _RootScaffoldState extends State<_RootScaffold> {
   void _saveProduct() {
     final updatedDto = UpdateProductSaleProfile(
       salePrice: currentSalePrice,
+      salePrice2: currentSalePrice2,
+      salePrice3: currentSalePrice3,
       discounts: currentDiscounts,
     );
     context.read<WriteProductSaleProfileCubit>().updateProfile(
@@ -262,6 +270,60 @@ class _RootScaffoldState extends State<_RootScaffold> {
 
                           initialValue: NumberFormatter.convertFromCentsToDouble(
                             widget.product.saleProfile.salePrice,
+                          ).toString(),
+
+                          inputFormatters: [DoubleThousandsFormatter()],
+                        ),
+
+                        const SizedBox(
+                          height: 12,
+                        ),
+
+                        TitleTextField(
+                          title: "Precio de Venta 2 (C\$ )",
+                          focusNode: priceFocus2,
+                          keyboardType: TextInputType.number,
+                          onChanged: (value) {
+                            if (value.isEmpty) {
+                              currentSalePrice2 = 0;
+                              setState(() {});
+                              return;
+                            }
+                            final formattedValue = value.replaceAll(",", "");
+                            final cents = ((double.tryParse(formattedValue) ?? 0) * 100).round();
+                            currentSalePrice2 = cents;
+                            setState(() {});
+                          },
+
+                          initialValue: NumberFormatter.convertFromCentsToDouble(
+                            widget.product.saleProfile.salePrice2,
+                          ).toString(),
+
+                          inputFormatters: [DoubleThousandsFormatter()],
+                        ),
+
+                        const SizedBox(
+                          height: 12,
+                        ),
+
+                        TitleTextField(
+                          title: "Precio de Venta 3 (C\$ )",
+                          focusNode: priceFocus3,
+                          keyboardType: TextInputType.number,
+                          onChanged: (value) {
+                            if (value.isEmpty) {
+                              currentSalePrice3 = 0;
+                              setState(() {});
+                              return;
+                            }
+                            final formattedValue = value.replaceAll(",", "");
+                            final cents = ((double.tryParse(formattedValue) ?? 0) * 100).round();
+                            currentSalePrice3 = cents;
+                            setState(() {});
+                          },
+
+                          initialValue: NumberFormatter.convertFromCentsToDouble(
+                            widget.product.saleProfile.salePrice3,
                           ).toString(),
 
                           inputFormatters: [DoubleThousandsFormatter()],
