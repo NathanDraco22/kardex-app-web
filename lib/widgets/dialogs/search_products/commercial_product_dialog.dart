@@ -134,6 +134,11 @@ class _FormContentState extends State<_FormContent> {
                     title: "Unidad",
                     bigTitle: widget.product.unitName,
                   ),
+                  TitleLabel(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    title: "Existencia",
+                    bigTitle: widget.product.account.availableStock.toString(),
+                  ),
                 ],
               ),
               Expanded(
@@ -146,20 +151,56 @@ class _FormContentState extends State<_FormContent> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
+                          const Text(
+                            "Nivel de Precio",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          DropdownButton<int>(
+                            value: commercialProductResult.selectedPriceLevel,
+                            isExpanded: true,
+                            items: [
+                              DropdownMenuItem(
+                                value: 1,
+                                child: Text(
+                                  "Precio 1 (${NumberFormatter.convertToMoneyLike(product.saleProfile.salePrice)})",
+                                ),
+                              ),
+                              DropdownMenuItem(
+                                value: 2,
+                                child: Text(
+                                  "Precio 2 (${NumberFormatter.convertToMoneyLike(product.saleProfile.salePrice2)})",
+                                ),
+                              ),
+                              DropdownMenuItem(
+                                value: 3,
+                                child: Text(
+                                  "Precio 3 (${NumberFormatter.convertToMoneyLike(product.saleProfile.salePrice3)})",
+                                ),
+                              ),
+                              if (isUserAdmin)
+                                const DropdownMenuItem(
+                                  value: 0,
+                                  child: Text("Precio manual"),
+                                ),
+                            ],
+                            onChanged: (value) {
+                              if (value == null) return;
+                              commercialProductResult.selectedPriceLevel = value;
+                              if (value == 1) {
+                                commercialProductResult.newPrice = product.saleProfile.salePrice;
+                              } else if (value == 2) {
+                                commercialProductResult.newPrice = product.saleProfile.salePrice2;
+                              } else if (value == 3) {
+                                commercialProductResult.newPrice = product.saleProfile.salePrice3;
+                              }
+                              setState(() {});
+                            },
+                          ),
+                          const SizedBox(height: 12),
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Flexible(
-                                fit: FlexFit.tight,
-                                child: TitleLabel(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  spacing: 12,
-                                  title: "Existencia",
-                                  bigTitle: widget.product.account.availableStock.toString(),
-                                ),
-                              ),
-
                               Flexible(
                                 fit: FlexFit.tight,
 
@@ -167,6 +208,7 @@ class _FormContentState extends State<_FormContent> {
                                   height: 90,
                                   child: TitleTextField(
                                     focusNode: focusNode,
+
                                     onEditingComplete: () {
                                       FocusScope.of(context).requestFocus(acceptFocusNode);
                                     },
@@ -201,7 +243,8 @@ class _FormContentState extends State<_FormContent> {
                                 child: SizedBox(
                                   height: 90,
                                   child: TitleTextField(
-                                    readOnly: isUserAdmin ? false : true,
+                                    key: ValueKey(commercialProductResult.selectedPriceLevel),
+                                    readOnly: commercialProductResult.selectedPriceLevel != 0,
                                     titleTextAlign: TextAlign.center,
                                     initialValue: price.toString(),
                                     inputFormatters: [DecimalTextInputFormatter()],
@@ -211,6 +254,7 @@ class _FormContentState extends State<_FormContent> {
                                       final rowInteger = NumberFormatter.convertFromDoubleToCents(rowDecimal);
 
                                       commercialProductResult.newPrice = int.tryParse(rowInteger.toString()) ?? 0;
+                                      commercialProductResult.selectedPriceLevel = 0;
                                       setState(() {});
                                     },
                                     title: "Precio",

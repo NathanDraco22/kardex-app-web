@@ -67,6 +67,7 @@ class ProductItem {
 
 class SaleItem {
   final ProductItem product;
+  final int selectedPrice;
   final int quantity;
   final int bonQuantity;
   final int cost;
@@ -78,6 +79,7 @@ class SaleItem {
 
   SaleItem({
     required this.product,
+    required this.selectedPrice,
     required this.quantity,
     this.bonQuantity = 0,
     required this.cost,
@@ -90,6 +92,7 @@ class SaleItem {
 
   factory SaleItem.fromJson(Map<String, dynamic> json) => SaleItem(
     product: ProductItem.fromJson(json['product']),
+    selectedPrice: json['selectedPrice'],
     quantity: json['quantity'],
     bonQuantity: json['bonQuantity'] ?? 0,
     cost: json['cost'],
@@ -102,6 +105,7 @@ class SaleItem {
 
   Map<String, dynamic> toJson() => {
     'product': product.toJson(),
+    'selectedPrice': selectedPrice,
     'quantity': quantity,
     'bonQuantity': bonQuantity,
     'cost': cost,

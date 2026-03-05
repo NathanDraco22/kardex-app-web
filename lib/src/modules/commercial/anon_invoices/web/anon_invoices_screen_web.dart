@@ -126,7 +126,7 @@ class _AnonBottomAppBar extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: ListenableBuilder(
-          listenable: viewController,
+          listenable: Listenable.merge([viewController, tableController]),
           builder: (context, _) {
             final total = tableController.total;
             final formattedTotal = NumberFormatter.convertToMoneyLike(total);

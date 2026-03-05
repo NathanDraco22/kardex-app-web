@@ -116,6 +116,7 @@ class _EditSaleItemDialogState extends State<EditSaleItemDialog> {
 
             final newItem = SaleItem(
               product: widget.item.product,
+              selectedPrice: widget.item.selectedPrice,
               quantity: quantity,
               bonQuantity: widget.item.bonQuantity, // Keep bonus? Assume yes.
               cost: widget.item.cost, // Metadata: Cost should probably not change or come from product?

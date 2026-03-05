@@ -286,6 +286,7 @@ List<SaleItem> createSaleItemFromCommercial(List<CommercialProductResult> items)
     final product = commercial.product;
     return SaleItem(
       product: ProductItem.fromJson(product.toJson()),
+      selectedPrice: commercial.selectedPriceLevel,
       cost: product.account.averageCost,
       price: commercial.newPrice,
       quantity: commercial.quantity,

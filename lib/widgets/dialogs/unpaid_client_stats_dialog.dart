@@ -18,13 +18,13 @@ class UnpaidClientStatsDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final now = DateTime.now();
+    final now = DateTime.now().startOfDay();
 
     // Corte calculation
     int daysSinceCorte = 0;
     String corteText = "No asignado";
     if (client.lastCreditStart != null) {
-      daysSinceCorte = now.difference(client.lastCreditStart!).inDays;
+      daysSinceCorte = now.difference(client.lastCreditStart!.startOfDay()).inDays;
       corteText = "${DateTimeTool.formatddMMyy(client.lastCreditStart!)} ($daysSinceCorte días)";
     }
 
@@ -32,7 +32,7 @@ class UnpaidClientStatsDialog extends StatelessWidget {
     int daysSinceAbono = 0;
     String abonoText = "Sin abonos previos";
     if (client.lastReceiptDate != null) {
-      daysSinceAbono = now.difference(client.lastReceiptDate!).inDays;
+      daysSinceAbono = now.difference(client.lastReceiptDate!.startOfDay()).inDays;
       abonoText = "${DateTimeTool.formatddMMyy(client.lastReceiptDate!)} ($daysSinceAbono días de inactividad)";
     }
 
