@@ -4,12 +4,14 @@ import 'package:flutter/services.dart';
 class IncrementalTextField extends StatefulWidget {
   const IncrementalTextField({
     super.key,
+    this.initialValue,
     required this.onChanged,
     this.minValue = 0,
     required this.maxValue,
   });
 
   final void Function(int value)? onChanged;
+  final int? initialValue;
   final int minValue;
   final int maxValue;
 
@@ -52,6 +54,9 @@ class _IncrementalTextFieldState extends State<IncrementalTextField> {
 
   @override
   void initState() {
+    if (widget.initialValue != null) {
+      _controller.text = widget.initialValue.toString();
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) => _focusNode.requestFocus());
     WidgetsBinding.instance.addPostFrameCallback((_) => _textFieldFocusNode.requestFocus());
     super.initState();

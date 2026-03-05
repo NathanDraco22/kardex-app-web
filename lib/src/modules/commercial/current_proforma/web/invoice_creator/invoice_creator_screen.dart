@@ -465,6 +465,7 @@ class _BodyState extends State<_Body> {
             newItems.add(
               SaleItem(
                 product: ProductItem.fromJson(commercial.product.toJson()),
+                selectedPrice: commercial.selectedPriceLevel,
                 cost: commercial.product.account.averageCost,
                 price: commercial.newPrice,
                 quantity: commercial.quantity,

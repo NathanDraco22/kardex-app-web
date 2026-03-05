@@ -115,11 +115,12 @@ class _Content extends StatelessWidget {
 
           final sortedClients = List.of(state.clients);
           sortedClients.sort((a, b) {
+            final now = DateTime.now().startOfDay();
             final baseDateA = a.lastReceiptDate ?? a.lastCreditStart;
-            final diasImpagoA = baseDateA != null ? DateTime.now().difference(baseDateA).inDays : 0;
+            final diasImpagoA = baseDateA != null ? now.difference(baseDateA.startOfDay()).inDays : 0;
 
             final baseDateB = b.lastReceiptDate ?? b.lastCreditStart;
-            final diasImpagoB = baseDateB != null ? DateTime.now().difference(baseDateB).inDays : 0;
+            final diasImpagoB = baseDateB != null ? now.difference(baseDateB.startOfDay()).inDays : 0;
 
             return diasImpagoB.compareTo(diasImpagoA);
           });
@@ -133,8 +134,9 @@ class _Content extends StatelessWidget {
               final currentClient = sortedClients[index];
               final balanceFormatted = NumberFormatter.convertToMoneyLike(currentClient.balance);
 
+              final now = DateTime.now().startOfDay();
               final baseDate = currentClient.lastReceiptDate ?? currentClient.lastCreditStart;
-              final diasImpago = baseDate != null ? DateTime.now().difference(baseDate).inDays : 0;
+              final diasImpago = baseDate != null ? now.difference(baseDate.startOfDay()).inDays : 0;
 
               Color? tileColor;
               if (diasImpago > 37) {

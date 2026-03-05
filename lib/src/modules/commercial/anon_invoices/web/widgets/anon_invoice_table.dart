@@ -180,7 +180,11 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
           controller.updateRow(item, AnonInvoiceItem(res));
         },
         onEdit: (item) async {
-          final res = await showCommercialProductDialog(context, product: item.commercial.product);
+          final res = await showCommercialProductDialog(
+            context,
+            product: item.commercial.product,
+            commercialProductResult: item.commercial,
+          );
           if (res == null) return;
           if (res.product.account.availableStock == 0 || res.product.account.availableStock < res.quantity) {
             if (!context.mounted) return;
@@ -226,8 +230,10 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
   @override
   Widget build(BuildContext context) {
     super.build(context);
+
     final product = widget.item.commercial.product;
-    final price = NumberFormatter.convertToMoneyLike(product.saleProfile.salePrice);
+
+    final price = NumberFormatter.convertToMoneyLike(widget.item.commercial.newPrice);
     final totalDiscount = NumberFormatter.convertToMoneyLike(widget.item.commercial.totalDiscount);
     final percenValue = widget.item.commercial.discountPercent;
     final total = NumberFormatter.convertToMoneyLike(widget.item.commercial.total);
@@ -252,14 +258,19 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
                             title: Text("Cambiar"),
                             leading: Icon(Icons.swap_horiz),
                           ),
-                          onTap: () => widget.onChange(widget.item),
+                          onTap: () {
+                            widget.onChange(widget.item);
+                          },
                         ),
                         PopupMenuItem(
                           child: const ListTile(
                             title: Text("Editar"),
                             leading: Icon(Icons.edit),
                           ),
-                          onTap: () => widget.onEdit(widget.item),
+                          onTap: () {
+                            widget.onEdit(widget.item);
+                            AnonInvoiceWebMediator.of(context).viewController.refresh();
+                          },
                         ),
                         PopupMenuItem(
                           child: const ListTile(
@@ -315,6 +326,7 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
                 fit: FlexFit.tight,
                 child: IncrementalTextField(
                   maxValue: widget.item.commercial.product.account.availableStock,
+                  initialValue: widget.item.commercial.quantity,
                   onChanged: (value) {
                     widget.item.commercial.quantity = value;
                     AnonInvoiceWebMediator.of(context).viewController.refresh();
@@ -323,6 +335,7 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
                 ),
               ),
               Flexible(
+                key: ValueKey(price),
                 fit: FlexFit.tight,
                 child: SizedBox(
                   height: 30,

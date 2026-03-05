@@ -175,6 +175,7 @@ CreateInvoice createAnonInvoiceFromControllers(
       final product = e.commercial.product;
       return SaleItem(
         product: ProductItem.fromJson(product.toJson()),
+        selectedPrice: e.commercial.selectedPriceLevel,
         cost: product.account.averageCost,
         price: e.commercial.newPrice,
         quantity: e.commercial.quantity,

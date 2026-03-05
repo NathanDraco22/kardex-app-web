@@ -9,6 +9,7 @@ class CommercialProductResult {
   }
   ProductInDbInBranch product;
   int _newPrice = 0;
+  int selectedPriceLevel = 1;
   Discount? selectedDisocunt;
   int quantity = 0;
   int get subTotal {
@@ -36,6 +37,7 @@ class CommercialProductResult {
   CommercialProductResult copyWith({
     ProductInDbInBranch? product,
     int? newPrice,
+    int? selectedPriceLevel,
     Discount? selectedDisocunt,
     int? quantity,
   }) {
@@ -48,6 +50,8 @@ class CommercialProductResult {
     } else {
       result._newPrice = _newPrice;
     }
+
+    result.selectedPriceLevel = selectedPriceLevel ?? this.selectedPriceLevel;
 
     if (selectedDisocunt != null) {
       result.selectedDisocunt = selectedDisocunt;
