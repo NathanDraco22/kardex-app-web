@@ -7,6 +7,9 @@ class OrderQueryParams {
   final OrderStatus? neStatus;
   final String? clientId;
   final String? branchId;
+  final int? startDate;
+  final int? endDate;
+  String? createdBy;
 
   OrderQueryParams({
     this.skip = 0,
@@ -15,6 +18,8 @@ class OrderQueryParams {
     this.neStatus,
     this.clientId,
     this.branchId,
+    this.startDate,
+    this.endDate,
   });
 
   Map<String, String> toQueryParameters() {
@@ -25,6 +30,8 @@ class OrderQueryParams {
       "neStatus": ?neStatus?.name,
       "clientId": ?clientId,
       "branchId": ?branchId,
+      "startDate": ?startDate?.toString(),
+      "endDate": ?endDate?.toString(),
     };
   }
 }

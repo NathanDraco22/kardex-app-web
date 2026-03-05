@@ -1,4 +1,5 @@
 import 'package:kardex_app_front/src/data/data.dart';
+import 'package:kardex_app_front/src/domain/models/common/product_sale_total.dart';
 import 'package:kardex_app_front/src/domain/models/order/order_model.dart';
 import 'package:kardex_app_front/src/domain/query_params/order_query_params.dart';
 import 'package:kardex_app_front/src/domain/responses/list_responses.dart';
@@ -25,6 +26,19 @@ class OrdersRepository {
       OrderInDb.fromJson,
     );
     return response;
+  }
+
+  Future<List<ProductSalesTotal>> getProductsInOrders({
+    required OrderQueryParams queryParams,
+  }) async {
+    final results = await ordersDataSource.getProductsInOrders(
+      queryParams: queryParams.toQueryParameters(),
+    );
+    final response = ListResponse<ProductSalesTotal>.fromJson(
+      results,
+      ProductSalesTotal.fromJson,
+    );
+    return response.data;
   }
 
   Future<OrderInDb?> getOrderById(String orderId) async {

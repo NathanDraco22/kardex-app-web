@@ -22,6 +22,7 @@ import 'package:kardex_app_front/src/modules/commercial/commercial_menu_screen.d
 import 'package:kardex_app_front/src/modules/commercial/current_devolutions/current_devolutions_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/current_orders/current_orders_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/daily_anon_invoinces/daily_anon_invoices_screen.dart';
+import 'package:kardex_app_front/src/modules/commercial/daily_product_in_orders/daily_product_in_orders_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/daily_product_sales/daily_product_sales_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/daily_receipt/daily_receipt_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/devolution_history/devolution_history_screen.dart';
@@ -210,6 +211,12 @@ class AppRouter {
             path: "daily-product-sales",
             name: "daily-product-sales",
             builder: (context, state) => const DailyProductSalesScreen(),
+          ),
+
+          GoRoute(
+            path: "daily-product-in-orders",
+            name: "daily-product-in-orders",
+            builder: (context, state) => const DailyProductInOrdersScreen(),
           ),
 
           GoRoute(

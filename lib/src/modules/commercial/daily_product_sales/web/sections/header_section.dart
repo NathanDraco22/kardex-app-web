@@ -12,7 +12,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
 
   @override
   Widget build(BuildContext context) {
-    final readCubit = context.read<ReadDailyProductSalesCubit>();
+    final readCubit = context.watch<ReadDailyProductSalesCubit>();
     return Card(
       key: ValueKey(readCubit.state),
       child: Padding(
