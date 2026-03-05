@@ -150,6 +150,17 @@ class CreateClient extends BaseClient {
     if (currentCoordinateValue is Coordinates) {
       coordinates = currentCoordinateValue;
     }
+
+    final currentPersonalReferencesValue = json['personalReferences'];
+    List<PersonalReference> personalReferences = [];
+    if (currentPersonalReferencesValue is List<PersonalReference>) {
+      personalReferences = currentPersonalReferencesValue;
+    } else if (currentPersonalReferencesValue != null) {
+      personalReferences = currentPersonalReferencesValue
+          .map((e) => PersonalReference.fromJson(e as Map<String, dynamic>))
+          .toList();
+    }
+
     return CreateClient(
       name: json['name'] as String,
       cardId: json['cardId'] as String?,
@@ -163,11 +174,7 @@ class CreateClient extends BaseClient {
       isCreditActive: json['isCreditActive'] as bool? ?? false,
       isActive: json['isActive'] as bool? ?? true,
       coordinates: coordinates,
-      personalReferences: json['personalReferences'] != null
-          ? (json['personalReferences'] as List<dynamic>)
-                .map((e) => PersonalReference.fromJson(e as Map<String, dynamic>))
-                .toList()
-          : [],
+      personalReferences: personalReferences,
     );
   }
 }

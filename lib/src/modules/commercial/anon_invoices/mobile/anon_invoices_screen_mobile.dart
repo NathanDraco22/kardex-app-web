@@ -201,7 +201,11 @@ class _Body extends StatelessWidget {
                         percentDiscount: currentCommercial.selectedDisocunt?.percentValue ?? 0,
                         onRemove: () => viewController.removeItem(currentCommercial),
                         onEdit: () async {
-                          final res = await showCommercialProductModal(context, product: currentCommercial.product);
+                          final res = await showCommercialProductModal(
+                            context,
+                            product: currentCommercial.product,
+                            commercialProductResult: currentCommercial,
+                          );
                           if (!context.mounted) return;
                           if (res == null) return;
                           if (res.product.account.availableStock == 0 ||
