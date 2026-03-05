@@ -69,11 +69,7 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    EdgeInsets mainPadding = const EdgeInsets.all(8.0);
-
-    if (context.isMobile()) {
-      mainPadding = EdgeInsets.zero;
-    }
+    EdgeInsets mainPadding = const EdgeInsets.all(4.0);
 
     return Center(
       child: Padding(

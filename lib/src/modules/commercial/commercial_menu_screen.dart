@@ -83,25 +83,25 @@ class _Body extends StatelessWidget {
               },
             ),
 
-          const Divider(
-            height: 4.0,
-            thickness: 2,
-          ),
-
           if (accessManager.hasCurrentAccess(context, CommercialSubModules.createInvoice))
             ListTile(
               leading: Icon(
-                FluentIcons.building_retail_money_24_filled,
+                FluentIcons.person_money_20_filled,
                 size: 32,
-                color: Colors.orange.shade600,
+                color: Colors.green.shade600,
               ),
-              title: const Text("Ventas diarias por Producto"),
+              title: const Text("Facturacion a Clientes"),
               onTap: () {
-                context.pushNamed("daily-product-sales");
+                context.pushNamed("client-invoice");
               },
             ),
 
           const Divider(height: 0.0),
+
+          const Divider(
+            height: 4.0,
+            thickness: 2,
+          ),
 
           if (accessManager.hasCurrentAccess(context, CommercialSubModules.createInvoice))
             ListTile(
@@ -115,6 +115,9 @@ class _Body extends StatelessWidget {
                 context.pushNamed("commercial-product-movements");
               },
             ),
+
+          const Divider(height: 0.0),
+
           if (accessManager.hasCurrentAccess(context, CommercialSubModules.createInvoice))
             ListTile(
               leading: const Icon(Icons.search, color: Colors.purple),
@@ -138,25 +141,41 @@ class _Body extends StatelessWidget {
             ),
 
           const Divider(height: 0.0),
-          const Divider(
-            height: 4.0,
-            thickness: 2,
-          ),
 
           if (accessManager.hasCurrentAccess(context, CommercialSubModules.createInvoice))
             ListTile(
               leading: Icon(
-                FluentIcons.person_money_20_filled,
+                FluentIcons.building_retail_money_24_filled,
                 size: 32,
-                color: Colors.green.shade600,
+                color: Colors.orange.shade600,
               ),
-              title: const Text("Facturacion a Clientes"),
+              title: const Text("Ventas diarias por Producto"),
               onTap: () {
-                context.pushNamed("client-invoice");
+                context.pushNamed("daily-product-sales");
               },
             ),
 
           const Divider(height: 0.0),
+
+          if (accessManager.hasCurrentAccess(context, CommercialSubModules.createInvoice))
+            ListTile(
+              leading: Icon(
+                Icons.list,
+                size: 32,
+                color: Colors.orange.shade600,
+              ),
+              title: const Text("Productos en Ordenes de Compra"),
+              onTap: () {
+                context.pushNamed("daily-product-in-orders");
+              },
+            ),
+
+          const Divider(height: 0.0),
+
+          const Divider(
+            height: 4.0,
+            thickness: 2,
+          ),
 
           if (accessManager.hasCurrentAccess(context, CommercialSubModules.orders))
             ListTile(
