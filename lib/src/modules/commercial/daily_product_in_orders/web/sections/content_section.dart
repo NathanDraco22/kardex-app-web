@@ -47,17 +47,10 @@ class _ContentSection extends StatelessWidget {
                     ),
                     BasicTableColumn(
                       label: const Text(
-                        "Cant. Solicitada",
+                        "Cantidad",
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      flex: 1,
-                    ),
-                    BasicTableColumn(
-                      label: const Text(
-                        "Bonificadas",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      flex: 1,
+                      flex: 2,
                     ),
                     BasicTableColumn(
                       label: const Text(
@@ -78,10 +71,7 @@ class _ContentSection extends StatelessWidget {
                           content: Text(productSale.productName),
                         ),
                         BasicTableCell(
-                          content: Text(productSale.totalQuantity.toString()),
-                        ),
-                        BasicTableCell(
-                          content: Text(productSale.totalBonQuantity.toString()),
+                          content: Text(productSale.totalUnits.toString()),
                         ),
                         BasicTableCell(
                           content: Text(
