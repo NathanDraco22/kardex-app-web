@@ -49,15 +49,32 @@ class _HeaderSectionState extends State<_HeaderSection> {
                 ],
               ),
             ),
-            TextButton(
-              onPressed: () async {
-                final user = await showActiveUserSelectionDialog(context);
-                if (user == null) return;
-                readCubit.loadDailyProductSales(userCreatorId: user.id);
-                currentSelectedUser = user;
-                setState(() {});
-              },
-              child: const Text("Seleccionar Usuario"),
+            Row(
+              children: [
+                TextButton(
+                  onPressed: () async {
+                    final user = await showActiveUserSelectionDialog(context);
+                    if (user == null) return;
+                    readCubit.loadDailyProductSales(userCreatorId: user.id);
+                    currentSelectedUser = user;
+                    setState(() {});
+                  },
+                  child: const Text("Seleccionar Usuario"),
+                ),
+                const Spacer(),
+                if (readCubit.state is ReadDailyProductSalesSuccess)
+                  FilledButton.icon(
+                    onPressed: () async {
+                      final products = (readCubit.state as ReadDailyProductSalesSuccess).productTotals;
+                      await CsvExportTool.exportProductSalesToCSV(
+                        products: products,
+                        fileName: "ventas_diarias",
+                      );
+                    },
+                    icon: const Icon(Icons.download),
+                    label: const Text("Exportar CSV"),
+                  ),
+              ],
             ),
 
             if (currentSelectedUser != null)

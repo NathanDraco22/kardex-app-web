@@ -5,6 +5,8 @@ class ProductSalesTotal {
   int totalBonQuantity;
   int total;
 
+  int get totalUnits => totalQuantity + totalBonQuantity;
+
   ProductSalesTotal({
     required this.productId,
     required this.productName,
