@@ -32,7 +32,7 @@ class _RootScaffold extends StatelessWidget {
           context.goNamed(routeName);
         }
 
-        if (state is Unauthenticated) {
+        if (state is Unauthenticated || state is AuthError) {
           context.goNamed("login");
         }
       },
