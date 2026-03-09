@@ -39,6 +39,7 @@ class UpdateUserDialog extends StatefulWidget {
 
 class _UpdateUserDialogState extends State<UpdateUserDialog> {
   String username = "";
+  String selectedUserId = "";
 
   bool isActive = true;
 
@@ -54,6 +55,7 @@ class _UpdateUserDialogState extends State<UpdateUserDialog> {
     username = widget.user.username;
     selectedRole = widget.user.role;
     selectedBranchIds = widget.user.branches;
+    selectedUserId = widget.user.id;
     super.initState();
   }
 
@@ -113,7 +115,7 @@ class _UpdateUserDialogState extends State<UpdateUserDialog> {
         }
       },
       child: AlertDialog(
-        title: const Text("Crear Usuario"),
+        title: const Text("Actualizar Usuario"),
         content: Form(
           key: formKey,
           child: SizedBox(
@@ -192,15 +194,16 @@ class _UpdateUserDialogState extends State<UpdateUserDialog> {
                   },
                 ),
 
-                SwitchListTile(
-                  value: isActive,
-                  onChanged: (value) {
-                    setState(() {
-                      isActive = value;
-                    });
-                  },
-                  title: const Text("Activo"),
-                ),
+                if (selectedUserId != widget.user.id)
+                  SwitchListTile(
+                    value: isActive,
+                    onChanged: (value) {
+                      setState(() {
+                        isActive = value;
+                      });
+                    },
+                    title: const Text("Activo"),
+                  ),
               ],
             ),
           ),
