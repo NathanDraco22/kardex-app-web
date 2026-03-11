@@ -175,7 +175,7 @@ Future<Uint8List> generateTicketPdfFromOrder(OrderInDb order, BranchInDb branch)
             pw.Row(
               children: [
                 pw.Expanded(
-                  flex: 3,
+                  flex: 4,
                   child: pw.Text(
                     'Descripción',
                     style: pw.TextStyle(
@@ -228,7 +228,7 @@ Future<Uint8List> generateTicketPdfFromOrder(OrderInDb order, BranchInDb branch)
                   child: pw.Row(
                     children: [
                       pw.Expanded(
-                        flex: 3,
+                        flex: 4,
                         child: pw.Text(
                           item.product.name,
                           maxLines: 2,
