@@ -67,7 +67,7 @@ Future<Uint8List> generateTicketPdfFromInvoice(InvoiceInDb invoice, BranchInDb b
               branch.name,
               style: pw.TextStyle(
                 fontWeight: pw.FontWeight.bold,
-                fontSize: 10,
+                fontSize: 12,
               ),
               textAlign: pw.TextAlign.center,
             ),
@@ -105,7 +105,7 @@ Future<Uint8List> generateTicketPdfFromInvoice(InvoiceInDb invoice, BranchInDb b
               'FACTURA',
               style: pw.TextStyle(
                 fontWeight: pw.FontWeight.bold,
-                fontSize: 10,
+                fontSize: 12,
               ),
               textAlign: pw.TextAlign.center,
             ),
