@@ -67,7 +67,7 @@ Future<Uint8List> generateTicketPdfFromInvoice(InvoiceInDb invoice, BranchInDb b
               branch.name,
               style: pw.TextStyle(
                 fontWeight: pw.FontWeight.bold,
-                fontSize: 12,
+                fontSize: 10,
               ),
               textAlign: pw.TextAlign.center,
             ),
@@ -105,7 +105,7 @@ Future<Uint8List> generateTicketPdfFromInvoice(InvoiceInDb invoice, BranchInDb b
               'FACTURA',
               style: pw.TextStyle(
                 fontWeight: pw.FontWeight.bold,
-                fontSize: 12,
+                fontSize: 10,
               ),
               textAlign: pw.TextAlign.center,
             ),
@@ -138,7 +138,7 @@ Future<Uint8List> generateTicketPdfFromInvoice(InvoiceInDb invoice, BranchInDb b
               ),
             ),
 
-            pw.SizedBox(height: 6),
+            pw.SizedBox(height: 4),
 
             if (invoice.clientInfo.name != "Sin Cliente")
               pw.Text(
@@ -176,7 +176,7 @@ Future<Uint8List> generateTicketPdfFromInvoice(InvoiceInDb invoice, BranchInDb b
             pw.Row(
               children: [
                 pw.Expanded(
-                  flex: 3,
+                  flex: 4,
                   child: pw.Text(
                     'Descripción',
                     style: pw.TextStyle(
@@ -229,7 +229,7 @@ Future<Uint8List> generateTicketPdfFromInvoice(InvoiceInDb invoice, BranchInDb b
                   child: pw.Row(
                     children: [
                       pw.Expanded(
-                        flex: 3,
+                        flex: 4,
                         child: pw.Text(
                           item.product.name,
                           maxLines: 2,
