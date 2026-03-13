@@ -8,9 +8,12 @@ import 'package:kardex_app_front/src/domain/repositories/invoice_repository.dart
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/printers/invoice_printer.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 
 Future<void> showInvoiceViewerDialog(BuildContext context, InvoiceInDb invoice) async {
   final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
+  final paperSize = await PrintManager.getLocalPaperSize();
+  if (!context.mounted) return;
   await Navigator.push(
     context,
     MaterialPageRoute(
@@ -18,8 +21,8 @@ Future<void> showInvoiceViewerDialog(BuildContext context, InvoiceInDb invoice) 
         return _InvoiceViewer(
           invoice: invoice,
           branch: currentBranch,
-          onShare: () => shareInvoice(invoice, currentBranch),
-          onPrint: () => printInvoice(invoice, currentBranch),
+          onShare: () => shareInvoice(invoice, currentBranch, paperSize: paperSize),
+          onPrint: () => printInvoice(invoice, currentBranch, paperSize: paperSize),
         );
       },
     ),
@@ -28,6 +31,8 @@ Future<void> showInvoiceViewerDialog(BuildContext context, InvoiceInDb invoice) 
 
 Future<void> showInvoiceViewerDialogFromId(BuildContext context, String invoiceId) async {
   final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
+  final paperSize = await PrintManager.getLocalPaperSize();
+  if (!context.mounted) return;
 
   await Navigator.push(
     context,
@@ -59,8 +64,8 @@ Future<void> showInvoiceViewerDialogFromId(BuildContext context, String invoiceI
             return _InvoiceViewer(
               invoice: invoice,
               branch: currentBranch,
-              onShare: () => shareInvoice(invoice, currentBranch),
-              onPrint: () => printInvoice(invoice, currentBranch),
+              onShare: () => shareInvoice(invoice, currentBranch, paperSize: paperSize),
+              onPrint: () => printInvoice(invoice, currentBranch, paperSize: paperSize),
             );
           },
         );

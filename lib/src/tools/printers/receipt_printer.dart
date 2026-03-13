@@ -8,23 +8,27 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
-Future<bool> printReceipt(ReceiptInDb receipt, BranchInDb branch) async {
-  final bytes = await generateTicketPdfFromReceipt(receipt, branch);
+Future<bool> printReceipt(ReceiptInDb receipt, BranchInDb branch, {PaperSize paperSize = PaperSize.mm80}) async {
+  final bytes = await generateTicketPdfFromReceipt(receipt, branch, paperSize: paperSize);
   return await Printing.layoutPdf(onLayout: (_) => bytes, name: 'recibo_${receipt.docNumber}.pdf');
 }
 
-Future<bool> shareReceipt(ReceiptInDb receipt, BranchInDb branch) async {
-  final bytes = await generateTicketPdfFromReceipt(receipt, branch);
+Future<bool> shareReceipt(ReceiptInDb receipt, BranchInDb branch, {PaperSize paperSize = PaperSize.mm80}) async {
+  final bytes = await generateTicketPdfFromReceipt(receipt, branch, paperSize: paperSize);
   return await Printing.sharePdf(bytes: bytes, filename: 'recibo_${receipt.docNumber}.pdf');
 }
 
-Future<Uint8List> generateTicketPdfFromReceipt(ReceiptInDb receipt, BranchInDb branch) async {
+Future<Uint8List> generateTicketPdfFromReceipt(
+  ReceiptInDb receipt,
+  BranchInDb branch, {
+  PaperSize paperSize = PaperSize.mm80,
+}) async {
   final pdf = pw.Document();
 
   final pageFormat = PdfPageFormat(
-    TicketSettings.ticketWidth * PdfPageFormat.mm,
+    TicketSettings.ticketWidth(paperSize) * PdfPageFormat.mm,
     double.infinity,
-    marginAll: TicketSettings.ticketMargin * PdfPageFormat.mm,
+    marginAll: TicketSettings.ticketMargin(paperSize) * PdfPageFormat.mm,
   );
 
   final branchImage = branch.image;
@@ -38,6 +42,8 @@ Future<Uint8List> generateTicketPdfFromReceipt(ReceiptInDb receipt, BranchInDb b
     (previousValue, element) => previousValue + element.amountApplied,
   );
 
+  final logoSize = TicketSettings.logoSize(paperSize);
+
   pdf.addPage(
     pw.Page(
       pageFormat: pageFormat,
@@ -48,7 +54,11 @@ Future<Uint8List> generateTicketPdfFromReceipt(ReceiptInDb receipt, BranchInDb b
             if (branchImage != null && branchImage.isNotEmpty)
               pw.Align(
                 alignment: pw.Alignment.center,
-                child: pw.Image(pw.MemoryImage(branchImage), width: 100, height: 100),
+                child: pw.Image(
+                  pw.MemoryImage(branchImage),
+                  width: logoSize,
+                  height: logoSize,
+                ),
               ),
 
             pw.Text(
@@ -58,26 +68,29 @@ Future<Uint8List> generateTicketPdfFromReceipt(ReceiptInDb receipt, BranchInDb b
             ),
             pw.Text(
               branch.address,
-              style: pw.TextStyle(fontSize: TicketSettings.contentFontSize),
+              style: pw.TextStyle(fontSize: TicketSettings.contentFontSize(paperSize)),
               textAlign: pw.TextAlign.center,
             ),
-            pw.Row(
-              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-              children: [
-                pw.Text(
-                  "Telf: ${branch.phone}",
-                  style: pw.TextStyle(
-                    fontSize: TicketSettings.contentFontSize,
-                  ),
-                ),
-                pw.Text(
-                  "Email: ${branch.email}",
-                  style: pw.TextStyle(
-                    fontSize: TicketSettings.contentFontSize,
-                  ),
-                ),
-              ],
-            ),
+            if (paperSize == PaperSize.mm80)
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  if (branch.phone.isNotEmpty)
+                    pw.Text(
+                      "Telf: ${branch.phone}",
+                      style: pw.TextStyle(
+                        fontSize: TicketSettings.contentFontSize(paperSize),
+                      ),
+                    ),
+                  if (branch.email.isNotEmpty)
+                    pw.Text(
+                      "Email: ${branch.email}",
+                      style: pw.TextStyle(
+                        fontSize: TicketSettings.contentFontSize(paperSize),
+                      ),
+                    ),
+                ],
+              ),
 
             pw.Text(
               'Recibo',
@@ -96,12 +109,12 @@ Future<Uint8List> generateTicketPdfFromReceipt(ReceiptInDb receipt, BranchInDb b
                 pw.Text(
                   'Recibo: ${receipt.docNumber}',
                   style: pw.TextStyle(
-                    fontSize: TicketSettings.contentFontSize,
+                    fontSize: TicketSettings.contentFontSize(paperSize),
                   ),
                 ),
                 pw.Text(
                   DateFormat('dd/MM/yyyy').format(receipt.createdAt),
-                  style: pw.TextStyle(fontSize: TicketSettings.contentFontSize),
+                  style: pw.TextStyle(fontSize: TicketSettings.contentFontSize(paperSize)),
                 ),
               ],
             ),
@@ -109,17 +122,20 @@ Future<Uint8List> generateTicketPdfFromReceipt(ReceiptInDb receipt, BranchInDb b
             if (receipt.clientInfo.name != "Sin Cliente")
               pw.Text(
                 'Cliente: ${receipt.clientInfo.name}',
-                style: pw.TextStyle(fontSize: TicketSettings.contentFontSize),
+                style: pw.TextStyle(fontSize: TicketSettings.contentFontSize(paperSize)),
               ),
             pw.Text(
               'Elaborado por: ${receipt.createdBy.name}',
-              style: pw.TextStyle(fontSize: TicketSettings.contentFontSize),
+              style: pw.TextStyle(fontSize: TicketSettings.contentFontSize(paperSize)),
             ),
             pw.Divider(color: PdfColors.grey),
 
             pw.Text(
               'Detalles del Pago',
-              style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: TicketSettings.contentFontSize),
+              style: pw.TextStyle(
+                fontWeight: pw.FontWeight.bold,
+                fontSize: TicketSettings.contentFontSize(paperSize),
+              ),
             ),
             pw.Divider(color: PdfColors.grey800),
             pw.Row(
@@ -127,11 +143,11 @@ Future<Uint8List> generateTicketPdfFromReceipt(ReceiptInDb receipt, BranchInDb b
               children: [
                 pw.Text(
                   'Fact.',
-                  style: pw.TextStyle(fontSize: TicketSettings.contentFontSize),
+                  style: pw.TextStyle(fontSize: TicketSettings.contentFontSize(paperSize)),
                 ),
                 pw.Text(
                   "Monto",
-                  style: pw.TextStyle(fontSize: TicketSettings.contentFontSize),
+                  style: pw.TextStyle(fontSize: TicketSettings.contentFontSize(paperSize)),
                 ),
               ],
             ),
@@ -145,11 +161,11 @@ Future<Uint8List> generateTicketPdfFromReceipt(ReceiptInDb receipt, BranchInDb b
                     children: [
                       pw.Text(
                         '#${invoice.docNumber}',
-                        style: pw.TextStyle(fontSize: TicketSettings.contentFontSize),
+                        style: pw.TextStyle(fontSize: TicketSettings.contentFontSize(paperSize)),
                       ),
                       pw.Text(
                         NumberFormatter.convertToMoneyLike(invoice.amountApplied),
-                        style: pw.TextStyle(fontSize: TicketSettings.contentFontSize),
+                        style: pw.TextStyle(fontSize: TicketSettings.contentFontSize(paperSize)),
                       ),
                     ],
                   ),
@@ -164,11 +180,11 @@ Future<Uint8List> generateTicketPdfFromReceipt(ReceiptInDb receipt, BranchInDb b
                 children: [
                   pw.Text(
                     'Devol.',
-                    style: pw.TextStyle(fontSize: TicketSettings.contentFontSize),
+                    style: pw.TextStyle(fontSize: TicketSettings.contentFontSize(paperSize)),
                   ),
                   pw.Text(
                     "Monto",
-                    style: pw.TextStyle(fontSize: TicketSettings.contentFontSize),
+                    style: pw.TextStyle(fontSize: TicketSettings.contentFontSize(paperSize)),
                   ),
                 ],
               ),
@@ -181,11 +197,11 @@ Future<Uint8List> generateTicketPdfFromReceipt(ReceiptInDb receipt, BranchInDb b
                     children: [
                       pw.Text(
                         '#${devolution.docNumber}',
-                        style: pw.TextStyle(fontSize: TicketSettings.contentFontSize),
+                        style: pw.TextStyle(fontSize: TicketSettings.contentFontSize(paperSize)),
                       ),
                       pw.Text(
                         NumberFormatter.convertToMoneyLike(devolution.amountApplied),
-                        style: pw.TextStyle(fontSize: TicketSettings.contentFontSize),
+                        style: pw.TextStyle(fontSize: TicketSettings.contentFontSize(paperSize)),
                       ),
                     ],
                   ),
@@ -200,14 +216,20 @@ Future<Uint8List> generateTicketPdfFromReceipt(ReceiptInDb receipt, BranchInDb b
               children: [
                 pw.Text(
                   'Facts: ',
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: TicketSettings.contentFontSize),
+                  style: pw.TextStyle(
+                    fontWeight: pw.FontWeight.bold,
+                    fontSize: TicketSettings.contentFontSize(paperSize),
+                  ),
                 ),
 
                 pw.SizedBox(
                   width: 80,
                   child: pw.Text(
                     NumberFormatter.convertToMoneyLike(totalInvoice),
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: TicketSettings.contentFontSize),
+                    style: pw.TextStyle(
+                      fontWeight: pw.FontWeight.bold,
+                      fontSize: TicketSettings.contentFontSize(paperSize),
+                    ),
                     textAlign: pw.TextAlign.right,
                   ),
                 ),
@@ -219,14 +241,20 @@ Future<Uint8List> generateTicketPdfFromReceipt(ReceiptInDb receipt, BranchInDb b
               children: [
                 pw.Text(
                   'Devol.: ',
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: TicketSettings.contentFontSize),
+                  style: pw.TextStyle(
+                    fontWeight: pw.FontWeight.bold,
+                    fontSize: TicketSettings.contentFontSize(paperSize),
+                  ),
                 ),
 
                 pw.SizedBox(
                   width: 80,
                   child: pw.Text(
                     NumberFormatter.convertToMoneyLike(totalDevolution),
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: TicketSettings.contentFontSize),
+                    style: pw.TextStyle(
+                      fontWeight: pw.FontWeight.bold,
+                      fontSize: TicketSettings.contentFontSize(paperSize),
+                    ),
                     textAlign: pw.TextAlign.right,
                   ),
                 ),
@@ -240,14 +268,20 @@ Future<Uint8List> generateTicketPdfFromReceipt(ReceiptInDb receipt, BranchInDb b
               children: [
                 pw.Text(
                   'Total: ',
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: TicketSettings.contentFontSize),
+                  style: pw.TextStyle(
+                    fontWeight: pw.FontWeight.bold,
+                    fontSize: TicketSettings.contentFontSize(paperSize),
+                  ),
                 ),
 
                 pw.SizedBox(
                   width: 80,
                   child: pw.Text(
                     NumberFormatter.convertToMoneyLike(receipt.total),
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: TicketSettings.contentFontSize),
+                    style: pw.TextStyle(
+                      fontWeight: pw.FontWeight.bold,
+                      fontSize: TicketSettings.contentFontSize(paperSize),
+                    ),
                     textAlign: pw.TextAlign.right,
                   ),
                 ),
@@ -259,7 +293,7 @@ Future<Uint8List> generateTicketPdfFromReceipt(ReceiptInDb receipt, BranchInDb b
             pw.Center(
               child: pw.Text(
                 '¡Gracias!',
-                style: pw.TextStyle(fontSize: TicketSettings.contentFontSize),
+                style: pw.TextStyle(fontSize: TicketSettings.contentFontSize(paperSize)),
               ),
             ),
           ],

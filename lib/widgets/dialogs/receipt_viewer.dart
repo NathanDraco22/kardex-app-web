@@ -9,16 +9,24 @@ import 'package:kardex_app_front/widgets/dialogs/devolution_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/invoice_viewer.dart';
 import 'package:kardex_app_front/src/domain/repositories/receipt_repository.dart';
 
+import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
+import 'package:kardex_app_front/src/tools/printers/paper_settings.dart';
+
 Future<void> showReceiptViewerDialog(BuildContext context, ReceiptInDb receipt) async {
+  final paperSize = await PrintManager.getLocalPaperSize();
+  if (!context.mounted) return;
   await Navigator.push(
     context,
     MaterialPageRoute(
-      builder: (context) => _ReceiptViewer(receipt),
+      builder: (context) => _ReceiptViewer(receipt, paperSize: paperSize),
     ),
   );
 }
 
 Future<void> showReceiptViewerDialogFromDocNumber(BuildContext context, String docNumber) async {
+  final paperSize = await PrintManager.getLocalPaperSize();
+  if (!context.mounted) return;
+
   await Navigator.push(
     context,
     MaterialPageRoute(
@@ -46,7 +54,7 @@ Future<void> showReceiptViewerDialogFromDocNumber(BuildContext context, String d
 
             final receipt = asyncSnapshot.data!;
 
-            return _ReceiptViewer(receipt);
+            return _ReceiptViewer(receipt, paperSize: paperSize);
           },
         );
       },
@@ -55,9 +63,10 @@ Future<void> showReceiptViewerDialogFromDocNumber(BuildContext context, String d
 }
 
 class _ReceiptViewer extends StatelessWidget {
-  const _ReceiptViewer(this.receipt);
+  const _ReceiptViewer(this.receipt, {this.paperSize = PaperSize.mm80});
 
   final ReceiptInDb receipt;
+  final PaperSize paperSize;
 
   @override
   Widget build(BuildContext context) {
@@ -71,14 +80,14 @@ class _ReceiptViewer extends StatelessWidget {
           IconButton(
             tooltip: "Compartir Recibo",
             onPressed: () {
-              shareReceipt(receipt, currentBranch);
+              shareReceipt(receipt, currentBranch, paperSize: paperSize);
             },
             icon: const Icon(Icons.share),
           ),
           IconButton(
             tooltip: "Imprimir Recibo",
             onPressed: () {
-              printReceipt(receipt, currentBranch);
+              printReceipt(receipt, currentBranch, paperSize: paperSize);
             },
             icon: const Icon(Icons.print),
           ),
