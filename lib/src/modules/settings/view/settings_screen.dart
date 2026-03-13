@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/constants/const_modules.dart';
+import 'package:kardex_app_front/src/modules/settings/view/local_printer_settings_dialog.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -62,6 +63,16 @@ class _Body extends StatelessWidget {
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
               context.pushNamed("integrations");
+            },
+          ),
+          const Divider(height: 0.0),
+
+          ListTile(
+            leading: const Icon(Icons.print),
+            title: const Text("Configuración de Impresora Local"),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              showLocalPrinterSettingsDialog(context);
             },
           ),
           const Divider(height: 0.0),

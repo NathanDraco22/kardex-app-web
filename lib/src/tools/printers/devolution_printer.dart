@@ -8,27 +8,41 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
-Future<bool> printDevolution(DevolutionInDb devolution, BranchInDb branch) async {
-  final bytes = await generateTicketPdfFromDevolution(devolution, branch);
+Future<bool> printDevolution(
+  DevolutionInDb devolution,
+  BranchInDb branch, {
+  PaperSize paperSize = PaperSize.mm80,
+}) async {
+  final bytes = await generateTicketPdfFromDevolution(devolution, branch, paperSize: paperSize);
   return await Printing.layoutPdf(onLayout: (_) => bytes, name: 'devolucion_${devolution.docNumber}.pdf');
 }
 
-Future<bool> shareDevolution(DevolutionInDb devolution, BranchInDb branch) async {
-  final bytes = await generateTicketPdfFromDevolution(devolution, branch);
+Future<bool> shareDevolution(
+  DevolutionInDb devolution,
+  BranchInDb branch, {
+  PaperSize paperSize = PaperSize.mm80,
+}) async {
+  final bytes = await generateTicketPdfFromDevolution(devolution, branch, paperSize: paperSize);
   return await Printing.sharePdf(bytes: bytes, filename: 'devolucion_${devolution.docNumber}.pdf');
 }
 
-Future<Uint8List> generateTicketPdfFromDevolution(DevolutionInDb devolution, BranchInDb branch) async {
+Future<Uint8List> generateTicketPdfFromDevolution(
+  DevolutionInDb devolution,
+  BranchInDb branch, {
+  PaperSize paperSize = PaperSize.mm80,
+}) async {
   final pdf = pw.Document();
   final NumberFormat currencyFormat = NumberFormat.currency(symbol: 'C\$');
 
   final pageFormat = PdfPageFormat(
-    TicketSettings.ticketWidth * PdfPageFormat.mm,
+    TicketSettings.ticketWidth(paperSize) * PdfPageFormat.mm,
     double.infinity,
-    marginAll: TicketSettings.ticketMargin * PdfPageFormat.mm,
+    marginAll: TicketSettings.ticketMargin(paperSize) * PdfPageFormat.mm,
   );
 
   final branchImage = branch.image;
+
+  final logoSize = TicketSettings.logoSize(paperSize);
 
   pdf.addPage(
     pw.Page(
@@ -45,8 +59,8 @@ Future<Uint8List> generateTicketPdfFromDevolution(DevolutionInDb devolution, Bra
                     pw.MemoryImage(
                       branchImage,
                     ),
-                    width: 100,
-                    height: 100,
+                    width: logoSize,
+                    height: logoSize,
                   ),
                 ],
               ),
@@ -61,7 +75,7 @@ Future<Uint8List> generateTicketPdfFromDevolution(DevolutionInDb devolution, Bra
             pw.Text(
               branch.address,
               style: pw.TextStyle(
-                fontSize: TicketSettings.contentFontSize,
+                fontSize: TicketSettings.contentFontSize(paperSize),
               ),
               textAlign: pw.TextAlign.center,
             ),
@@ -72,7 +86,7 @@ Future<Uint8List> generateTicketPdfFromDevolution(DevolutionInDb devolution, Bra
                   pw.Text(
                     "Telf: ${branch.phone}",
                     style: pw.TextStyle(
-                      fontSize: TicketSettings.contentFontSize,
+                      fontSize: TicketSettings.contentFontSize(paperSize),
                     ),
                     textAlign: pw.TextAlign.center,
                   ),
@@ -81,7 +95,7 @@ Future<Uint8List> generateTicketPdfFromDevolution(DevolutionInDb devolution, Bra
                   pw.Text(
                     "Email: ${branch.email}",
                     style: pw.TextStyle(
-                      fontSize: TicketSettings.contentFontSize,
+                      fontSize: TicketSettings.contentFontSize(paperSize),
                     ),
                     textAlign: pw.TextAlign.center,
                   ),
@@ -92,7 +106,7 @@ Future<Uint8List> generateTicketPdfFromDevolution(DevolutionInDb devolution, Bra
               'DEVOLUCIÓN',
               style: pw.TextStyle(
                 fontWeight: pw.FontWeight.bold,
-                fontSize: 12,
+                fontSize: 10,
               ),
               textAlign: pw.TextAlign.center,
             ),
@@ -105,14 +119,14 @@ Future<Uint8List> generateTicketPdfFromDevolution(DevolutionInDb devolution, Bra
                 pw.Text(
                   'Devolución: ${devolution.docNumber}',
                   style: pw.TextStyle(
-                    fontSize: TicketSettings.contentFontSize,
+                    fontSize: TicketSettings.contentFontSize(paperSize),
                   ),
                 ),
 
                 pw.Text(
                   DateFormat('dd/MM/yyyy').format(devolution.createdAt),
                   style: pw.TextStyle(
-                    fontSize: TicketSettings.contentFontSize,
+                    fontSize: TicketSettings.contentFontSize(paperSize),
                   ),
                 ),
               ],
@@ -124,14 +138,14 @@ Future<Uint8List> generateTicketPdfFromDevolution(DevolutionInDb devolution, Bra
               pw.Text(
                 "Cliente: ${devolution.clientInfo.name}",
                 style: pw.TextStyle(
-                  fontSize: TicketSettings.contentFontSize,
+                  fontSize: TicketSettings.contentFontSize(paperSize),
                 ),
               ),
 
             pw.Text(
               "Elaborado por: ${devolution.createdBy.name}",
               style: pw.TextStyle(
-                fontSize: TicketSettings.contentFontSize,
+                fontSize: TicketSettings.contentFontSize(paperSize),
               ),
             ),
 
@@ -145,7 +159,7 @@ Future<Uint8List> generateTicketPdfFromDevolution(DevolutionInDb devolution, Bra
                     'Descripción',
                     style: pw.TextStyle(
                       fontWeight: pw.FontWeight.bold,
-                      fontSize: TicketSettings.contentFontSize,
+                      fontSize: TicketSettings.contentFontSize(paperSize),
                     ),
                   ),
                 ),
@@ -156,21 +170,22 @@ Future<Uint8List> generateTicketPdfFromDevolution(DevolutionInDb devolution, Bra
                     textAlign: pw.TextAlign.center,
                     style: pw.TextStyle(
                       fontWeight: pw.FontWeight.bold,
-                      fontSize: TicketSettings.contentFontSize,
+                      fontSize: TicketSettings.contentFontSize(paperSize),
                     ),
                   ),
                 ),
-                pw.Expanded(
-                  flex: 2,
-                  child: pw.Text(
-                    'P/U',
-                    textAlign: pw.TextAlign.right,
-                    style: pw.TextStyle(
-                      fontWeight: pw.FontWeight.bold,
-                      fontSize: TicketSettings.contentFontSize,
+                if (paperSize == PaperSize.mm80)
+                  pw.Expanded(
+                    flex: 2,
+                    child: pw.Text(
+                      'P/U',
+                      textAlign: pw.TextAlign.right,
+                      style: pw.TextStyle(
+                        fontWeight: pw.FontWeight.bold,
+                        fontSize: TicketSettings.contentFontSize(paperSize),
+                      ),
                     ),
                   ),
-                ),
                 pw.Expanded(
                   flex: 2,
                   child: pw.Text(
@@ -178,7 +193,7 @@ Future<Uint8List> generateTicketPdfFromDevolution(DevolutionInDb devolution, Bra
                     textAlign: pw.TextAlign.right,
                     style: pw.TextStyle(
                       fontWeight: pw.FontWeight.bold,
-                      fontSize: TicketSettings.contentFontSize,
+                      fontSize: TicketSettings.contentFontSize(paperSize),
                     ),
                   ),
                 ),
@@ -199,7 +214,7 @@ Future<Uint8List> generateTicketPdfFromDevolution(DevolutionInDb devolution, Bra
                           maxLines: 2,
                           overflow: pw.TextOverflow.clip,
                           style: pw.TextStyle(
-                            fontSize: TicketSettings.contentFontSize,
+                            fontSize: TicketSettings.contentFontSize(paperSize),
                           ),
                         ),
                       ),
@@ -209,27 +224,28 @@ Future<Uint8List> generateTicketPdfFromDevolution(DevolutionInDb devolution, Bra
                           item.quantity.toString(),
                           textAlign: pw.TextAlign.center,
                           style: pw.TextStyle(
-                            fontSize: TicketSettings.contentFontSize,
+                            fontSize: TicketSettings.contentFontSize(paperSize),
                           ),
                         ),
                       ),
-                      pw.Expanded(
-                        flex: 2,
-                        child: pw.Text(
-                          NumberFormatter.convertFromCentsToDouble(item.price).toString(),
-                          textAlign: pw.TextAlign.right,
-                          style: pw.TextStyle(
-                            fontSize: TicketSettings.contentFontSize,
+                      if (paperSize == PaperSize.mm80)
+                        pw.Expanded(
+                          flex: 2,
+                          child: pw.Text(
+                            NumberFormatter.convertFromCentsToDouble(item.price).toString(),
+                            textAlign: pw.TextAlign.right,
+                            style: pw.TextStyle(
+                              fontSize: TicketSettings.contentFontSize(paperSize),
+                            ),
                           ),
                         ),
-                      ),
                       pw.Expanded(
                         flex: 2,
                         child: pw.Text(
                           NumberFormatter.convertFromCentsToDouble(item.subTotal).toString(),
                           textAlign: pw.TextAlign.right,
                           style: pw.TextStyle(
-                            fontSize: TicketSettings.contentFontSize,
+                            fontSize: TicketSettings.contentFontSize(paperSize),
                           ),
                         ),
                       ),
@@ -249,7 +265,7 @@ Future<Uint8List> generateTicketPdfFromDevolution(DevolutionInDb devolution, Bra
                     'TOTAL: ',
                     style: pw.TextStyle(
                       fontWeight: pw.FontWeight.bold,
-                      fontSize: TicketSettings.contentFontSize,
+                      fontSize: TicketSettings.contentFontSize(paperSize),
                     ),
                     textAlign: pw.TextAlign.right,
                   ),
@@ -261,7 +277,7 @@ Future<Uint8List> generateTicketPdfFromDevolution(DevolutionInDb devolution, Bra
                     currencyFormat.format(devolution.total / 100),
                     style: pw.TextStyle(
                       fontWeight: pw.FontWeight.bold,
-                      fontSize: TicketSettings.contentFontSize,
+                      fontSize: TicketSettings.contentFontSize(paperSize),
                     ),
                     textAlign: pw.TextAlign.right,
                   ),
@@ -275,7 +291,7 @@ Future<Uint8List> generateTicketPdfFromDevolution(DevolutionInDb devolution, Bra
               child: pw.Text(
                 'Documento de Devolución',
                 style: pw.TextStyle(
-                  fontSize: TicketSettings.contentFontSize,
+                  fontSize: TicketSettings.contentFontSize(paperSize),
                 ),
               ),
             ),

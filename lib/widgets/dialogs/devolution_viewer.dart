@@ -9,8 +9,13 @@ import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
 import 'package:kardex_app_front/src/tools/printers/devolution_printer.dart';
 
+import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
+
 Future<void> showDevolutionViewerDialog(BuildContext context, DevolutionInDb devolution) async {
   final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
+  final paperSize = await PrintManager.getLocalPaperSize();
+  if (!context.mounted) return;
+
   await Navigator.push(
     context,
     MaterialPageRoute(
@@ -18,8 +23,8 @@ Future<void> showDevolutionViewerDialog(BuildContext context, DevolutionInDb dev
         return _DevolutionViewer(
           devolution: devolution,
           branch: currentBranch,
-          onShare: () => shareDevolution(devolution, currentBranch),
-          onPrint: () => printDevolution(devolution, currentBranch),
+          onShare: () => shareDevolution(devolution, currentBranch, paperSize: paperSize),
+          onPrint: () => printDevolution(devolution, currentBranch, paperSize: paperSize),
         );
       },
     ),
@@ -29,6 +34,8 @@ Future<void> showDevolutionViewerDialog(BuildContext context, DevolutionInDb dev
 // --- FUNCIÓN PARA NAVEGAR CON SOLO EL ID ---
 Future<void> showDevolutionViewerDialogFromId(BuildContext context, String devolutionId) async {
   final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
+  final paperSize = await PrintManager.getLocalPaperSize();
+  if (!context.mounted) return;
 
   await Navigator.push(
     context,
@@ -56,8 +63,8 @@ Future<void> showDevolutionViewerDialogFromId(BuildContext context, String devol
             return _DevolutionViewer(
               devolution: devolution,
               branch: currentBranch,
-              onShare: () => shareDevolution(devolution, currentBranch),
-              onPrint: () => printDevolution(devolution, currentBranch),
+              onShare: () => shareDevolution(devolution, currentBranch, paperSize: paperSize),
+              onPrint: () => printDevolution(devolution, currentBranch, paperSize: paperSize),
             );
           },
         );

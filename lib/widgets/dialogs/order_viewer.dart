@@ -8,8 +8,13 @@ import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/printers/order_printer.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
 
+import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
+
 Future<void> showOrderViewerDialog(BuildContext context, OrderInDb order) async {
   final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
+  final paperSize = await PrintManager.getLocalPaperSize();
+  if (!context.mounted) return;
+
   await Navigator.push(
     context,
     MaterialPageRoute(
@@ -17,8 +22,8 @@ Future<void> showOrderViewerDialog(BuildContext context, OrderInDb order) async 
         return _OrderViewer(
           order: order,
           branch: currentBranch,
-          onShare: () => shareOrder(order, currentBranch),
-          onPrint: () => printOrder(order, currentBranch),
+          onShare: () => shareOrder(order, currentBranch, paperSize: paperSize),
+          onPrint: () => printOrder(order, currentBranch, paperSize: paperSize),
         );
       },
     ),
@@ -27,6 +32,8 @@ Future<void> showOrderViewerDialog(BuildContext context, OrderInDb order) async 
 
 Future<void> showOrderViewerDialogFromId(BuildContext context, String orderId) async {
   final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
+  final paperSize = await PrintManager.getLocalPaperSize();
+  if (!context.mounted) return;
 
   await Navigator.push(
     context,
@@ -58,8 +65,8 @@ Future<void> showOrderViewerDialogFromId(BuildContext context, String orderId) a
             return _OrderViewer(
               order: order,
               branch: currentBranch,
-              onShare: () => shareOrder(order, currentBranch),
-              onPrint: () => printOrder(order, currentBranch),
+              onShare: () => shareOrder(order, currentBranch, paperSize: paperSize),
+              onPrint: () => printOrder(order, currentBranch, paperSize: paperSize),
             );
           },
         );
