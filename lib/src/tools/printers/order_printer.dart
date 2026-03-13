@@ -52,6 +52,12 @@ Future<Uint8List> generateTicketPdfFromOrder(
   pdf.addPage(
     pw.Page(
       pageFormat: pageFormat,
+      theme: pw.ThemeData(
+        defaultTextStyle: pw.TextStyle(
+          font: await TicketSettings.ticketFont(paperSize),
+          fontBold: await TicketSettings.ticketFontBold(paperSize),
+        ),
+      ),
       build: (pw.Context context) {
         return pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.stretch,
