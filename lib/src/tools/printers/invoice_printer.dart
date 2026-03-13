@@ -52,6 +52,12 @@ Future<Uint8List> generateTicketPdfFromInvoice(
 
   pdf.addPage(
     pw.Page(
+      theme: pw.ThemeData(
+        defaultTextStyle: pw.TextStyle(
+          font: await TicketSettings.ticketFont(paperSize),
+          fontBold: await TicketSettings.ticketFontBold(paperSize),
+        ),
+      ),
       pageFormat: pageFormat,
       build: (pw.Context context) {
         return pw.Column(
