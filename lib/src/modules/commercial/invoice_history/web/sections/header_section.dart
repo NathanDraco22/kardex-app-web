@@ -34,6 +34,7 @@ class _HeaderSection extends StatelessWidget {
                         final invoiceRepo = context.read<InvoicesRepository>();
                         showSimpleSearchDialog<InvoiceInDb>(
                           context,
+                          title: "Buscar #Factura",
                           searchFuture: (value) {
                             return invoiceRepo.getInvoiceByDocNumber(value);
                           },

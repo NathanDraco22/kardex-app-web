@@ -30,6 +30,7 @@ class _HeaderSection extends StatelessWidget {
                       final adjustRepo = context.read<AdjustEntriesRepository>();
                       showSimpleSearchDialog<AdjustEntryInDb>(
                         context,
+                        title: "Buscar #Documento",
                         searchFuture: (value) {
                           return adjustRepo.getAdjustEntryByDocNumber(value, BranchesTool.getCurrentBranchId());
                         },

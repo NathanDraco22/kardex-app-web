@@ -29,6 +29,7 @@ class _HeaderSection extends StatelessWidget {
                       final adjustRepo = context.read<AdjustExitsRepository>();
                       showSimpleSearchDialog<AdjustExitInDb>(
                         context,
+                        title: "Buscar #Documento",
                         searchFuture: (value) {
                           // Search by Doc Number
                           return adjustRepo.getAdjustExitByDocNumber(value, BranchesTool.getCurrentBranchId());

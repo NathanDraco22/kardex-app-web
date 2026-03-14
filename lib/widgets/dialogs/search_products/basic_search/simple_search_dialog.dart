@@ -4,11 +4,13 @@ import 'package:go_router/go_router.dart';
 Future<void> showSimpleSearchDialog<T>(
   BuildContext context, {
   required Future<T> Function(String value) searchFuture,
+  required String title,
   required void Function(T value) onResult,
 }) {
   return showDialog<void>(
     context: context,
     builder: (context) => SimpleSearchDialog<T>(
+      title: title,
       searchFuture: searchFuture,
       onResult: onResult,
     ),
@@ -16,9 +18,10 @@ Future<void> showSimpleSearchDialog<T>(
 }
 
 class SimpleSearchDialog<T> extends StatefulWidget {
-  const SimpleSearchDialog({super.key, required this.searchFuture, required this.onResult});
+  const SimpleSearchDialog({super.key, required this.searchFuture, required this.onResult, required this.title});
 
   final Future<T> Function(String value) searchFuture;
+  final String title;
   final void Function(T value) onResult;
 
   @override
@@ -31,7 +34,7 @@ class _SimpleSearchDialogState<T> extends State<SimpleSearchDialog<T>> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text("Buscar Factura por #"),
+      title: Text(widget.title),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

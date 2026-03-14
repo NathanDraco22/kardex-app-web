@@ -34,6 +34,7 @@ class _HeaderSection extends StatelessWidget {
                         final devolutionRepo = context.read<DevolutionsRepository>();
                         showSimpleSearchDialog<DevolutionInDb>(
                           context,
+                          title: "Buscar #Devolución",
                           searchFuture: (value) {
                             return devolutionRepo.getDevolutionByDocNumber(value);
                           },

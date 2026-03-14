@@ -34,6 +34,7 @@ class _HeaderSection extends StatelessWidget {
                         final receiptRepo = context.read<ReceiptsRepository>();
                         showSimpleSearchDialog<ReceiptInDb>(
                           context,
+                          title: "Buscar #Recibo",
                           searchFuture: (value) {
                             return receiptRepo.getReceiptByDocNumber(value);
                           },
