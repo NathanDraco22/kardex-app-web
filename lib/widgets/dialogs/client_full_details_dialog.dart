@@ -4,7 +4,7 @@ import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-void showClientDetailsDialog(BuildContext context, {required ClientInDb client}) {
+void showClientFullDetailsDialog(BuildContext context, {required ClientInDb client}) {
   showDialog(
     context: context,
     builder: (context) {
@@ -72,6 +72,10 @@ class ClientDetailsDialog extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 12),
+              if (client.balance > 0) ...[
+                _BalanceCard(balance: client.balance),
+                const SizedBox(height: 12),
+              ],
               _ReferencesButton(client: client),
               const SizedBox(height: 12),
               Row(
@@ -247,6 +251,54 @@ class _CoordinateButton extends StatelessWidget {
               );
             }
           : null,
+    );
+  }
+}
+
+class _BalanceCard extends StatelessWidget {
+  const _BalanceCard({required this.balance});
+
+  final num balance;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.red.shade50,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.red.shade200),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.warning_amber_rounded, color: Colors.red.shade700, size: 28),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Saldo Pendiente",
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.red.shade800,
+                  ),
+                ),
+                Text(
+                  "C\$ ${(balance / 100).toStringAsFixed(2)}",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red.shade900,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
