@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void showUnpaidClientStatsDialog(BuildContext context, {required ClientInDb client}) {
   showDialog(
@@ -20,7 +21,6 @@ class UnpaidClientStatsDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final now = DateTime.now().startOfDay();
 
-    // Corte calculation
     int daysSinceCorte = 0;
     String corteText = "No asignado";
     if (client.lastCreditStart != null) {
@@ -28,7 +28,6 @@ class UnpaidClientStatsDialog extends StatelessWidget {
       corteText = "${DateTimeTool.formatddMMyy(client.lastCreditStart!)} ($daysSinceCorte días)";
     }
 
-    // Abono calculation
     int daysSinceAbono = 0;
     String abonoText = "Sin abonos previos";
     if (client.lastReceiptDate != null) {
@@ -45,6 +44,33 @@ class UnpaidClientStatsDialog extends StatelessWidget {
             "${client.id} - ${client.name}",
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             textAlign: TextAlign.center,
+          ),
+          const SizedBox(
+            height: 4,
+          ),
+          Row(
+            mainAxisAlignment: .spaceBetween,
+            children: [
+              TextButton.icon(
+                icon: const Icon(Icons.phone),
+                onPressed: () {
+                  if (client.phone != null) {
+                    launchUrl(Uri.parse("tel:${client.phone}"));
+                  }
+                },
+                label: Text(client.phone ?? "Sin teléfono"),
+              ),
+
+              TextButton.icon(
+                icon: const Icon(Icons.email),
+                onPressed: () {
+                  if (client.email != null) {
+                    launchUrl(Uri.parse("mailto:${client.email}"));
+                  }
+                },
+                label: Text(client.email ?? "Sin correo"),
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           _StatCard(

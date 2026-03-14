@@ -1,7 +1,12 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/constants/const_modules.dart';
+import 'package:kardex_app_front/widgets/dialogs/client_details_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/simple_search_dialog.dart';
+
+import '../../domain/repositories/client_repository.dart';
 
 class ClientCatalogMenuScreen extends StatelessWidget {
   const ClientCatalogMenuScreen({super.key});
@@ -39,6 +44,30 @@ class _Body extends StatelessWidget {
             title: const Text("Lista de Clientes"),
             onTap: () {
               context.pushNamed("client-list");
+            },
+            trailing: const Icon(Icons.chevron_right),
+          ),
+          const Divider(
+            height: 0.0,
+          ),
+          ListTile(
+            leading: const Icon(FluentIcons.search_12_filled),
+            title: const Text("Buscar Cliente por #Cedula"),
+            onTap: () {
+              final clientRepo = context.read<ClientsRepository>();
+              showSimpleSearchDialog(
+                context,
+                searchFuture: (value) {
+                  if (value.isEmpty) {
+                    return Future.error("La cedula no puede estar vacia");
+                  }
+                  return clientRepo.getClientByCardId(value.toUpperCase());
+                },
+                title: "Buscar Cliente por #Cedula",
+                onResult: (value) {
+                  showClientDetailsDialog(context, client: value);
+                },
+              );
             },
             trailing: const Icon(Icons.chevron_right),
           ),

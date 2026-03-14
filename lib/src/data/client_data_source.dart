@@ -35,6 +35,13 @@ class ClientsDataSource with HttpService {
     return res;
   }
 
+  Future<Map<String, dynamic>> getClientByCardId(String cardId) async {
+    final headers = HttpTools.generateAuthHeaders();
+    final uri = HttpTools.generateUri("$_clientEndpoint/card/$cardId");
+    final res = await getQuery(uri, headers: headers);
+    return res;
+  }
+
   Future<Map<String, dynamic>> searchClientByKeyword(String keyword) async {
     final headers = HttpTools.generateAuthHeaders();
     final uri = HttpTools.generateUri("$_clientEndpoint/search/$keyword");

@@ -55,6 +55,11 @@ class ClientsRepository {
     return ClientInDb.fromJson(result);
   }
 
+  Future<ClientInDb> getClientByCardId(String cardId) async {
+    final result = await clientsDataSource.getClientByCardId(cardId);
+    return ClientInDb.fromJson(result);
+  }
+
   Future<List<ClientInDb>> searchClientByKeyword(String keyword) async {
     final result = await clientsDataSource.searchClientByKeyword(keyword);
 

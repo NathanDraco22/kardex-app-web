@@ -104,7 +104,7 @@ class BaseClient {
   Map<String, dynamic> toJson() {
     return {
       'name': name,
-      'cardId': cardId,
+      'cardId': cardId?.toUpperCase(),
       'phone': phone,
       'address': address,
       'location': location,
@@ -249,7 +249,7 @@ class UpdateClient {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = {
       'name': name,
-      'cardId': cardId,
+      'cardId': cardId?.toUpperCase(),
       'phone': phone,
       'address': address,
       'location': location,
