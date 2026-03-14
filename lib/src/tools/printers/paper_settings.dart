@@ -9,14 +9,20 @@ class TicketSettings {
   static double ticketWidth(PaperSize size) => size == PaperSize.mm58 ? 50.0 : 72.0;
   static double ticketMargin(PaperSize size) => size == PaperSize.mm58 ? 1.0 : 2.0;
   static double logoSize(PaperSize size) => size == PaperSize.mm58 ? 50.0 : 90.0;
-  static Future<pw.Font> ticketFont(PaperSize size) async {
-    _font ??= pw.Font.ttf(await rootBundle.load('assets/fonts/RobotoMono.ttf'));
-    return _font!;
+  static Future<pw.Font?> ticketFont(PaperSize size) async {
+    if (size == PaperSize.mm58) {
+      _font ??= pw.Font.ttf(await rootBundle.load('assets/fonts/RobotoMono.ttf'));
+      return _font!;
+    }
+    return null;
   }
 
-  static Future<pw.Font> ticketFontBold(PaperSize size) async {
-    _fontBold ??= pw.Font.ttf(await rootBundle.load('assets/fonts/RobotoMono-semibold.ttf'));
-    return _fontBold!;
+  static Future<pw.Font?> ticketFontBold(PaperSize size) async {
+    if (size == PaperSize.mm58) {
+      _fontBold ??= pw.Font.ttf(await rootBundle.load('assets/fonts/RobotoMono-semibold.ttf'));
+      return _fontBold!;
+    }
+    return null;
   }
 }
 
