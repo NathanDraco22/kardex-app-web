@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/constants/const_modules.dart';
-import 'package:kardex_app_front/widgets/dialogs/client_details_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/client_full_details_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/simple_search_dialog.dart';
 
 import '../../domain/repositories/client_repository.dart';
@@ -65,7 +65,7 @@ class _Body extends StatelessWidget {
                 },
                 title: "Buscar Cliente por #Cedula",
                 onResult: (value) {
-                  showClientDetailsDialog(context, client: value);
+                  showClientFullDetailsDialog(context, client: value);
                 },
               );
             },

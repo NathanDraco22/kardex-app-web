@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
+import 'package:kardex_app_front/widgets/dialogs/client_full_details_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 void showUnpaidClientStatsDialog(BuildContext context, {required ClientInDb client}) {
@@ -85,6 +86,14 @@ class UnpaidClientStatsDialog extends StatelessWidget {
             value: abonoText,
             icon: Icons.payments_outlined,
             color: client.lastReceiptDate == null ? Colors.red.shade100 : _getColorForDays(daysSinceAbono),
+          ),
+
+          TextButton.icon(
+            icon: const Icon(Icons.person),
+            onPressed: () {
+              showClientFullDetailsDialog(context, client: client);
+            },
+            label: const Text("Ver Mas..."),
           ),
         ],
       ),

@@ -4,6 +4,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/client/client.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/client_list/cubit/client_read_cubit.dart';
+import 'package:kardex_app_front/widgets/dialogs/client_full_details_dialog.dart';
 import 'package:kardex_app_front/widgets/map/map_nic_widget.dart';
 import 'package:kardex_app_front/widgets/map/marker_point.dart';
 import 'package:latlong2/latlong.dart';
@@ -103,7 +104,7 @@ class _Map extends StatelessWidget {
           point: LatLng(client.coordinates!.latitude, client.coordinates!.longitude),
           child: MarkerPoint(
             title: client.name,
-            onTap: () => showClientDetailsDialog(context, client),
+            onTap: () => showClientFullDetailsDialog(context, client: client),
           ),
         );
       }
