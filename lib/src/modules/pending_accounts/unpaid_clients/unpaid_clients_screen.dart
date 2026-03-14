@@ -113,35 +113,45 @@ class _Content extends StatelessWidget {
             );
           }
 
-          final sortedClients = List.of(state.clients);
-          sortedClients.sort((a, b) {
-            final now = DateTime.now().startOfDay();
-            final baseDateA = a.lastReceiptDate ?? a.lastCreditStart;
-            final diasImpagoA = baseDateA != null ? now.difference(baseDateA.startOfDay()).inDays : 0;
+          final now = DateTime.now().startOfDay();
+          const int redAlertDays = 37;
+          const int yellowAlertDays = 30;
 
-            final baseDateB = b.lastReceiptDate ?? b.lastCreditStart;
-            final diasImpagoB = baseDateB != null ? now.difference(baseDateB.startOfDay()).inDays : 0;
+          final clientsWithDays = state.clients.map((client) {
+            final baseDate = client.lastReceiptDate ?? client.lastCreditStart;
+            final diasImpago = baseDate != null ? now.difference(baseDate.startOfDay()).inDays : 0;
+            return (client: client, unpaidDays: diasImpago);
+          }).toList();
 
-            return diasImpagoB.compareTo(diasImpagoA);
-          });
+          clientsWithDays.sort((a, b) => b.unpaidDays.compareTo(a.unpaidDays));
 
           return ListView.separated(
             separatorBuilder: (context, index) => const Divider(
               height: 0.0,
             ),
-            itemCount: sortedClients.length,
+            itemCount: clientsWithDays.length,
             itemBuilder: (context, index) {
-              final currentClient = sortedClients[index];
+              final item = clientsWithDays[index];
+              final currentClient = item.client;
+              final diasImpago = item.unpaidDays;
+
               final balanceFormatted = NumberFormatter.convertToMoneyLike(currentClient.balance);
 
-              final now = DateTime.now().startOfDay();
-              final baseDate = currentClient.lastReceiptDate ?? currentClient.lastCreditStart;
-              final diasImpago = baseDate != null ? now.difference(baseDate.startOfDay()).inDays : 0;
-
               Color? tileColor;
-              if (diasImpago > 37) {
+              bool isPastCutoff = false;
+
+              if (currentClient.lastCreditStart != null && currentClient.lastReceiptDate != null) {
+                final nextMonth = DateTime(
+                  currentClient.lastReceiptDate!.year,
+                  currentClient.lastReceiptDate!.month + 1,
+                  currentClient.lastCreditStart!.day,
+                );
+                isPastCutoff = now.isAfter(nextMonth);
+              }
+
+              if (diasImpago > redAlertDays) {
                 tileColor = Colors.red.shade300;
-              } else if (diasImpago > 30) {
+              } else if (diasImpago > yellowAlertDays || isPastCutoff) {
                 tileColor = Colors.amber.shade200;
               } else {
                 tileColor = index.isOdd ? Colors.grey.shade50 : Colors.white;
