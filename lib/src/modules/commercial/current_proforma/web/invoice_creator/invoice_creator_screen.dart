@@ -10,6 +10,7 @@ import 'package:kardex_app_front/src/modules/commercial/current_orders/modals/co
 import 'package:kardex_app_front/src/modules/commercial/current_proforma/cubit/read_proforma_cubit.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/printers/order_printer.dart';
+import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/invoice_viewer.dart';
@@ -143,14 +144,16 @@ class _RootScaffold extends StatelessWidget {
           title: const Text("Facturar Orden"),
           actions: [
             IconButton(
-              onPressed: () {
-                shareOrder(orderContainer.order, authState.branch);
+              onPressed: () async {
+                final paperSize = await PrintManager.getLocalPaperSize();
+                shareOrder(orderContainer.order, authState.branch, paperSize: paperSize);
               },
               icon: const Icon(Icons.share),
             ),
             IconButton(
-              onPressed: () {
-                printOrder(orderContainer.order, authState.branch);
+              onPressed: () async {
+                final paperSize = await PrintManager.getLocalPaperSize();
+                printOrder(orderContainer.order, authState.branch, paperSize: paperSize);
               },
               icon: const Icon(Icons.print),
             ),

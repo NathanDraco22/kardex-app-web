@@ -296,7 +296,7 @@ Future<Uint8List> generateTicketPdfFromOrder(
               mainAxisAlignment: pw.MainAxisAlignment.end,
               children: [
                 pw.SizedBox(
-                  width: 80,
+                  width: 60,
                   child: pw.Text(
                     'SUBTOTAL: ',
                     style: pw.TextStyle(
@@ -325,7 +325,7 @@ Future<Uint8List> generateTicketPdfFromOrder(
               mainAxisAlignment: pw.MainAxisAlignment.end,
               children: [
                 pw.SizedBox(
-                  width: 80,
+                  width: 60,
                   child: pw.Text(
                     'DESCUENTO: ',
                     style: pw.TextStyle(
@@ -354,7 +354,7 @@ Future<Uint8List> generateTicketPdfFromOrder(
               mainAxisAlignment: pw.MainAxisAlignment.end,
               children: [
                 pw.SizedBox(
-                  width: 80,
+                  width: 60,
                   child: pw.Text(
                     'TOTAL: ',
                     style: pw.TextStyle(
