@@ -8,7 +8,6 @@ import 'package:kardex_app_front/widgets/dialogs/client_full_details_dialog.dart
 import 'package:kardex_app_front/widgets/map/map_nic_widget.dart';
 import 'package:kardex_app_front/widgets/map/marker_point.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:kardex_app_front/widgets/map/dialogs/client_details_dialog.dart';
 
 import '../../../../domain/repositories/repositories.dart';
 
