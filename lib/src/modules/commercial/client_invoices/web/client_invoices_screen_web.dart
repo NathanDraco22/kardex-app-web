@@ -5,12 +5,11 @@ import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
 import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
 
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
-import 'package:kardex_app_front/src/domain/models/models.dart';
-import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 
 import 'package:kardex_app_front/src/tools/session_tool.dart';
 
 import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_app_front/widgets/client_selector_card.dart';
 
 import 'package:kardex_app_front/widgets/widgets.dart';
 

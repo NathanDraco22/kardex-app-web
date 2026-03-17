@@ -5,10 +5,9 @@ import 'package:kardex_app_front/src/domain/models/common/client_info.dart';
 import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
 import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
-import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/tools/session_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
-import 'package:kardex_app_front/widgets/super_widgets/custom_autocomplete_textfield.dart';
+import 'package:kardex_app_front/widgets/client_selector_card.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/text_field_date_selector.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
@@ -145,38 +144,11 @@ class _BodyState extends State<_Body> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text(
-                  "Cliente",
-                  textAlign: TextAlign.left,
-                ),
-                const SizedBox(height: 6),
-                CustomAutocompleteTextfield<ClientInDb>(
-                  onClose: (value) => viewController.selectedClient = value,
-                  titleBuilder: (value) => value.name,
-                  onSearch: (value) async {
-                    final repo = context.read<ClientsRepository>();
-                    try {
-                      final res = await repo.searchClientByKeyword(value);
-                      return res;
-                    } catch (e) {
-                      return [];
-                    }
-                  },
-                  suggestionBuilder: (value, close) {
-                    return ListView.builder(
-                      itemCount: value.length,
-                      itemBuilder: (context, index) {
-                        final client = value[index];
-                        return ListTile(
-                          title: Text(client.name),
-                          onTap: () {
-                            viewController.selectedClient = client;
-                            close(client);
-                          },
-                        );
-                      },
-                    );
-                  },
+                SizedBox(
+                  height: 160,
+                  child: ClientSelectorCard(
+                    onChange: (value) => viewController.selectedClient = value,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 Row(

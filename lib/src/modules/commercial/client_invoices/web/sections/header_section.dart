@@ -9,7 +9,15 @@ class _HeaderSection extends StatelessWidget {
     return Row(
       children: [
         SizedBox(
-          width: 400,
+          width: 350,
+          child: ClientSelectorCard(
+            onChange: (value) {
+              viewController.selectedClient = value;
+            },
+          ),
+        ),
+        SizedBox(
+          width: 150,
           child: Card(
             margin: EdgeInsets.zero,
             child: Padding(
@@ -20,113 +28,66 @@ class _HeaderSection extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const Text(
-                        "Cliente",
-                        textAlign: TextAlign.left,
-                      ),
-                      const SizedBox(height: 6),
-                      CustomAutocompleteTextfield<ClientInDb>(
-                        onClose: (value) => viewController.selectedClient = value,
-                        titleBuilder: (value) => value.name,
-                        onSearch: (value) async {
-                          final repo = context.read<ClientsRepository>();
-                          try {
-                            final res = await repo.searchClientByKeyword(value);
-
-                            return res;
-                          } catch (e) {
-                            return [];
-                          }
-                        },
-                        suggestionBuilder: (value, close) {
-                          return ListView.builder(
-                            itemCount: value.length,
-                            itemBuilder: (context, index) {
-                              final client = value[index];
-                              return ListTile(
-                                title: Text(client.name),
-                                onTap: () {
-                                  viewController.selectedClient = client;
-                                  close(client);
-                                },
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Flexible(
+                      AbsorbPointer(
+                        absorbing: true,
                         child: Column(
                           children: [
-                            const Text("Tipo de Pago"),
+                            const Text("Fecha"),
                             const SizedBox(height: 6),
-                            SizedBox(
-                              height: 44,
-                              child: ListenableBuilder(
-                                key: ValueKey(viewController.selectedClient ?? 'client_selected'),
-                                listenable: viewController,
-                                builder: (context, _) {
-                                  final selectedClient = viewController.selectedClient;
-
-                                  final dropdown = DropdownButtonFormField(
-                                    key: ValueKey(selectedClient ?? 'select_payment_type'),
-                                    initialValue: viewController.selectedPaymentType,
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
-                                    items: [
-                                      const DropdownMenuItem(
-                                        value: PaymentType.cash,
-                                        child: Text("Contado"),
-                                      ),
-                                      if (selectedClient?.isCreditActive ?? false)
-                                        const DropdownMenuItem(
-                                          value: PaymentType.credit,
-                                          child: Text("Credito"),
-                                        ),
-                                    ],
-                                    onChanged: (value) {
-                                      if (value != null) {
-                                        viewController.selectedPaymentType = value;
-                                      }
-                                    },
-                                  );
-
-                                  if (viewController.selectedClient == null) {
-                                    return AbsorbPointer(
-                                      child: Opacity(
-                                        opacity: 0.3,
-                                        child: dropdown,
-                                      ),
-                                    );
-                                  }
-                                  return dropdown;
-                                },
-                              ),
+                            DateFieldSelector(
+                              initDate: viewController.selectedDate,
+                              onSelectedDate: (value) {},
                             ),
                           ],
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      Flexible(
-                        child: AbsorbPointer(
-                          absorbing: true,
-                          child: Column(
-                            children: [
-                              const Text("Fecha"),
-                              const SizedBox(height: 6),
-                              DateFieldSelector(
-                                initDate: viewController.selectedDate,
-                                onSelectedDate: (value) {},
+                      const SizedBox(height: 6),
+
+                      const Text("Tipo de Pago"),
+                      const SizedBox(height: 6),
+                      SizedBox(
+                        height: 44,
+                        child: ListenableBuilder(
+                          key: ValueKey(viewController.selectedClient ?? 'client_selected'),
+                          listenable: viewController,
+                          builder: (context, _) {
+                            final selectedClient = viewController.selectedClient;
+                            final dropdown = DropdownButtonFormField(
+                              key: ValueKey(selectedClient ?? 'select_payment_type'),
+                              initialValue: viewController.selectedPaymentType,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
                               ),
-                            ],
-                          ),
+                              items: [
+                                const DropdownMenuItem(
+                                  value: PaymentType.cash,
+                                  child: Text("Contado"),
+                                ),
+                                if (selectedClient?.isCreditActive ?? false)
+                                  const DropdownMenuItem(
+                                    value: PaymentType.credit,
+                                    child: Text("Credito"),
+                                  ),
+                              ],
+                              onChanged: (value) {
+                                if (value != null) {
+                                  viewController.selectedPaymentType = value;
+                                }
+                              },
+                            );
+
+                            if (viewController.selectedClient == null) {
+                              return AbsorbPointer(
+                                child: Opacity(
+                                  opacity: 0.3,
+                                  child: dropdown,
+                                ),
+                              );
+                            }
+                            return dropdown;
+                          },
                         ),
                       ),
                     ],
