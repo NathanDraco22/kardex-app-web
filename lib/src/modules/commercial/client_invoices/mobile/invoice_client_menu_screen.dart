@@ -145,7 +145,7 @@ class _BodyState extends State<_Body> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 SizedBox(
-                  height: 160,
+                  height: 170,
                   child: ClientSelectorCard(
                     onChange: (value) => viewController.selectedClient = value,
                   ),

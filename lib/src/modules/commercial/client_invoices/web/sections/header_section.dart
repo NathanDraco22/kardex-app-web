@@ -9,7 +9,7 @@ class _HeaderSection extends StatelessWidget {
     return Row(
       children: [
         SizedBox(
-          width: 350,
+          width: 425,
           child: ClientSelectorCard(
             onChange: (value) {
               viewController.selectedClient = value;
@@ -17,7 +17,7 @@ class _HeaderSection extends StatelessWidget {
           ),
         ),
         SizedBox(
-          width: 150,
+          width: 125,
           child: Card(
             margin: EdgeInsets.zero,
             child: Padding(

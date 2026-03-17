@@ -66,7 +66,9 @@ class _ClientSelectorCardState extends State<ClientSelectorCard> {
                       widget.onChange(_selectedClient);
                       setState(() {});
                     },
-                    icon: const Icon(Icons.delete),
+                    icon: const Icon(
+                      Icons.delete,
+                    ),
                   ),
                 ],
               ),
@@ -76,7 +78,11 @@ class _ClientSelectorCardState extends State<ClientSelectorCard> {
               ),
               Text(
                 _selectedClient?.name ?? "",
-                style: const TextStyle(fontWeight: .w500, color: Colors.blue),
+                style: const TextStyle(
+                  fontWeight: .w500,
+                  color: Colors.blue,
+                  fontSize: 18,
+                ),
               ),
               Text(_selectedClient?.location ?? ""),
               Text(_selectedClient?.address ?? ""),
@@ -94,6 +100,7 @@ class _ClientSelectorCardState extends State<ClientSelectorCard> {
                     style: TextStyle(
                       fontWeight: .w500,
                       color: Colors.red.shade700,
+                      fontSize: 18,
                     ),
                   ),
                 ],
