@@ -80,6 +80,8 @@ class _RootScaffoldState extends State<_RootScaffold> {
   FocusNode priceFocus2 = FocusNode();
   FocusNode priceFocus3 = FocusNode();
 
+  bool hasLowerPrices = false;
+
   @override
   void initState() {
     super.initState();
@@ -109,6 +111,15 @@ class _RootScaffoldState extends State<_RootScaffold> {
 
   @override
   Widget build(BuildContext context) {
+    hasLowerPrices =
+        [
+          currentSalePrice,
+          if (currentSalePrice2 > 0) currentSalePrice2,
+          if (currentSalePrice3 > 0) currentSalePrice3,
+        ].any(
+          (price) => price < widget.product.account.averageCost,
+        );
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
@@ -249,10 +260,38 @@ class _RootScaffoldState extends State<_RootScaffold> {
                         ),
 
                         const SizedBox(
+                          height: 6,
+                        ),
+
+                        SizedBox(
+                          height: 30,
+                          child: Builder(
+                            builder: (context) {
+                              if (hasLowerPrices) {
+                                return ListTile(
+                                  leading: Icon(
+                                    Icons.warning_amber_rounded,
+                                    color: Colors.amber.shade700,
+                                  ),
+                                  title: Text(
+                                    "Precio de Venta menor al costo",
+                                    style: TextStyle(
+                                      color: Colors.amber.shade700,
+                                    ),
+                                  ),
+                                );
+                              }
+                              return const SizedBox.shrink();
+                            },
+                          ),
+                        ),
+
+                        const SizedBox(
                           height: 12,
                         ),
 
                         TitleTextField(
+                          key: const Key("price1"),
                           title: "Precio de Venta (C\$ )",
                           focusNode: priceFocus,
                           keyboardType: TextInputType.number,
@@ -280,6 +319,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
                         ),
 
                         TitleTextField(
+                          key: const Key("price2"),
                           title: "Precio de Venta 2 (C\$ )",
                           focusNode: priceFocus2,
                           keyboardType: TextInputType.number,
@@ -307,6 +347,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
                         ),
 
                         TitleTextField(
+                          key: const Key("price3"),
                           title: "Precio de Venta 3 (C\$ )",
                           focusNode: priceFocus3,
                           keyboardType: TextInputType.number,
