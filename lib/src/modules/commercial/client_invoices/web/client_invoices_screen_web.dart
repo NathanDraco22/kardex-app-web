@@ -155,7 +155,7 @@ class _Body extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SizedBox(
-              height: 160,
+              height: 170,
               child: _HeaderSection(),
             ),
             SizedBox(height: 8),
