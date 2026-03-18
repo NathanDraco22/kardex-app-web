@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ColourPalette {
   static const Color deepBackground = Color(0xFF072a3c);
@@ -12,6 +13,9 @@ class ColourPalette {
 
 class AppTheme {
   ThemeData get lightTheme => ThemeData.light(useMaterial3: false).copyWith(
+    textTheme: GoogleFonts.interTextTheme(
+      ThemeData.light(useMaterial3: false).textTheme,
+    ),
     dialogTheme: const DialogThemeData(
       constraints: BoxConstraints(minWidth: 600, maxWidth: 600),
       insetPadding: EdgeInsets.zero,

@@ -154,7 +154,7 @@ Future<Uint8List> generateTicketPdfFromOrder(
 
             if (order.clientInfo.name != "Sin Cliente")
               pw.Text(
-                "Cliente: ${order.clientInfo.name}",
+                "${order.clientId}-${order.clientInfo.name}",
                 style: pw.TextStyle(
                   fontSize: TicketSettings.contentFontSize(paperSize),
                 ),

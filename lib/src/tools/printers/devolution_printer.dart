@@ -142,7 +142,7 @@ Future<Uint8List> generateTicketPdfFromDevolution(
 
             if (devolution.clientInfo.name != "Sin Cliente")
               pw.Text(
-                "Cliente: ${devolution.clientInfo.name}",
+                "${devolution.clientId}-${devolution.clientInfo.name}",
                 style: pw.TextStyle(
                   fontSize: TicketSettings.contentFontSize(paperSize),
                 ),

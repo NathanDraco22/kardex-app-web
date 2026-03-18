@@ -59,6 +59,7 @@ dependencies:
   slide_to_submit_button: ^1.0.3
   toastification: ^3.0.3
   url_launcher: ^6.3.2
+  google_fonts: ^8.0.2
 
 dev_dependencies:
   flutter_launcher_icons: ^0.14.4
