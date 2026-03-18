@@ -64,6 +64,7 @@ class _UpdateUserDialogState extends State<UpdateUserDialog> {
     final authCubit = context.read<AuthCubit>();
     final authState = authCubit.state as Authenticated;
     final isMultiBranch = authState.servin.isMultiBranch;
+    final loggedUser = authState.session.user;
     final writeCubit = context.read<WriteUserCubit>();
     final readCubit = context.read<ReadUserCubit>();
     final readState = readCubit.state as ReadUserSuccess;
@@ -80,7 +81,7 @@ class _UpdateUserDialogState extends State<UpdateUserDialog> {
         if (state is DeleteUserSuccess) {
           LoadingDialogManager.closeLoadingDialog(context);
           readCubit.removeUser(state.user);
-          await DialogManager.showInfoDialog(context, "Usuario eliminado");
+          await DialogManager.showInfoDialog(context, "Usuario ${state.user.username} eliminado");
           if (!context.mounted) return;
           context.pop(state.user);
         }
@@ -194,7 +195,7 @@ class _UpdateUserDialogState extends State<UpdateUserDialog> {
                   },
                 ),
 
-                if (selectedUserId != widget.user.id)
+                if (selectedUserId != loggedUser.id)
                   SwitchListTile(
                     value: isActive,
                     onChanged: (value) {
@@ -203,6 +204,22 @@ class _UpdateUserDialogState extends State<UpdateUserDialog> {
                       });
                     },
                     title: const Text("Activo"),
+                  ),
+
+                if (selectedUserId != loggedUser.id)
+                  ListTile(
+                    leading: const Icon(Icons.delete, color: Colors.red),
+                    title: const Text("Eliminar Usuario", style: TextStyle(color: Colors.red)),
+                    onTap: () async {
+                      final result = await DialogManager.slideToConfirmDeleteActionDialog(
+                        context,
+                        "¿Está seguro de eliminar el usuario ${widget.user.username}?",
+                      );
+                      if (!context.mounted) return;
+                      if (result == true) {
+                        writeCubit.deleteUser(widget.user.id);
+                      }
+                    },
                   ),
               ],
             ),
