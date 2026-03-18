@@ -127,7 +127,7 @@ Future<Uint8List> generateTicketPdfFromReceipt(
             pw.SizedBox(height: 6),
             if (receipt.clientInfo.name != "Sin Cliente")
               pw.Text(
-                'Cliente: ${receipt.clientInfo.name}',
+                "${receipt.clientId}-${receipt.clientInfo.name}",
                 style: pw.TextStyle(fontSize: TicketSettings.contentFontSize(paperSize)),
               ),
             pw.Text(
