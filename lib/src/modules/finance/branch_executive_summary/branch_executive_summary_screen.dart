@@ -175,20 +175,53 @@ class _SummaryCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _StatColumn(
-                  title: "Ventas",
-                  amount: commercial.total,
-                  color: Colors.black87,
+                Expanded(
+                  child: _StatColumn(
+                    title: "Ventas",
+                    amount: commercial.total,
+                    color: Colors.black87,
+                  ),
                 ),
-                _StatColumn(
-                  title: "Costo Ventas",
-                  amount: commercial.totalCost,
-                  color: Colors.red[700]!,
+                Expanded(
+                  child: _StatColumn(
+                    title: "Costo Ventas",
+                    amount: commercial.totalCost,
+                    color: Colors.red[700]!,
+                  ),
                 ),
-                _StatColumn(
-                  title: "Margen Bruto",
-                  amount: margin,
-                  color: margin >= 0 ? Colors.green[700]! : Colors.red[700]!,
+                Expanded(
+                  child: _StatColumn(
+                    title: "Margen Bruto",
+                    amount: margin,
+                    color: margin >= 0 ? Colors.green[700]! : Colors.red[700]!,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: _StatColumn(
+                    title: "Ventas Contado",
+                    amount: commercial.cashSales,
+                    color: Colors.green[700]!,
+                  ),
+                ),
+                Expanded(
+                  child: _StatColumn(
+                    title: "Recibos",
+                    amount: commercial.totalReceiptCash,
+                    color: Colors.blue[700]!,
+                  ),
+                ),
+                Expanded(
+                  child: _StatColumn(
+                    title: "Devoluciones",
+                    amount: commercial.totalReceiptDevolutions,
+                    color: Colors.orange[700]!,
+                  ),
                 ),
               ],
             ),
@@ -212,6 +245,22 @@ class _SummaryCard extends StatelessWidget {
                 ],
               ),
             ],
+            const SizedBox(height: 16),
+            const Divider(),
+            const Text(
+              "Cuentas por Cobrar",
+              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                _StatColumn(
+                  title: "Total Pendiente",
+                  amount: commercial.totalOwed,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ],
+            ),
           ],
         ),
       ),

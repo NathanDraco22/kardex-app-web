@@ -61,6 +61,7 @@ class _Body extends StatelessWidget {
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 800),
         child: ListView(
+          padding: const EdgeInsets.only(bottom: 32),
           children: [
             _ChartsCard(state: state),
             const SizedBox(height: 12),

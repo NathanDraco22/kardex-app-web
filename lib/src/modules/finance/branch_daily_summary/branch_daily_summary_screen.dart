@@ -111,7 +111,7 @@ class _SummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final detail = item.detail;
-    final margin = detail.total - detail.totalCost;
+    final ganancia = detail.total - detail.totalCost;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -146,20 +146,54 @@ class _SummaryCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _StatColumn(
-                  title: "Vendido",
-                  amount: detail.total,
-                  color: Colors.black87,
+                Expanded(
+                  child: _StatColumn(
+                    title: "Contado",
+                    amount: detail.cashSales,
+                    color: Colors.green[700]!,
+                  ),
                 ),
-                _StatColumn(
-                  title: "Costo",
-                  amount: detail.totalCost,
-                  color: Colors.red[700]!,
+                Expanded(
+                  child: _StatColumn(
+                    title: "Crédito",
+                    amount: detail.creditSales,
+                    color: Colors.blueGrey[700]!,
+                  ),
                 ),
-                _StatColumn(
-                  title: "Margen Bruto",
-                  amount: margin,
-                  color: margin >= 0 ? Colors.green[700]! : Colors.red[700]!,
+                Expanded(
+                  child: _StatColumn(
+                    title: "Total Ventas",
+                    amount: detail.total,
+                    color: Colors.black87,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: _StatColumn(
+                    title: "Recibos",
+                    amount: detail.totalReceiptCash,
+                    color: Colors.blue[700]!,
+                  ),
+                ),
+
+                Expanded(
+                  child: _StatColumn(
+                    title: "Devoluciones",
+                    amount: detail.totalReceiptDevolutions,
+                    color: Colors.orange[700]!,
+                  ),
+                ),
+                Expanded(
+                  child: _StatColumn(
+                    title: "Ganancia",
+                    amount: ganancia,
+                    color: ganancia >= 0 ? Colors.green[700]! : Colors.red[700]!,
+                  ),
                 ),
               ],
             ),
