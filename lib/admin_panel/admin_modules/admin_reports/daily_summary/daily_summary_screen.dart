@@ -67,20 +67,92 @@ class _Body extends StatelessWidget {
               itemBuilder: (context, index) {
                 if (index < state.dailySummaries.length) {
                   final summary = state.dailySummaries[index];
-                  return ListTile(
-                    title: Text(
-                      "Fecha: ${DateTimeTool.formatdMMeS(DateTime.fromMillisecondsSinceEpoch(summary.startDate))}",
+                  final ganancia = summary.total - summary.totalCost;
+                  final isProfit = ganancia >= 0;
+
+                  return Card(
+                    margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      side: BorderSide(
+                        color: Colors.grey.shade300,
+                      ),
                     ),
-                    subtitle: Text("Total: ${NumberFormatter.convertToMoneyLike(summary.total)}"),
-                    trailing: const Icon(Icons.arrow_forward_ios_rounded),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DailySummaryDetailScreen(summary: summary),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DailySummaryDetailScreen(summary: summary),
+                          ),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    DateTimeTool.formatdMMeS(DateTime.fromMillisecondsSinceEpoch(summary.startDate)),
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.receipt_long, size: 14, color: Colors.grey),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        "${summary.totalInvoices} fact",
+                                        style: const TextStyle(color: Colors.grey, fontSize: 13),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  NumberFormatter.convertToMoneyLike(summary.total),
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: isProfit
+                                        ? Colors.green.withValues(alpha: 0.1)
+                                        : Colors.red.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    NumberFormatter.convertToMoneyLike(ganancia),
+                                    style: TextStyle(
+                                      color: isProfit ? Colors.green[700] : Colors.red[700],
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(width: 8),
+                          ],
                         ),
-                      );
-                    },
+                      ),
+                    ),
                   );
                 } else {
                   return const Padding(

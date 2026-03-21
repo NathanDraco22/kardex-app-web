@@ -9,8 +9,16 @@ final class ExecutiveSummaryInDb {
   final int startDate;
   final int endDate;
   final int salesTotal;
+  final int creditSales;
+  final int cashSales;
   final int salesTotalCost;
   final int totalInvoices;
+  final int totalPendingInvoices;
+  final List<PendingInvoiceTotalsByBranch> totalPendingBranches;
+  final int totalReceiptCash;
+  final int totalReceiptDevolutions;
+  final int totalReceipts;
+  final int receiptCount;
   final List<CommercialBranchDetail> commercialBranches;
   final int inventoryTotalCost;
   final List<InventoryBranchDetail> inventoryBranches;
@@ -25,8 +33,16 @@ final class ExecutiveSummaryInDb {
     required this.startDate,
     required this.endDate,
     required this.salesTotal,
+    required this.creditSales,
+    required this.cashSales,
     required this.salesTotalCost,
     required this.totalInvoices,
+    required this.totalPendingInvoices,
+    required this.totalPendingBranches,
+    required this.totalReceiptCash,
+    required this.totalReceiptDevolutions,
+    required this.totalReceipts,
+    required this.receiptCount,
     required this.commercialBranches,
     required this.inventoryTotalCost,
     required this.inventoryBranches,
@@ -43,8 +59,19 @@ final class ExecutiveSummaryInDb {
       startDate: json['startDate'] as int,
       endDate: json['endDate'] as int,
       salesTotal: json['salesTotal'] as int,
+      creditSales: (json['creditSales'] as int?) ?? 0,
+      cashSales: (json['cashSales'] as int?) ?? 0,
       salesTotalCost: json['salesTotalCost'] as int,
       totalInvoices: json['totalInvoices'] as int,
+      totalPendingInvoices: (json['totalPendingInvoices'] as int?) ?? 0,
+      totalPendingBranches: (json['totalPendingBranches'] as List<dynamic>?)
+              ?.map((e) => PendingInvoiceTotalsByBranch.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      totalReceiptCash: (json['totalReceiptCash'] as int?) ?? 0,
+      totalReceiptDevolutions: (json['totalReceiptDevolutions'] as int?) ?? 0,
+      totalReceipts: (json['totalReceipts'] as int?) ?? 0,
+      receiptCount: (json['receiptCount'] as int?) ?? 0,
       commercialBranches: (json['commercialBranches'] as List<dynamic>)
           .map((e) => CommercialBranchDetail.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -60,7 +87,8 @@ final class ExecutiveSummaryInDb {
 enum SummaryType {
   weekly,
   monthly,
-  yearly;
+  yearly
+  ;
 
   String get label {
     switch (this) {
