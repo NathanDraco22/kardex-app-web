@@ -34,6 +34,14 @@ class _ClientSelectionDialogState extends State<ClientSelectionDialog> {
       _errorMessage = null;
     });
 
+    if (keyword.isEmpty) {
+      setState(() {
+        _clients = [];
+        _isLoading = false;
+      });
+      return;
+    }
+
     try {
       final clientsRepo = context.read<ClientsRepository>();
       final clients = await clientsRepo.searchClientByKeyword(keyword);

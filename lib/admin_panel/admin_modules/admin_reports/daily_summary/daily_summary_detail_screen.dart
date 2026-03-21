@@ -26,11 +26,16 @@ class DailySummaryDetailScreen extends StatelessWidget {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 600),
           child: ListView(
+            padding: const EdgeInsets.only(bottom: 64),
             children: [
-              _SummaryCard(summary: summary),
+              _SalesCard(summary: summary),
               const SizedBox(height: 12),
+              _CashFlowCard(summary: summary),
+              const SizedBox(height: 12),
+              _OtherStatsCard(summary: summary),
+              const SizedBox(height: 24),
               const Text(
-                "Distribución por Sucursal",
+                "Ventas por Sucursal",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
@@ -120,8 +125,100 @@ class PieChartCard extends StatelessWidget {
   }
 }
 
-class _SummaryCard extends StatelessWidget {
-  const _SummaryCard({required this.summary});
+class _SalesCard extends StatelessWidget {
+  const _SalesCard({required this.summary});
+
+  final DailySummaryInDb summary;
+
+  @override
+  Widget build(BuildContext context) {
+    final ganancia = summary.total - summary.totalCost;
+    final isProfit = ganancia >= 0;
+
+    return Card(
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text("Resumen de Ventas", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            _RowInfo("Ventas al Contado", NumberFormatter.convertToMoneyLike(summary.cashSales)),
+            const Divider(),
+            _RowInfo("Ventas a Crédito", NumberFormatter.convertToMoneyLike(summary.creditSales)),
+            const Divider(),
+            _RowInfo("Total Ventas", NumberFormatter.convertToMoneyLike(summary.total)),
+            const Divider(),
+            _RowInfo("Costo Ventas", NumberFormatter.convertToMoneyLike(summary.totalCost)),
+            const Divider(),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text("Ganancia Estimada", style: TextStyle(fontSize: 16)),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: isProfit ? Colors.green.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      NumberFormatter.convertToMoneyLike(ganancia),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: isProfit ? Colors.green[700] : Colors.red[700],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CashFlowCard extends StatelessWidget {
+  const _CashFlowCard({required this.summary});
+
+  final DailySummaryInDb summary;
+
+  @override
+  Widget build(BuildContext context) {
+    final totalIngresoCaja = summary.cashSales + summary.totalReceiptCash;
+
+    return Card(
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text("Flujo de Caja", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            _RowInfo("Ventas al Contado", NumberFormatter.convertToMoneyLike(summary.cashSales)),
+            const Divider(),
+            _RowInfo("Recaudación Efectivo (Recibos)", NumberFormatter.convertToMoneyLike(summary.totalReceiptCash)),
+            const Divider(),
+            _RowInfo(
+              "Total Ingreso en Caja",
+              NumberFormatter.convertToMoneyLike(totalIngresoCaja),
+              isHighlight: true,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _OtherStatsCard extends StatelessWidget {
+  const _OtherStatsCard({required this.summary});
 
   final DailySummaryInDb summary;
 
@@ -132,14 +229,28 @@ class _SummaryCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _RowInfo("Ventas Totales", NumberFormatter.convertToMoneyLike(summary.total)),
+            const Text("Otros Datos", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            _RowInfo("Total de Abonos (Facturas)", NumberFormatter.convertToMoneyLike(summary.totalPaid)),
             const Divider(),
-            _RowInfo("Costo Total", NumberFormatter.convertToMoneyLike(summary.totalCost)),
+            _RowInfo(
+              "CxC Generado",
+              NumberFormatter.convertToMoneyLike(summary.totalOwed),
+              isHighlight: true,
+            ),
             const Divider(),
-            _RowInfo("Ganancia", NumberFormatter.convertToMoneyLike(summary.total - summary.totalCost)),
+            _RowInfo("Total en Recibos", NumberFormatter.convertToMoneyLike(summary.totalReceipts)),
             const Divider(),
-            _RowInfo("Total Facturas", summary.totalInvoices.toString()),
+            _RowInfo(
+              "Devoluciones Aplicadas (Recibos)",
+              NumberFormatter.convertToMoneyLike(summary.totalReceiptDevolutions),
+            ),
+            const Divider(),
+            _RowInfo("Total Facturas Emitidas", summary.totalInvoices.toString()),
+            const Divider(),
+            _RowInfo("Cantidad Recibos Emitidos", summary.receiptCount.toString()),
           ],
         ),
       ),
@@ -148,10 +259,11 @@ class _SummaryCard extends StatelessWidget {
 }
 
 class _RowInfo extends StatelessWidget {
-  const _RowInfo(this.label, this.value);
+  const _RowInfo(this.label, this.value, {this.isHighlight = false});
 
   final String label;
   final String value;
+  final bool isHighlight;
 
   @override
   Widget build(BuildContext context) {
@@ -161,7 +273,14 @@ class _RowInfo extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: const TextStyle(fontSize: 16)),
-          Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: isHighlight ? Theme.of(context).colorScheme.primary : null,
+            ),
+          ),
         ],
       ),
     );
