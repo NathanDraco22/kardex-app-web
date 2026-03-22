@@ -10,6 +10,7 @@ class TitleTextField extends StatelessWidget {
     this.titleTextAlign,
     this.validator,
     this.initialValue,
+    this.tooltip,
     this.focusNode,
     this.autofocus = false,
     this.maxLines = 1,
@@ -31,6 +32,7 @@ class TitleTextField extends StatelessWidget {
   final FocusNode? focusNode;
   final bool autofocus;
   final String? initialValue;
+  final String? tooltip;
   final String title;
   final TextAlign? titleTextAlign;
   final TextStyle? style;
@@ -49,9 +51,24 @@ class TitleTextField extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          title,
-          textAlign: titleTextAlign,
+        Row(
+          children: [
+            Text(
+              title,
+              textAlign: titleTextAlign,
+            ),
+            if (tooltip != null) ...[
+              const SizedBox(width: 4),
+              Tooltip(
+                message: tooltip,
+                child: Icon(
+                  Icons.info,
+                  size: 16,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            ],
+          ],
         ),
         TextFormField(
           readOnly: readOnly,

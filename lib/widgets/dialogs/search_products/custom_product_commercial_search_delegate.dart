@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/product/product_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/widgets/display_product_code.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_modal.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
@@ -105,7 +106,7 @@ class _ProductInBranchResultRow extends StatelessWidget {
     String valueToDisplay = NumberFormatter.convertToMoneyLike(value);
 
     return SizedBox(
-      height: 60,
+      height: 68,
       child: InkWell(
         hoverColor: Colors.yellow.shade100,
         focusColor: Colors.yellow.shade100,
@@ -122,12 +123,7 @@ class _ProductInBranchResultRow extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text(
-                        product.name,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      DisplayProductCode(product: product),
                       Row(
                         children: [
                           Flexible(

@@ -87,9 +87,14 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
               Text(
                 widget.product.name,
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
+                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
               ),
-              const SizedBox(height: 12),
+              Text(
+                widget.product.displayCode,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+              ),
+              const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 spacing: 12,

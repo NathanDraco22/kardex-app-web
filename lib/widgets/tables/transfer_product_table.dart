@@ -333,7 +333,7 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
     return Ink(
       color: widget.color,
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      height: 56,
+      height: 60,
       child: Row(
         children: [
           Flexible(
@@ -351,8 +351,20 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
                       ),
+                    ),
+                    Row(
+                      spacing: 8,
+                      children: [
+                        const Icon(
+                          Icons.qr_code,
+                          size: 12,
+                        ),
+                        Text(
+                          product.displayCode,
+                        ),
+                      ],
                     ),
                     Row(
                       spacing: 8,

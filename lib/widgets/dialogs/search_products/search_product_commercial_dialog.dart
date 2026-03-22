@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/product/product_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/product_repository.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/widgets/display_product_code.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_dialog.dart';
 import 'package:kardex_app_front/widgets/no_item.dart';
 import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
@@ -258,7 +259,7 @@ class ProductResultRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 40,
+      height: 60,
       child: InkWell(
         hoverColor: Colors.yellow.shade100,
         focusColor: Colors.yellow.shade100,
@@ -266,20 +267,16 @@ class ProductResultRow extends StatelessWidget {
         child: DecoratedBox(
           decoration: BoxDecoration(color: color),
           child: Row(
+            crossAxisAlignment: .center,
             children: [
               Flexible(
                 fit: FlexFit.tight,
                 flex: 3,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisAlignment: .center,
                   children: [
-                    Text(
-                      product.name,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                      ),
-                    ),
+                    DisplayProductCode(product: product),
                     Row(
                       children: [
                         Flexible(

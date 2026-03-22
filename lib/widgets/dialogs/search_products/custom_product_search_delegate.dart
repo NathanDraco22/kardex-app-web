@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/product/product_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/widgets/display_product_code.dart';
 import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 
 Future<ProductInDb?> showProductSearchDelegate(BuildContext context) async {
@@ -67,30 +68,69 @@ class _CustomProductSearchDelegateState extends State<CustomProductSearchDelegat
         itemCount: products.length,
         itemBuilder: (context, index) {
           final product = products[index];
-          return ListTile(
-            title: Text(
-              product.name,
-              style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            subtitle: Row(
-              children: [
-                Text(
-                  product.brandName,
-                ),
-              ],
-            ),
-            trailing: Text(
-              product.unitName,
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+          return _ProductResultRow(
+            color: index % 2 == 0 ? Colors.white : Colors.grey.shade100,
+            product: product,
             onTap: () => Navigator.pop(context, product),
           );
         },
+      ),
+    );
+  }
+}
+
+class _ProductResultRow extends StatelessWidget {
+  const _ProductResultRow({
+    required this.product,
+    this.color,
+    this.onTap,
+  });
+
+  final ProductInDb product;
+  final Color? color;
+  final void Function()? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 68,
+      child: InkWell(
+        hoverColor: Colors.yellow.shade100,
+        focusColor: Colors.yellow.shade100,
+        onTap: onTap,
+        child: DecoratedBox(
+          decoration: BoxDecoration(color: color),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Flexible(
+                  fit: FlexFit.tight,
+                  flex: 3,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      DisplayProductCode(product: product),
+                      Row(
+                        children: [
+                          Flexible(
+                            fit: FlexFit.tight,
+                            child: Text(product.brandName),
+                          ),
+
+                          Flexible(
+                            fit: FlexFit.tight,
+                            child: Text(product.unitName),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

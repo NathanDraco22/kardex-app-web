@@ -243,7 +243,7 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
         color: widget.color,
         padding: const EdgeInsets.all(8),
         child: SizedBox(
-          height: 48,
+          height: 60,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -291,6 +291,12 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
                             ),
+                          ),
+                          Row(
+                            children: [
+                              const Icon(Icons.qr_code, size: 12),
+                              Text(product.displayCode),
+                            ],
                           ),
                           Row(
                             children: [
@@ -357,6 +363,7 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
                 fit: FlexFit.tight,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(totalDiscount),
                     Text("($percenValue%)"),
@@ -368,6 +375,7 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
                 fit: FlexFit.tight,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text("0"),
                     Text("(0%)"),

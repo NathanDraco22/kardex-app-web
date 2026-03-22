@@ -335,6 +335,12 @@ class _MobileProductCardState extends State<_MobileProductCard> with AutomaticKe
                           fontSize: 16,
                         ),
                       ),
+                      Row(
+                        children: [
+                          const Icon(Icons.qr_code, size: 12),
+                          Text(widget.row.product.displayCode),
+                        ],
+                      ),
                       Text(
                         "${widget.row.product.brandName} - ${widget.row.product.unitName}",
                         style: const TextStyle(color: Colors.grey),

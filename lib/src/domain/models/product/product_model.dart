@@ -4,7 +4,7 @@ import '../product_sale_profile/product_sale_profile_model.dart';
 class BaseProduct {
   final String name;
   final String? description;
-  final String? code;
+  final String code;
   final String brandName;
   final String unitName;
   final String? categoryName;
@@ -12,10 +12,12 @@ class BaseProduct {
   final bool hasIva;
   final bool isActive;
 
+  String get displayCode => code.isEmpty ? "-" : code;
+
   BaseProduct({
     required this.name,
     this.description,
-    this.code,
+    this.code = "",
     required this.brandName,
     required this.unitName,
     required this.categoryName,
@@ -28,7 +30,7 @@ class BaseProduct {
     return BaseProduct(
       name: json['name'] as String,
       description: json['description'] as String?,
-      code: json['code'] as String?,
+      code: json['code'] as String? ?? "",
       brandName: json['brandName'] as String,
       unitName: json['unitName'] as String,
       categoryName: json['categoryName'] as String?,
@@ -69,7 +71,7 @@ class CreateProduct extends BaseProduct {
     return CreateProduct(
       name: json['name'] as String,
       description: json['description'] as String?,
-      code: json['code'] as String?,
+      code: json['code'] as String? ?? "",
       brandName: json['brandName'] as String,
       unitName: json['unitName'] as String,
       categoryName: json['categoryName'] as String?,
@@ -161,7 +163,7 @@ class ProductInDb extends BaseProduct {
       id: json['id'] as String,
       name: json['name'] as String,
       description: json['description'] as String?,
-      code: json['code'] as String?,
+      code: json['code'] as String? ?? "",
       brandName: json['brandName'] as String,
       unitName: json['unitName'] as String,
       categoryName: json['categoryName'] as String?,
