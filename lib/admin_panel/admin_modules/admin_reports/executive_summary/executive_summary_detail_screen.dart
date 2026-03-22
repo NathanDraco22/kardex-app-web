@@ -31,47 +31,43 @@ class ExecutiveSummaryDetailScreen extends StatelessWidget {
               children: [
                 _SalesCard(summary: summary),
                 const SizedBox(height: 12),
+                if (summary.commercialBranches.isNotEmpty) ...[
+                  const Text(
+                    "Ventas por Sucursal",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  _SalesPieChartCard(summary: summary),
+                ],
+                const SizedBox(height: 24),
+
                 _CashFlowCard(summary: summary),
                 const SizedBox(height: 12),
+                if (summary.commercialBranches.isNotEmpty) ...[
+                  const Text(
+                    "Flujo de Caja por Sucursal",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  _CashFlowChartCard(summary: summary),
+                ],
+                const SizedBox(height: 24),
+
                 _OtherStatsCard(summary: summary),
-                const SizedBox(height: 24),
-
-                // Sección Ventas
-                const Text(
-                  "Ventas por Sucursal",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
                 const SizedBox(height: 12),
-                if (summary.commercialBranches.isNotEmpty)
-                  _SalesPieChartCard(summary: summary)
-                else
-                  const Center(child: Text("No hay datos de ventas por sucursal")),
-
-                const SizedBox(height: 24),
-
-                // Sección Inventario
-                const Text(
-                  "Inventario por Sucursal",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
+                if (summary.inventoryBranches.isNotEmpty) ...[
+                  const Text(
+                    "Inventario por Sucursal",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  _InventoryPieChartCard(summary: summary),
+                ],
                 const SizedBox(height: 12),
-                if (summary.inventoryBranches.isNotEmpty)
-                  _InventoryPieChartCard(summary: summary)
-                else
-                  const Center(child: Text("No hay datos de inventario por sucursal")),
-
-                const SizedBox(height: 24),
-
-                // Sección Deuda
-                const Text(
-                  "CxC por Sucursal",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 12),
-                if (summary.totalPendingBranches.isNotEmpty)
-                  _DebtPieChartCard(summary: summary)
-                else
-                  const Center(child: Text("No hay datos de deudas por sucursal")),
+                if (summary.totalPendingBranches.isNotEmpty) ...[
+                  const Text(
+                    "CxC por Sucursal",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  _DebtPieChartCard(summary: summary),
+                ],
               ],
             ),
           ),
@@ -451,6 +447,112 @@ class _RowInfo extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _CashFlowChartCard extends StatelessWidget {
+  const _CashFlowChartCard({required this.summary});
+
+  final ExecutiveSummaryInDb summary;
+
+  @override
+  Widget build(BuildContext context) {
+    if (summary.commercialBranches.isEmpty) return const SizedBox();
+
+    final chartsColor = ColorTool.getChartColors();
+
+    double maxVal = 0;
+    for (final branch in summary.commercialBranches) {
+      final cashFlow = branch.cashSales + branch.totalReceiptCash;
+      if (cashFlow > maxVal) maxVal = cashFlow.toDouble();
+    }
+    if (maxVal == 0) maxVal = 1000;
+
+    final barGroups = <BarChartGroupData>[];
+    int index = 0;
+    for (final branch in summary.commercialBranches) {
+      final cashFlow = (branch.cashSales + branch.totalReceiptCash).toDouble();
+
+      barGroups.add(
+        BarChartGroupData(
+          x: index,
+          barRods: [
+            BarChartRodData(
+              toY: cashFlow,
+              color: chartsColor[index % chartsColor.length],
+              width: 22,
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ],
+        ),
+      );
+      index++;
+    }
+
+    return Card(
+      child: SizedBox(
+        height: 250,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: BarChart(
+                  BarChartData(
+                    alignment: BarChartAlignment.spaceAround,
+                    maxY: maxVal * 1.2,
+                    barTouchData: BarTouchData(
+                      touchTooltipData: BarTouchTooltipData(
+                        getTooltipColor: (_) => Colors.blueGrey,
+                        getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                          final bInfo = BranchesTool.getBranchById(
+                            summary.commercialBranches[group.x.toInt()].branchId,
+                          );
+                          return BarTooltipItem(
+                            "${bInfo.name}\n${NumberFormatter.convertToMoneyLike(rod.toY.toInt())}",
+                            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                          );
+                        },
+                      ),
+                    ),
+                    titlesData: FlTitlesData(
+                      show: true,
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          getTitlesWidget: (value, meta) {
+                            final idx = value.toInt();
+                            if (idx < 0 || idx >= summary.commercialBranches.length) return const SizedBox();
+                            final bName = BranchesTool.getBranchById(summary.commercialBranches[idx].branchId).name;
+                            final parts = bName.split(" ");
+                            final shortName = parts.isNotEmpty ? parts[0] : bName;
+
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: Text(
+                                shortName,
+                                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    ),
+                    gridData: const FlGridData(show: false),
+                    borderData: FlBorderData(show: false),
+                    barGroups: barGroups,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

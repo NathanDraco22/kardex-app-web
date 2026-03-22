@@ -30,19 +30,19 @@ class DailySummaryDetailScreen extends StatelessWidget {
             children: [
               _SalesCard(summary: summary),
               const SizedBox(height: 12),
-              _CashFlowCard(summary: summary),
-              const SizedBox(height: 12),
-              _OtherStatsCard(summary: summary),
-              const SizedBox(height: 24),
               const Text(
                 "Ventas por Sucursal",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 12),
               if (summary.branches.isNotEmpty)
                 PieChartCard(summary: summary)
               else
                 const Center(child: Text("No hay datos de sucursales")),
+              const SizedBox(height: 12),
+              _CashFlowCard(summary: summary),
+              const SizedBox(height: 12),
+              _OtherStatsCard(summary: summary),
+              const SizedBox(height: 12),
             ],
           ),
         ),
