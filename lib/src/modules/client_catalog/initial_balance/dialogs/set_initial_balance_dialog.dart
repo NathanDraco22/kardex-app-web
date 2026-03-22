@@ -6,6 +6,7 @@ import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/branch_repository.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
 import 'package:kardex_app_front/widgets/dialogs/branch_selection_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
 
 Future<({String branchId, int balance})?> showSetInitialBalanceDialog(
@@ -50,7 +51,7 @@ class _SetInitialBalanceDialogState extends State<SetInitialBalanceDialog> {
     }
   }
 
-  void _submit() {
+  void _submit() async {
     if (_formKey.currentState!.validate()) {
       if (_selectedBranch == null) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -64,12 +65,20 @@ class _SetInitialBalanceDialogState extends State<SetInitialBalanceDialog> {
         return;
       }
 
-      final balanceInCents = NumberFormatter.convertFromDoubleToCents(doubleValue);
+      final confirm = await DialogManager.slideToConfirmActionDialog(
+        context,
+        '¿Confirmar saldo inicial de \$ ${_amountController.text}?',
+      );
 
-      Navigator.pop(context, (
-        branchId: _selectedBranch!.id,
-        balance: balanceInCents,
-      ));
+      if (confirm) {
+        if (!mounted) return;
+        final balanceInCents = NumberFormatter.convertFromDoubleToCents(doubleValue);
+
+        Navigator.pop(context, (
+          branchId: _selectedBranch!.id,
+          balance: balanceInCents,
+        ));
+      }
     }
   }
 
