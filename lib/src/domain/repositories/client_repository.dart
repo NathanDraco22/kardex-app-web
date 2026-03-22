@@ -36,6 +36,15 @@ class ClientsRepository {
     return _clients;
   }
 
+  Future<List<ClientInDb>> getClients(ClientQueryParams params) async {
+    final results = await clientsDataSource.getClients(params.toMap());
+    final responseModel = ListResponse<ClientInDb>.fromJson(
+      results,
+      ClientInDb.fromJson,
+    );
+    return responseModel.data;
+  }
+
   Future<List<ClientInDb>> getClientWithBalance(ClientQueryParams params) async {
     final results = await clientsDataSource.getClientsWithBalance(params.toMap());
     final responseModel = ListResponse<ClientInDb>.fromJson(
