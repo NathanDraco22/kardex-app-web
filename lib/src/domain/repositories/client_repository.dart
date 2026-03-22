@@ -19,6 +19,12 @@ class ClientsRepository {
     return newClient;
   }
 
+  Future<ClientInDb> createInitialBalance(String branchId, String clientId, int balance) async {
+    final result = await clientsDataSource.createInitialBalance(branchId, clientId, balance);
+    final newClient = ClientInDb.fromJson(result);
+    return newClient;
+  }
+
   Future<List<ClientInDb>> getAllClients() async {
     final results = await clientsDataSource.getAllClients();
 

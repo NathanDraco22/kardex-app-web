@@ -51,6 +51,17 @@ class _Body extends StatelessWidget {
             height: 0.0,
           ),
           ListTile(
+            leading: const Icon(Icons.account_balance_wallet_rounded),
+            title: const Text("Saldos Iniciales"),
+            onTap: () {
+              context.pushNamed("initial-balance");
+            },
+            trailing: const Icon(Icons.chevron_right),
+          ),
+          const Divider(
+            height: 0.0,
+          ),
+          ListTile(
             leading: const Icon(FluentIcons.search_12_filled),
             title: const Text("Buscar Cliente por #Cedula"),
             onTap: () {
