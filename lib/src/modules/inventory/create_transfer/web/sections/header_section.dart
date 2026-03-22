@@ -187,11 +187,15 @@ Future<void> saveTransfer(BuildContext context) async {
     return TransferItem(
       id: e.product.id,
       name: e.product.name,
+      code: e.product.code,
       unitName: e.product.unitName,
       brandName: e.product.brandName,
       quantity: e.quantity,
       cost: e.unitaryCost,
       expirationDate: e.expirationDate?.millisecondsSinceEpoch,
+      salePrice: e.product.saleProfile.salePrice,
+      salePrice2: e.product.saleProfile.salePrice2,
+      salePrice3: e.product.saleProfile.salePrice3,
     );
   }).toList();
 

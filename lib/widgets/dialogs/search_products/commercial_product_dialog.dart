@@ -190,13 +190,19 @@ class _FormContentState extends State<_FormContent> {
                             ],
                             onChanged: (value) {
                               if (value == null) return;
+                              final priceMap = {
+                                1: product.saleProfile.salePrice,
+                                2: product.saleProfile.salePrice2,
+                                3: product.saleProfile.salePrice3,
+                              };
+
+                              if (priceMap[value] == 0) {
+                                return;
+                              }
+
                               commercialProductResult.selectedPriceLevel = value;
-                              if (value == 1) {
-                                commercialProductResult.newPrice = product.saleProfile.salePrice;
-                              } else if (value == 2) {
-                                commercialProductResult.newPrice = product.saleProfile.salePrice2;
-                              } else if (value == 3) {
-                                commercialProductResult.newPrice = product.saleProfile.salePrice3;
+                              if (value != 0) {
+                                commercialProductResult.newPrice = priceMap[value]!;
                               }
                               setState(() {});
                             },

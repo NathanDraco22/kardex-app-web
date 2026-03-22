@@ -76,14 +76,14 @@ class _Body extends StatelessWidget {
                                   text: 'Productos: ',
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 18,
+                                    fontSize: 16,
                                     color: Colors.grey,
                                   ),
                                 ),
                                 TextSpan(
                                   text: state.inventories.length.toString(),
                                   style: const TextStyle(
-                                    fontSize: 18,
+                                    fontSize: 16,
                                     color: Colors.black,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -99,14 +99,14 @@ class _Body extends StatelessWidget {
                                   text: 'Total: ',
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 18,
+                                    fontSize: 16,
                                     color: Colors.grey,
                                   ),
                                 ),
                                 TextSpan(
                                   text: totalInventory,
                                   style: TextStyle(
-                                    fontSize: 18,
+                                    fontSize: 16,
                                     color: Colors.green.shade700,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -145,6 +145,7 @@ class _Body extends StatelessWidget {
                     return InventoryRow(
                       color: rowColor,
                       productName: product.name,
+                      code: product.code ?? "--",
                       brandName: product.brandName,
                       unitName: product.unitName,
                       stock: inventory.currentStock.toString(),
