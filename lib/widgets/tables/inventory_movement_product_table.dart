@@ -5,6 +5,7 @@ import 'package:kardex_app_front/src/domain/models/product/product_model.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/input_formatter/input_formatter.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/widgets/display_product_code.dart';
 
 class ProductRow {
   ProductRow({
@@ -346,7 +347,7 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
     return Ink(
       color: widget.color,
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      height: 56,
+      height: 60,
       child: Row(
         children: [
           Flexible(
@@ -359,7 +360,7 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(product.name, style: const TextStyle(fontWeight: FontWeight.w500)),
+                    DisplayProductCode(product: product),
                     Row(
                       spacing: 4,
                       children: [

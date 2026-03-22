@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/widgets/display_product_code.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
@@ -273,12 +274,7 @@ class InvoiceTableRow extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          product.name,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        DisplayProductCode(product: product),
                         Row(
                           children: [
                             Expanded(

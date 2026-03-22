@@ -231,6 +231,7 @@ class _InnerContent extends StatelessWidget {
               Flexible(
                 child: TitleTextField(
                   key: const ValueKey("product_code"),
+                  tooltip: "El codigo es autogenerado si se deja vacio",
                   initialValue: widget.currentProduct?.code,
                   onEditingComplete: () => FocusScope.of(context).nextFocus(),
                   title: "Codigo",

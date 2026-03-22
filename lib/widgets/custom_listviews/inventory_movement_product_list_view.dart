@@ -239,12 +239,26 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
                 children: [
                   Row(
                     children: [
-                      Text(
-                        product.name,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
+                      Column(
+                        crossAxisAlignment: .start,
+                        children: [
+                          Text(
+                            product.name,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              const Icon(Icons.qr_code, size: 16),
+                              Text(
+                                product.displayCode,
+                                style: const TextStyle(fontSize: 16),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ],
                   ),

@@ -47,11 +47,7 @@ class _ContentSection extends StatelessWidget {
 
             return Column(
               children: [
-                Row(
-                  children: [
-                    Text(currentProduct.name),
-                  ],
-                ),
+                DisplayProductCode(product: currentProduct),
                 Row(
                   spacing: 8,
                   children: [

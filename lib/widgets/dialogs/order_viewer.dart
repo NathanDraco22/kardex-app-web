@@ -242,7 +242,7 @@ class OrderViewerContent extends StatelessWidget {
                 child: Row(
                   children: [
                     Expanded(
-                      flex: 2,
+                      flex: 4,
                       child: Text(
                         "Producto",
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
@@ -250,20 +250,25 @@ class OrderViewerContent extends StatelessWidget {
                     ),
                     Expanded(
                       child: Text(
-                        "Cantidad",
+                        "Cant.",
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        textAlign: TextAlign.center,
                       ),
                     ),
                     Expanded(
+                      flex: 2,
                       child: Text(
                         "Precio",
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        textAlign: TextAlign.center,
                       ),
                     ),
                     Expanded(
+                      flex: 2,
                       child: Text(
                         "Total",
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        textAlign: TextAlign.center,
                       ),
                     ),
                   ],
@@ -280,16 +285,30 @@ class OrderViewerContent extends StatelessWidget {
                       color: rowColor,
                       child: Row(
                         children: [
-                          Expanded(flex: 2, child: Text(saleItem.product.name)),
-                          Expanded(child: Text(saleItem.quantity.toString())),
                           Expanded(
+                            flex: 4,
                             child: Text(
-                              NumberFormatter.convertToMoneyLike(saleItem.price),
+                              saleItem.product.name,
                             ),
                           ),
                           Expanded(
                             child: Text(
+                              saleItem.quantity.toString(),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: Text(
+                              NumberFormatter.convertToMoneyLike(saleItem.price),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: Text(
                               NumberFormatter.convertToMoneyLike(saleItem.subTotal),
+                              textAlign: TextAlign.center,
                             ),
                           ),
                         ],
@@ -313,7 +332,7 @@ class OrderViewerContent extends StatelessWidget {
                           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                         ),
                         SizedBox(
-                          width: 100,
+                          width: 120,
                           child: Text(
                             NumberFormatter.convertToMoneyLike(orderSubTotal),
                             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
@@ -330,7 +349,7 @@ class OrderViewerContent extends StatelessWidget {
                           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                         ),
                         SizedBox(
-                          width: 100,
+                          width: 120,
                           child: Text(
                             NumberFormatter.convertToMoneyLike(totalDiscount),
                             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
@@ -349,7 +368,7 @@ class OrderViewerContent extends StatelessWidget {
                             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.grey),
                           ),
                           SizedBox(
-                            width: 100,
+                            width: 120,
                             child: Text(
                               NumberFormatter.convertToMoneyLike(order.total),
                               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),

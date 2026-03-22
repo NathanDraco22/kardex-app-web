@@ -259,7 +259,7 @@ class InvoiceViewerContent extends StatelessWidget {
                 child: Row(
                   children: [
                     Expanded(
-                      flex: 2,
+                      flex: 4,
                       child: Text(
                         "Producto",
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
@@ -267,20 +267,25 @@ class InvoiceViewerContent extends StatelessWidget {
                     ),
                     Expanded(
                       child: Text(
-                        "Cantidad",
+                        "Cant.",
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        textAlign: TextAlign.center,
                       ),
                     ),
                     Expanded(
+                      flex: 2,
                       child: Text(
                         "Precio",
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        textAlign: TextAlign.center,
                       ),
                     ),
                     Expanded(
+                      flex: 2,
                       child: Text(
                         "Total",
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        textAlign: TextAlign.center,
                       ),
                     ),
                   ],
@@ -297,16 +302,28 @@ class InvoiceViewerContent extends StatelessWidget {
                       color: rowColor,
                       child: Row(
                         children: [
-                          Expanded(flex: 2, child: Text(saleItem.product.name)),
-                          Expanded(child: Text(saleItem.quantity.toString())),
                           Expanded(
-                            child: Text(
-                              NumberFormatter.convertToMoneyLike(saleItem.price),
-                            ),
+                            flex: 4,
+                            child: Text(saleItem.product.name),
                           ),
                           Expanded(
                             child: Text(
+                              saleItem.quantity.toString(),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: Text(
+                              NumberFormatter.convertToMoneyLike(saleItem.price),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: Text(
                               NumberFormatter.convertToMoneyLike(saleItem.subTotal),
+                              textAlign: TextAlign.center,
                             ),
                           ),
                         ],
@@ -330,7 +347,7 @@ class InvoiceViewerContent extends StatelessWidget {
                           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                         ),
                         SizedBox(
-                          width: 100,
+                          width: 120,
                           child: Text(
                             NumberFormatter.convertToMoneyLike(invoiceSubTotal),
                             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
@@ -347,7 +364,7 @@ class InvoiceViewerContent extends StatelessWidget {
                           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                         ),
                         SizedBox(
-                          width: 100,
+                          width: 120,
                           child: Text(
                             NumberFormatter.convertToMoneyLike(totalDiscount),
                             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
@@ -366,7 +383,7 @@ class InvoiceViewerContent extends StatelessWidget {
                             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.grey),
                           ),
                           SizedBox(
-                            width: 100,
+                            width: 120,
                             child: Text(
                               NumberFormatter.convertToMoneyLike(invoice.total),
                               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),

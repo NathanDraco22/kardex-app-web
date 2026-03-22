@@ -71,6 +71,12 @@ class ProductInvoiceCard extends StatelessWidget {
                 ),
               ),
               Row(
+                children: [
+                  const Icon(Icons.qr_code, size: 12),
+                  Text(item.product.displayCode),
+                ],
+              ),
+              Row(
                 spacing: 12,
                 children: [
                   Text(item.product.brandName),
