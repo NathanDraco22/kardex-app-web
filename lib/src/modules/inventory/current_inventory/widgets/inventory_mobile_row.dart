@@ -83,7 +83,7 @@ class InventoryRow extends StatelessWidget {
               const SizedBox(height: 8),
               const Row(
                 children: [
-                  Expanded(child: Text("Existencia", style: TextStyle(fontSize: 16))),
+                  Expanded(child: Text("Existen", style: TextStyle(fontSize: 16))),
                   Expanded(
                     flex: 2,
                     child: Text("Costo Unit", textAlign: TextAlign.center, style: TextStyle(fontSize: 16)),
