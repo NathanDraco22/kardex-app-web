@@ -111,6 +111,12 @@ class _ContentSection extends StatelessWidget {
                     ),
                     Row(
                       children: [
+                        const Icon(Icons.qr_code, size: 12),
+                        Text(currentProduct.displayCode),
+                      ],
+                    ),
+                    Row(
+                      children: [
                         Flexible(
                           fit: FlexFit.tight,
                           child: Text(
