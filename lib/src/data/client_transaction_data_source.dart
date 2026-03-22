@@ -15,13 +15,15 @@ class ClientTransactionsDataSource with HttpService {
       _endpoint,
       queryParameters: params,
     );
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 
   Future<Map<String, dynamic>?> getClientTransactionById(String transactionId) async {
     final uri = HttpTools.generateUri("$_endpoint/$transactionId");
-    final res = await getQuery(uri);
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
     return res;
   }
 }
