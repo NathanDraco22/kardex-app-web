@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class InventoryRow extends StatelessWidget {
   final String productName;
+  final String code;
   final String brandName;
   final String unitName;
   final String stock;
@@ -13,6 +14,7 @@ class InventoryRow extends StatelessWidget {
   const InventoryRow({
     super.key,
     required this.productName,
+    required this.code,
     required this.brandName,
     required this.unitName,
     required this.stock,
@@ -24,7 +26,6 @@ class InventoryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 2. Usa InkWell para los efectos visuales y el onTap
     return InkWell(
       onTap: onTap,
       hoverColor: Colors.grey.withValues(alpha: 0.1),
@@ -32,23 +33,34 @@ class InventoryRow extends StatelessWidget {
         color: color,
         child: Padding(
           padding: const EdgeInsets.all(12.0),
-          // He usado Column en lugar de un Row con Column adentro para simplificar
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                productName, // <-- Usa la propiedad
+                productName,
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
+              ),
+              Row(
+                children: [
+                  const Icon(Icons.qr_code, size: 16),
+                  Text(
+                    code,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 4),
               Row(
                 children: [
                   Expanded(
                     child: Text(
-                      brandName, // <-- Usa la propiedad
+                      brandName,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -58,7 +70,7 @@ class InventoryRow extends StatelessWidget {
                   ),
                   Expanded(
                     child: Text(
-                      unitName, // <-- Usa la propiedad
+                      unitName,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -73,6 +85,7 @@ class InventoryRow extends StatelessWidget {
                 children: [
                   Expanded(child: Text("Existencia", style: TextStyle(fontSize: 16))),
                   Expanded(
+                    flex: 2,
                     child: Text("Costo Unit", textAlign: TextAlign.center, style: TextStyle(fontSize: 16)),
                   ),
                   Expanded(
@@ -85,13 +98,14 @@ class InventoryRow extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      stock, // <-- Usa la propiedad
+                      stock,
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     ),
                   ),
                   Expanded(
+                    flex: 2,
                     child: Text(
-                      unitCost, // <-- Usa la propiedad
+                      unitCost,
                       textAlign: TextAlign.center,
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     ),
@@ -99,7 +113,7 @@ class InventoryRow extends StatelessWidget {
                   Expanded(
                     flex: 2,
                     child: Text(
-                      totalValue, // <-- Usa la propiedad
+                      totalValue,
                       textAlign: TextAlign.center,
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     ),

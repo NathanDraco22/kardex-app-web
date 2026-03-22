@@ -25,7 +25,7 @@ class DisplayProductCode extends StatelessWidget {
         ),
         Row(
           children: [
-            const Icon(Icons.qr_code_rounded, size: 12),
+            const Icon(Icons.qr_code, size: 12),
             Text(product.displayCode),
           ],
         ),
