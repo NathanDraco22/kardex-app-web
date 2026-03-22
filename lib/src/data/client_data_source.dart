@@ -11,9 +11,28 @@ class ClientsDataSource with HttpService {
     return res;
   }
 
+  Future<Map<String, dynamic>> createInitialBalance(String branchId, String clientId, int balance) async {
+    final headers = HttpTools.generateAuthHeaders();
+    final uri = HttpTools.generateUri("$_clientEndpoint/initial-balance");
+    final body = {
+      "branchId": branchId,
+      "clientId": clientId,
+      "initialBalance": balance,
+    };
+    final res = await postQuery(uri, body, headers: headers);
+    return res;
+  }
+
   Future<Map<String, dynamic>> getAllClients() async {
     final headers = HttpTools.generateAuthHeaders();
     final uri = HttpTools.generateUri(_clientEndpoint);
+    final res = await getQuery(uri, headers: headers);
+    return res;
+  }
+
+  Future<Map<String, dynamic>> getClients(Map<String, String> params) async {
+    final headers = HttpTools.generateAuthHeaders();
+    final uri = HttpTools.generateUri(_clientEndpoint, queryParameters: params);
     final res = await getQuery(uri, headers: headers);
     return res;
   }
