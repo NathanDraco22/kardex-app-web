@@ -52,22 +52,37 @@ class HomeEndDrawer extends StatelessWidget {
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 20,
+                  fontWeight: .w600,
                 ),
               ),
             ),
 
             ListTile(
-              leading: const Icon(Icons.password),
-              title: const Text("Cambiar Contraseña"),
+              leading: const Icon(
+                Icons.password,
+                color: Colors.blue,
+              ),
+              title: const Text(
+                "Cambiar Contraseña",
+                style: TextStyle(
+                  fontSize: 16,
+                ),
+              ),
               onTap: () => showChangePassword(context),
             ),
 
-            const Divider(),
+            const Divider(
+              height: 0.0,
+              thickness: 2,
+            ),
 
             if (isMultiBranch && hasUserMultiBranch) ...[
               ListTile(
-                leading: const Icon(Icons.store),
-                title: const Text("Cambiar Sucursal"),
+                leading: const Icon(
+                  Icons.store,
+                  color: Colors.blue,
+                ),
+                title: const Text("Cambiar Sucursal", style: TextStyle(fontSize: 16)),
                 onTap: () async {
                   final filteredBranches = branches.where((element) {
                     return element.id != BranchesTool.getCurrentBranchId();
@@ -79,13 +94,19 @@ class HomeEndDrawer extends StatelessWidget {
                 },
               ),
 
-              const Divider(),
+              const Divider(
+                height: 0.0,
+                thickness: 2,
+              ),
             ],
 
             if (isAdmin && isMultiBranch)
               ListTile(
-                leading: const Icon(Icons.admin_panel_settings),
-                title: const Text("Ir a Panel Administrativo"),
+                leading: const Icon(
+                  Icons.admin_panel_settings,
+                  color: Colors.blue,
+                ),
+                title: const Text("Ir a Panel Administrativo", style: TextStyle(fontSize: 16)),
                 onTap: () async {
                   context.goNamed("admin-panel");
                 },
@@ -97,8 +118,9 @@ class HomeEndDrawer extends StatelessWidget {
               leading: Icon(Icons.exit_to_app, color: Colors.red.shade700),
 
               title: Text(
-                "Cerrar Sesión",
+                "Cerrar Sesión",
                 style: TextStyle(
+                  fontSize: 16,
                   color: Colors.red.shade700,
                 ),
               ),
