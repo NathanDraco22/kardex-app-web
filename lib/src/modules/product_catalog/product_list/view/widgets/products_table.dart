@@ -163,7 +163,7 @@ class _RowWidget extends StatelessWidget {
                         color: Colors.grey,
                       ),
                       Text(
-                        product.code ?? "--",
+                        product.displayCode,
                         style: const TextStyle(
                           color: Colors.grey,
                         ),
