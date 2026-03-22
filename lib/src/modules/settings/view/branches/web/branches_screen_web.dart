@@ -84,6 +84,9 @@ class _WebBody extends StatelessWidget {
                 if (!isMultiBranch || user.role != "Admin") {
                   return const SizedBox.shrink();
                 }
+                if (user.id != "root") {
+                  return const SizedBox.shrink();
+                }
 
                 return Row(
                   children: [

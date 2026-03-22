@@ -4,7 +4,6 @@ import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/models.dart';
 import 'package:kardex_app_front/src/domain/models/product_sale_profile/product_sale_profile_model.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/widgets/display_product_code.dart';
 import 'package:kardex_app_front/widgets/title_label.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
