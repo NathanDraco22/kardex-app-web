@@ -22,8 +22,8 @@ class WriteAnonInvoiceCubit extends Cubit<WriteAnonInvoiceState> {
         return;
       }
 
-      await invoicesRepository.createInvoice(createInvoice);
-      emit(WriteAnonInvoiceSuccess());
+      final invoice = await invoicesRepository.createInvoice(createInvoice);
+      emit(WriteAnonInvoiceSuccess(invoice));
       emit(WriteAnonInvoiceInitial());
     } catch (error) {
       emit(WriteAnonInvoiceError(error.toString()));

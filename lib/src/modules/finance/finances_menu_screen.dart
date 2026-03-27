@@ -76,6 +76,19 @@ class _Body extends StatelessWidget {
               onTap: () => context.pushNamed("client-accounts"),
             ),
             const Divider(height: 0.0),
+
+            ListTile(
+              leading: const Icon(
+                FluentIcons.receipt_money_24_filled,
+                color: Colors.green,
+              ),
+              title: const Text("Historial Detallado de Facturas"),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.pushNamed("detail-invoice-history"),
+            ),
+
+            const Divider(height: 0.0),
+
             ListTile(
               leading: const Icon(
                 FluentIcons.receipt_money_24_filled,

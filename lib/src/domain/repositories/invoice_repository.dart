@@ -25,6 +25,12 @@ class InvoicesRepository {
     return InvoiceInDb.fromJson(invoice);
   }
 
+  Future<ListResponse<InvoiceInDb>> getAllInvoices(InvoiceQueryParams params) async {
+    final res = await invoicesDataSource.getAllInvoices(params.toMap());
+    final result = ListResponse<InvoiceInDb>.fromJson(res, InvoiceInDb.fromJson);
+    return result;
+  }
+
   Future<ListResponse<InvoiceInDb>> getInvoicesByClientId(String clientId) async {
     final res = await invoicesDataSource.getInvoicesByClientId(clientId);
     final result = ListResponse<InvoiceInDb>.fromJson(res, InvoiceInDb.fromJson);
