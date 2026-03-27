@@ -181,15 +181,29 @@ class _SaveButton extends StatelessWidget {
   }
 }
 
-class _MobileBody extends StatelessWidget {
+class _MobileBody extends StatefulWidget {
   const _MobileBody();
+
+  @override
+  State<_MobileBody> createState() => _MobileBodyState();
+}
+
+class _MobileBodyState extends State<_MobileBody> {
+  ScrollController scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
     final mediator = CreateTransferMediator.read(context)!;
-    return Center(
+    return NotificationListener<NewMobileCardNotification>(
+      onNotification: (notification) {
+        Future(() {
+          scrollController.jumpTo(1.0);
+        });
+        return true;
+      },
       child: ListView(
         addAutomaticKeepAlives: true,
+        controller: scrollController,
         padding: const EdgeInsets.only(bottom: 112, top: 8),
         children: [
           const _MobileHeaderSection(
@@ -299,6 +313,8 @@ class _MobileHeaderSectionState extends State<_MobileHeaderSection> with Automat
   }
 }
 
+class NewMobileCardNotification extends Notification {}
+
 class _MobileProductCard extends StatefulWidget {
   const _MobileProductCard({required this.row, super.key});
 
@@ -311,6 +327,23 @@ class _MobileProductCard extends StatefulWidget {
 class _MobileProductCardState extends State<_MobileProductCard> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
+
+  FocusNode expirationDateFocusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      expirationDateFocusNode.requestFocus();
+      NewMobileCardNotification().dispatch(context);
+    });
+  }
+
+  @override
+  void dispose() {
+    expirationDateFocusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

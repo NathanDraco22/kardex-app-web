@@ -37,6 +37,7 @@ import 'package:kardex_app_front/src/modules/commercial/receipt_history/receipt_
 import 'package:kardex_app_front/src/modules/finance/client_accounts/view/client_account_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/client_movements/view/client_movements_screen.dart';
 import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
+import 'package:kardex_app_front/src/modules/finance/detail_invoice_history/invoice_history_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/finances_menu_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/paid_invoices/paid_invoices_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/branch_daily_summary/branch_daily_summary_screen.dart';
@@ -438,6 +439,11 @@ class AppRouter {
             path: "client-accounts",
             name: "client-accounts",
             builder: (context, state) => const ClientAccountScreen(),
+          ),
+          GoRoute(
+            path: "detail-invoice-history",
+            name: "detail-invoice-history",
+            builder: (context, state) => const DetailInvoiceHistoryScreen(),
           ),
           GoRoute(
             path: "paid-invoices",

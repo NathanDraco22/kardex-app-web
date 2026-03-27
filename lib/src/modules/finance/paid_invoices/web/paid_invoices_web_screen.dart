@@ -6,9 +6,9 @@ import 'package:kardex_app_front/src/modules/finance/paid_invoices/cubit/read_pa
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/basic_table_listview.dart';
+import 'package:kardex_app_front/widgets/dialogs/invoice_inspector.dart';
 import 'package:kardex_app_front/widgets/super_widgets/custom_autocomplete_textfield.dart';
 import 'package:kardex_app_front/widgets/date_picker_listile.dart';
-import 'package:kardex_app_front/widgets/dialogs/invoice_viewer.dart';
 import 'package:kardex_app_front/widgets/title_label.dart';
 
 part 'sections/header_section.dart';
