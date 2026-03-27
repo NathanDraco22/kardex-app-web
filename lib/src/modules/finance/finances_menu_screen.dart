@@ -79,7 +79,7 @@ class _Body extends StatelessWidget {
 
             ListTile(
               leading: const Icon(
-                FluentIcons.receipt_money_24_filled,
+                Icons.content_paste_search_rounded,
                 color: Colors.green,
               ),
               title: const Text("Historial Detallado de Facturas"),
