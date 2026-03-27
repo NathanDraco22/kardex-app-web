@@ -84,6 +84,9 @@ class _ContentSection extends StatelessWidget {
 
                     return BasicTableRow(
                       color: rowColor,
+                      onTap: () {
+                        showInvoiceInspector(context, currentInvoice);
+                      },
                       cells: [
                         BasicTableCell(
                           content: Text(
