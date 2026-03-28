@@ -39,7 +39,7 @@ class _HeaderSection extends StatelessWidget {
                             return invoiceRepo.getInvoiceByDocNumber(value);
                           },
                           onResult: (value) {
-                            showInvoiceViewerDialog(context, value);
+                            showInvoiceInspector(context, value);
                           },
                         );
                       },
