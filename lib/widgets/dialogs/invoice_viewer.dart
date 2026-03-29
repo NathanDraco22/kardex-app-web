@@ -247,6 +247,12 @@ class InvoiceViewerContent extends StatelessWidget {
                 ),
               ],
             ),
+
+            if (invoice.description.isNotEmpty)
+              Text(
+                "Observación: ${invoice.description}",
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
           ],
         ),
         const Divider(),

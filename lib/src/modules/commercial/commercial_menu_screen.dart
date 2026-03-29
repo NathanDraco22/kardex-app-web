@@ -160,6 +160,21 @@ class _Body extends StatelessWidget {
           if (accessManager.hasCurrentAccess(context, CommercialSubModules.createInvoice))
             ListTile(
               leading: Icon(
+                Icons.calendar_month,
+                size: 32,
+                color: Colors.orange.shade800,
+              ),
+              title: const Text("Ventas Diarias Globales"),
+              onTap: () {
+                context.pushNamed("daily-client-invoices");
+              },
+            ),
+
+          const Divider(height: 0.0),
+
+          if (accessManager.hasCurrentAccess(context, CommercialSubModules.createInvoice))
+            ListTile(
+              leading: Icon(
                 Icons.list,
                 size: 32,
                 color: Colors.orange.shade600,
