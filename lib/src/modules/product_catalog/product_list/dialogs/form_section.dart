@@ -384,6 +384,26 @@ class _InnerContent extends StatelessWidget {
               );
             },
           ),
+
+          const SizedBox(height: 16),
+
+          ListTile(
+            title: const Text("Borrar Producto", style: TextStyle(color: Colors.red)),
+            leading: const Icon(Icons.delete, color: Colors.red),
+            onTap: () async {
+              final isConfirmed = await DialogManager.slideToConfirmDeleteActionDialog(
+                context,
+                "¿Estas seguro de borrar el producto ${widget.currentProduct?.name}?"
+                "El producto se borrara permanentemente",
+              );
+
+              if (!isConfirmed) return;
+              if (!context.mounted) return;
+              if (widget.currentProduct == null) return;
+              context.read<WriteProductCubit>().deleteProduct(widget.currentProduct!.id);
+            },
+            tileColor: Colors.red.shade100,
+          ),
         ],
       ),
     );
