@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/src/domain/models/branch/branch_model.dart';
 import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
+import 'package:kardex_app_front/src/domain/models/client/initial_balance_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/branch_repository.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
 import 'package:kardex_app_front/widgets/dialogs/branch_selection_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
 
-Future<({String branchId, int balance})?> showSetInitialBalanceDialog(
+Future<({String branchId, List<InitBalanceItem> balances})?> showSetInitialBalanceDialog(
   BuildContext context,
   ClientInDb client,
 ) async {
-  return await showDialog<({String branchId, int balance})?>(
+  return await showDialog<({String branchId, List<InitBalanceItem> balances})?>(
     context: context,
     builder: (context) {
       return SetInitialBalanceDialog(client: client);
@@ -31,15 +32,8 @@ class SetInitialBalanceDialog extends StatefulWidget {
 }
 
 class _SetInitialBalanceDialogState extends State<SetInitialBalanceDialog> {
-  final _amountController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
   BranchInDb? _selectedBranch;
-
-  @override
-  void dispose() {
-    _amountController.dispose();
-    super.dispose();
-  }
+  List<InitBalanceItem> balances = [];
 
   void _selectBranch() async {
     final branches = context.read<BranchesRepository>().branches;
@@ -51,72 +45,80 @@ class _SetInitialBalanceDialogState extends State<SetInitialBalanceDialog> {
     }
   }
 
+  void _addBalance() async {
+    final newBalance = await _showAddEditBalanceDialog(context);
+    if (newBalance != null) {
+      setState(() {
+        balances.add(newBalance);
+      });
+    }
+  }
+
+  void _editBalance(int index) async {
+    final updatedBalance = await _showAddEditBalanceDialog(context, balanceToEdit: balances[index]);
+    if (updatedBalance != null) {
+      setState(() {
+        balances[index] = updatedBalance;
+      });
+    }
+  }
+
+  void _deleteBalance(int index) async {
+    final result = await DialogManager.confirmActionDialog(
+      context,
+      "¿Estás seguro de que deseas eliminar este saldo inicial?",
+    );
+    if (result) {
+      setState(() {
+        balances.removeAt(index);
+      });
+    }
+  }
+
   void _submit() async {
-    if (_formKey.currentState!.validate()) {
-      if (_selectedBranch == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Por favor, selecciona una sucursal.')),
-        );
-        return;
-      }
-
-      final doubleValue = double.tryParse(_amountController.text);
-      if (doubleValue == null) {
-        return;
-      }
-
-      final confirm = await DialogManager.slideToConfirmActionDialog(
-        context,
-        '¿Confirmar saldo inicial de \$ ${_amountController.text}?',
+    if (balances.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor agrega al menos un saldo inicial.')),
       );
+      return;
+    }
 
-      if (confirm) {
-        if (!mounted) return;
-        final balanceInCents = NumberFormatter.convertFromDoubleToCents(doubleValue);
+    if (_selectedBranch == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor, selecciona una sucursal.')),
+      );
+      return;
+    }
 
-        Navigator.pop(context, (
-          branchId: _selectedBranch!.id,
-          balance: balanceInCents,
-        ));
-      }
+    final totalFormatted = NumberFormatter.convertToMoneyLike(
+      balances.fold(0, (sum, item) => sum + item.initialBalance),
+    );
+
+    final confirm = await DialogManager.slideToConfirmActionDialog(
+      context,
+      '¿Confirmar creación de ${balances.length} saldos por un total de $totalFormatted\npara ${widget.client.name}?',
+    );
+
+    if (confirm) {
+      if (!mounted) return;
+      context.pop((
+        branchId: _selectedBranch!.id,
+        balances: balances,
+      ));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Establecer Saldo Inicial'),
-      content: SizedBox(
-        width: 400,
-        child: Form(
-          key: _formKey,
+    return SafeArea(
+      child: AlertDialog(
+        title: Text('Saldos Iniciales: ${widget.client.name}'),
+        content: SizedBox(
+          width: 600,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                'Cliente: ${widget.client.name}',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-              const SizedBox(height: 16),
-              TitleTextField(
-                title: 'Saldo Inicial (Ej. 150.50)',
-                controller: _amountController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-                ],
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Ingrese un monto válido';
-                  }
-                  if (double.tryParse(value) == null) {
-                    return 'Formato numérico incorrecto';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
               ListTile(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(4),
@@ -127,20 +129,150 @@ class _SetInitialBalanceDialogState extends State<SetInitialBalanceDialog> {
                 trailing: const Icon(Icons.store),
                 onTap: _selectBranch,
               ),
+              const SizedBox(height: 16),
+              const Text("Lista de Saldos", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              const SizedBox(height: 8),
+              Expanded(
+                child: balances.isEmpty
+                    ? const Center(
+                        child: Text(
+                          "No has agregado ningún saldo inicial aún.",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      )
+                    : ListView.separated(
+                        shrinkWrap: true,
+                        itemCount: balances.length,
+                        separatorBuilder: (context, index) => const Divider(),
+                        itemBuilder: (context, index) {
+                          final item = balances[index];
+                          return ListTile(
+                            title: Text(item.productName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                            subtitle: Text("Monto: ${NumberFormatter.convertToMoneyLike(item.initialBalance)}"),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.edit, color: Colors.blue),
+                                  onPressed: () => _editBalance(index),
+                                  tooltip: "Editar",
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete, color: Colors.red),
+                                  onPressed: () => _deleteBalance(index),
+                                  tooltip: "Eliminar",
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                onPressed: _addBalance,
+                icon: const Icon(Icons.add),
+                label: const Text("Agregar Saldo"),
+              ),
             ],
           ),
         ),
+        actions: [
+          OutlinedButton(
+            onPressed: () => context.pop(null),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: _submit,
+            child: const Text('Guardar Todo'),
+          ),
+        ],
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context, null),
-          child: const Text('Cancelar'),
-        ),
-        ElevatedButton(
-          onPressed: _submit,
-          child: const Text('Guardar'),
-        ),
-      ],
+    );
+  }
+
+  Future<InitBalanceItem?> _showAddEditBalanceDialog(
+    BuildContext context, {
+    InitBalanceItem? balanceToEdit,
+  }) async {
+    final formKey = GlobalKey<FormState>();
+    final isEditing = balanceToEdit != null;
+
+    String productName = balanceToEdit?.productName ?? 'SALDO INICIAL';
+    String amountText = balanceToEdit != null
+        ? NumberFormatter.convertFromCentsToDouble(balanceToEdit.initialBalance).toStringAsFixed(2)
+        : '';
+
+    return await showDialog<InitBalanceItem?>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(isEditing ? "Editar Saldo" : "Añadir Saldo"),
+          content: Form(
+            key: formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TitleTextField(
+                    key: const ValueKey("balance_amount"),
+                    textInputAction: TextInputAction.next,
+                    title: "Monto (Ej. 150.50)*",
+                    initialValue: amountText,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) return "Requerido";
+                      if (double.tryParse(value) == null) {
+                        return 'Formato numérico incorrecto';
+                      }
+                      amountText = value.trim();
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  TitleTextField(
+                    key: const ValueKey("balance_productName"),
+                    textInputAction: TextInputAction.done,
+                    title: "Concepto/Nombre del Producto (Opcional)",
+                    initialValue: productName,
+                    textCapitalization: TextCapitalization.words,
+                    validator: (value) {
+                      if (value != null && value.trim().isNotEmpty) {
+                        productName = value.trim().toUpperCase();
+                      } else {
+                        productName = 'SALDO INICIAL';
+                      }
+                      return null;
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            OutlinedButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancelar"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (formKey.currentState!.validate()) {
+                  final doubleValue = double.parse(amountText);
+                  final balanceInCents = NumberFormatter.convertFromDoubleToCents(doubleValue);
+
+                  final newItem = InitBalanceItem(
+                    initialBalance: balanceInCents,
+                    productName: productName,
+                  );
+                  Navigator.pop(context, newItem);
+                }
+              },
+              child: Text(isEditing ? "Guardar Cambios" : "Agregar"),
+            ),
+          ],
+        );
+      },
     );
   }
 }
