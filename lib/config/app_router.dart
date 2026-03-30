@@ -4,6 +4,7 @@ import 'package:kardex_app_front/admin_panel/admin_modules/admin_reports/daily_s
 import 'package:kardex_app_front/admin_panel/admin_modules/admin_reports/executive_summary/executive_summary_screen.dart';
 import 'package:kardex_app_front/admin_panel/admin_panel_screen.dart';
 import 'package:kardex_app_front/src/modules/activation/activation_screen.dart';
+import 'package:kardex_app_front/src/modules/shortcuts/shortcuts_menu_screen.dart';
 import 'package:kardex_app_front/src/modules/advanced_tools/advanced_tools_screen.dart';
 import 'package:kardex_app_front/src/modules/advanced_tools/product_stats/product_stats_screen.dart';
 import 'package:kardex_app_front/src/modules/advanced_tools/sale_projection/sale_projection_screen.dart';
@@ -108,6 +109,12 @@ class AppRouter {
         path: '/multibranch-home',
         name: 'multibranch-home',
         builder: (context, state) => const MultibranchHomeScreen(),
+      ),
+
+      GoRoute(
+        path: '/shortcuts',
+        name: 'shortcuts',
+        builder: (context, state) => const ShortcutsMenuScreen(),
       ),
 
       GoRoute(
