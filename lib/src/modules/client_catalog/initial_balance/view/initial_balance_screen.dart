@@ -5,6 +5,7 @@ import 'package:kardex_app_front/widgets/no_item.dart';
 import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
+import 'package:kardex_app_front/src/domain/models/client/initial_balance_model.dart';
 
 import '../cubit/initial_balance_read_cubit.dart';
 import '../cubit/initial_balance_write_cubit.dart';
@@ -105,11 +106,12 @@ class _InitialBalanceView extends StatelessWidget {
                             final result = await showSetInitialBalanceDialog(context, client);
                             if (result != null) {
                               if (!context.mounted) return;
-                              context.read<InitialBalanceWriteCubit>().createInitialBalance(
-                                result.branchId,
-                                client.id,
-                                result.balance,
+                              final payload = CreateMultipleInitialBalance(
+                                branchId: result.branchId,
+                                clientId: client.id,
+                                initialBalances: result.balances,
                               );
+                              context.read<InitialBalanceWriteCubit>().createMultipleInitialBalance(payload);
                             }
                           },
                         );

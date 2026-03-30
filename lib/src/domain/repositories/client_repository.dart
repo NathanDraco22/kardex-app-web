@@ -1,5 +1,6 @@
 import 'package:kardex_app_front/src/data/client_data_source.dart';
 import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
+import 'package:kardex_app_front/src/domain/models/client/initial_balance_model.dart';
 import 'package:kardex_app_front/src/domain/query_params/client_query_params.dart';
 import 'package:kardex_app_front/src/domain/responses/list_responses.dart';
 
@@ -19,9 +20,14 @@ class ClientsRepository {
     return newClient;
   }
 
-  Future<ClientInDb> createInitialBalance(String branchId, String clientId, int balance) async {
-    final result = await clientsDataSource.createInitialBalance(branchId, clientId, balance);
-    final newClient = ClientInDb.fromJson(result);
+  Future<ClientInDb> createMultipleInitialBalance(CreateMultipleInitialBalance payload) async {
+    final result = await clientsDataSource.createMultipleInitialBalance(payload.toJson());
+    final newClient = ListResponse<ClientInDb>.fromJson(result, ClientInDb.fromJson).data.first;
+    // Replace the updated client in local cache if necessary, or just return it.
+    final index = _clients.indexWhere((c) => c.id == payload.clientId);
+    if (index != -1) {
+      _clients[index] = newClient;
+    }
     return newClient;
   }
 
