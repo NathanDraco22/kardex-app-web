@@ -5,9 +5,7 @@ import 'package:kardex_app_front/admin_panel/admin_modules/admin_reports/executi
 import 'package:kardex_app_front/admin_panel/admin_panel_screen.dart';
 import 'package:kardex_app_front/src/modules/activation/activation_screen.dart';
 import 'package:kardex_app_front/src/modules/shortcuts/shortcuts_menu_screen.dart';
-import 'package:kardex_app_front/src/modules/advanced_tools/advanced_tools_screen.dart';
-import 'package:kardex_app_front/src/modules/advanced_tools/product_stats/product_stats_screen.dart';
-import 'package:kardex_app_front/src/modules/advanced_tools/sale_projection/sale_projection_screen.dart';
+
 import 'package:kardex_app_front/src/modules/client_catalog/client_catalog_menu_screen.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/client_groups/client_groups_screen.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/client_list/view/client_catalog_screen.dart';
@@ -31,7 +29,7 @@ import 'package:kardex_app_front/src/modules/commercial/daily_receipt/daily_rece
 import 'package:kardex_app_front/src/modules/commercial/devolution_history/devolution_history_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/invoice_history/invoice_history_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/pending_invoice_screen.dart';
-import 'package:kardex_app_front/src/modules/commercial/product_price_setting/product_price_setting.dart';
+
 
 import 'package:kardex_app_front/src/modules/commercial/proforma/proforma_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/product_movements/view/commercial_product_movements_screen.dart';
@@ -45,21 +43,17 @@ import 'package:kardex_app_front/src/modules/finance/paid_invoices/paid_invoices
 import 'package:kardex_app_front/src/modules/finance/branch_daily_summary/branch_daily_summary_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/branch_executive_summary/branch_executive_summary_screen.dart';
 import 'package:kardex_app_front/src/modules/home/view/home_screen.dart';
-import 'package:kardex_app_front/src/modules/inventory/adjust_entry/adjust_entry_screen.dart';
+
 import 'package:kardex_app_front/src/modules/inventory/create_transfer/create_transfer_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/current_inventory/current_inventory_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/current_tranfers/current_tranfers_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/expiration_logs/expiration_logs_screen.dart';
-import 'package:kardex_app_front/src/modules/inventory/history_entry/history_entry_screen.dart';
-import 'package:kardex_app_front/src/modules/inventory/history_exit/history_exit_screen.dart';
-import 'package:kardex_app_front/src/modules/inventory/inventory_entry/view/inventory_entry_screen.dart';
-import 'package:kardex_app_front/src/modules/inventory/inventory_exit/view/inventory_exit_screen.dart';
+
 import 'package:kardex_app_front/src/modules/inventory/inventory_menu_screen.dart';
-import 'package:kardex_app_front/src/modules/inventory/adjust_entry/history/adjust_entry_history_screen.dart';
-import 'package:kardex_app_front/src/modules/inventory/adjust_exit/history/adjust_exit_history_screen.dart';
-import 'package:kardex_app_front/src/modules/inventory/product_price_catalog/product_price_catalog_screen.dart';
+
+
 import 'package:kardex_app_front/src/modules/inventory/product_inventory_catalog/product_inventory_catalog_screen.dart';
-import 'package:kardex_app_front/src/modules/inventory/product_movements/view/product_movements_screen.dart';
+
 import 'package:kardex_app_front/src/modules/login/login_screen.dart';
 import 'package:kardex_app_front/src/modules/multi_branch_home/multibranch_home_screen.dart';
 import 'package:kardex_app_front/src/modules/pending_accounts/pending_client_transactions/credit_session_transactions_screen.dart';
@@ -70,12 +64,12 @@ import 'package:kardex_app_front/src/modules/product_catalog/product_category/vi
 import 'package:kardex_app_front/src/modules/product_catalog/product_list/view/product_list_screen.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/view/product_catalog_menu_screen.dart';
 import 'package:kardex_app_front/src/modules/settings/view/branches/branches_screen.dart';
-import 'package:kardex_app_front/src/modules/settings/view/price_to_product/price_to_product_screen.dart';
+
 import 'package:kardex_app_front/src/modules/settings/view/settings_screen.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/units/units_screen.dart';
 import 'package:kardex_app_front/src/modules/settings/view/users/users_screen.dart';
 import 'package:kardex_app_front/src/modules/splash/splash_screen.dart';
-import 'package:kardex_app_front/src/modules/suppliers_catalog/view/suppliers_catalog_screen.dart';
+
 import 'package:kardex_app_front/src/modules/settings/view/integrations/integrations_screen.dart';
 
 class AppRouter {
@@ -194,11 +188,13 @@ class AppRouter {
         ],
       ),
 
+/*
       GoRoute(
         path: '/suppliers-catalog',
         name: 'suppliers-catalog',
         builder: (context, state) => const SuppliersCatalogScreen(),
       ),
+*/
 
       GoRoute(
         path: '/commercial',
@@ -297,11 +293,13 @@ class AppRouter {
             builder: (context, state) => const DevolutionHistoryScreen(),
           ),
 
+/*
           GoRoute(
             path: "product-price-setting",
             name: "product-price-setting",
             builder: (context, state) => const ProductPriceSettingScreen(),
           ),
+*/
           GoRoute(
             path: "product-movements",
             name: "commercial-product-movements",
@@ -363,6 +361,7 @@ class AppRouter {
             name: "current-inventory",
             builder: (context, state) => const CurrentInventoryScreen(),
           ),
+/*
           GoRoute(
             path: "inventory-entry",
             name: "inventory-entry",
@@ -383,6 +382,7 @@ class AppRouter {
             name: "history-exit",
             builder: (context, state) => const HistoryExitScreen(),
           ),
+*/
           GoRoute(
             path: "current-tranfers",
             name: "current-tranfers",
@@ -394,16 +394,19 @@ class AppRouter {
             builder: (context, state) => const CreateTransferScreen(),
           ),
 
+/*
           GoRoute(
             path: "product-movements",
             name: "product-movements",
             builder: (context, state) => const ProductMovementsScreen(),
           ),
+*/
           GoRoute(
             path: "expiration-logs",
             name: "expiration-logs",
             builder: (context, state) => const ExpirationLogsScreen(),
           ),
+/*
           GoRoute(
             path: "adjust-entry",
             name: "adjust-entry",
@@ -419,11 +422,14 @@ class AppRouter {
             name: "history-adjust-exit",
             builder: (context, state) => const AdjustExitHistoryScreen(),
           ),
+*/
+/*
           GoRoute(
             path: "product-price-catalog",
             name: "product-price-catalog",
             builder: (context, state) => const ProductPriceCatalogScreen(),
           ),
+*/
           GoRoute(
             path: "product-inventory-catalog",
             name: "product-inventory-catalog",
@@ -432,6 +438,7 @@ class AppRouter {
         ],
       ),
 
+/*
       GoRoute(
         path: "/advanced-tools",
         name: "advanced-tools",
@@ -449,6 +456,7 @@ class AppRouter {
           ),
         ],
       ),
+*/
 
       GoRoute(
         path: "/finances",
@@ -501,12 +509,13 @@ class AppRouter {
             name: "users",
             builder: (context, state) => const UsersScreen(),
           ),
+/*
           GoRoute(
             path: "product-price",
             name: "product-price",
             builder: (context, state) => const PriceToProductScreen(),
           ),
-
+*/
           GoRoute(
             path: "branches",
             name: "branches",

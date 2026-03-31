@@ -1,11 +1,11 @@
 {
-    "name": "Neptuno App",
-    "short_name": "Neptuno",
+    "name": "Neptuno Lite",
+    "short_name": "Neptuno Lite",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0c2837",
     "theme_color": "#ffffff",
-    "description": "Neptuno App",
+    "description": "Neptuno Lite",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

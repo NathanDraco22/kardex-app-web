@@ -319,19 +319,7 @@ class _Body extends StatelessWidget {
             thickness: 2,
           ),
 
-          if (accessManager.hasCurrentAccess(context, CommercialSubModules.priceSetting))
-            ListTile(
-              leading: Icon(
-                FluentIcons.money_calculator_20_filled,
-                size: 32,
-                color: Colors.blue.shade600,
-              ),
-              title: const Text("Configuracion de Precios de Productos"),
-              onTap: () {
-                context.pushNamed("product-price-setting");
-              },
-            ),
-          const Divider(height: 0.0),
+
 
           const Divider(
             height: 4.0,

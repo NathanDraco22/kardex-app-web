@@ -31,10 +31,10 @@ try:
     arm64_apk_path = ouput_apk_path / "app-arm64-v8a-release.apk"
     armAbi_apk_path = ouput_apk_path / "app-armeabi-v7a-release.apk"
     
-    renamed = arm64_apk_path.with_name("neptuno-arm64-v8a.apk")
+    renamed = arm64_apk_path.with_name("neptuno-lite-arm64-v8a.apk")
     arm64_apk_path.rename(renamed)
 
-    renamed = armAbi_apk_path.with_name("neptuno-armeabi-v7a.apk")
+    renamed = armAbi_apk_path.with_name("neptuno-lite-armeabi-v7a.apk")
     armAbi_apk_path.rename(renamed)
     
 except Exception as e:

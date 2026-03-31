@@ -219,24 +219,6 @@ class _Body extends StatelessWidget {
                   },
                 ),
 
-              if (accessManager.hasAccessTo(user, Modules.suppliers))
-                HomeOptionCard(
-                  title: "Lista de Proveedores",
-                  icon: FluentIcons.building_multiple_20_filled,
-                  onTap: () {
-                    context.pushNamed("suppliers-catalog");
-                  },
-                ),
-
-              if (accessManager.hasAccessTo(user, Modules.products))
-                HomeOptionCard(
-                  title: "Catalogo de Productos",
-                  icon: FluentIcons.receipt_bag_20_filled,
-                  onTap: () {
-                    context.pushNamed("product-catalog");
-                  },
-                ),
-
               if (accessManager.hasAccessTo(user, Modules.commercial))
                 HomeOptionCard(
                   title: "Comercio",
@@ -270,15 +252,6 @@ class _Body extends StatelessWidget {
                   icon: FluentIcons.arrow_trending_lines_24_regular,
                   onTap: () {
                     context.pushNamed("finances");
-                  },
-                ),
-
-              if (accessManager.hasAccessTo(user, Modules.advancedTools))
-                HomeOptionCard(
-                  title: "Herramientas Avanzadas",
-                  icon: Icons.schema_rounded,
-                  onTap: () {
-                    context.pushNamed("advanced-tools");
                   },
                 ),
 

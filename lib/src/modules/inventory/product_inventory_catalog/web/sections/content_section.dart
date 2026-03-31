@@ -49,18 +49,18 @@ class _ContentSection extends StatelessWidget {
             flex: 2,
             label: Column(
               children: [
+                const Text(
+                  "Existencia",
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
                 Text(
-                  "Costo Promedio",
+                  "Costo",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.green.shade900,
                     fontWeight: FontWeight.bold,
                   ),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  "Existencia (Stock)",
-                  textAlign: TextAlign.center,
                 ),
               ],
             ),
@@ -97,61 +97,55 @@ class _ContentSection extends StatelessWidget {
 
           return BasicTableRow(
             color: color,
+            onTap: () async {
+              final updatedProduct = await showProductInventoryEditor(context, currentProduct);
+              if (updatedProduct != null && context.mounted) {
+                context.read<ReadProductInBranchCubit>().markProductAsEdited(updatedProduct);
+              }
+            },
+
             cells: [
               BasicTableCell(
-                content: TextButton(
-                  style: TextButton.styleFrom(
-                    textStyle: const TextStyle(fontWeight: FontWeight.normal),
-                    alignment: Alignment.centerLeft,
-                    padding: EdgeInsets.zero,
-                  ),
-                  onPressed: () async {
-                    final updatedProduct = await showProductInventoryEditor(context, currentProduct);
-                    if (updatedProduct != null && context.mounted) {
-                      context.read<ReadProductInBranchCubit>().markProductAsEdited(updatedProduct);
-                    }
-                  },
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        currentProduct.name,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                content: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      currentProduct.name,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        const Icon(Icons.qr_code, size: 12, color: Colors.grey),
+                        const SizedBox(width: 4),
+                        Text(currentProduct.displayCode, style: const TextStyle(color: Colors.grey)),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Flexible(
+                          fit: FlexFit.tight,
+                          child: Text(
+                            currentProduct.brandName,
+                            style: const TextStyle(
+                              color: Colors.grey,
+                            ),
+                          ),
                         ),
-                      ),
-                      Row(
-                        children: [
-                          const Icon(Icons.qr_code, size: 12, color: Colors.grey),
-                          const SizedBox(width: 4),
-                          Text(currentProduct.displayCode, style: const TextStyle(color: Colors.grey)),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Flexible(
-                            fit: FlexFit.tight,
-                            child: Text(
-                              currentProduct.brandName,
-                              style: const TextStyle(
-                                color: Colors.grey,
-                              ),
+                        Flexible(
+                          fit: FlexFit.tight,
+                          child: Text(
+                            currentProduct.unitName,
+                            style: const TextStyle(
+                              color: Colors.grey,
                             ),
                           ),
-                          Flexible(
-                            fit: FlexFit.tight,
-                            child: Text(
-                              currentProduct.unitName,
-                              style: const TextStyle(
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
 
@@ -159,21 +153,22 @@ class _ContentSection extends StatelessWidget {
                 content: Column(
                   children: [
                     Text(
+                      stock,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: currentProduct.account.currentStock > 0 ? Colors.green.shade900 : Colors.red.shade900,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    Text(
                       averageCost,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.green.shade900,
                         fontWeight: FontWeight.bold,
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      stock,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: currentProduct.account.currentStock > 0 ? Colors.green.shade900 : Colors.red.shade900,
-                      )
                     ),
                   ],
                 ),

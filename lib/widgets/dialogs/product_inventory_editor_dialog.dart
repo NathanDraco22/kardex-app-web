@@ -5,8 +5,6 @@ import 'package:kardex_app_front/src/domain/models/product/product_model.dart';
 import 'package:kardex_app_front/src/domain/models/product_sale_profile/product_sale_profile_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/commercial/product_price_setting/cubit/write_product_sale_profile_cubit.dart';
-import 'package:kardex_app_front/src/modules/commercial/product_price_setting/dialogs/discount_dialog.dart';
-import 'package:kardex_app_front/src/modules/commercial/product_price_setting/widgets/discount_tile.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/title_label.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
@@ -110,13 +108,14 @@ class _RootScaffoldState extends State<_RootScaffold> {
 
   @override
   Widget build(BuildContext context) {
-    hasLowerPrices = [
-      currentSalePrice,
-      if (currentSalePrice2 > 0) currentSalePrice2,
-      if (currentSalePrice3 > 0) currentSalePrice3,
-    ].any(
-      (price) => price < currentProduct.account.averageCost,
-    );
+    hasLowerPrices =
+        [
+          currentSalePrice,
+          if (currentSalePrice2 > 0) currentSalePrice2,
+          if (currentSalePrice3 > 0) currentSalePrice3,
+        ].any(
+          (price) => price < currentProduct.account.averageCost,
+        );
 
     return PopScope(
       canPop: false,
@@ -125,7 +124,10 @@ class _RootScaffoldState extends State<_RootScaffold> {
           return;
         }
 
-        final res = await DialogManager.confirmActionDialog(context, "Deseas salir sin guardar los cambios del precio?");
+        final res = await DialogManager.confirmActionDialog(
+          context,
+          "Deseas salir sin guardar los cambios del precio?",
+        );
 
         if (res != true) return;
 
@@ -159,7 +161,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
                     currentProduct = currentProduct.copyWith(saleProfile: state.profile);
                     Navigator.pop(context, currentProduct);
                   }
-                  
+
                   if (state is WriteProductSaleProfileError) {
                     LoadingDialogManager.closeLoadingDialog(context);
                     await DialogManager.showErrorDialog(context, state.error);
@@ -176,13 +178,13 @@ class _RootScaffoldState extends State<_RootScaffold> {
                     LoadingDialogManager.closeLoadingDialog(context);
                     await DialogManager.showInfoDialog(context, "Inventario actualizado exitosamente");
                     if (!context.mounted) return;
-                    
+
                     setState(() {
                       currentProduct = currentProduct.copyWith(account: state.account);
                       stockWasModified = true;
                     });
                   }
-                  
+
                   if (state is WriteProductAccountFailure) {
                     LoadingDialogManager.closeLoadingDialog(context);
                     await DialogManager.showErrorDialog(context, state.message);
@@ -279,7 +281,9 @@ class _RootScaffoldState extends State<_RootScaffold> {
                                 child: TitleLabel(
                                   title: "Existencia",
                                   bigTitle: currentProduct.account.currentStock.toString(),
-                                  bigTitleColor: currentProduct.account.currentStock > 0 ? Colors.green.shade900 : Colors.red.shade900,
+                                  bigTitleColor: currentProduct.account.currentStock > 0
+                                      ? Colors.green.shade900
+                                      : Colors.red.shade900,
                                 ),
                               ),
                             ],
@@ -291,38 +295,6 @@ class _RootScaffoldState extends State<_RootScaffold> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Expanded(
-                              child: TextButton.icon(
-                                style: TextButton.styleFrom(
-                                  backgroundColor: Colors.green.shade100,
-                                  foregroundColor: Colors.green.shade900,
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                ),
-                                icon: const Icon(Icons.add_circle_outline),
-                                label: const Text("Agregar al inventario"),
-                                onPressed: () async {
-                                  final authState = context.read<AuthCubit>().state;
-                                  if (authState is! Authenticated) return;
-                                  final branchId = authState.branch.id;
-                                  
-                                  final res = await showAddProductInventoryDialog(
-                                    context,
-                                    currentAverageCost: currentProduct.account.averageCost,
-                                  );
-
-                                  if (res == null) return;
-                                  if (!context.mounted) return;
-
-                                  context.read<WriteProductAccountCubit>().addProductAccount(
-                                    currentProduct.id,
-                                    branchId,
-                                    currentStock: res['currentStock']!,
-                                    averageCost: res['averageCost']!,
-                                  );
-                                },
-                              ),
-                            ),
-                            const SizedBox(width: 16),
                             Expanded(
                               child: TextButton.icon(
                                 style: TextButton.styleFrom(
@@ -348,6 +320,40 @@ class _RootScaffoldState extends State<_RootScaffold> {
                                     currentProduct.id,
                                     branchId,
                                     currentStock: res,
+                                  );
+                                },
+                              ),
+                            ),
+
+                            const SizedBox(width: 16),
+
+                            Expanded(
+                              child: TextButton.icon(
+                                style: TextButton.styleFrom(
+                                  backgroundColor: Colors.green.shade100,
+                                  foregroundColor: Colors.green.shade900,
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                ),
+                                icon: const Icon(Icons.add_circle_outline),
+                                label: const Text("Agregar al inventario"),
+                                onPressed: () async {
+                                  final authState = context.read<AuthCubit>().state;
+                                  if (authState is! Authenticated) return;
+                                  final branchId = authState.branch.id;
+
+                                  final res = await showAddProductInventoryDialog(
+                                    context,
+                                    currentAverageCost: currentProduct.account.averageCost,
+                                  );
+
+                                  if (res == null) return;
+                                  if (!context.mounted) return;
+
+                                  context.read<WriteProductAccountCubit>().addProductAccount(
+                                    currentProduct.id,
+                                    branchId,
+                                    currentStock: res['currentStock']!,
+                                    averageCost: res['averageCost']!,
                                   );
                                 },
                               ),
@@ -465,35 +471,6 @@ class _RootScaffoldState extends State<_RootScaffold> {
 
                           inputFormatters: [DoubleThousandsFormatter()],
                         ),
-
-                        const Divider(),
-                        Row(
-                          children: [
-                            const Text(
-                              "Descuentos",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              ),
-                            ),
-                            const Spacer(),
-                            TextButton(
-                              child: const Text("Agregar Descuento"),
-                              onPressed: () async {
-                                final res = await showDiscountDialog(context);
-                                if (res == null) return;
-
-                                currentDiscounts.add(res);
-                                setState(() {});
-                              },
-                            ),
-                          ],
-                        ),
-
-                        _DiscountListViewContainer(
-                          discounts: currentDiscounts,
-                          salePrice: currentSalePrice,
-                        ),
                       ],
                     ),
                   ),
@@ -502,68 +479,6 @@ class _RootScaffoldState extends State<_RootScaffold> {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _DiscountListViewContainer extends StatefulWidget {
-  const _DiscountListViewContainer({
-    required this.discounts,
-    required this.salePrice,
-  });
-
-  final List<Discount> discounts;
-  final int salePrice;
-
-  @override
-  State<_DiscountListViewContainer> createState() => _DiscountListViewContainerState();
-}
-
-class _DiscountListViewContainerState extends State<_DiscountListViewContainer> {
-  @override
-  Widget build(BuildContext context) {
-    final discounts = widget.discounts;
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: Colors.grey.shade400,
-        ),
-      ),
-      height: 200,
-      child: ListView.separated(
-        key: UniqueKey(),
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-        itemCount: discounts.length,
-        separatorBuilder: (context, index) {
-          return const SizedBox(height: 4.0);
-        },
-        itemBuilder: (context, index) {
-          final currentDiscount = discounts[index];
-          final currentPrice = widget.salePrice;
-          final discountAmount = ((currentPrice * currentDiscount.percentValue) / 100).round();
-          final discountTotal = currentPrice - discountAmount;
-          return DiscountTile(
-            name: currentDiscount.name,
-            percentValue: currentDiscount.percentValue,
-            amountValue: discountAmount,
-            totalValue: discountTotal,
-            onEditPressed: () async {
-              final res = await showDiscountDialog(context, discount: currentDiscount);
-              if (res == null) return;
-
-              discounts[index] = res;
-              setState(() {});
-            },
-            onDeletedPressed: () async {
-              final res = await DialogManager.confirmActionDialog(context, "Eliminar descuento?");
-              if (res != true) return;
-              discounts.removeAt(index);
-              setState(() {});
-            },
-          );
-        },
       ),
     );
   }
