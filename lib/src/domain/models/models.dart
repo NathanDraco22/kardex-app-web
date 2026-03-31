@@ -2,12 +2,7 @@ export 'branch/branch.dart';
 export 'branch/branch_model.dart';
 export 'client/client.dart';
 export 'client/client_model.dart';
-export 'entry_doc/entry_doc.dart';
-export 'entry_doc/entry_doc_model.dart';
 export 'common/exit_items.dart';
-
-export 'exit_doc/exit_doc.dart';
-export 'exit_doc/exit_doc_model.dart';
 
 export 'inventory/inventory_model.dart';
 export 'product/product.dart';

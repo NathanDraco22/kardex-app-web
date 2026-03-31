@@ -28,10 +28,6 @@ class ProviderContainer extends StatelessWidget {
     final productCateDataSource = ProductCategoriesDataSource();
     final unitDataSource = UnitsDataSource();
     final productDataSource = ProductsDataSource();
-    final entryDocsDataSource = EntryDocsDataSource();
-    final exitDocsDataSource = ExitDocsDataSource();
-    final entryHistoryDataSource = EntryHistoriesDataSource();
-    final exitHistoryDataSource = ExitHistoriesDataSource();
     final inventoryDataSource = InventoriesDataSource();
     final productSaleProfileDataSource = ProductSaleProfilesDataSource();
     final invoiceDataSource = InvoicesDataSource();
@@ -88,22 +84,6 @@ class ProviderContainer extends StatelessWidget {
 
         RepositoryProvider(
           create: (context) => UnitsRepository(unitDataSource),
-        ),
-
-        RepositoryProvider(
-          create: (context) => EntryDocsRepository(entryDocsDataSource),
-        ),
-
-        RepositoryProvider(
-          create: (context) => ExitDocsRepository(exitDocsDataSource),
-        ),
-
-        RepositoryProvider(
-          create: (context) => EntryHistoriesRepository(entryHistoryDataSource),
-        ),
-
-        RepositoryProvider(
-          create: (context) => ExitHistoriesRepository(exitHistoryDataSource),
         ),
 
         RepositoryProvider(
