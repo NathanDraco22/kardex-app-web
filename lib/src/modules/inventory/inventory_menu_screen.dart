@@ -81,6 +81,17 @@ class _Body extends StatelessWidget {
 
           ListTile(
             leading: const Icon(
+              Icons.inventory,
+              color: Colors.blueGrey,
+            ),
+            title: const Text("Catálogo de Inventario"),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.pushNamed("product-inventory-catalog"),
+          ),
+          const Divider(height: 0.0),
+
+          ListTile(
+            leading: const Icon(
               Icons.timer_sharp,
               color: Colors.amber,
             ),
