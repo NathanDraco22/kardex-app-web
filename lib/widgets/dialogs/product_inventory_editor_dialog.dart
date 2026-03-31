@@ -108,6 +108,14 @@ class _RootScaffoldState extends State<_RootScaffold> {
 
   @override
   Widget build(BuildContext context) {
+    final currentAuthState = context.read<AuthCubit>().state;
+
+    if (currentAuthState is! Authenticated) {
+      return const SizedBox.shrink();
+    }
+
+    final isAdmin = currentAuthState.session.isAdmin;
+
     hasLowerPrices =
         [
           currentSalePrice,
@@ -270,7 +278,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
                             children: [
                               Expanded(
                                 child: TitleLabel(
-                                  title: "Costo Promedio",
+                                  title: "Costo",
                                   bigTitle: NumberFormatter.convertToMoneyLike(
                                     currentProduct.account.averageCost,
                                   ),
@@ -304,24 +312,26 @@ class _RootScaffoldState extends State<_RootScaffold> {
                                 ),
                                 icon: const Icon(Icons.remove_circle_outline),
                                 label: const Text("Restar al inventario"),
-                                onPressed: () async {
-                                  final authState = context.read<AuthCubit>().state;
-                                  if (authState is! Authenticated) return;
-                                  final branchId = authState.branch.id;
+                                onPressed: isAdmin
+                                    ? () async {
+                                        final authState = context.read<AuthCubit>().state;
+                                        if (authState is! Authenticated) return;
+                                        final branchId = authState.branch.id;
 
-                                  final res = await showSubstractProductInventoryDialog(
-                                    context,
-                                  );
+                                        final res = await showSubstractProductInventoryDialog(
+                                          context,
+                                        );
 
-                                  if (res == null) return;
-                                  if (!context.mounted) return;
+                                        if (res == null) return;
+                                        if (!context.mounted) return;
 
-                                  context.read<WriteProductAccountCubit>().substractProductAccount(
-                                    currentProduct.id,
-                                    branchId,
-                                    currentStock: res,
-                                  );
-                                },
+                                        context.read<WriteProductAccountCubit>().substractProductAccount(
+                                          currentProduct.id,
+                                          branchId,
+                                          currentStock: res,
+                                        );
+                                      }
+                                    : null,
                               ),
                             ),
 

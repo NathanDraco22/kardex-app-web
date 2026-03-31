@@ -9,6 +9,8 @@ class LoginResponse {
     required this.accessToken,
   });
 
+  bool get isAdmin => user.role == "Admin";
+
   factory LoginResponse.fromJson(dynamic json) {
     return LoginResponse(
       user: UserInDbWithRole.fromJson(json['user']),
