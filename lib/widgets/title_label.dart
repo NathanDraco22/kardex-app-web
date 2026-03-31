@@ -6,12 +6,14 @@ class TitleLabel extends StatelessWidget {
     this.spacing = 0.0,
     required this.title,
     required this.bigTitle,
+    this.bigTitleColor,
     this.crossAxisAlignment = CrossAxisAlignment.start,
   });
 
   final double spacing;
   final String title;
   final String bigTitle;
+  final Color? bigTitleColor;
   final CrossAxisAlignment crossAxisAlignment;
 
   @override
@@ -23,9 +25,10 @@ class TitleLabel extends StatelessWidget {
         Text(title),
         Text(
           bigTitle,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 16,
+            color: bigTitleColor,
           ),
         ),
       ],

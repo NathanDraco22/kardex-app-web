@@ -58,6 +58,7 @@ import 'package:kardex_app_front/src/modules/inventory/inventory_menu_screen.dar
 import 'package:kardex_app_front/src/modules/inventory/adjust_entry/history/adjust_entry_history_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/adjust_exit/history/adjust_exit_history_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/product_price_catalog/product_price_catalog_screen.dart';
+import 'package:kardex_app_front/src/modules/inventory/product_inventory_catalog/product_inventory_catalog_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/product_movements/view/product_movements_screen.dart';
 import 'package:kardex_app_front/src/modules/login/login_screen.dart';
 import 'package:kardex_app_front/src/modules/multi_branch_home/multibranch_home_screen.dart';
@@ -422,6 +423,11 @@ class AppRouter {
             path: "product-price-catalog",
             name: "product-price-catalog",
             builder: (context, state) => const ProductPriceCatalogScreen(),
+          ),
+          GoRoute(
+            path: "product-inventory-catalog",
+            name: "product-inventory-catalog",
+            builder: (context, state) => const ProductInventoryCatalogScreen(),
           ),
         ],
       ),
