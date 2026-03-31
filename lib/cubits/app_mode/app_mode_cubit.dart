@@ -8,7 +8,7 @@ class AppModeCubit extends Cubit<AppModeState> {
   AppModeCubit() : super(NormalModeState());
 
   Future<void> switchToPracticeMode() async {
-    HttpTools.practiceUrl = "https://kardex-server-production.up.railway.app";
+    HttpTools.practiceUrl = "https://kardex-server-lite-production.up.railway.app";
     clearSession();
     emit(PracticeModeState());
   }
