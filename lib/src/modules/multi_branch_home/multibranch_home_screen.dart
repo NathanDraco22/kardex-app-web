@@ -21,7 +21,7 @@ class _RootScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Neptuno App"),
+        title: const Text("Neptuno Lite"),
       ),
       body: const _Body(),
     );

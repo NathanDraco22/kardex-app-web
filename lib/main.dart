@@ -38,7 +38,7 @@ class AppRoot extends StatelessWidget {
   Widget build(BuildContext context) {
     final appModeCubit = context.watch<AppModeCubit>();
     return MaterialApp.router(
-      title: 'Neptuno App',
+      title: 'Neptuno Lite',
       routerConfig: AppRouter.router,
       builder: (context, child) {
         final mediaQueryData = MediaQuery.of(context);
