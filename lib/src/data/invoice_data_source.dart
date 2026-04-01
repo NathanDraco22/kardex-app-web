@@ -66,6 +66,7 @@ class InvoicesDataSource with HttpService {
         "byPaidAt": true.toString(),
         "status": "paid",
         "offset": offset.toString(),
+        "limit": 10000.toString(),
       },
     );
     final headers = HttpTools.generateAuthHeaders();

@@ -164,7 +164,7 @@ class _Body extends StatelessWidget {
                 size: 32,
                 color: Colors.orange.shade800,
               ),
-              title: const Text("Ventas Diarias Globales"),
+              title: const Text("Ventas por factura"),
               onTap: () {
                 context.pushNamed("daily-client-invoices");
               },

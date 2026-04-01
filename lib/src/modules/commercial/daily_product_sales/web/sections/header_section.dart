@@ -49,32 +49,58 @@ class _HeaderSectionState extends State<_HeaderSection> {
                 ],
               ),
             ),
-            Row(
-              children: [
-                TextButton(
-                  onPressed: () async {
-                    final user = await showActiveUserSelectionDialog(context);
-                    if (user == null) return;
-                    readCubit.loadDailyProductSales(userCreatorId: user.id);
-                    currentSelectedUser = user;
-                    setState(() {});
-                  },
-                  child: const Text("Seleccionar Usuario"),
-                ),
-                const Spacer(),
-                if (readCubit.state is ReadDailyProductSalesSuccess)
-                  FilledButton.icon(
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 600),
+              child: Row(
+                children: [
+                  TextButton(
                     onPressed: () async {
-                      final products = (readCubit.state as ReadDailyProductSalesSuccess).productTotals;
-                      await CsvExportTool.exportProductSalesToCSV(
-                        products: products,
-                        fileName: "ventas_diarias",
-                      );
+                      final user = await showActiveUserSelectionDialog(context);
+                      if (user == null) return;
+                      readCubit.loadDailyProductSales(userCreatorId: user.id);
+                      currentSelectedUser = user;
+                      setState(() {});
                     },
-                    icon: const Icon(Icons.download),
-                    label: const Text("Exportar CSV"),
+                    child: const Text("Seleccionar Usuario"),
                   ),
-              ],
+                  const Spacer(),
+                  if (readCubit.state is ReadDailyProductSalesSuccess)
+                    FilledButton.icon(
+                      onPressed: () async {
+                        final option = await showExportOptionsDialog(context);
+                        if (option == null) return;
+                        
+                        final state = readCubit.state as ReadDailyProductSalesSuccess;
+                        
+                        if (option == ExportOption.csv) {
+                          await CsvExportTool.exportProductSalesToCSV(
+                            products: state.productTotals,
+                            fileName: "ventas_diarias_productos",
+                          );
+                        } else if (option == ExportOption.pdf) {
+                          final template = ProductByUserTemplate(
+                            title: "Ventas Diarias (Por Productos)",
+                            userInfo: currentSelectedUser != null
+                                ? UserInfo(id: currentSelectedUser!.id, name: currentSelectedUser!.username)
+                                : null,
+                            startDate: readCubit.startDate,
+                            endDate: null,
+                            count: state.productTotals.length,
+                            total: state.totalAmount,
+                            items: state.productTotals,
+                          );
+                          
+                          await PdfExportTool.export(
+                            template,
+                            fileName: "ventas_diarias_productos.pdf",
+                          );
+                        }
+                      },
+                      icon: const Icon(Icons.import_export),
+                      label: const Text("Exportar"),
+                    ),
+                ],
+              ),
             ),
 
             if (currentSelectedUser != null)
