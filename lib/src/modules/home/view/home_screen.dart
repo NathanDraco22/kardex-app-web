@@ -202,14 +202,6 @@ class _Body extends StatelessWidget {
             runSpacing: 20,
             alignment: WrapAlignment.center,
             children: [
-              HomeOptionCard(
-                title: "Atajos Rápidos",
-                icon: FluentIcons.flash_24_filled,
-                onTap: () {
-                  context.pushNamed("shortcuts");
-                },
-              ),
-
               if (accessManager.hasAccessTo(user, Modules.clients))
                 HomeOptionCard(
                   title: "Lista de Clientes",
