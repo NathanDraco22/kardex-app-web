@@ -12,7 +12,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
 
   @override
   Widget build(BuildContext context) {
-    final readCubit = context.read<ReadDailyClientInvoicesCubit>();
+    final readCubit = context.watch<ReadDailyClientInvoicesCubit>();
     return Card(
       key: ValueKey(readCubit.state),
       child: Padding(
@@ -89,12 +89,47 @@ class _HeaderSectionState extends State<_HeaderSection> {
                       ),
                     ],
                   ),
-                  FilledButton.icon(
-                    onPressed: () {
-                      readCubit.loadPaidInvoices();
-                    },
-                    label: const Text("Filtrar"),
-                    icon: const Icon(Icons.filter_alt_rounded),
+                  Row(
+                    children: [
+                      if (readCubit.state is ReadDailyClientInvoicesSuccess) ...[
+                        FilledButton.icon(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: Theme.of(context).colorScheme.tertiary,
+                            foregroundColor: Colors.white,
+                          ),
+                          onPressed: () async {
+                            final state = readCubit.state as ReadDailyClientInvoicesSuccess;
+
+                            final template = InvoiceByUserTemplate(
+                              title: "Ventas por Factura",
+                              userInfo: currentSelectedUser != null
+                                  ? UserInfo(id: currentSelectedUser!.id, name: currentSelectedUser!.username)
+                                  : null,
+                              startDate: readCubit.startDate,
+                              endDate: readCubit.endDate,
+                              count: state.totalCount,
+                              total: state.totals.total,
+                              items: state.invoices,
+                            );
+
+                            await PdfExportTool.export(
+                              template,
+                              fileName: "ventas_por_factura.pdf",
+                            );
+                          },
+                          label: const Text("Exportar"),
+                          icon: const Icon(Icons.picture_as_pdf),
+                        ),
+                        const SizedBox(width: 8),
+                      ],
+                      FilledButton.icon(
+                        onPressed: () {
+                          readCubit.loadPaidInvoices();
+                        },
+                        label: const Text("Filtrar"),
+                        icon: const Icon(Icons.filter_alt_rounded),
+                      ),
+                    ],
                   ),
                 ],
               ),

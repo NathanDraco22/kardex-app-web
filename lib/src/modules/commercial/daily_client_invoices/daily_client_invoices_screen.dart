@@ -11,10 +11,9 @@ class DailyClientInvoicesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final invoiceRepo = context.read<InvoicesRepository>();
     return BlocProvider(
-      create: (context) =>
-          ReadDailyClientInvoicesCubit(
-            invoicesRepository: invoiceRepo,
-          )..loadPaidInvoices(),
+      create: (context) => ReadDailyClientInvoicesCubit(
+        invoicesRepository: invoiceRepo,
+      )..loadPaidInvoices(),
       child: const _RootScaffold(),
     );
   }
@@ -35,7 +34,7 @@ class _RootScaffold extends StatelessWidget {
         return true;
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text("Facturas Pagadas Globales")),
+        appBar: AppBar(title: const Text("Ventas Por Factura")),
         body: const _Body(),
       ),
     );

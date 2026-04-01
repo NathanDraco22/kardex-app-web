@@ -32,6 +32,7 @@ class OrderQueryParams {
       "branchId": ?branchId,
       "startDate": ?startDate?.toString(),
       "endDate": ?endDate?.toString(),
+      "createdBy": ?createdBy,
     };
   }
 }

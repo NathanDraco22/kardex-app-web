@@ -9,6 +9,7 @@ class CsvExportTool {
   static Future<void> exportProductSalesToCSV({
     required List<ProductSalesTotal> products,
     required String fileName,
+    String? title,
   }) async {
     if (products.isEmpty) return;
 
