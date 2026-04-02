@@ -41,7 +41,7 @@ class _Body extends StatelessWidget {
         children: [
           ListTile(
             leading: const Icon(FluentIcons.cube_12_filled),
-            title: const Text("Lista de Productos"),
+            title: const Text("Lista Global de Productos"),
             onTap: () {
               context.pushNamed("product-list");
             },
