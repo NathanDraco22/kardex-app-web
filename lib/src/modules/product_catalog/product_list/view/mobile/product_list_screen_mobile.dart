@@ -26,7 +26,7 @@ class _MobileScaffold extends StatelessWidget {
 
     if (readCubit.state is ProductReadError) {
       return Scaffold(
-        appBar: AppBar(title: const Text("Lista de Productos")),
+        appBar: AppBar(title: const Text("Lista Global de Productos")),
         body: Center(
           child: Text((readCubit.state as ProductReadError).message),
         ),
@@ -34,7 +34,7 @@ class _MobileScaffold extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Lista de Productos")),
+      appBar: AppBar(title: const Text("Lista Global de Productos")),
       body: const _MobileBody(),
     );
   }
