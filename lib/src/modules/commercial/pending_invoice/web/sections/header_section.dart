@@ -22,9 +22,15 @@ class _HeaderSection extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "${client.id}-${client.name}",
+                  "#${client.id}",
                   style: const TextStyle(
-                    fontSize: 20,
+                    fontSize: 16,
+                  ),
+                ),
+                Text(
+                  client.name,
+                  style: const TextStyle(
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
