@@ -28,6 +28,22 @@ class _HeaderSection extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+
+                if (client.cardId != null) ...[
+                  Row(
+                    children: [
+                      const Icon(Icons.badge_outlined, size: 16),
+                      const SizedBox(width: 4),
+                      Text(
+                        client.cardId!,
+                        style: const TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+
                 if (client.location != null) ...[
                   Text(
                     client.location!,
@@ -42,20 +58,19 @@ class _HeaderSection extends StatelessWidget {
                   ),
                 ],
 
-                Text(
-                  'Telefono: ${client.phone ?? ''} ',
-                  style: const TextStyle(
-                    fontSize: 16,
-                  ),
+                Row(
+                  children: [
+                    const Icon(Icons.phone, size: 16),
+                    const SizedBox(width: 4),
+                    Text(
+                      client.phone ?? '',
+                      style: const TextStyle(
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 16),
-                Text(
-                  'Correo: ${client.email ?? ''} ',
-                  style: const TextStyle(
-                    fontSize: 16,
-                  ),
-                ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 16),
               ],
             ),
             Row(
