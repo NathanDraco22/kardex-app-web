@@ -168,22 +168,32 @@ class _Body extends StatelessWidget {
     final userName = user.username;
     final firstName = userName.split(" ")[0];
     final accessManager = AccessManager();
+    final currentBranch = BranchesTool.getCurrentBranch();
     return Center(
       child: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 24),
         children: [
-          Text(
-            BranchesTool.getCurrentBranchName(),
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+          if (currentBranch != null) ...[
+            Text(
+              currentBranch.name,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
+            Text(
+              currentBranch.address,
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+
           const SizedBox(height: 4),
           Text(
             "Bienvenido/a, $firstName",
             style: const TextStyle(
-              fontSize: 20,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
               color: Colors.grey,
             ),

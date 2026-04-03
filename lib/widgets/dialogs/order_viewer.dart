@@ -300,14 +300,14 @@ class OrderViewerContent extends StatelessWidget {
                           Expanded(
                             flex: 2,
                             child: Text(
-                              NumberFormatter.convertToMoneyLike(saleItem.price),
+                              NumberFormatter.convertFromCentsToDouble(saleItem.price).toString(),
                               textAlign: TextAlign.center,
                             ),
                           ),
                           Expanded(
                             flex: 2,
                             child: Text(
-                              NumberFormatter.convertToMoneyLike(saleItem.subTotal),
+                              NumberFormatter.convertFromCentsToDouble(saleItem.subTotal).toString(),
                               textAlign: TextAlign.center,
                             ),
                           ),

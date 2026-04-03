@@ -131,7 +131,7 @@ Future<Uint8List> generateTicketPdfFromReceipt(
                 style: pw.TextStyle(fontSize: TicketSettings.contentFontSize(paperSize)),
               ),
             pw.Text(
-              'Elaborado por: ${receipt.createdBy.name}',
+              'Autor: ${receipt.createdBy.name}',
               style: pw.TextStyle(fontSize: TicketSettings.contentFontSize(paperSize)),
             ),
             pw.Divider(color: PdfColors.grey),

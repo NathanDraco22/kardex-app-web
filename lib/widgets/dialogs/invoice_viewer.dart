@@ -223,7 +223,7 @@ class InvoiceViewerContent extends StatelessWidget {
             ),
 
             Text(
-              "Cliente: ${invoice.clientInfo.name}",
+              "${invoice.clientId} - ${invoice.clientInfo.name}",
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
 
@@ -242,7 +242,7 @@ class InvoiceViewerContent extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  "Elaborado por: ${invoice.createdBy.name}",
+                  "Autor: ${invoice.createdBy.name}",
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
               ],
@@ -321,14 +321,14 @@ class InvoiceViewerContent extends StatelessWidget {
                           Expanded(
                             flex: 2,
                             child: Text(
-                              NumberFormatter.convertToMoneyLike(saleItem.price),
+                              NumberFormatter.convertFromCentsToDouble(saleItem.price).toString(),
                               textAlign: TextAlign.center,
                             ),
                           ),
                           Expanded(
                             flex: 2,
                             child: Text(
-                              NumberFormatter.convertToMoneyLike(saleItem.subTotal),
+                              NumberFormatter.convertFromCentsToDouble(saleItem.subTotal).toString(),
                               textAlign: TextAlign.center,
                             ),
                           ),
