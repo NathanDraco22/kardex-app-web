@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/cubit/read_pending_client_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/web/pending_invoice_web_screen.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_app_front/widgets/client_list_tile.dart';
 import 'package:kardex_app_front/widgets/dialogs/show_client_with_balance_search_dialog.dart';
 
 class PendingClientScreenWeb extends StatelessWidget {
@@ -32,7 +33,7 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(4.0),
         child: Column(
           spacing: 8,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -134,8 +135,21 @@ class _Content extends StatelessWidget {
               final currentClient = state.clients[index];
               final balanceFormatted = NumberFormatter.convertToMoneyLike(currentClient.balance);
               final tileColor = index.isOdd ? Colors.grey.shade200 : Colors.white;
-              return ListTile(
-                tileColor: tileColor,
+              return CustomClientListTile(
+                client: currentClient,
+                backgroundColor: tileColor,
+                trailing: Row(
+                  mainAxisAlignment: .start,
+                  children: [
+                    Text(
+                      balanceFormatted,
+                      style: TextStyle(
+                        color: currentClient.balance > 0 ? Colors.red : Colors.green,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
                 onTap: () {
                   Navigator.push(
                     context,
@@ -151,20 +165,6 @@ class _Content extends StatelessWidget {
                     ),
                   );
                 },
-                title: Row(
-                  children: [
-                    Expanded(child: Text("${currentClient.id} - ${currentClient.name}")),
-                    Expanded(
-                      child: Text(
-                        balanceFormatted,
-                        textAlign: TextAlign.start,
-                      ),
-                    ),
-                  ],
-                ),
-                trailing: const Icon(
-                  Icons.chevron_right,
-                ),
               );
             },
           );

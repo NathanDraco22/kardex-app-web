@@ -31,3 +31,10 @@ Esta estructura se ha seguido para módulos como 'Historial de Facturas', 'Histo
 - **Cost Display**: Non-editable costs in tables/lists should be formatted as `(value / 100).toStringAsFixed(2)` instead of showing "--".
 - **UserInfo**: When creating entries, prefer explicit construction of `UserInfo(id: user.id, name: user.name)` over passing the Auth User object directly.
 - **Confirmation**: Use `DialogManager.slideToConfirmActionDialog` for critical save actions.
+
+## Widgets Genéricos
+- Se han creado widgets atómicos en `lib/widgets/elements/` para ser reutilizados en componentes más grandes.
+- `ClientShortInfo`: Muestra ID, Nombre, Cédula, Ubicación y Dirección de un cliente con iconos y estilos estandarizados.
+- Se ha refactorizado `ClientListTile` y `ClientsTable` para utilizar `ClientShortInfo`, asegurando consistencia visual y eliminando código duplicado.
+- `ClientListTile` en `lib/widgets/client_list_tile.dart` usa una estructura basada en `Row` e `InkWell` para mayor flexibilidad. Soporta un `backgroundColor` personalizado.
+

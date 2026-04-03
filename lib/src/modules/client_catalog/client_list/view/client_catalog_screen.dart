@@ -5,8 +5,8 @@ import 'package:kardex_app_front/src/domain/repositories/client_group_repository
 import 'package:kardex_app_front/src/domain/repositories/client_repository.dart';
 
 import 'package:kardex_app_front/src/tools/constant.dart';
+import 'package:kardex_app_front/widgets/client_list_tile.dart';
 import 'package:kardex_app_front/widgets/no_item.dart';
-import 'package:kardex_app_front/widgets/row_widgets/mobile_row.dart';
 import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 
 import '../cubit/client_read_cubit.dart';
