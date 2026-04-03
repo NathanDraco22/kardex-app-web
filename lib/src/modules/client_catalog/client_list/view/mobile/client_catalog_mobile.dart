@@ -140,22 +140,28 @@ class MobileClientsTable extends StatelessWidget {
                         rowColor = Colors.yellow.shade200;
                       }
                     }
-                    return MobileRow(
-                      color: rowColor,
-                      title: currentClient.name,
-                      isActive: currentClient.isActive,
-                      subtitle1: "Ced: ${currentClient.cardId}",
-                      subtitle2: "Telf: ${currentClient.phone}",
-                      onEditButtonPresesed: () async {
-                        final res = await showCreateClientDialog(context, client: currentClient);
 
-                        if (res == null) return;
-                        if (!context.mounted) return;
-                        await context.read<ReadClientCubit>().markClientUpdated(res);
-                        if (!context.mounted) return;
-                        context.read<ReadClientCubit>().refreshClient();
-                      },
-                      onTab: () {},
+                    return CustomClientListTile(
+                      client: currentClient,
+                      backgroundColor: rowColor,
+                      trailing: Row(
+                        children: [
+                          Text(currentClient.group),
+                          const Spacer(),
+                          IconButton(
+                            icon: const Icon(Icons.edit),
+                            onPressed: () async {
+                              final res = await showCreateClientDialog(context, client: currentClient);
+
+                              if (res == null) return;
+                              if (!context.mounted) return;
+                              await context.read<ReadClientCubit>().markClientUpdated(res);
+                              if (!context.mounted) return;
+                              context.read<ReadClientCubit>().refreshClient();
+                            },
+                          ),
+                        ],
+                      ),
                     );
                   },
                 ),
