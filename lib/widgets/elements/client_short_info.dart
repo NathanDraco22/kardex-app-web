@@ -60,7 +60,7 @@ class ClientShortInfo extends StatelessWidget {
             fontSize: nameFontSize,
             fontWeight: FontWeight.bold,
           ),
-          maxLines: 1,
+          maxLines: 2,
           overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(height: 4),
