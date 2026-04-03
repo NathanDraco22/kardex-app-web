@@ -179,7 +179,7 @@ Future<Uint8List> generateTicketPdfFromOrder(
               ),
 
             pw.Text(
-              "Elaborado por: ${order.createdBy.name}",
+              "Autor: ${order.createdBy.name}",
               style: pw.TextStyle(
                 fontSize: TicketSettings.contentFontSize(paperSize),
               ),
