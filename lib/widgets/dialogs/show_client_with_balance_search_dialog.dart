@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/client_repository.dart';
+import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_app_front/widgets/client_list_tile.dart';
 import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 
 Future<ClientInDb?> showClientWithBalanceSearch(BuildContext context) async {
@@ -83,6 +85,24 @@ class _ClientWithBalanceSearchDialogState extends State<_ClientWithBalanceSearch
                   separatorBuilder: (context, index) => const Divider(),
                   itemBuilder: (context, index) {
                     final client = _clients[index];
+
+                    return CustomClientListTile(
+                      client: client,
+                      trailing: Row(
+                        children: [
+                          Text(
+                            NumberFormatter.convertToMoneyLike(client.balance),
+                            style: TextStyle(
+                              color: client.balance > 0 ? Colors.red : Colors.green,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                      onTap: () {
+                        Navigator.pop(context, client);
+                      },
+                    );
                     return ListTile(
                       title: Text(client.name),
                       subtitle: Text("Saldo: ${(client.balance / 100).toStringAsFixed(2)}"),

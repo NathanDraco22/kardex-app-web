@@ -3,9 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/client_list/cubit/client_read_cubit.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/client_list/dialogs/create_client_dialog.dart';
-import 'package:kardex_app_front/widgets/no_item.dart';
-import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
-import 'package:kardex_app_front/widgets/status_tag_label.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 
 class ClientsTable extends StatelessWidget {
   const ClientsTable({
@@ -62,7 +60,7 @@ class ClientsTable extends StatelessWidget {
 
                 Flexible(
                   fit: FlexFit.tight,
-                  child: Center(child: Text("Estado")),
+                  child: Center(child: SizedBox()),
                 ),
 
                 Flexible(
@@ -146,36 +144,33 @@ class _RowWidget extends StatelessWidget {
               Flexible(
                 fit: FlexFit.tight,
                 flex: 2,
-                child: Text(client.name),
+                child: ClientShortInfo(
+                  client: client,
+                  showPhone: false,
+                ),
               ),
               Flexible(
                 fit: FlexFit.tight,
-                child: Text(client.group),
-              ),
-              Flexible(
-                fit: FlexFit.tight,
-                child: Text(client.phone ?? "--"),
-              ),
-
-              Flexible(
-                fit: FlexFit.tight,
-                child: Center(
-                  child: Builder(
-                    builder: (context) {
-                      if (client.isActive) {
-                        return const StatusTagLabel(
-                          label: "Activo",
-                          isActive: true,
-                        );
-                      } else {
-                        return const StatusTagLabel(
-                          label: "Inactivo",
-                          isActive: false,
-                        );
-                      }
-                    },
+                child: Text(
+                  client.group,
+                  style: const TextStyle(
+                    fontSize: 16,
                   ),
                 ),
+              ),
+              Flexible(
+                fit: FlexFit.tight,
+                child: Text(
+                  client.phone ?? "--",
+                  style: const TextStyle(
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+
+              const Flexible(
+                fit: FlexFit.tight,
+                child: Center(child: SizedBox()),
               ),
 
               Flexible(

@@ -1,4 +1,6 @@
 export 'basic_table_listview.dart';
+export 'elements/elements.dart';
+export 'client_list_tile.dart';
 export 'super_widgets/custom_autocomplete_textfield.dart';
 export 'custom_listviews/confirmation_product_listview.dart';
 export 'custom_listviews/custom_listviews.dart';
