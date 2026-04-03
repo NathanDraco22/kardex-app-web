@@ -103,13 +103,6 @@ class _ClientWithBalanceSearchDialogState extends State<_ClientWithBalanceSearch
                         Navigator.pop(context, client);
                       },
                     );
-                    return ListTile(
-                      title: Text(client.name),
-                      subtitle: Text("Saldo: ${(client.balance / 100).toStringAsFixed(2)}"),
-                      onTap: () {
-                        Navigator.pop(context, client);
-                      },
-                    );
                   },
                 ),
               ),
