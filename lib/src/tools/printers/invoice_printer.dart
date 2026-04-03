@@ -185,7 +185,7 @@ Future<Uint8List> generateTicketPdfFromInvoice(
             pw.SizedBox(height: 4),
 
             pw.Text(
-              "Facturador: ${invoice.createdBy.name}",
+              "Autor: ${invoice.createdBy.name}",
               style: pw.TextStyle(
                 fontSize: TicketSettings.contentFontSize(paperSize),
               ),
