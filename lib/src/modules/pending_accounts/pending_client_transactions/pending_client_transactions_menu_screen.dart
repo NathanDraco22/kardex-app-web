@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/cubit/read_pending_client_cubit.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_app_front/widgets/client_list_tile.dart';
 import 'package:kardex_app_front/widgets/dialogs/show_client_with_balance_search_dialog.dart';
 import 'credit_session_transactions_screen.dart';
 
@@ -135,8 +136,11 @@ class _Content extends StatelessWidget {
               final currentClient = state.clients[index];
               final balanceFormatted = NumberFormatter.convertToMoneyLike(currentClient.balance);
               final tileColor = index.isOdd ? Colors.grey.shade200 : Colors.white;
-              return ListTile(
-                tileColor: tileColor,
+
+              return CustomClientListTile(
+                client: currentClient,
+                backgroundColor: tileColor,
+                trailing: Text(balanceFormatted),
                 onTap: () {
                   Navigator.push(
                     context,
@@ -149,20 +153,6 @@ class _Content extends StatelessWidget {
                     ),
                   );
                 },
-                title: Row(
-                  children: [
-                    Expanded(child: Text("${currentClient.id} - ${currentClient.name}")),
-                    Expanded(
-                      child: Text(
-                        balanceFormatted,
-                        textAlign: TextAlign.start,
-                      ),
-                    ),
-                  ],
-                ),
-                trailing: const Icon(
-                  Icons.chevron_right,
-                ),
               );
             },
           );
