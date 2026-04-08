@@ -3,9 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
 import 'package:kardex_app_front/src/modules/finance/client_movements/view/client_movements_screen.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
-import 'package:kardex_app_front/widgets/no_item.dart';
-import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
-import 'package:kardex_app_front/widgets/status_tag_label.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 
 import '../../cubit/client_read_cubit.dart';
 
@@ -58,7 +56,7 @@ class ClientsTable extends StatelessWidget {
                 ),
                 Flexible(
                   fit: FlexFit.tight,
-                  child: Center(child: Text("Estado")),
+                  child: SizedBox(),
                 ),
               ],
             ),
@@ -127,57 +125,21 @@ class _RowWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final balanceFormatted = NumberFormatter.convertToMoneyLike(client.balance);
-    return Ink(
-      color: color,
-      child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) {
-                return ClientMovementsScreen(initialClient: client);
-              },
-            ),
-          );
-        },
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          child: Row(
-            children: [
-              Flexible(
-                fit: FlexFit.tight,
-                flex: 2,
-                child: Text(client.name),
-              ),
-              Flexible(
-                fit: FlexFit.tight,
-                child: Text(balanceFormatted),
-              ),
 
-              Flexible(
-                fit: FlexFit.tight,
-                child: Center(
-                  child: Builder(
-                    builder: (context) {
-                      if (client.isActive) {
-                        return const StatusTagLabel(
-                          label: "Activo",
-                          isActive: true,
-                        );
-                      } else {
-                        return const StatusTagLabel(
-                          label: "Inactivo",
-                          isActive: false,
-                        );
-                      }
-                    },
-                  ),
-                ),
-              ),
-            ],
+    return CustomClientListTile(
+      client: client,
+      backgroundColor: color,
+      trailing: Text(balanceFormatted),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) {
+              return ClientMovementsScreen(initialClient: client);
+            },
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

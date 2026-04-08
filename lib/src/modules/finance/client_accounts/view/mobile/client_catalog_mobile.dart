@@ -125,12 +125,11 @@ class MobileClientsTable extends StatelessWidget {
                     }
 
                     final balanceFormatted = NumberFormatter.convertToMoneyLike(currentClient.balance);
-                    return MobileRow(
-                      color: rowColor,
-                      title: currentClient.name,
-                      isActive: currentClient.isActive,
-                      subtitle1: "Saldo: $balanceFormatted",
-                      onTab: () {
+                    return CustomClientListTile(
+                      client: currentClient,
+                      backgroundColor: rowColor,
+                      trailing: Text(balanceFormatted),
+                      onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(

@@ -52,26 +52,22 @@ class _Body extends StatelessWidget {
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1200),
-          child: Padding(
-            padding: const EdgeInsets.all(4.0),
-            child: Column(
-              spacing: 8,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                SizedBox(
-                  height: 100,
-                  child: _HeaderSection(
-                    initialClient:
-                        (context.findAncestorWidgetOfExactType<ClientMovementsScreenMobile>())?.initialClient,
-                  ),
+          child: Column(
+            spacing: 8,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(
+                height: 100,
+                child: _HeaderSection(
+                  initialClient: (context.findAncestorWidgetOfExactType<ClientMovementsScreenMobile>())?.initialClient,
                 ),
-                const Expanded(
-                  child: Card(
-                    child: _ContentSection(),
-                  ),
+              ),
+              const Expanded(
+                child: Card(
+                  child: _ContentSection(),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

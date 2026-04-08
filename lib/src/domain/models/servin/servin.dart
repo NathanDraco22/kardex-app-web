@@ -4,12 +4,14 @@ class Servin {
     required this.url,
     required this.isActive,
     this.isMultiBranch = false,
+    this.isUsingExpirationDate = true,
   });
 
   final String name;
   final String url;
   final bool isActive;
   final bool isMultiBranch;
+  final bool isUsingExpirationDate;
 
   factory Servin.fromJson(Map<String, dynamic> json) {
     return Servin(
@@ -17,6 +19,7 @@ class Servin {
       url: json['url'],
       isActive: json['isActive'],
       isMultiBranch: json['isMultiBranch'] ?? false,
+      isUsingExpirationDate: json['isUsingExpirationDate'] ?? true,
     );
   }
 
@@ -26,6 +29,7 @@ class Servin {
       'url': url,
       'isActive': isActive,
       'isMultiBranch': isMultiBranch,
+      'isUsingExpirationDate': isUsingExpirationDate,
     };
     return map;
   }

@@ -46,20 +46,24 @@ class _ContentSection extends StatelessWidget {
             final currentClient = state.client;
 
             return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    Text(
-                      currentClient.name,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    Expanded(
+                      child: Text(
+                        currentClient.name,
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        maxLines: 2,
+                      ),
                     ),
                   ],
                 ),
-                Row(
-                  spacing: 8,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 4,
                   children: [
-                    if (currentClient.cardId != null) Text("RFC: ${currentClient.cardId}"),
-                    if (currentClient.phone != null) Text("Tel: ${currentClient.phone}"),
+                    if (currentClient.cardId != null) Text("Cedula: ${currentClient.cardId}"),
                   ],
                 ),
 

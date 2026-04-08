@@ -9,6 +9,8 @@ import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/printers/invoice_printer.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
 import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
+import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_invoice_template.dart';
+import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 
 Future<void> showInvoiceViewerDialog(BuildContext context, InvoiceInDb invoice) async {
   final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
@@ -23,6 +25,10 @@ Future<void> showInvoiceViewerDialog(BuildContext context, InvoiceInDb invoice) 
           branch: currentBranch,
           onShare: () => shareInvoice(invoice, currentBranch, paperSize: paperSize),
           onPrint: () => printInvoice(invoice, currentBranch, paperSize: paperSize),
+          onExportPdf: () async {
+            final template = SingleInvoiceTemplate(invoice: invoice, branch: currentBranch);
+            await PdfExportTool.export(template, fileName: "factura_${invoice.docNumber}.pdf");
+          },
         );
       },
     ),
@@ -66,6 +72,10 @@ Future<void> showInvoiceViewerDialogFromId(BuildContext context, String invoiceI
               branch: currentBranch,
               onShare: () => shareInvoice(invoice, currentBranch, paperSize: paperSize),
               onPrint: () => printInvoice(invoice, currentBranch, paperSize: paperSize),
+              onExportPdf: () async {
+                final template = SingleInvoiceTemplate(invoice: invoice, branch: currentBranch);
+                await PdfExportTool.export(template, fileName: "factura_${invoice.docNumber}.pdf");
+              },
             );
           },
         );
@@ -80,12 +90,14 @@ class _InvoiceViewer extends StatelessWidget {
     required this.branch,
     this.onShare,
     this.onPrint,
+    this.onExportPdf,
   });
 
   final InvoiceInDb invoice;
   final BranchInDb branch;
   final VoidCallback? onShare;
   final VoidCallback? onPrint;
+  final VoidCallback? onExportPdf;
 
   @override
   Widget build(BuildContext context) {
@@ -93,6 +105,11 @@ class _InvoiceViewer extends StatelessWidget {
       appBar: AppBar(
         title: Text("Factura #${invoice.docNumber}"),
         actions: [
+          IconButton(
+            tooltip: "Exportar PDF (A4)",
+            onPressed: onExportPdf,
+            icon: const Icon(Icons.picture_as_pdf),
+          ),
           IconButton(
             tooltip: "Compartir Factura",
             onPressed: onShare,
@@ -222,9 +239,18 @@ class InvoiceViewerContent extends StatelessWidget {
               },
             ),
 
-            Text(
-              "${invoice.clientId} - ${invoice.clientInfo.name}",
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            Builder(
+              builder: (context) {
+                String clientLabel = "${invoice.clientId} - ${invoice.clientInfo.name}";
+                if (invoice.clientId == "SALE_CLIENT") {
+                  clientLabel = invoice.clientInfo.name;
+                }
+
+                return Text(
+                  clientLabel,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                );
+              },
             ),
 
             if (invoice.clientInfo.location != null && invoice.clientInfo.location!.isNotEmpty)

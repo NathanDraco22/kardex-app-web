@@ -9,6 +9,7 @@ import 'package:kardex_app_front/src/tools/extensiones.dart';
 import 'package:kardex_app_front/src/tools/input_formatter/input_formatter.dart';
 
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
+import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
 import '../cubit/read_expiration_log_cubit.dart';
@@ -171,32 +172,34 @@ class _ExpirationLogCreationScreenState extends State<ExpirationLogCreationScree
                       ),
 
                       Flexible(
-                        child: TitleTextField(
-                          textInputAction: TextInputAction.done,
-                          inputFormatters: [
-                            MonthYearInputFormatter(),
-                          ],
-                          keyboardType: TextInputType.number,
-                          title: "Fecha de Vencimiento (MES/AÑO)",
-                          initialValue: _expirationDate,
-                          onChanged: (value) {
-                            _expirationDate = value;
-                          },
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              _expirationDateParsed = null;
-                              return "Campo requerido";
-                            }
+                        child: ExpirationDateGate(
+                          child: TitleTextField(
+                            textInputAction: TextInputAction.done,
+                            inputFormatters: [
+                              MonthYearInputFormatter(),
+                            ],
+                            keyboardType: TextInputType.number,
+                            title: "Fecha de Vencimiento (MES/AÑO)",
+                            initialValue: _expirationDate,
+                            onChanged: (value) {
+                              _expirationDate = value;
+                            },
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                _expirationDateParsed = null;
+                                return "Campo requerido";
+                              }
 
-                            if (value.length < 5) return "Formato de fecha inválido";
-                            try {
-                              _expirationDateParsed = DateTimeTool.fromMMYY(value);
-                            } on Exception catch (_) {
-                              return "Formato de fecha inválido";
-                            }
+                              if (value.length < 5) return "Formato de fecha inválido";
+                              try {
+                                _expirationDateParsed = DateTimeTool.fromMMYY(value);
+                              } on Exception catch (_) {
+                                return "Formato de fecha inválido";
+                              }
 
-                            return null;
-                          },
+                              return null;
+                            },
+                          ),
                         ),
                       ),
                     ],

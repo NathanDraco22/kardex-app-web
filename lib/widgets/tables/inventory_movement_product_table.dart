@@ -6,6 +6,7 @@ import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/input_formatter/input_formatter.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/widgets/display_product_code.dart';
+import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
 
 class ProductRow {
   ProductRow({
@@ -175,9 +176,11 @@ class _HeaderTable extends StatelessWidget {
             child: Text("Nombre del Producto"),
           ),
           if (haveExpirationDate)
-            const Flexible(
-              fit: FlexFit.tight,
-              child: Center(child: Text("F. Vencimiento")),
+            const ExpirationDateGate(
+              child: Flexible(
+                fit: FlexFit.tight,
+                child: Center(child: Text("F. Vencimiento")),
+              ),
             ),
           const Flexible(
             fit: FlexFit.tight,
@@ -374,23 +377,25 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
             ),
           ),
           if (widget.rowModel.haveExpirationDate)
-            Flexible(
-              fit: FlexFit.tight,
-              child: Center(
-                child: TextField(
-                  focusNode: expirationDateFocus,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: false),
-                  inputFormatters: [MonthYearInputFormatter()],
-                  textAlign: TextAlign.center,
-                  onEditingComplete: () => FocusScope.of(context).nextFocus(),
-                  onChanged: (value) {
-                    try {
-                      final dateTime = DateTimeTool.fromMMYY(value);
-                      widget.rowModel.expirationDate = dateTime;
-                    } catch (e) {
-                      widget.rowModel.expirationDate = null;
-                    }
-                  },
+            ExpirationDateGate(
+              child: Flexible(
+                fit: FlexFit.tight,
+                child: Center(
+                  child: TextField(
+                    focusNode: expirationDateFocus,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: false),
+                    inputFormatters: [MonthYearInputFormatter()],
+                    textAlign: TextAlign.center,
+                    onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                    onChanged: (value) {
+                      try {
+                        final dateTime = DateTimeTool.fromMMYY(value);
+                        widget.rowModel.expirationDate = dateTime;
+                      } catch (e) {
+                        widget.rowModel.expirationDate = null;
+                      }
+                    },
+                  ),
                 ),
               ),
             ),
