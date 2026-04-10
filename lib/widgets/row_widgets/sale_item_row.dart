@@ -31,7 +31,7 @@ class _SaleItemRowState extends State<SaleItemRow> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 48,
+      height: 60,
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -77,6 +77,8 @@ class _SaleItemRowState extends State<SaleItemRow> {
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       Row(
                         children: [

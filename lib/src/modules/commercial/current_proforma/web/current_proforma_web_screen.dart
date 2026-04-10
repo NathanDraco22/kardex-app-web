@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
-import 'package:kardex_app_front/src/domain/models/order/order_model.dart' show OrderStatus;
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/commercial/current_proforma/cubit/read_proforma_cubit.dart';
-import 'package:kardex_app_front/src/tools/datetime_tool.dart';
-import 'package:kardex_app_front/src/tools/tools.dart';
-import 'package:kardex_app_front/widgets/super_widgets/custom_autocomplete_textfield.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 
 import 'invoice_creator/invoice_creator_screen.dart';
 
@@ -40,7 +37,7 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Center(
       child: Padding(
-        padding: EdgeInsets.all(8.0),
+        padding: EdgeInsets.all(4.0),
         child: Column(
           spacing: 8,
 
