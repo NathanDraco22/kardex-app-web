@@ -74,8 +74,9 @@ class _ContentSection extends StatelessWidget {
                     final currentInvoice = invoices[index];
                     final totalPaid = NumberFormatter.convertToMoneyLike(currentInvoice.total);
 
-                    final paidDate = currentInvoice.paidAt ?? DateTime.now();
-                    final paidAtFormatted = "${DateTimeTool.formatddMMyy(paidDate)} ${DateTimeTool.formatHHmm(paidDate)}";
+                    final paidDate = currentInvoice.createdAt;
+                    final paidAtFormatted =
+                        "${DateTimeTool.formatddMMyy(paidDate)} ${DateTimeTool.formatHHmm(paidDate)}";
 
                     final clientName = currentInvoice.clientInfo.name;
 

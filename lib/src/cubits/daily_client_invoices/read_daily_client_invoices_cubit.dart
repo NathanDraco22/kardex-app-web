@@ -2,7 +2,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_totals.dart';
+import 'package:kardex_app_front/src/domain/query_params/history_params.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
+import 'package:kardex_app_front/src/tools/branches_tool.dart';
 import 'package:kardex_app_front/src/tools/constant.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 
@@ -21,6 +23,8 @@ class ReadDailyClientInvoicesCubit extends Cubit<ReadDailyClientInvoicesState> {
 
   bool isLastPage = false;
 
+  InvoiceQueryParams params = InvoiceQueryParams();
+
   final InvoicesRepository invoicesRepository;
 
   Future<void> loadPaidInvoices() async {
@@ -29,20 +33,16 @@ class ReadDailyClientInvoicesCubit extends Cubit<ReadDailyClientInvoicesState> {
     try {
       final topEndDate = endDate?.add(const Duration(days: 1));
 
-      final result = await invoicesRepository.getPaidInvoices(
-        clientId: null, // null fetches all clients
-        startDate: startDate?.millisecondsSinceEpoch,
-        endDate: topEndDate?.millisecondsSinceEpoch,
-        offset: offset,
-        userCreatorId: userCreatorId,
-      );
+      params = InvoiceQueryParams()
+        ..branchId = BranchesTool.getCurrentBranchId()
+        ..clientId = null
+        ..startDate = DateTime.fromMillisecondsSinceEpoch(startDate?.millisecondsSinceEpoch ?? 0)
+        ..endDate = DateTime.fromMillisecondsSinceEpoch(topEndDate?.millisecondsSinceEpoch ?? 0)
+        ..createdBy = userCreatorId;
 
-      final totals = await invoicesRepository.getTotalFromPaidInvoices(
-        clientId: null, // null fetches all clients
-        startDate: startDate?.millisecondsSinceEpoch,
-        endDate: topEndDate?.millisecondsSinceEpoch,
-        userCreatorId: userCreatorId,
-      );
+      final result = await invoicesRepository.getAllInvoices(params);
+
+      final totals = await invoicesRepository.getTotalFromInvoices(params);
 
       offset += result.data.length;
       isLastPage = result.data.length < paginationItems;
