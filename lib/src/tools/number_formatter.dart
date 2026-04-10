@@ -22,4 +22,11 @@ class NumberFormatter {
   static double convertFromCentsToDouble(int value) {
     return value / 100;
   }
+
+  static String convertFromCentsToUnitsCurrency(int valueInCents) {
+    final valueInCurrency = valueInCents / 100;
+    final value = double.parse(valueInCurrency.toStringAsFixed(2));
+
+    return _instance.format(value);
+  }
 }
