@@ -9,6 +9,7 @@ import 'package:pdf/widgets.dart' as pw;
 
 class ProductByUserTemplate implements PdfTemplate {
   final String title;
+  final String branchName;
   final UserInfo? userInfo;
   final DateTime? startDate;
   final DateTime? endDate;
@@ -18,6 +19,7 @@ class ProductByUserTemplate implements PdfTemplate {
 
   ProductByUserTemplate({
     required this.title,
+    required this.branchName,
     this.userInfo,
     this.startDate,
     this.endDate,
@@ -90,6 +92,8 @@ class ProductByUserTemplate implements PdfTemplate {
           pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
+              pw.Text("Sucursal: $branchName", style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+              pw.SizedBox(height: 4),
               pw.Text("Usuario: ${userInfo?.name ?? 'Todos'}", style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
               pw.SizedBox(height: 4),
               pw.Text("Periodo: $dateRangeStr"),

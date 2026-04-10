@@ -80,6 +80,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                         } else if (option == ExportOption.pdf) {
                           final template = ProductByUserTemplate(
                             title: "Productos en Pedidos (Diario)",
+                            branchName: BranchesTool.getCurrentBranchName(),
                             userInfo: currentSelectedUser != null
                                 ? UserInfo(id: currentSelectedUser!.id, name: currentSelectedUser!.username)
                                 : null,
