@@ -48,29 +48,39 @@ class _LocalPrinterSettingsDialogState extends State<_LocalPrinterSettingsDialog
         children: [
           const Text('Seleccione el tamaño del papel térmico a usar por defecto en este dispositivo:'),
           const SizedBox(height: 16),
-          RadioListTile<PaperSize>(
-            title: const Text('80 mm'),
-            value: PaperSize.mm80,
+
+          RadioGroup<PaperSize>(
             groupValue: _selectedSize,
-            onChanged: (PaperSize? value) {
+            onChanged: (value) {
               if (value != null) {
                 setState(() {
                   _selectedSize = value;
                 });
               }
             },
-          ),
-          RadioListTile<PaperSize>(
-            title: const Text('58 mm'),
-            value: PaperSize.mm58,
-            groupValue: _selectedSize,
-            onChanged: (PaperSize? value) {
-              if (value != null) {
-                setState(() {
-                  _selectedSize = value;
-                });
-              }
-            },
+            child: Column(
+              children: [
+                ListTile(
+                  onTap: () {
+                    setState(() {
+                      _selectedSize = .mm80;
+                    });
+                  },
+                  title: const Text('80 mm'),
+                  leading: const Radio<PaperSize>(value: .mm80),
+                ),
+
+                ListTile(
+                  onTap: () {
+                    setState(() {
+                      _selectedSize = .mm58;
+                    });
+                  },
+                  title: const Text('58 mm'),
+                  leading: const Radio<PaperSize>(value: .mm58),
+                ),
+              ],
+            ),
           ),
         ],
       ),

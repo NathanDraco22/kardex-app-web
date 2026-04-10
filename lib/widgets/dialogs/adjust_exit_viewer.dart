@@ -6,6 +6,8 @@ import 'package:kardex_app_front/src/domain/models/branch/branch.dart';
 import 'package:kardex_app_front/src/domain/repositories/adjust_exits_repository.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
+import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_adjust_exit_template.dart';
 
 Future<void> showAdjustExitViewerDialog(BuildContext context, AdjustExitInDb adjustExit) async {
   final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
@@ -16,6 +18,10 @@ Future<void> showAdjustExitViewerDialog(BuildContext context, AdjustExitInDb adj
         return _AdjustExitViewer(
           adjustExit: adjustExit,
           branch: currentBranch,
+          onExportPdf: () async {
+            final template = SingleAdjustExitTemplate(adjustExit: adjustExit, branch: currentBranch);
+            await PdfExportTool.export(template, fileName: "salida_ajuste_${adjustExit.docNumber}.pdf");
+          },
         );
       },
     ),
@@ -51,6 +57,10 @@ Future<void> showAdjustExitViewerDialogFromId(BuildContext context, String adjus
             return _AdjustExitViewer(
               adjustExit: adjustExit,
               branch: currentBranch,
+              onExportPdf: () async {
+                final template = SingleAdjustExitTemplate(adjustExit: adjustExit, branch: currentBranch);
+                await PdfExportTool.export(template, fileName: "salida_ajuste_${adjustExit.docNumber}.pdf");
+              },
             );
           },
         );
@@ -63,14 +73,12 @@ class _AdjustExitViewer extends StatelessWidget {
   const _AdjustExitViewer({
     required this.adjustExit,
     required this.branch,
-    this.onShare,
-    this.onPrint,
+    this.onExportPdf,
   });
 
   final AdjustExitInDb adjustExit;
   final BranchInDb branch;
-  final VoidCallback? onShare;
-  final VoidCallback? onPrint;
+  final VoidCallback? onExportPdf;
 
   String _getTypeLabel(AdjustExitType type) {
     switch (type) {
@@ -96,8 +104,7 @@ class _AdjustExitViewer extends StatelessWidget {
       appBar: AppBar(
         title: Text("Salida por $typeLabel #${adjustExit.docNumber}"),
         actions: [
-          IconButton(tooltip: "Compartir", onPressed: onShare, icon: const Icon(Icons.share)),
-          IconButton(tooltip: "Imprimir", onPressed: onPrint, icon: const Icon(Icons.print)),
+          IconButton(tooltip: "Exportar PDF (A4)", onPressed: onExportPdf, icon: const Icon(Icons.picture_as_pdf)),
         ],
       ),
       body: SafeArea(
