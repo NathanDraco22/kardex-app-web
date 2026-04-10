@@ -47,10 +47,10 @@ class _BottomAppBar extends StatelessWidget {
     final state = readCubit.state;
 
     if (state is! ReadDailyClientInvoicesSuccess) return const SizedBox.shrink();
-    
+
     final totalAmount = state.totals.total;
     final formattedTotalPaid = NumberFormatter.convertToMoneyLike(totalAmount);
-    
+
     return BottomAppBar(
       height: 60,
       child: Row(
@@ -73,7 +73,7 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    EdgeInsets mainPadding = const EdgeInsets.all(8.0);
+    EdgeInsets mainPadding = const EdgeInsets.all(4.0);
 
     if (context.isMobile()) {
       mainPadding = EdgeInsets.zero;
