@@ -6,6 +6,8 @@ import 'package:kardex_app_front/src/domain/models/entry_history/entry_history_m
 import 'package:kardex_app_front/src/domain/repositories/entry_histories_repository.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
+import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_entry_history_template.dart';
 
 // --- FUNCIÓN PARA NAVEGAR CON EL MODELO COMPLETO ---
 Future<void> showEntryHistoryViewerDialog(BuildContext context, EntryHistoryInDb entryHistory) async {
@@ -17,6 +19,10 @@ Future<void> showEntryHistoryViewerDialog(BuildContext context, EntryHistoryInDb
         return _EntryHistoryViewer(
           entryHistory: entryHistory,
           branch: currentBranch,
+          onExportPdf: () async {
+            final template = SingleEntryHistoryTemplate(entryHistory: entryHistory, branch: currentBranch);
+            await PdfExportTool.export(template, fileName: "entrada_inventario_${entryHistory.docNumber}.pdf");
+          },
         );
       },
     ),
@@ -53,6 +59,10 @@ Future<void> showEntryHistoryViewerDialogFromId(BuildContext context, String ent
             return _EntryHistoryViewer(
               entryHistory: entryHistory,
               branch: currentBranch,
+              onExportPdf: () async {
+                final template = SingleEntryHistoryTemplate(entryHistory: entryHistory, branch: currentBranch);
+                await PdfExportTool.export(template, fileName: "entrada_inventario_${entryHistory.docNumber}.pdf");
+              },
             );
           },
         );
@@ -66,14 +76,12 @@ class _EntryHistoryViewer extends StatelessWidget {
   const _EntryHistoryViewer({
     required this.entryHistory,
     required this.branch,
-    this.onShare,
-    this.onPrint,
+    this.onExportPdf,
   });
 
   final EntryHistoryInDb entryHistory;
   final BranchInDb branch;
-  final VoidCallback? onShare;
-  final VoidCallback? onPrint;
+  final VoidCallback? onExportPdf;
 
   @override
   Widget build(BuildContext context) {
@@ -81,8 +89,7 @@ class _EntryHistoryViewer extends StatelessWidget {
       appBar: AppBar(
         title: Text("Historial de Entrada #${entryHistory.docNumber}"),
         actions: [
-          IconButton(tooltip: "Compartir", onPressed: onShare, icon: const Icon(Icons.share)),
-          IconButton(tooltip: "Imprimir", onPressed: onPrint, icon: const Icon(Icons.print)),
+          IconButton(tooltip: "Exportar PDF (A4)", onPressed: onExportPdf, icon: const Icon(Icons.picture_as_pdf)),
         ],
       ),
       body: SafeArea(

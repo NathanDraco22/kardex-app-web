@@ -6,6 +6,8 @@ import 'package:kardex_app_front/src/domain/models/branch/branch.dart';
 import 'package:kardex_app_front/src/domain/repositories/adjust_entries_repository.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
+import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_adjust_entry_template.dart';
 
 Future<void> showAdjustEntryViewerDialog(BuildContext context, AdjustEntryInDb adjustEntry) async {
   final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
@@ -16,6 +18,10 @@ Future<void> showAdjustEntryViewerDialog(BuildContext context, AdjustEntryInDb a
         return _AdjustEntryViewer(
           adjustEntry: adjustEntry,
           branch: currentBranch,
+          onExportPdf: () async {
+            final template = SingleAdjustEntryTemplate(adjustEntry: adjustEntry, branch: currentBranch);
+            await PdfExportTool.export(template, fileName: "entrada_ajuste_${adjustEntry.docNumber}.pdf");
+          },
         );
       },
     ),
@@ -51,6 +57,10 @@ Future<void> showAdjustEntryViewerDialogFromId(BuildContext context, String adju
             return _AdjustEntryViewer(
               adjustEntry: adjustEntry,
               branch: currentBranch,
+              onExportPdf: () async {
+                final template = SingleAdjustEntryTemplate(adjustEntry: adjustEntry, branch: currentBranch);
+                await PdfExportTool.export(template, fileName: "entrada_ajuste_${adjustEntry.docNumber}.pdf");
+              },
             );
           },
         );
@@ -63,14 +73,12 @@ class _AdjustEntryViewer extends StatelessWidget {
   const _AdjustEntryViewer({
     required this.adjustEntry,
     required this.branch,
-    this.onShare,
-    this.onPrint,
+    this.onExportPdf,
   });
 
   final AdjustEntryInDb adjustEntry;
   final BranchInDb branch;
-  final VoidCallback? onShare;
-  final VoidCallback? onPrint;
+  final VoidCallback? onExportPdf;
 
   @override
   Widget build(BuildContext context) {
@@ -83,8 +91,7 @@ class _AdjustEntryViewer extends StatelessWidget {
       appBar: AppBar(
         title: Text("Ajuste de Entrada #${adjustEntry.docNumber}"),
         actions: [
-          IconButton(tooltip: "Compartir", onPressed: onShare, icon: const Icon(Icons.share)),
-          IconButton(tooltip: "Imprimir", onPressed: onPrint, icon: const Icon(Icons.print)),
+          IconButton(tooltip: "Exportar PDF (A4)", onPressed: onExportPdf, icon: const Icon(Icons.picture_as_pdf)),
         ],
       ),
       body: SafeArea(
