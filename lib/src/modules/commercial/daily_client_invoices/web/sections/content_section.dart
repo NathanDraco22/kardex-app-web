@@ -66,9 +66,6 @@ class _ContentSection extends StatelessWidget {
                     final totalPaid = NumberFormatter.convertFromCentsToUnitsCurrency(currentInvoice.total);
 
                     final createdAt = currentInvoice.createdAt;
-                    final createdAtFormatted =
-                        "${DateTimeTool.formatddMMyy(createdAt)} ${DateTimeTool.formatHHmm(createdAt)}";
-
                     final clientName = currentInvoice.clientInfo.name;
 
                     return BasicTableRow(
