@@ -18,12 +18,12 @@ class _HeaderSectionState extends State<_HeaderSection> {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
-          spacing: 16,
+          spacing: 8,
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Column(
-              spacing: 12,
+              spacing: 4,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 TextButton.icon(
