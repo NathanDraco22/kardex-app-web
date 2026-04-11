@@ -2,15 +2,20 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/common/product_sale_total.dart';
 import 'package:kardex_app_front/src/domain/query_params/order_query_params.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
+import 'package:kardex_app_front/src/tools/branches_tool.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 
 part 'read_daily_product_in_orders_state.dart';
 
 class ReadDailyProductInOrdersCubit extends Cubit<ReadDailyProductInOrdersState> {
-  ReadDailyProductInOrdersCubit({required this.ordersRepository}) : super(ReadDailyProductInOrdersInitial()) {
+  ReadDailyProductInOrdersCubit({required this.ordersRepository, this.defaultCreatorId})
+    : super(ReadDailyProductInOrdersInitial()) {
     final todayMidnight = DateTimeTool.getTodayMidnight();
     startDate = todayMidnight;
+    userCreatorId = defaultCreatorId;
   }
+
+  String? defaultCreatorId;
 
   DateTime? startDate;
   String? userCreatorId;
@@ -22,7 +27,7 @@ class ReadDailyProductInOrdersCubit extends Cubit<ReadDailyProductInOrdersState>
     if (startDate != null) {
       this.startDate = startDate;
     }
-    if (userCreatorId != null) {
+    if (userCreatorId != null && defaultCreatorId == null) {
       this.userCreatorId = userCreatorId;
     }
 
@@ -33,6 +38,7 @@ class ReadDailyProductInOrdersCubit extends Cubit<ReadDailyProductInOrdersState>
         startDate: this.startDate?.millisecondsSinceEpoch,
         endDate: topEndDate?.millisecondsSinceEpoch,
         neStatus: .cancelled,
+        branchId: BranchesTool.getCurrentBranchId(),
       )..createdBy = this.userCreatorId;
 
       final result = await ordersRepository.getProductsInOrders(queryParams: params);
@@ -50,7 +56,7 @@ class ReadDailyProductInOrdersCubit extends Cubit<ReadDailyProductInOrdersState>
 
   void clearFilters() {
     startDate = DateTimeTool.getTodayMidnight();
-    userCreatorId = null;
+    userCreatorId = defaultCreatorId;
     loadDailyProductInOrders(startDate: startDate);
   }
 }

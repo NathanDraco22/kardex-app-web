@@ -68,6 +68,16 @@ class _Body extends StatelessWidget {
             const Divider(height: 0.0),
             ListTile(
               leading: const Icon(
+                Icons.analytics_outlined,
+                color: Colors.orange,
+              ),
+              title: const Text("Resultado de Operaciones Diarias"),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.pushNamed("daily-operations-results"),
+            ),
+            const Divider(height: 0.0),
+            ListTile(
+              leading: const Icon(
                 FluentIcons.notepad_person_24_filled,
                 color: Colors.blue,
               ),

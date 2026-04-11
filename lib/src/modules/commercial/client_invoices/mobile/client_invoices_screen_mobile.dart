@@ -8,6 +8,7 @@ import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_prod
 import 'package:kardex_app_front/widgets/dialogs/search_products/custom_product_commercial_search_delegate.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/quick_commercial_product_search_delegate.dart';
 
 import '../widgets/product_invoice_card.dart';
 import 'invoice_client_menu_screen.dart';
@@ -63,10 +64,21 @@ class _RootScaffold extends StatelessWidget {
         visible: MediaQuery.viewInsetsOf(context).bottom == 0.0,
         child: FloatingActionButton.extended(
           onPressed: () async {
+            final isQuote = writeCubit.documentType == CommercialDocumentType.quote;
+
+            if (isQuote) {
+              final res = await showQuickCommercialProductSearchDelegate(
+                context,
+                restrictStock: false,
+              );
+              if (res == null) return;
+              viewController.addMultipleItems(res);
+              return;
+            }
+
             final res = await showCommercialProductSearchDelegate(context);
             if (res == null) return;
-            if (writeCubit.documentType != CommercialDocumentType.quote &&
-                res.quantity > res.product.account.availableStock) {
+            if (!isQuote && res.quantity > res.product.account.availableStock) {
               if (!context.mounted) return;
               await DialogManager.showErrorDialog(
                 context,

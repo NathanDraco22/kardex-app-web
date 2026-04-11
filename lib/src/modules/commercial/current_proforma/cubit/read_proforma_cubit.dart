@@ -17,6 +17,7 @@ class ReadProformaCubit extends Cubit<ReadProformaState> {
   List<OrderInDb> _ordersCache = [];
 
   String? clientId;
+  String? createdBy;
 
   Future<void> loadPaginatedOrders() async {
     emit(ReadProformaLoading());
@@ -25,10 +26,11 @@ class ReadProformaCubit extends Cubit<ReadProformaState> {
       final response = await ordersRepository.getPaginatedOrders(
         queryParams: OrderQueryParams(
           skip: 0,
-          limit: 100,
+          limit: 1000,
           branchId: currentBranch,
           clientId: clientId,
           status: OrderStatus.draft,
+          createdBy: createdBy,
         ),
       );
 
@@ -48,14 +50,17 @@ class ReadProformaCubit extends Cubit<ReadProformaState> {
 
   Future<void> setFilterParams({
     String? clientId,
+    String? createdBy,
   }) async {
     this.clientId = clientId;
+    this.createdBy = createdBy;
     _ordersCache = [];
     isLastPage = false;
   }
 
   Future<void> clearFilterParams() async {
     clientId = null;
+    createdBy = null;
     _ordersCache = [];
     isLastPage = false;
     loadPaginatedOrders();

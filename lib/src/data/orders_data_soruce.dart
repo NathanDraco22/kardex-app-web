@@ -41,6 +41,18 @@ class OrdersDataSource with HttpService {
     return res;
   }
 
+  Future<Map<String, dynamic>> productVSDemand({
+    required Map<String, String> queryParams,
+  }) async {
+    final uri = HttpTools.generateUri(
+      "$_endpoint/product-demand-vs-inventory",
+      queryParameters: queryParams,
+    );
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
+    return res;
+  }
+
   Future<Map<String, dynamic>?> getOrderById(String orderId) async {
     final uri = HttpTools.generateUri("$_endpoint/$orderId");
     final headers = HttpTools.generateAuthHeaders();

@@ -22,6 +22,7 @@ class TitleTextField extends StatelessWidget {
     this.readOnly = false,
     this.onTap,
     this.textInputAction,
+    this.centerTitle = false,
   });
 
   final TextInputType? keyboardType;
@@ -38,6 +39,7 @@ class TitleTextField extends StatelessWidget {
   final TextStyle? style;
   final TextInputAction? textInputAction;
   final bool readOnly;
+  final bool centerTitle;
   final void Function()? onTap;
   final void Function()? onEditingComplete;
 
@@ -52,6 +54,7 @@ class TitleTextField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Row(
+          mainAxisAlignment: centerTitle ? MainAxisAlignment.center : MainAxisAlignment.start,
           children: [
             Text(
               title,

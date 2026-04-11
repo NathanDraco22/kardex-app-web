@@ -43,16 +43,18 @@ class _HeaderSectionState extends State<_HeaderSection> {
                 if (widget.initialClient == null)
                   TextButton.icon(
                     onPressed: () async {
-                      // TODO: Implement Client Search Delegate or Dialog
-                      // For now, we might rely on passing the client from the previous screen
-                      // But if this is a standalone screen, we need search.
-                      // We will implement a search delegate in the next step.
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Búsqueda de clientes pendiente de implementar")),
+                      final client = await showClientSelectionDialog(context);
+                      if (client == null) return;
+                      setState(() {
+                        selectedClient = client;
+                      });
+                      readCubit.loadPaginatedTransactions(
+                        client: selectedClient!,
+                        endDate: selectedDay,
                       );
                     },
                     label: const Text("Buscar Cliente"),
-                    icon: const Icon(Icons.search),
+                    icon: const Icon(Icons.business),
                   ),
 
                 SizedBox(

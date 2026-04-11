@@ -13,6 +13,10 @@ class _HeaderSectionState extends State<_HeaderSection> {
   @override
   Widget build(BuildContext context) {
     final readCubit = context.watch<ReadDailyProductSalesCubit>();
+    final (isSellerRole, userInDb) = RoleTools.isSeller(context);
+    if (isSellerRole) {
+      currentSelectedUser = userInDb;
+    }
     return Card(
       key: ValueKey(readCubit.state),
       child: Padding(
@@ -40,7 +44,9 @@ class _HeaderSectionState extends State<_HeaderSection> {
                   TextButton.icon(
                     onPressed: () {
                       readCubit.clearFilters();
-                      currentSelectedUser = null;
+                      if (!isSellerRole) {
+                        currentSelectedUser = null;
+                      }
                       setState(() {});
                     },
                     icon: const Icon(Icons.clear),
@@ -53,25 +59,29 @@ class _HeaderSectionState extends State<_HeaderSection> {
               constraints: const BoxConstraints(maxWidth: 600),
               child: Row(
                 children: [
-                  TextButton(
-                    onPressed: () async {
-                      final user = await showActiveUserSelectionDialog(context);
-                      if (user == null) return;
-                      readCubit.loadDailyProductSales(userCreatorId: user.id);
-                      currentSelectedUser = user;
-                      setState(() {});
-                    },
-                    child: const Text("Seleccionar Usuario"),
-                  ),
+                  if (!isSellerRole)
+                    TextButton.icon(
+                      onPressed: () async {
+                        final user = await showActiveUserSelectionDialog(context);
+                        if (user == null) return;
+                        readCubit.loadDailyProductSales(userCreatorId: user.id);
+                        currentSelectedUser = user;
+                        setState(() {});
+                      },
+                      icon: const Icon(Icons.person),
+                      label: currentSelectedUser == null
+                          ? const Text("Seleccionar Usuario")
+                          : Text(currentSelectedUser!.username),
+                    ),
                   const Spacer(),
                   if (readCubit.state is ReadDailyProductSalesSuccess)
                     FilledButton.icon(
                       onPressed: () async {
                         final option = await showExportOptionsDialog(context);
                         if (option == null) return;
-                        
+
                         final state = readCubit.state as ReadDailyProductSalesSuccess;
-                        
+
                         if (option == ExportOption.csv) {
                           await CsvExportTool.exportProductSalesToCSV(
                             products: state.productTotals,
@@ -90,7 +100,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                             total: state.totalAmount,
                             items: state.productTotals,
                           );
-                          
+
                           await PdfExportTool.export(
                             template,
                             fileName: "ventas_diarias_productos.pdf",
@@ -104,7 +114,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
               ),
             ),
 
-            if (currentSelectedUser != null)
+            if (currentSelectedUser != null && !isSellerRole)
               Text(
                 currentSelectedUser!.username,
                 style: const TextStyle(

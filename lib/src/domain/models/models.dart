@@ -3,6 +3,8 @@ export 'branch/branch_model.dart';
 export 'client/client.dart';
 export 'client/client_model.dart';
 export 'common/exit_items.dart';
+export 'common/product_stock_demand.dart';
+
 
 export 'inventory/inventory_model.dart';
 export 'product/product.dart';
@@ -18,3 +20,4 @@ export 'unit/unit.dart';
 export 'unit/unit_model.dart';
 export 'integration/integration_model.dart';
 export 'integration/telegram_integration.dart';
+export 'reports/totals_result.dart';
