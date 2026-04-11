@@ -109,11 +109,6 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                     bigTitle: widget.product.unitName,
                     crossAxisAlignment: CrossAxisAlignment.center,
                   ),
-                  TitleLabel(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    title: "Existencia",
-                    bigTitle: widget.product.account.availableStock.toString(),
-                  ),
                 ],
               ),
               Expanded(
@@ -179,6 +174,31 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                           ),
                           const SizedBox(height: 12),
                           Row(
+                            children: [
+                              Expanded(
+                                child: TitleLabel(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  title: "Existencia",
+                                  bigTitle: widget.product.account.availableStock.toString(),
+                                ),
+                              ),
+                              Expanded(
+                                child: Visibility(
+                                  visible: isUserAdmin,
+                                  child: TitleLabel(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    title: "Costo",
+                                    bigTitle: NumberFormatter.convertFromCentsToUnitsCurrency(
+                                      widget.product.account.averageCost,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const Expanded(child: SizedBox.shrink()),
+                            ],
+                          ),
+                          const Divider(),
+                          Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -189,6 +209,7 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                                   height: 90,
                                   child: TitleTextField(
                                     focusNode: focusNode,
+                                    style: const TextStyle(fontWeight: .w600),
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return "";
@@ -203,6 +224,7 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                                       return null;
                                     },
                                     titleTextAlign: TextAlign.center,
+                                    centerTitle: true,
                                     initialValue: commercialProductResult.quantity.toString(),
                                     inputFormatters: [IntegerTextInputFormatter()],
                                     keyboardType: TextInputType.number,
@@ -221,10 +243,13 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                                 child: SizedBox(
                                   height: 90,
                                   child: TitleTextField(
+                                    centerTitle: true,
                                     key: ValueKey(commercialProductResult.selectedPriceLevel),
                                     readOnly: commercialProductResult.selectedPriceLevel != 0,
                                     titleTextAlign: TextAlign.center,
                                     initialValue: price.toString(),
+                                    style: const TextStyle(fontWeight: FontWeight.w600),
+
                                     inputFormatters: [DecimalTextInputFormatter()],
                                     keyboardType: TextInputType.number,
                                     onChanged: (value) {
@@ -293,7 +318,7 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
           ),
         ),
         bottomNavigationBar: BottomAppBar(
-          height: 140,
+          height: 160,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
             child: Column(

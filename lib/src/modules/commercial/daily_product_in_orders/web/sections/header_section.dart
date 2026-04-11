@@ -13,6 +13,10 @@ class _HeaderSectionState extends State<_HeaderSection> {
   @override
   Widget build(BuildContext context) {
     final readCubit = context.watch<ReadDailyProductInOrdersCubit>();
+    final (isSellerRole, userInDb) = RoleTools.isSeller(context);
+    if (isSellerRole) {
+      currentSelectedUser = userInDb;
+    }
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -39,7 +43,9 @@ class _HeaderSectionState extends State<_HeaderSection> {
                   TextButton.icon(
                     onPressed: () {
                       readCubit.clearFilters();
-                      currentSelectedUser = null;
+                      if (!isSellerRole) {
+                        currentSelectedUser = null;
+                      }
                       setState(() {});
                     },
                     icon: const Icon(Icons.clear),
@@ -52,16 +58,20 @@ class _HeaderSectionState extends State<_HeaderSection> {
               constraints: const BoxConstraints(maxWidth: 600),
               child: Row(
                 children: [
-                  TextButton(
-                    onPressed: () async {
-                      final user = await showActiveUserSelectionDialog(context);
-                      if (user == null) return;
-                      readCubit.loadDailyProductInOrders(userCreatorId: user.id);
-                      currentSelectedUser = user;
-                      setState(() {});
-                    },
-                    child: const Text("Seleccionar Usuario"),
-                  ),
+                  if (!isSellerRole)
+                    TextButton.icon(
+                      onPressed: () async {
+                        final user = await showActiveUserSelectionDialog(context);
+                        if (user == null) return;
+                        readCubit.loadDailyProductInOrders(userCreatorId: user.id);
+                        currentSelectedUser = user;
+                        setState(() {});
+                      },
+                      icon: const Icon(Icons.person),
+                      label: currentSelectedUser == null
+                          ? const Text("Seleccionar Usuario")
+                          : Text(currentSelectedUser!.username),
+                    ),
                   const Spacer(),
                   if (readCubit.state is ReadDailyProductInOrdersSuccess)
                     FilledButton.icon(
@@ -104,7 +114,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
               ),
             ),
 
-            if (currentSelectedUser != null)
+            if (currentSelectedUser != null && !isSellerRole)
               Text(
                 currentSelectedUser!.username,
                 style: const TextStyle(

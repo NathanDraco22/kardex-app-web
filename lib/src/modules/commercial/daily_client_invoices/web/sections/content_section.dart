@@ -76,7 +76,7 @@ class _ContentSection extends StatelessWidget {
                       cells: [
                         BasicTableCell(
                           content: Column(
-                            crossAxisAlignment: .start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(DateTimeTool.formatddMMyy(createdAt)),
                               Text(DateTimeTool.formatHHmm(createdAt)),
@@ -85,7 +85,7 @@ class _ContentSection extends StatelessWidget {
                         ),
                         BasicTableCell(
                           content: Column(
-                            crossAxisAlignment: .start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text("#${currentInvoice.docNumber}"),
                               Text(

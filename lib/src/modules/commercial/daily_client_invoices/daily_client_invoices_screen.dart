@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/cubits/daily_client_invoices/read_daily_client_invoices_cubit.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/commercial/daily_client_invoices/web/daily_client_invoices_screen_web.dart';
+import 'package:kardex_app_front/src/tools/role_tools.dart';
 
 class DailyClientInvoicesScreen extends StatelessWidget {
   const DailyClientInvoicesScreen({super.key});
@@ -10,9 +11,11 @@ class DailyClientInvoicesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final invoiceRepo = context.read<InvoicesRepository>();
+    final (isSellerRole, userInDb) = RoleTools.isSeller(context);
     return BlocProvider(
       create: (context) => ReadDailyClientInvoicesCubit(
         invoicesRepository: invoiceRepo,
+        defaultCreatorId: isSellerRole ? userInDb?.id : null,
       )..loadPaidInvoices(),
       child: const _RootScaffold(),
     );

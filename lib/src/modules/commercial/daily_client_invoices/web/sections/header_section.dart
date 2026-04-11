@@ -12,7 +12,14 @@ class _HeaderSectionState extends State<_HeaderSection> {
 
   @override
   Widget build(BuildContext context) {
+    final (isSellerRole, userInDb) = RoleTools.isSeller(context);
+
+    if (isSellerRole) {
+      currentSelectedUser = userInDb;
+    }
+
     final readCubit = context.watch<ReadDailyClientInvoicesCubit>();
+
     return Card(
       key: ValueKey(readCubit.state),
       child: Padding(
@@ -28,7 +35,9 @@ class _HeaderSectionState extends State<_HeaderSection> {
                   TextButton.icon(
                     onPressed: () {
                       readCubit.clearFilters();
-                      currentSelectedUser = null;
+                      if (!isSellerRole) {
+                        currentSelectedUser = null;
+                      }
                       setState(() {});
                     },
                     icon: const Icon(Icons.clear),
@@ -75,18 +84,20 @@ class _HeaderSectionState extends State<_HeaderSection> {
                 children: [
                   Row(
                     children: [
-                      TextButton(
-                        onPressed: () async {
-                          final user = await showActiveUserSelectionDialog(context);
-                          if (user == null) return;
-                          readCubit.userCreatorId = user.id;
-                          currentSelectedUser = user;
-                          setState(() {});
-                        },
-                        child: currentSelectedUser == null
-                            ? const Text("Seleccionar Usuario")
-                            : Text(currentSelectedUser!.username),
-                      ),
+                      if (!isSellerRole)
+                        TextButton.icon(
+                          icon: const Icon(Icons.person),
+                          onPressed: () async {
+                            final user = await showActiveUserSelectionDialog(context);
+                            if (user == null) return;
+                            readCubit.userCreatorId = user.id;
+                            currentSelectedUser = user;
+                            setState(() {});
+                          },
+                          label: currentSelectedUser == null
+                              ? const Text("Seleccionar Usuario")
+                              : Text(currentSelectedUser!.username),
+                        ),
                     ],
                   ),
                   Row(

@@ -139,17 +139,12 @@ class _FormContentState extends State<_FormContent> {
                     title: "Unidad",
                     bigTitle: widget.product.unitName,
                   ),
-                  TitleLabel(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    title: "Existencia",
-                    bigTitle: widget.product.account.availableStock.toString(),
-                  ),
                 ],
               ),
               Expanded(
                 child: ListView(
                   children: [
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8),
 
                     SizedBox(
                       width: 600,
@@ -207,7 +202,32 @@ class _FormContentState extends State<_FormContent> {
                               setState(() {});
                             },
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TitleLabel(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  title: "Existencia",
+                                  bigTitle: widget.product.account.availableStock.toString(),
+                                ),
+                              ),
+                              Expanded(
+                                child: Visibility(
+                                  visible: isUserAdmin,
+                                  child: TitleLabel(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    title: "Costo",
+                                    bigTitle: NumberFormatter.convertFromCentsToUnitsCurrency(
+                                      widget.product.account.averageCost,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const Expanded(child: SizedBox.shrink()),
+                            ],
+                          ),
+                          const Divider(),
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.center,

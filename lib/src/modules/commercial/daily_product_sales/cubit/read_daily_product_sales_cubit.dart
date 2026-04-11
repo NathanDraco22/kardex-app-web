@@ -8,10 +8,14 @@ import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 part 'read_daily_product_sales_state.dart';
 
 class ReadDailyProductSalesCubit extends Cubit<ReadDailyProductSalesState> {
-  ReadDailyProductSalesCubit({required this.invoicesRepository}) : super(ReadDailyProductSalesInitial()) {
+  ReadDailyProductSalesCubit({required this.invoicesRepository, this.defaultCreatorId})
+    : super(ReadDailyProductSalesInitial()) {
     final todayMidnight = DateTimeTool.getTodayMidnight();
     startDate = todayMidnight;
+    userCreatorId = defaultCreatorId;
   }
+
+  String? defaultCreatorId;
 
   DateTime? startDate;
   String? userCreatorId;
@@ -23,7 +27,7 @@ class ReadDailyProductSalesCubit extends Cubit<ReadDailyProductSalesState> {
     if (startDate != null) {
       this.startDate = startDate;
     }
-    if (userCreatorId != null) {
+    if (userCreatorId != null && defaultCreatorId == null) {
       this.userCreatorId = userCreatorId;
     }
 
@@ -52,7 +56,7 @@ class ReadDailyProductSalesCubit extends Cubit<ReadDailyProductSalesState> {
 
   void clearFilters() {
     startDate = DateTimeTool.getTodayMidnight();
-    userCreatorId = null;
+    userCreatorId = defaultCreatorId;
     loadDailyProductSales(startDate: startDate);
   }
 }

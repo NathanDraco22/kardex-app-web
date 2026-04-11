@@ -1,4 +1,6 @@
 import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/src/modules/commercial/product_demand_vs_stock/product_demand_vs_stock_screen.dart';
+import 'package:kardex_app_front/src/modules/finance/daily_operations_results/daily_operations_results_screen.dart';
 import 'package:kardex_app_front/admin_panel/admin_modules/admin_reports/admin_reports_menu.dart';
 import 'package:kardex_app_front/admin_panel/admin_modules/admin_reports/daily_summary/daily_summary_screen.dart';
 import 'package:kardex_app_front/admin_panel/admin_modules/admin_reports/executive_summary/executive_summary_screen.dart';
@@ -316,6 +318,11 @@ class AppRouter {
             name: "proforma",
             builder: (context, state) => const ProformaScreen(),
           ),
+          GoRoute(
+            path: "product-demand-vs-stock",
+            name: "product-demand-vs-stock",
+            builder: (context, state) => const ProductDemandVsStockScreen(),
+          ),
         ],
       ),
 
@@ -481,6 +488,11 @@ class AppRouter {
             path: "branch-executive-summary",
             name: "branch-executive-summary",
             builder: (context, state) => const BranchExecutiveSummaryScreen(),
+          ),
+          GoRoute(
+            path: "daily-operations-results",
+            name: "daily-operations-results",
+            builder: (context, state) => const DailyOperationsResultsScreen(),
           ),
         ],
       ),
