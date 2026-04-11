@@ -18,7 +18,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
-          spacing: 8,
+          spacing: 16,
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

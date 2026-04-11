@@ -20,6 +20,7 @@ class OrderQueryParams {
     this.branchId,
     this.startDate,
     this.endDate,
+    this.createdBy,
   });
 
   Map<String, String> toQueryParameters() {

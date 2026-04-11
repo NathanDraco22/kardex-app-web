@@ -44,7 +44,7 @@ class _ContentSection extends StatelessWidget {
                     BasicTableColumn(
                       label: const Align(
                         alignment: Alignment.center,
-                        child: Text("Inventario", style: TextStyle(fontWeight: FontWeight.bold)),
+                        child: Text("Invent.", style: TextStyle(fontWeight: FontWeight.bold)),
                       ),
                     ),
                     BasicTableColumn(

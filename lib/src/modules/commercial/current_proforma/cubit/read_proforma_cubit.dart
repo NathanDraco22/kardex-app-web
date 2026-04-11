@@ -30,6 +30,7 @@ class ReadProformaCubit extends Cubit<ReadProformaState> {
           branchId: currentBranch,
           clientId: clientId,
           status: OrderStatus.draft,
+          createdBy: createdBy,
         ),
       );
 
