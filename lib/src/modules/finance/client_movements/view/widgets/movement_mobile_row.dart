@@ -103,11 +103,16 @@ class MovementMobileRow extends StatelessWidget {
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        Text(
-                          "#${currentTransaction.docNumber}".substring(0, 12),
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w500,
-                          ),
+                        Builder(
+                          builder: (context) {
+                            String docNumber = "#${currentTransaction.docNumber}";
+
+                            if (docNumber.length > 12) {
+                              docNumber = docNumber.substring(0, 10);
+                            }
+
+                            return Text(docNumber);
+                          },
                         ),
                       ],
                     ),
