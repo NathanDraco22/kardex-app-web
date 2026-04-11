@@ -14,6 +14,7 @@ import 'package:kardex_app_front/src/tools/loading_dialog.dart';
 import 'package:kardex_app_front/src/tools/session_tool.dart';
 import 'package:kardex_app_front/widgets/dialogs/branch_selection_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/search_product_in_branch_delegate.dart';
+import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
 
 import 'package:kardex_app_front/widgets/tables/transfer_product_table.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
@@ -396,38 +397,44 @@ class _MobileProductCardState extends State<_MobileProductCard> with AutomaticKe
             const Divider(),
             Row(
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text("Vencimiento"),
-                      const SizedBox(
-                        height: 6,
-                      ),
-
-                      TextField(
-                        autofocus: true,
-                        inputFormatters: [MonthYearInputFormatter()],
-                        textAlign: TextAlign.start,
-                        keyboardType: .number,
-                        textInputAction: .next,
-                        decoration: const InputDecoration(
-                          hintText: "mm/aa",
-                          isDense: true,
+                ExpirationDateGate(
+                  child: Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text("Vencimiento"),
+                        const SizedBox(
+                          height: 6,
                         ),
-                        onChanged: (value) {
-                          try {
-                            final date = DateTimeTool.fromMMYY(value);
-                            widget.row.expirationDate = date;
-                          } on Exception catch (_) {
-                            widget.row.expirationDate = null;
-                          }
-                        },
-                      ),
-                    ],
+
+                        TextField(
+                          autofocus: true,
+                          inputFormatters: [MonthYearInputFormatter()],
+                          textAlign: TextAlign.start,
+                          keyboardType: .number,
+                          textInputAction: .next,
+                          decoration: const InputDecoration(
+                            hintText: "mm/aa",
+                            isDense: true,
+                          ),
+                          onChanged: (value) {
+                            try {
+                              final date = DateTimeTool.fromMMYY(value);
+                              widget.row.expirationDate = date;
+                            } on Exception catch (_) {
+                              widget.row.expirationDate = null;
+                            }
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                const SizedBox(width: 16),
+
+                const ExpirationDateGate(
+                  child: SizedBox(width: 16),
+                ),
+
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

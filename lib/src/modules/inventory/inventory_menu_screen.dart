@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/constants/const_modules.dart';
 
 import 'package:kardex_app_front/src/tools/icon_widgets.dart';
+import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
 import 'package:kardex_app_front/widgets/menu_app_bar.dart';
 
 import 'package:kardex_app_front/widgets/dialogs/global_stock_search_modal.dart';
@@ -102,14 +103,16 @@ class _Body extends StatelessWidget {
           ),
           const Divider(height: 0.0),
 
-          ListTile(
-            leading: const Icon(
-              Icons.timer_sharp,
-              color: Colors.amber,
+          ExpirationDateGate(
+            child: ListTile(
+              leading: const Icon(
+                Icons.timer_sharp,
+                color: Colors.amber,
+              ),
+              title: const Text("Bitacora de Vencimientos"),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.pushNamed("expiration-logs"),
             ),
-            title: const Text("Bitacora de Vencimientos"),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => context.pushNamed("expiration-logs"),
           ),
           const Divider(height: 0.0),
 

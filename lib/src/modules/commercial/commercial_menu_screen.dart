@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/constants/const_modules.dart';
 import 'package:kardex_app_front/src/core/access_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/global_stock_search_modal.dart';
+import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
 import 'package:kardex_app_front/widgets/menu_app_bar.dart';
 
 class CommercialMenuScreen extends StatelessWidget {
@@ -326,13 +327,15 @@ class _Body extends StatelessWidget {
             thickness: 2,
           ),
 
-          ListTile(
-            leading: const Icon(
-              Icons.timer_sharp,
-              color: Colors.amber,
+          ExpirationDateGate(
+            child: ListTile(
+              leading: const Icon(
+                Icons.timer_sharp,
+                color: Colors.amber,
+              ),
+              title: const Text("Bitacora de Vencimientos"),
+              onTap: () => context.pushNamed("expiration-logs"),
             ),
-            title: const Text("Bitacora de Vencimientos"),
-            onTap: () => context.pushNamed("expiration-logs"),
           ),
           const Divider(height: 0.0),
         ],

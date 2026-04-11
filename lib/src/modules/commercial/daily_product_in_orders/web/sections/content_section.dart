@@ -46,16 +46,21 @@ class _ContentSection extends StatelessWidget {
                       flex: 3,
                     ),
                     BasicTableColumn(
-                      label: const Text(
-                        "Cantidad",
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                      label: const Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          "Cant.",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                       ),
-                      flex: 2,
                     ),
                     BasicTableColumn(
-                      label: const Text(
-                        "Importe",
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                      label: const Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          "Importe",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                       ),
                       flex: 2,
                     ),
@@ -71,11 +76,17 @@ class _ContentSection extends StatelessWidget {
                           content: Text(productSale.productName),
                         ),
                         BasicTableCell(
-                          content: Text(productSale.totalUnits.toString()),
+                          content: Align(
+                            alignment: Alignment.center,
+                            child: Text(productSale.totalUnits.toString()),
+                          ),
                         ),
                         BasicTableCell(
-                          content: Text(
-                            NumberFormatter.convertToMoneyLike(productSale.total),
+                          content: Align(
+                            alignment: Alignment.center,
+                            child: Text(
+                              NumberFormatter.convertFromCentsToUnitsCurrency(productSale.total),
+                            ),
                           ),
                         ),
                       ],

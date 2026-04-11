@@ -5,6 +5,7 @@ import 'package:kardex_app_front/src/domain/models/product/product_model.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/input_formatter/input_formatter.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
 
 class TransferProductRow {
   TransferProductRow({
@@ -165,9 +166,11 @@ class _HeaderTable extends StatelessWidget {
             child: Text("Nombre del Producto"),
           ),
 
-          Flexible(
-            fit: FlexFit.tight,
-            child: Center(child: Text("F. Vencimiento")),
+          ExpirationDateGate(
+            child: Flexible(
+              fit: FlexFit.tight,
+              child: Center(child: Text("F. Vencimiento")),
+            ),
           ),
           Flexible(
             fit: FlexFit.tight,
@@ -378,28 +381,31 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
               ],
             ),
           ),
-          Flexible(
-            fit: FlexFit.tight,
-            child: Center(
-              child: TextField(
-                focusNode: expirationFocus,
-                inputFormatters: [MonthYearInputFormatter()],
-                textAlign: TextAlign.center,
-                onEditingComplete: () {
-                  FocusScope.of(context).nextFocus();
-                },
-                decoration: const InputDecoration(
-                  hintText: "mm/aa",
-                  isDense: true,
+
+          ExpirationDateGate(
+            child: Flexible(
+              fit: FlexFit.tight,
+              child: Center(
+                child: TextField(
+                  focusNode: expirationFocus,
+                  inputFormatters: [MonthYearInputFormatter()],
+                  textAlign: TextAlign.center,
+                  onEditingComplete: () {
+                    FocusScope.of(context).nextFocus();
+                  },
+                  decoration: const InputDecoration(
+                    hintText: "mm/aa",
+                    isDense: true,
+                  ),
+                  onChanged: (value) {
+                    try {
+                      final date = DateTimeTool.fromMMYY(value);
+                      widget.rowModel.expirationDate = date;
+                    } on Exception catch (_) {
+                      widget.rowModel.expirationDate = null;
+                    }
+                  },
                 ),
-                onChanged: (value) {
-                  try {
-                    final date = DateTimeTool.fromMMYY(value);
-                    widget.rowModel.expirationDate = date;
-                  } on Exception catch (_) {
-                    widget.rowModel.expirationDate = null;
-                  }
-                },
               ),
             ),
           ),

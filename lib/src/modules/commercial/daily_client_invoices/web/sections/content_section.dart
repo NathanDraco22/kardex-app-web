@@ -47,15 +47,6 @@ class _ContentSection extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      flex: 1,
-                    ),
-                    BasicTableColumn(
-                      label: const Text(
-                        "Cliente",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
                       flex: 2,
                     ),
                     BasicTableColumn(
@@ -72,11 +63,9 @@ class _ContentSection extends StatelessWidget {
                     final rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
 
                     final currentInvoice = invoices[index];
-                    final totalPaid = NumberFormatter.convertToMoneyLike(currentInvoice.total);
+                    final totalPaid = NumberFormatter.convertFromCentsToUnitsCurrency(currentInvoice.total);
 
-                    final paidDate = currentInvoice.paidAt ?? DateTime.now();
-                    final paidAtFormatted = "${DateTimeTool.formatddMMyy(paidDate)} ${DateTimeTool.formatHHmm(paidDate)}";
-
+                    final createdAt = currentInvoice.createdAt;
                     final clientName = currentInvoice.clientInfo.name;
 
                     return BasicTableRow(
@@ -86,16 +75,25 @@ class _ContentSection extends StatelessWidget {
                       color: rowColor,
                       cells: [
                         BasicTableCell(
-                          content: Text(paidAtFormatted),
+                          content: Column(
+                            crossAxisAlignment: .start,
+                            children: [
+                              Text(DateTimeTool.formatddMMyy(createdAt)),
+                              Text(DateTimeTool.formatHHmm(createdAt)),
+                            ],
+                          ),
                         ),
                         BasicTableCell(
-                          content: Text("#${currentInvoice.docNumber}"),
-                        ),
-                        BasicTableCell(
-                          content: Text(
-                            clientName,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
+                          content: Column(
+                            crossAxisAlignment: .start,
+                            children: [
+                              Text("#${currentInvoice.docNumber}"),
+                              Text(
+                                clientName,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
                           ),
                         ),
                         BasicTableCell(

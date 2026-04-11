@@ -61,7 +61,7 @@ class _ContentSection extends StatelessWidget {
 
           return ListView.separated(
             separatorBuilder: (context, index) => const Divider(height: 2.0, thickness: 2),
-            padding: const EdgeInsets.only(bottom: 40, left: 8, right: 8),
+            padding: const EdgeInsets.only(bottom: 40, right: 4, left: 4),
             itemCount: invoices.length,
             itemBuilder: (context, index) {
               final tileColor = index.isOdd ? Colors.white : Colors.grey.shade200;
@@ -162,7 +162,7 @@ class _DevolutionDialog extends StatelessWidget {
                 showDevolutionViewerDialog(context, currentDevolutions);
               },
               subtitle: Text(
-                DateTimeTool.formatddMMyy(currentDevolutions.createdAt),
+                DateTimeTool.formatddMMyyEs(currentDevolutions.createdAt),
               ),
               trailing: Text(
                 NumberFormatter.convertToMoneyLike(currentDevolutions.total),

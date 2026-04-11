@@ -5,6 +5,7 @@ import 'package:kardex_app_front/src/tools/input_formatter/input_formatter.dart'
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/calculator/calculator_field.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/custom_product_search_delegate.dart';
+import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
 
 class ProductRowCard {
@@ -285,30 +286,32 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
                     color: Colors.black12,
                   ),
                   if (rowCard.haveExpirationDate)
-                    Row(
-                      children: [
-                        Flexible(
-                          fit: FlexFit.tight,
-                          child: TitleTextField(
-                            focusNode: expirationDateFocusNode,
-                            inputFormatters: [MonthYearInputFormatter()],
-                            titleTextAlign: TextAlign.center,
-                            keyboardType: TextInputType.number,
-                            textInputAction: .next,
-                            onEditingComplete: () => FocusScope.of(context).nextFocus(),
-                            title: "F. Vencimiento",
-                            onChanged: (value) {
-                              try {
-                                final date = DateTimeTool.fromMMYY(value);
-                                rowCard.expirationDate = date;
-                              } catch (e) {
-                                rowCard.expirationDate = null;
-                              }
-                            },
+                    ExpirationDateGate(
+                      child: Row(
+                        children: [
+                          Flexible(
+                            fit: FlexFit.tight,
+                            child: TitleTextField(
+                              focusNode: expirationDateFocusNode,
+                              inputFormatters: [MonthYearInputFormatter()],
+                              titleTextAlign: TextAlign.center,
+                              keyboardType: TextInputType.number,
+                              textInputAction: .next,
+                              onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                              title: "F. Vencimiento",
+                              onChanged: (value) {
+                                try {
+                                  final date = DateTimeTool.fromMMYY(value);
+                                  rowCard.expirationDate = date;
+                                } catch (e) {
+                                  rowCard.expirationDate = null;
+                                }
+                              },
+                            ),
                           ),
-                        ),
-                        const Spacer(),
-                      ],
+                          const Spacer(),
+                        ],
+                      ),
                     ),
 
                   Row(

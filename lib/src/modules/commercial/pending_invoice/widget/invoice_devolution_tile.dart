@@ -85,7 +85,7 @@ class InvoiceDevolutionTile extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(width: 16),
+            const VerticalDivider(),
 
             // --- Contenido Principal (antes 'title' y 'subtitle') ---
             Expanded(
@@ -93,9 +93,16 @@ class InvoiceDevolutionTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    "Fact#${invoice.docNumber}",
-                    style: Theme.of(context).textTheme.titleMedium,
+                  Builder(
+                    builder: (context) {
+                      String docNumber = "#${invoice.docNumber}";
+
+                      if (docNumber.length > 12) {
+                        docNumber = docNumber.substring(0, 10);
+                      }
+
+                      return Text(docNumber);
+                    },
                   ),
 
                   if (targetDevolution.isNotEmpty)
@@ -110,13 +117,13 @@ class InvoiceDevolutionTile extends StatelessWidget {
                     Text(
                       NumberFormatter.convertToMoneyLike(invoice.totalRemaining),
                       style: const TextStyle(
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                 ],
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 8),
 
             // --- Checkbox (antes el 'trailing') ---
           ],

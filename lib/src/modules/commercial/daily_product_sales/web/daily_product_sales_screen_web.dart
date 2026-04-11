@@ -12,6 +12,7 @@ import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/product_by_user_template.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 import 'package:kardex_app_front/widgets/dialogs/export_options_dialog.dart';
+import 'package:kardex_app_front/src/tools/branches_tool.dart';
 
 part 'sections/content_section.dart';
 part 'sections/header_section.dart';

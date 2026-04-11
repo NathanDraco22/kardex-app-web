@@ -116,7 +116,7 @@ class _RootScaffold extends StatelessWidget {
 
         if (state is WriteOrderToInvoiceSuccess) {
           LoadingDialogManager.closeLoadingDialog(context);
-          String message = "Proforma convertida a factura con éxito";
+          String message = "Cotización convertida a factura con éxito";
           await DialogManager.showInfoDialog(context, message);
           if (!context.mounted) return;
           final readCubit = context.read<ReadProformaCubit>();
@@ -201,7 +201,7 @@ class _RootScaffold extends StatelessWidget {
                       writeCubit.deleteOrderDraft(orderContainer.order.id);
                     },
                     icon: const Icon(Icons.cancel),
-                    label: const Text("Borrar Proforma"),
+                    label: const Text("Cancelar"),
                   ),
                   const SizedBox(width: 32),
                   ElevatedButton.icon(
@@ -214,7 +214,7 @@ class _RootScaffold extends StatelessWidget {
                       writeCubit.convertOrderToInvoice(orderContainer.order.id);
                     },
                     icon: const Icon(Icons.check),
-                    label: const Text("Facturar Proforma"),
+                    label: const Text("Facturar"),
                   ),
                 ],
               );
@@ -278,18 +278,29 @@ class _BodyState extends State<_Body> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "Orden: ${order.docNumber}",
+                              "#${order.docNumber}",
                               style: const TextStyle(
                                 fontSize: 16,
-                                fontWeight: FontWeight.w500,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
-                            Text(
-                              DateTimeTool.formatddMMyy(order.createdAt),
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
+                            Column(
+                              children: [
+                                Text(
+                                  DateTimeTool.formatddMMyyEs(order.createdAt),
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                Text(
+                                  DateTimeTool.formatHHmm(order.createdAt),
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -314,8 +325,21 @@ class _BodyState extends State<_Body> {
                           order.clientInfo.name,
                           style: const TextStyle(
                             fontSize: 16,
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.w600,
                           ),
+                        ),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.person,
+                              size: 16,
+                              color: Colors.grey,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              order.createdBy.name,
+                            ),
+                          ],
                         ),
                         Text(
                           order.description,
@@ -328,7 +352,7 @@ class _BodyState extends State<_Body> {
                           "Total: $totalFormatted",
                           style: const TextStyle(
                             fontSize: 16,
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.w600,
                           ),
                           textAlign: TextAlign.end,
                         ),

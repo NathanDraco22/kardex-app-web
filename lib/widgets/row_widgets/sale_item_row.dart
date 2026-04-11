@@ -31,7 +31,7 @@ class _SaleItemRowState extends State<SaleItemRow> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 48,
+      height: 60,
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -77,6 +77,8 @@ class _SaleItemRowState extends State<SaleItemRow> {
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       Row(
                         children: [
@@ -101,13 +103,13 @@ class _SaleItemRowState extends State<SaleItemRow> {
                   child: Center(
                     child: Builder(
                       builder: (context) {
-                        final price = NumberFormatter.convertToMoneyLike(
+                        final price = NumberFormatter.convertFromCentsToUnitsCurrency(
                           widget.saleItem.total,
                         );
                         return Text(
                           price,
                           style: const TextStyle(
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.w600,
                           ),
                         );
                       },
