@@ -103,13 +103,13 @@ class _SaleItemRowState extends State<SaleItemRow> {
                   child: Center(
                     child: Builder(
                       builder: (context) {
-                        final price = NumberFormatter.convertToMoneyLike(
+                        final price = NumberFormatter.convertFromCentsToUnitsCurrency(
                           widget.saleItem.total,
                         );
                         return Text(
                           price,
                           style: const TextStyle(
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.w600,
                           ),
                         );
                       },

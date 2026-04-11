@@ -93,8 +93,16 @@ class InvoiceDevolutionTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    "#${invoice.docNumber}".substring(0, 12),
+                  Builder(
+                    builder: (context) {
+                      String docNumber = "#${invoice.docNumber}";
+
+                      if (docNumber.length > 12) {
+                        docNumber = docNumber.substring(0, 10);
+                      }
+
+                      return Text(docNumber);
+                    },
                   ),
 
                   if (targetDevolution.isNotEmpty)

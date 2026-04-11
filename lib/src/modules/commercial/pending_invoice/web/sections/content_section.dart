@@ -162,7 +162,7 @@ class _DevolutionDialog extends StatelessWidget {
                 showDevolutionViewerDialog(context, currentDevolutions);
               },
               subtitle: Text(
-                DateTimeTool.formatddMMyy(currentDevolutions.createdAt),
+                DateTimeTool.formatddMMyyEs(currentDevolutions.createdAt),
               ),
               trailing: Text(
                 NumberFormatter.convertToMoneyLike(currentDevolutions.total),
