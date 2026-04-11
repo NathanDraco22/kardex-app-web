@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/commercial/daily_product_in_orders/web/daily_product_in_orders_screen_web.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
+import 'package:kardex_app_front/src/tools/role_tools.dart';
 
 import 'cubit/read_daily_product_in_orders_cubit.dart';
 
@@ -12,10 +13,12 @@ class DailyProductInOrdersScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final orderRepo = context.read<OrdersRepository>();
+    final (isSellerRole, userInDb) = RoleTools.isSeller(context);
     return BlocProvider(
       create: (context) =>
           ReadDailyProductInOrdersCubit(
             ordersRepository: orderRepo,
+            defaultCreatorId: isSellerRole ? userInDb?.id : null,
           )..loadDailyProductInOrders(
             startDate: DateTimeTool.getTodayMidnight(),
           ),

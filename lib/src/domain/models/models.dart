@@ -5,6 +5,8 @@ export 'client/client_model.dart';
 export 'entry_doc/entry_doc.dart';
 export 'entry_doc/entry_doc_model.dart';
 export 'common/exit_items.dart';
+export 'common/product_stock_demand.dart';
+
 
 export 'exit_doc/exit_doc.dart';
 export 'exit_doc/exit_doc_model.dart';
@@ -23,3 +25,4 @@ export 'unit/unit.dart';
 export 'unit/unit_model.dart';
 export 'integration/integration_model.dart';
 export 'integration/telegram_integration.dart';
+export 'reports/totals_result.dart';

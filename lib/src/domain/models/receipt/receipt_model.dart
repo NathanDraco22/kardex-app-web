@@ -6,7 +6,23 @@ enum PaymentMethod {
   transfer,
   card,
   check,
-  other,
+  other
+  ;
+
+  String get display {
+    switch (this) {
+      case PaymentMethod.cash:
+        return "Efectivo";
+      case PaymentMethod.transfer:
+        return "Transferencia";
+      case PaymentMethod.card:
+        return "Tarjeta";
+      case PaymentMethod.check:
+        return "Cheque";
+      case PaymentMethod.other:
+        return "Otro";
+    }
+  }
 }
 
 class AppliedInvoice {

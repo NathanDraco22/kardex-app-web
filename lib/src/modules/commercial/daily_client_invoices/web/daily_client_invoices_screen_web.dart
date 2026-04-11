@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/cubits/daily_client_invoices/read_daily_client_invoices_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/user/user_model.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
+import 'package:kardex_app_front/src/tools/role_tools.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/basic_table_listview.dart';
 import 'package:kardex_app_front/widgets/date_picker_listile.dart';
@@ -59,7 +60,7 @@ class _BottomAppBar extends StatelessWidget {
         children: [
           TitleLabel(
             crossAxisAlignment: CrossAxisAlignment.center,
-            title: "Monto Total Pagado",
+            title: "Total",
             bigTitle: formattedTotalPaid,
           ),
         ],

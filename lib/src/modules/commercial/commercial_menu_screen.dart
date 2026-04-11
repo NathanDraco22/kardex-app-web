@@ -187,6 +187,19 @@ class _Body extends StatelessWidget {
             ),
 
           const Divider(height: 0.0),
+          if (accessManager.hasCurrentAccess(context, CommercialSubModules.createInvoice))
+            ListTile(
+              leading: Icon(
+                Icons.analytics_outlined,
+                size: 32,
+                color: Colors.blue.shade800,
+              ),
+              title: const Text("Cotizaciones vs Existencias"),
+              onTap: () {
+                context.pushNamed("product-demand-vs-stock");
+              },
+            ),
+          const Divider(height: 0.0),
 
           const Divider(
             height: 4.0,
