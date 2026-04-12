@@ -199,7 +199,7 @@ class _Body extends StatelessWidget {
                           ),
                           TextButton(
                             onPressed: () {
-                              showInvoiceViewerDialogFromId(context, devolution.originalInvoiceId);
+                              showInvoiceViewerDialogFromDocNumber(context, devolution.originalInvoiceId);
                             },
                             child: const Text("Ver Factura"),
                           ),

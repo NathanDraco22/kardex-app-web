@@ -44,34 +44,44 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Padding(
-        padding: EdgeInsets.all(8.0),
-        child: Column(
-          spacing: 8,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(
-              height: 100,
-              child: Card(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Clientes con Atraso de Pago",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
+    return NotificationListener(
+      onNotification: (notification) {
+        if (notification is ScrollNotification) {
+          if (notification.metrics.pixels >= notification.metrics.maxScrollExtent * 0.7) {
+            context.read<ReadPendingClientCubit>().getNextPage();
+          }
+        }
+        return false;
+      },
+      child: const Center(
+        child: Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Column(
+            spacing: 8,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(
+                height: 100,
+                child: Card(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Clientes con Atraso de Pago",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-            Expanded(
-              child: _Content(),
-            ),
-          ],
+              Expanded(
+                child: _Content(),
+              ),
+            ],
+          ),
         ),
       ),
     );

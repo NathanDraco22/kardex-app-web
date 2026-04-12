@@ -206,7 +206,7 @@ Iterable<Widget> _buildInvoiceRows(BuildContext context, List<AppliedInvoice> in
       tileColor: tileColor,
       minTileHeight: 40,
       onTap: () {
-        showInvoiceViewerDialogFromId(context, currentInvoice.invoiceId);
+        showInvoiceViewerDialogFromDocNumber(context, currentInvoice.invoiceId);
       },
       title: Text(
         "#${currentInvoice.docNumber}",
