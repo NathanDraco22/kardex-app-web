@@ -44,7 +44,7 @@ class MovementMobileRow extends StatelessWidget {
         onTap: () {
           switch (currentTransaction.subtype) {
             case TransactionSubType.invoice:
-              showInvoiceViewerDialogFromId(context, currentTransaction.documentId);
+              showInvoiceViewerDialogFromDocNumber(context, currentTransaction.docNumber);
               break;
             case TransactionSubType.receipt:
               showReceiptViewerDialogFromDocNumber(context, currentTransaction.docNumber);

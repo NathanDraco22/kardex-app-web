@@ -35,7 +35,7 @@ Future<void> showInvoiceViewerDialog(BuildContext context, InvoiceInDb invoice) 
   );
 }
 
-Future<void> showInvoiceViewerDialogFromId(BuildContext context, String invoiceId) async {
+Future<void> showInvoiceViewerDialogFromDocNumber(BuildContext context, String docNumber) async {
   final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
   final paperSize = await PrintManager.getLocalPaperSize();
   if (!context.mounted) return;
@@ -45,7 +45,7 @@ Future<void> showInvoiceViewerDialogFromId(BuildContext context, String invoiceI
     MaterialPageRoute(
       builder: (context) {
         return FutureBuilder(
-          future: context.read<InvoicesRepository>().getInvoiceById(invoiceId),
+          future: context.read<InvoicesRepository>().getInvoiceByDocNumber(docNumber),
           builder: (context, asyncSnapshot) {
             if (asyncSnapshot.connectionState != ConnectionState.done) {
               return Scaffold(
