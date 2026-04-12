@@ -61,7 +61,7 @@ class _Body extends StatelessWidget {
     if (isMobile) {
       return const ClientInvoicesScreenMobile(
         pageTitle: "Proforma / Cotización",
-        actionButtonLabel: "Finalizar Cotización",
+        actionButtonLabel: "Enviar Cotización",
       );
     }
 

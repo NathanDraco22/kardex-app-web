@@ -4,6 +4,7 @@ import 'package:kardex_app_front/src/domain/models/product/product_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
+import 'package:kardex_app_front/src/tools/input_formatters.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/widgets/display_product_code.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
@@ -62,6 +63,25 @@ class _QuickProductSearchDelegateState extends State<QuickProductSearchDelegate>
           _cart.remove(product.id);
         }
       }
+    });
+  }
+
+  void _setProductQuantity(ProductInDbInBranch product, int newQuantity) {
+    setState(() {
+      if (newQuantity <= 0) {
+        _cart.remove(product.id);
+        return;
+      }
+
+      int finalQuantity = newQuantity;
+      if (widget.restrictStock && newQuantity > product.account.availableStock) {
+        finalQuantity = product.account.availableStock;
+      }
+
+      if (!_cart.containsKey(product.id)) {
+        _cart[product.id] = CommercialProductResult(product: product);
+      }
+      _cart[product.id]!.quantity = finalQuantity;
     });
   }
 
@@ -149,6 +169,10 @@ class _QuickProductSearchDelegateState extends State<QuickProductSearchDelegate>
             color: quantity > 0 ? Colors.amber.shade50 : Colors.white,
             onIncrement: canIncrement ? () => _incrementProduct(product) : null,
             onDecrement: quantity > 0 ? () => _decrementProduct(product) : null,
+            onQuantityChanged: (value) {
+              final newQuantity = int.tryParse(value) ?? 0;
+              _setProductQuantity(product, newQuantity);
+            },
           );
         },
       ),
@@ -156,12 +180,13 @@ class _QuickProductSearchDelegateState extends State<QuickProductSearchDelegate>
   }
 }
 
-class _ProductInBranchQuickResultRow extends StatelessWidget {
+class _ProductInBranchQuickResultRow extends StatefulWidget {
   const _ProductInBranchQuickResultRow({
     required this.product,
     required this.quantity,
     this.onIncrement,
     this.onDecrement,
+    required this.onQuantityChanged,
     this.color,
   });
 
@@ -169,15 +194,45 @@ class _ProductInBranchQuickResultRow extends StatelessWidget {
   final int quantity;
   final VoidCallback? onIncrement;
   final VoidCallback? onDecrement;
+  final ValueChanged<String> onQuantityChanged;
   final Color? color;
 
   @override
+  State<_ProductInBranchQuickResultRow> createState() => _ProductInBranchQuickResultRowState();
+}
+
+class _ProductInBranchQuickResultRowState extends State<_ProductInBranchQuickResultRow> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.quantity == 0 ? "" : widget.quantity.toString());
+  }
+
+  @override
+  void didUpdateWidget(covariant _ProductInBranchQuickResultRow oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.quantity != widget.quantity) {
+      if (int.tryParse(_controller.text) != widget.quantity) {
+        _controller.text = widget.quantity == 0 ? "" : widget.quantity.toString();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    int value = product.saleProfile.salePrice;
+    int value = widget.product.saleProfile.salePrice;
     String valueToDisplay = NumberFormatter.convertToMoneyLike(value);
 
     return DecoratedBox(
-      decoration: BoxDecoration(color: color),
+      decoration: BoxDecoration(color: widget.color),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
         child: Column(
@@ -191,10 +246,10 @@ class _ProductInBranchQuickResultRow extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      DisplayProductCode(product: product),
+                      DisplayProductCode(product: widget.product),
                       const SizedBox(height: 4),
                       Text(
-                        "${product.brandName} - ${product.unitName}",
+                        "${widget.product.brandName} - ${widget.product.unitName}",
                         style: const TextStyle(fontSize: 14, color: Colors.grey),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -217,10 +272,10 @@ class _ProductInBranchQuickResultRow extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        "Stock: ${product.account.availableStock}",
+                        "Stock: ${widget.product.account.availableStock}",
                         style: TextStyle(
                           fontSize: 13,
-                          color: product.account.availableStock > 0 ? Colors.green.shade700 : Colors.red,
+                          color: widget.product.account.availableStock > 0 ? Colors.green.shade700 : Colors.red,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -232,49 +287,63 @@ class _ProductInBranchQuickResultRow extends StatelessWidget {
             const SizedBox(height: 12),
             // Controles del Carrito + y - más grandes
             Row(
+              spacing: 4,
               mainAxisAlignment: MainAxisAlignment.center,
+
               children: [
                 Expanded(
                   child: FilledButton(
-                    onPressed: onDecrement,
+                    onPressed: widget.onDecrement,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                       foregroundColor: Colors.white,
                       disabledBackgroundColor: Colors.grey.shade100,
-                      disabledForegroundColor: Colors.grey.shade400,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      disabledForegroundColor: Colors.grey.shade300,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                       elevation: 0,
                     ),
-                    child: const Icon(Icons.remove, size: 18),
+                    child: const Icon(Icons.remove, size: 24),
                   ),
                 ),
                 SizedBox(
-                  width: 80,
-                  child: Text(
-                    quantity.toString(),
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                  width: 140,
+                  height: 60,
+                  child: Center(
+                    child: TextField(
+                      decoration: const InputDecoration(
+                        isDense: true,
+                        contentPadding: EdgeInsets.all(12),
+                      ),
+                      controller: _controller,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      inputFormatters: [IntegerTextInputFormatter()],
+                      keyboardType: TextInputType.number,
+                      onChanged: widget.onQuantityChanged,
                     ),
                   ),
                 ),
                 Expanded(
                   child: FilledButton(
-                    onPressed: onIncrement,
+                    onPressed: widget.onIncrement,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      disabledBackgroundColor: Colors.grey.shade100,
+                      disabledForegroundColor: Colors.grey.shade300,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                       elevation: 0,
                     ),
-                    child: const Icon(Icons.add, size: 20),
+                    child: const Icon(Icons.add, size: 24),
                   ),
                 ),
               ],

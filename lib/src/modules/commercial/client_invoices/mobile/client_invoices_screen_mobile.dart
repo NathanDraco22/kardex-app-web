@@ -171,14 +171,14 @@ class _Body extends StatelessWidget {
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.grey,
-                                  fontSize: 16,
+                                  fontSize: 18,
                                 ),
                               ),
                               TextSpan(
                                 text: viewController.totalItems.toString(),
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 16,
+                                  fontSize: 18,
                                 ),
                               ),
                             ],
@@ -193,14 +193,14 @@ class _Body extends StatelessWidget {
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.grey,
-                                  fontSize: 16,
+                                  fontSize: 18,
                                 ),
                               ),
                               TextSpan(
                                 text: formattedTotal,
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 16,
+                                  fontSize: 18,
                                   color: Colors.green.shade700,
                                 ),
                               ),
