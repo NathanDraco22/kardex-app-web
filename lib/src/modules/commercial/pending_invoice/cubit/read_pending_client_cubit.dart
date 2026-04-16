@@ -15,6 +15,8 @@ class ReadPendingClientCubit extends Cubit<ReadPendingClientState> {
   bool _isLastPage = false;
 
   Future<void> loadPendingClients() async {
+    clientQueryParams.limit = 500;
+
     emit(ReadPendingClientLoading());
     try {
       final clients = await clientRepository.getClientWithBalance(clientQueryParams);
@@ -33,9 +35,12 @@ class ReadPendingClientCubit extends Cubit<ReadPendingClientState> {
 
     if (currentState is! ReadPendingClientSuccess) return;
 
+    if (currentState is ReadNextPagePendingClientSuccess) return;
+
     if (_isLastPage) return;
 
     try {
+      emit(ReadNextPagePendingClientSuccess(currentState.clients));
       final clients = await clientRepository.getClientWithBalance(clientQueryParams);
       clientQueryParams.offset += clients.length;
       if (clients.length < clientQueryParams.limit) _isLastPage = true;
