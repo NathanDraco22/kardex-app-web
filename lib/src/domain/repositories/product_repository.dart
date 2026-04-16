@@ -27,7 +27,7 @@ class ProductsRepository {
   }
 
   Future<List<ProductInDb>> searchProductByKeyword(String keyword) async {
-    final result = await productsDataSource.searchProductByKeyword(keyword);
+    final result = await productsDataSource.searchProductByKeyword(keyword.trim());
     final response = ListResponse<ProductInDb>.fromJson(
       result,
       ProductInDb.fromJson,
@@ -50,7 +50,7 @@ class ProductsRepository {
   }
 
   Future<List<ProductInDbInBranch>> searchProductInBranch(String keyword) async {
-    final result = await productsDataSource.searchProductInBranch(keyword);
+    final result = await productsDataSource.searchProductInBranch(keyword.trim());
     final response = ListResponse<ProductInDbInBranch>.fromJson(
       result,
       ProductInDbInBranch.fromJson,
