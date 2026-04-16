@@ -94,7 +94,7 @@ class _Header extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
           Center(
             child: SegmentedButton<int>(
               segments: const [

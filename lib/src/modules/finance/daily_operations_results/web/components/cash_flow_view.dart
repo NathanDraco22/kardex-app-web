@@ -97,7 +97,7 @@ class _TotalsHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(4.0),
       color: Colors.grey.shade50,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -113,7 +113,7 @@ class _TotalsHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
               color: Colors.green.shade50,
               borderRadius: BorderRadius.circular(12),
