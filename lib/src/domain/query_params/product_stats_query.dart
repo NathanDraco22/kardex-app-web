@@ -27,7 +27,7 @@ class ReadProductStatQueryParams {
 
   Map<String, String> toQueryMap() {
     return {
-      if (branchId != null) 'branchId': branchId!,
+      'branchId': ?branchId,
     };
   }
 }
