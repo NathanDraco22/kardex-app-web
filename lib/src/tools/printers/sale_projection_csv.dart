@@ -45,7 +45,7 @@ class SaleProjectionCsv {
     final now = DateTime.now();
     final fileName = "proyeccion_ventas_${DateTimeTool.formatddMMyy(now)}.csv";
 
-    final outputFile = await FilePicker.platform.saveFile(
+    final outputFile = await FilePicker.saveFile(
       dialogTitle: 'Guardar Proyección de Ventas',
       fileName: fileName,
       type: FileType.custom,

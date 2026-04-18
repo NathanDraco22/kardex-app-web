@@ -23,8 +23,8 @@ class ClientTransactionQueryParams {
 
   Map<String, String> toMap() {
     return {
-      if (branchId != null) 'branchId': branchId!,
-      if (clientId != null) 'clientId': clientId!,
+      'branchId': ?branchId,
+      'clientId': ?clientId,
       if (endDate != null) 'endDate': endDate!.toString(),
       if (startDate != null) 'startDate': startDate!.toString(),
       if (type != null) 'type': type!.name,
