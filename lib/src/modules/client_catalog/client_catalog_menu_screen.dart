@@ -4,7 +4,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/constants/const_modules.dart';
 import 'package:kardex_app_front/widgets/dialogs/client_full_details_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/simple_search_dialog.dart';
+import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
+import 'package:kardex_app_front/src/tools/branches_tool.dart';
+import 'package:kardex_app_front/src/tools/exports/pdf/templates/clients_catalog_template.dart';
+import 'package:kardex_app_front/src/tools/tools.dart';
 
 import '../../domain/repositories/client_repository.dart';
 
@@ -101,6 +106,32 @@ class _Body extends StatelessWidget {
             title: const Text("Grupos de Clientes"),
             onTap: () {
               context.pushNamed("client-groups");
+            },
+            trailing: const Icon(Icons.chevron_right),
+          ),
+          const Divider(
+            height: 0.0,
+          ),
+          ListTile(
+            leading: const Icon(Icons.picture_as_pdf),
+            title: const Text("Exportar Clientes (PDF)"),
+            onTap: () async {
+              LoadingDialogManager.showLoadingDialog(context);
+              try {
+                final clientRepo = context.read<ClientsRepository>();
+                final clientsList = await clientRepo.getAllClients();
+                final template = ClientsCatalogTemplate(
+                  branchName: BranchesTool.getCurrentBranchName(),
+                  clients: clientsList,
+                );
+                await PdfExportTool.export(template, fileName: "catalogo_clientes.pdf");
+                if (context.mounted) Navigator.pop(context); // Cerrar loader
+              } catch (e) {
+                if (context.mounted) {
+                  Navigator.pop(context); // Cerrar loader
+                  DialogManager.showErrorDialog(context, e.toString());
+                }
+              }
             },
             trailing: const Icon(Icons.chevron_right),
           ),
