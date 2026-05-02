@@ -55,6 +55,7 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
     if (widget.client != null) {
       creationMap['coordinates'] = widget.client!.coordinates;
       creationMap['personalReferences'] = List<PersonalReference>.from(widget.client!.personalReferences);
+      creditLimit = widget.client!.creditLimit;
     } else {
       creationMap['personalReferences'] = <PersonalReference>[];
     }
@@ -427,6 +428,29 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
                         );
                       },
                     ),
+
+                    if (isCreditActive) ...[
+                      const SizedBox(height: 12),
+                      TitleTextField(
+                        key: const ValueKey("creditLimit_field"),
+                        title: "Limite de Credito",
+                        initialValue: (creditLimit / 100).toStringAsFixed(2),
+                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            creditLimit = 0;
+                          } else {
+                            final parsed = double.tryParse(value.replaceAll(',', ''));
+                            if (parsed != null) {
+                              creditLimit = (parsed * 100).toInt();
+                            }
+                          }
+                          creationMap["creditLimit"] = creditLimit;
+                          return null;
+                        },
+                      ),
+                    ],
 
                     if (currentClient != null) ...[
                       const Divider(),

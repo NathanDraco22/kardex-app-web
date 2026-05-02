@@ -37,4 +37,8 @@ Esta estructura se ha seguido para módulos como 'Historial de Facturas', 'Histo
 - `ClientShortInfo`: Muestra ID, Nombre, Cédula, Ubicación y Dirección de un cliente con iconos y estilos estandarizados.
 - Se ha refactorizado `ClientListTile` y `ClientsTable` para utilizar `ClientShortInfo`, asegurando consistencia visual y eliminando código duplicado.
 - `ClientListTile` en `lib/widgets/client_list_tile.dart` usa una estructura basada en `Row` e `InkWell` para mayor flexibilidad. Soporta un `backgroundColor` personalizado.
-
+## Catálogo de Clientes
+- **Límite de Crédito**: Se ha habilitado la visualización y edición del campo `creditLimit`.
+  - En `client_full_details_dialog.dart`, se muestra el límite formateado como moneda (`C\$`).
+  - En `create_client_dialog.dart`, se ha añadido un campo de entrada numérica que se activa solo si "Crédito Activo" está habilitado.
+  - El valor se almacena como `int` (multiplicado por 100) para manejar decimales de forma consistente con otros campos financieros del proyecto.
