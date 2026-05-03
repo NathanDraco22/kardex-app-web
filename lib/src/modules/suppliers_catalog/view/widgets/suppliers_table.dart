@@ -136,66 +136,69 @@ class _RowWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Ink(
-      color: color,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Row(
-          children: [
-            Flexible(
-              fit: FlexFit.tight,
-              flex: 2,
-              child: Text(supplier.name),
-            ),
-            Flexible(
-              fit: FlexFit.tight,
-              child: Text(supplier.phone ?? "--"),
-            ),
-            Flexible(
-              fit: FlexFit.tight,
-              child: Text(supplier.email ?? "--"),
-            ),
+    return Material(
+      color: Colors.transparent,
+      child: Ink(
+        color: color,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Row(
+            children: [
+              Flexible(
+                fit: FlexFit.tight,
+                flex: 2,
+                child: Text(supplier.name),
+              ),
+              Flexible(
+                fit: FlexFit.tight,
+                child: Text(supplier.phone ?? "--"),
+              ),
+              Flexible(
+                fit: FlexFit.tight,
+                child: Text(supplier.email ?? "--"),
+              ),
 
-            Flexible(
-              fit: FlexFit.tight,
-              child: Center(
-                child: Builder(
-                  builder: (context) {
-                    if (supplier.isActive) {
-                      return const StatusTagLabel(
-                        label: "Activo",
-                        isActive: true,
-                      );
-                    } else {
-                      return const StatusTagLabel(
-                        label: "Inactivo",
-                        isActive: false,
-                      );
-                    }
-                  },
+              Flexible(
+                fit: FlexFit.tight,
+                child: Center(
+                  child: Builder(
+                    builder: (context) {
+                      if (supplier.isActive) {
+                        return const StatusTagLabel(
+                          label: "Activo",
+                          isActive: true,
+                        );
+                      } else {
+                        return const StatusTagLabel(
+                          label: "Inactivo",
+                          isActive: false,
+                        );
+                      }
+                    },
+                  ),
                 ),
               ),
-            ),
 
-            Flexible(
-              fit: FlexFit.tight,
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: IconButton(
-                  onPressed: () async {
-                    final res = await showCreateSupplierDialog(context, supplier: supplier);
+              Flexible(
+                fit: FlexFit.tight,
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: IconButton(
+                    onPressed: () async {
+                      final res = await showCreateSupplierDialog(context, supplier: supplier);
 
-                    if (res == null) return;
-                    if (!context.mounted) return;
-                    await context.read<ReadSupplierCubit>().markSupplierUpdated(res);
-                    if (!context.mounted) return;
-                    context.read<ReadSupplierCubit>().refreshSupplier();
-                  },
-                  icon: const Icon(Icons.edit),
+                      if (res == null) return;
+                      if (!context.mounted) return;
+                      await context.read<ReadSupplierCubit>().markSupplierUpdated(res);
+                      if (!context.mounted) return;
+                      context.read<ReadSupplierCubit>().refreshSupplier();
+                    },
+                    icon: const Icon(Icons.edit),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
