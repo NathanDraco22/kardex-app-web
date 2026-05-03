@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
-import 'package:kardex_app_front/src/domain/models/common/client_info.dart';
 import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
-import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
-import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
-import 'package:kardex_app_front/src/tools/session_tool.dart';
+import 'package:kardex_app_front/src/modules/commercial/client_invoices/view_controller.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/client_selector_card.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
@@ -15,8 +11,11 @@ import 'package:kardex_app_front/widgets/title_texfield.dart';
 import '../cubit/write_invoice_cubit.dart';
 import '../widgets/confirmation_send_modal.dart';
 
-Future<void> showInvoiceClientMenuScreen(BuildContext context, List<SaleItem> saleItems) async {
+Future<void> showInvoiceClientMenuScreen(
+  BuildContext context,
+) async {
   final writeCubit = context.read<WriteInvoiceCubit>();
+  final saleItems = writeCubit.viewController.createSaleItemFromCommercial();
 
   await Navigator.push(
     context,
@@ -29,34 +28,6 @@ Future<void> showInvoiceClientMenuScreen(BuildContext context, List<SaleItem> sa
       ),
     ),
   );
-}
-
-class ViewController extends ChangeNotifier {
-  ClientInDb? _selectedClient;
-  PaymentType? _selectedPaymentType;
-
-  ClientInDb? get selectedClient => _selectedClient;
-  PaymentType? get selectedPaymentType => _selectedPaymentType;
-
-  String description = '';
-
-  set selectedClient(ClientInDb? value) {
-    _selectedClient = value;
-    if (value == null) {
-      _selectedPaymentType = PaymentType.cash;
-    }
-
-    if (value?.isCreditActive == true) {
-      _selectedPaymentType = PaymentType.credit;
-    }
-
-    notifyListeners();
-  }
-
-  set selectedPaymentType(PaymentType? value) {
-    _selectedPaymentType = value;
-    notifyListeners();
-  }
 }
 
 class InvoiceClientMenuScreen extends StatelessWidget {
@@ -119,11 +90,11 @@ class _Body extends StatefulWidget {
 }
 
 class _BodyState extends State<_Body> {
-  late ViewController viewController;
+  late ClientInvoiceViewController viewController;
 
   @override
   void initState() {
-    viewController = ViewController();
+    viewController = context.read<WriteInvoiceCubit>().viewController;
     super.initState();
   }
 
@@ -147,6 +118,7 @@ class _BodyState extends State<_Body> {
                 SizedBox(
                   height: 170,
                   child: ClientSelectorCard(
+                    initialClient: viewController.selectedClient,
                     onChange: (value) => viewController.selectedClient = value,
                   ),
                 ),
@@ -185,7 +157,9 @@ class _BodyState extends State<_Body> {
                                       ),
                                   ],
                                   onChanged: (value) {
-                                    viewController.selectedPaymentType = value;
+                                    if (value != null) {
+                                      viewController.selectedPaymentType = value;
+                                    }
                                   },
                                 );
 
@@ -239,7 +213,7 @@ class _BodyState extends State<_Body> {
 
                 const SizedBox(height: 16),
 
-                _SendButton(viewController: viewController, widget: widget),
+                const _SendButton(),
               ],
             ),
           ],
@@ -250,16 +224,11 @@ class _BodyState extends State<_Body> {
 }
 
 class _SendButton extends StatelessWidget {
-  const _SendButton({
-    required this.viewController,
-    required this.widget,
-  });
-
-  final ViewController viewController;
-  final _Body widget;
+  const _SendButton();
 
   @override
   Widget build(BuildContext context) {
+    final viewController = context.read<WriteInvoiceCubit>().viewController;
     return ListenableBuilder(
       listenable: viewController,
       builder: (context, _) {
@@ -282,45 +251,9 @@ class _SendButton extends StatelessWidget {
           onPressed: viewController.selectedClient == null
               ? null
               : () async {
-                  final totalCost = widget.saleItems.fold<int>(
-                    0,
-                    (previousValue, element) => previousValue + (element.cost * element.quantity),
-                  );
+                  final createInvoice = viewController.generateCreateInvoice(context);
 
-                  final total = widget.saleItems.fold<int>(
-                    0,
-                    (previousValue, element) => previousValue + element.total,
-                  );
-
-                  final selectedClient = viewController.selectedClient!;
-
-                  final (currentUser, currentBranch) = SessionTool.getFullUserFrom(context);
-
-                  final newInvoice = CreateInvoice(
-                    branchId: currentBranch.id,
-                    clientId: selectedClient.id,
-                    clientInfo: ClientInfo(
-                      name: selectedClient.name,
-                      group: selectedClient.group,
-                      address: selectedClient.address,
-                      cardId: selectedClient.cardId,
-                      location: selectedClient.location,
-                      phone: selectedClient.phone,
-                      email: selectedClient.email,
-                    ),
-                    description: viewController.description,
-                    docNumber: "",
-                    saleItems: widget.saleItems,
-                    status: InvoiceStatus.open,
-                    paymentType: viewController.selectedPaymentType!,
-                    bankReference: "",
-                    totalCost: totalCost,
-                    total: total,
-                    createdBy: UserInfo(
-                      id: currentUser.id,
-                      name: currentUser.username,
-                    ),
-                  );
+                  if (createInvoice == null) return;
 
                   final res = await showConfirmationSendBottomModal(
                     context,
@@ -341,7 +274,7 @@ class _SendButton extends StatelessWidget {
                         Expanded(
                           child: ListView(
                             children: [
-                              for (final item in newInvoice.saleItems)
+                              for (final item in createInvoice.saleItems)
                                 ListTile(
                                   title: Text(item.product.name),
                                   subtitle: Row(
@@ -365,7 +298,7 @@ class _SendButton extends StatelessWidget {
                         ),
                         const Divider(),
                         Text(
-                          "Total: ${NumberFormatter.convertToMoneyLike(newInvoice.total)}",
+                          "Total: ${NumberFormatter.convertToMoneyLike(createInvoice.total)}",
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
@@ -380,9 +313,8 @@ class _SendButton extends StatelessWidget {
                   if (res != true) return;
                   if (!context.mounted) return;
                   context.read<WriteInvoiceCubit>().createNewInvoice(
-                    newInvoice,
+                    createInvoice,
                     viewController.selectedClient!,
-                    currentUser,
                   );
                 },
           icon: const Icon(Icons.send),

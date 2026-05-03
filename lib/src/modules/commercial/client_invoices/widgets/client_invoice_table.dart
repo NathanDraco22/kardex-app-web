@@ -9,35 +9,29 @@ import 'package:kardex_app_front/widgets/dialogs/search_products/search_product_
 import '../web/mediator.dart';
 import 'more_action_row_button.dart';
 
-class ClientInvoiceItem {
-  final CommercialProductResult commercial;
-
-  ClientInvoiceItem(this.commercial);
-}
-
 class ClientInvoiceTableController extends ChangeNotifier {
-  List<ClientInvoiceItem> items = [];
+  List<CommercialProductResult> items = [];
 
   int get total {
     var total = 0.0;
 
     for (var item in items) {
-      total += item.commercial.total;
+      total += item.total;
     }
     return total.toInt();
   }
 
-  void addRow(ClientInvoiceItem item) {
+  void addRow(CommercialProductResult item) {
     items.add(item);
     notifyListeners();
   }
 
-  void removeRow(ClientInvoiceItem item) {
+  void removeRow(CommercialProductResult item) {
     items.remove(item);
     notifyListeners();
   }
 
-  void updateRow(ClientInvoiceItem oldItem, ClientInvoiceItem newItem) {
+  void updateRow(CommercialProductResult oldItem, CommercialProductResult newItem) {
     final index = items.indexOf(oldItem);
     items[index] = newItem;
     notifyListeners();
@@ -117,7 +111,6 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
             listenable: widget.controller,
             builder: (context, _) {
               return ListView(
-                // reverse: true,
                 controller: scrollController,
                 padding: const EdgeInsets.only(bottom: 32),
                 children: [
@@ -150,7 +143,7 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
                             return;
                           }
 
-                          widget.controller.addRow(ClientInvoiceItem(res));
+                          widget.controller.addRow(res);
                           if (!context.mounted) return;
                           ClientInvoiceWebMediator.of(context).viewController.refresh();
                         },
@@ -178,7 +171,7 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
         item: currentItem,
         onRemove: (item) => controller.removeRow(item),
         onChange: (item) async {
-          final res = await showSearchProductCommercialDialog(context, product: item.commercial.product);
+          final res = await showSearchProductCommercialDialog(context, product: item.product);
           if (res == null) return;
           if (widget.restrictQuantity &&
               (res.quantity > res.product.account.availableStock || res.product.account.availableStock == 0)) {
@@ -190,13 +183,13 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
             return;
           }
           if (res.quantity == 0) return;
-          controller.updateRow(item, ClientInvoiceItem(res));
+          controller.updateRow(item, res);
         },
         onEdit: (item) async {
           final res = await showCommercialProductDialog(
             context,
-            product: item.commercial.product,
-            commercialProductResult: item.commercial,
+            product: item.product,
+            commercialProductResult: item,
           );
           if (res == null) return;
           if (widget.restrictQuantity && res.quantity > res.product.account.availableStock) {
@@ -208,7 +201,7 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
             return;
           }
           if (res.quantity == 0) return;
-          controller.updateRow(item, ClientInvoiceItem(res));
+          controller.updateRow(item, res);
         },
       );
     }
@@ -227,21 +220,21 @@ class InvoiceTableRow extends StatelessWidget {
 
   final Color color;
 
-  final ClientInvoiceItem item;
+  final CommercialProductResult item;
 
-  final void Function(ClientInvoiceItem item) onRemove;
-  final void Function(ClientInvoiceItem item) onEdit;
-  final void Function(ClientInvoiceItem item) onChange;
+  final void Function(CommercialProductResult item) onRemove;
+  final void Function(CommercialProductResult item) onEdit;
+  final void Function(CommercialProductResult item) onChange;
 
   @override
   Widget build(BuildContext context) {
-    final product = item.commercial.product;
+    final product = item.product;
     final price = NumberFormatter.convertToMoneyLike(product.saleProfile.salePrice);
-    final edittedPrice = NumberFormatter.convertToMoneyLike(item.commercial.newPrice);
-    final subTotal = NumberFormatter.convertToMoneyLike(item.commercial.subTotal);
-    final totalDiscount = NumberFormatter.convertToMoneyLike(item.commercial.totalDiscount);
-    final percenValue = item.commercial.discountPercent;
-    final total = NumberFormatter.convertToMoneyLike(item.commercial.total);
+    final edittedPrice = NumberFormatter.convertToMoneyLike(item.newPrice);
+    final subTotal = NumberFormatter.convertToMoneyLike(item.subTotal);
+    final totalDiscount = NumberFormatter.convertToMoneyLike(item.totalDiscount);
+    final percenValue = item.discountPercent;
+    final total = NumberFormatter.convertToMoneyLike(item.total);
     return Material(
       color: Colors.transparent,
       child: Ink(
@@ -303,7 +296,7 @@ class InvoiceTableRow extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(item.commercial.quantity.toString()),
+                  Text(item.quantity.toString()),
                 ],
               ),
             ),
