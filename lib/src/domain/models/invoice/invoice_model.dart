@@ -15,8 +15,8 @@ class BaseInvoice {
   final InvoiceStatus status;
   final PaymentType paymentType;
   final String bankReference;
-  final int totalCost;
-  final int total;
+  int totalCost;
+  int total;
   final DateTime? paidAt;
   final UserInfo createdBy;
 
@@ -123,6 +123,17 @@ class CreateInvoice extends BaseInvoice {
       total: total,
       createdBy: createdBy,
     );
+  }
+
+  void ensureCostAndTotal() {
+    int newTotalCost = 0;
+    int newTotal = 0;
+    for (var item in saleItems) {
+      newTotalCost += item.cost * (item.quantity + item.bonQuantity);
+      newTotal += item.total;
+    }
+    totalCost = newTotalCost;
+    total = newTotal;
   }
 }
 

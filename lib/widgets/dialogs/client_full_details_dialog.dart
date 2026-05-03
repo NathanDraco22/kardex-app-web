@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
+import 'package:kardex_app_front/src/tools/number_formatter.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -98,6 +99,11 @@ class ClientDetailsDialog extends StatelessWidget {
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 12),
+              _DetailItem(
+                title: "Límite de Crédito",
+                value: NumberFormatter.convertToMoneyLike(client.creditLimit),
               ),
             ],
           ),

@@ -13,7 +13,7 @@ class ProductQueryParams {
     return {
       "offset": offset.toString(),
       "limit": limit.toString(),
-      if (branchId != null) "branchId": branchId!,
+      "branchId": ?branchId,
     };
   }
 }

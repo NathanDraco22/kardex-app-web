@@ -17,7 +17,7 @@ class DailySummaryQueryParams {
     return {
       'offset': offset.toString(),
       'limit': limit.toString(),
-      if (dateId != null) 'dateId': dateId!,
+      'dateId': ?dateId,
       if (startDate != null) 'startDate': startDate.toString(),
       if (endDate != null) 'endDate': endDate.toString(),
     };

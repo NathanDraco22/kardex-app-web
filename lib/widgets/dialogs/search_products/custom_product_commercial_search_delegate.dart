@@ -7,24 +7,45 @@ import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/wi
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_modal.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
+import 'package:kardex_app_front/widgets/dialogs/product_in_branch_info_dialog.dart';
 
 Future<CommercialProductResult?> showCommercialProductSearchDelegate(BuildContext context) async {
   return await Navigator.push<CommercialProductResult?>(
     context,
     MaterialPageRoute(
-      builder: (context) => const CustomProductSearchDelegate(),
+      builder: (context) => CustomProductSearchDelegate<CommercialProductResult>(
+        onSelect: (ctx, product) => showCommercialProductModal(ctx, product: product),
+      ),
     ),
   );
 }
 
-class CustomProductSearchDelegate extends StatefulWidget {
-  const CustomProductSearchDelegate({super.key});
-
-  @override
-  State<CustomProductSearchDelegate> createState() => _CustomProductSearchDelegateState();
+Future<void> showProductInfoSearchDelegate(BuildContext context) async {
+  return await Navigator.push<void>(
+    context,
+    MaterialPageRoute(
+      builder: (context) => CustomProductSearchDelegate<void>(
+        onSelect: (ctx, product) async {
+          await showProductInBranchInfoDialog(ctx, product: product);
+        },
+      ),
+    ),
+  );
 }
 
-class _CustomProductSearchDelegateState extends State<CustomProductSearchDelegate> {
+class CustomProductSearchDelegate<T> extends StatefulWidget {
+  const CustomProductSearchDelegate({
+    super.key,
+    required this.onSelect,
+  });
+
+  final Future<T?> Function(BuildContext, ProductInDbInBranch) onSelect;
+
+  @override
+  State<CustomProductSearchDelegate<T>> createState() => _CustomProductSearchDelegateState<T>();
+}
+
+class _CustomProductSearchDelegateState<T> extends State<CustomProductSearchDelegate<T>> {
   bool isSearching = false;
 
   List<ProductInDbInBranch> products = [];
@@ -76,7 +97,7 @@ class _CustomProductSearchDelegateState extends State<CustomProductSearchDelegat
             product: product,
             color: Colors.white,
             onTap: () async {
-              final res = await showCommercialProductModal(context, product: product);
+              final res = await widget.onSelect(context, product);
               if (res == null) return;
               if (!context.mounted) return;
               Navigator.pop(context, res);

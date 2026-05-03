@@ -19,11 +19,11 @@ class TransactionQueryParams {
 
   Map<String, String> toMap() {
     return {
-      if (branchId != null) 'branchId': branchId!,
-      if (productId != null) 'productId': productId!,
-      if (endDate != null) 'endDate': endDate!.toString(),
-      if (type != null) 'type': type!,
-      if (subtype != null) 'subtype': subtype!,
+      'branchId': ?branchId,
+      'productId': ?productId,
+      'endDate': ?endDate?.toString(),
+      'type': ?type,
+      'subtype': ?subtype,
       'offset': offset.toString(),
       'limit': limit.toString(),
     };
