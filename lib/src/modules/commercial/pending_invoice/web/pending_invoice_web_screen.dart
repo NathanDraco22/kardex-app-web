@@ -146,10 +146,13 @@ class _PendingInvoiceFloatingButtons extends StatelessWidget {
             await Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => ReceiptCreatorScreen(
-                  client: viewController.selectedClient!,
-                  invoices: viewController.selectedInvoices,
-                  devolutions: viewController.selectedDevolutions,
+                builder: (_) => BlocProvider.value(
+                  value: context.read<ReadPendingInvoiceCubit>(),
+                  child: ReceiptCreatorScreen(
+                    client: viewController.selectedClient!,
+                    invoices: viewController.selectedInvoices,
+                    devolutions: viewController.selectedDevolutions,
+                  ),
                 ),
               ),
             );

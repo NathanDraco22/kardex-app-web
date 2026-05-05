@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/modules/inventory/current_inventory/cubit/read_current_inventory_cubit.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_app_front/src/tools/branches_tool.dart';
+import 'package:kardex_app_front/src/tools/exports/pdf/templates/current_inventory_template.dart';
+import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 import 'package:kardex_app_front/widgets/basic_table_listview.dart';
 import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 
@@ -39,7 +42,27 @@ class _RootScaffold extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Inventario Actual")),
+      appBar: AppBar(
+        title: const Text("Inventario Actual"),
+        actions: [
+          if (state is ReadCurrentInventorySuccess)
+            IconButton(
+              icon: const Icon(Icons.picture_as_pdf),
+              onPressed: () async {
+                final template = CurrentInventoryTemplate(
+                  title: "Inventario Actual",
+                  branchName: BranchesTool.getCurrentBranchName(),
+                  items: state.inventories,
+                  total: state.total,
+                );
+                await PdfExportTool.export(
+                  template,
+                  fileName: "inventario_actual.pdf",
+                );
+              },
+            ),
+        ],
+      ),
       body: const _Body(),
     );
   }

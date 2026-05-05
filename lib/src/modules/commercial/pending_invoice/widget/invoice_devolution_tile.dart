@@ -25,6 +25,25 @@ class InvoiceDevolutionTile extends StatelessWidget {
   final VoidCallback onViewReceipts;
   final Color? tileColor;
 
+  Widget _buildDetailRow(String label, int amount, {bool isBold = false, Color? color}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: TextStyle(fontWeight: isBold ? FontWeight.bold : FontWeight.w400, color: Colors.grey[700]),
+          ),
+          Text(
+            NumberFormatter.convertToMoneyLike(amount),
+            style: TextStyle(fontWeight: isBold ? FontWeight.bold : FontWeight.w500, color: color),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final targetDevolution = devolutions.where((d) => d.originalInvoiceId == invoice.id).toList();
@@ -36,97 +55,92 @@ class InvoiceDevolutionTile extends StatelessWidget {
     final int devolutionsTotal = targetDevolution.fold(0, (sum, d) => sum + d.total);
     final int adjustedTotal = invoice.totalRemaining - devolutionsTotal;
 
-    return Ink(
-      color: tileColor,
+    String docNumber = "#${invoice.docNumber}";
+    if (docNumber.length > 12) {
+      docNumber = docNumber.substring(0, 10);
+    }
 
+    Color? currentTileColor;
+
+    if (isSelected) {
+      currentTileColor = Colors.amber.shade100;
+    } else {
+      currentTileColor = tileColor;
+    }
+
+    return Ink(
+      color: currentTileColor,
       child: InkWell(
         onTap: isDisabled ? null : () => onChanged(!isSelected),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Checkbox(
-              value: isSelected,
-              onChanged: isDisabled ? null : onChanged,
-            ),
-            Column(
-              children: [
-                TextButton(
-                  onPressed: onViewInvoice,
-                  child: const Text("Ver factura"),
-                ),
-
-                Builder(
-                  builder: (context) {
-                    void Function()? onPressed;
-
-                    if (hasOpenDevolutions || hasConfirmedDevolutions) {
-                      onPressed = () => onViewDevolutions();
-                    }
-
-                    return TextButton(
-                      onPressed: onPressed,
-                      child: const Text("Devoluciones"),
-                    );
-                  },
-                ),
-                Builder(
-                  builder: (context) {
-                    void Function()? onPressed;
-
-                    if (invoice.amountPaid > 0) {
-                      onPressed = () => onViewReceipts();
-                    }
-
-                    return TextButton(
-                      onPressed: onPressed,
-                      child: const Text("Recibos"),
-                    );
-                  },
-                ),
-              ],
-            ),
-            const VerticalDivider(),
-
-            // --- Contenido Principal (antes 'title' y 'subtitle') ---
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Builder(
-                    builder: (context) {
-                      String docNumber = "#${invoice.docNumber}";
-
-                      if (docNumber.length > 12) {
-                        docNumber = docNumber.substring(0, 10);
-                      }
-
-                      return Text(docNumber);
-                    },
-                  ),
-
-                  if (targetDevolution.isNotEmpty)
-                    Text(
-                      '${NumberFormatter.convertToMoneyLike(invoice.totalRemaining)} - ${NumberFormatter.convertToMoneyLike(devolutionsTotal)} = ${NumberFormatter.convertToMoneyLike(adjustedTotal)}',
-                      style: TextStyle(
-                        color: Theme.of(context).primaryColor,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    )
-                  else
-                    Text(
-                      NumberFormatter.convertToMoneyLike(invoice.totalRemaining),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 4.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Checkbox(
+                value: isSelected,
+                onChanged: isDisabled ? null : onChanged,
               ),
-            ),
-            const SizedBox(width: 8),
+              const SizedBox(width: 8),
 
-            // --- Checkbox (antes el 'trailing') ---
-          ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Factura $docNumber",
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                        PopupMenuButton<int>(
+                          icon: const Icon(Icons.more_vert),
+                          tooltip: "Ver detalles",
+                          onSelected: (value) {
+                            if (value == 0) onViewInvoice();
+                            if (value == 1) onViewDevolutions();
+                            if (value == 2) onViewReceipts();
+                          },
+                          itemBuilder: (context) => [
+                            const PopupMenuItem(
+                              value: 0,
+                              child: Text("Ver Factura"),
+                            ),
+                            if (hasOpenDevolutions || hasConfirmedDevolutions)
+                              const PopupMenuItem(
+                                value: 1,
+                                child: Text("Ver Devoluciones"),
+                              ),
+                            if (invoice.amountPaid > 0)
+                              const PopupMenuItem(
+                                value: 2,
+                                child: Text("Ver Recibos"),
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
+
+                    _buildDetailRow("Total Factura:", invoice.total),
+                    _buildDetailRow("Abonos:", invoice.amountPaid),
+                    if (targetDevolution.isNotEmpty) _buildDetailRow("Devoluciones:", devolutionsTotal),
+
+                    const Divider(height: 16),
+
+                    _buildDetailRow(
+                      "Restante a Pagar:",
+                      adjustedTotal,
+                      isBold: true,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                    const SizedBox(height: 4),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+            ],
+          ),
         ),
       ),
     );
