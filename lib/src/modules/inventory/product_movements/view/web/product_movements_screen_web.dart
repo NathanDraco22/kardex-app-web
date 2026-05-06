@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/models.dart';
 import 'package:kardex_app_front/src/domain/models/product_transaction/product_transaction.dart';
+import 'package:kardex_app_front/src/domain/query_params/transaction_query_params.dart';
 import 'package:kardex_app_front/src/modules/inventory/product_movements/cubit/read_product_transaction_cubit.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/extensiones.dart';
@@ -59,10 +60,7 @@ class _Body extends StatelessWidget {
             spacing: 8,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              SizedBox(
-                height: 100,
-                child: _HeaderSection(),
-              ),
+              _HeaderSection(),
 
               Expanded(
                 child: Card(

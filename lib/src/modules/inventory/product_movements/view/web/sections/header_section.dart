@@ -10,6 +10,7 @@ class _HeaderSection extends StatefulWidget {
 class _HeaderSectionState extends State<_HeaderSection> {
   DateTime selectedDay = DateTime.now();
   ProductInDb? selectedProduct;
+  TransactionType? selectedType;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +32,10 @@ class _HeaderSectionState extends State<_HeaderSection> {
 
                     readCubit.loadPaginatedTransactions(
                       product: selectedProduct!,
-                      endDate: selectedDay,
+                      queryParams: TransactionQueryParams(
+                        endDate: selectedDay.endOfDay().millisecondsSinceEpoch,
+                        type: selectedType?.name,
+                      ),
                     );
                   },
                   label: const Text("Buscar Producto"),
@@ -48,12 +52,46 @@ class _HeaderSectionState extends State<_HeaderSection> {
                       if (selectedProduct == null) return;
                       readCubit.loadPaginatedTransactions(
                         product: selectedProduct!,
-                        endDate: selectedDay,
+                        queryParams: TransactionQueryParams(
+                          endDate: selectedDay.endOfDay().millisecondsSinceEpoch,
+                          type: selectedType?.name,
+                        ),
                       );
                     },
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: 8),
+            SegmentedButton<TransactionType?>(
+              segments: const [
+                ButtonSegment(
+                  value: null,
+                  label: Text("Todas"),
+                ),
+                ButtonSegment(
+                  value: TransactionType.entry,
+                  label: Text("Entradas"),
+                ),
+                ButtonSegment(
+                  value: TransactionType.exit,
+                  label: Text("Salidas"),
+                ),
+              ],
+              selected: {selectedType},
+              onSelectionChanged: (newSelection) {
+                setState(() {
+                  selectedType = newSelection.first;
+                });
+                if (selectedProduct == null) return;
+                readCubit.loadPaginatedTransactions(
+                  product: selectedProduct!,
+                  queryParams: TransactionQueryParams(
+                    endDate: selectedDay.endOfDay().millisecondsSinceEpoch,
+                    type: selectedType?.name,
+                  ),
+                );
+              },
             ),
           ],
         ),
