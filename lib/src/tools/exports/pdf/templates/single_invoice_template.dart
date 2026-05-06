@@ -114,7 +114,7 @@ class SingleInvoiceTemplate implements PdfTemplate {
               ],
               pw.SizedBox(height: 4),
               pw.Text(
-                "Autor: ${invoice.createdBy.name}",
+                "Vendedor: ${invoice.createdBy.name}",
                 style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
               ),
               if (invoice.description.isNotEmpty) ...[
