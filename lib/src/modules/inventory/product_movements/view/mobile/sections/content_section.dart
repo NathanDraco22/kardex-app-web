@@ -8,7 +8,7 @@ class _ContentSection extends StatelessWidget {
     final readCubit = context.read<ReadProductTransactionCubit>();
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(4.0),
         child: BlocBuilder(
           bloc: readCubit,
           builder: (context, state) {
@@ -45,135 +45,138 @@ class _ContentSection extends StatelessWidget {
 
             final currentProduct = state.product;
 
-            return Column(
-              children: [
-                DisplayProductCode(product: currentProduct),
-                Row(
-                  spacing: 8,
-                  children: [
-                    Text(currentProduct.brandName),
-                    Text(currentProduct.unitName),
-                  ],
-                ),
-
-                const Divider(),
-
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-                  child: Row(
+            return SafeArea(
+              child: Column(
+                children: [
+                  DisplayProductCode(product: currentProduct),
+                  Row(
+                    spacing: 8,
                     children: [
-                      Expanded(
-                        child: Text(
-                          "Fecha",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                          ),
-                          textAlign: TextAlign.start,
-                        ),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: Text(
-                          "Documento",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                          ),
-                          textAlign: TextAlign.start,
-                        ),
-                      ),
-                      Expanded(
-                        flex: 2,
-
-                        child: Text(
-                          "Costo",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      Expanded(
-                        flex: 2,
-
-                        child: Column(
-                          children: [
-                            Text(
-                              "Cantidad",
-                              style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            Text(
-                              "Existencia",
-                              style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      Text(currentProduct.brandName),
+                      Text(currentProduct.unitName),
                     ],
                   ),
-                ),
 
-                const Divider(
-                  thickness: 1,
-                  height: 0.0,
-                ),
+                  const Divider(),
 
-                Expanded(
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                    child: ListView.builder(
-                      reverse: true,
-                      shrinkWrap: true,
-                      itemCount: state.transactions.length,
-                      itemBuilder: (context, index) {
-                        final currentTransaction = state.transactions[index];
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: Text(
+                            "Fecha",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                            ),
+                            textAlign: TextAlign.start,
+                          ),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: Text(
+                            "Documento",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                            ),
+                            textAlign: TextAlign.start,
+                          ),
+                        ),
+                        Expanded(
+                          flex: 2,
 
-                        final rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+                          child: Text(
+                            "Costo",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        Expanded(
+                          flex: 2,
 
-                        if (index < state.transactions.length - 1) {
-                          final nextTransaction = state.transactions[index + 1];
-                          if (currentTransaction.createdAt.day != nextTransaction.createdAt.day) {
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(4),
-                                  decoration: BoxDecoration(
-                                    color: Colors.amber.shade100,
-                                  ),
-                                  child: Text(
-                                    DateTimeTool.formatddMMyy(currentTransaction.createdAt),
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12,
-                                    ),
-                                  ),
+                          child: Column(
+                            children: [
+                              Text(
+                                "Cantidad",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w500,
                                 ),
-                                Divider(
-                                  height: 0.0,
-                                  thickness: 2.0,
-                                  color: Colors.amber.shade100,
+                              ),
+                              Text(
+                                "Existencia",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w500,
                                 ),
-                                MovementMobileRow(
-                                  currentTransaction: currentTransaction,
-                                  rowColor: rowColor,
-                                ),
-                              ],
-                            );
-                          }
-                        }
-                        return MovementMobileRow(
-                          currentTransaction: currentTransaction,
-                          rowColor: rowColor,
-                        );
-                      },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-              ],
+
+                  const Divider(
+                    thickness: 1,
+                    height: 0.0,
+                  ),
+
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: ListView.builder(
+                        reverse: true,
+                        shrinkWrap: true,
+                        itemCount: state.transactions.length,
+                        itemBuilder: (context, index) {
+                          final currentTransaction = state.transactions[index];
+
+                          final rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+
+                          if (index < state.transactions.length - 1) {
+                            final nextTransaction = state.transactions[index + 1];
+                            if (currentTransaction.createdAt.day != nextTransaction.createdAt.day) {
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(4),
+                                    decoration: BoxDecoration(
+                                      color: Colors.amber.shade100,
+                                    ),
+                                    child: Text(
+                                      DateTimeTool.formatddMMyy(currentTransaction.createdAt),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                                  Divider(
+                                    height: 0.0,
+                                    thickness: 2.0,
+                                    color: Colors.amber.shade100,
+                                  ),
+                                  MovementMobileRow(
+                                    currentTransaction: currentTransaction,
+                                    rowColor: rowColor,
+                                  ),
+                                ],
+                              );
+                            }
+                          }
+                          return MovementMobileRow(
+                            currentTransaction: currentTransaction,
+                            rowColor: rowColor,
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             );
           },
         ),
@@ -222,6 +225,7 @@ class MovementMobileRow extends StatelessWidget {
           child: Row(
             children: [
               Expanded(
+                flex: 2,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
