@@ -17,7 +17,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
     final readCubit = context.read<ReadProductTransactionCubit>();
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(4.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
