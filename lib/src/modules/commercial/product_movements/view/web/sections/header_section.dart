@@ -31,7 +31,9 @@ class _HeaderSectionState extends State<_HeaderSection> {
 
                     readCubit.loadPaginatedTransactions(
                       product: selectedProduct!,
-                      endDate: selectedDay,
+                      queryParams: TransactionQueryParams(
+                        endDate: selectedDay.endOfDay().millisecondsSinceEpoch,
+                      ),
                     );
                   },
                   label: const Text("Buscar Producto"),
@@ -48,7 +50,9 @@ class _HeaderSectionState extends State<_HeaderSection> {
                       if (selectedProduct == null) return;
                       readCubit.loadPaginatedTransactions(
                         product: selectedProduct!,
-                        endDate: selectedDay,
+                        queryParams: TransactionQueryParams(
+                          endDate: selectedDay.endOfDay().millisecondsSinceEpoch,
+                        ),
                       );
                     },
                   ),
