@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/src/domain/models/common/client_info.dart';
 import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
-import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
-
-import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
 
 import 'package:kardex_app_front/src/tools/session_tool.dart';
 
@@ -13,6 +9,7 @@ import 'package:kardex_app_front/widgets/client_selector_card.dart';
 
 import 'package:kardex_app_front/widgets/widgets.dart';
 
+import '../view_controller.dart';
 import '../widgets/client_invoice_table.dart';
 import '../widgets/dialogs/confirm_invoice_dialog.dart';
 import '../cubit/write_invoice_cubit.dart';
@@ -37,14 +34,29 @@ class ClientInvoicesScreenWeb extends StatefulWidget {
 
 class _ClientInvoicesScreenWebState extends State<ClientInvoicesScreenWeb> {
   bool rebuild = false;
-  ViewController viewController = ViewController();
   ClientInvoiceTableController tableController = ClientInvoiceTableController();
+
+  late ClientInvoiceViewController viewController;
+
+  @override
+  void initState() {
+    super.initState();
+    viewController = context.read<WriteInvoiceCubit>().viewController;
+    tableController.addListener(() {
+      viewController.refreshItems(tableController.items);
+    });
+  }
+
+  @override
+  void dispose() {
+    tableController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     if (rebuild) {
       rebuild = false;
-      viewController = ViewController();
       tableController = ClientInvoiceTableController();
       Future(() => setState(() {}));
       return const EmptyScaffold();
@@ -129,7 +141,10 @@ class _RootScaffold extends StatelessWidget {
                       alignment: Alignment.center,
                       child: Text(
                         totalMoney,
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     );
                   },

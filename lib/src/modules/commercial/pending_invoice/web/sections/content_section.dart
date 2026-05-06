@@ -29,6 +29,7 @@ class _ContentSection extends StatelessWidget {
             );
           }
           if (state is ReadInvoiceLoading) {
+            Future(() => viewController.clearSelected());
             return const Center(
               child: CircularProgressIndicator(),
             );

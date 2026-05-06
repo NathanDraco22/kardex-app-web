@@ -9,10 +9,19 @@ import 'cubit/write_invoice_cubit.dart';
 import 'mobile/client_invoices_screen_mobile.dart';
 import 'web/client_invoices_screen_web.dart';
 
-class ClientInvoiceScreen extends StatelessWidget {
+import 'view_controller.dart';
+
+class ClientInvoiceScreen extends StatefulWidget {
   const ClientInvoiceScreen({super.key, this.isOrder = false});
 
   final bool isOrder;
+
+  @override
+  State<ClientInvoiceScreen> createState() => _ClientInvoiceScreenState();
+}
+
+class _ClientInvoiceScreenState extends State<ClientInvoiceScreen> {
+  final viewController = ClientInvoiceViewController();
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +33,8 @@ class ClientInvoiceScreen extends StatelessWidget {
           create: (context) => WriteInvoiceCubit(
             invoicesRepository: invoiceRepo,
             ordersRepository: orderRepo,
-            documentType: isOrder ? CommercialDocumentType.order : CommercialDocumentType.invoice,
+            documentType: widget.isOrder ? .order : .invoice,
+            viewController: viewController,
           ),
         ),
       ],
