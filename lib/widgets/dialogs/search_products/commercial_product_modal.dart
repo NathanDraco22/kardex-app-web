@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/models.dart';
@@ -274,6 +275,24 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                                 ),
                               ),
                             ],
+                          ),
+
+                          TextButton.icon(
+                            onPressed: () {
+                              final priceString = NumberFormatter.convertToMoneyLike(commercialProductResult.newPrice);
+                              final text =
+                                  "${product.name} \n${product.brandName} - ${product.unitName} \nPrecio: $priceString";
+                              Clipboard.setData(ClipboardData(text: text));
+                              ScaffoldMessenger.of(context).clearSnackBars();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text("Copiado: ${product.name} - $priceString"),
+                                  duration: const Duration(seconds: 2),
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.copy, size: 18),
+                            label: const Text("Copiar Info"),
                           ),
 
                           const SizedBox(height: 12),
