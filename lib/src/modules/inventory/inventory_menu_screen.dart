@@ -45,25 +45,22 @@ class _Body extends StatelessWidget {
           ListTile(
             leading: IconWidgets.currentInventoryIcon,
             title: const Text("Inventario Actual"),
-            trailing: const Icon(Icons.chevron_right),
             onTap: () => context.pushNamed("current-inventory"),
           ),
           const Divider(height: 0.0),
 
           ListTile(
-            leading: const Icon(Icons.search, color: Colors.purple),
-            title: const Text("Consulta de Existencias Globales"),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => showGlobalStockSearchModal(context),
+            leading: const Icon(Icons.info_outline, color: Colors.blueAccent),
+            title: const Text("Consulta Rápida de Producto"),
+            onTap: () => showProductInfoSearchDelegate(context),
           ),
 
           const Divider(height: 0.0),
 
           ListTile(
-            leading: const Icon(Icons.info_outline, color: Colors.blueAccent),
-            title: const Text("Consulta Rápida de Producto"),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => showProductInfoSearchDelegate(context),
+            leading: const Icon(Icons.search, color: Colors.purple),
+            title: const Text("Consulta de Existencias Globales"),
+            onTap: () => showGlobalStockSearchModal(context),
           ),
 
           const Divider(height: 0.0),
@@ -74,7 +71,6 @@ class _Body extends StatelessWidget {
               color: Colors.teal,
             ),
             title: const Text("Movimientos de un Producto"),
-            trailing: const Icon(Icons.chevron_right),
             onTap: () => context.pushNamed("product-movements"),
           ),
           const Divider(height: 0.0),
@@ -85,7 +81,6 @@ class _Body extends StatelessWidget {
               color: Colors.green,
             ),
             title: const Text("Precios de productos"),
-            trailing: const Icon(Icons.chevron_right),
             onTap: () => context.pushNamed("product-price-catalog"),
           ),
           const Divider(height: 0.0),
@@ -97,7 +92,6 @@ class _Body extends StatelessWidget {
                 color: Colors.amber,
               ),
               title: const Text("Bitacora de Vencimientos"),
-              trailing: const Icon(Icons.chevron_right),
               onTap: () => context.pushNamed("expiration-logs"),
             ),
           ),
@@ -111,14 +105,12 @@ class _Body extends StatelessWidget {
           ListTile(
             leading: IconWidgets.entryInventoryIcon,
             title: const Text("Entrada de Inventario"),
-            trailing: const Icon(Icons.chevron_right),
             onTap: () => context.pushNamed("inventory-entry"),
           ),
           const Divider(height: 0.0),
           ListTile(
             leading: IconWidgets.exitInventoryIcon,
             title: const Text("Salida de Inventario"),
-            trailing: const Icon(Icons.chevron_right),
             onTap: () => context.pushNamed("inventory-exit"),
           ),
 
@@ -130,7 +122,6 @@ class _Body extends StatelessWidget {
               color: Colors.blue,
             ),
             title: const Text("Historial de Entradas"),
-            trailing: const Icon(Icons.chevron_right),
             onTap: () => context.pushNamed("history-entry"),
           ),
           const Divider(height: 0.0),
@@ -140,7 +131,6 @@ class _Body extends StatelessWidget {
               color: Colors.red,
             ),
             title: const Text("Historial de salidas"),
-            trailing: const Icon(Icons.chevron_right),
             onTap: () => context.pushNamed("history-exit"),
           ),
           const Divider(height: 0.0),
@@ -156,7 +146,6 @@ class _Body extends StatelessWidget {
               size: 28,
             ),
             title: const Text("Transferencias"),
-            trailing: const Icon(Icons.chevron_right),
             onTap: () => context.pushNamed("current-tranfers"),
           ),
 
@@ -169,7 +158,6 @@ class _Body extends StatelessWidget {
               color: Colors.red,
             ),
             title: const Text("Crear Transferencia"),
-            trailing: const Icon(Icons.chevron_right),
             onTap: () => context.pushNamed("create-transfer"),
           ),
 
@@ -183,7 +171,6 @@ class _Body extends StatelessWidget {
           ListTile(
             leading: IconWidgets.entryInventoryIcon,
             title: const Text("Entrada por Ajuste"),
-            trailing: const Icon(Icons.chevron_right),
             onTap: () => context.pushNamed("adjust-entry"),
           ),
           const Divider(height: 0.0),
@@ -194,7 +181,6 @@ class _Body extends StatelessWidget {
               color: Colors.blue,
             ),
             title: const Text("Historial de Entradas por Ajuste"),
-            trailing: const Icon(Icons.chevron_right),
             onTap: () => context.pushNamed("history-adjust-entry"),
           ),
 
@@ -203,7 +189,6 @@ class _Body extends StatelessWidget {
           ListTile(
             leading: IconWidgets.exitInventoryIcon,
             title: const Text("Salida por Ajuste"),
-            trailing: const Icon(Icons.chevron_right),
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
@@ -222,7 +207,6 @@ class _Body extends StatelessWidget {
               color: Colors.red,
             ),
             title: const Text("Historial de Salidas por Ajuste"),
-            trailing: const Icon(Icons.chevron_right),
             onTap: () => context.pushNamed("history-adjust-exit"),
           ),
 
@@ -231,7 +215,6 @@ class _Body extends StatelessWidget {
           ListTile(
             leading: IconWidgets.exitInventoryIcon,
             title: const Text("Mermas"),
-            trailing: const Icon(Icons.chevron_right),
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
