@@ -4,11 +4,18 @@ import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/branch/branch.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/web/receipt_creator/modals/fast_payment_modal.dart';
+import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_invoice_template.dart';
+import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_app_front/src/tools/printers/invoice_printer.dart';
+import 'package:kardex_app_front/src/tools/printers/paper_settings.dart';
+import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/invoice_viewer.dart';
 
 Future<double?> showInvoiceAcreditViewerScreen(BuildContext context, InvoiceInDb invoice) async {
   final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
+  if (!context.mounted) return null;
+  final paperSize = await PrintManager.getLocalPaperSize();
   if (!context.mounted) return null;
   return await Navigator.push<double>(
     context,
@@ -17,6 +24,7 @@ Future<double?> showInvoiceAcreditViewerScreen(BuildContext context, InvoiceInDb
         return _InvoiceAcreditViewer(
           invoice: invoice,
           branch: currentBranch,
+          paperSize: paperSize,
         );
       },
     ),
@@ -27,16 +35,42 @@ class _InvoiceAcreditViewer extends StatelessWidget {
   const _InvoiceAcreditViewer({
     required this.invoice,
     required this.branch,
+    required this.paperSize,
   });
 
   final InvoiceInDb invoice;
   final BranchInDb branch;
+  final PaperSize paperSize;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Factura #${invoice.docNumber} - Resumen y Abono"),
+        title: Text("Factura #${invoice.docNumber}"),
+        actions: [
+          IconButton(
+            tooltip: "Exportar PDF (A4)",
+            onPressed: () async {
+              final template = SingleInvoiceTemplate(invoice: invoice, branch: branch);
+              await PdfExportTool.export(template, fileName: "factura_${invoice.docNumber}.pdf");
+            },
+            icon: const Icon(Icons.picture_as_pdf),
+          ),
+          IconButton(
+            tooltip: "Compartir Factura",
+            onPressed: () async {
+              await shareInvoice(invoice, branch, paperSize: paperSize);
+            },
+            icon: const Icon(Icons.share),
+          ),
+          IconButton(
+            tooltip: "Imprimir Factura",
+            onPressed: () async {
+              await printInvoice(invoice, branch, paperSize: paperSize);
+            },
+            icon: const Icon(Icons.print),
+          ),
+        ],
       ),
       body: SafeArea(
         child: Center(
@@ -111,7 +145,7 @@ class _InvoiceAcreditViewer extends StatelessWidget {
                         maxAmountToPay: NumberFormatter.convertFromCentsToDouble(remaining),
                         clientName: invoice.clientInfo.name,
                       );
-                      
+
                       if (amountToPay != null && context.mounted) {
                         Navigator.pop(context, amountToPay);
                       }
