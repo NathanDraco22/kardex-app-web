@@ -71,7 +71,8 @@ class InvoiceDevolutionTile extends StatelessWidget {
     return Ink(
       color: currentTileColor,
       child: InkWell(
-        onTap: isDisabled ? null : () => onChanged(!isSelected),
+        onLongPress: isDisabled ? null : () => onChanged(true),
+        onTap: isDisabled ? null : () => onChanged(false),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 4.0),
           child: Row(
@@ -97,7 +98,7 @@ class InvoiceDevolutionTile extends StatelessWidget {
                         PopupMenuButton<int>(
                           icon: const Icon(Icons.more_vert),
                           tooltip: "Ver detalles",
-                          onSelected: (value) {
+                          onSelected: (value) async {
                             if (value == 0) onViewInvoice();
                             if (value == 1) onViewDevolutions();
                             if (value == 2) onViewReceipts();

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/models.dart';
@@ -236,7 +237,7 @@ class _FormContentState extends State<_FormContent> {
                                 fit: FlexFit.tight,
 
                                 child: SizedBox(
-                                  height: 90,
+                                  height: 80,
                                   child: TitleTextField(
                                     focusNode: focusNode,
 
@@ -272,7 +273,7 @@ class _FormContentState extends State<_FormContent> {
                                 fit: FlexFit.tight,
 
                                 child: SizedBox(
-                                  height: 90,
+                                  height: 80,
                                   child: TitleTextField(
                                     key: ValueKey(commercialProductResult.selectedPriceLevel),
                                     readOnly: commercialProductResult.selectedPriceLevel != 0,
@@ -302,6 +303,24 @@ class _FormContentState extends State<_FormContent> {
                                 ),
                               ),
                             ],
+                          ),
+
+                          TextButton.icon(
+                            onPressed: () {
+                              final priceString = NumberFormatter.convertToMoneyLike(commercialProductResult.newPrice);
+                              final text =
+                                  "${product.name} \n${product.brandName} - ${product.unitName} \nPrecio: $priceString";
+                              Clipboard.setData(ClipboardData(text: text));
+                              ScaffoldMessenger.of(context).clearSnackBars();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text("Copiado: ${product.name} - $priceString"),
+                                  duration: const Duration(seconds: 2),
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.copy, size: 18),
+                            label: const Text("Copiar Info"),
                           ),
 
                           const SizedBox(height: 12),

@@ -83,8 +83,31 @@ class _ContentSection extends StatelessWidget {
                   viewController.removeFromSelected(currentInvoice);
                 },
 
-                onViewInvoice: () {
-                  showInvoiceViewerDialog(context, currentInvoice);
+                onViewInvoice: () async {
+                  final amount = await showInvoiceAcreditViewerScreen(context, currentInvoice);
+                  if (amount != null && context.mounted) {
+                    final amountCents = (amount * 100).round();
+                    final client = viewController.selectedClient!;
+                    final (currentUser, currentBranch) = SessionTool.getFullUserFrom(context);
+                    
+                    final targetDevolutions = devolutions.where((d) => d.originalInvoiceId == currentInvoice.id).toList();
+
+                    final (createReceipt, errorOrSummary) = FastReceiptLogic.allocateFastPayment(
+                      paymentAmountCents: amountCents,
+                      invoices: [currentInvoice],
+                      devolutions: targetDevolutions,
+                      client: client,
+                      branchId: currentBranch.id,
+                      currentUserId: currentUser.id,
+                      currentUserName: currentUser.username,
+                    );
+
+                    if (createReceipt != null) {
+                       context.read<WriteReceiptCubit>().createNewReceipt(createReceipt);
+                    } else {
+                       DialogManager.showErrorDialog(context, errorOrSummary);
+                    }
+                  }
                 },
                 onViewDevolutions: () {
                   final targetDevolution = devolutions
