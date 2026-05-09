@@ -201,6 +201,7 @@ class _Body extends StatelessWidget {
               child: ListenableBuilder(
                 listenable: viewController,
                 builder: (context, _) {
+                  print(viewController.items.length);
                   return ListView.separated(
                     itemCount: viewController.items.length,
                     padding: const EdgeInsets.only(

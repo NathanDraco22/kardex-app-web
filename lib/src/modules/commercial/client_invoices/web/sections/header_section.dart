@@ -166,7 +166,6 @@ class MenuActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewController = ClientInvoiceWebMediator.of(context).viewController;
-    final tableController = ClientInvoiceWebMediator.of(context).tableController;
 
     final cubit = context.read<WriteInvoiceCubit>();
 
@@ -190,7 +189,7 @@ class MenuActions extends StatelessWidget {
     return ListenableBuilder(
       listenable: viewController,
       builder: (context, _) {
-        final canSave = viewController.selectedClient != null && tableController.items.isNotEmpty;
+        final canSave = viewController.selectedClient != null && viewController.items.isNotEmpty;
         return Row(
           mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.stretch,
