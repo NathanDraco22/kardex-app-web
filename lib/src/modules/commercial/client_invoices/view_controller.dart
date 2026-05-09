@@ -39,7 +39,10 @@ class ClientInvoiceViewController extends ChangeNotifier {
   int get totalAmount => items.fold(0, (previousValue, element) => previousValue + element.total);
 
   void addItem(CommercialProductResult item) {
-    items.add(item);
+    final existingItem = items.any((i) => i.product.id == item.product.id);
+    if (existingItem) return;
+
+    items = [...items, item];
     notifyListeners();
   }
 

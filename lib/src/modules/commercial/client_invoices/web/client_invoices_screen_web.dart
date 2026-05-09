@@ -34,22 +34,17 @@ class ClientInvoicesScreenWeb extends StatefulWidget {
 
 class _ClientInvoicesScreenWebState extends State<ClientInvoicesScreenWeb> {
   bool rebuild = false;
-  ClientInvoiceTableController tableController = ClientInvoiceTableController();
 
   late ClientInvoiceViewController viewController;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     viewController = context.read<WriteInvoiceCubit>().viewController;
-    tableController.addListener(() {
-      viewController.refreshItems(tableController.items);
-    });
   }
 
   @override
   void dispose() {
-    tableController.dispose();
     super.dispose();
   }
 
@@ -57,7 +52,6 @@ class _ClientInvoicesScreenWebState extends State<ClientInvoicesScreenWeb> {
   Widget build(BuildContext context) {
     if (rebuild) {
       rebuild = false;
-      tableController = ClientInvoiceTableController();
       Future(() => setState(() {}));
       return const EmptyScaffold();
     }
@@ -88,7 +82,6 @@ class _ClientInvoicesScreenWebState extends State<ClientInvoicesScreenWeb> {
 
       child: ClientInvoiceWebMediator(
         viewController: viewController,
-        tableController: tableController,
         child: const _RootScaffold(),
       ),
     );
@@ -100,7 +93,7 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = ClientInvoiceWebMediator.of(context).tableController;
+    final controller = ClientInvoiceWebMediator.of(context).viewController;
     final cubit = context.read<WriteInvoiceCubit>();
     final webScreenWidget = context.findAncestorWidgetOfExactType<ClientInvoicesScreenWeb>();
 
@@ -136,7 +129,7 @@ class _RootScaffold extends StatelessWidget {
                 child: ListenableBuilder(
                   listenable: controller,
                   builder: (context, _) {
-                    final totalMoney = NumberFormatter.convertToMoneyLike(controller.total);
+                    final totalMoney = NumberFormatter.convertToMoneyLike(controller.totalAmount);
                     return Align(
                       alignment: Alignment.center,
                       child: Text(
