@@ -52,6 +52,8 @@ class _ClientInvoicesScreenWebState extends State<ClientInvoicesScreenWeb> {
   Widget build(BuildContext context) {
     if (rebuild) {
       rebuild = false;
+      final cubit = context.read<WriteInvoiceCubit>();
+      cubit.viewController.clear();
       Future(() => setState(() {}));
       return const EmptyScaffold();
     }

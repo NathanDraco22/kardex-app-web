@@ -69,6 +69,14 @@ class ClientInvoiceViewController extends ChangeNotifier {
 
   void refresh() => notifyListeners();
 
+  void clear() {
+    description = '';
+    items = [];
+    selectedClient = null;
+    selectedPaymentType = PaymentType.cash;
+    notifyListeners();
+  }
+
   List<SaleItem> createSaleItemFromCommercial() {
     final saleItems = items.map((commercial) {
       final product = commercial.product;
