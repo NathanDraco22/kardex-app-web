@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/constants/const_modules.dart';
 import 'package:kardex_app_front/src/core/access_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/global_stock_search_modal.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/custom_product_commercial_search_delegate.dart';
 import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
 import 'package:kardex_app_front/widgets/menu_app_bar.dart';
 
@@ -115,6 +116,16 @@ class _Body extends StatelessWidget {
               onTap: () {
                 context.pushNamed("commercial-product-movements");
               },
+            ),
+
+          const Divider(height: 0.0),
+
+          if (accessManager.hasCurrentAccess(context, CommercialSubModules.createInvoice))
+            ListTile(
+              leading: const Icon(Icons.info_outline, color: Colors.blueAccent),
+              title: const Text("Consulta Rápida de Producto"),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => showProductInfoSearchDelegate(context),
             ),
 
           const Divider(height: 0.0),

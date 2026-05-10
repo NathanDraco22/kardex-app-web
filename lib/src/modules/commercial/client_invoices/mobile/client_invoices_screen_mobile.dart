@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/cubit/write_invoice_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/mobile/mediator.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_modal.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/custom_product_commercial_search_delegate.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
-import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
+
 import 'package:kardex_app_front/widgets/dialogs/search_products/quick_commercial_product_search_delegate.dart';
 
 import '../widgets/product_invoice_card.dart';
@@ -28,9 +27,9 @@ class ClientInvoicesScreenMobile extends StatefulWidget {
 }
 
 class _ClientInvoicesScreenMobileState extends State<ClientInvoicesScreenMobile> {
-  final viewController = InvoiceMobileViewController();
   @override
   Widget build(BuildContext context) {
+    final viewController = context.read<WriteInvoiceCubit>().viewController;
     return InvoiceMobileMediator(
       viewController: viewController,
       child: const _RootScaffold(),
@@ -113,12 +112,8 @@ class _RootScaffold extends StatelessWidget {
                     onPressed: isEmptyItems
                         ? null
                         : () async {
-                            final saleItems = createSaleItemFromCommercial(
-                              viewController.items,
-                            );
                             await showInvoiceClientMenuScreen(
                               context,
-                              saleItems,
                             );
                           },
                     label: Text(saveButton),
@@ -291,23 +286,4 @@ class _Body extends StatelessWidget {
       ),
     );
   }
-}
-
-List<SaleItem> createSaleItemFromCommercial(List<CommercialProductResult> items) {
-  final saleItems = items.map((commercial) {
-    final product = commercial.product;
-    return SaleItem(
-      product: ProductItem.fromJson(product.toJson()),
-      selectedPrice: commercial.selectedPriceLevel,
-      cost: product.account.averageCost,
-      price: commercial.newPrice,
-      quantity: commercial.quantity,
-      discountPercentage: commercial.discountPercent,
-      totalDiscount: commercial.totalDiscount,
-      subTotal: commercial.subTotal,
-      total: commercial.total,
-    );
-  }).toList();
-
-  return saleItems;
 }

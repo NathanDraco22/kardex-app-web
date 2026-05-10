@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/src/domain/models/common/client_info.dart';
 import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
-import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
-
-import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
 
 import 'package:kardex_app_front/src/tools/session_tool.dart';
 
@@ -13,6 +9,7 @@ import 'package:kardex_app_front/widgets/client_selector_card.dart';
 
 import 'package:kardex_app_front/widgets/widgets.dart';
 
+import '../view_controller.dart';
 import '../widgets/client_invoice_table.dart';
 import '../widgets/dialogs/confirm_invoice_dialog.dart';
 import '../cubit/write_invoice_cubit.dart';
@@ -37,15 +34,26 @@ class ClientInvoicesScreenWeb extends StatefulWidget {
 
 class _ClientInvoicesScreenWebState extends State<ClientInvoicesScreenWeb> {
   bool rebuild = false;
-  ViewController viewController = ViewController();
-  ClientInvoiceTableController tableController = ClientInvoiceTableController();
+
+  late ClientInvoiceViewController viewController;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    viewController = context.read<WriteInvoiceCubit>().viewController;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     if (rebuild) {
       rebuild = false;
-      viewController = ViewController();
-      tableController = ClientInvoiceTableController();
+      final cubit = context.read<WriteInvoiceCubit>();
+      cubit.viewController.clear();
       Future(() => setState(() {}));
       return const EmptyScaffold();
     }
@@ -76,7 +84,6 @@ class _ClientInvoicesScreenWebState extends State<ClientInvoicesScreenWeb> {
 
       child: ClientInvoiceWebMediator(
         viewController: viewController,
-        tableController: tableController,
         child: const _RootScaffold(),
       ),
     );
@@ -88,7 +95,7 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = ClientInvoiceWebMediator.of(context).tableController;
+    final controller = ClientInvoiceWebMediator.of(context).viewController;
     final cubit = context.read<WriteInvoiceCubit>();
     final webScreenWidget = context.findAncestorWidgetOfExactType<ClientInvoicesScreenWeb>();
 
@@ -124,12 +131,15 @@ class _RootScaffold extends StatelessWidget {
                 child: ListenableBuilder(
                   listenable: controller,
                   builder: (context, _) {
-                    final totalMoney = NumberFormatter.convertToMoneyLike(controller.total);
+                    final totalMoney = NumberFormatter.convertToMoneyLike(controller.totalAmount);
                     return Align(
                       alignment: Alignment.center,
                       child: Text(
                         totalMoney,
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     );
                   },

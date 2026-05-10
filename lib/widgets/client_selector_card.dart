@@ -8,9 +8,11 @@ class ClientSelectorCard extends StatefulWidget {
   const ClientSelectorCard({
     super.key,
     required this.onChange,
+    this.initialClient,
   });
 
   final void Function(ClientInDb?) onChange;
+  final ClientInDb? initialClient;
 
   @override
   State<ClientSelectorCard> createState() => _ClientSelectorCardState();
@@ -18,6 +20,13 @@ class ClientSelectorCard extends StatefulWidget {
 
 class _ClientSelectorCardState extends State<ClientSelectorCard> {
   ClientInDb? _selectedClient;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedClient = widget.initialClient;
+  }
+
   @override
   Widget build(BuildContext context) {
     final unSelectClient = Column(

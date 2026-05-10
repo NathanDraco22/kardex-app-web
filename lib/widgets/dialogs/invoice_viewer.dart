@@ -268,7 +268,7 @@ class InvoiceViewerContent extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  "Autor: ${invoice.createdBy.name}",
+                  "Vendedor: ${invoice.createdBy.name}",
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
               ],

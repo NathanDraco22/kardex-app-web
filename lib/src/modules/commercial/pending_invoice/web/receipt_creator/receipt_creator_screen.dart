@@ -8,6 +8,7 @@ import 'package:kardex_app_front/src/domain/models/devolution/devolution.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
 import 'package:kardex_app_front/src/domain/models/receipt/receipt_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/receipt_repository.dart';
+import 'package:kardex_app_front/src/modules/commercial/pending_invoice/cubit/read_invoice_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/cubit/write_receipt_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/modals/confirm_receipt_modal.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/web/receipt_creator/modals/partial_payment_modal.dart';
@@ -74,6 +75,7 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final client = CreateReceiptMediator.of(context).client;
     return BlocListener<WriteReceiptCubit, WriteReceiptState>(
       listener: (context, state) async {
         if (state is WriteReceiptInProgress) {
@@ -88,6 +90,8 @@ class _RootScaffold extends StatelessWidget {
         if (state is WriteReceiptSuccess) {
           LoadingDialogManager.closeLoadingDialog(context);
 
+          context.read<ReadPendingInvoiceCubit>().loadPaginatedInvoices(client.id);
+
           await DialogManager.showInfoDialog(
             context,
             "Recibo creado con éxito",
@@ -95,8 +99,6 @@ class _RootScaffold extends StatelessWidget {
           if (!context.mounted) return;
           await showReceiptViewerDialog(context, state.receipt);
           if (!context.mounted) return;
-          Navigator.pop(context);
-          Navigator.pop(context);
           Navigator.pop(context);
         }
       },

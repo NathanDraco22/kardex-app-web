@@ -13,7 +13,7 @@ Future<void> showDocumentViewer(BuildContext context, ProductTransactionInDb cur
     case TransactionSubType.exit:
       break;
     case TransactionSubType.invoice:
-      await showInvoiceViewerDialogFromDocNumber(context, currentTransaction.documentId);
+      await showInvoiceViewerDialogFromDocNumber(context, currentTransaction.docNumber);
       break;
     case TransactionSubType.devolution:
       showDevolutionViewerDialogFromId(context, currentTransaction.documentId);

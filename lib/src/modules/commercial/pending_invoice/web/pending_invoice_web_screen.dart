@@ -12,7 +12,7 @@ import 'package:kardex_app_front/src/tools/session_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/devolution_viewer.dart';
-import 'package:kardex_app_front/widgets/dialogs/invoice_viewer.dart';
+import 'package:kardex_app_front/widgets/dialogs/invoice_acredit_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/receipt_viewer.dart';
 import 'package:kardex_app_front/widgets/map/launch_map_button.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/cubit/write_receipt_cubit.dart';
@@ -146,10 +146,13 @@ class _PendingInvoiceFloatingButtons extends StatelessWidget {
             await Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => ReceiptCreatorScreen(
-                  client: viewController.selectedClient!,
-                  invoices: viewController.selectedInvoices,
-                  devolutions: viewController.selectedDevolutions,
+                builder: (_) => BlocProvider.value(
+                  value: context.read<ReadPendingInvoiceCubit>(),
+                  child: ReceiptCreatorScreen(
+                    client: viewController.selectedClient!,
+                    invoices: viewController.selectedInvoices,
+                    devolutions: viewController.selectedDevolutions,
+                  ),
                 ),
               ),
             );

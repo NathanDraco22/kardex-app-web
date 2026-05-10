@@ -11,6 +11,7 @@ class _HeaderSection extends StatelessWidget {
         SizedBox(
           width: 425,
           child: ClientSelectorCard(
+            initialClient: viewController.selectedClient,
             onChange: (value) {
               viewController.selectedClient = value;
             },
@@ -165,7 +166,6 @@ class MenuActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewController = ClientInvoiceWebMediator.of(context).viewController;
-    final tableController = ClientInvoiceWebMediator.of(context).tableController;
 
     final cubit = context.read<WriteInvoiceCubit>();
 
@@ -189,7 +189,7 @@ class MenuActions extends StatelessWidget {
     return ListenableBuilder(
       listenable: viewController,
       builder: (context, _) {
-        final canSave = viewController.selectedClient != null && tableController.items.isNotEmpty;
+        final canSave = viewController.selectedClient != null && viewController.items.isNotEmpty;
         return Row(
           mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -197,7 +197,8 @@ class MenuActions extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: canSave
                   ? () async {
-                      final newInvoice = createInvoiceFromControllers(viewController, tableController, context);
+                      final newInvoice = viewController.generateCreateInvoice(context);
+                      if (newInvoice == null) return;
 
                       final res = await showConfirmationInvoiceDialog(
                         context,
@@ -212,7 +213,6 @@ class MenuActions extends StatelessWidget {
                       context.read<WriteInvoiceCubit>().createNewInvoice(
                         newInvoice,
                         viewController.selectedClient!,
-                        currentUser,
                       );
                     }
                   : null,
@@ -224,71 +224,4 @@ class MenuActions extends StatelessWidget {
       },
     );
   }
-}
-
-CreateInvoice createInvoiceFromControllers(
-  ViewController viewController,
-  ClientInvoiceTableController tableController,
-  BuildContext context,
-) {
-  final salesItems = tableController.items.map(
-    (e) {
-      final product = e.commercial.product;
-      return SaleItem(
-        product: ProductItem.fromJson(product.toJson()),
-        selectedPrice: e.commercial.selectedPriceLevel,
-        cost: product.account.averageCost,
-        price: e.commercial.newPrice,
-        quantity: e.commercial.quantity,
-        discountPercentage: e.commercial.discountPercent,
-        totalDiscount: e.commercial.totalDiscount,
-        subTotal: e.commercial.subTotal,
-        total: e.commercial.total,
-      );
-    },
-  );
-
-  final totalCost = salesItems.fold<int>(
-    0,
-    (previousValue, element) => previousValue + (element.cost * element.quantity),
-  );
-
-  final total = salesItems.fold<int>(
-    0,
-    (previousValue, element) => previousValue + element.total,
-  );
-
-  final selectedClient = viewController.selectedClient!;
-
-  final (currentUser, currentBranch) = SessionTool.getFullUserFrom(context);
-
-  final clientInfo = ClientInfo(
-    name: selectedClient.name,
-    group: selectedClient.group,
-    address: selectedClient.address,
-    cardId: selectedClient.cardId,
-    location: selectedClient.location,
-    phone: selectedClient.phone,
-    email: selectedClient.email,
-  );
-
-  final createClientInvoice = CreateInvoice(
-    branchId: currentBranch.id,
-    clientId: selectedClient.id,
-    clientInfo: clientInfo,
-    docNumber: "",
-    description: viewController.description,
-    saleItems: salesItems.toList(),
-    status: InvoiceStatus.open,
-    paymentType: viewController.selectedPaymentType,
-    bankReference: "",
-    totalCost: totalCost,
-    total: total,
-    createdBy: UserInfo(
-      id: currentUser.id,
-      name: currentUser.username,
-    ),
-  );
-
-  return createClientInvoice;
 }

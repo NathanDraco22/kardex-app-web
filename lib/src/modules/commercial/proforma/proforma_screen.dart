@@ -4,13 +4,20 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/cubit/write_invoice_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/mobile/client_invoices_screen_mobile.dart';
+import 'package:kardex_app_front/src/modules/commercial/client_invoices/view_controller.dart';
 import 'package:kardex_app_front/src/tools/extensiones.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/web/client_invoices_screen_web.dart';
 
-class ProformaScreen extends StatelessWidget {
+class ProformaScreen extends StatefulWidget {
   const ProformaScreen({super.key});
 
+  @override
+  State<ProformaScreen> createState() => _ProformaScreenState();
+}
+
+class _ProformaScreenState extends State<ProformaScreen> {
+  final viewController = ClientInvoiceViewController();
   @override
   Widget build(BuildContext context) {
     final invoiceRepo = context.read<InvoicesRepository>();
@@ -22,6 +29,7 @@ class ProformaScreen extends StatelessWidget {
             invoicesRepository: invoiceRepo,
             ordersRepository: orderRepo,
             documentType: CommercialDocumentType.quote,
+            viewController: viewController,
           ),
         ),
       ],
@@ -65,10 +73,6 @@ class _Body extends StatelessWidget {
       );
     }
 
-    // Reuse existing web screen, assuming it will adapt via Cubit state or similar
-    // Since Web screen wasn't heavily refactored for dynamic labels in this plan phase,
-    // we use it as is. It will use the Cubit logic correctly, but might show default labels
-    // if not updated. For now, Mobile is the priority target for this feature request.
     return const ClientInvoicesScreenWeb(
       pageTitle: "Proforma / Cotización",
       actionButtonLabel: "Finalizar Cotización",

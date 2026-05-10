@@ -79,25 +79,22 @@ class _Body extends StatelessWidget {
           ListTile(
             leading: IconWidgets.currentInventoryIcon,
             title: const Text("Inventario Actual"),
-            trailing: const Icon(Icons.chevron_right),
             onTap: () => context.pushNamed("current-inventory"),
           ),
           const Divider(height: 0.0),
 
           ListTile(
-            leading: const Icon(Icons.search, color: Colors.purple),
-            title: const Text("Consulta de Existencias Globales"),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => showGlobalStockSearchModal(context),
+            leading: const Icon(Icons.info_outline, color: Colors.blueAccent),
+            title: const Text("Consulta Rápida de Producto"),
+            onTap: () => showProductInfoSearchDelegate(context),
           ),
 
           const Divider(height: 0.0),
 
           ListTile(
-            leading: const Icon(Icons.info_outline, color: Colors.blueAccent),
-            title: const Text("Consulta Rápida de Producto"),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => showProductInfoSearchDelegate(context),
+            leading: const Icon(Icons.search, color: Colors.purple),
+            title: const Text("Consulta de Existencias Globales"),
+            onTap: () => showGlobalStockSearchModal(context),
           ),
 
           const Divider(height: 0.0),
@@ -120,7 +117,6 @@ class _Body extends StatelessWidget {
                 color: Colors.amber,
               ),
               title: const Text("Bitacora de Vencimientos"),
-              trailing: const Icon(Icons.chevron_right),
               onTap: () => context.pushNamed("expiration-logs"),
             ),
           ),
@@ -138,7 +134,6 @@ class _Body extends StatelessWidget {
               size: 28,
             ),
             title: const Text("Transferencias"),
-            trailing: const Icon(Icons.chevron_right),
             onTap: () => context.pushNamed("current-tranfers"),
           ),
 
@@ -151,7 +146,6 @@ class _Body extends StatelessWidget {
               color: Colors.red,
             ),
             title: const Text("Crear Transferencia"),
-            trailing: const Icon(Icons.chevron_right),
             onTap: () => context.pushNamed("create-transfer"),
           ),
 

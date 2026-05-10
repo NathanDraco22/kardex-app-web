@@ -23,18 +23,16 @@ class ReadProductTransactionCubit extends Cubit<ReadProductTransactionState> {
 
   Future<void> loadPaginatedTransactions({
     required ProductInDb product,
-    required DateTime endDate,
+    required TransactionQueryParams queryParams,
   }) async {
     emit(ReadProductTransactionLoading());
     this.product = product;
 
-    queryParams = TransactionQueryParams(
-      offset: 0,
-      limit: paginationItems,
-      branchId: BranchesTool.getCurrentBranchId(),
-      productId: product.id,
-      endDate: endDate.endOfDay().millisecondsSinceEpoch,
-    );
+    this.queryParams = queryParams;
+    this.queryParams.offset = 0;
+    this.queryParams.limit = paginationItems;
+    this.queryParams.branchId = BranchesTool.getCurrentBranchId();
+    this.queryParams.productId = product.id;
 
     _transactionsCache = [];
     isLastPage = false;
