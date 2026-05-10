@@ -24,6 +24,12 @@ class _ClientInvoiceScreenState extends State<ClientInvoiceScreen> {
   final viewController = ClientInvoiceViewController();
 
   @override
+  void dispose() {
+    viewController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final invoiceRepo = context.read<InvoicesRepository>();
     final orderRepo = context.read<OrdersRepository>();
