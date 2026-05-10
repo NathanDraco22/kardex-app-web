@@ -25,6 +25,8 @@ try:
             break
         if output:
             print(output.strip())
+    if ouput_apk_path.exists():
+        shutil.rmtree(ouput_apk_path)
 
     shutil.move(build_apk_path, ouput_apk_path)
 

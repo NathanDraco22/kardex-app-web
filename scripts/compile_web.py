@@ -28,6 +28,9 @@ try:
             break
         if output:
             print(output.strip())
+            
+    if ouput_web_path.exists():
+        shutil.rmtree(ouput_web_path)
 
     shutil.move(build_web_path, ouput_web_path)
 
