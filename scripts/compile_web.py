@@ -28,11 +28,14 @@ try:
             break
         if output:
             print(output.strip())
-            
+
     if ouput_web_path.exists():
         shutil.rmtree(ouput_web_path)
 
     shutil.move(build_web_path, ouput_web_path)
+
+    if (ouput_path / "deploy.zip").exists():
+        (ouput_path / "deploy.zip").unlink()
 
     shutil.make_archive( str(ouput_path / "deploy"), "zip", ouput_web_path)
 
