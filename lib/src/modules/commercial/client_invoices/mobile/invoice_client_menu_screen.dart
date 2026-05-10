@@ -99,12 +99,6 @@ class _BodyState extends State<_Body> {
   }
 
   @override
-  void dispose() {
-    viewController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
