@@ -286,7 +286,7 @@ class _EntryHistoryViewer extends StatelessWidget {
                                           ),
                                         ],
                                       ),
-                                    ), // Asumiendo que necesitas obtener el nombre
+                                    ),
                                     Expanded(
                                       child: Text(
                                         item.quantity.toString(),
