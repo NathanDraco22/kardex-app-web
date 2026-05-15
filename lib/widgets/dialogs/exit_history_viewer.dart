@@ -248,16 +248,23 @@ class _ExitHistoryViewer extends StatelessWidget {
                                       flex: 2,
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
-
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
-                                          Text(
-                                            item.productName,
-                                          ),
                                           Row(
                                             children: [
+                                              const Icon(Icons.qr_code, size: 12),
                                               Text(
                                                 item.code ?? "",
                                               ),
+                                            ],
+                                          ),
+                                          Text(
+                                            item.productName,
+                                            style: const TextStyle(fontWeight: .w600),
+                                          ),
+                                          Row(
+                                            spacing: 4,
+                                            children: [
                                               Text(
                                                 item.brandName ?? "",
                                               ),

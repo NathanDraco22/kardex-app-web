@@ -80,7 +80,7 @@ class _Body extends StatelessWidget {
               Icons.monetization_on,
               color: Colors.green,
             ),
-            title: const Text("Precios de productos"),
+            title: const Text("Catalogo de Precios"),
             onTap: () => context.pushNamed("product-price-catalog"),
           ),
           const Divider(height: 0.0),

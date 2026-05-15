@@ -261,15 +261,21 @@ class _EntryHistoryViewer extends StatelessWidget {
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
+                                          Row(
+                                            children: [
+                                              const Icon(Icons.qr_code, size: 12),
+                                              Text(
+                                                item.code ?? "",
+                                              ),
+                                            ],
+                                          ),
                                           Text(
                                             item.productName,
+                                            style: const TextStyle(fontWeight: .w600),
                                           ),
                                           Row(
                                             spacing: 4,
                                             children: [
-                                              Text(
-                                                item.code ?? "",
-                                              ),
                                               Text(
                                                 item.brandName ?? "",
                                               ),
