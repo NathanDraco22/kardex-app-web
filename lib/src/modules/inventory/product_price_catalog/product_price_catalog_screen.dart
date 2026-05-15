@@ -41,6 +41,7 @@ class _RootScaffold extends StatelessWidget {
           IconButton(
             onPressed: () {
               showDialog(
+                barrierDismissible: false,
                 context: context,
                 builder: (dialogContext) {
                   return BlocProvider.value(
