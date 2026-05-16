@@ -63,7 +63,6 @@ class ReadProformaCubit extends Cubit<ReadProformaState> {
     createdBy = null;
     _ordersCache = [];
     isLastPage = false;
-    loadPaginatedOrders();
   }
 
   Future<void> updateOrderCache(OrderInDb order) async {
