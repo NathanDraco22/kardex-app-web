@@ -27,15 +27,17 @@ class AuthCubit extends Cubit<AuthState> {
   final ClientGroupsRepository clientGroupRepository;
 
   Future<void> checkSession() async {
+    Servin? currentServin;
     emit(AuthLoading());
     try {
-      final currentServin = await servinRepository.getCurrentServinFromLocal();
+      currentServin = await servinRepository.getCurrentServinFromLocal();
 
       if (currentServin == null) {
         emit(AuthInactive());
         return;
       }
       HttpTools.baseUrl = currentServin.url;
+      HttpTools.servin = currentServin;
 
       final result = await Future.wait([
         authRepository.getLocalSession(),
@@ -94,7 +96,11 @@ class AuthCubit extends Cubit<AuthState> {
       emit(AuthError(error.toString()));
     } catch (error) {
       if (isClosed) return;
-      emit(Unauthenticated());
+      emit(
+        Unauthenticated(
+          servin: currentServin,
+        ),
+      );
     }
   }
 
@@ -109,6 +115,7 @@ class AuthCubit extends Cubit<AuthState> {
       }
 
       HttpTools.baseUrl = currentServin.url;
+      HttpTools.servin = currentServin;
 
       final result = await Future.wait([
         authRepository.login(userId, password),
@@ -177,6 +184,11 @@ class AuthCubit extends Cubit<AuthState> {
     } catch (error) {
       emit(AuthError(error.toString()));
     }
+  }
+
+  Future<void> initServinUnauthenticated(Servin servin) async {
+    HttpTools.servin = servin;
+    emit(Unauthenticated(servin: servin));
   }
 
   Future<void> logout() async {

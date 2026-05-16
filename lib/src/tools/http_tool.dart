@@ -1,11 +1,13 @@
 import 'package:kardex_app_front/config/app_env.dart';
 import 'package:kardex_app_front/src/core/token_manager.dart';
+import 'package:kardex_app_front/src/domain/models/servin/servin.dart';
 
 class HttpTools {
   static String baseUrl = AppEnv.serverUrl;
+  static Servin? servin;
   static const String _api = "/api";
 
-  static String practiceUrl = "";
+  static String practiceUrl = "http://localhost:8000";
 
   static Uri generateUri(String path, {int version = 1, Map<String, String>? queryParameters}) {
     assert(path.startsWith("/"));
@@ -32,9 +34,11 @@ class HttpTools {
 
   static Map<String, String> generateAuthHeaders() {
     final token = TokenManager().getToken();
+    final servinNickname = servin?.nickname;
     return {
       "Authorization": "Bearer $token",
       "X-Agent": "Neptuno",
+      "X-Servin": ?servinNickname,
     };
   }
 }
