@@ -14,6 +14,12 @@ class _HeaderSectionState extends State<_HeaderSection> {
   @override
   Widget build(BuildContext context) {
     final readCubit = context.read<ReadProformaCubit>();
+    final (isSeller, currentUser) = RoleTools.isSeller(context);
+
+    if (isSeller && currentUser != null) {
+      currentSelectedUser = currentUser;
+    }
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -42,21 +48,24 @@ class _HeaderSectionState extends State<_HeaderSection> {
                   icon: const Icon(Icons.business),
                   label: Text(currentSelectedClient?.name ?? "Seleccionar cliente"),
                 ),
-                TextButton.icon(
-                  onPressed: () async {
-                    final user = await showActiveUserSelectionDialog(context);
-                    if (user == null) return;
-                    setState(() {
-                      currentSelectedUser = user;
-                    });
-                    readCubit.setFilterParams(
-                      clientId: currentSelectedClient?.id,
-                      createdBy: currentSelectedUser?.id,
-                    );
-                    readCubit.loadPaginatedOrders();
-                  },
-                  icon: const Icon(Icons.person),
-                  label: Text(currentSelectedUser?.username ?? "Seleccionar usuario"),
+                Visibility(
+                  visible: !isSeller,
+                  child: TextButton.icon(
+                    onPressed: () async {
+                      final user = await showActiveUserSelectionDialog(context);
+                      if (user == null) return;
+                      setState(() {
+                        currentSelectedUser = user;
+                      });
+                      readCubit.setFilterParams(
+                        clientId: currentSelectedClient?.id,
+                        createdBy: currentSelectedUser?.id,
+                      );
+                      readCubit.loadPaginatedOrders();
+                    },
+                    icon: const Icon(Icons.person),
+                    label: Text(currentSelectedUser?.username ?? "Seleccionar usuario"),
+                  ),
                 ),
               ],
             ),
@@ -67,6 +76,10 @@ class _HeaderSectionState extends State<_HeaderSection> {
                   currentSelectedClient = null;
                 });
                 readCubit.clearFilterParams();
+                if (isSeller && currentUser != null) {
+                  readCubit.setFilterParams(createdBy: currentUser.id);
+                }
+                readCubit.loadPaginatedOrders();
               },
               icon: const Icon(Icons.clear),
               label: const Text("Limpiar"),
