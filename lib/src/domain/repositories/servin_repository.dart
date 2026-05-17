@@ -33,6 +33,7 @@ class ServinRepository {
     if (localServin == null) return null;
 
     final updatedServin = localServin.copyWith(
+      nickname: servinResponse.nickname,
       isActive: servinResponse.isActive,
       isMultiBranch: servinResponse.isMultiBranch,
     );
