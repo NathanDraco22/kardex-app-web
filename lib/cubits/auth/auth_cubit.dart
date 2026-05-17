@@ -27,20 +27,24 @@ class AuthCubit extends Cubit<AuthState> {
   final ClientGroupsRepository clientGroupRepository;
 
   Future<void> checkSession() async {
+    Servin? currentServin;
     emit(AuthLoading());
+
     try {
-      final currentServin = await servinRepository.getCurrentServinFromLocal();
+      currentServin = await servinRepository.getCurrentServinFromLocal();
 
       if (currentServin == null) {
         emit(AuthInactive());
         return;
       }
       HttpTools.baseUrl = currentServin.url;
+      HttpTools.servin = currentServin;
 
       final result = await Future.wait([
         authRepository.getLocalSession(),
         servinRepository.refreshServinStatus(),
       ]);
+
       LoginResponse? loginResponse = result[0] as LoginResponse?;
       final servin = result[1] as Servin?;
 
@@ -64,7 +68,7 @@ class AuthCubit extends Cubit<AuthState> {
         if (branch == null) {
           throw Exception("Branch not found");
         }
-        HttpTools.baseUrl = currentServin.url;
+
         BranchesTool.setCurrentBranch(branch);
         BranchesTool.setBranches(results[1] as List<BranchInDb>);
 
@@ -94,7 +98,11 @@ class AuthCubit extends Cubit<AuthState> {
       emit(AuthError(error.toString()));
     } catch (error) {
       if (isClosed) return;
-      emit(Unauthenticated());
+      emit(
+        Unauthenticated(
+          servin: currentServin,
+        ),
+      );
     }
   }
 
@@ -109,6 +117,7 @@ class AuthCubit extends Cubit<AuthState> {
       }
 
       HttpTools.baseUrl = currentServin.url;
+      HttpTools.servin = currentServin;
 
       final result = await Future.wait([
         authRepository.login(userId, password),
@@ -177,6 +186,11 @@ class AuthCubit extends Cubit<AuthState> {
     } catch (error) {
       emit(AuthError(error.toString()));
     }
+  }
+
+  Future<void> initServinUnauthenticated(Servin servin) async {
+    HttpTools.servin = servin;
+    emit(Unauthenticated(servin: servin));
   }
 
   Future<void> logout() async {
