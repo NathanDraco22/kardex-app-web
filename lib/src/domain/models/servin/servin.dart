@@ -9,6 +9,7 @@ class Servin {
   });
 
   final String name;
+  // TODO: makes required for the next version
   final String? nickname;
   final String url;
   final bool isActive;

@@ -29,6 +29,7 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> checkSession() async {
     Servin? currentServin;
     emit(AuthLoading());
+
     try {
       currentServin = await servinRepository.getCurrentServinFromLocal();
 
@@ -43,6 +44,7 @@ class AuthCubit extends Cubit<AuthState> {
         authRepository.getLocalSession(),
         servinRepository.refreshServinStatus(),
       ]);
+
       LoginResponse? loginResponse = result[0] as LoginResponse?;
       final servin = result[1] as Servin?;
 
@@ -66,7 +68,7 @@ class AuthCubit extends Cubit<AuthState> {
         if (branch == null) {
           throw Exception("Branch not found");
         }
-        HttpTools.baseUrl = currentServin.url;
+
         BranchesTool.setCurrentBranch(branch);
         BranchesTool.setBranches(results[1] as List<BranchInDb>);
 
