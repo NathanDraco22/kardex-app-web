@@ -32,13 +32,12 @@ class DevolutionsRepository {
     return response.data;
   }
 
-  Future<List<DevolutionInDb>> getOpenDevolutions(String userId) async {
+  Future<List<DevolutionInDb>> getAllActiveDevolutions(String userId) async {
     final params = DevolutionQueryParams()
       ..branchId = BranchesTool.getCurrentBranchId()
-      ..status = DevolutionStatus.open
       ..clientId = userId;
 
-    final results = await devolutionsDataSource.getAllDevolutions(params.toMap());
+    final results = await devolutionsDataSource.getAllActiveDevolutions(params.toMap());
     final response = ListResponse<DevolutionInDb>.fromJson(results, DevolutionInDb.fromJson);
     return response.data;
   }
