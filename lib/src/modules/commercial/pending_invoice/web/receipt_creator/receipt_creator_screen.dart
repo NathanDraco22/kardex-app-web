@@ -8,7 +8,7 @@ import 'package:kardex_app_front/src/domain/models/devolution/devolution.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
 import 'package:kardex_app_front/src/domain/models/receipt/receipt_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/receipt_repository.dart';
-import 'package:kardex_app_front/src/modules/commercial/pending_invoice/cubit/read_invoice_cubit.dart';
+import 'package:kardex_app_front/src/modules/commercial/pending_invoice/cubit/read_pending_invoice_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/cubit/write_receipt_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/modals/confirm_receipt_modal.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/web/receipt_creator/modals/partial_payment_modal.dart';

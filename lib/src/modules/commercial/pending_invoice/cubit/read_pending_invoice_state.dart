@@ -1,4 +1,4 @@
-part of 'read_invoice_cubit.dart';
+part of 'read_pending_invoice_cubit.dart';
 
 sealed class ReadInvoiceState {}
 

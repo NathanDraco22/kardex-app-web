@@ -58,6 +58,12 @@ class DevolutionsDataSource with HttpService {
     return await getQuery(uri, headers: headers);
   }
 
+  Future<Map<String, dynamic>> getAllActiveDevolutions(Map<String, String> params) async {
+    final uri = HttpTools.generateUri("$_endpoint/all/active", queryParameters: params);
+    final headers = HttpTools.generateAuthHeaders();
+    return await getQuery(uri, headers: headers);
+  }
+
   Future<Map<String, dynamic>> getDevolutionByDocNumber(String docNumber) async {
     final uri = HttpTools.generateUri("$_endpoint/doc/$docNumber");
     final headers = HttpTools.generateAuthHeaders();
