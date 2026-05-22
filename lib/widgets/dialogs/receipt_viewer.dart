@@ -8,22 +8,33 @@ import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/devolution_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/invoice_viewer.dart';
 import 'package:kardex_app_front/src/domain/repositories/receipt_repository.dart';
+import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_receipt_template.dart';
+import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 
 import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 import 'package:kardex_app_front/src/tools/printers/paper_settings.dart';
 
 Future<void> showReceiptViewerDialog(BuildContext context, ReceiptInDb receipt) async {
+  final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
   final paperSize = await PrintManager.getLocalPaperSize();
   if (!context.mounted) return;
   await Navigator.push(
     context,
     MaterialPageRoute(
-      builder: (context) => _ReceiptViewer(receipt, paperSize: paperSize),
+      builder: (context) => _ReceiptViewer(
+        receipt,
+        paperSize: paperSize,
+        onExportPdf: () async {
+          final template = SingleReceiptTemplate(receipt: receipt, branch: currentBranch);
+          await PdfExportTool.export(template, fileName: "recibo_${receipt.docNumber}.pdf");
+        },
+      ),
     ),
   );
 }
 
 Future<void> showReceiptViewerDialogFromDocNumber(BuildContext context, String docNumber) async {
+  final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
   final paperSize = await PrintManager.getLocalPaperSize();
   if (!context.mounted) return;
 
@@ -54,7 +65,14 @@ Future<void> showReceiptViewerDialogFromDocNumber(BuildContext context, String d
 
             final receipt = asyncSnapshot.data!;
 
-            return _ReceiptViewer(receipt, paperSize: paperSize);
+            return _ReceiptViewer(
+              receipt,
+              paperSize: paperSize,
+              onExportPdf: () async {
+                final template = SingleReceiptTemplate(receipt: receipt, branch: currentBranch);
+                await PdfExportTool.export(template, fileName: "recibo_${receipt.docNumber}.pdf");
+              },
+            );
           },
         );
       },
@@ -63,10 +81,15 @@ Future<void> showReceiptViewerDialogFromDocNumber(BuildContext context, String d
 }
 
 class _ReceiptViewer extends StatelessWidget {
-  const _ReceiptViewer(this.receipt, {this.paperSize = PaperSize.mm80});
+  const _ReceiptViewer(
+    this.receipt, {
+    this.paperSize = PaperSize.mm80,
+    this.onExportPdf,
+  });
 
   final ReceiptInDb receipt;
   final PaperSize paperSize;
+  final VoidCallback? onExportPdf;
 
   @override
   Widget build(BuildContext context) {
@@ -77,6 +100,11 @@ class _ReceiptViewer extends StatelessWidget {
       appBar: AppBar(
         title: Text("Recibo #${receipt.docNumber}"),
         actions: [
+          IconButton(
+            tooltip: "Exportar PDF (A4)",
+            onPressed: onExportPdf,
+            icon: const Icon(Icons.picture_as_pdf),
+          ),
           IconButton(
             tooltip: "Compartir Recibo",
             onPressed: () {
