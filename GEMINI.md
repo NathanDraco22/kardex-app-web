@@ -5,8 +5,14 @@
 - He revisado y tengo en mi contexto el contenido de los archivos `devolution_viewer.dart`, `_viewer.dart` y `receipt_viewer.dart` de la carpeta `widgets/dialogs`.
 - El usuario quiere que siempre le responda en español.
 - El usuario quiere que anote el contexto de nuestra conversación en el archivo GEMINI.md.
-- La sintaxis de mapas con `?` para manejar valores nulos es válida a partir de Dart 3.8.
 - Se han creado las features completas de 'Historial de Recibos' y 'Historial de Devoluciones', replicando la estructura de UI y Cubit de 'Historial de Facturas'.
+- Se ha rediseñado la cabecera en `single_invoice_template.dart` para incluir de forma limpia y estética la información completa de la sucursal (logo, dirección, teléfono, email).
+- Se han creado las plantillas PDF en tamaño de hoja normal (A4) para Pedidos (`single_order_template.dart`), Recibos de pago (`single_receipt_template.dart`) y Devoluciones (`single_devolution_template.dart`), compartiendo la misma estructura de cabecera premium y datos de la sucursal.
+- Se integraron los botones "Exportar PDF (A4)" en los visores de Pedidos (`order_viewer.dart`), Recibos (`receipt_viewer.dart`) y Devoluciones (`devolution_viewer.dart`) para garantizar paridad de funciones en la exportación de documentos con respecto a las Facturas.
+- Se realizaron ajustes de diseño en los 4 templates PDF A4 (`single_invoice_template.dart`, `single_order_template.dart`, `single_receipt_template.dart` y `single_devolution_template.dart`) para:
+  - Eliminar el prefijo textual `"Fecha: "` de la cabecera superior derecha, dejando solo el valor de fecha y hora.
+  - Reubicar la información del vendedor, persona que elaboró o cobró el documento a la columna izquierda (debajo de la ubicación del cliente).
+
 
 ## Arquitectura de Módulos
 La arquitectura de un módulo en este proyecto Flutter incluye:

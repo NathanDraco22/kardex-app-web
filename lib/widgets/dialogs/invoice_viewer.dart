@@ -84,6 +84,55 @@ Future<void> showInvoiceViewerDialogFromDocNumber(BuildContext context, String d
   );
 }
 
+Future<void> showInvoiceViewerDialogFromId(BuildContext context, String id) async {
+  final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
+  final paperSize = await PrintManager.getLocalPaperSize();
+  if (!context.mounted) return;
+
+  await Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) {
+        return FutureBuilder(
+          future: context.read<InvoicesRepository>().getInvoiceById(id),
+          builder: (context, asyncSnapshot) {
+            if (asyncSnapshot.connectionState != ConnectionState.done) {
+              return Scaffold(
+                appBar: AppBar(),
+                body: const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            }
+
+            if (asyncSnapshot.hasError) {
+              return Scaffold(
+                appBar: AppBar(),
+                body: Center(
+                  child: Text("Error al cargar la factura \n ${asyncSnapshot.error}"),
+                ),
+              );
+            }
+
+            final invoice = asyncSnapshot.data!;
+
+            return _InvoiceViewer(
+              invoice: invoice,
+              branch: currentBranch,
+              onShare: () => shareInvoice(invoice, currentBranch, paperSize: paperSize),
+              onPrint: () => printInvoice(invoice, currentBranch, paperSize: paperSize),
+              onExportPdf: () async {
+                final template = SingleInvoiceTemplate(invoice: invoice, branch: currentBranch);
+                await PdfExportTool.export(template, fileName: "factura_${invoice.docNumber}.pdf");
+              },
+            );
+          },
+        );
+      },
+    ),
+  );
+}
+
 class _InvoiceViewer extends StatelessWidget {
   const _InvoiceViewer({
     required this.invoice,

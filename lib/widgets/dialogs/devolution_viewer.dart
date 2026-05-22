@@ -8,6 +8,8 @@ import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
 import 'package:kardex_app_front/src/tools/printers/devolution_printer.dart';
+import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_devolution_template.dart';
+import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 
 import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 
@@ -25,6 +27,10 @@ Future<void> showDevolutionViewerDialog(BuildContext context, DevolutionInDb dev
           branch: currentBranch,
           onShare: () => shareDevolution(devolution, currentBranch, paperSize: paperSize),
           onPrint: () => printDevolution(devolution, currentBranch, paperSize: paperSize),
+          onExportPdf: () async {
+            final template = SingleDevolutionTemplate(devolution: devolution, branch: currentBranch);
+            await PdfExportTool.export(template, fileName: "devolucion_${devolution.docNumber}.pdf");
+          },
         );
       },
     ),
@@ -65,6 +71,10 @@ Future<void> showDevolutionViewerDialogFromId(BuildContext context, String devol
               branch: currentBranch,
               onShare: () => shareDevolution(devolution, currentBranch, paperSize: paperSize),
               onPrint: () => printDevolution(devolution, currentBranch, paperSize: paperSize),
+              onExportPdf: () async {
+                final template = SingleDevolutionTemplate(devolution: devolution, branch: currentBranch);
+                await PdfExportTool.export(template, fileName: "devolucion_${devolution.docNumber}.pdf");
+              },
             );
           },
         );
@@ -80,12 +90,14 @@ class _DevolutionViewer extends StatelessWidget {
     required this.branch,
     this.onShare,
     this.onPrint,
+    this.onExportPdf,
   });
 
   final DevolutionInDb devolution;
   final BranchInDb branch;
   final VoidCallback? onShare;
   final VoidCallback? onPrint;
+  final VoidCallback? onExportPdf;
 
   @override
   Widget build(BuildContext context) {
@@ -93,6 +105,11 @@ class _DevolutionViewer extends StatelessWidget {
       appBar: AppBar(
         title: Text("Devolución #${devolution.docNumber}"),
         actions: [
+          IconButton(
+            tooltip: "Exportar PDF (A4)",
+            onPressed: onExportPdf,
+            icon: const Icon(Icons.picture_as_pdf),
+          ),
           IconButton(
             tooltip: "Compartir Devolución",
             onPressed: onShare,
