@@ -157,6 +157,21 @@ class _Body extends StatelessWidget {
           if (accessManager.hasCurrentAccess(context, CommercialSubModules.createInvoice))
             ListTile(
               leading: Icon(
+                Icons.find_in_page_rounded,
+                size: 32,
+                color: Colors.green.shade800,
+              ),
+              title: const Text("Buscar facturas por producto"),
+              onTap: () {
+                context.pushNamed("invoices-by-product");
+              },
+            ),
+
+          const Divider(height: 0.0),
+
+          if (accessManager.hasCurrentAccess(context, CommercialSubModules.createInvoice))
+            ListTile(
+              leading: Icon(
                 FluentIcons.building_retail_money_24_filled,
                 size: 32,
                 color: Colors.orange.shade600,

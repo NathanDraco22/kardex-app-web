@@ -48,3 +48,13 @@ Esta estructura se ha seguido para módulos como 'Historial de Facturas', 'Histo
   - En `client_full_details_dialog.dart`, se muestra el límite formateado como moneda (`C\$`).
   - En `create_client_dialog.dart`, se ha añadido un campo de entrada numérica que se activa solo si "Crédito Activo" está habilitado.
   - El valor se almacena como `int` (multiplicado por 100) para manejar decimales de forma consistente con otros campos financieros del proyecto.
+
+## Historial de Facturas por Producto (Mayo 2026)
+- **Endpoint**: Se añadió soporte en el frontend para el endpoint del servidor `/invoices/byProduct/{product_id}` con query parameters `InvoiceQueryParams`.
+- **Capa de Datos**: Modificado `InvoicesDataSource` agregando `getInvoicesByProduct`.
+- **Capa de Dominio**: Modificado `InvoicesRepository` agregando `getInvoicesByProduct` retornando `ListResponse<InvoiceInDb>`.
+- **Capa de Lógica**: Creado el cubit `ReadInvoiceByProductCubit` (`read_invoice_by_product_cubit.dart` y `read_invoice_by_product_state.dart`) para cargar paginadamente las facturas asociadas a un producto.
+- **Módulo UI**: Creado el módulo `Buscar facturas por producto` en `lib/src/modules/commercial/invoice_by_product/` compuesto por `invoice_by_product_screen.dart`, `invoice_by_product_web_screen.dart` y sus subsecciones (`header_section.dart` y `content_section.dart`).
+- **Navegación y Menú**: Registrada la ruta `invoices-by-product` en `app_router.dart` y agregada la opción en el menú principal de comercio en `commercial_menu_screen.dart`.
+
+

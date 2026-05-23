@@ -135,4 +135,13 @@ class InvoicesRepository {
     final result = await invoiceDevolutionsDataSource.getAnonInvoicesWithDevlutions(docNumber);
     return InvoiceDevolutionResponse.fromJson(result);
   }
+
+  Future<ListResponse<InvoiceInDb>> getInvoicesByProduct(
+    String productId,
+    InvoiceQueryParams params,
+  ) async {
+    final res = await invoicesDataSource.getInvoicesByProduct(productId, params.toMap());
+    final result = ListResponse<InvoiceInDb>.fromJson(res, InvoiceInDb.fromJson);
+    return result;
+  }
 }
