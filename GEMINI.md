@@ -57,4 +57,23 @@ Esta estructura se ha seguido para módulos como 'Historial de Facturas', 'Histo
 - **Módulo UI**: Creado el módulo `Buscar facturas por producto` en `lib/src/modules/commercial/invoice_by_product/` compuesto por `invoice_by_product_screen.dart`, `invoice_by_product_web_screen.dart` y sus subsecciones (`header_section.dart` y `content_section.dart`).
 - **Navegación y Menú**: Registrada la ruta `invoices-by-product` en `app_router.dart` y agregada la opción en el menú principal de comercio en `commercial_menu_screen.dart`.
 
+## Onion CLI Helper
+- La herramienta `onion` CLI ya está correctamente instalada y disponible en el `PATH` global del sistema.
+- Se puede ejecutar directamente en cualquier terminal escribiendo:
+  `onion --help`
+- Si en algún momento deja de funcionar de forma global, se puede recurrir a su ruta absoluta del entorno virtual:
+  `C:\Users\sytru\Developer\Python\onion-cli\.venv\Scripts\onion.exe`
 
+### Convenciones de Nombres
+- Pasar siempre la entidad en **singular** (ej. `product`). La CLI genera las variaciones de PascalCase y snake_case para singular y plural de forma automática.
+
+### Comandos Clave (Flutter / Dart)
+- `onion dart <entidad>`: Genera modelo, datasource y repositorio en una sola ejecución.
+- `onion flutter-module <entidad>`: Crea la carpeta del módulo Flutter con cubits, vista base, dialogs y widgets stubs.
+- `onion dart-cubit <entidad>`: Genera los cubits de lectura/escritura y sus estados.
+- `onion dart-model <entidad>`: Genera solo los archivos de modelo en Dart.
+- `onion dart-view <entidad>`: Genera solo el StatelessWidget básico de vista.
+
+### Comandos Clave (FastAPI / Python)
+- `onion crud <entidad> --version <n>`: Genera router, controller, repos, datasource, model (stubs).
+- `onion crud-mongo <entidad> --version <n>`: Genera CRUD completo integrado con persistencia MongoDB.

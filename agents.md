@@ -242,4 +242,49 @@ Las carpetas de UI están atadas a la estructura de módulos de negocio (`lib/sr
 2. **Evitar hardcode en rutas y auth:** Utiliza SIEMPRE `HttpTools` y `with HttpService`. 
 3. **No realizar parseos Json en DataSource:** El return del source siempre viaja en bruto a la capa de Repositorio. El repositorio se hace responsable del tipado fuerte.
 4. **Respeto a Dart Moderno:** Las directivas de "Null Safety" y Mapas con null coalescing como `map?['value']` deben respetarse como prácticas soportadas y recomendadas (Dart 3+).
-5. **Persistencia de estilos en UI:** Respeta colores, tipografía global y formatos. Los costos no editables se formatean tipicamente dividiendo sobre 100 con `.toStringAsFixed(2)`.
+5. Persistencia de estilos en UI: Respeta colores, tipografía global y formatos. Los costos no editables se formatean tipicamente dividiendo sobre 100 con `.toStringAsFixed(2)`.
+
+---
+
+## 9. Uso de la Herramienta Onion CLI
+
+El proyecto cuenta con un helper CLI en Python llamado `onion` para automatizar la creación de código siguiendo la Arquitectura Onion. Esta herramienta está instalada globalmente en el sistema y se puede ejecutar escribiendo `onion` en la terminal.
+
+### Reglas de Nomenclatura
+- Todos los nombres de las entidades deben proveerse en **singular** (ej. `product`, no `products`). La CLI las pluralizará y formateará automáticamente (PascalCase y snake_case).
+
+### Comandos Comunes para Dart / Flutter
+Cuando se trabaje en el frontend, se pueden usar los siguientes comandos desde la raíz del proyecto para generar plantillas consistentes:
+
+- **Generar Capa de Datos Completa:** Genera modelo, datasource y repositorio.
+  ```bash
+  onion dart <nombre_de_entidad_en_singular>
+  ```
+  *Archivos generados:* `lib/src/models/<entidad>_model.dart`, `lib/src/data/<entidad>_data_source.dart`, `lib/src/domain/repositories/<entidad>_repository.dart`.
+  
+- **Generar Módulo Flutter Completo:** Genera la estructura de directorios recomendada en `lib/src/modules/` (vista básica, cubits de lectura/escritura, stubs de dialogs y widgets).
+  ```bash
+  onion flutter-module <nombre_de_entidad_en_singular>
+  ```
+
+- **Generar solo Cubits:** Genera los archivos de cubit y estados para lectura (`Read`) y escritura (`Write`) en un directorio.
+  ```bash
+  onion dart-cubit <nombre_de_entidad_en_singular>
+  ```
+
+- **Generar solo Modelos:** Genera las 4 clases de datos (`Base`, `Create`, `Update`, `InDb`) en Dart.
+  ```bash
+  onion dart-model <nombre_de_entidad_en_singular>
+  ```
+
+- **Generar solo la Vista:** Genera una pantalla base StatelessWidget.
+  ```bash
+  onion dart-view <nombre_de_entidad_en_singular>
+  ```
+
+### Comandos Comunes para FastAPI (Backend)
+Si se requiere trabajar en el backend, la CLI permite generar endpoints y persistencia rápidamente:
+- **CRUD Completo (Memoria/Stubs):** `onion crud <entidad> --version <v>`
+- **CRUD Completo con MongoDB:** `onion crud-mongo <entidad> --version <v>`
+- **Generar solo Router/Controller:** `onion router <entidad> --version <v>`
+- **Generar solo Repositorio/DataSource:** `onion repo <entidad> --version <v>`
