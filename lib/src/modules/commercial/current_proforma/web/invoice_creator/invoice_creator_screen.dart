@@ -173,7 +173,7 @@ class _RootScaffold extends StatelessWidget {
 
             return ElevatedButton.icon(
               onPressed: () {
-                showInvoiceViewerDialogFromDocNumber(context, orderContainer.order.invoiceId);
+                showInvoiceViewerDialogFromId(context, orderContainer.order.invoiceId);
               },
               label: const Text("Ver Factura"),
               icon: const Icon(Icons.picture_as_pdf),

@@ -7,6 +7,8 @@ import 'package:kardex_app_front/src/domain/repositories/order_repository.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/printers/order_printer.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_order_template.dart';
+import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 
 import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 
@@ -24,6 +26,10 @@ Future<void> showOrderViewerDialog(BuildContext context, OrderInDb order) async 
           branch: currentBranch,
           onShare: () => shareOrder(order, currentBranch, paperSize: paperSize),
           onPrint: () => printOrder(order, currentBranch, paperSize: paperSize),
+          onExportPdf: () async {
+            final template = SingleOrderTemplate(order: order, branch: currentBranch);
+            await PdfExportTool.export(template, fileName: "pedido_${order.docNumber}.pdf");
+          },
         );
       },
     ),
@@ -67,6 +73,10 @@ Future<void> showOrderViewerDialogFromId(BuildContext context, String orderId) a
               branch: currentBranch,
               onShare: () => shareOrder(order, currentBranch, paperSize: paperSize),
               onPrint: () => printOrder(order, currentBranch, paperSize: paperSize),
+              onExportPdf: () async {
+                final template = SingleOrderTemplate(order: order, branch: currentBranch);
+                await PdfExportTool.export(template, fileName: "pedido_${order.docNumber}.pdf");
+              },
             );
           },
         );
@@ -81,12 +91,14 @@ class _OrderViewer extends StatelessWidget {
     required this.branch,
     this.onShare,
     this.onPrint,
+    this.onExportPdf,
   });
 
   final OrderInDb order;
   final BranchInDb branch;
   final VoidCallback? onShare;
   final VoidCallback? onPrint;
+  final VoidCallback? onExportPdf;
 
   @override
   Widget build(BuildContext context) {
@@ -94,6 +106,11 @@ class _OrderViewer extends StatelessWidget {
       appBar: AppBar(
         title: Text("Pedido #${order.docNumber}"),
         actions: [
+          IconButton(
+            tooltip: "Exportar PDF (A4)",
+            onPressed: onExportPdf,
+            icon: const Icon(Icons.picture_as_pdf),
+          ),
           IconButton(
             tooltip: "Compartir Pedido",
             onPressed: onShare,

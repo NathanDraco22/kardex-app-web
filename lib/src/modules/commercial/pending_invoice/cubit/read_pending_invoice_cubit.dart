@@ -2,8 +2,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/devolution/devolution.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
+import 'package:kardex_app_front/src/domain/responses/list_responses.dart';
 
-part 'read_invoice_state.dart';
+part 'read_pending_invoice_state.dart';
 
 class ReadPendingInvoiceCubit extends Cubit<ReadInvoiceState> {
   ReadPendingInvoiceCubit({required this.invoicesRepository, required this.devolutionsRepository})
@@ -18,19 +19,12 @@ class ReadPendingInvoiceCubit extends Cubit<ReadInvoiceState> {
   Future<void> loadPaginatedInvoices(String clientId) async {
     emit(ReadInvoiceLoading());
     try {
-      final response = await invoicesRepository.getPendingInvoices(
-        clientId,
-      );
-
-      final requestedDevolutions = Future.wait([
-        devolutionsRepository.getConfirmedDevolutions(clientId),
-        devolutionsRepository.getOpenDevolutions(clientId),
+      final res = await Future.wait([
+        invoicesRepository.getPendingInvoices(clientId),
+        devolutionsRepository.getAllActiveDevolutions(clientId),
       ]);
-      final results = await requestedDevolutions;
-      final confirmedDevolutions = results[0];
-      final openDevolutions = results[1];
-
-      final devolutions = [...confirmedDevolutions, ...openDevolutions];
+      final response = res[0] as ListResponse<InvoiceInDb>;
+      final devolutions = res[1] as List<DevolutionInDb>;
 
       _invoicesCache = response.data;
       if (_invoicesCache.length >= response.count) {

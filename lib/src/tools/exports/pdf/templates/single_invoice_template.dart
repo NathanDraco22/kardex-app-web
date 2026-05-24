@@ -40,6 +40,7 @@ class SingleInvoiceTemplate implements PdfTemplate {
   }
 
   pw.Widget _buildHeader() {
+    final branchImage = branch.image;
     String clientLabel = "${invoice.clientId} - ${invoice.clientInfo.name}";
     if (invoice.clientId == "SALE_CLIENT") {
       clientLabel = invoice.clientInfo.name;
@@ -48,35 +49,69 @@ class SingleInvoiceTemplate implements PdfTemplate {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.stretch,
       children: [
-        pw.Text(
-          "Factura",
-          style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 16),
-        ),
-        pw.SizedBox(height: 8),
         pw.Row(
           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            pw.Text(
-              "No. ${invoice.docNumber}",
-              style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
+            pw.Expanded(
+              child: pw.Row(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  if (branchImage != null && branchImage.isNotEmpty) ...[
+                    pw.Image(
+                      pw.MemoryImage(branchImage),
+                      width: 60,
+                      height: 60,
+                    ),
+                    pw.SizedBox(width: 12),
+                  ],
+                  pw.Expanded(
+                    child: pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Text(
+                          branch.name,
+                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
+                        ),
+                        pw.SizedBox(height: 4),
+                        pw.Text(
+                          branch.address,
+                          style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey700),
+                        ),
+                        pw.SizedBox(height: 2),
+                        pw.Text(
+                          "Tel: ${branch.phone} | Email: ${branch.email}",
+                          style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey700),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
+            pw.SizedBox(width: 16),
             pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.end,
               children: [
                 pw.Text(
-                  DateTimeTool.formatddMMyy(invoice.createdAt),
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
+                  "FACTURA",
+                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 18, color: PdfColors.blue800),
                 ),
+                pw.SizedBox(height: 4),
                 pw.Text(
-                  DateTimeTool.formatHHmm(invoice.createdAt),
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
+                  "No. ${invoice.docNumber}",
+                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                ),
+                pw.SizedBox(height: 2),
+                pw.Text(
+                  "${DateTimeTool.formatddMMyy(invoice.createdAt)} ${DateTimeTool.formatHHmm(invoice.createdAt)}",
+                  style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey700),
                 ),
               ],
             ),
           ],
         ),
-        pw.SizedBox(height: 12),
+        pw.SizedBox(height: 16),
         pw.Container(
           padding: const pw.EdgeInsets.all(12),
           decoration: pw.BoxDecoration(
@@ -84,50 +119,67 @@ class SingleInvoiceTemplate implements PdfTemplate {
             borderRadius: const pw.BorderRadius.all(pw.Radius.circular(8)),
             border: pw.Border.all(color: PdfColors.grey300),
           ),
-          child: pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+          child: pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              pw.Text(
-                branch.name,
-                style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
-              ),
-              pw.SizedBox(height: 4),
-              _buildPaymentType(),
-              pw.SizedBox(height: 4),
-              pw.Text(
-                clientLabel,
-                style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
-              ),
-              if (invoice.clientInfo.location != null && invoice.clientInfo.location!.isNotEmpty) ...[
-                pw.SizedBox(height: 4),
-                pw.Text(
-                  "${invoice.clientInfo.location}",
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
+              pw.Expanded(
+                child: pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text(
+                      "CLIENTE",
+                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 9, color: PdfColors.grey600),
+                    ),
+                    pw.SizedBox(height: 4),
+                    pw.Text(
+                      clientLabel,
+                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                    ),
+                    if (invoice.clientInfo.location != null && invoice.clientInfo.location!.isNotEmpty) ...[
+                      pw.SizedBox(height: 2),
+                      pw.Text(
+                        "${invoice.clientInfo.location}",
+                        style: const pw.TextStyle(fontSize: 10),
+                      ),
+                    ],
+                    if (invoice.clientInfo.address != null && invoice.clientInfo.address!.isNotEmpty) ...[
+                      pw.SizedBox(height: 2),
+                      pw.Text(
+                        "${invoice.clientInfo.address}",
+                        style: const pw.TextStyle(fontSize: 10),
+                      ),
+                    ],
+                    pw.SizedBox(height: 4),
+                    pw.Text(
+                      "Vendedor: ${invoice.createdBy.name}",
+                      style: const pw.TextStyle(fontSize: 10),
+                    ),
+                  ],
                 ),
-              ],
-              if (invoice.clientInfo.address != null && invoice.clientInfo.address!.isNotEmpty) ...[
-                pw.SizedBox(height: 4),
-                pw.Text(
-                  "${invoice.clientInfo.address}",
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
-                ),
-              ],
-              pw.SizedBox(height: 4),
-              pw.Text(
-                "Vendedor: ${invoice.createdBy.name}",
-                style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
               ),
-              if (invoice.description.isNotEmpty) ...[
-                pw.SizedBox(height: 4),
-                pw.Text(
-                  "Observación: ${invoice.description}",
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
-                ),
-              ],
+              pw.SizedBox(width: 16),
+              pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.end,
+                children: [
+                  pw.Text(
+                    "DETALLES",
+                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 9, color: PdfColors.grey600),
+                  ),
+                  pw.SizedBox(height: 4),
+                  _buildPaymentType(),
+                  if (invoice.description.isNotEmpty) ...[
+                    pw.SizedBox(height: 2),
+                    pw.Text(
+                      "Observación: ${invoice.description}",
+                      style: const pw.TextStyle(fontSize: 10),
+                    ),
+                  ],
+                ],
+              ),
             ],
           ),
         ),
-        pw.SizedBox(height: 12),
       ],
     );
   }

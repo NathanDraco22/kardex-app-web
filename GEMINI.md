@@ -5,8 +5,14 @@
 - He revisado y tengo en mi contexto el contenido de los archivos `devolution_viewer.dart`, `_viewer.dart` y `receipt_viewer.dart` de la carpeta `widgets/dialogs`.
 - El usuario quiere que siempre le responda en español.
 - El usuario quiere que anote el contexto de nuestra conversación en el archivo GEMINI.md.
-- La sintaxis de mapas con `?` para manejar valores nulos es válida a partir de Dart 3.8.
 - Se han creado las features completas de 'Historial de Recibos' y 'Historial de Devoluciones', replicando la estructura de UI y Cubit de 'Historial de Facturas'.
+- Se ha rediseñado la cabecera en `single_invoice_template.dart` para incluir de forma limpia y estética la información completa de la sucursal (logo, dirección, teléfono, email).
+- Se han creado las plantillas PDF en tamaño de hoja normal (A4) para Pedidos (`single_order_template.dart`), Recibos de pago (`single_receipt_template.dart`) y Devoluciones (`single_devolution_template.dart`), compartiendo la misma estructura de cabecera premium y datos de la sucursal.
+- Se integraron los botones "Exportar PDF (A4)" en los visores de Pedidos (`order_viewer.dart`), Recibos (`receipt_viewer.dart`) y Devoluciones (`devolution_viewer.dart`) para garantizar paridad de funciones en la exportación de documentos con respecto a las Facturas.
+- Se realizaron ajustes de diseño en los 4 templates PDF A4 (`single_invoice_template.dart`, `single_order_template.dart`, `single_receipt_template.dart` y `single_devolution_template.dart`) para:
+  - Eliminar el prefijo textual `"Fecha: "` de la cabecera superior derecha, dejando solo el valor de fecha y hora.
+  - Reubicar la información del vendedor, persona que elaboró o cobró el documento a la columna izquierda (debajo de la ubicación del cliente).
+
 
 ## Arquitectura de Módulos
 La arquitectura de un módulo en este proyecto Flutter incluye:
@@ -42,3 +48,32 @@ Esta estructura se ha seguido para módulos como 'Historial de Facturas', 'Histo
   - En `client_full_details_dialog.dart`, se muestra el límite formateado como moneda (`C\$`).
   - En `create_client_dialog.dart`, se ha añadido un campo de entrada numérica que se activa solo si "Crédito Activo" está habilitado.
   - El valor se almacena como `int` (multiplicado por 100) para manejar decimales de forma consistente con otros campos financieros del proyecto.
+
+## Historial de Facturas por Producto (Mayo 2026)
+- **Endpoint**: Se añadió soporte en el frontend para el endpoint del servidor `/invoices/byProduct/{product_id}` con query parameters `InvoiceQueryParams`.
+- **Capa de Datos**: Modificado `InvoicesDataSource` agregando `getInvoicesByProduct`.
+- **Capa de Dominio**: Modificado `InvoicesRepository` agregando `getInvoicesByProduct` retornando `ListResponse<InvoiceInDb>`.
+- **Capa de Lógica**: Creado el cubit `ReadInvoiceByProductCubit` (`read_invoice_by_product_cubit.dart` y `read_invoice_by_product_state.dart`) para cargar paginadamente las facturas asociadas a un producto.
+- **Módulo UI**: Creado el módulo `Buscar facturas por producto` en `lib/src/modules/commercial/invoice_by_product/` compuesto por `invoice_by_product_screen.dart`, `invoice_by_product_web_screen.dart` y sus subsecciones (`header_section.dart` y `content_section.dart`).
+- **Navegación y Menú**: Registrada la ruta `invoices-by-product` en `app_router.dart` y agregada la opción en el menú principal de comercio en `commercial_menu_screen.dart`.
+
+## Onion CLI Helper
+- La herramienta `onion` CLI ya está correctamente instalada y disponible en el `PATH` global del sistema.
+- Se puede ejecutar directamente en cualquier terminal escribiendo:
+  `onion --help`
+- Si en algún momento deja de funcionar de forma global, se puede recurrir a su ruta absoluta del entorno virtual:
+  `C:\Users\sytru\Developer\Python\onion-cli\.venv\Scripts\onion.exe`
+
+### Convenciones de Nombres
+- Pasar siempre la entidad en **singular** (ej. `product`). La CLI genera las variaciones de PascalCase y snake_case para singular y plural de forma automática.
+
+### Comandos Clave (Flutter / Dart)
+- `onion dart <entidad>`: Genera modelo, datasource y repositorio en una sola ejecución.
+- `onion flutter-module <entidad>`: Crea la carpeta del módulo Flutter con cubits, vista base, dialogs y widgets stubs.
+- `onion dart-cubit <entidad>`: Genera los cubits de lectura/escritura y sus estados.
+- `onion dart-model <entidad>`: Genera solo los archivos de modelo en Dart.
+- `onion dart-view <entidad>`: Genera solo el StatelessWidget básico de vista.
+
+### Comandos Clave (FastAPI / Python)
+- `onion crud <entidad> --version <n>`: Genera router, controller, repos, datasource, model (stubs).
+- `onion crud-mongo <entidad> --version <n>`: Genera CRUD completo integrado con persistencia MongoDB.

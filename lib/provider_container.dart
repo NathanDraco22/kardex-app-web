@@ -3,16 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/cubits/app_mode/app_mode_cubit.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/cubits/toast/toast_cubit.dart';
-import 'package:kardex_app_front/src/data/adjust_entries_data_source.dart';
-import 'package:kardex_app_front/src/data/adjust_exits_data_source.dart';
-import 'package:kardex_app_front/src/data/data.dart';
-import 'package:kardex_app_front/src/data/transfers_data_source.dart';
-import 'package:kardex_app_front/src/domain/repositories/adjust_entries_repository.dart';
-import 'package:kardex_app_front/src/domain/repositories/adjust_exits_repository.dart';
+import 'package:kardex_app_front/src/data/data_sources.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
-import 'package:kardex_app_front/src/domain/repositories/transfers_repository.dart';
-import 'package:kardex_app_front/src/data/integrations_data_source.dart';
-import 'package:kardex_app_front/src/domain/repositories/integrations_repository.dart';
 
 class ProviderContainer extends StatelessWidget {
   const ProviderContainer({super.key, required this.child});

@@ -30,6 +30,7 @@ import 'package:kardex_app_front/src/modules/commercial/daily_product_sales/dail
 import 'package:kardex_app_front/src/modules/commercial/daily_receipt/daily_receipt_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/devolution_history/devolution_history_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/invoice_history/invoice_history_screen.dart';
+import 'package:kardex_app_front/src/modules/commercial/invoice_by_product/invoice_by_product_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/pending_invoice_screen.dart';
 
 
@@ -243,6 +244,12 @@ class AppRouter {
             path: "invoice-history",
             name: "invoice-history",
             builder: (context, state) => const InvoiceHistoryScreen(),
+          ),
+
+          GoRoute(
+            path: "invoices-by-product",
+            name: "invoices-by-product",
+            builder: (context, state) => const InvoiceByProductScreen(),
           ),
 
           GoRoute(
