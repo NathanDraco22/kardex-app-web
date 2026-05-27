@@ -11,7 +11,16 @@
 - Se integraron los botones "Exportar PDF (A4)" en los visores de Pedidos (`order_viewer.dart`), Recibos (`receipt_viewer.dart`) y Devoluciones (`devolution_viewer.dart`) para garantizar paridad de funciones en la exportación de documentos con respecto a las Facturas.
 - Se realizaron ajustes de diseño en los 4 templates PDF A4 (`single_invoice_template.dart`, `single_order_template.dart`, `single_receipt_template.dart` y `single_devolution_template.dart`) para:
   - Eliminar el prefijo textual `"Fecha: "` de la cabecera superior derecha, dejando solo el valor de fecha y hora.
-  - Reubicar la información del vendedor, persona que elaboró o cobró el documento a la columna izquierda (debajo de la ubicación del cliente).
+- Se ha implementado un botón de ordenamiento alfabético toggle (A-Z / Z-A) en las pantallas de creación de factura para Pedidos (`current_orders/invoice_creator_screen.dart`) y Proformas (`current_proforma/invoice_creator_screen.dart`).
+- Dicho botón ordena visualmente los items al instante mediante `setState` de forma local (evitando llamar al servidor por ahora).
+- Se sincronizó esta ordenación en el `OrderContainer` mutable expuesto por el `InvoiceCreateMediator` en ambos módulos, lo cual garantiza que las operaciones que leen de la cabecera (como "Imprimir", "Compartir" o modales de confirmación de facturación/cancelación) tengan acceso inmediato a la lista ordenada.
+- Se implementó el mismo botón de ordenamiento alfabético toggle (A-Z / Z-A) en la tabla de facturación a clientes (`client_invoice_table.dart`) al lado de la columna "Producto". Ordena localmente a través de `ClientInvoiceViewController` y se limpia su estado visual (`_isAscending = null`) al detectar cambios externos por parte del usuario (adiciones, ediciones, remociones).
+
+
+
+
+
+
 
 
 ## Arquitectura de Módulos

@@ -27,51 +27,151 @@ class ClientInvoiceTable extends StatefulWidget {
 
 class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
   ScrollController scrollController = ScrollController();
+  bool? _isAscending;
+  bool _isSortingInternal = false;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_onControllerChange);
+  }
 
   @override
   void dispose() {
+    widget.controller.removeListener(_onControllerChange);
     scrollController.dispose();
     super.dispose();
+  }
+
+  void _onControllerChange() {
+    if (!_isSortingInternal) {
+      setState(() {
+        _isAscending = null;
+      });
+    }
+  }
+
+  void _toggleSort() {
+    final nextAscending = !(_isAscending ?? false);
+
+    _isSortingInternal = true;
+    widget.controller.items.sort((a, b) {
+      final nameA = a.product.name.toLowerCase();
+      final nameB = b.product.name.toLowerCase();
+      return nextAscending ? nameA.compareTo(nameB) : nameB.compareTo(nameA);
+    });
+
+    setState(() {
+      _isAscending = nextAscending;
+    });
+
+    widget.controller.refresh();
+    _isSortingInternal = false;
   }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Row(
+        const SizedBox(height: 8),
+        Row(
           children: [
             Flexible(
               flex: 3,
               fit: FlexFit.tight,
-              child: Center(child: Text("Producto")),
+              child: Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text("Producto", style: TextStyle(fontWeight: FontWeight.bold)),
+                    const SizedBox(width: 4),
+                    SizedBox(
+                      width: 40,
+                      child: IconButton(
+                        visualDensity: VisualDensity.compact,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        tooltip: _isAscending == null
+                            ? "Ordenar productos (A-Z)"
+                            : _isAscending!
+                            ? "Ordenar Z-A"
+                            : "Ordenar A-Z",
+                        icon: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.sort_by_alpha, size: 16),
+                            if (_isAscending != null)
+                              Icon(
+                                _isAscending! ? Icons.arrow_downward : Icons.arrow_upward,
+                                size: 11,
+                              ),
+                          ],
+                        ),
+                        onPressed: _toggleSort,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
 
-            Flexible(
+            const Flexible(
               fit: FlexFit.tight,
-              child: Center(child: Text("Cantidad")),
+              child: Center(
+                child: Text(
+                  "Cantidad",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
             ),
-            Flexible(
+            const Flexible(
               fit: FlexFit.tight,
-              child: Center(child: Text("Precio Unitario")),
-            ),
-
-            Flexible(
-              fit: FlexFit.tight,
-              child: Center(child: Text("SubTotal")),
-            ),
-            Flexible(
-              fit: FlexFit.tight,
-              child: Center(child: Text("Descuento")),
-            ),
-
-            Flexible(
-              fit: FlexFit.tight,
-              child: Center(child: Text("IVA")),
+              child: Center(
+                child: Text(
+                  "Precio Unitario",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
             ),
 
-            Flexible(
+            const Flexible(
               fit: FlexFit.tight,
-              child: Center(child: Text("Total")),
+              child: Center(
+                child: Text(
+                  "SubTotal",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+            const Flexible(
+              fit: FlexFit.tight,
+              child: Center(
+                child: Text(
+                  "Descuento",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+
+            const Flexible(
+              fit: FlexFit.tight,
+              child: Center(
+                child: Text(
+                  "IVA",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+
+            const Flexible(
+              fit: FlexFit.tight,
+              child: Center(
+                child: Text(
+                  "Total",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
             ),
           ],
         ),
