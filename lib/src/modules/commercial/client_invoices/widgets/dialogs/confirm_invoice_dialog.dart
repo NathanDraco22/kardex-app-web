@@ -52,20 +52,20 @@ Future<bool> showConfirmationInvoiceDialog(
                         Flexible(
                           fit: FlexFit.tight,
                           child: Text(
-                            NumberFormatter.convertToMoneyLike(item.price),
+                            NumberFormatter.convertFromCentsToUnitsCurrency(item.price),
                           ),
                         ),
 
                         Flexible(
                           fit: FlexFit.tight,
                           child: Text(
-                            NumberFormatter.convertToMoneyLike(item.totalDiscount),
+                            NumberFormatter.convertFromCentsToUnitsCurrency(item.totalDiscount),
                           ),
                         ),
                         Flexible(
                           fit: FlexFit.tight,
                           child: Text(
-                            NumberFormatter.convertToMoneyLike(item.total),
+                            NumberFormatter.convertFromCentsToUnitsCurrency(item.total),
                           ),
                         ),
                       ],
@@ -78,6 +78,11 @@ Future<bool> showConfirmationInvoiceDialog(
                   const Spacer(),
                   Text(
                     "Total: ${NumberFormatter.convertToMoneyLike(createInvoice.total)}",
+                    style: TextStyle(
+                      color: Colors.blue.shade600,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 18,
+                    ),
                   ),
                 ],
               ),

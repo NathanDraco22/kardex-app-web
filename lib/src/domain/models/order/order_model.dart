@@ -181,6 +181,44 @@ class OrderInDb extends BaseOrder {
     createdBy: UserInfo.fromJson(json['createdBy']),
   );
 
+  OrderInDb copyWith({
+    String? id,
+    String? branchId,
+    String? clientId,
+    ClientInfo? clientInfo,
+    String? docNumber,
+    String? invoiceId,
+    List<SaleItem>? saleItems,
+    String? description,
+    int? amountPaid,
+    OrderStatus? status,
+    PaymentType? paymentType,
+    int? totalCost,
+    int? total,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    UserInfo? createdBy,
+  }) {
+    return OrderInDb(
+      id: id ?? this.id,
+      branchId: branchId ?? this.branchId,
+      clientId: clientId ?? this.clientId,
+      clientInfo: clientInfo ?? this.clientInfo,
+      docNumber: docNumber ?? this.docNumber,
+      invoiceId: invoiceId ?? this.invoiceId,
+      saleItems: saleItems ?? this.saleItems,
+      description: description ?? this.description,
+      amountPaid: amountPaid ?? this.amountPaid,
+      status: status ?? this.status,
+      paymentType: paymentType ?? this.paymentType,
+      totalCost: totalCost ?? this.totalCost,
+      total: total ?? this.total,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      createdBy: createdBy ?? this.createdBy,
+    );
+  }
+
   @override
   Map<String, dynamic> toJson() {
     final data = super.toJson();
