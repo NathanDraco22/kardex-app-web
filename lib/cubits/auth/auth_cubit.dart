@@ -193,6 +193,8 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthInactive());
   }
 
+  // Mark: - Helpers
+
   void _updateNetworkConfig({
     required Servin servin,
     BranchInDb? branch,
