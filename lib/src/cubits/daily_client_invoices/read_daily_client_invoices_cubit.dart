@@ -4,7 +4,6 @@ import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_totals.dart';
 import 'package:kardex_app_front/src/domain/query_params/history_params.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 
 part 'read_daily_client_invoices_state.dart';
@@ -31,7 +30,7 @@ class ReadDailyClientInvoicesCubit extends Cubit<ReadDailyClientInvoicesState> {
 
   final InvoicesRepository invoicesRepository;
 
-  Future<void> loadPaidInvoices() async {
+  Future<void> loadPaidInvoices(String branchId) async {
     emit(ReadDailyClientInvoicesLoading());
     offset = 0;
     try {
@@ -40,7 +39,7 @@ class ReadDailyClientInvoicesCubit extends Cubit<ReadDailyClientInvoicesState> {
       final effectiveUserCreatorId = defaultCreatorId ?? userCreatorId;
 
       params = InvoiceQueryParams()
-        ..branchId = BranchesTool.getCurrentBranchId()
+        ..branchId = branchId
         ..clientId = null
         ..startDate = DateTime.fromMillisecondsSinceEpoch(startDate?.millisecondsSinceEpoch ?? 0)
         ..endDate = DateTime.fromMillisecondsSinceEpoch(topEndDate?.millisecondsSinceEpoch ?? 0)
@@ -60,7 +59,7 @@ class ReadDailyClientInvoicesCubit extends Cubit<ReadDailyClientInvoicesState> {
     }
   }
 
-  Future<void> nextPage() async {
+  Future<void> nextPage(String branchId) async {
     if (isLastPage) return;
     final currentState = state;
     if (currentState is! ReadDailyClientInvoicesSuccess) return;
@@ -80,7 +79,7 @@ class ReadDailyClientInvoicesCubit extends Cubit<ReadDailyClientInvoicesState> {
 
       final result = await invoicesRepository.getAllInvoices(
         InvoiceQueryParams()
-          ..branchId = BranchesTool.getCurrentBranchId()
+          ..branchId = branchId
           ..clientId = null
           ..startDate = DateTime.fromMillisecondsSinceEpoch(startDate?.millisecondsSinceEpoch ?? 0)
           ..endDate = DateTime.fromMillisecondsSinceEpoch(topEndDate?.millisecondsSinceEpoch ?? 0)
@@ -103,11 +102,11 @@ class ReadDailyClientInvoicesCubit extends Cubit<ReadDailyClientInvoicesState> {
     }
   }
 
-  void clearFilters() {
+  void clearFilters(String branchId) {
     startDate = DateTimeTool.getTodayMidnight();
     endDate = startDate;
     offset = 0;
     userCreatorId = defaultCreatorId;
-    loadPaidInvoices();
+    loadPaidInvoices(branchId);
   }
 }

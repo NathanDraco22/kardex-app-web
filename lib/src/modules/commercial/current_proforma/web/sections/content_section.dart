@@ -31,7 +31,7 @@ class _ContentSection extends StatelessWidget {
           return RefreshIndicator(
             onRefresh: () {
               final cubit = context.read<ReadProformaCubit>();
-              return cubit.loadPaginatedOrders();
+              return cubit.loadPaginatedOrders(getIt<AuthCubit>().currentBranchId);
             },
             child: ListView.builder(
               itemCount: orders.length,

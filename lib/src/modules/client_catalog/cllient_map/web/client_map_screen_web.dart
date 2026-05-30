@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/client/client.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/client_list/cubit/client_read_cubit.dart';
@@ -68,7 +69,7 @@ class _Map extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authCubit = context.read<AuthCubit>();
+    final authCubit = getIt<AuthCubit>();
     final authState = authCubit.state;
 
     if (authState is! Authenticated) {

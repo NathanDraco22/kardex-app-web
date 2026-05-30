@@ -13,14 +13,17 @@ class ReadExitHistoryCubit extends Cubit<ReadExitHistoryState> {
   bool isLastPage = false;
   List<ExitHistoryInDb> _historiesCache = [];
 
+  String? _lastBranchId;
   String? clientId;
   int? startDate;
   int? endDate;
 
-  Future<void> loadPaginatedHistories() async {
+  Future<void> loadPaginatedHistories(String branchId) async {
+    _lastBranchId = branchId;
     emit(ReadExitHistoryLoading());
     try {
       final response = await exitHistoriesRepository.getExitHistories(
+        branchId: branchId,
         offset: 0,
         clientId: clientId,
         startDate: startDate,
@@ -41,10 +44,11 @@ class ReadExitHistoryCubit extends Cubit<ReadExitHistoryState> {
     }
   }
 
-  Future<void> getNextPage() async {
+  Future<void> getNextPage(String branchId) async {
     if (isLastPage) return;
     try {
       final response = await exitHistoriesRepository.getExitHistories(
+        branchId: branchId,
         offset: _historiesCache.length,
         clientId: clientId,
         startDate: startDate,
@@ -68,6 +72,8 @@ class ReadExitHistoryCubit extends Cubit<ReadExitHistoryState> {
     endDate = null;
     _historiesCache = [];
     isLastPage = false;
-    loadPaginatedHistories();
+    if (_lastBranchId != null) {
+      loadPaginatedHistories(_lastBranchId!);
+    }
   }
 }

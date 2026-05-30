@@ -23,7 +23,7 @@ class _HeaderSection extends StatelessWidget {
                 onPressed: () async {
                   final template = ProductDemandVsStockTemplate(
                     title: "Cotizaciones vs Existencias",
-                    branchName: BranchesTool.getCurrentBranchName(),
+                    branchName: getIt<AuthCubit>().currentBranchName,
                     items: state.results,
                   );
                   await PdfExportTool.export(

@@ -1,5 +1,4 @@
 import 'package:kardex_app_front/src/services/http_service.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
 import 'package:kardex_app_front/src/tools/http_tool.dart';
 
 class InventoriesDataSource with HttpService {
@@ -11,12 +10,10 @@ class InventoriesDataSource with HttpService {
 
   final _endpoint = "/inventories";
 
-  Future<Map<String, dynamic>> getAllInventories() async {
-    final currentBranch = BranchesTool.getCurrentBranchId();
-
+  Future<Map<String, dynamic>> getAllInventories(String branchId) async {
     final uri = HttpTools.generateUri(
       _endpoint,
-      queryParameters: {'branchId': currentBranch},
+      queryParameters: {'branchId': branchId},
     );
 
     final headers = HttpTools.generateAuthHeaders();

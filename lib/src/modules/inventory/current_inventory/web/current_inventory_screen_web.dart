@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/modules/inventory/current_inventory/cubit/read_current_inventory_cubit.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/current_inventory_template.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 import 'package:kardex_app_front/widgets/basic_table_listview.dart';
@@ -51,7 +52,7 @@ class _RootScaffold extends StatelessWidget {
               onPressed: () async {
                 final template = CurrentInventoryTemplate(
                   title: "Inventario Actual",
-                  branchName: BranchesTool.getCurrentBranchName(),
+                  branchName: getIt<AuthCubit>().currentBranchName,
                   items: state.inventories,
                   total: state.total,
                 );

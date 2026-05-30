@@ -14,8 +14,8 @@ class ProductSaleProfilesRepository {
     return ProductSaleProfileInDb.fromJson(result);
   }
 
-  Future<List<ProductSaleProfileInDbWithProduct>> getAllProductSaleProfilesCurrentBranch() async {
-    final results = await productSaleProfilesDataSource.getAllProductSaleProfilesCurrentBranch();
+  Future<List<ProductSaleProfileInDbWithProduct>> getAllProductSaleProfilesCurrentBranch(String branchId) async {
+    final results = await productSaleProfilesDataSource.getAllProductSaleProfilesCurrentBranch(branchId);
     final response = ListResponse<ProductSaleProfileInDbWithProduct>.fromJson(
       results,
       ProductSaleProfileInDbWithProduct.fromJson,
@@ -23,8 +23,8 @@ class ProductSaleProfilesRepository {
     return response.data;
   }
 
-  Future<ProductSaleProfileInDbWithProduct?> getProductSaleProfileByProductId(String productId) async {
-    final result = await productSaleProfilesDataSource.getProductSaleProfileByProductId(productId);
+  Future<ProductSaleProfileInDbWithProduct?> getProductSaleProfileByProductId(String productId, String branchId) async {
+    final result = await productSaleProfilesDataSource.getProductSaleProfileByProductId(productId, branchId);
     if (result == null) return null;
     return ProductSaleProfileInDbWithProduct.fromJson(result);
   }
@@ -32,10 +32,12 @@ class ProductSaleProfilesRepository {
   Future<ProductSaleProfileInDb?> updateProductSaleProfileByProductId(
     String productId,
     UpdateProductSaleProfile profile,
+    String branchId,
   ) async {
     final result = await productSaleProfilesDataSource.updateProductSaleProfileByProductId(
       productId,
       profile.toJson(),
+      branchId,
     );
     if (result == null) return null;
     return ProductSaleProfileInDb.fromJson(result);

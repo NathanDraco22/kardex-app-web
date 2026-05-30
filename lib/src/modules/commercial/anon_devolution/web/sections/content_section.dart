@@ -5,7 +5,7 @@ class _ContentSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authCubit = context.read<AuthCubit>();
+    final authCubit = getIt<AuthCubit>();
     if (authCubit.state is! Authenticated) {
       return const Center(
         child: Text("No autenticado"),

@@ -40,7 +40,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                             titleBuilder: (value) => value.name,
                             onClose: (value) {
                               readCubit.setFilterParams(clientId: value.id);
-                              readCubit.loadPaginatedOrders();
+                              readCubit.loadPaginatedOrders(getIt<AuthCubit>().currentBranchId);
                             },
                             onSearch: (value) async {
                               final repo = context.read<ClientsRepository>();
@@ -77,7 +77,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
             ),
             TextButton.icon(
               onPressed: () {
-                readCubit.clearFilterParams();
+                readCubit.clearFilterParams(getIt<AuthCubit>().currentBranchId);
                 setState(() {});
               },
               icon: const Icon(Icons.clear),

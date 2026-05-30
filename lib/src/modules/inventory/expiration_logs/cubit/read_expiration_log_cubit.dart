@@ -2,7 +2,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/expiration_log/expiration_log.dart';
 import 'package:kardex_app_front/src/domain/query_params/expiration_query_params.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
 
 part 'read_expiration_log_state.dart';
 
@@ -12,11 +11,11 @@ class ReadExpirationLogCubit extends Cubit<ReadExpirationLogState> {
   final ExpirationLogsRepository expirationLogsRepository;
   List<ExpirationLogInDb> _logsCache = [];
 
-  Future<void> loadAllExpirationLogs() async {
+  Future<void> loadAllExpirationLogs(String branchId) async {
     emit(ReadExpirationLogLoading());
     try {
       final params = ExpirationQueryParams(
-        branchId: BranchesTool.getCurrentBranchId(),
+        branchId: branchId,
       );
       final logs = await expirationLogsRepository.getAllExpirationLogs(
         params,

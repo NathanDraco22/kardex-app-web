@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/commercial/current_proforma/cubit/read_proforma_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/current_proforma/web/current_proforma_web_screen.dart';
@@ -11,7 +13,7 @@ class CurrentProformaScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final orderRepo = context.read<OrdersRepository>();
-    final (isSeller, currentUser) = RoleTools.isSeller(context);
+    final (isSeller, currentUser) = RoleTools.isSeller();
 
     if (currentUser == null) {
       return const Center(child: Text("No Autorizado"));
@@ -23,7 +25,7 @@ class CurrentProformaScreen extends StatelessWidget {
         if (isSeller) {
           cubit.setFilterParams(createdBy: currentUser.id);
         }
-        return cubit..loadPaginatedOrders();
+        return cubit..loadPaginatedOrders(getIt<AuthCubit>().currentBranchId);
       },
       child: const _RootScaffold(),
     );

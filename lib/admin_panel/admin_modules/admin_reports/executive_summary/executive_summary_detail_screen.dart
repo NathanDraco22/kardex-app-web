@@ -2,7 +2,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:kardex_app_front/admin_panel/widgets/pie_chart_row.dart';
 import 'package:kardex_app_front/src/domain/models/executive_summary/executive_summary_in_db.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/tools/color_tool.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
@@ -84,7 +85,9 @@ class _SalesPieChartCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final branches = summary.commercialBranches.map((branch) => BranchesTool.getBranchById(branch.branchId)).toList();
+    final branches = summary.commercialBranches
+        .map((branch) => getIt<AuthCubit>().getBranchById(branch.branchId))
+        .toList();
 
     final chartsColor = ColorTool.getChartColors();
     return Card(
@@ -149,7 +152,9 @@ class _InventoryPieChartCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final branches = summary.inventoryBranches.map((branch) => BranchesTool.getBranchById(branch.branchId)).toList();
+    final branches = summary.inventoryBranches
+        .map((branch) => getIt<AuthCubit>().getBranchById(branch.branchId))
+        .toList();
 
     final chartsColor = ColorTool.getChartColors();
     return Card(
@@ -216,7 +221,9 @@ class _DebtPieChartCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final branches = summary.totalPendingBranches.map((branch) => BranchesTool.getBranchById(branch.branchId)).toList();
+    final branches = summary.totalPendingBranches
+        .map((branch) => getIt<AuthCubit>().getBranchById(branch.branchId))
+        .toList();
 
     final chartsColor = ColorTool.getChartColors();
     final double totalOwedAllBranches = summary.totalPendingBranches.fold(
@@ -508,7 +515,7 @@ class _CashFlowChartCard extends StatelessWidget {
                       touchTooltipData: BarTouchTooltipData(
                         getTooltipColor: (_) => Colors.blueGrey,
                         getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                          final bInfo = BranchesTool.getBranchById(
+                          final bInfo = getIt<AuthCubit>().getBranchById(
                             summary.commercialBranches[group.x.toInt()].branchId,
                           );
                           return BarTooltipItem(
@@ -526,7 +533,9 @@ class _CashFlowChartCard extends StatelessWidget {
                           getTitlesWidget: (value, meta) {
                             final idx = value.toInt();
                             if (idx < 0 || idx >= summary.commercialBranches.length) return const SizedBox();
-                            final bName = BranchesTool.getBranchById(summary.commercialBranches[idx].branchId).name;
+                            final bName = getIt<AuthCubit>()
+                                .getBranchById(summary.commercialBranches[idx].branchId)
+                                .name;
                             final parts = bName.split(" ");
                             final shortName = parts.isNotEmpty ? parts[0] : bName;
 

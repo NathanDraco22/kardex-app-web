@@ -6,6 +6,8 @@ import 'package:kardex_app_front/src/domain/repositories/product_repository.dart
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/widgets/display_product_code.dart';
 import 'package:kardex_app_front/widgets/no_item.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 
 Future<ProductInDbInBranch?> showSearchProductInBranchDialog(
@@ -114,7 +116,8 @@ class _SearchProductInBranchDialogState extends State<SearchProductInBranchDialo
                             }
                             isSearching = true;
                             setState(() {});
-                            products = await _productsRepository.searchProductInBranch(value);
+                            final branchId = getIt<AuthCubit>().currentBranchId;
+                            products = await _productsRepository.searchProductInBranch(value, branchId);
                             isSearching = false;
                             setState(() {});
                           },

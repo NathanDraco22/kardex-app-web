@@ -99,7 +99,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                             children: [
                               FilledButton.icon(
                                 onPressed: () {
-                                  readCubit.loadPaidInvoices();
+                                  readCubit.loadPaidInvoices(getIt<AuthCubit>().currentBranchId);
                                 },
                                 label: const Text("Filtrar"),
                                 icon: const Icon(Icons.filter_alt_rounded),
@@ -109,7 +109,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                                 onPressed: () {
                                   readCubit.clearFilters();
                                   setState(() {});
-                                  readCubit.loadPaidInvoices();
+                                  readCubit.loadPaidInvoices(getIt<AuthCubit>().currentBranchId);
                                 },
                                 child: const Icon(Icons.clear),
                               ),

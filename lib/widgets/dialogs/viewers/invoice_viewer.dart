@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/branch/branch.dart';
 import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
@@ -13,7 +14,7 @@ import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_invoice_
 import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 
 Future<void> showInvoiceViewerDialog(BuildContext context, InvoiceInDb invoice) async {
-  final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
+  final currentBranch = (getIt<AuthCubit>().state as Authenticated).branch;
   final paperSize = await PrintManager.getLocalPaperSize();
   if (!context.mounted) return;
   await Navigator.push(
@@ -36,7 +37,7 @@ Future<void> showInvoiceViewerDialog(BuildContext context, InvoiceInDb invoice) 
 }
 
 Future<void> showInvoiceViewerDialogFromDocNumber(BuildContext context, String docNumber) async {
-  final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
+  final currentBranch = (getIt<AuthCubit>().state as Authenticated).branch;
   final paperSize = await PrintManager.getLocalPaperSize();
   if (!context.mounted) return;
 
@@ -85,7 +86,7 @@ Future<void> showInvoiceViewerDialogFromDocNumber(BuildContext context, String d
 }
 
 Future<void> showInvoiceViewerDialogFromId(BuildContext context, String id) async {
-  final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
+  final currentBranch = (getIt<AuthCubit>().state as Authenticated).branch;
   final paperSize = await PrintManager.getLocalPaperSize();
   if (!context.mounted) return;
 

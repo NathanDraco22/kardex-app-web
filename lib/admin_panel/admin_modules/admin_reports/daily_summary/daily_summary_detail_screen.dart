@@ -2,7 +2,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:kardex_app_front/admin_panel/widgets/pie_chart_row.dart';
 import 'package:kardex_app_front/src/domain/models/daily_summary/daily_summary_in_db.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/tools/color_tool.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
@@ -63,7 +64,7 @@ class PieChartCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final branches = summary.branches
         .map(
-          (branch) => BranchesTool.getBranchById(branch.branchId),
+          (branch) => getIt<AuthCubit>().getBranchById(branch.branchId),
         )
         .toList();
 

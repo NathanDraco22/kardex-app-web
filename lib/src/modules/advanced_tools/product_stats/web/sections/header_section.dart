@@ -16,7 +16,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
   @override
   void initState() {
     super.initState();
-    currentBranch = BranchesTool.getCurrentBranch()!;
+    currentBranch = getIt<AuthCubit>().currentBranch!;
   }
 
   @override
@@ -132,7 +132,7 @@ class _SelectBranchButton extends StatelessWidget {
     }
     return TextButton(
       onPressed: () async {
-        final branches = BranchesTool.branches;
+        final branches = getIt<AuthCubit>().branches;
         final selectedBranch = await showBranchSelectionDialog(context, branches);
 
         if (selectedBranch == null) return;

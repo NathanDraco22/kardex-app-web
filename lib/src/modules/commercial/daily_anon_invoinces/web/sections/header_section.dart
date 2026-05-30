@@ -32,7 +32,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                       defaultDate: readCubit.startDate,
                       title: "Fecha",
                       onSelected: (value) {
-                        readCubit.loadDailyPaidAnonInvoices(startDate: value);
+                        readCubit.loadDailyPaidAnonInvoices(getIt<AuthCubit>().currentBranchId, startDate: value);
                       },
                     ),
                   ),
@@ -53,7 +53,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
               onPressed: () async {
                 final user = await showActiveUserSelectionDialog(context);
                 if (user == null) return;
-                readCubit.loadDailyPaidAnonInvoices(userCreatorId: user.id);
+                readCubit.loadDailyPaidAnonInvoices(getIt<AuthCubit>().currentBranchId, userCreatorId: user.id);
                 currentSelectedUser = user;
                 setState(() {});
               },

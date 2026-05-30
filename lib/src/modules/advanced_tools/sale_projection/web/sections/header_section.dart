@@ -20,7 +20,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
   @override
   void initState() {
     super.initState();
-    currentBranch = BranchesTool.getCurrentBranch()!;
+    currentBranch = getIt<AuthCubit>().currentBranch!;
     _daysController = TextEditingController(text: widget.projectionDays.toString());
   }
 
@@ -76,7 +76,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                       final days = int.tryParse(_daysController.text);
                       if (days == null) return;
                       final cubit = context.read<ExportExcelCubit>();
-                      await cubit.exportExcel(days);
+                      await cubit.exportExcel(days, branchName: getIt<AuthCubit>().currentBranchName, branchId: getIt<AuthCubit>().currentBranchId);
                     } on Exception catch (e) {
                       if (!context.mounted) return;
                       await DialogManager.showErrorDialog(context, e.toString());
@@ -113,7 +113,7 @@ class _SelectBranchButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextButton(
       onPressed: () async {
-        final branches = BranchesTool.branches;
+        final branches = getIt<AuthCubit>().branches;
         final selectedBranch = await showBranchSelectionDialog(context, branches);
 
         if (selectedBranch == null) return;

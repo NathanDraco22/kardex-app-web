@@ -6,8 +6,8 @@ import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
 import 'package:kardex_app_front/src/domain/models/models.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_exit/cubit/write_exit_doc_cubit.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
-import 'package:kardex_app_front/src/tools/session_tool.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/search_product_in_branch_dialog.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 

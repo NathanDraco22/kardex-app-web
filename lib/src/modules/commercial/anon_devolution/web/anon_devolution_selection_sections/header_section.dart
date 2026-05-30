@@ -6,7 +6,7 @@ class _HeaderSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authState = context.read<AuthCubit>().state;
+    final authState = getIt<AuthCubit>().state;
     if (authState is! Authenticated) return const SizedBox.shrink();
     final branch = authState.branch;
     return Card(

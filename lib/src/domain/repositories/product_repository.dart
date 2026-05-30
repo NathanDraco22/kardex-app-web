@@ -35,8 +35,8 @@ class ProductsRepository {
     return response.data;
   }
 
-  Future<List<ProductInDbInBranch>> getAllProductsInBranch(ProductQueryParams queryParams) async {
-    final results = await productsDataSource.getAllProductInBranch(queryParams.toQueryParameters());
+  Future<List<ProductInDbInBranch>> getAllProductsInBranch(ProductQueryParams queryParams, String branchId) async {
+    final results = await productsDataSource.getAllProductInBranch(queryParams.toQueryParameters(), branchId);
     final response = ListResponse<ProductInDbInBranch>.fromJson(
       results,
       ProductInDbInBranch.fromJson,
@@ -44,13 +44,13 @@ class ProductsRepository {
     return response.data;
   }
 
-  Future<ProductInDbInBranch> getProductInBranchById(String productId) async {
-    final result = await productsDataSource.getProductInBranchById(productId);
+  Future<ProductInDbInBranch> getProductInBranchById(String productId, String branchId) async {
+    final result = await productsDataSource.getProductInBranchById(productId, branchId);
     return ProductInDbInBranch.fromJson(result);
   }
 
-  Future<List<ProductInDbInBranch>> searchProductInBranch(String keyword) async {
-    final result = await productsDataSource.searchProductInBranch(keyword.trim());
+  Future<List<ProductInDbInBranch>> searchProductInBranch(String keyword, String branchId) async {
+    final result = await productsDataSource.searchProductInBranch(keyword.trim(), branchId);
     final response = ListResponse<ProductInDbInBranch>.fromJson(
       result,
       ProductInDbInBranch.fromJson,

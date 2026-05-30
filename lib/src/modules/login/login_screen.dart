@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/app_mode/app_mode_cubit.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
@@ -23,7 +24,7 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authCubit = context.read<AuthCubit>();
+    final authCubit = getIt<AuthCubit>();
     final appModeCubit = context.read<AppModeCubit>();
     int secretCounter = 0;
     return BlocListener(
@@ -114,7 +115,7 @@ class _BodyState extends State<_Body> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    final authCubit = context.read<AuthCubit>();
+    final authCubit = getIt<AuthCubit>();
 
     return Container(
       height: screenSize.height,
@@ -180,7 +181,7 @@ class _BodyState extends State<_Body> {
                       PasswordTextField(
                         title: "Contraseña",
                         onEditingComplete: () {
-                          context.read<AuthCubit>().login(userId, password);
+                          getIt<AuthCubit>().login(userId, password);
                         },
                         onChanged: (value) {
                           password = value.trim();
@@ -190,7 +191,7 @@ class _BodyState extends State<_Body> {
                       const SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: () {
-                          context.read<AuthCubit>().login(userId, password);
+                          getIt<AuthCubit>().login(userId, password);
                         },
                         child: const Text("Iniciar Sesión"),
                       ),

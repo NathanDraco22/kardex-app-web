@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/activation/cubit/activation_cubit.dart';
@@ -40,7 +41,7 @@ class _RootScaffold extends StatelessWidget {
 
         if (state is ActivationSuccess) {
           LoadingDialogManager.closeLoadingDialog(context);
-          context.read<AuthCubit>().initServinUnauthenticated(state.servin);
+          getIt<AuthCubit>().initServinUnauthenticated(state.servin);
           await DialogManager.showInfoDialog(
             context,
             "Bienvenido a: \n ${state.servin.name}",

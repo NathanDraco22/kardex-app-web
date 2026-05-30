@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
 import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
@@ -56,7 +57,7 @@ class _RootScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final writeCubit = context.read<WriteAnonDevolutionCubit>();
-    final authCubit = context.read<AuthCubit>();
+    final authCubit = getIt<AuthCubit>();
     final authState = authCubit.state;
 
     if (authState is! Authenticated) {

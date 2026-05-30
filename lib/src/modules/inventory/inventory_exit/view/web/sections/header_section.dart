@@ -209,13 +209,15 @@ Future<void> saveExit(BuildContext context) async {
 
   if (!context.mounted) return;
 
-  final (currentUser, _) = SessionTool.getFullUserFrom(context);
+  final authState = getIt<AuthCubit>().state;
+  if (authState is! Authenticated) throw Exception("User or branch not found");
+  final currentUser = authState.session.user;
 
   final createExitDoct = CreateExitDoc(
     clientId: headerData.client!.id,
     docNumber: headerData.docNumber!,
     docDate: headerData.docDate!,
-    branchId: BranchesTool.getCurrentBranchId(),
+    branchId: getIt<AuthCubit>().currentBranchId,
     items: items,
     createdBy: UserInfo(
       id: currentUser.id,

@@ -26,7 +26,7 @@ class _HeaderSection extends StatelessWidget {
                       title: "Fecha Limite",
                       onSelected: (value) {
                         readCubit.params.endDate = value.endOfDay();
-                        readCubit.loadInvoicesHistory();
+                        readCubit.loadInvoicesHistory(getIt<AuthCubit>().currentBranchId);
                       },
                     ),
                     TextButton.icon(
@@ -72,7 +72,7 @@ class _HeaderSection extends StatelessWidget {
                                 child: CustomAutocompleteTextfield<ClientInDb>(
                                   onClose: (value) {
                                     readCubit.params.clientId = value.id;
-                                    readCubit.loadInvoicesHistory();
+                                    readCubit.loadInvoicesHistory(getIt<AuthCubit>().currentBranchId);
                                   },
                                   titleBuilder: (value) => value.name,
                                   onSearch: (value) async {
@@ -116,7 +116,7 @@ class _HeaderSection extends StatelessWidget {
                     const SizedBox(width: 16),
                     TextButton.icon(
                       onPressed: () {
-                        readCubit.setDefaultParams();
+                        readCubit.setDefaultParams(getIt<AuthCubit>().currentBranchId);
                       },
                       label: const Text("Limpiar"),
                       icon: const Icon(Icons.clear),

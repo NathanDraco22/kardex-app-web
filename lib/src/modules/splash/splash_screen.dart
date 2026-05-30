@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/config/app_theme.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/tools/navigation_tool.dart';
 
@@ -19,7 +20,7 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authCubit = context.read<AuthCubit>()..checkSession();
+    final authCubit = getIt<AuthCubit>()..checkSession();
     return BlocListener(
       bloc: authCubit,
       listener: (context, state) async {
@@ -49,17 +50,19 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authCubit = context.watch<AuthCubit>();
-    if (authCubit.state is AuthError) {
-      final state = authCubit.state as AuthError;
-      return Center(
-        child: Text(
-          state.message,
-        ),
-      );
-    }
-    return const Center(
-      child: CircularProgressIndicator(),
+    return BlocBuilder<AuthCubit, AuthState>(bloc: getIt<AuthCubit>(),
+      builder: (context, authState) {
+        if (authState is AuthError) {
+          return Center(
+            child: Text(
+              authState.message,
+            ),
+          );
+        }
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
     );
   }
 }

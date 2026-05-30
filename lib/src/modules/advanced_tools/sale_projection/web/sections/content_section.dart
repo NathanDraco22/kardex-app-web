@@ -16,7 +16,7 @@ class _ContentSectionState extends State<_ContentSection> {
   void initState() {
     super.initState();
     // Carga inicial con la sucursal actual
-    final branchId = BranchesTool.getCurrentBranchId();
+    final branchId = getIt<AuthCubit>().currentBranchId;
     context.read<ReadSaleProjectionCubit>().getAllWithAccount(branchId: branchId);
   }
 

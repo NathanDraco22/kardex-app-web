@@ -3,7 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/modules/commercial/product_demand_vs_stock/cubit/read_product_stock_demand_cubit.dart';
 import 'package:kardex_app_front/widgets/basic_table_listview.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/product_demand_vs_stock_template.dart';
 
 part 'sections/content_section.dart';

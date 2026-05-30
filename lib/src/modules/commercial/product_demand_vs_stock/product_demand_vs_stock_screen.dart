@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/commercial/product_demand_vs_stock/web/product_demand_vs_stock_screen_web.dart';
 
@@ -14,7 +16,7 @@ class ProductDemandVsStockScreen extends StatelessWidget {
     return BlocProvider(
       create: (context) => ReadProductStockDemandCubit(
         ordersRepository: orderRepo,
-      )..loadProductStockDemand(),
+      )..loadProductStockDemand(getIt<AuthCubit>().currentBranchId),
       child: const _RootScaffold(),
     );
   }

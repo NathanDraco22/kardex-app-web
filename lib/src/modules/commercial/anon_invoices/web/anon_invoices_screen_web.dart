@@ -11,7 +11,8 @@ import 'package:kardex_app_front/src/modules/commercial/anon_invoices/web/widget
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/widgets/dialogs/payment_confirmation_dialog.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
-import 'package:kardex_app_front/src/tools/session_tool.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/global_stock_search_modal.dart';
 import 'package:kardex_app_front/widgets/empty_scaffold.dart';

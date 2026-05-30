@@ -3,7 +3,6 @@ import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_totals.dart';
 import 'package:kardex_app_front/src/domain/query_params/history_params.dart';
 import 'package:kardex_app_front/src/domain/repositories/invoice_repository.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
 
 part 'read_invoice_history_state.dart';
 
@@ -15,10 +14,10 @@ class ReadInvoiceHistoryCubit extends Cubit<ReadInvoiceHistoryState> {
   InvoiceQueryParams params = InvoiceQueryParams();
   bool _isLastPage = false;
 
-  Future<void> loadInvoicesHistory() async {
+  Future<void> loadInvoicesHistory(String branchId) async {
     emit(ReadInvoiceHistoryLoading());
     params.offset = 0;
-    params.branchId = BranchesTool.getCurrentBranchId();
+    params.branchId = branchId;
 
     try {
       final invoices = await invoicesRepository.getInvoicesHistory(params);
@@ -59,9 +58,9 @@ class ReadInvoiceHistoryCubit extends Cubit<ReadInvoiceHistoryState> {
     }
   }
 
-  void setDefaultParams() {
+  void setDefaultParams(String branchId) {
     params = InvoiceQueryParams();
     _isLastPage = false;
-    loadInvoicesHistory();
+    loadInvoicesHistory(branchId);
   }
 }

@@ -6,12 +6,12 @@ import 'package:kardex_app_front/src/domain/models/common/transfer_item.dart';
 import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
 import 'package:kardex_app_front/src/domain/models/transfer/transfer_in_db.dart';
 import 'package:kardex_app_front/src/modules/inventory/create_transfer/mediator.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/input_formatter/input_formatter.dart';
 import 'package:kardex_app_front/src/tools/input_formatters.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
-import 'package:kardex_app_front/src/tools/session_tool.dart';
 import 'package:kardex_app_front/widgets/dialogs/selectors/branch_selection_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/search_product_in_branch_delegate.dart';
 import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
@@ -155,10 +155,10 @@ class _SaveButton extends StatelessWidget {
                 );
               }).toList();
 
-              final userWithRole = SessionTool.getUserFrom(context);
+              final userWithRole = getIt<AuthCubit>().user;
               if (userWithRole == null) return;
 
-              final originBranch = BranchesTool.getCurrentBranch();
+              final originBranch = getIt<AuthCubit>().currentBranch;
 
               final createTransfer = CreateTransfer(
                 origin: originBranch!.id,
@@ -262,7 +262,7 @@ class _MobileHeaderSectionState extends State<_MobileHeaderSection> with Automat
                   "Sucursal Origen",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                Text(BranchesTool.getCurrentBranchName()),
+                Text(getIt<AuthCubit>().currentBranchName),
                 const SizedBox(height: 12),
 
                 const Text(
@@ -271,8 +271,8 @@ class _MobileHeaderSectionState extends State<_MobileHeaderSection> with Automat
                 ),
                 InkWell(
                   onTap: () async {
-                    final branches = BranchesTool.branches
-                        .where((element) => element.id != BranchesTool.getCurrentBranchId())
+                    final branches = getIt<AuthCubit>().branches
+                        .where((element) => element.id != getIt<AuthCubit>().currentBranchId)
                         .toList();
 
                     final res = await showBranchSelectionDialog(context, branches);

@@ -7,6 +7,8 @@ import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/wi
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_modal.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/widgets/dialogs/product_in_branch_info_dialog.dart';
 
 Future<CommercialProductResult?> showCommercialProductSearchDelegate(BuildContext context) async {
@@ -70,7 +72,8 @@ class _CustomProductSearchDelegateState<T> extends State<CustomProductSearchDele
                         if (value.isEmpty) return;
                         isSearching = true;
                         setState(() {});
-                        products = await context.read<ProductsRepository>().searchProductInBranch(value);
+                        final branchId = getIt<AuthCubit>().currentBranchId;
+                        products = await context.read<ProductsRepository>().searchProductInBranch(value, branchId);
                         isSearching = false;
                         setState(() {});
                       },

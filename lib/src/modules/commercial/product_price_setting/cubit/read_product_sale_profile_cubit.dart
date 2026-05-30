@@ -10,10 +10,10 @@ class ReadProductSaleProfileCubit extends Cubit<ReadProductSaleProfileState> {
   final ProductSaleProfilesRepository profilesRepository;
   List<ProductSaleProfileInDbWithProduct> _profilesCache = [];
 
-  Future<void> loadCurrentBranchProfiles() async {
+  Future<void> loadCurrentBranchProfiles(String branchId) async {
     emit(ReadProductSaleProfileLoading());
     try {
-      final profiles = await profilesRepository.getAllProductSaleProfilesCurrentBranch();
+      final profiles = await profilesRepository.getAllProductSaleProfilesCurrentBranch(branchId);
       _profilesCache = profiles;
       if (isClosed) return;
       emit(ReadProductSaleProfileSuccess(profiles));
