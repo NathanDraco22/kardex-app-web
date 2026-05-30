@@ -3,7 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/cubits/product_accounts/read_product_accounts_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/product/product_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 
 class ProductStockDialog extends StatelessWidget {
   const ProductStockDialog({super.key, required this.product});
@@ -98,7 +99,7 @@ class _StockList extends StatelessWidget {
             separatorBuilder: (context, index) => const Divider(),
             itemBuilder: (context, index) {
               final account = state.accounts[index];
-              final branch = BranchesTool.getBranchById(account.branchId);
+              final branch = getIt<AuthCubit>().getBranchById(account.branchId);
 
               return ListTile(
                 title: Text(

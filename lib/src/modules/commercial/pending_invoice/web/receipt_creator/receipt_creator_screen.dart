@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/client/client.dart';
 import 'package:kardex_app_front/src/domain/models/common/client_info.dart';
 import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
@@ -13,10 +15,9 @@ import 'package:kardex_app_front/src/modules/commercial/pending_invoice/cubit/wr
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/modals/confirm_receipt_modal.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/web/receipt_creator/modals/partial_payment_modal.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
-import 'package:kardex_app_front/src/tools/session_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
-import 'package:kardex_app_front/widgets/dialogs/receipt_viewer.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/receipt_viewer.dart';
 
 class CreateReceiptMediator extends InheritedWidget {
   const CreateReceiptMediator({
@@ -90,7 +91,7 @@ class _RootScaffold extends StatelessWidget {
         if (state is WriteReceiptSuccess) {
           LoadingDialogManager.closeLoadingDialog(context);
 
-          context.read<ReadPendingInvoiceCubit>().loadPaginatedInvoices(client.id);
+          context.read<ReadPendingInvoiceCubit>().loadPaginatedInvoices(client.id, getIt<AuthCubit>().currentBranchId);
 
           await DialogManager.showInfoDialog(
             context,
@@ -155,7 +156,10 @@ class _CreateReceiptBottomBar extends StatelessWidget {
                   if (result == null) return;
                   if (!context.mounted) return;
 
-                  final (currentUser, currentBranch) = SessionTool.getFullUserFrom(context);
+                  final authState = getIt<AuthCubit>().state;
+                  if (authState is! Authenticated) throw Exception("User or branch not found");
+                  final currentUser = authState.session.user;
+                  final currentBranch = authState.branch;
 
                   // 1. Calculate Applied Invoices (Cash Input + Linked Devolutions)
                   final appliedInvoices = <AppliedInvoice>[];
@@ -256,7 +260,10 @@ class _CreateReceiptBottomBar extends StatelessWidget {
 
                   if (!context.mounted) return;
 
-                  final (currentUser, currentBranch) = SessionTool.getFullUserFrom(context);
+                  final authState = getIt<AuthCubit>().state;
+                  if (authState is! Authenticated) throw Exception("User or branch not found");
+                  final currentUser = authState.session.user;
+                  final currentBranch = authState.branch;
 
                   final createReceipt = CreateReceipt(
                     branchId: currentBranch.id,

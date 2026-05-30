@@ -4,7 +4,7 @@ import 'package:kardex_app_front/src/cubits/client_transaction/read_client_trans
 import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
 import 'package:kardex_app_front/src/modules/finance/client_movements/view/widgets/movement_mobile_row.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
-import 'package:kardex_app_front/widgets/dialogs/client_selection_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/selectors/client_selection_dialog.dart';
 
 import 'package:kardex_app_front/widgets/widgets.dart';
 

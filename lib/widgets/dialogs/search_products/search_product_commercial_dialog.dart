@@ -9,6 +9,9 @@ import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_prod
 import 'package:kardex_app_front/widgets/no_item.dart';
 import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+
 import '../models/commercial_product_result.dart';
 
 Future<CommercialProductResult?> showSearchProductCommercialDialog(
@@ -130,7 +133,8 @@ class _SearchProductCommercialDialogState extends State<SearchProductCommercialD
                             }
                             isSearching = true;
                             setState(() {});
-                            products = await _productsRepository.searchProductInBranch(value);
+                            final branchId = getIt<AuthCubit>().currentBranchId;
+                            products = await _productsRepository.searchProductInBranch(value, branchId);
                             isSearching = false;
                             setState(() {});
                           },

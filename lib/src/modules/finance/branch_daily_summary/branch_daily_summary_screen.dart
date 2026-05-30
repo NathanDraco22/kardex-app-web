@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/finance/branch_daily_summary/cubit/read_branch_daily_summary_cubit.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
@@ -13,7 +15,7 @@ class BranchDailySummaryScreen extends StatelessWidget {
     return BlocProvider(
       create: (context) {
         final repo = context.read<DailySummariesRepository>();
-        return ReadBranchDailySummaryCubit(dailySummariesRepository: repo)..getDailySummary();
+        return ReadBranchDailySummaryCubit(dailySummariesRepository: repo, currentBranchId: getIt<AuthCubit>().currentBranchId)..getDailySummary();
       },
       child: const _RootScaffold(),
     );

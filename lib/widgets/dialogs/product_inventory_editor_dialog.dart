@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/src/domain/models/product/product_model.dart';
 import 'package:kardex_app_front/src/domain/models/product_sale_profile/product_sale_profile_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
@@ -100,7 +101,10 @@ class _RootScaffoldState extends State<_RootScaffold> {
       salePrice3: currentSalePrice3,
       discounts: currentDiscounts,
     );
+
+    final branchId = getIt<AuthCubit>().currentBranchId;
     context.read<WriteProductSaleProfileCubit>().updateProfile(
+      branchId,
       currentProduct.id,
       updatedDto,
     );

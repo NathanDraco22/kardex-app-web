@@ -3,7 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/expiration_log/expiration_log.dart';
 
 import 'package:kardex_app_front/src/domain/models/product/product_model.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/extensiones.dart';
 import 'package:kardex_app_front/src/tools/input_formatter/input_formatter.dart';
@@ -97,7 +98,7 @@ class _ExpirationLogCreationScreenState extends State<ExpirationLogCreationScree
                   unitName: _selectedProduct!.unitName,
                   categoryName: _selectedProduct!.categoryName,
                 ),
-                branchId: BranchesTool.getCurrentBranchId(),
+                branchId: getIt<AuthCubit>().currentBranchId,
                 expirationDate: _expirationDateParsed!,
               );
 

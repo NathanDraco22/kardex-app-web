@@ -6,7 +6,7 @@ import 'package:kardex_app_front/constants/const_modules.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/cubits/toast/toast_cubit.dart';
 import 'package:kardex_app_front/src/core/access_manager.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:toastification/toastification.dart';
 
 import 'widgets/home_end_drawer.dart';
@@ -25,71 +25,74 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authCubit = context.watch<AuthCubit>();
-    final authState = authCubit.state;
-    if (authState is AuthLoading) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
-
-    if (authState is AuthError) {
-      return Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              authCubit.logout();
-            },
-          ),
-          title: const Text("Error"),
-        ),
-        body: Center(
-          child: Text(authState.message),
-        ),
-      );
-    }
-
-    if (authState is! Authenticated) {
-      Future(() {
-        if (!context.mounted) return;
-        context.goNamed("login");
-      });
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
-
-    final user = authState.session.user;
-
-    return BlocListener<ToastCubit, ToastState>(
-      listener: (context, state) {
-        if (state is! ToastMessage) {
-          return;
+    return BlocBuilder<AuthCubit, AuthState>(
+      bloc: getIt<AuthCubit>(),
+      builder: (context, authState) {
+        if (authState is AuthLoading) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
         }
-        toastification.show(
-          context: context,
-          type: ToastificationType.warning,
-          title: Text(state.message),
-          backgroundColor: Colors.amber.shade100,
+
+        if (authState is AuthError) {
+          return Scaffold(
+            appBar: AppBar(
+              leading: IconButton(
+                icon: const Icon(Icons.logout),
+                onPressed: () {
+                  getIt<AuthCubit>().logout();
+                },
+              ),
+              title: const Text("Error"),
+            ),
+            body: Center(
+              child: Text(authState.message),
+            ),
+          );
+        }
+
+        if (authState is! Authenticated) {
+          Future(() {
+            if (!context.mounted) return;
+            context.goNamed("login");
+          });
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+
+        final user = authState.session.user;
+
+        return BlocListener<ToastCubit, ToastState>(
+          listener: (context, state) {
+            if (state is! ToastMessage) {
+              return;
+            }
+            toastification.show(
+              context: context,
+              type: ToastificationType.warning,
+              title: Text(state.message),
+              backgroundColor: Colors.amber.shade100,
+            );
+          },
+          child: Scaffold(
+            endDrawer: HomeEndDrawer(user: user),
+            appBar: AppBar(
+              title: const Text("Neptuno App"),
+              actions: [
+                const AvatarButton(),
+                const SizedBox(width: 12),
+              ],
+            ),
+            backgroundColor: Colors.white,
+            body: const _Body(),
+          ),
         );
       },
-      child: Scaffold(
-        endDrawer: HomeEndDrawer(user: user),
-        appBar: AppBar(
-          title: const Text("Neptuno Lite"),
-          actions: [
-            const AvatarButton(),
-            const SizedBox(width: 12),
-          ],
-        ),
-        backgroundColor: Colors.white,
-        body: const _Body(),
-      ),
     );
   }
 }
@@ -108,13 +111,13 @@ class _AvatarButtonState extends State<AvatarButton> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     context.read<ToastCubit>().hasNearExpiration(
-      BranchesTool.getCurrentBranchId(),
+      getIt<AuthCubit>().currentBranchId,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final authState = context.read<AuthCubit>().state;
+    final authState = getIt<AuthCubit>().state;
     if (authState is! Authenticated) {
       return const SizedBox.shrink();
     }
@@ -149,7 +152,7 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authState = context.read<AuthCubit>().state;
+    final authState = getIt<AuthCubit>().state;
     if (authState is AuthLoading) {
       return const Center(
         child: CircularProgressIndicator(),
@@ -168,7 +171,7 @@ class _Body extends StatelessWidget {
     final userName = user.username;
     final firstName = userName.split(" ")[0];
     final accessManager = AccessManager();
-    final currentBranch = BranchesTool.getCurrentBranch();
+    final currentBranch = getIt<AuthCubit>().currentBranch;
     return Center(
       child: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 24),

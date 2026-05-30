@@ -32,7 +32,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                 children: [
                   TextButton.icon(
                     onPressed: () {
-                      readCubit.setDefaultParams();
+                      readCubit.setDefaultParams(getIt<AuthCubit>().currentBranchId);
                       widget.onProductSelected(null);
                       setState(() {});
                     },
@@ -93,7 +93,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                     onPressed: widget.selectedProduct == null
                         ? null
                         : () {
-                            readCubit.loadInvoicesByProduct(widget.selectedProduct!.id);
+                            readCubit.loadInvoicesByProduct(widget.selectedProduct!.id, getIt<AuthCubit>().currentBranchId);
                           },
                     label: const Text("Filtrar"),
                     icon: const Icon(Icons.filter_alt_rounded),

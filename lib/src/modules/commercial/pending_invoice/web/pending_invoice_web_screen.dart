@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/client/client.dart';
 import 'package:kardex_app_front/src/domain/models/devolution/devolution.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
@@ -8,12 +10,11 @@ import 'package:kardex_app_front/src/modules/commercial/pending_invoice/web/moda
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/web/receipt_creator/receipt_creator_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/widget/invoice_devolution_tile.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
-import 'package:kardex_app_front/src/tools/session_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
-import 'package:kardex_app_front/widgets/dialogs/devolution_viewer.dart';
-import 'package:kardex_app_front/widgets/dialogs/invoice_acredit_viewer.dart';
-import 'package:kardex_app_front/widgets/dialogs/receipt_viewer.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/devolution_viewer.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_acredit_viewer.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/receipt_viewer.dart';
 import 'package:kardex_app_front/widgets/map/launch_map_button.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/cubit/write_receipt_cubit.dart';
 
@@ -88,6 +89,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
     if (selectedClient != null && !hasInitLoading) {
       context.read<ReadPendingInvoiceCubit>().loadPaginatedInvoices(
         selectedClient.id,
+        getIt<AuthCubit>().currentBranchId,
       );
       hasInitLoading = true;
     }
@@ -110,7 +112,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
 
           final selectedClient = PendingInvoiceMediator.of(context).notifier?.selectedClient;
           if (selectedClient != null) {
-            context.read<ReadPendingInvoiceCubit>().loadPaginatedInvoices(selectedClient.id);
+            context.read<ReadPendingInvoiceCubit>().loadPaginatedInvoices(selectedClient.id, getIt<AuthCubit>().currentBranchId);
           }
         }
       },

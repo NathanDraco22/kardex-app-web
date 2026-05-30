@@ -7,7 +7,8 @@ import 'package:kardex_app_front/widgets/dialogs/client_full_details_dialog.dart
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/simple_search_dialog.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/clients_catalog_template.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 
@@ -121,7 +122,7 @@ class _Body extends StatelessWidget {
                 final clientRepo = context.read<ClientsRepository>();
                 final clientsList = await clientRepo.getAllClients();
                 final template = ClientsCatalogTemplate(
-                  branchName: BranchesTool.getCurrentBranchName(),
+                  branchName: getIt<AuthCubit>().currentBranchName,
                   clients: clientsList,
                 );
                 await PdfExportTool.export(template, fileName: "catalogo_clientes.pdf");

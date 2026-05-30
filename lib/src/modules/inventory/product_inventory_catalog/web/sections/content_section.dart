@@ -32,7 +32,7 @@ class _ContentSection extends StatelessWidget {
         final nextPageThreshold = maxScrollExtend * 0.65;
 
         if (scrollOffset >= nextPageThreshold) {
-          context.read<ReadProductInBranchCubit>().getNextPage();
+          context.read<ReadProductInBranchCubit>().getNextPage(getIt<AuthCubit>().currentBranchId);
         }
         return false;
       },

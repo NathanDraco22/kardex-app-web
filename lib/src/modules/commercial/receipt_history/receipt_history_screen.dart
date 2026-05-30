@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/cubits/receipt_history/read_receipt_history_cubit.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/commercial/receipt_history/web/receipt_history_web_screen.dart';
@@ -12,7 +14,7 @@ class ReceiptHistoryScreen extends StatelessWidget {
     final receiptRepo = context.read<ReceiptsRepository>();
 
     return BlocProvider(
-      create: (context) => ReadReceiptHistoryCubit(receiptRepo)..loadReceiptsHistory(),
+      create: (context) => ReadReceiptHistoryCubit(receiptRepo)..loadReceiptsHistory(getIt<AuthCubit>().currentBranchId),
       child: const _RootScaffold(),
     );
   }

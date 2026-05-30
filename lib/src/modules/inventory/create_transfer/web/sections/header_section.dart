@@ -32,7 +32,7 @@ class _HeaderSection extends StatelessWidget {
                       ),
                       Flexible(
                         fit: FlexFit.tight,
-                        child: Text(BranchesTool.getCurrentBranchName()),
+                        child: Text(getIt<AuthCubit>().currentBranchName),
                       ),
                     ],
                   ),
@@ -41,8 +41,8 @@ class _HeaderSection extends StatelessWidget {
                   const SizedBox(height: 6),
                   InkWell(
                     onTap: () async {
-                      final branches = BranchesTool.branches
-                          .where((element) => element.id != BranchesTool.getCurrentBranchId())
+                      final branches = getIt<AuthCubit>().branches
+                          .where((element) => element.id != getIt<AuthCubit>().currentBranchId)
                           .toList();
 
                       final res = await showBranchSelectionDialog(context, branches);
@@ -199,9 +199,11 @@ Future<void> saveTransfer(BuildContext context) async {
     );
   }).toList();
 
-  final (currentUser, _) = SessionTool.getFullUserFrom(context);
+  final authState = getIt<AuthCubit>().state;
+  if (authState is! Authenticated) throw Exception("User or branch not found");
+  final currentUser = authState.session.user;
 
-  final originBranch = BranchesTool.getCurrentBranch();
+  final originBranch = getIt<AuthCubit>().currentBranch;
 
   final createTransfer = CreateTransfer(
     origin: originBranch!.id,

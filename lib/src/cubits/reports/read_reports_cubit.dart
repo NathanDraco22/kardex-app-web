@@ -2,7 +2,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/reports/totals_result.dart';
 import 'package:kardex_app_front/src/domain/query_params/totals_query_params.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 
 part 'read_reports_state.dart';
@@ -22,13 +21,13 @@ class ReadReportsCubit extends Cubit<ReadReportsState> {
 
   final ReportsRepository reportsRepository;
 
-  Future<void> loadReports() async {
+  Future<void> loadReports(String branchId) async {
     emit(ReadReportsLoading());
     try {
       final topEndDate = endDate?.add(const Duration(days: 1));
 
       params = TotalsQueryParams()
-        ..branchId = BranchesTool.getCurrentBranchId()
+        ..branchId = branchId
         ..startDate = startDate
         ..endDate = topEndDate;
 
@@ -40,9 +39,9 @@ class ReadReportsCubit extends Cubit<ReadReportsState> {
     }
   }
 
-  void clearFilters() {
+  void clearFilters(String branchId) {
     startDate = DateTimeTool.getTodayMidnight();
     endDate = startDate;
-    loadReports();
+    loadReports(branchId);
   }
 }

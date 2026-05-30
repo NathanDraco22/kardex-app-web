@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kardex_app_front/src/domain/models/client/client.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
 import 'package:kardex_app_front/widgets/dialogs/client_full_details_dialog.dart';
-import 'package:kardex_app_front/widgets/dialogs/client_selection_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/selectors/client_selection_dialog.dart';
 
 class ClientSelectorCard extends StatefulWidget {
   const ClientSelectorCard({

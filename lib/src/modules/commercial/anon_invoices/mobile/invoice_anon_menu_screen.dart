@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/constants/default_values.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/common/client_info.dart';
 import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
 import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/cubits/write_invoice_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/widgets/dialogs/payment_confirmation_dialog.dart';
-import 'package:kardex_app_front/src/tools/session_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
-import 'package:kardex_app_front/widgets/dialogs/invoice_viewer.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
 import 'package:kardex_app_front/widgets/text_field_date_selector.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
 
@@ -237,7 +238,10 @@ class _SendButton extends StatelessWidget {
               (previousValue, element) => previousValue + element.total,
             );
 
-            final (currentUser, currentBranch) = SessionTool.getFullUserFrom(context);
+            final authState = getIt<AuthCubit>().state;
+            if (authState is! Authenticated) throw Exception("User or branch not found");
+            final currentUser = authState.session.user;
+            final currentBranch = authState.branch;
 
             CreateInvoice newInvoice = CreateInvoice(
               branchId: currentBranch.id,

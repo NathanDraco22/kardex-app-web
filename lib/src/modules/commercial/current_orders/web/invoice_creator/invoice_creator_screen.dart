@@ -10,7 +10,7 @@ import 'package:kardex_app_front/src/modules/commercial/current_orders/modals/co
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
-import 'package:kardex_app_front/widgets/dialogs/invoice_viewer.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
 import 'package:kardex_app_front/widgets/row_widgets/sale_item_row.dart';
 
 Future<OrderInDb?> showOrderInvoiceCreatorDialog(BuildContext context, OrderInDb order) async {
@@ -26,10 +26,20 @@ Future<OrderInDb?> showOrderInvoiceCreatorDialog(BuildContext context, OrderInDb
   );
 }
 
-class InvoiceCreateMediator extends InheritedWidget {
-  const InvoiceCreateMediator({super.key, required super.child, required this.order});
+class OrderContainer {
+  OrderInDb order;
 
-  final OrderInDb order;
+  OrderContainer({required this.order});
+
+  void updateOrder(OrderInDb order) {
+    this.order = order;
+  }
+}
+
+class InvoiceCreateMediator extends InheritedWidget {
+  const InvoiceCreateMediator({super.key, required super.child, required this.orderContainer});
+
+  final OrderContainer orderContainer;
 
   static InvoiceCreateMediator of(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<InvoiceCreateMediator>()!;
@@ -50,7 +60,7 @@ class InvoiceCreatorScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final orderRepo = context.read<OrdersRepository>();
     return InvoiceCreateMediator(
-      order: order,
+      orderContainer: OrderContainer(order: order),
       child: BlocProvider(
         create: (context) => WriteOrderCubit(
           ordersRepository: orderRepo,
@@ -66,7 +76,7 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final order = InvoiceCreateMediator.of(context).order;
+    final orderContainer = InvoiceCreateMediator.of(context).orderContainer;
     final writeCubit = context.read<WriteOrderCubit>();
     return BlocListener<WriteOrderCubit, WriteOrderState>(
       listener: (context, state) async {
@@ -112,17 +122,17 @@ class _RootScaffold extends StatelessWidget {
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: Builder(
           builder: (context) {
-            if (order.status == OrderStatus.open) {
+            if (orderContainer.order.status == OrderStatus.open) {
               return const SizedBox.shrink();
             }
 
-            if (order.invoiceId.isEmpty) {
+            if (orderContainer.order.invoiceId.isEmpty) {
               return const SizedBox.shrink();
             }
 
             return ElevatedButton.icon(
               onPressed: () {
-                showInvoiceViewerDialogFromId(context, order.invoiceId);
+                showInvoiceViewerDialogFromId(context, orderContainer.order.invoiceId);
               },
               label: const Text("Ver Factura"),
               icon: const Icon(Icons.picture_as_pdf),
@@ -133,11 +143,11 @@ class _RootScaffold extends StatelessWidget {
           height: 60,
           child: Builder(
             builder: (context) {
-              if (order.status != OrderStatus.open) {
-                final textColor = order.status == OrderStatus.completed ? Colors.green : Colors.red;
+              if (orderContainer.order.status != OrderStatus.open) {
+                final textColor = orderContainer.order.status == OrderStatus.completed ? Colors.green : Colors.red;
                 return Center(
                   child: Text(
-                    order.status.tag.toUpperCase(),
+                    orderContainer.order.status.tag.toUpperCase(),
                     style: TextStyle(
                       color: textColor,
                       fontSize: 20,
@@ -155,9 +165,9 @@ class _RootScaffold extends StatelessWidget {
                       backgroundColor: Colors.red.shade300,
                     ),
                     onPressed: () async {
-                      final res = await showCancelOrderInvoiceModal(context, order);
+                      final res = await showCancelOrderInvoiceModal(context, orderContainer.order);
                       if (res != true) return;
-                      writeCubit.cancelOrder(order.id);
+                      writeCubit.cancelOrder(orderContainer.order.id);
                     },
                     icon: const Icon(Icons.cancel),
                     label: const Text("Cancelar Orden"),
@@ -168,9 +178,9 @@ class _RootScaffold extends StatelessWidget {
                       backgroundColor: Colors.green.shade300,
                     ),
                     onPressed: () async {
-                      final res = await showConfirmOrderInvoiceModal(context, order);
+                      final res = await showConfirmOrderInvoiceModal(context, orderContainer.order);
                       if (res != true) return;
-                      writeCubit.convertOrderToInvoice(order.id);
+                      writeCubit.convertOrderToInvoice(orderContainer.order.id);
                     },
                     icon: const Icon(Icons.check),
                     label: const Text("Facturar Orden"),
@@ -194,11 +204,40 @@ class _Body extends StatefulWidget {
 
 class _BodyState extends State<_Body> {
   List<SaleItem> markedItems = [];
+  OrderInDb? _currentOrder;
+  bool? _isAscending;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _currentOrder ??= InvoiceCreateMediator.of(context).orderContainer.order;
+  }
+
+  void _toggleSort() {
+    if (_currentOrder == null) return;
+    final nextAscending = !(_isAscending ?? false);
+
+    final sortedItems = List<SaleItem>.from(_currentOrder!.saleItems);
+    sortedItems.sort((a, b) {
+      final nameA = a.product.name.toLowerCase();
+      final nameB = b.product.name.toLowerCase();
+      return nextAscending ? nameA.compareTo(nameB) : nameB.compareTo(nameA);
+    });
+
+    final updatedOrder = _currentOrder!.copyWith(saleItems: sortedItems);
+
+    InvoiceCreateMediator.of(context).orderContainer.updateOrder(updatedOrder);
+
+    setState(() {
+      _currentOrder = updatedOrder;
+      _isAscending = nextAscending;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final mediator = InvoiceCreateMediator.of(context);
-    final order = mediator.order;
+    if (_currentOrder == null) return const SizedBox.shrink();
+    final order = _currentOrder!;
     final saleItems = order.saleItems;
     final totalFormatted = NumberFormatter.convertToMoneyLike(order.total);
     return Center(
@@ -270,11 +309,14 @@ class _BodyState extends State<_Body> {
                         ),
                       ),
 
+                      const SizedBox(height: 12),
+
                       Text(
                         "Total: $totalFormatted",
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
                         textAlign: TextAlign.end,
                       ),
@@ -294,12 +336,36 @@ class _BodyState extends State<_Body> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        const Text(
-                          "Detalle:",
-                          style: TextStyle(
-                            fontSize: 18,
-                          ),
-                          textAlign: TextAlign.start,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Detalle:",
+                              style: TextStyle(
+                                fontSize: 18,
+                              ),
+                              textAlign: TextAlign.start,
+                            ),
+                            IconButton(
+                              tooltip: _isAscending == null
+                                  ? "Ordenar productos (A-Z)"
+                                  : _isAscending!
+                                  ? "Ordenar Z-A"
+                                  : "Ordenar A-Z",
+                              icon: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.sort_by_alpha, size: 20),
+                                  if (_isAscending != null)
+                                    Icon(
+                                      _isAscending! ? Icons.arrow_downward : Icons.arrow_upward,
+                                      size: 14,
+                                    ),
+                                ],
+                              ),
+                              onPressed: _toggleSort,
+                            ),
+                          ],
                         ),
                         Expanded(
                           child: ListView(

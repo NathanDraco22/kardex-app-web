@@ -17,12 +17,14 @@ class ReadDailyAnonInvoicesCubit extends Cubit<ReadDailyAnonInvoicesState> {
   DateTime? startDate;
   int offset = 0;
   String? userCreatorId;
+  String? _lastBranchId;
 
   bool isLastPage = false;
 
   final InvoicesRepository invoicesRepository;
 
-  Future<void> loadDailyPaidAnonInvoices({DateTime? startDate, String? userCreatorId}) async {
+  Future<void> loadDailyPaidAnonInvoices(String branchId, {DateTime? startDate, String? userCreatorId}) async {
+    _lastBranchId = branchId;
     emit(ReadDailyAnonInvoicesLoading());
     if (startDate != null) {
       this.startDate = startDate;
@@ -34,6 +36,7 @@ class ReadDailyAnonInvoicesCubit extends Cubit<ReadDailyAnonInvoicesState> {
     try {
       final topEndDate = this.startDate?.add(const Duration(days: 1));
       final result = await invoicesRepository.getPaidInvoices(
+        branchId: branchId,
         clientId: kSaleClientId,
         startDate: this.startDate?.millisecondsSinceEpoch,
         endDate: topEndDate?.millisecondsSinceEpoch,
@@ -42,6 +45,7 @@ class ReadDailyAnonInvoicesCubit extends Cubit<ReadDailyAnonInvoicesState> {
       );
 
       final totals = await invoicesRepository.getTotalFromPaidInvoices(
+        branchId: branchId,
         clientId: kSaleClientId,
         startDate: this.startDate?.millisecondsSinceEpoch,
         endDate: topEndDate?.millisecondsSinceEpoch,
@@ -58,7 +62,7 @@ class ReadDailyAnonInvoicesCubit extends Cubit<ReadDailyAnonInvoicesState> {
     }
   }
 
-  Future<void> nextPage() async {
+  Future<void> nextPage(String branchId) async {
     if (isLastPage) return;
     final currentState = state;
     if (currentState is! ReadDailyAnonInvoicesSuccess) return;
@@ -74,6 +78,7 @@ class ReadDailyAnonInvoicesCubit extends Cubit<ReadDailyAnonInvoicesState> {
       final topEndDate = startDate?.add(const Duration(days: 1));
 
       final result = await invoicesRepository.getPaidInvoices(
+        branchId: branchId,
         clientId: kSaleClientId,
         startDate: startDate?.millisecondsSinceEpoch,
         endDate: topEndDate?.millisecondsSinceEpoch,
@@ -98,6 +103,8 @@ class ReadDailyAnonInvoicesCubit extends Cubit<ReadDailyAnonInvoicesState> {
     startDate = DateTimeTool.getTodayMidnight();
     offset = 0;
     userCreatorId = null;
-    loadDailyPaidAnonInvoices(startDate: startDate);
+    if (_lastBranchId != null) {
+      loadDailyPaidAnonInvoices(_lastBranchId!, startDate: startDate);
+    }
   }
 }

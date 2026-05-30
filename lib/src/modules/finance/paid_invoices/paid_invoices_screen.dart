@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/tools/extensiones.dart';
 
@@ -17,7 +19,7 @@ class PaidInvoicesScreen extends StatelessWidget {
     return BlocProvider(
       create: (context) => ReadPaidInvoicesCubit(
         invoicesRepository: invoiceRepo,
-      )..loadPaidInvoices(),
+      )..loadPaidInvoices(getIt<AuthCubit>().currentBranchId),
       child: const _RootScaffold(),
     );
   }
@@ -33,7 +35,7 @@ class _RootScaffold extends StatelessWidget {
         final scrollOffset = notification.metrics.pixels;
         final maxScrollExtent = notification.metrics.maxScrollExtent;
         if (scrollOffset >= maxScrollExtent * 0.7) {
-          context.read<ReadPaidInvoicesCubit>().nextPage();
+          context.read<ReadPaidInvoicesCubit>().nextPage(getIt<AuthCubit>().currentBranchId);
         }
         return false;
       },

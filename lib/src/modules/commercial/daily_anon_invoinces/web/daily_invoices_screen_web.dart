@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/user/user_model.dart';
 import 'package:kardex_app_front/src/modules/commercial/daily_anon_invoinces/cubit/read_daily_anon_invoices_cubit.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/basic_table_listview.dart';
 import 'package:kardex_app_front/widgets/date_picker_button.dart';
-import 'package:kardex_app_front/widgets/dialogs/invoice_viewer.dart';
-import 'package:kardex_app_front/widgets/dialogs/user_selection_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
+import 'package:kardex_app_front/widgets/dialogs/selectors/user_selection_dialog.dart';
 import 'package:kardex_app_front/widgets/title_label.dart';
 
 part 'sections/content_section.dart';

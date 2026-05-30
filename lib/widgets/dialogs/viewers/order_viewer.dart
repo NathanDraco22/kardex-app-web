@@ -1,33 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/branch/branch.dart';
-import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
-import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
-import 'package:kardex_app_front/src/domain/repositories/invoice_repository.dart';
+import 'package:kardex_app_front/src/domain/models/order/order_model.dart';
+import 'package:kardex_app_front/src/domain/repositories/order_repository.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
-import 'package:kardex_app_front/src/tools/printers/invoice_printer.dart';
+import 'package:kardex_app_front/src/tools/printers/order_printer.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
-import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
-import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_invoice_template.dart';
+import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_order_template.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 
-Future<void> showInvoiceViewerDialog(BuildContext context, InvoiceInDb invoice) async {
-  final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
+import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
+
+Future<void> showOrderViewerDialog(BuildContext context, OrderInDb order) async {
+  final currentBranch = (getIt<AuthCubit>().state as Authenticated).branch;
   final paperSize = await PrintManager.getLocalPaperSize();
   if (!context.mounted) return;
+
   await Navigator.push(
     context,
     MaterialPageRoute(
       builder: (context) {
-        return _InvoiceViewer(
-          invoice: invoice,
+        return _OrderViewer(
+          order: order,
           branch: currentBranch,
-          onShare: () => shareInvoice(invoice, currentBranch, paperSize: paperSize),
-          onPrint: () => printInvoice(invoice, currentBranch, paperSize: paperSize),
+          onShare: () => shareOrder(order, currentBranch, paperSize: paperSize),
+          onPrint: () => printOrder(order, currentBranch, paperSize: paperSize),
           onExportPdf: () async {
-            final template = SingleInvoiceTemplate(invoice: invoice, branch: currentBranch);
-            await PdfExportTool.export(template, fileName: "factura_${invoice.docNumber}.pdf");
+            final template = SingleOrderTemplate(order: order, branch: currentBranch);
+            await PdfExportTool.export(template, fileName: "pedido_${order.docNumber}.pdf");
           },
         );
       },
@@ -35,8 +37,8 @@ Future<void> showInvoiceViewerDialog(BuildContext context, InvoiceInDb invoice) 
   );
 }
 
-Future<void> showInvoiceViewerDialogFromDocNumber(BuildContext context, String docNumber) async {
-  final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
+Future<void> showOrderViewerDialogFromId(BuildContext context, String orderId) async {
+  final currentBranch = (getIt<AuthCubit>().state as Authenticated).branch;
   final paperSize = await PrintManager.getLocalPaperSize();
   if (!context.mounted) return;
 
@@ -45,7 +47,7 @@ Future<void> showInvoiceViewerDialogFromDocNumber(BuildContext context, String d
     MaterialPageRoute(
       builder: (context) {
         return FutureBuilder(
-          future: context.read<InvoicesRepository>().getInvoiceByDocNumber(docNumber),
+          future: context.read<OrdersRepository>().getOrderById(orderId),
           builder: (context, asyncSnapshot) {
             if (asyncSnapshot.connectionState != ConnectionState.done) {
               return Scaffold(
@@ -56,25 +58,25 @@ Future<void> showInvoiceViewerDialogFromDocNumber(BuildContext context, String d
               );
             }
 
-            if (asyncSnapshot.hasError) {
+            if (asyncSnapshot.hasError || asyncSnapshot.data == null) {
               return Scaffold(
                 appBar: AppBar(),
                 body: Center(
-                  child: Text("Error al cargar la factura \n ${asyncSnapshot.error}"),
+                  child: Text("Error al cargar el pedido \n ${asyncSnapshot.error ?? 'Pedido no encontrado'}"),
                 ),
               );
             }
 
-            final invoice = asyncSnapshot.data!;
+            final order = asyncSnapshot.data!;
 
-            return _InvoiceViewer(
-              invoice: invoice,
+            return _OrderViewer(
+              order: order,
               branch: currentBranch,
-              onShare: () => shareInvoice(invoice, currentBranch, paperSize: paperSize),
-              onPrint: () => printInvoice(invoice, currentBranch, paperSize: paperSize),
+              onShare: () => shareOrder(order, currentBranch, paperSize: paperSize),
+              onPrint: () => printOrder(order, currentBranch, paperSize: paperSize),
               onExportPdf: () async {
-                final template = SingleInvoiceTemplate(invoice: invoice, branch: currentBranch);
-                await PdfExportTool.export(template, fileName: "factura_${invoice.docNumber}.pdf");
+                final template = SingleOrderTemplate(order: order, branch: currentBranch);
+                await PdfExportTool.export(template, fileName: "pedido_${order.docNumber}.pdf");
               },
             );
           },
@@ -84,65 +86,16 @@ Future<void> showInvoiceViewerDialogFromDocNumber(BuildContext context, String d
   );
 }
 
-Future<void> showInvoiceViewerDialogFromId(BuildContext context, String id) async {
-  final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
-  final paperSize = await PrintManager.getLocalPaperSize();
-  if (!context.mounted) return;
-
-  await Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) {
-        return FutureBuilder(
-          future: context.read<InvoicesRepository>().getInvoiceById(id),
-          builder: (context, asyncSnapshot) {
-            if (asyncSnapshot.connectionState != ConnectionState.done) {
-              return Scaffold(
-                appBar: AppBar(),
-                body: const Center(
-                  child: CircularProgressIndicator(),
-                ),
-              );
-            }
-
-            if (asyncSnapshot.hasError) {
-              return Scaffold(
-                appBar: AppBar(),
-                body: Center(
-                  child: Text("Error al cargar la factura \n ${asyncSnapshot.error}"),
-                ),
-              );
-            }
-
-            final invoice = asyncSnapshot.data!;
-
-            return _InvoiceViewer(
-              invoice: invoice,
-              branch: currentBranch,
-              onShare: () => shareInvoice(invoice, currentBranch, paperSize: paperSize),
-              onPrint: () => printInvoice(invoice, currentBranch, paperSize: paperSize),
-              onExportPdf: () async {
-                final template = SingleInvoiceTemplate(invoice: invoice, branch: currentBranch);
-                await PdfExportTool.export(template, fileName: "factura_${invoice.docNumber}.pdf");
-              },
-            );
-          },
-        );
-      },
-    ),
-  );
-}
-
-class _InvoiceViewer extends StatelessWidget {
-  const _InvoiceViewer({
-    required this.invoice,
+class _OrderViewer extends StatelessWidget {
+  const _OrderViewer({
+    required this.order,
     required this.branch,
     this.onShare,
     this.onPrint,
     this.onExportPdf,
   });
 
-  final InvoiceInDb invoice;
+  final OrderInDb order;
   final BranchInDb branch;
   final VoidCallback? onShare;
   final VoidCallback? onPrint;
@@ -152,7 +105,7 @@ class _InvoiceViewer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Factura #${invoice.docNumber}"),
+        title: Text("Pedido #${order.docNumber}"),
         actions: [
           IconButton(
             tooltip: "Exportar PDF (A4)",
@@ -160,12 +113,12 @@ class _InvoiceViewer extends StatelessWidget {
             icon: const Icon(Icons.picture_as_pdf),
           ),
           IconButton(
-            tooltip: "Compartir Factura",
+            tooltip: "Compartir Pedido",
             onPressed: onShare,
             icon: const Icon(Icons.share),
           ),
           IconButton(
-            tooltip: "Imprimir Factura",
+            tooltip: "Imprimir Pedido",
             onPressed: onPrint,
             icon: const Icon(Icons.print),
           ),
@@ -178,8 +131,8 @@ class _InvoiceViewer extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 600),
-              child: InvoiceViewerContent(
-                invoice: invoice,
+              child: OrderViewerContent(
+                order: order,
                 branch: branch,
               ),
             ),
@@ -190,30 +143,30 @@ class _InvoiceViewer extends StatelessWidget {
   }
 }
 
-class InvoiceViewerContent extends StatelessWidget {
-  const InvoiceViewerContent({
+class OrderViewerContent extends StatelessWidget {
+  const OrderViewerContent({
     super.key,
-    required this.invoice,
+    required this.order,
     required this.branch,
   });
 
-  final InvoiceInDb invoice;
+  final OrderInDb order;
   final BranchInDb branch;
 
   @override
   Widget build(BuildContext context) {
-    final totalDiscount = invoice.saleItems.fold(
+    final totalDiscount = order.saleItems.fold(
       0,
       (previousValue, element) => previousValue + element.totalDiscount,
     );
-    final invoiceSubTotal = invoice.saleItems.fold(
+    final orderSubTotal = order.saleItems.fold(
       0,
       (element, previousValue) => previousValue.subTotal + element,
     );
     return Column(
       children: [
         const Text(
-          "Factura",
+          "Pedido",
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 16,
@@ -230,7 +183,7 @@ class InvoiceViewerContent extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "No. ${invoice.docNumber}",
+                      "No. ${order.docNumber}",
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -241,11 +194,11 @@ class InvoiceViewerContent extends StatelessWidget {
                 Column(
                   children: [
                     Text(
-                      DateTimeTool.formatddMMyy(invoice.createdAt),
+                      DateTimeTool.formatddMMyy(order.createdAt),
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     ),
                     Text(
-                      DateTimeTool.formatHHmm(invoice.createdAt),
+                      DateTimeTool.formatHHmm(order.createdAt),
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     ),
                   ],
@@ -260,74 +213,41 @@ class InvoiceViewerContent extends StatelessWidget {
             ),
             Builder(
               builder: (context) {
-                final label = Text(
-                  invoice.paymentType.typeLabel,
+                return Text(
+                  order.paymentType.typeLabel,
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 );
-
-                if (<PaymentType>[.card, .transfer].contains(invoice.paymentType)) {
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      label,
-                      Text(
-                        " - Ref: ${invoice.bankReference}",
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  );
-                }
-
-                return label;
               },
             ),
 
-            Builder(
-              builder: (context) {
-                String clientLabel = "${invoice.clientId} - ${invoice.clientInfo.name}";
-                if (invoice.clientId == "SALE_CLIENT") {
-                  clientLabel = invoice.clientInfo.name;
-                }
-
-                return Text(
-                  clientLabel,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                );
-              },
+            Text(
+              "Cliente: ${order.clientInfo.name}",
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
 
-            if (invoice.clientInfo.location != null && invoice.clientInfo.location!.isNotEmpty)
+            if (order.clientInfo.location != null && order.clientInfo.location!.isNotEmpty)
               Text(
-                "${invoice.clientInfo.location}",
+                "${order.clientInfo.location}",
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
 
-            if (invoice.clientInfo.address != null && invoice.clientInfo.address!.isNotEmpty)
+            if (order.clientInfo.address != null && order.clientInfo.address!.isNotEmpty)
               Text(
-                "${invoice.clientInfo.address}",
+                "${order.clientInfo.address}",
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
 
             Row(
               children: [
                 Text(
-                  "Vendedor: ${invoice.createdBy.name}",
+                  "Elaborado por: ${order.createdBy.name}",
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
               ],
             ),
-
-            if (invoice.description.isNotEmpty)
-              Text(
-                "Observación: ${invoice.description}",
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
           ],
         ),
         const Divider(),
@@ -374,9 +294,9 @@ class InvoiceViewerContent extends StatelessWidget {
               ),
               Expanded(
                 child: ListView.builder(
-                  itemCount: invoice.saleItems.length,
+                  itemCount: order.saleItems.length,
                   itemBuilder: (context, index) {
-                    final saleItem = invoice.saleItems[index];
+                    final saleItem = order.saleItems[index];
                     final rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
                     return Container(
                       padding: const EdgeInsets.all(4),
@@ -385,7 +305,9 @@ class InvoiceViewerContent extends StatelessWidget {
                         children: [
                           Expanded(
                             flex: 4,
-                            child: Text(saleItem.product.name),
+                            child: Text(
+                              saleItem.product.name,
+                            ),
                           ),
                           Expanded(
                             child: Text(
@@ -430,7 +352,7 @@ class InvoiceViewerContent extends StatelessWidget {
                         SizedBox(
                           width: 120,
                           child: Text(
-                            NumberFormatter.convertToMoneyLike(invoiceSubTotal),
+                            NumberFormatter.convertToMoneyLike(orderSubTotal),
                             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                             textAlign: TextAlign.end,
                           ),
@@ -466,7 +388,7 @@ class InvoiceViewerContent extends StatelessWidget {
                           SizedBox(
                             width: 120,
                             child: Text(
-                              NumberFormatter.convertToMoneyLike(invoice.total),
+                              NumberFormatter.convertToMoneyLike(order.total),
                               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                               textAlign: TextAlign.end,
                             ),

@@ -3,7 +3,6 @@ import 'package:kardex_app_front/src/domain/models/devolution/devolution.dart';
 import 'package:kardex_app_front/src/domain/query_params/devolution_query_params.dart';
 import 'package:kardex_app_front/src/domain/query_params/history_params.dart';
 import 'package:kardex_app_front/src/domain/responses/list_responses.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
 
 class DevolutionsRepository {
   final DevolutionsDataSource devolutionsDataSource;
@@ -21,9 +20,9 @@ class DevolutionsRepository {
     return response.data;
   }
 
-  Future<List<DevolutionInDb>> getConfirmedDevolutions(String userId) async {
+  Future<List<DevolutionInDb>> getConfirmedDevolutions(String userId, String branchId) async {
     final params = DevolutionQueryParams()
-      ..branchId = BranchesTool.getCurrentBranchId()
+      ..branchId = branchId
       ..status = DevolutionStatus.confirmed
       ..clientId = userId;
 
@@ -32,9 +31,9 @@ class DevolutionsRepository {
     return response.data;
   }
 
-  Future<List<DevolutionInDb>> getAllActiveDevolutions(String userId) async {
+  Future<List<DevolutionInDb>> getAllActiveDevolutions(String userId, String branchId) async {
     final params = DevolutionQueryParams()
-      ..branchId = BranchesTool.getCurrentBranchId()
+      ..branchId = branchId
       ..clientId = userId;
 
     final results = await devolutionsDataSource.getAllActiveDevolutions(params.toMap());

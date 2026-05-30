@@ -4,10 +4,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/admin_panel/widgets/custom_7_charts.dart';
 import 'package:kardex_app_front/admin_panel/widgets/panel_drawer.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
-import 'package:kardex_app_front/widgets/dialogs/branch_selection_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/selectors/branch_selection_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/global_stock_search_modal.dart';
 
 import 'cubit/read_admin_panel_cubit.dart';
@@ -31,7 +32,7 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authState = context.read<AuthCubit>().state;
+    final authState = getIt<AuthCubit>().state;
     if (authState is AuthLoading) {
       return const Center(
         child: CircularProgressIndicator(),
@@ -66,7 +67,7 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authState = context.read<AuthCubit>().state as Authenticated;
+    final authState = getIt<AuthCubit>().state as Authenticated;
     final adminPanelState = context.watch<ReadAdminPanelCubit>().state;
 
     if (adminPanelState is ReadAdminPanelLoading) {
@@ -204,7 +205,7 @@ class _Body extends StatelessWidget {
                       if (res == null) return;
 
                       if (!context.mounted) return;
-                      context.read<AuthCubit>().changeBranch(res.id);
+                       getIt<AuthCubit>().changeBranch(res.id);
                       context.go("/home");
                     },
                   ),
@@ -269,7 +270,7 @@ class AvatarButton extends StatefulWidget {
 class _AvatarButtonState extends State<AvatarButton> {
   @override
   Widget build(BuildContext context) {
-    final authState = context.read<AuthCubit>().state;
+    final authState = getIt<AuthCubit>().state;
     if (authState is! Authenticated) {
       return const SizedBox.shrink();
     }

@@ -38,7 +38,7 @@ class ReadPaidInvoicesCubit extends Cubit<ReadPaidInvoicesState> {
 
   bool isLastPage = false;
 
-  Future<void> loadPaidInvoices() async {
+  Future<void> loadPaidInvoices(String branchId) async {
     emit(ReadPaidInvoicesLoading());
 
     isLastPage = false;
@@ -46,6 +46,7 @@ class ReadPaidInvoicesCubit extends Cubit<ReadPaidInvoicesState> {
     try {
       final topEndDate = invoiceQueryParams.endDate?.add(const Duration(days: 1));
       final result = await invoicesRepository.getPaidInvoices(
+        branchId: branchId,
         clientId: invoiceQueryParams.clientId,
         startDate: invoiceQueryParams.startDate!.millisecondsSinceEpoch,
         endDate: topEndDate!.millisecondsSinceEpoch,
@@ -58,6 +59,7 @@ class ReadPaidInvoicesCubit extends Cubit<ReadPaidInvoicesState> {
       }
 
       final totals = await invoicesRepository.getTotalFromPaidInvoices(
+        branchId: branchId,
         clientId: invoiceQueryParams.clientId,
         startDate: invoiceQueryParams.startDate!.millisecondsSinceEpoch,
         endDate: topEndDate.millisecondsSinceEpoch,
@@ -69,7 +71,7 @@ class ReadPaidInvoicesCubit extends Cubit<ReadPaidInvoicesState> {
     }
   }
 
-  Future<void> nextPage() async {
+  Future<void> nextPage(String branchId) async {
     if (isLastPage) return;
     final currentState = state;
     if (currentState is ReadSearchingInvoice) return;
@@ -86,6 +88,7 @@ class ReadPaidInvoicesCubit extends Cubit<ReadPaidInvoicesState> {
       final topEndDate = invoiceQueryParams.endDate?.add(const Duration(days: 1));
 
       final result = await invoicesRepository.getPaidInvoices(
+        branchId: branchId,
         clientId: invoiceQueryParams.clientId,
         startDate: invoiceQueryParams.startDate!.millisecondsSinceEpoch,
         endDate: topEndDate!.millisecondsSinceEpoch,

@@ -6,11 +6,11 @@ import 'package:kardex_app_front/src/domain/models/transfer/transfer_in_db.dart'
 import 'package:kardex_app_front/src/domain/repositories/transfers_repository.dart';
 import 'package:kardex_app_front/src/modules/inventory/current_tranfers/modals/cancel_transfer_modal.dart';
 import 'package:kardex_app_front/src/modules/inventory/current_tranfers/modals/receive_transfer_modal.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
-import 'package:kardex_app_front/src/tools/session_tool.dart';
 import 'package:kardex_app_front/widgets/basic_table_listview.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 
@@ -72,14 +72,14 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) {
     String originName;
     try {
-      originName = BranchesTool.getBranchById(transfer.origin).name;
+      originName = getIt<AuthCubit>().getBranchById(transfer.origin).name;
     } catch (_) {
       originName = transfer.origin;
     }
 
     String destName;
     try {
-      destName = BranchesTool.getBranchById(transfer.destination).name;
+      destName = getIt<AuthCubit>().getBranchById(transfer.destination).name;
     } catch (_) {
       destName = transfer.destination;
     }
@@ -258,7 +258,7 @@ class _BottomBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final writeCubit = context.watch<WriteTransferCubit>();
-    final currentBranchId = BranchesTool.getCurrentBranchId();
+    final currentBranchId = getIt<AuthCubit>().currentBranchId;
 
     TransferInDb currentTransfer = transfer;
     if (writeCubit.state is WriteTransferSuccess) {
@@ -283,7 +283,7 @@ class _BottomBar extends StatelessWidget {
             if (confirm != true) return;
 
             if (!context.mounted) return;
-            final userWithRole = SessionTool.getUserFrom(context);
+            final userWithRole = getIt<AuthCubit>().user;
             if (userWithRole == null) return;
 
             final intent = ReceiveTransferIntent(
@@ -306,7 +306,7 @@ class _BottomBar extends StatelessWidget {
             if (confirm != true) return;
 
             if (!context.mounted) return;
-            final userWithRole = SessionTool.getUserFrom(context);
+            final userWithRole = getIt<AuthCubit>().user;
             if (userWithRole == null) return;
 
             final intent = CancelTransferIntent(

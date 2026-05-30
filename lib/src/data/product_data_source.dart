@@ -1,5 +1,4 @@
 import 'package:kardex_app_front/src/services/http_service.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
 import 'package:kardex_app_front/src/tools/constant.dart';
 import 'package:kardex_app_front/src/tools/http_tool.dart';
 
@@ -55,9 +54,9 @@ class ProductsDataSource with HttpService {
 
   Future<Map<String, dynamic>> searchProductInBranch(
     String textQuery,
+    String branchId,
   ) async {
-    final currentBranch = BranchesTool.getCurrentBranchId();
-    final uri = HttpTools.generateUri("$_endpoint/branch/$currentBranch/search/$textQuery");
+    final uri = HttpTools.generateUri("$_endpoint/branch/$branchId/search/$textQuery");
     final headers = HttpTools.generateAuthHeaders();
     final res = await getQuery(uri, headers: headers);
     return res;
@@ -65,17 +64,16 @@ class ProductsDataSource with HttpService {
 
   Future<Map<String, dynamic>> getAllProductInBranch(
     Map<String, String> queryParams,
+    String branchId,
   ) async {
-    final currentBranch = BranchesTool.getCurrentBranchId();
-    final uri = HttpTools.generateUri("$_endpoint/branch/$currentBranch", queryParameters: queryParams);
+    final uri = HttpTools.generateUri("$_endpoint/branch/$branchId", queryParameters: queryParams);
     final headers = HttpTools.generateAuthHeaders();
     final res = await getQuery(uri, headers: headers);
     return res;
   }
 
-  Future<Map<String, dynamic>> getProductInBranchById(String productId) async {
-    final currentBranch = BranchesTool.getCurrentBranchId();
-    final uri = HttpTools.generateUri("$_endpoint/$productId/branch/$currentBranch");
+  Future<Map<String, dynamic>> getProductInBranchById(String productId, String branchId) async {
+    final uri = HttpTools.generateUri("$_endpoint/$productId/branch/$branchId");
     final headers = HttpTools.generateAuthHeaders();
     final res = await getQuery(uri, headers: headers);
     return res;

@@ -6,9 +6,9 @@ import 'package:kardex_app_front/src/domain/models/branch/branch.dart';
 import 'package:kardex_app_front/src/domain/models/user/user_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/branch_repository.dart';
 import 'package:kardex_app_front/src/modules/change_password/change_password_screen.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
-import 'package:kardex_app_front/widgets/dialogs/branch_selection_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/selectors/branch_selection_dialog.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
 class HomeEndDrawer extends StatelessWidget {
@@ -21,7 +21,7 @@ class HomeEndDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authCubit = context.read<AuthCubit>();
+    final authCubit = getIt<AuthCubit>();
     final authState = authCubit.state as Authenticated;
 
     final allBranches = context.read<BranchesRepository>().branches;
@@ -85,12 +85,12 @@ class HomeEndDrawer extends StatelessWidget {
                 title: const Text("Cambiar Sucursal", style: TextStyle(fontSize: 16)),
                 onTap: () async {
                   final filteredBranches = branches.where((element) {
-                    return element.id != BranchesTool.getCurrentBranchId();
+                    return element.id != getIt<AuthCubit>().currentBranchId;
                   }).toList();
                   final res = await showBranchSelectionDialog(context, filteredBranches);
                   if (res == null) return;
                   if (!context.mounted) return;
-                  context.read<AuthCubit>().changeBranch(res.id);
+                  getIt<AuthCubit>().changeBranch(res.id);
                 },
               ),
 
@@ -129,7 +129,7 @@ class HomeEndDrawer extends StatelessWidget {
                 if (res != true) return;
                 if (!context.mounted) return;
                 LoadingDialogManager.showLoadingDialog(context);
-                await context.read<AuthCubit>().logout();
+                await getIt<AuthCubit>().logout();
                 if (!context.mounted) return;
                 LoadingDialogManager.closeLoadingDialog(context);
                 context.goNamed("login");

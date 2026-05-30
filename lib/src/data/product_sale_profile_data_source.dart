@@ -1,5 +1,4 @@
 import 'package:kardex_app_front/src/services/http_service.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
 import 'package:kardex_app_front/src/tools/http_tool.dart';
 
 class ProductSaleProfilesDataSource with HttpService {
@@ -18,21 +17,19 @@ class ProductSaleProfilesDataSource with HttpService {
     return res;
   }
 
-  Future<Map<String, dynamic>> getAllProductSaleProfilesCurrentBranch() async {
-    final currentBranch = BranchesTool.getCurrentBranchId();
+  Future<Map<String, dynamic>> getAllProductSaleProfilesCurrentBranch(String branchId) async {
     final uri = HttpTools.generateUri(
-      "$_endpoint/$currentBranch",
+      "$_endpoint/$branchId",
     );
     final headers = HttpTools.generateAuthHeaders();
     final res = await getQuery(uri, headers: headers);
     return res;
   }
 
-  Future<Map<String, dynamic>?> getProductSaleProfileByProductId(String productId) async {
-    final currentBranch = BranchesTool.getCurrentBranchId();
+  Future<Map<String, dynamic>?> getProductSaleProfileByProductId(String productId, String branchId) async {
     final uri = HttpTools.generateUri(
       "$_endpoint/$productId",
-      queryParameters: {'branchId': currentBranch},
+      queryParameters: {'branchId': branchId},
     );
     final headers = HttpTools.generateAuthHeaders();
     final res = await getQuery(uri, headers: headers);
@@ -42,9 +39,9 @@ class ProductSaleProfilesDataSource with HttpService {
   Future<Map<String, dynamic>?> updateProductSaleProfileByProductId(
     String productId,
     Map<String, dynamic> profile,
+    String branchId,
   ) async {
-    final currentBranch = BranchesTool.getCurrentBranchId();
-    final uri = HttpTools.generateUri("$_endpoint/$currentBranch/$productId");
+    final uri = HttpTools.generateUri("$_endpoint/$branchId/$productId");
     final headers = HttpTools.generateAuthHeaders();
     final res = await patchQuery(uri, body: profile, headers: headers);
     return res;

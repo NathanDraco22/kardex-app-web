@@ -2,7 +2,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/adjust_exit/adjust_exit_model.dart';
 import 'package:kardex_app_front/src/domain/query_params/adjust_query_params.dart';
 import 'package:kardex_app_front/src/domain/repositories/adjust_exits_repository.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 
 part 'read_adjust_exit_history_state.dart';
@@ -17,9 +16,9 @@ class ReadAdjustExitHistoryCubit extends Cubit<ReadAdjustExitHistoryState> {
   );
   bool _isLastPage = false;
 
-  Future<void> loadAdjustExitsHistory() async {
+  Future<void> loadAdjustExitsHistory(String branchId) async {
     emit(ReadAdjustExitHistoryLoading());
-    params = params.copyWith(offset: 0, branchId: BranchesTool.getCurrentBranchId());
+    params = params.copyWith(offset: 0, branchId: branchId);
 
     try {
       final exits = await adjustExitsRepository.getAllAdjustExits(params);
@@ -58,9 +57,9 @@ class ReadAdjustExitHistoryCubit extends Cubit<ReadAdjustExitHistoryState> {
     }
   }
 
-  void setDefaultParams() {
+  void setDefaultParams(String branchId) {
     params = const AdjustQueryParams();
     _isLastPage = false;
-    loadAdjustExitsHistory();
+    loadAdjustExitsHistory(branchId);
   }
 }

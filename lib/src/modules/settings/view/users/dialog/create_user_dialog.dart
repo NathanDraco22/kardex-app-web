@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/user/user_model.dart';
 import 'package:kardex_app_front/src/domain/models/user_role/user_role_model.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/multi_branch_selection_dialog.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
@@ -49,7 +49,7 @@ class _CreateUserDialogState extends State<CreateUserDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final authCubit = context.read<AuthCubit>();
+    final authCubit = getIt<AuthCubit>();
     final authState = authCubit.state as Authenticated;
     final isMultiBranch = authState.servin.isMultiBranch;
 
@@ -198,7 +198,7 @@ class _CreateUserDialogState extends State<CreateUserDialog> {
                 Builder(
                   builder: (context) {
                     if (!isMultiBranch) {
-                      selectedBranchIds = [BranchesTool.getCurrentBranchId()];
+                      selectedBranchIds = [getIt<AuthCubit>().currentBranchId];
                       return const SizedBox.shrink();
                     }
                     return Row(

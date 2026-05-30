@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/cubits/read_product_in_branch/read_product_in_branch_cubit.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/inventory/product_inventory_catalog/web/product_inventory_catalog_web.dart';
@@ -18,7 +20,7 @@ class ProductInventoryCatalogScreen extends StatelessWidget {
           create: (context) {
             return ReadProductInBranchCubit(
               productsRepository: productsRepo,
-            )..getProducts();
+            )..getProducts(getIt<AuthCubit>().currentBranchId);
           },
         ),
         BlocProvider(
@@ -77,7 +79,7 @@ class _RootScaffold extends StatelessWidget {
                             }
                             return ElevatedButton.icon(
                               onPressed: () {
-                                context.read<ExportPriceListCubit>().exportExcel();
+                                context.read<ExportPriceListCubit>().exportExcel(branchName: getIt<AuthCubit>().currentBranchName, branchId: getIt<AuthCubit>().currentBranchId);
                               },
                               icon: const Icon(Icons.file_download),
                               label: const Text("Exportar a Excel"),

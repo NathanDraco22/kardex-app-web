@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/app_mode/app_mode_cubit.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/cubits/toast/toast_cubit.dart';
@@ -209,36 +210,55 @@ class ProviderContainer extends StatelessWidget {
   }
 }
 
-class GlobalCubitProvider extends StatelessWidget {
+class GlobalCubitProvider extends StatefulWidget {
   const GlobalCubitProvider({super.key, required this.child});
 
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
+  State<GlobalCubitProvider> createState() => _GlobalCubitProviderState();
+}
+
+class _GlobalCubitProviderState extends State<GlobalCubitProvider> {
+  late final AuthCubit _authCubit;
+
+  @override
+  void initState() {
+    super.initState();
     final authRepo = context.read<AuthRepository>();
     final branchRepo = context.read<BranchesRepository>();
     final servinRepo = context.read<ServinRepository>();
-    final expirationLogRepo = context.read<ExpirationLogsRepository>();
     final clientGroupRepo = context.read<ClientGroupsRepository>();
+    
+    _authCubit = AuthCubit(
+      authRepository: authRepo,
+      branchesRepository: branchRepo,
+      servinRepository: servinRepo,
+      clientGroupRepository: clientGroupRepo,
+    );
+    getIt.registerSingleton<AuthCubit>(_authCubit);
+  }
+
+  @override
+  void dispose() {
+    getIt.unregister<AuthCubit>();
+    _authCubit.close();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final expirationLogRepo = context.read<ExpirationLogsRepository>();
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => AppModeCubit()),
-        BlocProvider(
-          create: (context) => AuthCubit(
-            authRepository: authRepo,
-            branchesRepository: branchRepo,
-            servinRepository: servinRepo,
-            clientGroupRepository: clientGroupRepo,
-          ),
-        ),
         BlocProvider(
           create: (context) => ToastCubit(
             expirationLogsRepository: expirationLogRepo,
           ),
         ),
       ],
-      child: child,
+      child: widget.child,
     );
   }
 }

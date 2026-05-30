@@ -16,12 +16,12 @@ class ReadPendingInvoiceCubit extends Cubit<ReadInvoiceState> {
   bool isLastPage = false;
   List<InvoiceInDb> _invoicesCache = [];
 
-  Future<void> loadPaginatedInvoices(String clientId) async {
+  Future<void> loadPaginatedInvoices(String clientId, String branchId) async {
     emit(ReadInvoiceLoading());
     try {
       final res = await Future.wait([
         invoicesRepository.getPendingInvoices(clientId),
-        devolutionsRepository.getAllActiveDevolutions(clientId),
+        devolutionsRepository.getAllActiveDevolutions(clientId, branchId),
       ]);
       final response = res[0] as ListResponse<InvoiceInDb>;
       final devolutions = res[1] as List<DevolutionInDb>;

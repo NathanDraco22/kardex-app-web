@@ -277,13 +277,16 @@ class _SendButton extends StatelessWidget {
                                       Text(
                                         item.quantity.toString(),
                                       ),
-                                      Text(NumberFormatter.convertToMoneyLike(item.price).toString()),
+                                      Text(NumberFormatter.convertFromCentsToUnitsCurrency(item.price).toString()),
                                       Text(
                                         NumberFormatter.convertToMoneyLike(
                                           item.totalDiscount,
                                         ).toString(),
                                       ),
-                                      Text(NumberFormatter.convertToMoneyLike(item.total).toString()),
+                                      Text(
+                                        NumberFormatter.convertToMoneyLike(item.total).toString(),
+                                        style: TextStyle(color: Theme.of(context).colorScheme.primary),
+                                      ),
                                     ],
                                   ),
                                 ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
 import 'package:kardex_app_front/src/domain/models/order/order_model.dart';
@@ -13,7 +14,7 @@ import 'package:kardex_app_front/src/tools/printers/order_printer.dart';
 import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
-import 'package:kardex_app_front/widgets/dialogs/invoice_viewer.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/custom_product_commercial_search_delegate.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/search_product_commercial_dialog.dart';
@@ -83,7 +84,7 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authCubit = context.read<AuthCubit>();
+    final authCubit = getIt<AuthCubit>();
     final authState = authCubit.state;
     if (authState is! Authenticated) {
       return const Scaffold(
@@ -235,11 +236,33 @@ class _Body extends StatefulWidget {
 
 class _BodyState extends State<_Body> {
   OrderInDb? _currentOrder;
+  bool? _isAscending;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _currentOrder ??= InvoiceCreateMediator.of(context).orderContainer.order;
+  }
+
+  void _toggleSort() {
+    if (_currentOrder == null) return;
+    final nextAscending = !(_isAscending ?? false);
+
+    final sortedItems = List<SaleItem>.from(_currentOrder!.saleItems);
+    sortedItems.sort((a, b) {
+      final nameA = a.product.name.toLowerCase();
+      final nameB = b.product.name.toLowerCase();
+      return nextAscending ? nameA.compareTo(nameB) : nameB.compareTo(nameA);
+    });
+
+    final updatedOrder = _currentOrder!.copyWith(saleItems: sortedItems);
+
+    InvoiceCreateMediator.of(context).orderContainer.updateOrder(updatedOrder);
+
+    setState(() {
+      _currentOrder = updatedOrder;
+      _isAscending = nextAscending;
+    });
   }
 
   @override
@@ -255,6 +278,7 @@ class _BodyState extends State<_Body> {
         if (state is WriteOrderSuccess) {
           setState(() {
             _currentOrder = state.order;
+            _isAscending = null; // Reset order visual al actualizar externamente
           });
           LoadingDialogManager.closeLoadingDialog(context);
         }
@@ -348,11 +372,13 @@ class _BodyState extends State<_Body> {
                             color: Colors.grey,
                           ),
                         ),
+                        const SizedBox(height: 12),
                         Text(
                           "Total: $totalFormatted",
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                           textAlign: TextAlign.end,
                         ),
@@ -369,12 +395,39 @@ class _BodyState extends State<_Body> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          const Text(
-                            "Detalle:",
-                            style: TextStyle(
-                              fontSize: 18,
-                            ),
-                            textAlign: TextAlign.start,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                "Detalle:",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                ),
+                                textAlign: TextAlign.start,
+                              ),
+                              SizedBox(
+                                width: 80,
+                                child: IconButton(
+                                  tooltip: _isAscending == null
+                                      ? "Ordenar productos (A-Z)"
+                                      : _isAscending!
+                                      ? "Ordenar Z-A"
+                                      : "Ordenar A-Z",
+                                  icon: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(Icons.sort_by_alpha, size: 28),
+                                      if (_isAscending != null)
+                                        Icon(
+                                          _isAscending! ? Icons.arrow_downward : Icons.arrow_upward,
+                                          size: 20,
+                                        ),
+                                    ],
+                                  ),
+                                  onPressed: _toggleSort,
+                                ),
+                              ),
+                            ],
                           ),
                           Expanded(
                             child: ListView(

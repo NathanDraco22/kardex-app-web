@@ -6,8 +6,8 @@ import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/custom_invoice_list_tile.dart';
 import 'package:kardex_app_front/widgets/custom_receipt_list_tile.dart';
-import 'package:kardex_app_front/widgets/dialogs/invoice_inspector.dart';
-import 'package:kardex_app_front/widgets/dialogs/receipt_viewer.dart';
+import 'package:kardex_app_front/widgets/dialogs/inspectors/invoice_inspector.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/receipt_viewer.dart';
 import 'package:kardex_app_front/widgets/title_label.dart';
 
 class CashFlowView extends StatefulWidget {

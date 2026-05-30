@@ -1,26 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
-import 'package:kardex_app_front/src/domain/models/adjust_entry/adjust_entry_model.dart';
+import 'package:kardex_app_front/src/domain/models/adjust_exit/adjust_exit_model.dart';
 import 'package:kardex_app_front/src/domain/models/branch/branch.dart';
-import 'package:kardex_app_front/src/domain/repositories/adjust_entries_repository.dart';
+import 'package:kardex_app_front/src/domain/repositories/adjust_exits_repository.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
-import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_adjust_entry_template.dart';
+import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_adjust_exit_template.dart';
 
-Future<void> showAdjustEntryViewerDialog(BuildContext context, AdjustEntryInDb adjustEntry) async {
-  final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
+Future<void> showAdjustExitViewerDialog(BuildContext context, AdjustExitInDb adjustExit) async {
+  final currentBranch = (getIt<AuthCubit>().state as Authenticated).branch;
   await Navigator.push(
     context,
     MaterialPageRoute(
       builder: (context) {
-        return _AdjustEntryViewer(
-          adjustEntry: adjustEntry,
+        return _AdjustExitViewer(
+          adjustExit: adjustExit,
           branch: currentBranch,
           onExportPdf: () async {
-            final template = SingleAdjustEntryTemplate(adjustEntry: adjustEntry, branch: currentBranch);
-            await PdfExportTool.export(template, fileName: "entrada_ajuste_${adjustEntry.docNumber}.pdf");
+            final template = SingleAdjustExitTemplate(adjustExit: adjustExit, branch: currentBranch);
+            await PdfExportTool.export(template, fileName: "salida_ajuste_${adjustExit.docNumber}.pdf");
           },
         );
       },
@@ -28,15 +29,15 @@ Future<void> showAdjustEntryViewerDialog(BuildContext context, AdjustEntryInDb a
   );
 }
 
-Future<void> showAdjustEntryViewerDialogFromId(BuildContext context, String adjustEntryId) async {
-  final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
+Future<void> showAdjustExitViewerDialogFromId(BuildContext context, String adjustExitId) async {
+  final currentBranch = (getIt<AuthCubit>().state as Authenticated).branch;
 
   await Navigator.push(
     context,
     MaterialPageRoute(
       builder: (context) {
-        return FutureBuilder<AdjustEntryInDb?>(
-          future: context.read<AdjustEntriesRepository>().getAdjustEntryById(adjustEntryId),
+        return FutureBuilder<AdjustExitInDb?>(
+          future: context.read<AdjustExitsRepository>().getAdjustExitById(adjustExitId),
           builder: (context, asyncSnapshot) {
             if (asyncSnapshot.connectionState != ConnectionState.done) {
               return Scaffold(
@@ -48,18 +49,18 @@ Future<void> showAdjustEntryViewerDialogFromId(BuildContext context, String adju
             if (asyncSnapshot.hasError || asyncSnapshot.data == null) {
               return Scaffold(
                 appBar: AppBar(),
-                body: Center(child: Text("Error al cargar el ajuste \n ${asyncSnapshot.error}")),
+                body: Center(child: Text("Error al cargar la salida \n ${asyncSnapshot.error}")),
               );
             }
 
-            final adjustEntry = asyncSnapshot.data!;
+            final adjustExit = asyncSnapshot.data!;
 
-            return _AdjustEntryViewer(
-              adjustEntry: adjustEntry,
+            return _AdjustExitViewer(
+              adjustExit: adjustExit,
               branch: currentBranch,
               onExportPdf: () async {
-                final template = SingleAdjustEntryTemplate(adjustEntry: adjustEntry, branch: currentBranch);
-                await PdfExportTool.export(template, fileName: "entrada_ajuste_${adjustEntry.docNumber}.pdf");
+                final template = SingleAdjustExitTemplate(adjustExit: adjustExit, branch: currentBranch);
+                await PdfExportTool.export(template, fileName: "salida_ajuste_${adjustExit.docNumber}.pdf");
               },
             );
           },
@@ -69,27 +70,40 @@ Future<void> showAdjustEntryViewerDialogFromId(BuildContext context, String adju
   );
 }
 
-class _AdjustEntryViewer extends StatelessWidget {
-  const _AdjustEntryViewer({
-    required this.adjustEntry,
+class _AdjustExitViewer extends StatelessWidget {
+  const _AdjustExitViewer({
+    required this.adjustExit,
     required this.branch,
     this.onExportPdf,
   });
 
-  final AdjustEntryInDb adjustEntry;
+  final AdjustExitInDb adjustExit;
   final BranchInDb branch;
   final VoidCallback? onExportPdf;
+
+  String _getTypeLabel(AdjustExitType type) {
+    switch (type) {
+      case AdjustExitType.adjust:
+        return "Ajuste";
+      case AdjustExitType.loss:
+        return "Pérdida";
+      case AdjustExitType.devolution:
+        return "Devolución";
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     // Calculate total on the fly
-    final total = adjustEntry.items.fold<int>(0, (prev, item) {
+    final total = adjustExit.items.fold<int>(0, (prev, item) {
       return prev + (item.cost * item.quantity);
     });
 
+    final typeLabel = _getTypeLabel(adjustExit.type);
+
     return Scaffold(
       appBar: AppBar(
-        title: Text("Ajuste de Entrada #${adjustEntry.docNumber}"),
+        title: Text("Salida por $typeLabel #${adjustExit.docNumber}"),
         actions: [
           IconButton(tooltip: "Exportar PDF (A4)", onPressed: onExportPdf, icon: const Icon(Icons.picture_as_pdf)),
         ],
@@ -106,9 +120,9 @@ class _AdjustEntryViewer extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const Text(
-                        "Entrada por Ajuste",
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      Text(
+                        "Salida por $typeLabel",
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 16),
@@ -117,14 +131,11 @@ class _AdjustEntryViewer extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "No. ${adjustEntry.docNumber}",
+                            "No. ${adjustExit.docNumber}",
                             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                           ),
-                          // AdjustEntryInDb stores creation time in createdAt (int epoch),
-                          // but usually documents have a docDate.
-                          // The model only has createdAt. I'll use that.
                           Text(
-                            DateTimeTool.formatddMMyy(DateTime.fromMillisecondsSinceEpoch(adjustEntry.createdAt)),
+                            DateTimeTool.formatddMMyy(DateTime.fromMillisecondsSinceEpoch(adjustExit.createdAt)),
                             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                           ),
                         ],
@@ -134,11 +145,11 @@ class _AdjustEntryViewer extends StatelessWidget {
                         "Sucursal: ${branch.name}",
                         style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
                       ),
-                      if (adjustEntry.description.isNotEmpty)
+                      if (adjustExit.description.isNotEmpty)
                         Padding(
                           padding: const EdgeInsets.only(top: 8.0),
                           child: Text(
-                            "Descripción: ${adjustEntry.description}",
+                            "Descripción: ${adjustExit.description}",
                             style: TextStyle(color: Colors.grey.shade700),
                           ),
                         ),
@@ -154,7 +165,7 @@ class _AdjustEntryViewer extends StatelessWidget {
                                 style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
                               ),
                               Text(
-                                adjustEntry.createdBy.name,
+                                adjustExit.createdBy.name,
                                 style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
                               ),
                             ],
@@ -162,7 +173,7 @@ class _AdjustEntryViewer extends StatelessWidget {
                           Row(
                             children: [
                               Text(
-                                DateTimeTool.formatddMMyy(DateTime.fromMillisecondsSinceEpoch(adjustEntry.createdAt)),
+                                DateTimeTool.formatddMMyy(DateTime.fromMillisecondsSinceEpoch(adjustExit.createdAt)),
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 15,
@@ -170,7 +181,7 @@ class _AdjustEntryViewer extends StatelessWidget {
                               ),
                               const Text(" | "),
                               Text(
-                                DateTimeTool.formatHHmm(DateTime.fromMillisecondsSinceEpoch(adjustEntry.createdAt)),
+                                DateTimeTool.formatHHmm(DateTime.fromMillisecondsSinceEpoch(adjustExit.createdAt)),
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 15,
@@ -224,9 +235,9 @@ class _AdjustEntryViewer extends StatelessWidget {
                         ),
                         Expanded(
                           child: ListView.builder(
-                            itemCount: adjustEntry.items.length,
+                            itemCount: adjustExit.items.length,
                             itemBuilder: (context, index) {
-                              final item = adjustEntry.items[index];
+                              final item = adjustExit.items[index];
                               final rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
                               return Container(
                                 padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),

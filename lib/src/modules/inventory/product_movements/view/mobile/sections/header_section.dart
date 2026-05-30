@@ -31,6 +31,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                     if (selectedProduct == null) return;
 
                     readCubit.loadPaginatedTransactions(
+                      branchId: getIt<AuthCubit>().currentBranchId,
                       product: selectedProduct!,
                       queryParams: TransactionQueryParams(
                         endDate: selectedDay.endOfDay().millisecondsSinceEpoch,
@@ -51,6 +52,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                       selectedDay = value;
                       if (selectedProduct == null) return;
                       readCubit.loadPaginatedTransactions(
+                        branchId: getIt<AuthCubit>().currentBranchId,
                         product: selectedProduct!,
                         queryParams: TransactionQueryParams(
                           endDate: selectedDay.endOfDay().millisecondsSinceEpoch,
@@ -85,6 +87,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                 });
                 if (selectedProduct == null) return;
                 readCubit.loadPaginatedTransactions(
+                  branchId: getIt<AuthCubit>().currentBranchId,
                   product: selectedProduct!,
                   queryParams: TransactionQueryParams(
                     endDate: selectedDay.endOfDay().millisecondsSinceEpoch,

@@ -7,6 +7,8 @@ import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/src/tools/input_formatters.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/widgets/display_product_code.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 
 Future<List<CommercialProductResult>?> showQuickCommercialProductSearchDelegate(
@@ -135,7 +137,8 @@ class _QuickProductSearchDelegateState extends State<QuickProductSearchDelegate>
                         if (value.isEmpty) return;
                         isSearching = true;
                         setState(() {});
-                        products = await context.read<ProductsRepository>().searchProductInBranch(value);
+                        final branchId = getIt<AuthCubit>().currentBranchId;
+                        products = await context.read<ProductsRepository>().searchProductInBranch(value, branchId);
                         isSearching = false;
                         setState(() {});
                       },
