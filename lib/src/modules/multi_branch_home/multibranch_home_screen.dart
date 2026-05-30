@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/repositories/branch_repository.dart';
 import 'package:kardex_app_front/widgets/dialogs/selectors/branch_selection_dialog.dart';
@@ -33,7 +34,7 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authCubit = context.read<AuthCubit>();
+    final authCubit = getIt<AuthCubit>();
     final authState = authCubit.state;
 
     if (authState is! Authenticated) {
@@ -113,7 +114,7 @@ class _Body extends StatelessWidget {
                 if (res == null) return;
 
                 if (!context.mounted) return;
-                context.read<AuthCubit>().changeBranch(res.id);
+                getIt<AuthCubit>().changeBranch(res.id);
                 context.go("/home");
               },
               child: Ink(

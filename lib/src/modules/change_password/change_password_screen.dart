@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/common/change_password.dart';
 import 'package:kardex_app_front/src/domain/repositories/auth_repository.dart';
@@ -80,7 +81,7 @@ class _BodyState extends State<_Body> {
 
   @override
   Widget build(BuildContext context) {
-    final state = context.read<AuthCubit>().state;
+    final state = getIt<AuthCubit>().state;
 
     if (state is! Authenticated) {
       context.goNamed("login");

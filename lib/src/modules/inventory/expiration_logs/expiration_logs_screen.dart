@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/inventory/expiration_logs/web/expiration_logs_screen_web.dart';
 
@@ -22,7 +24,7 @@ class ExpirationLogsScreen extends StatelessWidget {
         BlocProvider(
           create: (_) => ReadExpirationLogCubit(
             expirationLogsRepository: expirationLogRepo,
-          )..loadAllExpirationLogs(),
+          )..loadAllExpirationLogs(getIt<AuthCubit>().currentBranchId),
         ),
       ],
       child: const _RootScaffold(),

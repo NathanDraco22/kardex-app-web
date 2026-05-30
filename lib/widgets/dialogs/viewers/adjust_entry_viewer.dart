@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/adjust_entry/adjust_entry_model.dart';
 import 'package:kardex_app_front/src/domain/models/branch/branch.dart';
@@ -10,7 +11,7 @@ import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_adjust_entry_template.dart';
 
 Future<void> showAdjustEntryViewerDialog(BuildContext context, AdjustEntryInDb adjustEntry) async {
-  final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
+  final currentBranch = (getIt<AuthCubit>().state as Authenticated).branch;
   await Navigator.push(
     context,
     MaterialPageRoute(
@@ -29,7 +30,7 @@ Future<void> showAdjustEntryViewerDialog(BuildContext context, AdjustEntryInDb a
 }
 
 Future<void> showAdjustEntryViewerDialogFromId(BuildContext context, String adjustEntryId) async {
-  final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
+  final currentBranch = (getIt<AuthCubit>().state as Authenticated).branch;
 
   await Navigator.push(
     context,

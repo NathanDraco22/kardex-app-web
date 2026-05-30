@@ -11,7 +11,7 @@ class ExportExcelCubit extends Cubit<ExportExcelState> {
 
   final ProductStatsRepository productStatsRepository;
 
-  Future<void> exportExcel(int projectionDays) async {
+  Future<void> exportExcel(int projectionDays, {String? branchName, String? branchId}) async {
     emit(ExportExcelLoading());
     try {
       await productStatsRepository.generateExcel(projectionDays);

@@ -4,7 +4,6 @@ import 'package:kardex_app_front/src/domain/models/models.dart';
 import 'package:kardex_app_front/src/domain/models/product_transaction/product_transaction.dart';
 import 'package:kardex_app_front/src/domain/query_params/transaction_query_params.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
 import 'package:kardex_app_front/src/tools/constant.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 
@@ -22,6 +21,7 @@ class ReadProductTransactionCubit extends Cubit<ReadProductTransactionState> {
   late ProductInDb product;
 
   Future<void> loadPaginatedTransactions({
+    required String branchId,
     required ProductInDb product,
     required TransactionQueryParams queryParams,
   }) async {
@@ -31,7 +31,7 @@ class ReadProductTransactionCubit extends Cubit<ReadProductTransactionState> {
     this.queryParams = queryParams;
     this.queryParams.offset = 0;
     this.queryParams.limit = paginationItems;
-    this.queryParams.branchId = BranchesTool.getCurrentBranchId();
+    this.queryParams.branchId = branchId;
     this.queryParams.productId = product.id;
 
     _transactionsCache = [];

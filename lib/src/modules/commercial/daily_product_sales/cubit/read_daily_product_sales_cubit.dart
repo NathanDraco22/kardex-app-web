@@ -2,7 +2,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/common/product_sale_total.dart';
 import 'package:kardex_app_front/src/domain/query_params/history_params.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 
 part 'read_daily_product_sales_state.dart';
@@ -22,7 +21,7 @@ class ReadDailyProductSalesCubit extends Cubit<ReadDailyProductSalesState> {
 
   final InvoicesRepository invoicesRepository;
 
-  Future<void> loadDailyProductSales({DateTime? startDate, String? userCreatorId}) async {
+  Future<void> loadDailyProductSales({required String branchId, DateTime? startDate, String? userCreatorId}) async {
     emit(ReadDailyProductSalesLoading());
     if (startDate != null) {
       this.startDate = startDate;
@@ -35,7 +34,7 @@ class ReadDailyProductSalesCubit extends Cubit<ReadDailyProductSalesState> {
       final topEndDate = this.startDate?.add(const Duration(days: 1));
 
       final params = InvoiceQueryParams()
-        ..branchId = BranchesTool.getCurrentBranchId()
+        ..branchId = branchId
         ..startDate = this.startDate
         ..endDate = topEndDate
         ..createdBy = this.userCreatorId
@@ -54,9 +53,9 @@ class ReadDailyProductSalesCubit extends Cubit<ReadDailyProductSalesState> {
     }
   }
 
-  void clearFilters() {
+  void clearFilters(String branchId) {
     startDate = DateTimeTool.getTodayMidnight();
     userCreatorId = defaultCreatorId;
-    loadDailyProductSales(startDate: startDate);
+    loadDailyProductSales(branchId: branchId, startDate: startDate);
   }
 }

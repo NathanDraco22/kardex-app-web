@@ -19,7 +19,7 @@ class _HeaderSection extends StatelessWidget {
                 title: "Fecha Limite",
                 onSelected: (value) {
                   readCubit.params = readCubit.params.copyWith(endDate: value.endOfDay().millisecondsSinceEpoch);
-                  readCubit.loadAdjustEntriesHistory();
+                  readCubit.loadAdjustEntriesHistory(getIt<AuthCubit>().currentBranchId);
                 },
               ),
               Row(
@@ -32,7 +32,7 @@ class _HeaderSection extends StatelessWidget {
                         context,
                         title: "Buscar #Documento",
                         searchFuture: (value) {
-                          return adjustRepo.getAdjustEntryByDocNumber(value, BranchesTool.getCurrentBranchId());
+                          return adjustRepo.getAdjustEntryByDocNumber(value, getIt<AuthCubit>().currentBranchId);
                         },
                         onResult: (value) {
                           showAdjustEntryViewerDialog(context, value);
@@ -45,7 +45,7 @@ class _HeaderSection extends StatelessWidget {
                   const SizedBox(width: 16),
                   TextButton.icon(
                     onPressed: () {
-                      readCubit.setDefaultParams();
+                      readCubit.setDefaultParams(getIt<AuthCubit>().currentBranchId);
                     },
                     label: const Text("Limpiar"),
                     icon: const Icon(Icons.clear),

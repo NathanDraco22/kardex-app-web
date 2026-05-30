@@ -11,10 +11,10 @@ class ReadCurrentInventoryCubit extends Cubit<ReadCurrentInventoryState> {
 
   List<InventoryInDb> _currentInventories = [];
 
-  Future<void> loadAllInventories() async {
+  Future<void> loadAllInventories(String branchId) async {
     emit(ReadCurrentInventoryLoading());
     try {
-      final inventories = await inventoriesRepository.getAllInventories();
+      final inventories = await inventoriesRepository.getAllInventories(branchId);
       if (isClosed) return;
       _currentInventories = inventories;
       emit(ReadCurrentInventorySuccess(inventories));

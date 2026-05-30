@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/branch/branch.dart';
 import 'package:kardex_app_front/src/domain/models/exit_history/exit_history_model.dart';
@@ -11,7 +12,7 @@ import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_exit_his
 
 // --- FUNCIÓN PARA NAVEGAR CON EL MODELO COMPLETO ---
 Future<void> showExitHistoryViewerDialog(BuildContext context, ExitHistoryInDb exitHistory) async {
-  final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
+  final currentBranch = (getIt<AuthCubit>().state as Authenticated).branch;
   await Navigator.push(
     context,
     MaterialPageRoute(
@@ -31,7 +32,7 @@ Future<void> showExitHistoryViewerDialog(BuildContext context, ExitHistoryInDb e
 
 // --- FUNCIÓN PARA NAVEGAR CON SOLO EL ID ---
 Future<void> showExitHistoryViewerDialogFromId(BuildContext context, String exitHistoryId) async {
-  final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
+  final currentBranch = (getIt<AuthCubit>().state as Authenticated).branch;
 
   await Navigator.push(
     context,

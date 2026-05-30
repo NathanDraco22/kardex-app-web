@@ -197,7 +197,10 @@ CreateInvoice createAnonInvoiceFromControllers(
     (previousValue, element) => previousValue + element.total,
   );
 
-  final (currentUser, currentBranch) = SessionTool.getFullUserFrom(context);
+  final authState = getIt<AuthCubit>().state;
+  if (authState is! Authenticated) throw Exception("User or branch not found");
+  final currentUser = authState.session.user;
+  final currentBranch = authState.branch;
 
   final createClientInvoice = CreateInvoice(
     branchId: currentBranch.id,

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/commercial/daily_anon_invoinces/web/daily_invoices_screen_web.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
@@ -17,6 +19,7 @@ class DailyAnonInvoicesScreen extends StatelessWidget {
           ReadDailyAnonInvoicesCubit(
             invoicesRepository: invoiceRepo,
           )..loadDailyPaidAnonInvoices(
+            getIt<AuthCubit>().currentBranchId,
             startDate: DateTimeTool.getTodayMidnight(),
           ),
       child: const _RootScaffold(),
@@ -34,7 +37,7 @@ class _RootScaffold extends StatelessWidget {
         final scrollOffset = notification.metrics.pixels;
         final maxScrollExtent = notification.metrics.maxScrollExtent;
         if (scrollOffset >= maxScrollExtent * 0.65) {
-          context.read<ReadDailyAnonInvoicesCubit>().nextPage();
+          context.read<ReadDailyAnonInvoicesCubit>().nextPage(getIt<AuthCubit>().currentBranchId);
         }
         return true;
       },

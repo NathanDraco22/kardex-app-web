@@ -13,7 +13,7 @@ class _ContentSectionState extends State<_ContentSection> {
     super.initState();
 
     context.read<ReadProductStatsCubit>().getAllWithInfo(
-      branchId: BranchesTool.getCurrentBranchId(),
+      branchId: getIt<AuthCubit>().currentBranchId,
     );
   }
 

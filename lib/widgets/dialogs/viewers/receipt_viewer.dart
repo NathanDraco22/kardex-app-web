@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/receipt/receipt_model.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
@@ -15,7 +16,7 @@ import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 import 'package:kardex_app_front/src/tools/printers/paper_settings.dart';
 
 Future<void> showReceiptViewerDialog(BuildContext context, ReceiptInDb receipt) async {
-  final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
+  final currentBranch = (getIt<AuthCubit>().state as Authenticated).branch;
   final paperSize = await PrintManager.getLocalPaperSize();
   if (!context.mounted) return;
   await Navigator.push(
@@ -34,7 +35,7 @@ Future<void> showReceiptViewerDialog(BuildContext context, ReceiptInDb receipt) 
 }
 
 Future<void> showReceiptViewerDialogFromDocNumber(BuildContext context, String docNumber) async {
-  final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
+  final currentBranch = (getIt<AuthCubit>().state as Authenticated).branch;
   final paperSize = await PrintManager.getLocalPaperSize();
   if (!context.mounted) return;
 
@@ -94,7 +95,7 @@ class _ReceiptViewer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Asumimos que obtienes la sucursal del AuthCubit
-    final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
+    final currentBranch = (getIt<AuthCubit>().state as Authenticated).branch;
 
     return Scaffold(
       appBar: AppBar(

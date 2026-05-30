@@ -38,7 +38,7 @@ class _HeaderSection extends StatelessWidget {
                 ],
                 onChanged: (value) {
                   if (value != null) {
-                    cubit.setFilterType(value);
+                    cubit.setFilterType(value, getIt<AuthCubit>().currentBranchId);
                   }
                 },
               ),

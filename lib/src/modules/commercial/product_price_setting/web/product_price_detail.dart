@@ -3,6 +3,8 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/product_sale_profile/product_sale_profile_model.dart';
 import 'package:kardex_app_front/src/modules/commercial/product_price_setting/dialogs/discount_dialog.dart';
 import 'package:kardex_app_front/src/modules/commercial/product_price_setting/widgets/discount_tile.dart';
@@ -78,6 +80,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
       discounts: currentProfile.discounts,
     );
     context.read<WriteProductSaleProfileCubit>().updateProfile(
+      getIt<AuthCubit>().currentBranchId,
       currentProfile.productId,
       updatedDto,
     );

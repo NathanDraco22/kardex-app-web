@@ -1,14 +1,15 @@
 import 'dart:developer';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/constants/default_values.dart';
 import 'package:kardex_app_front/src/core/session_manager.dart';
 import 'package:kardex_app_front/src/core/token_manager.dart';
 import 'package:kardex_app_front/src/domain/models/branch/branch.dart';
 import 'package:kardex_app_front/src/domain/models/servin/servin.dart';
+import 'package:kardex_app_front/src/domain/models/user/user_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/domain/responses/login_responses.dart';
 import 'package:kardex_app_front/src/services/exceptions/http_exceptions.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
 import 'package:kardex_app_front/src/tools/http_tool.dart';
 
 part 'auth_state.dart';
@@ -25,6 +26,24 @@ class AuthCubit extends Cubit<AuthState> {
   final BranchesRepository branchesRepository;
   final ServinRepository servinRepository;
   final ClientGroupsRepository clientGroupRepository;
+
+  String get currentBranchId => (state is Authenticated) ? (state as Authenticated).branch.id : kOriginBranchId;
+
+  BranchInDb? get currentBranch => (state is Authenticated) ? (state as Authenticated).branch : null;
+
+  List<BranchInDb> get branches => (state is Authenticated) ? (state as Authenticated).branches : [];
+
+  BranchInDb getBranchById(String id) => branches.firstWhere((b) => b.id == id);
+
+  UserInDbWithRole? get user => (state is Authenticated) ? (state as Authenticated).session.user : null;
+
+  Servin? get servin {
+    if (state is Authenticated) return (state as Authenticated).servin;
+    if (state is Unauthenticated) return (state as Unauthenticated).servin;
+    return null;
+  }
+
+  String get currentBranchName => currentBranch?.name ?? "No Branch Selected";
 
   Future<void> checkSession() async {
     Servin? currentServin;
@@ -57,20 +76,18 @@ class AuthCubit extends Cubit<AuthState> {
         }
 
         TokenManager().storeToken(loginResponse.accessToken);
-        final initBranchId = loginResponse.user.branches.firstOrNull ?? BranchesTool.getCurrentBranchId();
+        final initBranchId = loginResponse.user.branches.firstOrNull ?? kOriginBranchId;
 
         final results = await Future.wait([
           branchesRepository.getBranchById(initBranchId),
           branchesRepository.getAllBranches(),
         ]);
         final branch = results[0] as BranchInDb?;
+        final allBranches = results[1] as List<BranchInDb>;
 
         if (branch == null) {
           throw Exception("Branch not found");
         }
-
-        BranchesTool.setCurrentBranch(branch);
-        BranchesTool.setBranches(results[1] as List<BranchInDb>);
 
         try {
           clientGroupRepository.getAllClientGroups();
@@ -78,10 +95,13 @@ class AuthCubit extends Cubit<AuthState> {
           log(e.toString());
         }
 
+        HttpTools.currentBranch = branch;
+
         emit(
           Authenticated(
             loginResponse,
             branch,
+            allBranches,
             servin ?? currentServin,
           ),
         );
@@ -130,31 +150,34 @@ class AuthCubit extends Cubit<AuthState> {
 
       TokenManager().storeToken(loginResponse.accessToken);
 
-      final initBranchId = loginResponse.user.branches.firstOrNull ?? BranchesTool.getCurrentBranchId();
+      final initBranchId = loginResponse.user.branches.firstOrNull ?? kOriginBranchId;
 
       final results = await Future.wait([
         branchesRepository.getBranchById(initBranchId),
         branchesRepository.getAllBranches(),
       ]);
       final branch = results[0] as BranchInDb?;
+      final allBranches = results[1] as List<BranchInDb>;
 
       if (branch == null) {
         throw Exception("Branch not found");
       }
 
       HttpTools.baseUrl = currentServin.url;
-      BranchesTool.setCurrentBranch(branch);
-      BranchesTool.setBranches(results[1] as List<BranchInDb>);
 
       try {
         clientGroupRepository.getAllClientGroups();
       } catch (e) {
         log(e.toString());
       }
+
+      HttpTools.currentBranch = branch;
+
       emit(
         Authenticated(
           loginResponse,
           branch,
+          allBranches,
           servin ?? currentServin,
         ),
       );
@@ -175,11 +198,13 @@ class AuthCubit extends Cubit<AuthState> {
         throw Exception("Branch not found");
       }
 
-      BranchesTool.setCurrentBranch(branch);
+      HttpTools.currentBranch = branch;
+
       emit(
         Authenticated(
           currentState.session,
           branch,
+          currentState.branches,
           currentState.servin,
         ),
       );
@@ -197,6 +222,7 @@ class AuthCubit extends Cubit<AuthState> {
     Servin? currentServin;
     if (state is Authenticated) {
       currentServin = (state as Authenticated).servin;
+      HttpTools.currentBranch = null;
     }
     TokenManager().removeToken();
     await SessionManager().removeSession();

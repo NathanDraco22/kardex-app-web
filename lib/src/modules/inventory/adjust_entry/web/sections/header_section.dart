@@ -7,7 +7,7 @@ class _HeaderSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final mediator = AdjustEntryMediator.read(context)!;
     final headerData = mediator.headerData;
-    final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
+    final currentBranch = (getIt<AuthCubit>().state as Authenticated).branch;
 
     return Row(
       children: [
@@ -164,12 +164,12 @@ Future<void> saveAction(BuildContext context) async {
 
   if (!context.mounted) return;
 
-  final authState = context.read<AuthCubit>().state as Authenticated;
+  final authState = getIt<AuthCubit>().state as Authenticated;
 
   final currentUser = authState.session.user;
 
   final createDto = CreateAdjustEntry(
-    branchId: BranchesTool.getCurrentBranchId(),
+    branchId: getIt<AuthCubit>().currentBranchId,
     description: mediator.headerData.description ?? "",
     items: items,
     createdBy: UserInfo(id: currentUser.id, name: currentUser.username),

@@ -11,8 +11,9 @@ final class AuthInactive extends AuthState {}
 final class Authenticated extends AuthState {
   final LoginResponse session;
   final BranchInDb branch;
+  final List<BranchInDb> branches;
   final Servin servin;
-  Authenticated(this.session, this.branch, this.servin);
+  Authenticated(this.session, this.branch, this.branches, this.servin);
 }
 
 final class Unauthenticated extends AuthState {
