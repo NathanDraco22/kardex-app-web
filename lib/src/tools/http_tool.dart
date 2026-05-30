@@ -41,6 +41,7 @@ class HttpTools {
       "Authorization": "Bearer $token",
       "X-Agent": "Neptuno",
       "X-Servin": ?servinNickname,
+      "X-Branch": ?currentBranch?.id,
     };
   }
 }
