@@ -1,9 +1,14 @@
+import os
 import shutil
 from pathlib import Path
 import subprocess
 
 current_path = Path.cwd()
 build_apk_path = current_path / "build" / "app" / "outputs" / "flutter-apk"
+
+my_env = os.environ.copy()
+my_env["PYTHONUNBUFFERED"] = "1"
+my_env["TERM"] = "xterm-256color"
 
 ouput_path = current_path / "output"
 ouput_path.mkdir(exist_ok=True)
@@ -23,19 +28,20 @@ try:
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True,
+        bufsize=1,
         shell=True,
+        env=my_env,
     )
 
-    while True:
-        tunnel_stdout = result.stdout
-        if tunnel_stdout is None:
-            print("No stdout available.")
-            break
-        output = tunnel_stdout.readline()
-        if output == "" and result.poll() is not None:
-            break
-        if output:
-            print(output.strip())
+    tunnel_stdout = result.stdout
+    if tunnel_stdout is None:
+        print("No stdout available.")
+        os._exit(1)
+
+    with tunnel_stdout:
+        for line in iter(tunnel_stdout.readline, ""):
+            print(line.strip())
+
     if ouput_apk_path.exists():
         shutil.rmtree(ouput_apk_path)
 
