@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:kardex_app_front/src/tools/branches_tool.dart';
-import 'package:kardex_app_front/widgets/dialogs/branch_selection_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/selectors/branch_selection_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/search_product_in_branch_dialog.dart';
 
 import 'package:kardex_app_front/widgets/tables/transfer_product_table.dart';

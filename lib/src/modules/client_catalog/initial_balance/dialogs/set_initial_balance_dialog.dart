@@ -6,7 +6,7 @@ import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
 import 'package:kardex_app_front/src/domain/models/client/initial_balance_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/branch_repository.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
-import 'package:kardex_app_front/widgets/dialogs/branch_selection_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/selectors/branch_selection_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
 

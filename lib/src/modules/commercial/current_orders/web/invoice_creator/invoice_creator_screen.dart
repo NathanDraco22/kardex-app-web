@@ -10,7 +10,7 @@ import 'package:kardex_app_front/src/modules/commercial/current_orders/modals/co
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
-import 'package:kardex_app_front/widgets/dialogs/invoice_viewer.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
 import 'package:kardex_app_front/widgets/row_widgets/sale_item_row.dart';
 
 Future<OrderInDb?> showOrderInvoiceCreatorDialog(BuildContext context, OrderInDb order) async {
@@ -232,7 +232,6 @@ class _BodyState extends State<_Body> {
       _currentOrder = updatedOrder;
       _isAscending = nextAscending;
     });
-
   }
 
   @override

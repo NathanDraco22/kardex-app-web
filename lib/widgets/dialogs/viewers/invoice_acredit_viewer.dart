@@ -10,7 +10,7 @@ import 'package:kardex_app_front/src/tools/number_formatter.dart';
 import 'package:kardex_app_front/src/tools/printers/invoice_printer.dart';
 import 'package:kardex_app_front/src/tools/printers/paper_settings.dart';
 import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
-import 'package:kardex_app_front/widgets/dialogs/invoice_viewer.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
 
 Future<double?> showInvoiceAcreditViewerScreen(BuildContext context, InvoiceInDb invoice) async {
   final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;

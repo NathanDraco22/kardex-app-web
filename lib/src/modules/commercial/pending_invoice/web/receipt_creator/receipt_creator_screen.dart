@@ -16,7 +16,7 @@ import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/session_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
-import 'package:kardex_app_front/widgets/dialogs/receipt_viewer.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/receipt_viewer.dart';
 
 class CreateReceiptMediator extends InheritedWidget {
   const CreateReceiptMediator({

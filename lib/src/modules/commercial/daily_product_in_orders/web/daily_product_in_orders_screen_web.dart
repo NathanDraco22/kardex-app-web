@@ -8,7 +8,7 @@ import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/basic_table_listview.dart';
 import 'package:kardex_app_front/widgets/date_picker_button.dart';
 import 'package:kardex_app_front/widgets/dialogs/export_options_dialog.dart';
-import 'package:kardex_app_front/widgets/dialogs/user_selection_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/selectors/user_selection_dialog.dart';
 import 'package:kardex_app_front/widgets/title_label.dart';
 import 'package:kardex_app_front/src/tools/exports/csv_export_tool.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/product_by_user_template.dart';

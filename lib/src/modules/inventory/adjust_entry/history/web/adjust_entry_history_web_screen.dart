@@ -6,7 +6,7 @@ import 'package:kardex_app_front/src/domain/repositories/adjust_entries_reposito
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
 import 'package:kardex_app_front/widgets/date_picker_button.dart';
-import 'package:kardex_app_front/widgets/dialogs/adjust_entry_viewer.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/adjust_entry_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/simple_search_dialog.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/src/tools/branches_tool.dart';
