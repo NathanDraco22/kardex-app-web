@@ -6,7 +6,7 @@ import 'package:kardex_app_front/src/modules/inventory/history_exit/cubit/read_e
 import 'package:kardex_app_front/src/modules/inventory/inventory_exit/cubit/read_exit_doc_cubit.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
-import 'package:kardex_app_front/widgets/dialogs/exit_history_viewer.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/exit_history_viewer.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
 part 'sections/header_section.dart';

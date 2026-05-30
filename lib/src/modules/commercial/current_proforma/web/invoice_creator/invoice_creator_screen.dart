@@ -13,7 +13,7 @@ import 'package:kardex_app_front/src/tools/printers/order_printer.dart';
 import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
-import 'package:kardex_app_front/widgets/dialogs/invoice_viewer.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/custom_product_commercial_search_delegate.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/search_product_commercial_dialog.dart';
@@ -262,7 +262,6 @@ class _BodyState extends State<_Body> {
       _currentOrder = updatedOrder;
       _isAscending = nextAscending;
     });
-
   }
 
   @override

@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/repositories/branch_repository.dart';
-import 'package:kardex_app_front/widgets/dialogs/branch_selection_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/selectors/branch_selection_dialog.dart';
 
 class MultibranchHomeScreen extends StatelessWidget {
   const MultibranchHomeScreen({super.key});

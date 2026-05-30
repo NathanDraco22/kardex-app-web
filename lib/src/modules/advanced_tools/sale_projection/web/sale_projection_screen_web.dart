@@ -5,7 +5,7 @@ import 'package:kardex_app_front/src/modules/advanced_tools/sale_projection/cubi
 import 'package:kardex_app_front/src/tools/branches_tool.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
-import 'package:kardex_app_front/widgets/dialogs/branch_selection_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/selectors/branch_selection_dialog.dart';
 import 'package:kardex_app_front/src/domain/models/branch/branch_model.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
-import 'package:kardex_app_front/widgets/dialogs/invoice_viewer.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
 
 import '../cubit/read_anon_invoices_cubit.dart';
 import 'anon_devolution_selection_screen.dart';

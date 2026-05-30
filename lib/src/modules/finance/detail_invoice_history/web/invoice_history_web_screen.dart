@@ -8,7 +8,7 @@ import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/date_picker_button.dart';
-import 'package:kardex_app_front/widgets/dialogs/invoice_inspector.dart';
+import 'package:kardex_app_front/widgets/dialogs/inspectors/invoice_inspector.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/simple_search_dialog.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 

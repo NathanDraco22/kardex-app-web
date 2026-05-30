@@ -10,7 +10,7 @@ import 'package:kardex_app_front/src/modules/commercial/anon_devolution/cubit/wr
 import 'package:kardex_app_front/src/modules/commercial/client_devolution/modals/confirm_devolution_modal.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
-import 'package:kardex_app_front/widgets/dialogs/devolution_viewer.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/devolution_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 
 part 'anon_devolution_confirmation_sections/content_section.dart';

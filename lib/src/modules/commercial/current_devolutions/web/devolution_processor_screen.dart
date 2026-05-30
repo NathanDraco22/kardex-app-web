@@ -8,9 +8,9 @@ import 'package:kardex_app_front/src/modules/commercial/current_devolutions/moda
 import 'package:kardex_app_front/src/modules/commercial/current_devolutions/modals/confirm_devolution_modal.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
-import 'package:kardex_app_front/widgets/dialogs/devolution_viewer.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/devolution_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
-import 'package:kardex_app_front/widgets/dialogs/invoice_viewer.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
 
 Future<DevolutionInDb?> showDevolutionProcessorDialog(BuildContext context, DevolutionInDb devolution) async {
   final readCubit = context.read<ReadDevolutionCubit>();

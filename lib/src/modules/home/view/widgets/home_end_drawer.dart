@@ -8,7 +8,7 @@ import 'package:kardex_app_front/src/domain/repositories/branch_repository.dart'
 import 'package:kardex_app_front/src/modules/change_password/change_password_screen.dart';
 import 'package:kardex_app_front/src/tools/branches_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
-import 'package:kardex_app_front/widgets/dialogs/branch_selection_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/selectors/branch_selection_dialog.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
 class HomeEndDrawer extends StatelessWidget {
