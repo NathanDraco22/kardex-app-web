@@ -44,6 +44,7 @@ class InvoicesRepository {
   }
 
   Future<ListResponse<InvoiceInDb>> getPaidInvoices({
+    required String branchId,
     String? clientId,
     int? startDate,
     int? endDate,
@@ -51,6 +52,7 @@ class InvoicesRepository {
     required int offset,
   }) async {
     final res = await invoicesDataSource.getPaidInvoices(
+      branchId: branchId,
       clientId: clientId,
       startDate: startDate,
       endDate: endDate,
@@ -62,12 +64,14 @@ class InvoicesRepository {
   }
 
   Future<InvoiceTotals> getTotalFromPaidInvoices({
+    required String branchId,
     String? clientId,
     int? startDate,
     int? endDate,
     String? userCreatorId,
   }) async {
     final res = await invoicesDataSource.getTotalFromPaidInvoices(
+      branchId: branchId,
       clientId: clientId,
       startDate: startDate,
       endDate: endDate,
@@ -78,12 +82,14 @@ class InvoicesRepository {
   }
 
   Future<ListResponse<InvoiceInDb>> getClientInvoices({
+    required String branchId,
     String? clientId,
     int? startDate,
     int? endDate,
     required int offset,
   }) async {
     final res = await invoicesDataSource.getClientInvoices(
+      branchId: branchId,
       clientId: clientId,
       startDate: startDate,
       endDate: endDate,

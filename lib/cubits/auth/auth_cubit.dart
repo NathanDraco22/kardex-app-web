@@ -1,14 +1,15 @@
 import 'dart:developer';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/constants/default_values.dart';
 import 'package:kardex_app_front/src/core/session_manager.dart';
 import 'package:kardex_app_front/src/core/token_manager.dart';
 import 'package:kardex_app_front/src/domain/models/branch/branch.dart';
 import 'package:kardex_app_front/src/domain/models/servin/servin.dart';
+import 'package:kardex_app_front/src/domain/models/user/user_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/domain/responses/login_responses.dart';
 import 'package:kardex_app_front/src/services/exceptions/http_exceptions.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
 import 'package:kardex_app_front/src/tools/http_tool.dart';
 
 part 'auth_state.dart';
@@ -26,6 +27,26 @@ class AuthCubit extends Cubit<AuthState> {
   final ServinRepository servinRepository;
   final ClientGroupsRepository clientGroupRepository;
 
+  String get currentBranchId => (state is Authenticated) ? (state as Authenticated).branch.id : kOriginBranchId;
+
+  BranchInDb? get currentBranch => (state is Authenticated) ? (state as Authenticated).branch : null;
+
+  List<BranchInDb> get branches => (state is Authenticated) ? (state as Authenticated).branches : [];
+
+  BranchInDb getBranchById(String id) => branches.firstWhere((b) => b.id == id);
+
+  UserInDbWithRole? get user => (state is Authenticated) ? (state as Authenticated).session.user : null;
+
+  Servin? get servin {
+    if (state is Authenticated) return (state as Authenticated).servin;
+    if (state is Unauthenticated) return (state as Unauthenticated).servin;
+    return null;
+  }
+
+  String get currentBranchName => currentBranch?.name ?? "No Branch Selected";
+
+  // MARK: - Auth Logic
+
   Future<void> checkSession() async {
     Servin? currentServin;
     emit(AuthLoading());
@@ -37,16 +58,16 @@ class AuthCubit extends Cubit<AuthState> {
         emit(AuthInactive());
         return;
       }
-      HttpTools.baseUrl = currentServin.url;
-      HttpTools.servin = currentServin;
 
-      final result = await Future.wait([
+      _updateNetworkConfig(servin: currentServin);
+
+      final [loginResponseObj, servinObj] = await Future.wait([
         authRepository.getLocalSession(),
         servinRepository.refreshServinStatus(),
       ]);
 
-      LoginResponse? loginResponse = result[0] as LoginResponse?;
-      final servin = result[1] as Servin?;
+      LoginResponse? loginResponse = loginResponseObj as LoginResponse?;
+      final servin = servinObj as Servin?;
 
       if (loginResponse != null) {
         final isTokenNearToExpiration = TokenManager().isTokenGotExpired(
@@ -56,34 +77,10 @@ class AuthCubit extends Cubit<AuthState> {
           loginResponse = await authRepository.refreshToken(loginResponse.accessToken);
         }
 
-        TokenManager().storeToken(loginResponse.accessToken);
-        final initBranchId = loginResponse.user.branches.firstOrNull ?? BranchesTool.getCurrentBranchId();
-
-        final results = await Future.wait([
-          branchesRepository.getBranchById(initBranchId),
-          branchesRepository.getAllBranches(),
-        ]);
-        final branch = results[0] as BranchInDb?;
-
-        if (branch == null) {
-          throw Exception("Branch not found");
-        }
-
-        BranchesTool.setCurrentBranch(branch);
-        BranchesTool.setBranches(results[1] as List<BranchInDb>);
-
-        try {
-          clientGroupRepository.getAllClientGroups();
-        } catch (e) {
-          log(e.toString());
-        }
-
-        emit(
-          Authenticated(
-            loginResponse,
-            branch,
-            servin ?? currentServin,
-          ),
+        await _initializeSession(
+          loginResponse: loginResponse,
+          currentServin: currentServin,
+          refreshedServin: servin,
         );
         return;
       }
@@ -91,7 +88,8 @@ class AuthCubit extends Cubit<AuthState> {
     } on HttpServiceException catch (error) {
       if (error is UnauthorizedException) {
         if (isClosed) return;
-        emit(Unauthenticated());
+        emit(Unauthenticated(servin: currentServin));
+        return;
       }
 
       if (isClosed) return;
@@ -116,47 +114,22 @@ class AuthCubit extends Cubit<AuthState> {
         return;
       }
 
-      HttpTools.baseUrl = currentServin.url;
-      HttpTools.servin = currentServin;
+      _updateNetworkConfig(servin: currentServin);
 
-      final result = await Future.wait([
+      // Desestructuración de listas en Dart 3
+      final [loginResponseObj, servinObj] = await Future.wait([
         authRepository.login(userId, password),
         servinRepository.refreshServinStatus(),
       ]);
-      final loginResponse = result[0] as LoginResponse;
-      final servin = result[1] as Servin?;
+      final loginResponse = loginResponseObj as LoginResponse;
+      final servin = servinObj as Servin?;
 
       if (isClosed) return;
 
-      TokenManager().storeToken(loginResponse.accessToken);
-
-      final initBranchId = loginResponse.user.branches.firstOrNull ?? BranchesTool.getCurrentBranchId();
-
-      final results = await Future.wait([
-        branchesRepository.getBranchById(initBranchId),
-        branchesRepository.getAllBranches(),
-      ]);
-      final branch = results[0] as BranchInDb?;
-
-      if (branch == null) {
-        throw Exception("Branch not found");
-      }
-
-      HttpTools.baseUrl = currentServin.url;
-      BranchesTool.setCurrentBranch(branch);
-      BranchesTool.setBranches(results[1] as List<BranchInDb>);
-
-      try {
-        clientGroupRepository.getAllClientGroups();
-      } catch (e) {
-        log(e.toString());
-      }
-      emit(
-        Authenticated(
-          loginResponse,
-          branch,
-          servin ?? currentServin,
-        ),
+      await _initializeSession(
+        loginResponse: loginResponse,
+        currentServin: currentServin,
+        refreshedServin: servin,
       );
     } catch (error) {
       if (isClosed) return;
@@ -175,11 +148,16 @@ class AuthCubit extends Cubit<AuthState> {
         throw Exception("Branch not found");
       }
 
-      BranchesTool.setCurrentBranch(branch);
+      _updateNetworkConfig(
+        servin: currentState.servin,
+        branch: branch,
+      );
+
       emit(
         Authenticated(
           currentState.session,
           branch,
+          currentState.branches,
           currentState.servin,
         ),
       );
@@ -189,7 +167,7 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> initServinUnauthenticated(Servin servin) async {
-    HttpTools.servin = servin;
+    _updateNetworkConfig(servin: servin);
     emit(Unauthenticated(servin: servin));
   }
 
@@ -198,6 +176,13 @@ class AuthCubit extends Cubit<AuthState> {
     if (state is Authenticated) {
       currentServin = (state as Authenticated).servin;
     }
+
+    if (currentServin != null) {
+      _updateNetworkConfig(servin: currentServin, branch: null);
+    } else {
+      HttpTools.currentBranch = null;
+    }
+
     TokenManager().removeToken();
     await SessionManager().removeSession();
     emit(Unauthenticated(servin: currentServin));
@@ -206,5 +191,56 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> exitFromBusiness() async {
     await servinRepository.clearCurrentServin();
     emit(AuthInactive());
+  }
+
+  // MARK: - Helpers
+
+  void _updateNetworkConfig({
+    required Servin servin,
+    BranchInDb? branch,
+  }) {
+    HttpTools.baseUrl = servin.url;
+    HttpTools.servin = servin;
+    HttpTools.currentBranch = branch;
+  }
+
+  Future<void> _initializeSession({
+    required LoginResponse loginResponse,
+    required Servin currentServin,
+    Servin? refreshedServin,
+  }) async {
+    TokenManager().storeToken(loginResponse.accessToken);
+    final initBranchId = loginResponse.user.branches.firstOrNull ?? kOriginBranchId;
+
+    final [branchObj, allBranchesObj] = await Future.wait([
+      branchesRepository.getBranchById(initBranchId),
+      branchesRepository.getAllBranches(),
+    ]);
+    final branch = branchObj as BranchInDb?;
+    final allBranches = allBranchesObj as List<BranchInDb>;
+
+    if (branch == null) {
+      throw Exception("Branch not found");
+    }
+
+    try {
+      clientGroupRepository.getAllClientGroups();
+    } catch (e) {
+      log(e.toString());
+    }
+
+    _updateNetworkConfig(
+      servin: refreshedServin ?? currentServin,
+      branch: branch,
+    );
+
+    emit(
+      Authenticated(
+        loginResponse,
+        branch,
+        allBranches,
+        refreshedServin ?? currentServin,
+      ),
+    );
   }
 }

@@ -2,7 +2,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/transfer/transfer_in_db.dart';
 import 'package:kardex_app_front/src/domain/query_params/transfer_query_params.dart';
 import 'package:kardex_app_front/src/domain/repositories/transfers_repository.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
 
 part 'read_transfers_state.dart';
 
@@ -17,15 +16,14 @@ class ReadTransfersCubit extends Cubit<ReadTransfersState> {
   bool isLastPage = false;
   TransferFilterType? _currentFilterType;
 
-  TransferQueryParams _buildParams({int offset = 0}) {
-    final currentBranchId = BranchesTool.getCurrentBranchId();
+  TransferQueryParams _buildParams(String branchId, {int offset = 0}) {
     String? origin;
     String? destination;
 
     if (_currentFilterType == TransferFilterType.sent) {
-      origin = currentBranchId;
+      origin = branchId;
     } else {
-      destination = currentBranchId;
+      destination = branchId;
     }
 
     return TransferQueryParams(
@@ -36,12 +34,12 @@ class ReadTransfersCubit extends Cubit<ReadTransfersState> {
     );
   }
 
-  Future<void> loadPaginatedTransfers() async {
+  Future<void> loadPaginatedTransfers(String branchId) async {
     emit(ReadTransfersLoading());
     try {
       _cache.clear();
       isLastPage = false;
-      final params = _buildParams(offset: 0);
+      final params = _buildParams(branchId, offset: 0);
       final response = await transfersRepository.getAllTransfers(params);
 
       _cache = response;
@@ -59,10 +57,10 @@ class ReadTransfersCubit extends Cubit<ReadTransfersState> {
     }
   }
 
-  Future<void> getNextPage() async {
+  Future<void> getNextPage(String branchId) async {
     if (isLastPage) return;
     try {
-      final params = _buildParams(offset: _cache.length);
+      final params = _buildParams(branchId, offset: _cache.length);
       final response = await transfersRepository.getAllTransfers(params);
 
       _cache.addAll(response);
@@ -77,10 +75,10 @@ class ReadTransfersCubit extends Cubit<ReadTransfersState> {
     }
   }
 
-  void setFilterType(TransferFilterType type) {
+  void setFilterType(TransferFilterType type, String branchId) {
     if (_currentFilterType == type) return;
     _currentFilterType = type;
-    loadPaginatedTransfers();
+    loadPaginatedTransfers(branchId);
   }
 
   TransferFilterType? get currentFilterType => _currentFilterType;

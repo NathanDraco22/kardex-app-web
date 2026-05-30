@@ -15,13 +15,13 @@ class ReadProductInBranchCubit extends Cubit<ReadProductInBranchState> {
   ProductQueryParams _params = ProductQueryParams(offset: 0, limit: 50);
   bool isLastPage = false;
 
-  Future<void> getProducts({ProductQueryParams? params}) async {
+  Future<void> getProducts(String branchId, {ProductQueryParams? params}) async {
     emit(ReadProductInBranchLoading());
-    _params = params ?? ProductQueryParams(offset: 0, limit: 50, branchId: _params.branchId);
+    _params = params ?? ProductQueryParams(offset: 0, limit: 50, branchId: branchId);
     isLastPage = false;
 
     try {
-      final products = await productsRepository.getAllProductsInBranch(_params);
+      final products = await productsRepository.getAllProductsInBranch(_params, branchId);
 
       if (products.length < _params.limit) {
         isLastPage = true;
@@ -39,7 +39,7 @@ class ReadProductInBranchCubit extends Cubit<ReadProductInBranchState> {
     }
   }
 
-  Future<void> getNextPage() async {
+  Future<void> getNextPage(String branchId) async {
     if (isLastPage) return;
     final currentState = state;
     if (currentState is! ReadProductInBranchSuccess) return;
@@ -53,7 +53,7 @@ class ReadProductInBranchCubit extends Cubit<ReadProductInBranchState> {
     );
 
     try {
-      final products = await productsRepository.getAllProductsInBranch(_params);
+      final products = await productsRepository.getAllProductsInBranch(_params, branchId);
 
       if (products.length < _params.limit) {
         isLastPage = true;
@@ -62,7 +62,7 @@ class ReadProductInBranchCubit extends Cubit<ReadProductInBranchState> {
       _params = ProductQueryParams(
         offset: _params.offset + products.length,
         limit: _params.limit,
-        branchId: _params.branchId,
+        branchId: branchId,
       );
 
       emit(

@@ -25,7 +25,7 @@ class ProductInBranchInfoDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isSeller = RoleTools.isSeller(context).$1;
+    final isSeller = RoleTools.isSeller().$1;
 
     Widget buildPriceCopyable(String title, int priceInCents) {
       final priceString = NumberFormatter.convertToMoneyLike(priceInCents);

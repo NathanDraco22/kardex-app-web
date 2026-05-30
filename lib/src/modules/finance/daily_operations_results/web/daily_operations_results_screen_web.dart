@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/cubits/reports/read_reports_cubit.dart';
 import 'package:kardex_app_front/widgets/date_picker_button.dart';
 
@@ -88,7 +90,7 @@ class _Header extends StatelessWidget {
                   onSelected: (date) {
                     cubit.startDate = date;
                     cubit.endDate = date;
-                    cubit.loadReports();
+                    cubit.loadReports(getIt<AuthCubit>().currentBranchId);
                   },
                 ),
               ),

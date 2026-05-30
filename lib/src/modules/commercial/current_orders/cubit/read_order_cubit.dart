@@ -2,7 +2,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/order/order_model.dart';
 import 'package:kardex_app_front/src/domain/query_params/order_query_params.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
 
 part 'read_order_state.dart';
 
@@ -18,15 +17,14 @@ class ReadOrderCubit extends Cubit<ReadOrderState> {
 
   String? clientId;
 
-  Future<void> loadPaginatedOrders() async {
+  Future<void> loadPaginatedOrders(String branchId) async {
     emit(ReadOrderLoading());
-    final currentBranch = BranchesTool.getCurrentBranchId();
     try {
       final response = await ordersRepository.getPaginatedOrders(
         queryParams: OrderQueryParams(
           skip: 0,
           limit: 100,
-          branchId: currentBranch,
+          branchId: branchId,
           clientId: clientId,
           neStatus: OrderStatus.draft,
         ),
@@ -54,11 +52,11 @@ class ReadOrderCubit extends Cubit<ReadOrderState> {
     isLastPage = false;
   }
 
-  Future<void> clearFilterParams() async {
+  Future<void> clearFilterParams(String branchId) async {
     clientId = null;
     _ordersCache = [];
     isLastPage = false;
-    loadPaginatedOrders();
+    loadPaginatedOrders(branchId);
   }
 
   Future<void> updateOrderCache(OrderInDb order) async {

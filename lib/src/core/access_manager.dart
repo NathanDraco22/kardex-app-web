@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/user/user_model.dart';
 
@@ -16,7 +16,7 @@ class AccessManager {
   }
 
   bool hasCurrentAccess(BuildContext context, String permissionName) {
-    final authState = context.read<AuthCubit>().state;
+    final authState = getIt<AuthCubit>().state;
     if (authState is! Authenticated) return false;
     final user = authState.session.user;
     return hasAccessTo(user, permissionName);

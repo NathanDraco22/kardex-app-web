@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 
 class ExpirationDateGate extends StatelessWidget {
@@ -9,7 +9,7 @@ class ExpirationDateGate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authState = context.read<AuthCubit>().state;
+    final authState = getIt<AuthCubit>().state;
 
     if (authState is! Authenticated) {
       return const SizedBox.shrink();

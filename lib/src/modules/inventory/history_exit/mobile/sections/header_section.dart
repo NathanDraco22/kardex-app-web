@@ -98,7 +98,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
               children: [
                 FilledButton.icon(
                   onPressed: () {
-                    readCubit.loadPaginatedHistories();
+                    readCubit.loadPaginatedHistories(getIt<AuthCubit>().currentBranchId);
                   },
                   label: const Text("Filtrar"),
                   icon: const Icon(Icons.filter_alt_rounded),

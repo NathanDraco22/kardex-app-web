@@ -4,6 +4,8 @@ import 'package:kardex_app_front/src/domain/models/product/product_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/widgets/display_product_code.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 
 Future<ProductInDbInBranch?> showSearchProductInBranchDelegate(BuildContext context, bool useAverageCost) async {
@@ -50,7 +52,8 @@ class _CustomProductSearchDelegateState extends State<CustomProductSearchDelegat
                         if (value.isEmpty) return;
                         isSearching = true;
                         setState(() {});
-                        products = await context.read<ProductsRepository>().searchProductInBranch(value);
+                        final branchId = getIt<AuthCubit>().currentBranchId;
+                        products = await context.read<ProductsRepository>().searchProductInBranch(value, branchId);
                         isSearching = false;
                         setState(() {});
                       },

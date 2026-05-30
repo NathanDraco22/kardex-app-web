@@ -1,10 +1,12 @@
 import 'package:kardex_app_front/config/app_env.dart';
 import 'package:kardex_app_front/src/core/token_manager.dart';
+import 'package:kardex_app_front/src/domain/models/branch/branch.dart';
 import 'package:kardex_app_front/src/domain/models/servin/servin.dart';
 
 class HttpTools {
   static String baseUrl = AppEnv.serverUrl;
   static Servin? servin;
+  static BranchInDb? currentBranch;
   static const String _api = "/api";
 
   static String practiceUrl = "";

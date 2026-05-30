@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/cubits/adjust_entry_history/read_adjust_entry_history_cubit.dart';
 import 'package:kardex_app_front/src/domain/repositories/adjust_entries_repository.dart';
 import 'package:kardex_app_front/src/modules/inventory/adjust_entry/history/web/adjust_entry_history_web_screen.dart';
@@ -12,7 +14,7 @@ class AdjustEntryHistoryScreen extends StatelessWidget {
     final adjustRepo = context.read<AdjustEntriesRepository>();
 
     return BlocProvider(
-      create: (context) => ReadAdjustEntryHistoryCubit(adjustRepo)..loadAdjustEntriesHistory(),
+      create: (context) => ReadAdjustEntryHistoryCubit(adjustRepo)..loadAdjustEntriesHistory(getIt<AuthCubit>().currentBranchId),
       child: const _RootScaffold(),
     );
   }

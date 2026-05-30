@@ -169,7 +169,7 @@ class MenuActions extends StatelessWidget {
 
     final cubit = context.read<WriteInvoiceCubit>();
 
-    final currentUser = SessionTool.getUserFrom(context);
+    final currentUser = getIt<AuthCubit>().user;
 
     if (currentUser == null) {
       throw Exception("User not found in Client Invoices");

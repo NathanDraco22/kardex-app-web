@@ -88,7 +88,10 @@ class _ContentSection extends StatelessWidget {
                   if (amount != null && context.mounted) {
                     final amountCents = (amount * 100).round();
                     final client = viewController.selectedClient!;
-                    final (currentUser, currentBranch) = SessionTool.getFullUserFrom(context);
+                    final authState = getIt<AuthCubit>().state;
+                    if (authState is! Authenticated) throw Exception("User or branch not found");
+                    final currentUser = authState.session.user;
+                    final currentBranch = authState.branch;
                     
                     final targetDevolutions = devolutions.where((d) => d.originalInvoiceId == currentInvoice.id).toList();
 

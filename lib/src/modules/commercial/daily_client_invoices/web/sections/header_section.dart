@@ -12,7 +12,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
 
   @override
   Widget build(BuildContext context) {
-    final (isSellerRole, userInDb) = RoleTools.isSeller(context);
+    final (isSellerRole, userInDb) = RoleTools.isSeller();
 
     if (isSellerRole) {
       currentSelectedUser = userInDb;
@@ -34,7 +34,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                 children: [
                   TextButton.icon(
                     onPressed: () {
-                      readCubit.clearFilters();
+                      readCubit.clearFilters(getIt<AuthCubit>().currentBranchId);
                       if (!isSellerRole) {
                         currentSelectedUser = null;
                       }
@@ -135,7 +135,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                       ],
                       FilledButton.icon(
                         onPressed: () {
-                          readCubit.loadPaidInvoices();
+                          readCubit.loadPaidInvoices(getIt<AuthCubit>().currentBranchId);
                         },
                         label: const Text("Filtrar"),
                         icon: const Icon(Icons.filter_alt_rounded),

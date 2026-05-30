@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/commercial/current_orders/cubit/read_order_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/current_orders/web/current_orders_web_screen.dart';
@@ -14,7 +16,7 @@ class CurrentOrdersScreen extends StatelessWidget {
     return BlocProvider(
       create: (context) => ReadOrderCubit(
         ordersRepository: orderRepo,
-      )..loadPaginatedOrders(),
+      )..loadPaginatedOrders(getIt<AuthCubit>().currentBranchId),
       child: const _RootScaffold(),
     );
   }

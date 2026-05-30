@@ -1,5 +1,4 @@
 import 'package:kardex_app_front/src/services/http_service.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
 import 'package:kardex_app_front/src/tools/http_tool.dart';
 
 class EntryHistoriesDataSource with HttpService {
@@ -12,13 +11,13 @@ class EntryHistoriesDataSource with HttpService {
   final _endpoint = "/entry-histories";
 
   Future<Map<String, dynamic>> getEntryHistories({
+    required String branchId,
     required int offset,
     int? limit,
     String? supplierId,
     int? startDate,
     int? endDate,
   }) async {
-    final currentBranch = BranchesTool.getCurrentBranchId();
     final uri = HttpTools.generateUri(
       _endpoint,
       queryParameters: {
@@ -27,7 +26,7 @@ class EntryHistoriesDataSource with HttpService {
         "supplierId": ?supplierId,
         "startDate": ?startDate?.toString(),
         "endDate": ?endDate?.toString(),
-        "branchId": currentBranch,
+        "branchId": branchId,
       },
     );
     final headers = HttpTools.generateAuthHeaders();

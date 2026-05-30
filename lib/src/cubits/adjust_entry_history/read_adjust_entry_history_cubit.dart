@@ -2,7 +2,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/adjust_entry/adjust_entry_model.dart';
 import 'package:kardex_app_front/src/domain/query_params/adjust_query_params.dart';
 import 'package:kardex_app_front/src/domain/repositories/adjust_entries_repository.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 
 part 'read_adjust_entry_history_state.dart';
@@ -17,9 +16,9 @@ class ReadAdjustEntryHistoryCubit extends Cubit<ReadAdjustEntryHistoryState> {
   );
   bool _isLastPage = false;
 
-  Future<void> loadAdjustEntriesHistory() async {
+  Future<void> loadAdjustEntriesHistory(String branchId) async {
     emit(ReadAdjustEntryHistoryLoading());
-    params = params.copyWith(offset: 0, branchId: BranchesTool.getCurrentBranchId());
+    params = params.copyWith(offset: 0, branchId: branchId);
 
     try {
       final entries = await adjustEntriesRepository.getAllAdjustEntries(params);
@@ -59,9 +58,9 @@ class ReadAdjustEntryHistoryCubit extends Cubit<ReadAdjustEntryHistoryState> {
     }
   }
 
-  void setDefaultParams() {
+  void setDefaultParams(String branchId) {
     params = const AdjustQueryParams();
     _isLastPage = false;
-    loadAdjustEntriesHistory();
+    loadAdjustEntriesHistory(branchId);
   }
 }

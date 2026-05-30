@@ -9,10 +9,10 @@ class WriteProductSaleProfileCubit extends Cubit<WriteProductSaleProfileState> {
 
   final ProductSaleProfilesRepository profilesRepository;
 
-  Future<void> updateProfile(String productId, UpdateProductSaleProfile updateProfile) async {
+  Future<void> updateProfile(String branchId, String productId, UpdateProductSaleProfile updateProfile) async {
     emit(WriteProductSaleProfileInProgress());
     try {
-      final profile = await profilesRepository.updateProductSaleProfileByProductId(productId, updateProfile);
+      final profile = await profilesRepository.updateProductSaleProfileByProductId(productId, updateProfile, branchId);
       emit(WriteProductSaleProfileSuccess(profile!));
       emit(WriteProductSaleProfileInitial());
     } catch (error) {

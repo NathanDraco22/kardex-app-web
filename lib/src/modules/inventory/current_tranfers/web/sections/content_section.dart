@@ -72,7 +72,7 @@ class _ContentSection extends StatelessWidget {
                     final branchId = isSent ? transfer.destination : transfer.origin;
                     String branchName;
                     try {
-                      branchName = BranchesTool.getBranchById(branchId).name;
+                      branchName = getIt<AuthCubit>().getBranchById(branchId).name;
                     } catch (_) {
                       branchName = "Desconocido ($branchId)";
                     }
@@ -84,7 +84,7 @@ class _ContentSection extends StatelessWidget {
                       onTap: () async {
                         await showTransferDetailScreen(context, transfer);
                         if (context.mounted) {
-                          cubit.loadPaginatedTransfers();
+                          cubit.loadPaginatedTransfers(getIt<AuthCubit>().currentBranchId);
                         }
                       },
                       cells: [

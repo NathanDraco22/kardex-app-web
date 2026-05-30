@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/user/user_model.dart';
 import 'package:kardex_app_front/src/modules/change_password/change_password_screen.dart';
@@ -68,7 +68,7 @@ class PanelEndDrawer extends StatelessWidget {
                 if (res != true) return;
                 if (!context.mounted) return;
                 LoadingDialogManager.showLoadingDialog(context);
-                await context.read<AuthCubit>().logout();
+                await getIt<AuthCubit>().logout();
                 if (!context.mounted) return;
                 LoadingDialogManager.closeLoadingDialog(context);
                 context.goNamed("login");

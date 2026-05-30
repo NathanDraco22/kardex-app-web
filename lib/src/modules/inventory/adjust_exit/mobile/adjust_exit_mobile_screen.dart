@@ -86,7 +86,7 @@ class _MobileScaffold extends StatelessWidget {
               if (res != true) return;
               if (!context.mounted) return;
 
-              final authState = context.read<AuthCubit>().state as Authenticated;
+              final authState = getIt<AuthCubit>().state as Authenticated;
               final currentUser = authState.session.user;
 
               final items = mediator.productListViewController.rowCards.map((card) {
@@ -164,7 +164,7 @@ class _MobileHeaderSectionState extends State<_MobileHeaderSection> with Automat
     super.build(context);
     final mediator = AdjustExitMediator.read(context)!;
     final headerData = mediator.headerData;
-    final currentBranch = (context.read<AuthCubit>().state as Authenticated).branch;
+    final currentBranch = (getIt<AuthCubit>().state as Authenticated).branch;
 
     return Card(
       child: Padding(

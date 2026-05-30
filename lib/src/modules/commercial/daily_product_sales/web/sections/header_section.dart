@@ -13,7 +13,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
   @override
   Widget build(BuildContext context) {
     final readCubit = context.watch<ReadDailyProductSalesCubit>();
-    final (isSellerRole, userInDb) = RoleTools.isSeller(context);
+    final (isSellerRole, userInDb) = RoleTools.isSeller();
     if (isSellerRole) {
       currentSelectedUser = userInDb;
     }
@@ -36,14 +36,14 @@ class _HeaderSectionState extends State<_HeaderSection> {
                       defaultDate: readCubit.startDate,
                       title: "Fecha",
                       onSelected: (value) {
-                        readCubit.loadDailyProductSales(startDate: value);
+                        readCubit.loadDailyProductSales(branchId: getIt<AuthCubit>().currentBranchId, startDate: value);
                       },
                     ),
                   ),
                   const VerticalDivider(),
                   TextButton.icon(
                     onPressed: () {
-                      readCubit.clearFilters();
+                      readCubit.clearFilters(getIt<AuthCubit>().currentBranchId);
                       if (!isSellerRole) {
                         currentSelectedUser = null;
                       }
@@ -64,7 +64,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                       onPressed: () async {
                         final user = await showActiveUserSelectionDialog(context);
                         if (user == null) return;
-                        readCubit.loadDailyProductSales(userCreatorId: user.id);
+                        readCubit.loadDailyProductSales(branchId: getIt<AuthCubit>().currentBranchId, userCreatorId: user.id);
                         currentSelectedUser = user;
                         setState(() {});
                       },
@@ -90,7 +90,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                         } else if (option == ExportOption.pdf) {
                           final template = ProductByUserTemplate(
                             title: "Ventas Diarias (Por Productos)",
-                            branchName: BranchesTool.getCurrentBranchName(),
+                            branchName: getIt<AuthCubit>().currentBranchName,
                             userInfo: currentSelectedUser != null
                                 ? UserInfo(id: currentSelectedUser!.id, name: currentSelectedUser!.username)
                                 : null,

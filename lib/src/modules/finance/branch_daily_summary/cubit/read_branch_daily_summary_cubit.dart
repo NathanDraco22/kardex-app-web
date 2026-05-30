@@ -3,7 +3,6 @@ import 'package:kardex_app_front/src/domain/models/common/branches_detail.dart';
 import 'package:kardex_app_front/src/domain/models/daily_summary/daily_summary_in_db.dart';
 import 'package:kardex_app_front/src/domain/query_params/daily_summary_params.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 
 part 'read_branch_daily_summary_state.dart';
@@ -11,13 +10,14 @@ part 'read_branch_daily_summary_state.dart';
 class ReadBranchDailySummaryCubit extends Cubit<ReadBranchDailySummaryState> {
   ReadBranchDailySummaryCubit({
     required this.dailySummariesRepository,
+    required this.currentBranchId,
   }) : super(ReadBranchDailySummaryInitial());
 
   final DailySummariesRepository dailySummariesRepository;
+  final String currentBranchId;
 
   DailySummaryQueryParams _params = DailySummaryQueryParams();
   bool isLastPage = false;
-  final String currentBranchId = BranchesTool.getCurrentBranchId();
 
   Future<void> getDailySummary({DailySummaryQueryParams? params}) async {
     _params.endDate = DateTimeTool.getTodayMidnight().add(const Duration(days: 1)).millisecondsSinceEpoch;

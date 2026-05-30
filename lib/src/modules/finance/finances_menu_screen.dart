@@ -6,6 +6,8 @@ import 'package:kardex_app_front/admin_panel/widgets/custom_7_bar_chart.dart';
 import 'package:kardex_app_front/admin_panel/widgets/custom_7_charts.dart';
 import 'package:kardex_app_front/admin_panel/widgets/title_amount.dart';
 import 'package:kardex_app_front/constants/const_modules.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/cubits/finance/read_finance_charts_cubit.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
@@ -21,7 +23,7 @@ class FinancesMenuScreen extends StatelessWidget {
     final adminPanelRepo = context.read<AdminPanelRepository>();
     return BlocProvider(
       create: (context) {
-        return ReadFinanceChartsCubit(adminPanelRepo)..getChartsCurrentBranch();
+        return ReadFinanceChartsCubit(adminPanelRepo)..getChartsCurrentBranch(getIt<AuthCubit>().currentBranchId);
       },
       child: const _RootScaffold(),
     );

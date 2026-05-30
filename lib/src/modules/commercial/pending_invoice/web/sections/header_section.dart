@@ -132,7 +132,10 @@ class _HeaderSection extends StatelessWidget {
                         if (amount == null || amount <= 0) return;
 
                         if (!context.mounted) return;
-                        final (currentUser, currentBranch) = SessionTool.getFullUserFrom(context);
+                        final authState = getIt<AuthCubit>().state;
+                        if (authState is! Authenticated) throw Exception("User or branch not found");
+                        final currentUser = authState.session.user;
+                        final currentBranch = authState.branch;
 
                         final amountCents = (amount * 100).round();
                         final (createReceiptPayload, summary) = FastReceiptLogic.allocateFastPayment(

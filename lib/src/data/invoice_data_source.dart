@@ -1,5 +1,4 @@
 import 'package:kardex_app_front/src/services/http_service.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
 import 'package:kardex_app_front/src/tools/http_tool.dart';
 
 class InvoicesDataSource with HttpService {
@@ -48,17 +47,17 @@ class InvoicesDataSource with HttpService {
   }
 
   Future<Map<String, dynamic>> getPaidInvoices({
+    required String branchId,
     String? clientId,
     int? startDate,
     int? endDate,
     String? userCreatorId,
     required int offset,
   }) async {
-    final currentBranch = BranchesTool.getCurrentBranchId();
     final uri = HttpTools.generateUri(
       _endpoint,
       queryParameters: {
-        "branchId": currentBranch,
+        "branchId": branchId,
         "clientId": ?clientId,
         "startDate": ?startDate?.toString(),
         "endDate": ?endDate?.toString(),
@@ -75,16 +74,16 @@ class InvoicesDataSource with HttpService {
   }
 
   Future<Map<String, dynamic>> getTotalFromPaidInvoices({
+    required String branchId,
     String? clientId,
     int? startDate,
     int? endDate,
     String? userCreatorId,
   }) async {
-    final currentBranch = BranchesTool.getCurrentBranchId();
     final uri = HttpTools.generateUri(
       "$_endpoint/totals",
       queryParameters: {
-        "branchId": currentBranch,
+        "branchId": branchId,
         "clientId": ?clientId,
         "startDate": ?startDate?.toString(),
         "endDate": ?endDate?.toString(),
@@ -99,16 +98,16 @@ class InvoicesDataSource with HttpService {
   }
 
   Future<Map<String, dynamic>> getClientInvoices({
+    required String branchId,
     String? clientId,
     int? startDate,
     int? endDate,
     required int offset,
   }) async {
-    final currentBranch = BranchesTool.getCurrentBranchId();
     final uri = HttpTools.generateUri(
       _endpoint,
       queryParameters: {
-        "branchId": currentBranch,
+        "branchId": branchId,
         "clientId": ?clientId,
         "startDate": ?startDate?.toString(),
         "endDate": ?endDate?.toString(),

@@ -7,8 +7,8 @@ class InventoriesRepository {
 
   InventoriesRepository(this.inventoriesDataSource);
 
-  Future<List<InventoryInDb>> getAllInventories() async {
-    final results = await inventoriesDataSource.getAllInventories();
+  Future<List<InventoryInDb>> getAllInventories(String branchId) async {
+    final results = await inventoriesDataSource.getAllInventories(branchId);
 
     final response = ListResponse<InventoryInDb>.fromJson(
       results,

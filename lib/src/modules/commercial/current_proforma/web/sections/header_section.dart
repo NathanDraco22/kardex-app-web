@@ -14,7 +14,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
   @override
   Widget build(BuildContext context) {
     final readCubit = context.read<ReadProformaCubit>();
-    final (isSeller, currentUser) = RoleTools.isSeller(context);
+    final (isSeller, currentUser) = RoleTools.isSeller();
 
     if (isSeller && currentUser != null) {
       currentSelectedUser = currentUser;
@@ -43,7 +43,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                       clientId: currentSelectedClient?.id,
                       createdBy: currentSelectedUser?.id,
                     );
-                    readCubit.loadPaginatedOrders();
+                    readCubit.loadPaginatedOrders(getIt<AuthCubit>().currentBranchId);
                   },
                   icon: const Icon(Icons.business),
                   label: Text(currentSelectedClient?.name ?? "Seleccionar cliente"),
@@ -61,7 +61,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                         clientId: currentSelectedClient?.id,
                         createdBy: currentSelectedUser?.id,
                       );
-                      readCubit.loadPaginatedOrders();
+                      readCubit.loadPaginatedOrders(getIt<AuthCubit>().currentBranchId);
                     },
                     icon: const Icon(Icons.person),
                     label: Text(currentSelectedUser?.username ?? "Seleccionar usuario"),
@@ -79,7 +79,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                 if (isSeller && currentUser != null) {
                   readCubit.setFilterParams(createdBy: currentUser.id);
                 }
-                readCubit.loadPaginatedOrders();
+                readCubit.loadPaginatedOrders(getIt<AuthCubit>().currentBranchId);
               },
               icon: const Icon(Icons.clear),
               label: const Text("Limpiar"),

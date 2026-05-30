@@ -9,6 +9,8 @@ import 'package:kardex_app_front/src/modules/commercial/product_price_setting/di
 import 'package:kardex_app_front/src/modules/commercial/product_price_setting/widgets/discount_tile.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/title_label.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
 Future<ProductSaleProfileInDb?> showPriceEditorByProductId(
@@ -17,8 +19,9 @@ Future<ProductSaleProfileInDb?> showPriceEditorByProductId(
 ) async {
   LoadingDialogManager.showLoadingDialog(context);
   try {
+    final branchId = getIt<AuthCubit>().currentBranchId;
     final productRepo = context.read<ProductsRepository>();
-    final product = await productRepo.getProductInBranchById(productId);
+    final product = await productRepo.getProductInBranchById(productId, branchId);
     if (!context.mounted) return null;
     LoadingDialogManager.closeLoadingDialog(context);
 
@@ -103,7 +106,9 @@ class _RootScaffoldState extends State<_RootScaffold> {
       salePrice3: currentSalePrice3,
       discounts: currentDiscounts,
     );
+    final branchId = getIt<AuthCubit>().currentBranchId;
     context.read<WriteProductSaleProfileCubit>().updateProfile(
+      branchId,
       widget.product.id,
       updatedDto,
     );

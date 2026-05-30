@@ -2,7 +2,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
 import 'package:kardex_app_front/src/domain/query_params/history_params.dart';
 import 'package:kardex_app_front/src/domain/repositories/invoice_repository.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
 import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 
 part 'read_invoice_by_product_state.dart';
@@ -18,11 +17,11 @@ class ReadInvoiceByProductCubit extends Cubit<ReadInvoiceByProductState> {
   bool _isLastPage = false;
   late String _productId;
 
-  Future<void> loadInvoicesByProduct(String productId) async {
+  Future<void> loadInvoicesByProduct(String productId, String branchId) async {
     _productId = productId;
     emit(ReadInvoiceByProductLoading());
     params.offset = 0;
-    params.branchId = BranchesTool.getCurrentBranchId();
+    params.branchId = branchId;
 
     try {
       final listResponse = await invoicesRepository.getInvoicesByProduct(_productId, params);
@@ -61,14 +60,14 @@ class ReadInvoiceByProductCubit extends Cubit<ReadInvoiceByProductState> {
     }
   }
 
-  void setDefaultParams() {
+  void setDefaultParams(String branchId) {
     params = InvoiceQueryParams()
       ..endDate = DateTime.now().endOfDay()
       ..startDate = DateTime.now().startOfDay();
 
     _isLastPage = false;
     if (state is ReadInvoiceByProductSuccess || state is ReadInvoiceByProductError) {
-      loadInvoicesByProduct(_productId);
+      loadInvoicesByProduct(_productId, branchId);
     }
   }
 }

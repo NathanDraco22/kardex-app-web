@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/models.dart';
 import 'package:kardex_app_front/src/domain/models/product_sale_profile/product_sale_profile_model.dart';
@@ -100,7 +100,7 @@ class _FormContentState extends State<_FormContent> {
 
   @override
   Widget build(BuildContext context) {
-    final authState = context.read<AuthCubit>().state;
+    final authState = getIt<AuthCubit>().state;
     if (authState is! Authenticated) return const SizedBox.shrink();
     final isUserAdmin = authState.session.user.role == "Admin";
     final product = commercialProductResult.product;

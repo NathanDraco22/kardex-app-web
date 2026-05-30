@@ -2,7 +2,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/domain/models/receipt/receipt_model.dart';
 import 'package:kardex_app_front/src/domain/query_params/history_params.dart';
 import 'package:kardex_app_front/src/domain/repositories/receipt_repository.dart';
-import 'package:kardex_app_front/src/tools/branches_tool.dart';
 
 part 'read_receipt_history_state.dart';
 
@@ -14,10 +13,10 @@ class ReadReceiptHistoryCubit extends Cubit<ReadReceiptHistoryState> {
   InvoiceQueryParams params = InvoiceQueryParams();
   bool _isLastPage = false;
 
-  Future<void> loadReceiptsHistory() async {
+  Future<void> loadReceiptsHistory(String branchId) async {
     emit(ReadReceiptHistoryLoading());
     params.offset = 0;
-    params.branchId = BranchesTool.getCurrentBranchId();
+    params.branchId = branchId;
     try {
       final receipts = await receiptsRepository.getReceiptHistory(params);
       _isLastPage = receipts.length < params.limit;
@@ -53,9 +52,9 @@ class ReadReceiptHistoryCubit extends Cubit<ReadReceiptHistoryState> {
     }
   }
 
-  void setDefaultParams() {
+  void setDefaultParams(String branchId) {
     params = InvoiceQueryParams();
     _isLastPage = false;
-    loadReceiptsHistory();
+    loadReceiptsHistory(branchId);
   }
 }
