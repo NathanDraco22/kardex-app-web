@@ -250,7 +250,7 @@ Iterable<Widget> buildHomeOptions(BuildContext context) sync* {
       () => context.pushNamed("commercial"),
     ),
     (
-      [Modules.commercial],
+      [Modules.pendingInvoices],
       "Cuentas por Cobrar",
       FluentIcons.receipt_money_24_filled,
       () => context.pushNamed("pending-accounts"),
@@ -279,6 +279,12 @@ Iterable<Widget> buildHomeOptions(BuildContext context) sync* {
       FluentIcons.settings_20_filled,
       () => context.pushNamed("settings"),
     ),
+    // (
+    //   [Modules.expenses],
+    //   "Gastos",
+    //   FluentIcons.money_24_regular,
+    //   () => context.pushNamed("expenses"),
+    // ),
   ];
 
   for (final (permissions, title, icon, onTap) in listOptions) {

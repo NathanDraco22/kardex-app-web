@@ -7,7 +7,9 @@ enum Modules {
   finance,
   inventory,
   advancedTools,
-  settings;
+  settings,
+  pendingInvoices,
+  expenses;
 }
 
 enum CommercialSubModules {
