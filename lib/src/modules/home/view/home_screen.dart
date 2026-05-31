@@ -262,6 +262,12 @@ Iterable<Widget> buildHomeOptions(BuildContext context) sync* {
       () => context.pushNamed("inventory"),
     ),
     (
+      [Modules.expenses],
+      "Gastos",
+      FluentIcons.money_24_regular,
+      () => context.pushNamed("expenses"),
+    ),
+    (
       [Modules.finance],
       "Finanzas",
       FluentIcons.arrow_trending_lines_24_regular,
@@ -279,12 +285,6 @@ Iterable<Widget> buildHomeOptions(BuildContext context) sync* {
       FluentIcons.settings_20_filled,
       () => context.pushNamed("settings"),
     ),
-    // (
-    //   [Modules.expenses],
-    //   "Gastos",
-    //   FluentIcons.money_24_regular,
-    //   () => context.pushNamed("expenses"),
-    // ),
   ];
 
   for (final (permissions, title, icon, onTap) in listOptions) {
