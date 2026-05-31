@@ -10,20 +10,26 @@ class ExpenseQueryParams {
   String? docNumber;
   int? minAmount;
   int? maxAmount;
+  String? type;
 
   Map<String, String> toMap() {
-    return {
+    final data = <String, dynamic>{
       'offset': offset.toString(),
       'limit': limit.toString(),
-      'status': ?status,
-      'startDate': ?startDate?.toString(),
-      'endDate': ?endDate?.toString(),
-      'createdBy': ?createdBy,
-      'branchId': ?branchId,
-      'category': ?category,
-      'docNumber': ?docNumber,
-      'minAmount': ?minAmount?.toString(),
-      'maxAmount': ?maxAmount?.toString(),
+      'status': status,
+      'startDate': startDate?.toString(),
+      'endDate': endDate?.toString(),
+      'createdBy': createdBy,
+      'branchId': branchId,
+      'category': category,
+      'docNumber': docNumber,
+      'minAmount': minAmount?.toString(),
+      'maxAmount': maxAmount?.toString(),
+      'type': type,
     };
+
+    data.removeWhere((_, v) => v == null);
+
+    return data.cast<String, String>();
   }
 }

@@ -2,6 +2,8 @@ import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
 
 enum ExpenseStatus { draft, open, paid, partiallyPaid, cancelled }
 
+enum ExpenseType { operative, supplier, tax }
+
 class BaseExpense {
   final String branchId;
   final String docNumber;
@@ -11,6 +13,8 @@ class BaseExpense {
   final int date;
   final String dateId;
   final ExpenseStatus status;
+  final ExpenseType type;
+  final String supplierId;
   final bool isActive;
   final int? expirationDate;
   final UserInfo createdBy;
@@ -25,6 +29,8 @@ class BaseExpense {
     required this.date,
     required this.dateId,
     required this.status,
+    required this.type,
+    this.supplierId = "",
     this.isActive = true,
     this.expirationDate,
     required this.createdBy,
@@ -41,6 +47,8 @@ class BaseExpense {
       date: json['date'] as int,
       dateId: json['dateId'] as String,
       status: ExpenseStatus.values.byName(json['status'].toString()),
+      type: ExpenseType.values.byName(json['type'].toString()),
+      supplierId: json['supplierId'] as String? ?? "",
       isActive: json['isActive'] as bool? ?? true,
       expirationDate: json['expirationDate'] as int?,
       createdBy: UserInfo.fromJson(json['createdBy']),
@@ -58,6 +66,8 @@ class BaseExpense {
       'date': date,
       'dateId': dateId,
       'status': status.name,
+      'type': type.name,
+      'supplierId': supplierId,
       'isActive': isActive,
       'expirationDate': expirationDate,
       'createdBy': createdBy.toJson(),
@@ -76,6 +86,8 @@ class CreateExpense extends BaseExpense {
     required super.date,
     required super.dateId,
     required super.status,
+    required super.type,
+    super.supplierId,
     super.isActive,
     super.expirationDate,
     required super.createdBy,
@@ -92,6 +104,8 @@ class CreateExpense extends BaseExpense {
       date: json['date'] as int,
       dateId: json['dateId'] as String,
       status: ExpenseStatus.values.byName(json['status'].toString()),
+      type: ExpenseType.values.byName(json['type'].toString()),
+      supplierId: json['supplierId'] as String? ?? "",
       isActive: json['isActive'] as bool? ?? true,
       expirationDate: json['expirationDate'] as int?,
       createdBy: UserInfo.fromJson(json['createdBy']),
@@ -106,6 +120,8 @@ class UpdateExpense {
   final String? description;
   final int? date;
   final String? dateId;
+  final ExpenseType? type;
+  final String? supplierId;
   final bool? isActive;
 
   UpdateExpense({
@@ -114,6 +130,8 @@ class UpdateExpense {
     this.description,
     this.date,
     this.dateId,
+    this.type,
+    this.supplierId,
     this.isActive,
   });
 
@@ -124,6 +142,8 @@ class UpdateExpense {
       description: json['description'] as String?,
       date: json['date'] as int?,
       dateId: json['dateId'] as String?,
+      type: json['type'] != null ? ExpenseType.values.byName(json['type'].toString()) : null,
+      supplierId: json['supplierId'] as String?,
       isActive: json['isActive'] as bool?,
     );
   }
@@ -135,6 +155,8 @@ class UpdateExpense {
       'description': description,
       'date': date,
       'dateId': dateId,
+      'type': type?.name,
+      'supplierId': supplierId,
       'isActive': isActive,
     };
     data.removeWhere((key, value) => value == null);
@@ -178,6 +200,8 @@ class ExpenseInDb extends BaseExpense {
     required super.date,
     required super.dateId,
     required super.status,
+    required super.type,
+    super.supplierId,
     super.isActive,
     super.expirationDate,
     required super.createdBy,
@@ -200,6 +224,8 @@ class ExpenseInDb extends BaseExpense {
       date: json['date'] as int,
       dateId: json['dateId'] as String,
       status: ExpenseStatus.values.byName(json['status'].toString()),
+      type: ExpenseType.values.byName(json['type'].toString()),
+      supplierId: json['supplierId'] as String? ?? "",
       isActive: json['isActive'] as bool? ?? true,
       expirationDate: json['expirationDate'] as int?,
       createdBy: UserInfo.fromJson(json['createdBy']),
