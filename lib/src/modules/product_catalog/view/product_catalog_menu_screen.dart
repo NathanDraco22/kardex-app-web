@@ -1,12 +1,12 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kardex_app_front/constants/const_modules.dart';
+import 'package:kardex_app_front/src/domain/models/user_role/modules.dart';
 
 class ProductCatalogMenuScreen extends StatelessWidget {
   const ProductCatalogMenuScreen({super.key});
 
-  static const accessName = Modules.products;
+  static final accessName = Modules.products.name;
 
   @override
   Widget build(BuildContext context) {

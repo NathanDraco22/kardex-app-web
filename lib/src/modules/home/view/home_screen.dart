@@ -2,13 +2,14 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kardex_app_front/constants/const_modules.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/cubits/toast/toast_cubit.dart';
-import 'package:kardex_app_front/src/core/access_manager.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/src/domain/models/user_role/modules.dart';
+import 'package:kardex_app_front/widgets/gates/role_permission_gate.dart';
 import 'package:toastification/toastification.dart';
 
+import 'widgets/home_card_option.dart';
 import 'widgets/home_end_drawer.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -25,7 +26,8 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthCubit, AuthState>(bloc: getIt<AuthCubit>(),
+    return BlocBuilder<AuthCubit, AuthState>(
+      bloc: getIt<AuthCubit>(),
       builder: (context, authState) {
         if (authState is AuthLoading) {
           return const Scaffold(
@@ -169,7 +171,6 @@ class _Body extends StatelessWidget {
     final user = authState.session.user;
     final userName = user.username;
     final firstName = userName.split(" ")[0];
-    final accessManager = AccessManager();
     final currentBranch = getIt<AuthCubit>().currentBranch;
     return Center(
       child: ListView(
@@ -210,91 +211,10 @@ class _Body extends StatelessWidget {
           const SizedBox(height: 12),
 
           Wrap(
-            spacing: 24,
+            spacing: 20,
             runSpacing: 20,
             alignment: WrapAlignment.center,
-            children: [
-              if (accessManager.hasAccessTo(user, Modules.clients))
-                HomeOptionCard(
-                  title: "Lista de Clientes",
-                  icon: FluentIcons.contact_card_16_filled,
-                  onTap: () {
-                    context.pushNamed("client-catalog");
-                  },
-                ),
-
-              if (accessManager.hasAccessTo(user, Modules.suppliers))
-                HomeOptionCard(
-                  title: "Lista de Proveedores",
-                  icon: FluentIcons.building_multiple_20_filled,
-                  onTap: () {
-                    context.pushNamed("suppliers-catalog");
-                  },
-                ),
-
-              if (accessManager.hasAccessTo(user, Modules.products))
-                HomeOptionCard(
-                  title: "Catalogo de Productos",
-                  icon: FluentIcons.receipt_bag_20_filled,
-                  onTap: () {
-                    context.pushNamed("product-catalog");
-                  },
-                ),
-
-              if (accessManager.hasAccessTo(user, Modules.commercial))
-                HomeOptionCard(
-                  title: "Comercio",
-                  icon: FluentIcons.money_calculator_20_filled,
-                  onTap: () {
-                    context.pushNamed("commercial");
-                  },
-                ),
-
-              if (accessManager.hasAccessTo(user, Modules.commercial))
-                HomeOptionCard(
-                  title: "Cuentas por Cobrar",
-                  icon: FluentIcons.receipt_money_24_filled,
-                  onTap: () {
-                    context.pushNamed("pending-accounts");
-                  },
-                ),
-
-              if (accessManager.hasAccessTo(user, Modules.inventory))
-                HomeOptionCard(
-                  title: "Inventario",
-                  icon: FluentIcons.box_toolbox_20_filled,
-                  onTap: () {
-                    context.pushNamed("inventory");
-                  },
-                ),
-
-              if (accessManager.hasAccessTo(user, Modules.finance))
-                HomeOptionCard(
-                  title: "Finanzas",
-                  icon: FluentIcons.arrow_trending_lines_24_regular,
-                  onTap: () {
-                    context.pushNamed("finances");
-                  },
-                ),
-
-              if (accessManager.hasAccessTo(user, Modules.advancedTools))
-                HomeOptionCard(
-                  title: "Herramientas Avanzadas",
-                  icon: Icons.schema_rounded,
-                  onTap: () {
-                    context.pushNamed("advanced-tools");
-                  },
-                ),
-
-              if (accessManager.hasAccessTo(user, Modules.settings))
-                HomeOptionCard(
-                  title: "Configuraciones",
-                  icon: FluentIcons.settings_20_filled,
-                  onTap: () {
-                    context.pushNamed("settings");
-                  },
-                ),
-            ],
+            children: buildHomeOptions(context).toList(),
           ),
           const SizedBox(height: 8),
         ],
@@ -303,46 +223,70 @@ class _Body extends StatelessWidget {
   }
 }
 
-class HomeOptionCard extends StatelessWidget {
-  const HomeOptionCard({
-    super.key,
-    required this.title,
-    required this.icon,
-    this.onTap,
-  });
+Iterable<Widget> buildHomeOptions(BuildContext context) sync* {
+  final listOptions = [
+    (
+      [Modules.clients],
+      "Lista de Clientes",
+      FluentIcons.contact_card_16_filled,
+      () => context.pushNamed("client-catalog"),
+    ),
+    (
+      [Modules.suppliers],
+      "Lista de Proveedores",
+      FluentIcons.building_multiple_20_filled,
+      () => context.pushNamed("suppliers-catalog"),
+    ),
+    (
+      [Modules.products],
+      "Catalogo de Productos",
+      FluentIcons.receipt_bag_20_filled,
+      () => context.pushNamed("product-catalog"),
+    ),
+    (
+      [Modules.commercial],
+      "Comercio",
+      FluentIcons.money_calculator_20_filled,
+      () => context.pushNamed("commercial"),
+    ),
+    (
+      [Modules.commercial],
+      "Cuentas por Cobrar",
+      FluentIcons.receipt_money_24_filled,
+      () => context.pushNamed("pending-accounts"),
+    ),
+    (
+      [Modules.inventory],
+      "Inventario",
+      FluentIcons.box_toolbox_20_filled,
+      () => context.pushNamed("inventory"),
+    ),
+    (
+      [Modules.finance],
+      "Finanzas",
+      FluentIcons.arrow_trending_lines_24_regular,
+      () => context.pushNamed("finances"),
+    ),
+    (
+      [Modules.advancedTools],
+      "Herramientas Avanzadas",
+      Icons.schema_rounded,
+      () => context.pushNamed("advanced-tools"),
+    ),
+    (
+      [Modules.settings],
+      "Configuraciones",
+      FluentIcons.settings_20_filled,
+      () => context.pushNamed("settings"),
+    ),
+  ];
 
-  final String title;
-  final IconData icon;
-  final void Function()? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Ink(
-        height: 120,
-        width: 300,
-        decoration: BoxDecoration(
-          color: Colors.indigo.shade50,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              size: 64,
-            ),
-
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 16,
-              ),
-            ),
-          ],
-        ),
-      ),
+  for (final (permissions, title, icon, onTap) in listOptions) {
+    yield RolePermissionGate(
+      width: 300,
+      height: 120,
+      permissions: permissions,
+      child: HomeOptionCard(title: title, icon: icon, onTap: onTap),
     );
   }
 }

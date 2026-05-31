@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/admin_panel/widgets/custom_7_bar_chart.dart';
 import 'package:kardex_app_front/admin_panel/widgets/custom_7_charts.dart';
 import 'package:kardex_app_front/admin_panel/widgets/title_amount.dart';
-import 'package:kardex_app_front/constants/const_modules.dart';
+import 'package:kardex_app_front/src/domain/models/user_role/modules.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/cubits/finance/read_finance_charts_cubit.dart';
@@ -16,7 +16,7 @@ import 'package:kardex_app_front/widgets/menu_app_bar.dart';
 class FinancesMenuScreen extends StatelessWidget {
   const FinancesMenuScreen({super.key});
 
-  static const accessName = Modules.finance;
+  static final accessName = Modules.finance.name;
 
   @override
   Widget build(BuildContext context) {

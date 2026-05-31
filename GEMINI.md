@@ -15,6 +15,9 @@
 - Dicho botón ordena visualmente los items al instante mediante `setState` de forma local (evitando llamar al servidor por ahora).
 - Se sincronizó esta ordenación en el `OrderContainer` mutable expuesto por el `InvoiceCreateMediator` en ambos módulos, lo cual garantiza que las operaciones que leen de la cabecera (como "Imprimir", "Compartir" o modales de confirmación de facturación/cancelación) tengan acceso inmediato a la lista ordenada.
 - Se implementó el mismo botón de ordenamiento alfabético toggle (A-Z / Z-A) en la tabla de facturación a clientes (`client_invoice_table.dart`) al lado de la columna "Producto". Ordena localmente a través de `ClientInvoiceViewController` y se limpia su estado visual (`_isAscending = null`) al detectar cambios externos por parte del usuario (adiciones, ediciones, remociones).
+- Se realizó la migración del control de acceso basado en constantes de tipo String (`lib/constants/const_modules.dart`) hacia enums fuertemente tipados (`Modules` y `CommercialSubModules`) en `lib/src/domain/models/user_role/modules.dart`.
+- Se introdujo el widget `RolePermissionGate` en `lib/widgets/gates/role_permission_gate.dart` para manejar de forma declarativa el control de acceso visual (whitelist/blacklist) en la UI de Flutter, integrándose con `AccessManager` de forma limpia.
+- Se refactorizaron múltiples pantallas del sistema (`HomeScreen`, menús principales de finanzas, inventario, comercio, configuración, clientes y proveedores) para emplear esta nueva infraestructura declarativa basada en Enums y `.name` en lugar de strings sueltos.
 
 
 
