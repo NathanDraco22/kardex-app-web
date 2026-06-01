@@ -16,6 +16,7 @@ export 'entry_histories_data_source.dart';
 export 'executive_summaries_data_source.dart';
 export 'exit_doc_data_source.dart';
 export 'exit_histories_data_source.dart';
+export 'expense_categories_data_source.dart';
 export 'expenses_data_source.dart';
 export 'expiration_log_data_source.dart';
 export 'integrations_data_source.dart';

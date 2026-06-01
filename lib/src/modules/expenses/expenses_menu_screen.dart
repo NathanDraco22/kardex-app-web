@@ -47,6 +47,12 @@ class _Body extends StatelessWidget {
           ),
           const Divider(height: 0.0),
           ListTile(
+            leading: const Icon(Icons.category, color: Colors.indigo),
+            title: const Text("Categorías de Gastos"),
+            onTap: () => context.pushNamed("expense-categories"),
+          ),
+          const Divider(height: 0.0),
+          ListTile(
             leading: const Icon(Icons.assessment, color: Colors.blue),
             title: const Text("Reporte de Gastos"),
             onTap: () => context.pushNamed("expenses-report"),

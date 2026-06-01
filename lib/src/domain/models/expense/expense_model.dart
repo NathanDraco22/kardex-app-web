@@ -123,6 +123,8 @@ class UpdateExpense {
   final ExpenseType? type;
   final String? supplierId;
   final bool? isActive;
+  final ExpenseStatus? status;
+  final int? expirationDate;
 
   UpdateExpense({
     this.amount,
@@ -133,6 +135,8 @@ class UpdateExpense {
     this.type,
     this.supplierId,
     this.isActive,
+    this.status,
+    this.expirationDate,
   });
 
   factory UpdateExpense.fromJson(Map<String, dynamic> json) {
@@ -145,6 +149,8 @@ class UpdateExpense {
       type: json['type'] != null ? ExpenseType.values.byName(json['type'].toString()) : null,
       supplierId: json['supplierId'] as String?,
       isActive: json['isActive'] as bool?,
+      status: json['status'] != null ? ExpenseStatus.values.byName(json['status'].toString()) : null,
+      expirationDate: json['expirationDate'] as int?,
     );
   }
 
@@ -158,6 +164,8 @@ class UpdateExpense {
       'type': type?.name,
       'supplierId': supplierId,
       'isActive': isActive,
+      'status': status?.name,
+      'expirationDate': expirationDate,
     };
     data.removeWhere((key, value) => value == null);
     return data;

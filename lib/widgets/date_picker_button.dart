@@ -7,6 +7,7 @@ class DatePickerButton extends StatefulWidget {
     required this.title,
     required this.onSelected,
     this.defaultDate,
+    this.maxDateTime,
     this.isActive = true,
   });
 
@@ -14,6 +15,7 @@ class DatePickerButton extends StatefulWidget {
   final ValueChanged<DateTime> onSelected;
   final bool isActive;
   final DateTime? defaultDate;
+  final DateTime? maxDateTime;
 
   @override
   DatePickerButtonState createState() => DatePickerButtonState();
@@ -78,7 +80,7 @@ class DatePickerButtonState extends State<DatePickerButton> {
       context: context,
       initialDate: _selectedDate ?? DateTime.now(),
       firstDate: DateTime(2000),
-      lastDate: DateTime.now(),
+      lastDate: widget.maxDateTime ?? DateTime.now(),
     );
     if (picked != null && picked != _selectedDate) {
       setState(() {

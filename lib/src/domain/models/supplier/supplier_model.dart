@@ -1,5 +1,6 @@
 class BaseSupplier {
   final String name;
+  final int creditDays;
   final String? cardId;
   final String? email;
   final String? phone;
@@ -7,6 +8,7 @@ class BaseSupplier {
 
   BaseSupplier({
     required this.name,
+    required this.creditDays,
     this.cardId,
     this.email,
     this.phone,
@@ -16,6 +18,7 @@ class BaseSupplier {
   factory BaseSupplier.fromJson(Map json) {
     return BaseSupplier(
       name: json['name'] as String,
+      creditDays: json['creditDays'] as int? ?? 0,
       cardId: json['cardId'] as String?,
       email: json['email'] as String?,
       phone: json['phone'] as String?,
@@ -30,6 +33,7 @@ class BaseSupplier {
       'email': email,
       'phone': phone,
       'isActive': isActive,
+      'creditDays': creditDays,
     };
   }
 }
@@ -37,6 +41,7 @@ class BaseSupplier {
 class CreateSupplier extends BaseSupplier {
   CreateSupplier({
     required super.name,
+    required super.creditDays,
     super.cardId,
     super.email,
     super.phone,
@@ -46,6 +51,7 @@ class CreateSupplier extends BaseSupplier {
   factory CreateSupplier.fromJson(Map json) {
     return CreateSupplier(
       name: json['name'] as String,
+      creditDays: json['creditDays'] as int? ?? 0,
       cardId: json['cardId'] as String?,
       email: json['email'] as String?,
       phone: json['phone'] as String?,
@@ -56,6 +62,7 @@ class CreateSupplier extends BaseSupplier {
 
 class UpdateSupplier {
   final String? name;
+  final int? creditDays;
   final String? cardId;
   final String? email;
   final String? phone;
@@ -63,6 +70,7 @@ class UpdateSupplier {
 
   UpdateSupplier({
     this.name,
+    this.creditDays,
     this.cardId,
     this.email,
     this.phone,
@@ -72,6 +80,7 @@ class UpdateSupplier {
   factory UpdateSupplier.fromJson(Map<String, dynamic> json) {
     return UpdateSupplier(
       name: json['name'] as String?,
+      creditDays: json['creditDays'] as int?,
       cardId: json['cardId'] as String?,
       email: json['email'] as String?,
       phone: json['phone'] as String?,
@@ -82,6 +91,7 @@ class UpdateSupplier {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = {
       'name': name,
+      'creditDays': creditDays,
       'cardId': cardId,
       'email': email,
       'phone': phone,
@@ -103,6 +113,7 @@ class SupplierInDb extends BaseSupplier {
   SupplierInDb({
     required this.id,
     required super.name,
+    required super.creditDays,
     super.cardId,
     super.email,
     super.phone,
@@ -116,6 +127,7 @@ class SupplierInDb extends BaseSupplier {
     return SupplierInDb(
       id: json['id'] as String,
       name: json['name'] as String,
+      creditDays: json['creditDays'] as int? ?? 0,
       cardId: json['cardId'] as String?,
       email: json['email'] as String?,
       phone: json['phone'] as String?,
