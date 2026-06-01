@@ -80,9 +80,10 @@ import 'package:kardex_app_front/src/modules/splash/splash_screen.dart';
 import 'package:kardex_app_front/src/modules/suppliers_catalog/view/suppliers_catalog_screen.dart';
 import 'package:kardex_app_front/src/modules/settings/view/integrations/integrations_screen.dart';
 import 'package:kardex_app_front/src/modules/expenses/expenses_menu_screen.dart';
-import 'package:kardex_app_front/src/modules/expenses/operative_expenses/view/operative_expenses_view.dart';
+import 'package:kardex_app_front/src/modules/expenses/operative_expenses/view/operative_expenses_screen.dart';
 import 'package:kardex_app_front/src/modules/expenses/supplier_expenses/view/supplier_expenses_view.dart';
 import 'package:kardex_app_front/src/modules/expenses/expenses_reports/view/expenses_reports_view.dart';
+import 'package:kardex_app_front/src/modules/expenses/expense_categories/view/expense_categories_view.dart';
 
 class AppRouter {
   static GoRouter router = GoRouter(
@@ -556,6 +557,11 @@ class AppRouter {
             path: 'expenses-report',
             name: 'expenses-report',
             builder: (context, state) => const ExpensesReportScreen(),
+          ),
+          GoRoute(
+            path: 'expense-categories',
+            name: 'expense-categories',
+            builder: (context, state) => const ExpenseCategoriesScreen(),
           ),
         ],
       ),

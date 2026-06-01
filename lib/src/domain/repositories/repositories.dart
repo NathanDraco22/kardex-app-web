@@ -15,6 +15,7 @@ export 'entry_histories_repository.dart';
 export 'executive_summaries_repository.dart';
 export 'exit_doc_repository.dart';
 export 'exit_histories_repository.dart';
+export 'expense_categories_repository.dart';
 export 'expenses_repository.dart';
 export 'expiration_logs_repository.dart';
 export 'integrations_repository.dart';
