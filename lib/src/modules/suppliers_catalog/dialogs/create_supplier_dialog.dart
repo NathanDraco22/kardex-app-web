@@ -6,6 +6,7 @@ import 'package:kardex_app_front/src/modules/suppliers_catalog/cubit/supplier_wr
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
+import 'package:kardex_app_front/src/tools/input_formatters.dart';
 
 Future<SupplierInDb?> showCreateSupplierDialog(BuildContext context, {SupplierInDb? supplier}) async {
   final writeCubit = context.read<WriteSupplierCubit>();
@@ -142,6 +143,25 @@ class _CreateSupplierDialogState extends State<CreateSupplierDialog> {
                           return null;
                         }
                         creationMap["cardId"] = value.trim();
+                        return null;
+                      },
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    TitleTextField(
+                      key: const ValueKey("creditDays_field"),
+                      title: "Días de Crédito",
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [IntegerTextInputFormatter()],
+                      onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                      initialValue: widget.supplier?.creditDays.toString() ?? '0',
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          creationMap["creditDays"] = 0;
+                          return null;
+                        }
+                        creationMap["creditDays"] = int.tryParse(value) ?? 0;
                         return null;
                       },
                     ),

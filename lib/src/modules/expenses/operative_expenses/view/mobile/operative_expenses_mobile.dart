@@ -33,29 +33,26 @@ class _MobileBody extends StatelessWidget {
     final state = cubit.state as ReadExpenseSuccess;
 
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                const Spacer(),
-                SizedBox(
-                  height: 40,
-                  child: ElevatedButton.icon(
-                    onPressed: () async {
-                      final res = await showCreateExpenseDialog(context);
-                      if (res == null) return;
-                      if (!context.mounted) return;
-                      context.read<ReadExpenseCubit>().markExpenseCreated(res);
-                    },
-                    icon: const Icon(Icons.add),
-                    label: const Text("Agregar Nuevo Gasto"),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  const Spacer(),
+                  SizedBox(
+                    height: 40,
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        await showCreateExpenseDialog(context);
+                      },
+                      icon: const Icon(Icons.add),
+                      label: const Text("Agregar Nuevo Gasto"),
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
+                ],
+              ),
+              const SizedBox(height: 12),
             Expanded(
               child: Card(
                 margin: EdgeInsets.zero,
@@ -63,13 +60,41 @@ class _MobileBody extends StatelessWidget {
                   children: [
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      child: Row(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          SizedBox(
-                            width: MediaQuery.sizeOf(context).width * 0.7,
-                            child: SearchFieldDebounced(
-                              onSearch: (value) => cubit.searchByKeyword(value),
+                          SearchFieldDebounced(
+                            onSearch: (value) => cubit.searchByKeyword(value),
+                          ),
+                          const SizedBox(height: 8),
+                          DropdownButtonFormField<String?>(
+                            key: ValueKey(cubit.queryParams.status),
+                            initialValue: cubit.queryParams.status,
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              label: Text("Estado"),
+                              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                             ),
+                            items: const [
+                              DropdownMenuItem(
+                                value: null,
+                                child: Text("Todos"),
+                              ),
+                              DropdownMenuItem(
+                                value: 'open',
+                                child: Text("Pendiente"),
+                              ),
+                              DropdownMenuItem(
+                                value: 'paid',
+                                child: Text("Pagado"),
+                              ),
+                            ],
+                            onChanged: (value) {
+                              final currentParams = cubit.queryParams;
+                              currentParams.status = value;
+                              currentParams.offset = 0;
+                              cubit.getAll(currentParams);
+                            },
                           ),
                         ],
                       ),
@@ -99,11 +124,11 @@ class _MobileBody extends StatelessWidget {
                               final expense = state.items[index];
                               Color rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
 
-                              if (state.newItems.any((e) => e.id == expense.id)) {
+                              if (state.deletedItems.any((e) => e.id == expense.id) || expense.isDeleted) {
+                                rowColor = Colors.red.shade200;
+                              } else if (state.newItems.any((e) => e.id == expense.id)) {
                                 rowColor = Colors.yellow.shade200;
-                              }
-
-                              if (state.updatedItems.any((e) => e.id == expense.id)) {
+                              } else if (state.updatedItems.any((e) => e.id == expense.id)) {
                                 rowColor = Colors.blue.shade200;
                               }
 
@@ -135,6 +160,10 @@ class _MobileExpenseRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final readState = context.watch<ReadExpenseCubit>().state;
+    final isDeleted =
+        expense.isDeleted || (readState is ReadExpenseSuccess && readState.deletedItems.any((e) => e.id == expense.id));
+
     final isExpired =
         expense.expirationDate != null &&
         DateTime.fromMillisecondsSinceEpoch(expense.expirationDate!).isBefore(DateTime.now()) &&
@@ -178,27 +207,32 @@ class _MobileExpenseRow extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 6),
-                    Row(
+                    Column(
                       spacing: 8,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _StatusBadge(status: expense.status),
                         if (expense.expirationDate != null) ...[
-                          Icon(
-                            Icons.event,
-                            size: 14,
-                            color: isExpired ? Colors.red.shade700 : Colors.grey.shade600,
-                          ),
-                          Text(
-                            DateTimeTool.formatddMMyyEs(
-                              DateTime.fromMillisecondsSinceEpoch(expense.expirationDate!),
-                            ),
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: isExpired ? Colors.red.shade700 : Colors.grey.shade600,
-                              fontWeight: isExpired ? FontWeight.w600 : null,
-                            ),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.event,
+                                size: 14,
+                                color: isExpired ? Colors.red.shade700 : Colors.grey.shade600,
+                              ),
+                              Text(
+                                DateTimeTool.formatddMMyyEs(
+                                  DateTime.fromMillisecondsSinceEpoch(expense.expirationDate!),
+                                ),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: isExpired ? Colors.red.shade700 : Colors.grey.shade600,
+                                  fontWeight: isExpired ? FontWeight.w600 : null,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
+                        StatusBadge(status: expense.status),
                       ],
                     ),
                   ],
@@ -215,21 +249,102 @@ class _MobileExpenseRow extends StatelessWidget {
                   textAlign: .center,
                 ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: () async {
-                      final res = await showCreateExpenseDialog(context, expense: expense);
-                      if (res == null) return;
-                      if (!context.mounted) return;
-                      context.read<ReadExpenseCubit>().markExpenseUpdated(res);
-                      if (!context.mounted) return;
-                    },
-                  ),
-                ],
-              ),
+              isDeleted
+                  ? const SizedBox(width: 48)
+                  : PopupMenuButton<int>(
+                      icon: const Icon(Icons.more_vert),
+                      onSelected: (value) async {
+                        if (value == 0) {
+                          final res = await showCreateExpenseDialog(context, expense: expense);
+                          if (res == null) return;
+                          if (!context.mounted) return;
+                          context.read<ReadExpenseCubit>().markExpenseUpdated(res);
+                        } else if (value == 1) {
+                          final confirmed = await DialogManager.slideToConfirmActionDialog(
+                            context,
+                            "¿Deseas marcar este gasto como pagado?",
+                          );
+                          if (confirmed != true) return;
+                          if (!context.mounted) return;
+                          LoadingDialogManager.showLoadingDialog(context);
+                          try {
+                            final updated = await context.read<ExpensesRepository>().updateExpenseById(
+                              expense.id,
+                              UpdateExpense(
+                                status: ExpenseStatus.paid,
+                                expirationDate: null,
+                              ),
+                            );
+                            if (updated != null) {
+                              if (!context.mounted) return;
+                              context.read<ReadExpenseCubit>().markExpenseUpdated(updated);
+                            }
+                          } catch (e) {
+                            if (!context.mounted) return;
+                            DialogManager.showErrorDialog(context, e.toString());
+                          } finally {
+                            if (context.mounted) {
+                              LoadingDialogManager.closeLoadingDialog(context);
+                            }
+                          }
+                        } else if (value == 2) {
+                          final confirmed = await DialogManager.slideToConfirmActionDialog(
+                            context,
+                            "¿Deseas eliminar este gasto?",
+                          );
+                          if (confirmed != true) return;
+                          if (!context.mounted) return;
+                          LoadingDialogManager.showLoadingDialog(context);
+                          try {
+                            final deleted = await context.read<ExpensesRepository>().deleteExpenseById(expense.id);
+                            if (deleted != null) {
+                              if (!context.mounted) return;
+                              context.read<ReadExpenseCubit>().markExpenseDeleted(deleted);
+                            }
+                          } catch (e) {
+                            if (!context.mounted) return;
+                            DialogManager.showErrorDialog(context, e.toString());
+                          } finally {
+                            if (context.mounted) {
+                              LoadingDialogManager.closeLoadingDialog(context);
+                            }
+                          }
+                        }
+                      },
+                      itemBuilder: (context) => [
+                        const PopupMenuItem(
+                          value: 0,
+                          child: Row(
+                            children: [
+                              Icon(Icons.edit, size: 20),
+                              SizedBox(width: 8),
+                              Text("Editar"),
+                            ],
+                          ),
+                        ),
+                        if (expense.status == ExpenseStatus.open)
+                          const PopupMenuItem(
+                            value: 1,
+                            child: Row(
+                              children: [
+                                Icon(Icons.check_circle_outline, size: 20, color: Colors.green),
+                                SizedBox(width: 8),
+                                Text("Marcar como Pagado"),
+                              ],
+                            ),
+                          ),
+                        const PopupMenuItem(
+                          value: 2,
+                          child: Row(
+                            children: [
+                              Icon(Icons.delete_outline, size: 20, color: Colors.red),
+                              SizedBox(width: 8),
+                              Text("Eliminar", style: TextStyle(color: Colors.red)),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
             ],
           ),
         ),

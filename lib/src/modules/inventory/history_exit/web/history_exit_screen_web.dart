@@ -6,7 +6,6 @@ import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/inventory/history_exit/cubit/read_exit_history_cubit.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_exit/cubit/read_exit_doc_cubit.dart';
-import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/exit_history_viewer.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';

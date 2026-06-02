@@ -129,6 +129,7 @@ Encargados exclusivamente de traer datos (`getAll`, `getById`).
 - Su estado `Success` (ej. `ReadUnitSuccess`) contiene todos los elementos listos para mostrarse.
 - Del estado `Success` derivan estados para indicar elementos afectados recientemente. Por ejemplo, listas que contienen qué elementos fueron `created`, `updated`, o `deleted`, lo cual permite a la UI resaltarlos o animarlos.
 - También derivan estados como `Searching` para indicar filtros aplicados conservando la carga útil base.
+- **Carga Condicional para Evitar Parpadeos (UX Premium)**: En el método `getAll`, al refrescar o filtrar los datos, si el estado actual ya es exitoso (`ReadSuccess`), se debe emitir el estado intermedio `ReadSearching` (u otro estado que herede de `ReadSuccess` y conserve las listas en memoria) en lugar de un `ReadLoading()` global. Esto previene que la pantalla se borre de golpe para mostrar un spinner de carga central grande, posibilitando que la interfaz use un indicador de red discreto (como un `LinearProgressIndicator` superior) mientras mantiene visibles los datos anteriores en segundo plano.
 
 **Ejemplo de Estados (Read):**
 ```dart
@@ -213,6 +214,8 @@ final class WriteError extends WriteState {
 - Inyectan el Repositorio a través del constructor.
 - Manejan excepciones con un bloque try/catch y emiten `Error(error.toString())`.
 - Si se requiere actualizar en un listado persistente localmente, el `ReadCubit` expone métodos síncronos (como `markUnitUpdated` o `putUnitFirst`) para recibir el push directo del objeto modificado por el `WriteCubit`.
+- **Sincronización Reactiva vía UI (Recomendado):** Para mantener la legibilidad y evitar acoplamiento imperativo en diálogos individuales, se prefiere envolver la vista principal o tabla en un `BlocListener<WriteCubit, WriteState>` para capturar los eventos de éxito del cubit de escritura (ej. `ItemCreated`, `ItemUpdated`, `ItemDeleted`) y llamar automáticamente a los métodos síncronos de actualización del cubit de lectura (ej. `markItemUpdated`).
+
 ## 6. Patrón de Repositorios Reactivos (ReactiveRepository Mixin)
 
 Para desacoplar la UI de la coordinación entre Cubits de Lectura y Escritura, la aplicación implementa de manera opcional/avanzada el estándar de **Repositorio Reactivo** apoyado en eventos genéricos.
@@ -243,6 +246,7 @@ Las carpetas de UI están atadas a la estructura de módulos de negocio (`lib/sr
 3. **No realizar parseos Json en DataSource:** El return del source siempre viaja en bruto a la capa de Repositorio. El repositorio se hace responsable del tipado fuerte.
 4. **Respeto a Dart Moderno:** Las directivas de "Null Safety" y Mapas con null coalescing como `map?['value']` deben respetarse como prácticas soportadas y recomendadas (Dart 3+).
 5. Persistencia de estilos en UI: Respeta colores, tipografía global y formatos. Los costos no editables se formatean tipicamente dividiendo sobre 100 con `.toStringAsFixed(2)`.
+6. **Uso de Formateadores de Entrada (Input Formatters):** Antes de crear cualquier campo de entrada de texto (`TextField`, `TextFormField`, `TitleTextField`) que requiera entrada de tipo numérico o decimal, se debe verificar la existencia de los formateadores predefinidos en `lib/src/tools/input_formatters.dart` (por ejemplo, `IntegerTextInputFormatter` para números enteros o `DecimalTextInputFormatter` para decimales con dos dígitos) y aplicarlos para asegurar la integridad de los datos.
 
 ---
 
