@@ -112,7 +112,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
 
   @override
   Widget build(BuildContext context) {
-    final currentAuthState = context.read<AuthCubit>().state;
+    final currentAuthState = getIt<AuthCubit>().state;
 
     if (currentAuthState is! Authenticated) {
       return const SizedBox.shrink();
@@ -318,7 +318,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
                                 label: const Text("Restar al inventario"),
                                 onPressed: isAdmin
                                     ? () async {
-                                        final authState = context.read<AuthCubit>().state;
+                                        final authState = getIt<AuthCubit>().state;
                                         if (authState is! Authenticated) return;
                                         final branchId = authState.branch.id;
 
@@ -351,7 +351,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
                                 icon: const Icon(Icons.add_circle_outline),
                                 label: const Text("Agregar al inventario"),
                                 onPressed: () async {
-                                  final authState = context.read<AuthCubit>().state;
+                                  final authState = getIt<AuthCubit>().state;
                                   if (authState is! Authenticated) return;
                                   final branchId = authState.branch.id;
 
