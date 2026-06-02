@@ -19,7 +19,19 @@ class ReadExpenseCubit extends Cubit<ReadExpenseState> {
 
   Future<void> getAll([ExpenseQueryParams? params]) async {
     queryParams = params ?? ExpenseQueryParams();
-    emit(ReadExpenseLoading());
+    if (state is ReadExpenseSuccess) {
+      final scopeState = state as ReadExpenseSuccess;
+      emit(
+        ReadExpenseSearching(
+          scopeState.items,
+          newItems: scopeState.newItems,
+          updatedItems: scopeState.updatedItems,
+          deletedItems: scopeState.deletedItems,
+        ),
+      );
+    } else {
+      emit(ReadExpenseLoading());
+    }
     try {
       final results = await Future.wait([
         expensesRepository.getAllExpenses(queryParams),

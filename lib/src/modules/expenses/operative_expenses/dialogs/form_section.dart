@@ -19,7 +19,7 @@ class _FormContentState extends State<_FormContent> {
   ExpenseType selectedType = ExpenseType.operative;
   int amountInCents = 0;
   int dateTimestamp = DateTime.now().millisecondsSinceEpoch;
-  bool isPaid = true;
+  bool isCredit = false;
   int? expirationDateTimestamp;
 
   @override
@@ -29,13 +29,13 @@ class _FormContentState extends State<_FormContent> {
     if (widget.expense != null) {
       amountInCents = widget.expense!.amount;
       dateTimestamp = widget.expense!.date;
-      isPaid = widget.expense!.status == ExpenseStatus.paid;
+      isCredit = widget.expense!.status != ExpenseStatus.paid;
       expirationDateTimestamp = widget.expense!.expirationDate;
       widget.creationMap['docNumber'] = widget.expense!.docNumber;
       widget.creationMap['category'] = widget.expense!.category;
       widget.creationMap['description'] = widget.expense!.description;
     } else {
-      isPaid = true;
+      isCredit = false;
     }
   }
 
@@ -83,8 +83,8 @@ class _FormContentState extends State<_FormContent> {
             child: InkWell(
               onTap: () {
                 setState(() {
-                  isPaid = !isPaid;
-                  if (!isPaid && expirationDateTimestamp == null) {
+                  isCredit = !isCredit;
+                  if (isCredit && expirationDateTimestamp == null) {
                     expirationDateTimestamp = DateTime.now().millisecondsSinceEpoch;
                   }
                 });
@@ -94,13 +94,13 @@ class _FormContentState extends State<_FormContent> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text("¿Pagado?"),
+                    const Text("¿Crédito?"),
                     Switch(
-                      value: isPaid,
+                      value: isCredit,
                       onChanged: (value) {
                         setState(() {
-                          isPaid = value;
-                          if (!isPaid && expirationDateTimestamp == null) {
+                          isCredit = value;
+                          if (isCredit && expirationDateTimestamp == null) {
                             expirationDateTimestamp = DateTime.now().millisecondsSinceEpoch;
                           }
                         });
@@ -111,7 +111,7 @@ class _FormContentState extends State<_FormContent> {
               ),
             ),
           ),
-          if (!isPaid) ...[
+          if (isCredit) ...[
             const SizedBox(width: 12),
             Flexible(
               child: DatePickerButton(
@@ -230,8 +230,8 @@ class _FormContentState extends State<_FormContent> {
       final authCubit = getIt<AuthCubit>();
       widget.creationMap['branchId'] = authCubit.currentBranchId;
       widget.creationMap['dateId'] = dateTimestamp.toString();
-      widget.creationMap['status'] = isPaid ? ExpenseStatus.paid.name : ExpenseStatus.open.name;
-      widget.creationMap['expirationDate'] = isPaid ? null : expirationDateTimestamp;
+      widget.creationMap['status'] = isCredit ? ExpenseStatus.open.name : ExpenseStatus.paid.name;
+      widget.creationMap['expirationDate'] = isCredit ? expirationDateTimestamp : null;
       widget.creationMap['createdBy'] = UserInfo(
         id: authCubit.user?.id ?? "",
         name: authCubit.user?.username ?? "",

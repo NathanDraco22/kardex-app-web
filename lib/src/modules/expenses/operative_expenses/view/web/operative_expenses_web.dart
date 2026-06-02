@@ -53,7 +53,7 @@ class _WebBody extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-            const Expanded(child: _ExpensesTable()),
+            const Expanded(child: ExpensesTable()),
           ],
         ),
       ),

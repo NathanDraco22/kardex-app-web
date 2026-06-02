@@ -9,7 +9,6 @@ import 'package:kardex_app_front/src/modules/commercial/pending_invoice/cubit/re
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/web/modals/invoice_receipts_history_modal.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/web/receipt_creator/receipt_creator_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/widget/invoice_devolution_tile.dart';
-import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/devolution_viewer.dart';
@@ -112,7 +111,10 @@ class _RootScaffoldState extends State<_RootScaffold> {
 
           final selectedClient = PendingInvoiceMediator.of(context).notifier?.selectedClient;
           if (selectedClient != null) {
-            context.read<ReadPendingInvoiceCubit>().loadPaginatedInvoices(selectedClient.id, getIt<AuthCubit>().currentBranchId);
+            context.read<ReadPendingInvoiceCubit>().loadPaginatedInvoices(
+              selectedClient.id,
+              getIt<AuthCubit>().currentBranchId,
+            );
           }
         }
       },
