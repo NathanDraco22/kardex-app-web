@@ -169,6 +169,7 @@ class _MobileExpenseRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final readState = context.watch<ReadExpenseCubit>().state;
+    final canDelete = DateTime.now().difference(expense.createdAt).inHours < 12;
     final isDeleted =
         expense.isDeleted || (readState is ReadExpenseSuccess && readState.deletedItems.any((e) => e.id == expense.id));
 
@@ -192,67 +193,63 @@ class _MobileExpenseRow extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      spacing: 4,
                       children: [
-                        Icon(
-                          Icons.receipt_long_outlined,
-                          color: Colors.blueGrey.shade700,
-                          size: 16,
-                        ),
                         Text(
-                          expense.docNumber,
-                          style: TextStyle(fontSize: 14, color: Colors.blueGrey.shade700),
+                          expense.supplierName,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
+                        const SizedBox(width: 8),
+                        SupplierStatusBadge(status: expense.status),
                       ],
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 4),
                     Text(
-                      expense.supplierName.isNotEmpty ? expense.supplierName : "—",
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
+                      "Doc: ${expense.docNumber.isEmpty ? "—" : expense.docNumber}",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade600,
                       ),
                     ),
-                    const SizedBox(height: 6),
-                    Column(
-                      spacing: 8,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    const SizedBox(height: 2),
+                    Row(
                       children: [
                         if (expense.expirationDate != null) ...[
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.event,
-                                size: 14,
-                                color: isExpired ? Colors.red.shade700 : Colors.grey.shade600,
-                              ),
-                              Text(
-                                DateTimeTool.formatddMMyyEs(
-                                  DateTime.fromMillisecondsSinceEpoch(expense.expirationDate!),
-                                ),
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: isExpired ? Colors.red.shade700 : Colors.grey.shade600,
-                                  fontWeight: isExpired ? FontWeight.w600 : null,
-                                ),
-                              ),
-                            ],
+                          Text(
+                            "Vence: ${DateTimeTool.formatddMMyyEs(
+                              DateTime.fromMillisecondsSinceEpoch(expense.expirationDate!),
+                            )}",
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: isExpired ? Colors.red.shade700 : Colors.grey.shade600,
+                              fontWeight: isExpired ? FontWeight.bold : null,
+                            ),
                           ),
+                          const SizedBox(width: 8),
                         ],
-                        SupplierStatusBadge(status: expense.status),
+                        Text(
+                          "Creado: ${DateTimeTool.formatddMMyyEs(
+                            DateTime.fromMillisecondsSinceEpoch(expense.date),
+                          )}",
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
                       ],
                     ),
                   ],
                 ),
               ),
-              Expanded(
-                child: Text(
-                  NumberFormatter.convertFromCentsToUnitsCurrency(expense.amount),
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  textAlign: TextAlign.center,
+              const SizedBox(width: 8),
+              Text(
+                NumberFormatter.convertFromCentsToUnitsCurrency(expense.amount),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
               isDeleted
@@ -339,16 +336,17 @@ class _MobileExpenseRow extends StatelessWidget {
                               ],
                             ),
                           ),
-                        const PopupMenuItem(
-                          value: 2,
-                          child: Row(
-                            children: [
-                              Icon(Icons.delete_outline, size: 20, color: Colors.red),
-                              SizedBox(width: 8),
-                              Text("Eliminar", style: TextStyle(color: Colors.red)),
-                            ],
+                        if (canDelete)
+                          const PopupMenuItem(
+                            value: 2,
+                            child: Row(
+                              children: [
+                                Icon(Icons.delete_outline, size: 20, color: Colors.red),
+                                SizedBox(width: 8),
+                                Text("Eliminar", style: TextStyle(color: Colors.red)),
+                              ],
+                            ),
                           ),
-                        ),
                       ],
                     ),
             ],

@@ -123,6 +123,7 @@ class SupplierExpensesRows extends StatelessWidget {
         itemCount: items.length,
         itemBuilder: (context, index) {
           final expense = items[index];
+          final canDelete = DateTime.now().difference(expense.createdAt).inHours < 12;
           Color rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
 
           if (state.deletedItems.any((e) => e.id == expense.id) || expense.isDeleted) {
@@ -282,16 +283,17 @@ class SupplierExpensesRows extends StatelessWidget {
                                         ],
                                       ),
                                     ),
-                                  const PopupMenuItem(
-                                    value: 2,
-                                    child: Row(
-                                      children: [
-                                        Icon(Icons.delete_outline, size: 20, color: Colors.red),
-                                        SizedBox(width: 8),
-                                        Text("Eliminar", style: TextStyle(color: Colors.red)),
-                                      ],
+                                  if (canDelete)
+                                    const PopupMenuItem(
+                                      value: 2,
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.delete_outline, size: 20, color: Colors.red),
+                                          SizedBox(width: 8),
+                                          Text("Eliminar", style: TextStyle(color: Colors.red)),
+                                        ],
+                                      ),
                                     ),
-                                  ),
                                 ],
                               ),
                       ),
