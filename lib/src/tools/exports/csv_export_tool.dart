@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:file_saver/file_saver.dart';
 import 'package:flutter/foundation.dart';
 import 'package:kardex_app_front/src/domain/models/common/product_sale_total.dart';
+import 'package:kardex_app_front/src/domain/models/expense/expense_model.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 
 class CsvExportTool {
@@ -23,6 +24,74 @@ class CsvExportTool {
 
       buffer.writeln(
         '"$safeName",${product.totalUnits},"$formattedTotal"',
+      );
+    }
+
+    final bytes = utf8.encode(buffer.toString());
+    final uint8List = Uint8List.fromList(bytes);
+
+    if (kIsWeb) {
+      await FileSaver.instance.saveFile(
+        name: fileName,
+        bytes: uint8List,
+        fileExtension: "csv",
+        mimeType: MimeType.csv,
+      );
+    } else {
+      await FileSaver.instance.saveAs(
+        name: fileName,
+        bytes: uint8List,
+        fileExtension: "csv",
+        mimeType: MimeType.csv,
+      );
+    }
+  }
+
+  static Future<void> exportExpensesToCSV({
+    required List<ExpenseInDb> expenses,
+    required String fileName,
+  }) async {
+    if (expenses.isEmpty) return;
+
+    final StringBuffer buffer = StringBuffer();
+
+    // Agregar BOM UTF-8 para compatibilidad con Excel
+    buffer.write('\uFEFF');
+
+    buffer.writeln("Tipo,N° Documento,Concepto,Fecha,Estado,Monto");
+
+    for (final expense in expenses) {
+      final isOperative = expense.type == ExpenseType.operative;
+      final typeStr = isOperative ? "Operativo" : "Proveedor";
+      final concept = isOperative ? expense.category : expense.supplierName;
+      final safeConcept = concept.replaceAll('"', '""');
+      final dateStr = DateTimeTool.formatddMMyyEs(
+        DateTime.fromMillisecondsSinceEpoch(expense.date),
+      );
+
+      String statusStr = "";
+      switch (expense.status) {
+        case ExpenseStatus.draft:
+          statusStr = "Borrador";
+          break;
+        case ExpenseStatus.open:
+          statusStr = "Pendiente";
+          break;
+        case ExpenseStatus.paid:
+          statusStr = "Pagado";
+          break;
+        case ExpenseStatus.partiallyPaid:
+          statusStr = "Parcial";
+          break;
+        case ExpenseStatus.cancelled:
+          statusStr = "Cancelado";
+          break;
+      }
+
+      final formattedAmount = NumberFormatter.convertToMoneyLike(expense.amount);
+
+      buffer.writeln(
+        '"$typeStr","${expense.docNumber}","$safeConcept","$dateStr","$statusStr","$formattedAmount"',
       );
     }
 

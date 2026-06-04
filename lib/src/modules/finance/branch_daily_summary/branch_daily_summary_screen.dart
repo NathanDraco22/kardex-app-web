@@ -15,7 +15,10 @@ class BranchDailySummaryScreen extends StatelessWidget {
     return BlocProvider(
       create: (context) {
         final repo = context.read<DailySummariesRepository>();
-        return ReadBranchDailySummaryCubit(dailySummariesRepository: repo, currentBranchId: getIt<AuthCubit>().currentBranchId)..getDailySummary();
+        return ReadBranchDailySummaryCubit(
+          dailySummariesRepository: repo,
+          currentBranchId: getIt<AuthCubit>().currentBranchId,
+        )..getDailySummary();
       },
       child: const _RootScaffold(),
     );
