@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/cubits/expenses/read_expenses_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/expense/expense_model.dart';
+import 'package:kardex_app_front/src/domain/query_params/expense_query_params.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/expenses/expenses_reports/widgets/expenses_reports_widgets.dart';
@@ -17,6 +20,7 @@ class ExpensesReportScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final expensesRepo = context.read<ExpensesRepository>();
     final expenseCategoriesRepo = context.read<ExpenseCategoriesRepository>();
+    final today = DateTime.now();
 
     return MultiBlocProvider(
       providers: [
@@ -24,7 +28,12 @@ class ExpensesReportScreen extends StatelessWidget {
           create: (_) => ReadExpenseCubit(
             expensesRepo,
             expenseCategoriesRepo,
-          )..getAll(), // Carga inicial por defecto sin filtros de tipo
+          )..getAll(
+              ExpenseQueryParams()
+                ..branchId = getIt<AuthCubit>().currentBranchId
+                ..startDate = today.startOfDay().millisecondsSinceEpoch
+                ..endDate = today.endOfDay().millisecondsSinceEpoch,
+            ),
         ),
       ],
       child: const _BaseScaffold(),
