@@ -31,10 +31,13 @@ class _HeaderSectionState extends State<HeaderSection> {
     final cubit = context.read<ReadExpenseCubit>();
     if (cubit.queryParams.startDate != null) {
       _startDate = DateTime.fromMillisecondsSinceEpoch(cubit.queryParams.startDate!);
+    } else {
+      _startDate = DateTime.now().startOfDay();
     }
     if (cubit.queryParams.endDate != null) {
-      // Restar el día adicional que agregamos al guardar
-      _endDate = DateTime.fromMillisecondsSinceEpoch(cubit.queryParams.endDate!).subtract(const Duration(days: 1));
+      _endDate = DateTime.fromMillisecondsSinceEpoch(cubit.queryParams.endDate!);
+    } else {
+      _endDate = DateTime.now().endOfDay();
     }
   }
 
@@ -59,11 +62,15 @@ class _HeaderSectionState extends State<HeaderSection> {
                 ),
                 TextButton.icon(
                   onPressed: () {
+                    final today = DateTime.now();
                     setState(() {
-                      _startDate = null;
-                      _endDate = null;
+                      _startDate = today.startOfDay();
+                      _endDate = today.endOfDay();
                     });
-                    final params = ExpenseQueryParams()..branchId = authCubit.currentBranchId;
+                    final params = ExpenseQueryParams()
+                      ..branchId = authCubit.currentBranchId
+                      ..startDate = today.startOfDay().millisecondsSinceEpoch
+                      ..endDate = today.endOfDay().millisecondsSinceEpoch;
                     cubit.getAll(params);
                   },
                   icon: const Icon(Icons.clear_all),
@@ -111,10 +118,10 @@ class _HeaderSectionState extends State<HeaderSection> {
                         final params = ExpenseQueryParams()
                           ..branchId = authCubit.currentBranchId;
                         if (_startDate != null) {
-                          params.startDate = _startDate!.millisecondsSinceEpoch;
+                          params.startDate = _startDate!.startOfDay().millisecondsSinceEpoch;
                         }
                         if (_endDate != null) {
-                          params.endDate = _endDate!.add(const Duration(days: 1)).millisecondsSinceEpoch;
+                          params.endDate = _endDate!.endOfDay().millisecondsSinceEpoch;
                         }
                         cubit.getAll(params);
                       },
