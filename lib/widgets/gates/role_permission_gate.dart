@@ -24,7 +24,6 @@ class RolePermissionGate extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final accessManager = AccessManager();
-
     final hasAccess = switch (mode) {
       PermissionMode.whitelist => permissions.any(
         (p) => accessManager.hasCurrentAccess(context, p.name),
