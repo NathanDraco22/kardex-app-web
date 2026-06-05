@@ -51,6 +51,8 @@ class ProviderContainer extends StatelessWidget {
     final integrationsDataSource = IntegrationsDataSource();
     final clientGroupsDataSource = ClientGroupDataSource();
     final reportsDataSource = ReportsDataSource();
+    final expensesDataSource = ExpensesDataSource();
+    final expenseCategoriesDataSource = ExpenseCategoriesDataSource();
 
     return MultiRepositoryProvider(
       providers: [
@@ -222,6 +224,12 @@ class ProviderContainer extends StatelessWidget {
         RepositoryProvider(
           create: (context) => ReportsRepository(reportsDataSource),
         ),
+        RepositoryProvider(
+          create: (context) => ExpensesRepository(expensesDataSource),
+        ),
+        RepositoryProvider(
+          create: (context) => ExpenseCategoriesRepository(expenseCategoriesDataSource),
+        ),
       ],
       child: GlobalCubitProvider(
         child: child,
@@ -249,7 +257,7 @@ class _GlobalCubitProviderState extends State<GlobalCubitProvider> {
     final branchRepo = context.read<BranchesRepository>();
     final servinRepo = context.read<ServinRepository>();
     final clientGroupRepo = context.read<ClientGroupsRepository>();
-    
+
     _authCubit = AuthCubit(
       authRepository: authRepo,
       branchesRepository: branchRepo,

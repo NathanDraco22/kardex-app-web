@@ -15,6 +15,7 @@ class BaseExpense {
   final ExpenseStatus status;
   final ExpenseType type;
   final String supplierId;
+  final String supplierName;
   final bool isActive;
   final int? expirationDate;
   final UserInfo createdBy;
@@ -31,6 +32,7 @@ class BaseExpense {
     required this.status,
     required this.type,
     this.supplierId = "",
+    this.supplierName = "",
     this.isActive = true,
     this.expirationDate,
     required this.createdBy,
@@ -49,6 +51,7 @@ class BaseExpense {
       status: ExpenseStatus.values.byName(json['status'].toString()),
       type: ExpenseType.values.byName(json['type'].toString()),
       supplierId: json['supplierId'] as String? ?? "",
+      supplierName: json['supplierName'] as String? ?? "",
       isActive: json['isActive'] as bool? ?? true,
       expirationDate: json['expirationDate'] as int?,
       createdBy: UserInfo.fromJson(json['createdBy']),
@@ -68,6 +71,7 @@ class BaseExpense {
       'status': status.name,
       'type': type.name,
       'supplierId': supplierId,
+      'supplierName': supplierName,
       'isActive': isActive,
       'expirationDate': expirationDate,
       'createdBy': createdBy.toJson(),
@@ -88,6 +92,7 @@ class CreateExpense extends BaseExpense {
     required super.status,
     required super.type,
     super.supplierId,
+    super.supplierName,
     super.isActive,
     super.expirationDate,
     required super.createdBy,
@@ -106,6 +111,7 @@ class CreateExpense extends BaseExpense {
       status: ExpenseStatus.values.byName(json['status'].toString()),
       type: ExpenseType.values.byName(json['type'].toString()),
       supplierId: json['supplierId'] as String? ?? "",
+      supplierName: json['supplierName'] as String? ?? "",
       isActive: json['isActive'] as bool? ?? true,
       expirationDate: json['expirationDate'] as int?,
       createdBy: UserInfo.fromJson(json['createdBy']),
@@ -122,7 +128,10 @@ class UpdateExpense {
   final String? dateId;
   final ExpenseType? type;
   final String? supplierId;
+  final String? supplierName;
   final bool? isActive;
+  final ExpenseStatus? status;
+  final int? expirationDate;
 
   UpdateExpense({
     this.amount,
@@ -132,7 +141,10 @@ class UpdateExpense {
     this.dateId,
     this.type,
     this.supplierId,
+    this.supplierName,
     this.isActive,
+    this.status,
+    this.expirationDate,
   });
 
   factory UpdateExpense.fromJson(Map<String, dynamic> json) {
@@ -144,7 +156,10 @@ class UpdateExpense {
       dateId: json['dateId'] as String?,
       type: json['type'] != null ? ExpenseType.values.byName(json['type'].toString()) : null,
       supplierId: json['supplierId'] as String?,
+      supplierName: json['supplierName'] as String?,
       isActive: json['isActive'] as bool?,
+      status: json['status'] != null ? ExpenseStatus.values.byName(json['status'].toString()) : null,
+      expirationDate: json['expirationDate'] as int?,
     );
   }
 
@@ -157,7 +172,10 @@ class UpdateExpense {
       'dateId': dateId,
       'type': type?.name,
       'supplierId': supplierId,
+      'supplierName': supplierName,
       'isActive': isActive,
+      'status': status?.name,
+      'expirationDate': expirationDate,
     };
     data.removeWhere((key, value) => value == null);
     return data;
@@ -202,6 +220,7 @@ class ExpenseInDb extends BaseExpense {
     required super.status,
     required super.type,
     super.supplierId,
+    super.supplierName,
     super.isActive,
     super.expirationDate,
     required super.createdBy,
@@ -213,9 +232,7 @@ class ExpenseInDb extends BaseExpense {
       id: json['id'] as String,
       isDeleted: json['isDeleted'] as bool? ?? false,
       createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
-      updatedAt: json['updatedAt'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt'] as int)
-          : null,
+      updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt'] as int) : null,
       branchId: json['branchId'] as String,
       docNumber: json['docNumber'] as String? ?? "",
       amount: json['amount'] as int,
@@ -226,6 +243,7 @@ class ExpenseInDb extends BaseExpense {
       status: ExpenseStatus.values.byName(json['status'].toString()),
       type: ExpenseType.values.byName(json['type'].toString()),
       supplierId: json['supplierId'] as String? ?? "",
+      supplierName: json['supplierName'] as String? ?? "",
       isActive: json['isActive'] as bool? ?? true,
       expirationDate: json['expirationDate'] as int?,
       createdBy: UserInfo.fromJson(json['createdBy']),
