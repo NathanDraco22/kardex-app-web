@@ -95,4 +95,15 @@ class ProductsDataSource with HttpService {
     final res = await deleteQuery(uri, headers: headers);
     return res;
   }
+
+  Future<Map<String, dynamic>> getProductsInBranchByIds(
+    String branchId,
+    Map<String, dynamic> body,
+  ) async {
+    final uri = HttpTools.generateUri("$_endpoint/branch/$branchId/by-ids");
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await postQuery(uri, body, headers: headers);
+    return res;
+  }
 }
+

@@ -275,3 +275,17 @@ class ProductInDbInBranch extends ProductInDb {
     );
   }
 }
+
+class GetProductsInBranchRequest {
+  final List<String> productIds;
+
+  GetProductsInBranchRequest({
+    required this.productIds,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'productIds': productIds,
+    };
+  }
+}
