@@ -1,3 +1,4 @@
+import sys
 import shutil
 from pathlib import Path
 import subprocess
@@ -12,6 +13,8 @@ ouput_web_path = ouput_path / "web"
 
 netlify = "nfp_a1LFtkrKcc8BqusstHnYFKKm1kBmTFuXc5e9"
 
+is_deploy = len(sys.argv) > 1 and sys.argv[1] == "deploy"
+
 try:
     result = subprocess.Popen(
         [
@@ -24,7 +27,6 @@ try:
         ],
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
-        text=True,
         shell=True,
     )
 
@@ -34,6 +36,7 @@ try:
             print("No stdout available.")
             break
         output = tunnel_stdout.readline()
+        output = output.decode("utf-8") if isinstance(output, bytes) else output
         if output == "" and result.poll() is not None:
             break
         if output:
@@ -47,18 +50,19 @@ try:
     if (ouput_path / "deploy.zip").exists():
         (ouput_path / "deploy.zip").unlink()
 
-    shutil.make_archive(str(ouput_path / "deploy"), "zip", ouput_web_path)
+    if is_deploy:
+        shutil.make_archive(str(ouput_path / "deploy"), "zip", ouput_web_path)
 
-    response = requests.post(
-        "https://api.netlify.com/api/v1/sites/96321453-ae5b-48b6-919e-0e10ece5e2bf/deploys",
-        headers={
-            "Authorization": f"Bearer {netlify}",
-            "Content-Type": "application/zip",
-        },
-        data=open(ouput_path / "deploy.zip", "rb").read(),
-    )
-    print(response.status_code)
-    print(response.text)
+        response = requests.post(
+            "https://api.netlify.com/api/v1/sites/96321453-ae5b-48b6-919e-0e10ece5e2bf/deploys",
+            headers={
+                "Authorization": f"Bearer {netlify}",
+                "Content-Type": "application/zip",
+            },
+            data=open(ouput_path / "deploy.zip", "rb").read(),
+        )
+        print(response.status_code)
+        print(response.text)
 
 
 except Exception as e:
