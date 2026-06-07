@@ -33,26 +33,26 @@ class _MobileBody extends StatelessWidget {
     final state = cubit.state as ReadExpenseSuccess;
 
     return Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  const Spacer(),
-                  SizedBox(
-                    height: 40,
-                    child: ElevatedButton.icon(
-                      onPressed: () async {
-                        await showCreateExpenseDialog(context);
-                      },
-                      icon: const Icon(Icons.add),
-                      label: const Text("Agregar Nuevo Gasto"),
-                    ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                const Spacer(),
+                SizedBox(
+                  height: 40,
+                  child: ElevatedButton.icon(
+                    onPressed: () async {
+                      await showCreateExpenseDialog(context);
+                    },
+                    icon: const Icon(Icons.add),
+                    label: const Text("Agregar Nuevo Gasto"),
                   ),
-                ],
-              ),
-              const SizedBox(height: 12),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
             Expanded(
               child: Card(
                 margin: EdgeInsets.zero,
@@ -63,12 +63,9 @@ class _MobileBody extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          SearchFieldDebounced(
-                            onSearch: (value) => cubit.searchByKeyword(value),
-                          ),
                           const SizedBox(height: 8),
                           DropdownButtonFormField<String?>(
-                            key: ValueKey(cubit.queryParams.status),
+                            key: ValueKey("status_${cubit.queryParams.status}"),
                             initialValue: cubit.queryParams.status,
                             decoration: const InputDecoration(
                               border: OutlineInputBorder(),
@@ -92,6 +89,20 @@ class _MobileBody extends StatelessWidget {
                             onChanged: (value) {
                               final currentParams = cubit.queryParams;
                               currentParams.status = value;
+                              currentParams.offset = 0;
+                              cubit.getAll(currentParams);
+                            },
+                          ),
+                          const SizedBox(height: 12),
+                          ExpenseCategoryDropdown(
+                            key: ValueKey("category_${cubit.queryParams.category}"),
+                            value: cubit.queryParams.category,
+                            showAllOption: true,
+                            label: "Categoría",
+                            categories: cubit.expenseCategories,
+                            onChanged: (value) {
+                              final currentParams = cubit.queryParams;
+                              currentParams.category = value;
                               currentParams.offset = 0;
                               cubit.getAll(currentParams);
                             },
@@ -161,9 +172,10 @@ class _MobileExpenseRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final readState = context.watch<ReadExpenseCubit>().state;
-    final canDelete = DateTime.now().difference(expense.createdAt).inHours < 12;
+    final canEditOrDelete = DateTime.now().difference(expense.createdAt).inHours < 4;
     final isDeleted =
         expense.isDeleted || (readState is ReadExpenseSuccess && readState.deletedItems.any((e) => e.id == expense.id));
+    final showActions = !isDeleted && (canEditOrDelete || expense.status == ExpenseStatus.open);
 
     final isExpired =
         expense.expirationDate != null &&
@@ -173,8 +185,10 @@ class _MobileExpenseRow extends StatelessWidget {
 
     return Material(
       color: Colors.transparent,
-      child: Ink(
-        color: rowColor,
+      child: InkWell(
+        onTap: () => showOperativeExpenseViewerDialog(context, expense),
+        child: Ink(
+          color: rowColor,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: Row(
@@ -206,7 +220,8 @@ class _MobileExpenseRow extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 2),
-                    Row(
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         if (expense.expirationDate != null) ...[
                           Text(
@@ -244,7 +259,7 @@ class _MobileExpenseRow extends StatelessWidget {
                   color: Theme.of(context).colorScheme.primary,
                 ),
               ),
-              isDeleted
+              !showActions
                   ? const SizedBox(width: 48)
                   : PopupMenuButton<int>(
                       icon: const Icon(Icons.more_vert),
@@ -307,16 +322,17 @@ class _MobileExpenseRow extends StatelessWidget {
                         }
                       },
                       itemBuilder: (context) => [
-                        const PopupMenuItem(
-                          value: 0,
-                          child: Row(
-                            children: [
-                              Icon(Icons.edit, size: 20),
-                              SizedBox(width: 8),
-                              Text("Editar"),
-                            ],
+                        if (canEditOrDelete)
+                          const PopupMenuItem(
+                            value: 0,
+                            child: Row(
+                              children: [
+                                Icon(Icons.edit, size: 20),
+                                SizedBox(width: 8),
+                                Text("Editar"),
+                              ],
+                            ),
                           ),
-                        ),
                         if (expense.status == ExpenseStatus.open)
                           const PopupMenuItem(
                             value: 1,
@@ -328,7 +344,7 @@ class _MobileExpenseRow extends StatelessWidget {
                               ],
                             ),
                           ),
-                        if (canDelete)
+                        if (canEditOrDelete)
                           const PopupMenuItem(
                             value: 2,
                             child: Row(
@@ -345,6 +361,7 @@ class _MobileExpenseRow extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ),
+  );
   }
 }

@@ -9,6 +9,8 @@ import 'package:kardex_app_front/widgets/no_item.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/src/modules/expenses/supplier_expenses/widgets/supplier_selector.dart';
 
+import 'package:kardex_app_front/widgets/dialogs/viewers/supplier_expense_viewer.dart';
+
 import '../dialogs/create_supplier_expense_dialog.dart';
 
 class SupplierExpensesTable extends StatelessWidget {
@@ -38,7 +40,7 @@ class SupplierExpensesTable extends StatelessWidget {
                 SizedBox(
                   width: 200,
                   child: DropdownButtonFormField<String?>(
-                    key: ValueKey(cubit.queryParams.status),
+                    key: ValueKey("status_${cubit.queryParams.status}"),
                     initialValue: cubit.queryParams.status,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
@@ -123,10 +125,12 @@ class SupplierExpensesRows extends StatelessWidget {
         itemCount: items.length,
         itemBuilder: (context, index) {
           final expense = items[index];
-          final canDelete = DateTime.now().difference(expense.createdAt).inHours < 12;
+          final canEditOrDelete = DateTime.now().difference(expense.createdAt).inHours < 4;
+          final isDeleted = expense.isDeleted || state.deletedItems.any((e) => e.id == expense.id);
+          final showActions = !isDeleted && (canEditOrDelete || expense.status == ExpenseStatus.open);
           Color rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
 
-          if (state.deletedItems.any((e) => e.id == expense.id) || expense.isDeleted) {
+          if (isDeleted) {
             rowColor = Colors.red.shade200;
           } else if (state.newItems.any((e) => e.id == expense.id)) {
             rowColor = Colors.yellow.shade200;
@@ -142,8 +146,10 @@ class SupplierExpensesRows extends StatelessWidget {
 
           return Material(
             color: Colors.transparent,
-            child: Ink(
-              color: rowColor,
+            child: InkWell(
+              onTap: () => showSupplierExpenseViewerDialog(context, expense),
+              child: Ink(
+                color: rowColor,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 child: Row(
@@ -201,7 +207,7 @@ class SupplierExpensesRows extends StatelessWidget {
                       fit: FlexFit.tight,
                       child: Align(
                         alignment: Alignment.centerRight,
-                        child: (expense.isDeleted || state.deletedItems.any((e) => e.id == expense.id))
+                        child: !showActions
                             ? const SizedBox()
                             : PopupMenuButton<int>(
                                 icon: const Icon(Icons.more_vert),
@@ -262,16 +268,17 @@ class SupplierExpensesRows extends StatelessWidget {
                                   }
                                 },
                                 itemBuilder: (context) => [
-                                  const PopupMenuItem(
-                                    value: 0,
-                                    child: Row(
-                                      children: [
-                                        Icon(Icons.edit, size: 20),
-                                        SizedBox(width: 8),
-                                        Text("Editar"),
-                                      ],
+                                  if (canEditOrDelete)
+                                    const PopupMenuItem(
+                                      value: 0,
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.edit, size: 20),
+                                          SizedBox(width: 8),
+                                          Text("Editar"),
+                                        ],
+                                      ),
                                     ),
-                                  ),
                                   if (expense.status == ExpenseStatus.open)
                                     const PopupMenuItem(
                                       value: 1,
@@ -283,7 +290,7 @@ class SupplierExpensesRows extends StatelessWidget {
                                         ],
                                       ),
                                     ),
-                                  if (canDelete)
+                                  if (canEditOrDelete)
                                     const PopupMenuItem(
                                       value: 2,
                                       child: Row(
@@ -302,8 +309,9 @@ class SupplierExpensesRows extends StatelessWidget {
                 ),
               ),
             ),
-          );
-        },
+          ),
+        );
+      },
       ),
     );
   }

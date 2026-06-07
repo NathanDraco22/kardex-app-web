@@ -263,6 +263,39 @@ class _SummaryCard extends StatelessWidget {
                 ),
               ],
             ),
+            const SizedBox(height: 16),
+            const Divider(),
+            const Text(
+              "Gastos / Egresos",
+              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: _StatColumn(
+                    title: "Gastos Totales",
+                    amount: commercial.expensesTotal,
+                    color: Colors.black87,
+                  ),
+                ),
+                Expanded(
+                  child: _StatColumn(
+                    title: "Gastos Pagados",
+                    amount: commercial.expensesPaid,
+                    color: Colors.green[700]!,
+                  ),
+                ),
+                Expanded(
+                  child: _StatColumn(
+                    title: "Gastos Pendientes",
+                    amount: commercial.expensesOwed,
+                    color: Colors.orange[700]!,
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),

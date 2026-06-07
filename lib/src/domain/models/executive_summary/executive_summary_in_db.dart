@@ -23,6 +23,8 @@ final class ExecutiveSummaryInDb {
   final int inventoryTotalCost;
   final List<InventoryBranchDetail> inventoryBranches;
   final int createdAt;
+  final int expensesTotal;
+  final int expensesPaid;
 
   ExecutiveSummaryInDb({
     required this.id,
@@ -47,7 +49,11 @@ final class ExecutiveSummaryInDb {
     required this.inventoryTotalCost,
     required this.inventoryBranches,
     required this.createdAt,
+    required this.expensesTotal,
+    required this.expensesPaid,
   });
+
+  int get expensesOwed => expensesTotal - expensesPaid;
 
   factory ExecutiveSummaryInDb.fromJson(Map<String, dynamic> json) {
     return ExecutiveSummaryInDb(
@@ -80,6 +86,8 @@ final class ExecutiveSummaryInDb {
           .map((e) => InventoryBranchDetail.fromJson(e as Map<String, dynamic>))
           .toList(),
       createdAt: json['createdAt'] as int,
+      expensesTotal: (json['expensesTotal'] as int?) ?? 0,
+      expensesPaid: (json['expensesPaid'] as int?) ?? 0,
     );
   }
 }
