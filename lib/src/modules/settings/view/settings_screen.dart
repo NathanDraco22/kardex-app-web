@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kardex_app_front/constants/const_modules.dart';
+import 'package:kardex_app_front/src/domain/models/user_role/modules.dart';
 import 'package:kardex_app_front/src/modules/settings/view/local_printer_settings_dialog.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
-  static const accessName = Modules.settings;
+  static final accessName = Modules.settings.name;
 
   @override
   Widget build(BuildContext context) {

@@ -80,4 +80,20 @@ class ProductsRepository {
     final deletedProduct = ProductInDb.fromJson(result);
     return deletedProduct;
   }
+
+  Future<List<ProductInDbInBranch>> getProductsInBranchByIds({
+    required String branchId,
+    required GetProductsInBranchRequest request,
+  }) async {
+    final results = await productsDataSource.getProductsInBranchByIds(
+      branchId,
+      request.toJson(),
+    );
+    final response = ListResponse<ProductInDbInBranch>.fromJson(
+      results,
+      ProductInDbInBranch.fromJson,
+    );
+    return response.data;
+  }
 }
+

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/constants/const_modules.dart';
+import 'package:kardex_app_front/src/domain/models/user_role/modules.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/modules/suppliers_catalog/cubit/supplier_read_cubit.dart';
 import 'package:kardex_app_front/src/modules/suppliers_catalog/cubit/supplier_write_cubit.dart';
@@ -18,7 +18,7 @@ part 'mobile/supplier_catalog_mobile.dart';
 class SuppliersCatalogScreen extends StatelessWidget {
   const SuppliersCatalogScreen({super.key});
 
-  static const accessName = Modules.suppliers;
+  static final accessName = Modules.suppliers.name;
 
   @override
   Widget build(BuildContext context) {

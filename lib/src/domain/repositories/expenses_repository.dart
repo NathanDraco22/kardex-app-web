@@ -25,6 +25,7 @@ class ExpensesRepository {
       results,
       ExpenseInDb.fromJson,
     );
+    _expenses = response.data;
     return response.data;
   }
 

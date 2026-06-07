@@ -9,17 +9,17 @@ import 'package:kardex_app_front/src/modules/commercial/current_orders/cubit/wri
 import 'package:kardex_app_front/src/modules/commercial/current_orders/modals/cancel_order_invoice_modal.dart';
 import 'package:kardex_app_front/src/modules/commercial/current_orders/modals/confirm_order_invoice_modal.dart';
 import 'package:kardex_app_front/src/modules/commercial/current_proforma/cubit/read_proforma_cubit.dart';
-import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 import 'package:kardex_app_front/src/tools/printers/order_printer.dart';
 import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_modal.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/custom_product_commercial_search_delegate.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/search_product_commercial_dialog.dart';
 import 'package:kardex_app_front/widgets/row_widgets/sale_item_row.dart';
-import 'package:kardex_app_front/src/modules/commercial/current_proforma/web/invoice_creator/widgets/edit_sale_item_dialog.dart';
 
 Future<OrderInDb?> showProformaInvoiceCreatorDialog(BuildContext context, OrderInDb order) async {
   final readCubit = context.read<ReadProformaCubit>();
@@ -460,12 +460,38 @@ class _BodyState extends State<_Body> {
 
       yield SaleItemRow(
         onEdit: () async {
-          final newItem = await showEditSaleItemDialog(context, saleItem);
-          if (newItem == null) return;
+          CommercialProductResult? commercial;
+          if (context.isMobile()) {
+            commercial = await showCommercialProductModalFromId(
+              context,
+              productId: saleItem.product.id,
+              previousSaleItem: saleItem,
+            );
+          } else {
+            commercial = await showCommercialProductDialogFromId(
+              context,
+              productId: saleItem.product.id,
+              previousSaleItem: saleItem,
+            );
+          }
+
+          if (commercial == null) return;
 
           if (!context.mounted) return;
 
           if (_currentOrder == null) return;
+
+          final newItem = SaleItem(
+            product: saleItem.product,
+            selectedPrice: commercial.selectedPriceLevel,
+            cost: commercial.product.account.averageCost,
+            price: commercial.newPrice,
+            quantity: commercial.quantity,
+            discountPercentage: commercial.discountPercent,
+            totalDiscount: commercial.totalDiscount,
+            subTotal: commercial.subTotal,
+            total: commercial.total,
+          );
 
           List<SaleItem> newItems = List.from(saleItems);
           newItems[i] = newItem;
@@ -486,6 +512,7 @@ class _BodyState extends State<_Body> {
 
           context.read<WriteOrderCubit>().updateOrder(_currentOrder!.id, updateOrder);
         },
+
         onRemove: () async {
           final res = await DialogManager.confirmActionDialog(context, "Eliminar ${saleItem.product.name}");
           if (res != true) return;

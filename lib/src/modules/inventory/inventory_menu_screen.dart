@@ -1,8 +1,7 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kardex_app_front/constants/const_modules.dart';
-
+import 'package:kardex_app_front/src/domain/models/user_role/modules.dart';
 import 'package:kardex_app_front/src/tools/icon_widgets.dart';
 import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
 import 'package:kardex_app_front/widgets/menu_app_bar.dart';
@@ -13,7 +12,7 @@ import 'package:kardex_app_front/widgets/dialogs/search_products/custom_product_
 class InventoryMenuScreen extends StatelessWidget {
   const InventoryMenuScreen({super.key});
 
-  static const accessName = Modules.inventory;
+  static final accessName = Modules.inventory.name;
 
   @override
   Widget build(BuildContext context) {

@@ -20,6 +20,7 @@ export 'unit/unit.dart';
 export 'unit/unit_model.dart';
 export 'expense/expense.dart';
 export 'expense/expense_model.dart';
+export 'expense_category_model/expense_category_model.dart';
 export 'integration/integration_model.dart';
 export 'integration/telegram_integration.dart';
 export 'reports/totals_result.dart';
