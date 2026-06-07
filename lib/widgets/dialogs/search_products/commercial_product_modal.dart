@@ -1,13 +1,73 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/models.dart';
 import 'package:kardex_app_front/src/domain/models/product_sale_profile/product_sale_profile_model.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
+import 'package:kardex_app_front/src/domain/repositories/product_repository.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 import 'package:kardex_app_front/widgets/title_label.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
+
+Future<CommercialProductResult?> showCommercialProductModalFromId(
+  BuildContext context, {
+  required String productId,
+  SaleItem? previousSaleItem,
+}) async {
+  final authState = getIt<AuthCubit>().state;
+  if (authState is! Authenticated) return null;
+  final branchId = authState.branch.id;
+
+  LoadingDialogManager.showLoadingDialog(context);
+  try {
+    final product = await context
+        .read<ProductsRepository>()
+        .getProductInBranchById(productId, branchId)
+        .timeout(const Duration(seconds: 10));
+    if (!context.mounted) return null;
+    LoadingDialogManager.closeLoadingDialog(context);
+
+    CommercialProductResult? initialResult;
+    if (previousSaleItem != null) {
+      Discount? appliedDiscount;
+      if (previousSaleItem.discountPercentage > 0) {
+        final match = product.saleProfile.discounts.where(
+          (d) => d.percentValue == previousSaleItem.discountPercentage,
+        );
+        if (match.isNotEmpty) {
+          appliedDiscount = match.first;
+        } else {
+          appliedDiscount = Discount(
+            name: "Descuento",
+            percentValue: previousSaleItem.discountPercentage,
+            isActive: true,
+          );
+        }
+      }
+
+      initialResult = CommercialProductResult(product: product)
+        ..quantity = previousSaleItem.quantity
+        ..selectedPriceLevel = previousSaleItem.selectedPrice
+        ..newPrice = previousSaleItem.price
+        ..selectedDisocunt = appliedDiscount;
+    }
+
+    return await showCommercialProductModal(
+      context,
+      product: product,
+      commercialProductResult: initialResult,
+    );
+  } catch (e) {
+    if (context.mounted) {
+      LoadingDialogManager.closeLoadingDialog(context);
+      DialogManager.showErrorDialog(context, "Error al obtener el producto: $e");
+    }
+    return null;
+  }
+}
 
 Future<CommercialProductResult?> showCommercialProductModal(
   BuildContext context, {

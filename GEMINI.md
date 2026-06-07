@@ -21,6 +21,10 @@
 - Se actualizó el formulario de creación y edición de proveedores (`create_supplier_dialog.dart`) para incluir el campo `creditDays` (Días de Crédito), validándolo y formateándolo mediante `IntegerTextInputFormatter` para permitir únicamente valores numéricos.
 - Se actualizó la guía `agents.md` agregando una directriz que instruye a los agentes a verificar la disponibilidad de formateadores de entrada predefinidos en `input_formatters.dart` antes de crear nuevos campos de entrada numéricos o decimales.
 - Se creó el componente `supplier_selection_dialog.dart` en `lib/widgets/dialogs/selectors/`, el cual funciona similar al selector de clientes, permitiendo buscar y seleccionar proveedores mediante `SuppliersRepository`.
+- Se integró el endpoint POST `/products/branch/{branch_id}/by-ids` en el frontend, agregando la nueva entidad de petición `GetProductsInBranchRequest` en `product_model.dart`, el método correspondiente en `ProductsDataSource` y la llamada tipada en `ProductsRepository`.
+- Se crearon las funciones utilitarias `showCommercialProductDialogFromId` y `showCommercialProductModalFromId` en los respectivos diálogos comerciales de productos para encapsular el loader, la consulta del producto por ID y la apertura segura de los diálogos.
+
+
 
 
 
