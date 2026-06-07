@@ -232,12 +232,6 @@ Iterable<Widget> buildHomeOptions(BuildContext context) sync* {
       () => context.pushNamed("client-catalog"),
     ),
     (
-      [Modules.suppliers],
-      "Lista de Proveedores",
-      FluentIcons.building_multiple_20_filled,
-      () => context.pushNamed("suppliers-catalog"),
-    ),
-    (
       [Modules.products],
       "Catalogo de Productos",
       FluentIcons.receipt_bag_20_filled,
@@ -272,12 +266,6 @@ Iterable<Widget> buildHomeOptions(BuildContext context) sync* {
       "Finanzas",
       FluentIcons.arrow_trending_lines_24_regular,
       () => context.pushNamed("finances"),
-    ),
-    (
-      [Modules.advancedTools],
-      "Herramientas Avanzadas",
-      Icons.schema_rounded,
-      () => context.pushNamed("advanced-tools"),
     ),
     (
       [Modules.settings],
