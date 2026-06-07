@@ -124,4 +124,142 @@ class DialogManager {
 
     return result ?? false;
   }
+
+  static Future<int?> showSaveDraftDialog(
+    BuildContext context, {
+    String title = "Guardar Borrador",
+    String content = "Tienes una transferencia en progreso. ¿Deseas conservar los cambios para continuar después?",
+    String saveButtonText = "Salir y Guardar Borrador",
+    String discardButtonText = "Salir y no guardar",
+    String cancelButtonText = "Cancelar",
+  }) async {
+    return showDialog<int>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        final theme = Theme.of(context);
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 400),
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.save_outlined, color: theme.colorScheme.primary, size: 28),
+                      const SizedBox(width: 12),
+                      Text(
+                        title,
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    content,
+                    style: const TextStyle(fontSize: 15, height: 1.4),
+                  ),
+                  const SizedBox(height: 24),
+                   Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () => context.pop(1),
+                        child: Text(saveButtonText),
+                      ),
+                      const SizedBox(height: 12),
+                      TextButton(
+                        onPressed: () => context.pop(3),
+                        child: Text(cancelButtonText),
+                      ),
+                      const SizedBox(height: 24),
+                      OutlinedButton(
+                        onPressed: () => context.pop(2),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.red.shade700,
+                          side: BorderSide(color: Colors.red.shade200),
+                        ),
+                        child: Text(discardButtonText),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  static Future<bool> showRestoreDraftDialog(
+    BuildContext context, {
+    String title = "Borrador Encontrado",
+    String content = "Se encontró una transferencia sin terminar de una sesión anterior en esta sucursal. ¿Deseas reanudarla?",
+    String restoreButtonText = "Reanudar",
+    String discardButtonText = "Descartar",
+  }) async {
+    final result = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        final theme = Theme.of(context);
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 400),
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.history_toggle_off, color: theme.colorScheme.primary, size: 28),
+                      const SizedBox(width: 12),
+                      Text(
+                        title,
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    content,
+                    style: const TextStyle(fontSize: 15, height: 1.4),
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () => context.pop(false),
+                        style: TextButton.styleFrom(foregroundColor: Colors.red.shade700),
+                        child: Text(discardButtonText),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: () => context.pop(true),
+                        child: Text(restoreButtonText),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+    return result ?? false;
+  }
 }

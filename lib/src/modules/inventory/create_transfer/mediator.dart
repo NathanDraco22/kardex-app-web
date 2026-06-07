@@ -21,8 +21,17 @@ class TransferHeaderData {
 }
 
 class CreateTransferNotifier extends ChangeNotifier {
-  final TransferProductTableController controller = TransferProductTableController();
-  final TransferHeaderData headerData = TransferHeaderData();
+  final TransferProductTableController controller;
+  final TransferHeaderData headerData;
+
+  CreateTransferNotifier({
+    List<TransferProductRow>? initialRows,
+    BranchInDb? destinationBranch,
+    String? observations,
+  })  : controller = TransferProductTableController()..rows = List.from(initialRows ?? []),
+        headerData = TransferHeaderData()
+          ..destinationBranch = destinationBranch
+          ..observations = observations;
 
   bool hasProductWithZeroValue() {
     final rows = controller.rows;
