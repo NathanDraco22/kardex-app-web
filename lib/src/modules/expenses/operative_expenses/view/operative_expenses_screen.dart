@@ -4,6 +4,7 @@ import 'package:kardex_app_front/src/cubits/expenses/read_expenses_cubit.dart';
 import 'package:kardex_app_front/src/cubits/expenses/write_expenses_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/expense/expense_model.dart';
 import 'package:kardex_app_front/src/domain/query_params/expense_query_params.dart';
+import 'package:kardex_app_front/src/domain/repositories/expense_categories_repository.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/no_item.dart';

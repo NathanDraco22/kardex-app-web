@@ -5,6 +5,7 @@ import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/cubits/expenses/read_expenses_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/expense/expense_model.dart';
 import 'package:kardex_app_front/src/domain/query_params/expense_query_params.dart';
+import 'package:kardex_app_front/src/domain/repositories/expense_categories_repository.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/expenses/expenses_reports/widgets/expenses_reports_widgets.dart';
@@ -25,15 +26,16 @@ class ExpensesReportScreen extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (_) => ReadExpenseCubit(
-            expensesRepo,
-            expenseCategoriesRepo,
-          )..getAll(
-              ExpenseQueryParams()
-                ..branchId = getIt<AuthCubit>().currentBranchId
-                ..startDate = today.startOfDay().millisecondsSinceEpoch
-                ..endDate = today.endOfDay().millisecondsSinceEpoch,
-            ),
+          create: (_) =>
+              ReadExpenseCubit(
+                expensesRepo,
+                expenseCategoriesRepo,
+              )..getAll(
+                ExpenseQueryParams()
+                  ..branchId = getIt<AuthCubit>().currentBranchId
+                  ..startDate = today.startOfDay().millisecondsSinceEpoch
+                  ..endDate = today.endOfDay().millisecondsSinceEpoch,
+              ),
         ),
       ],
       child: const _BaseScaffold(),
@@ -46,8 +48,6 @@ class _BaseScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return context.isMobile()
-        ? const ExpensesReportsMobile()
-        : const ExpensesReportsWeb();
+    return context.isMobile() ? const ExpensesReportsMobile() : const ExpensesReportsWeb();
   }
 }

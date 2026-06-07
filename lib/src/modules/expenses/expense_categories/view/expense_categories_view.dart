@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
+import 'package:kardex_app_front/src/domain/repositories/expense_categories_repository.dart';
 import 'package:kardex_app_front/src/cubits/expense_category_cubit/read_expense_categories_cubit.dart';
 import 'package:kardex_app_front/src/cubits/expense_category_cubit/write_expense_categories_cubit.dart';
 

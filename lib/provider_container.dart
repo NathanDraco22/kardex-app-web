@@ -5,6 +5,8 @@ import 'package:kardex_app_front/cubits/app_mode/app_mode_cubit.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/cubits/toast/toast_cubit.dart';
 import 'package:kardex_app_front/src/data/data_sources.dart';
+import 'package:kardex_app_front/src/data/expense_categories_data_source.dart';
+import 'package:kardex_app_front/src/domain/repositories/expense_categories_repository.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 
 class ProviderContainer extends StatelessWidget {
