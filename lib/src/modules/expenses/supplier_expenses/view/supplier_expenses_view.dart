@@ -9,6 +9,7 @@ import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/no_item.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/supplier_expense_viewer.dart';
 import 'package:kardex_app_front/src/modules/expenses/supplier_expenses/widgets/supplier_selector.dart';
 import 'package:kardex_app_front/src/modules/expenses/supplier_expenses/widgets/supplier_expenses_widgets.dart';
 

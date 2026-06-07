@@ -221,7 +221,7 @@ class ProductInDbInBranch extends ProductInDb {
       unitName: json['unitName'],
       categoryName: json['categoryName'],
       tags: List<String>.from(json['tags']),
-      hasIva: json['hasIva'],
+      hasIva: json['hasIva'] ?? false,
       isActive: json['isActive'] ?? true,
       isDeleted: json['isDeleted'] ?? false,
       createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt']),

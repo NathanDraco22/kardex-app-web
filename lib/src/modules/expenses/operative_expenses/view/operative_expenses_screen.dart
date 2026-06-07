@@ -8,9 +8,10 @@ import 'package:kardex_app_front/src/domain/repositories/expense_categories_repo
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/no_item.dart';
-import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/src/modules/expenses/operative_expenses/widgets/operative_expenses_widgets.dart';
+import 'package:kardex_app_front/widgets/dropdown/expense_category_dropdown.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/operative_expense_viewer.dart';
 
 import '../dialogs/create_expense_dialog.dart';
 

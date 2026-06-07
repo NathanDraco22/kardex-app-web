@@ -11,6 +11,8 @@ class CommercialBranchDetail {
   final int totalReceiptDevolutions;
   final int totalReceipts;
   final int receiptCount;
+  final int expensesTotal;
+  final int expensesPaid;
 
   CommercialBranchDetail({
     required this.branchId,
@@ -25,7 +27,11 @@ class CommercialBranchDetail {
     required this.totalReceiptDevolutions,
     required this.totalReceipts,
     required this.receiptCount,
+    this.expensesTotal = 0,
+    this.expensesPaid = 0,
   });
+
+  int get expensesOwed => expensesTotal - expensesPaid;
 
   factory CommercialBranchDetail.fromJson(Map<String, dynamic> json) {
     return CommercialBranchDetail(
@@ -41,6 +47,8 @@ class CommercialBranchDetail {
       totalReceiptDevolutions: (json['totalReceiptDevolutions'] as int?) ?? 0,
       totalReceipts: (json['totalReceipts'] as int?) ?? 0,
       receiptCount: (json['receiptCount'] as int?) ?? 0,
+      expensesTotal: (json['expensesTotal'] as int?) ?? 0,
+      expensesPaid: (json['expensesPaid'] as int?) ?? 0,
     );
   }
 }

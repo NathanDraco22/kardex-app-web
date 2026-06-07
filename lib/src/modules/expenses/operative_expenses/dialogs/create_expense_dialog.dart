@@ -6,14 +6,13 @@ import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/cubits/expenses/write_expenses_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
 import 'package:kardex_app_front/src/domain/models/expense/expense_model.dart';
-import 'package:kardex_app_front/src/domain/models/expense_category_model/expense_category_model.dart';
 import 'package:kardex_app_front/src/domain/repositories/expense_categories_repository.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
 import 'package:kardex_app_front/widgets/date_picker_button.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
-import 'package:kardex_app_front/widgets/super_widgets/custom_autocomplete_textfield.dart';
+import 'package:kardex_app_front/widgets/dropdown/expense_category_dropdown.dart';
 import 'package:kardex_app_front/src/tools/extensiones.dart';
 
 part 'form_section.dart';

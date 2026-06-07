@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:go_router/go_router.dart';
 
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
@@ -24,28 +23,12 @@ part 'sections/content_section.dart';
 
 class RebuildTransferScreenNotification extends Notification {}
 
-class CreateTransferScreenWeb extends StatefulWidget {
+class CreateTransferScreenWeb extends StatelessWidget {
   const CreateTransferScreenWeb({super.key});
 
   @override
-  State<CreateTransferScreenWeb> createState() => _CreateTransferScreenWebState();
-}
-
-class _CreateTransferScreenWebState extends State<CreateTransferScreenWeb> {
-  final notifier = CreateTransferNotifier();
-
-  @override
-  void dispose() {
-    notifier.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return CreateTransferMediator(
-      notifier: notifier,
-      child: const _RootScaffold(),
-    );
+    return const _RootScaffold();
   }
 }
 
@@ -54,7 +37,6 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mediator = CreateTransferMediator.read(context)!;
     return BlocListener<WriteTransferCubit, WriteTransferState>(
       listener: (context, state) {
         if (state is WriteTransferLoading) {
@@ -83,18 +65,8 @@ class _RootScaffold extends StatelessWidget {
             appBar: AppBar(
               title: const Text("Nueva Transferencia"),
               leading: IconButton(
-                onPressed: () async {
-                  final hasRows = mediator.productTableController.rows.isNotEmpty;
-
-                  if (hasRows) {
-                    final res = await DialogManager.confirmActionDialog(
-                      context,
-                      "¿Deseas salir sin guardar? (Perderás los cambios)",
-                    );
-                    if (res != true) return;
-                  }
-                  if (!context.mounted) return;
-                  context.pop();
+                onPressed: () {
+                  Navigator.of(context).maybePop();
                 },
                 icon: const Icon(Icons.arrow_back),
               ),

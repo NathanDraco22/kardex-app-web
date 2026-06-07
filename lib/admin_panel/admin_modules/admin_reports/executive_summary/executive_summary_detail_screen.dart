@@ -52,6 +52,17 @@ class ExecutiveSummaryDetailScreen extends StatelessWidget {
                 ],
                 const SizedBox(height: 24),
 
+                _ExpensesCard(summary: summary),
+                const SizedBox(height: 12),
+                if (summary.commercialBranches.isNotEmpty) ...[
+                  const Text(
+                    "Gastos por Sucursal",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  _ExpensesPieChartCard(summary: summary),
+                ],
+                const SizedBox(height: 24),
+
                 _OtherStatsCard(summary: summary),
                 const SizedBox(height: 12),
                 if (summary.inventoryBranches.isNotEmpty) ...[
@@ -566,3 +577,145 @@ class _CashFlowChartCard extends StatelessWidget {
     );
   }
 }
+
+class _ExpensesCard extends StatelessWidget {
+  const _ExpensesCard({required this.summary});
+
+  final ExecutiveSummaryInDb summary;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 2,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.red.withValues(alpha: 0.05),
+              Colors.orange.withValues(alpha: 0.05),
+            ],
+          ),
+        ),
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.trending_down, color: Colors.orange[800]),
+                const SizedBox(width: 8),
+                const Text(
+                  "Resumen de Gastos / Egresos",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            _RowInfo("Gastos Totales", NumberFormatter.convertToMoneyLike(summary.expensesTotal)),
+            const Divider(),
+            _RowInfo("Gastos Pagados", NumberFormatter.convertToMoneyLike(summary.expensesPaid)),
+            const Divider(),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text("Gastos Pendientes (Por Pagar)", style: TextStyle(fontSize: 16)),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      NumberFormatter.convertToMoneyLike(summary.expensesOwed),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.orange[900],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ExpensesPieChartCard extends StatelessWidget {
+  const _ExpensesPieChartCard({required this.summary});
+
+  final ExecutiveSummaryInDb summary;
+
+  @override
+  Widget build(BuildContext context) {
+    final branches = summary.commercialBranches
+        .map((branch) => getIt<AuthCubit>().getBranchById(branch.branchId))
+        .toList();
+
+    final chartsColor = ColorTool.getChartColors();
+    return Card(
+      child: SizedBox(
+        height: 250,
+        child: Row(
+          children: [
+            Flexible(
+              child: PieChart(
+                PieChartData(
+                  sectionsSpace: 0,
+                  centerSpaceRadius: 40,
+                  sections: List.generate(summary.commercialBranches.length, (i) {
+                    final branch = summary.commercialBranches[i];
+                    const fontSize = 16.0;
+                    const radius = 50.0;
+                    const shadows = [Shadow(color: Colors.black, blurRadius: 2)];
+
+                    final percentage = summary.expensesTotal > 0
+                        ? (branch.expensesTotal / summary.expensesTotal) * 100
+                        : 0.0;
+
+                    return PieChartSectionData(
+                      color: chartsColor[i % chartsColor.length],
+                      value: branch.expensesTotal.toDouble(),
+                      title: '${percentage.toStringAsFixed(1)}%',
+                      radius: radius,
+                      titleStyle: const TextStyle(
+                        fontSize: fontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        shadows: shadows,
+                      ),
+                    );
+                  }),
+                ),
+              ),
+            ),
+            Flexible(
+              child: ListView(
+                shrinkWrap: true,
+                children: List.generate(summary.commercialBranches.length, (i) {
+                  final branchName = branches[i].name;
+                  final branchDetail = summary.commercialBranches[i];
+                  return PieChartRow(
+                    title: branchName,
+                    subtitle: NumberFormatter.convertToMoneyLike(branchDetail.expensesTotal),
+                    color: chartsColor[i % chartsColor.length],
+                  );
+                }),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
