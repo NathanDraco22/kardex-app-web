@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/src/cubits/transfers/write_transfer_cubit.dart';
 import 'package:kardex_app_front/src/domain/models/common/transfer_item.dart';
 import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
@@ -80,17 +80,8 @@ class _MobileScaffold extends StatelessWidget {
         ),
         appBar: AppBar(
           leading: IconButton(
-            onPressed: () async {
-              final hasRows = mediator.productTableController.rows.isNotEmpty;
-              if (hasRows) {
-                final res = await DialogManager.confirmActionDialog(
-                  context,
-                  "¿Deseas salir sin guardar? (Perderás los cambios)",
-                );
-                if (res != true) return;
-              }
-              if (!context.mounted) return;
-              context.pop();
+            onPressed: () {
+              Navigator.of(context).maybePop();
             },
             icon: const Icon(
               Icons.arrow_back,
@@ -301,6 +292,7 @@ class _MobileHeaderSectionState extends State<_MobileHeaderSection> with Automat
                 TitleTextField(
                   title: "Observaciones",
                   maxLines: 2,
+                  initialValue: headerData.observations,
                   onChanged: (p0) {
                     headerData.observations = p0;
                   },
@@ -331,9 +323,20 @@ class _MobileProductCardState extends State<_MobileProductCard> with AutomaticKe
 
   FocusNode expirationDateFocusNode = FocusNode();
 
+  late final TextEditingController quantityController;
+  late final TextEditingController expirationController;
+
   @override
   void initState() {
     super.initState();
+    quantityController = TextEditingController(
+      text: widget.row.quantity > 0 ? widget.row.quantity.toString() : "",
+    );
+    expirationController = TextEditingController(
+      text: widget.row.expirationDate != null
+          ? DateFormat('MM/yy').format(widget.row.expirationDate!)
+          : "",
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       expirationDateFocusNode.requestFocus();
       NewMobileCardNotification().dispatch(context);
@@ -343,6 +346,8 @@ class _MobileProductCardState extends State<_MobileProductCard> with AutomaticKe
   @override
   void dispose() {
     expirationDateFocusNode.dispose();
+    quantityController.dispose();
+    expirationController.dispose();
     super.dispose();
   }
 
@@ -409,6 +414,7 @@ class _MobileProductCardState extends State<_MobileProductCard> with AutomaticKe
 
                         TextField(
                           autofocus: true,
+                          controller: expirationController,
                           inputFormatters: [MonthYearInputFormatter()],
                           textAlign: TextAlign.start,
                           keyboardType: .number,
@@ -444,6 +450,7 @@ class _MobileProductCardState extends State<_MobileProductCard> with AutomaticKe
                         height: 6,
                       ),
                       TextField(
+                        controller: quantityController,
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
                         inputFormatters: [IntegerTextInputFormatter()],
                         textAlign: TextAlign.center,

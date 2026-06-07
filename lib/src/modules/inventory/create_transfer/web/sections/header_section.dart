@@ -108,6 +108,7 @@ class _HeaderSection extends StatelessWidget {
                                 child: TitleTextField(
                                   title: "Observaciones",
                                   maxLines: 2,
+                                  initialValue: headerData.observations,
                                   onChanged: (p0) {
                                     headerData.observations = p0;
                                   },

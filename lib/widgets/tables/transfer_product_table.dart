@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:kardex_app_front/src/domain/models/product/product_model.dart';
 import 'package:kardex_app_front/src/tools/input_formatter/input_formatter.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
@@ -101,6 +102,14 @@ class _TransferProductTableState extends State<TransferProductTable> {
     _tableController = widget.controller;
     _tableController ??= TransferProductTableController();
     super.initState();
+  }
+
+  @override
+  void didUpdateWidget(covariant TransferProductTable oldWidget) {
+    if (widget.controller != oldWidget.controller) {
+      _tableController = widget.controller ?? TransferProductTableController();
+    }
+    super.didUpdateWidget(oldWidget);
   }
 
   @override
@@ -306,9 +315,21 @@ class EntryRow extends StatefulWidget {
 class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin {
   final expirationFocus = FocusNode();
   final focusNode = FocusNode();
+
+  late final TextEditingController quantityController;
+  late final TextEditingController expirationController;
+
   @override
   void initState() {
     super.initState();
+    quantityController = TextEditingController(
+      text: widget.rowModel.quantity > 0 ? widget.rowModel.quantity.toString() : "",
+    );
+    expirationController = TextEditingController(
+      text: widget.rowModel.expirationDate != null
+          ? DateFormat('MM/yy').format(widget.rowModel.expirationDate!)
+          : "",
+    );
     Future(
       () {
         expirationFocus.requestFocus();
@@ -319,6 +340,8 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
   @override
   void dispose() {
     focusNode.dispose();
+    quantityController.dispose();
+    expirationController.dispose();
     super.dispose();
   }
 
@@ -387,6 +410,7 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
               child: Center(
                 child: TextField(
                   focusNode: expirationFocus,
+                  controller: expirationController,
                   inputFormatters: [MonthYearInputFormatter()],
                   textAlign: TextAlign.center,
                   onEditingComplete: () {
@@ -413,6 +437,7 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
             child: Center(
               child: TextField(
                 focusNode: focusNode,
+                controller: quantityController,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 inputFormatters: [IntegerTextInputFormatter()],
                 textAlign: TextAlign.center,
