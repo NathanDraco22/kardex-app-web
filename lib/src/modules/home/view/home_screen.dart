@@ -8,9 +8,14 @@ import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/src/domain/models/user_role/modules.dart';
 import 'package:kardex_app_front/widgets/gates/role_permission_gate.dart';
 import 'package:toastification/toastification.dart';
+import 'package:kardex_app_front/src/tools/constant.dart';
+import 'package:kardex_app_front/src/domain/models/branch/branch_model.dart';
 
 import 'widgets/home_card_option.dart';
 import 'widgets/home_end_drawer.dart';
+
+part 'web/home_web.dart';
+part 'mobile/home_mobile.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -172,127 +177,98 @@ class _Body extends StatelessWidget {
     final userName = user.username;
     final firstName = userName.split(" ")[0];
     final currentBranch = getIt<AuthCubit>().currentBranch;
-    return Center(
-      child: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 24),
-        children: [
-          if (currentBranch != null) ...[
-            Text(
-              currentBranch.name,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            Text(
-              currentBranch.address,
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
 
-          const SizedBox(height: 4),
-          Text(
-            "Bienvenido/a, $firstName",
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey,
-            ),
-          ),
-          const SizedBox(height: 12),
+    final isMobile = MediaQuery.sizeOf(context).width < maxPhoneScreenWidth;
 
-          const Text(
-            "Elige una opcion",
-            style: TextStyle(fontSize: 16),
-          ),
+    if (isMobile) {
+      return _HomeMobileBody(
+        firstName: firstName,
+        currentBranch: currentBranch,
+      );
+    }
 
-          const SizedBox(height: 12),
-
-          Wrap(
-            spacing: 20,
-            runSpacing: 20,
-            alignment: WrapAlignment.center,
-            children: buildHomeOptions(context).toList(),
-          ),
-          const SizedBox(height: 8),
-        ],
-      ),
+    return _HomeWebBody(
+      firstName: firstName,
+      currentBranch: currentBranch,
     );
   }
 }
 
-Iterable<Widget> buildHomeOptions(BuildContext context) sync* {
-  final listOptions = [
-    (
-      [Modules.clients],
-      "Lista de Clientes",
-      FluentIcons.contact_card_16_filled,
-      () => context.pushNamed("client-catalog"),
+class HomeOption {
+  final List<Modules> permissions;
+  final String title;
+  final IconData icon;
+  final void Function() onTap;
+
+  const HomeOption({
+    required this.permissions,
+    required this.title,
+    required this.icon,
+    required this.onTap,
+  });
+}
+
+List<HomeOption> getHomeOptions(BuildContext context) {
+  return [
+    HomeOption(
+      permissions: const [Modules.clients],
+      title: "Lista de Clientes",
+      icon: FluentIcons.contact_card_16_filled,
+      onTap: () => context.pushNamed("client-catalog"),
     ),
-    (
-      [Modules.suppliers],
-      "Lista de Proveedores",
-      FluentIcons.building_multiple_20_filled,
-      () => context.pushNamed("suppliers-catalog"),
+    HomeOption(
+      permissions: const [Modules.suppliers],
+      title: "Lista de Proveedores",
+      icon: FluentIcons.building_multiple_20_filled,
+      onTap: () => context.pushNamed("suppliers-catalog"),
     ),
-    (
-      [Modules.products],
-      "Catalogo de Productos",
-      FluentIcons.receipt_bag_20_filled,
-      () => context.pushNamed("product-catalog"),
+    HomeOption(
+      permissions: const [Modules.products],
+      title: "Catalogo de Productos",
+      icon: FluentIcons.receipt_bag_20_filled,
+      onTap: () => context.pushNamed("product-catalog"),
     ),
-    (
-      [Modules.commercial],
-      "Comercio",
-      FluentIcons.money_calculator_20_filled,
-      () => context.pushNamed("commercial"),
+    HomeOption(
+      permissions: const [Modules.commercial],
+      title: "Comercio",
+      icon: FluentIcons.money_calculator_20_filled,
+      onTap: () => context.pushNamed("commercial"),
     ),
-    (
-      [Modules.pendingInvoices],
-      "Cuentas por Cobrar",
-      FluentIcons.receipt_money_24_filled,
-      () => context.pushNamed("pending-accounts"),
+    HomeOption(
+      permissions: const [Modules.pendingInvoices],
+      title: "Cuentas por Cobrar",
+      icon: FluentIcons.receipt_money_24_filled,
+      onTap: () => context.pushNamed("pending-accounts"),
     ),
-    (
-      [Modules.inventory],
-      "Inventario",
-      FluentIcons.box_toolbox_20_filled,
-      () => context.pushNamed("inventory"),
+    HomeOption(
+      permissions: const [Modules.inventory],
+      title: "Inventario",
+      icon: FluentIcons.box_toolbox_20_filled,
+      onTap: () => context.pushNamed("inventory"),
     ),
-    (
-      [Modules.expenses],
-      "Gastos",
-      FluentIcons.money_24_regular,
-      () => context.pushNamed("expenses"),
+    HomeOption(
+      permissions: const [Modules.expenses],
+      title: "Gastos",
+      icon: FluentIcons.money_24_regular,
+      onTap: () => context.pushNamed("expenses"),
     ),
-    (
-      [Modules.finance],
-      "Finanzas",
-      FluentIcons.arrow_trending_lines_24_regular,
-      () => context.pushNamed("finances"),
+    HomeOption(
+      permissions: const [Modules.finance],
+      title: "Finanzas",
+      icon: FluentIcons.arrow_trending_lines_24_regular,
+      onTap: () => context.pushNamed("finances"),
     ),
-    (
-      [Modules.advancedTools],
-      "Herramientas Avanzadas",
-      Icons.schema_rounded,
-      () => context.pushNamed("advanced-tools"),
+    HomeOption(
+      permissions: const [Modules.advancedTools],
+      title: "Herramientas Avanzadas",
+      icon: Icons.schema_rounded,
+      onTap: () => context.pushNamed("advanced-tools"),
     ),
-    (
-      [Modules.settings],
-      "Configuraciones",
-      FluentIcons.settings_20_filled,
-      () => context.pushNamed("settings"),
+    HomeOption(
+      permissions: const [Modules.settings],
+      title: "Configuraciones",
+      icon: FluentIcons.settings_20_filled,
+      onTap: () => context.pushNamed("settings"),
     ),
   ];
-
-  for (final (permissions, title, icon, onTap) in listOptions) {
-    yield RolePermissionGate(
-      width: 300,
-      height: 120,
-      permissions: permissions,
-      child: HomeOptionCard(title: title, icon: icon, onTap: onTap),
-    );
-  }
 }
