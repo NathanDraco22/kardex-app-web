@@ -136,59 +136,22 @@ class _FormContentState extends State<_FormContent> {
       Row(
         children: [
           Flexible(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const Text(
-                  "Categoría*",
-                  textAlign: TextAlign.start,
-                ),
-                const SizedBox(height: 6),
-                CustomAutocompleteTextfield<ExpenseCategoryInDb>(
-                  initValue: widget.expense != null
-                      ? context.read<ExpenseCategoriesRepository>().expenseCategories.firstWhere(
-                          (element) => element.name == widget.expense!.category,
-                          orElse: () => ExpenseCategoryInDb(
-                            id: "",
-                            name: widget.expense!.category,
-                            createdAt: DateTime.now(),
-                          ),
-                        )
-                      : null,
-                  onClose: (value) => widget.creationMap['category'] = value.name,
-                  onFieldSubmitted: (value) {
-                    FocusScope.of(context).nextFocus();
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "La categoría es requerida";
-                    }
-                    widget.creationMap['category'] = value.trim();
-                    return null;
-                  },
-                  onSearch: (value) async {
-                    final repo = context.read<ExpenseCategoriesRepository>();
-                    return repo.expenseCategories
-                        .where((element) => element.name.toLowerCase().contains(value.toLowerCase()))
-                        .toList();
-                  },
-                  suggestionBuilder: (value, close) {
-                    return ListView.builder(
-                      itemCount: value.length,
-                      shrinkWrap: true,
-                      itemBuilder: (context, index) => ListTile(
-                        title: Text(value[index].name),
-                        onTap: () {
-                          widget.creationMap['category'] = value[index].name;
-                          close(value[index]);
-                          FocusScope.of(context).nextFocus();
-                        },
-                      ),
-                    );
-                  },
-                  titleBuilder: (value) => value.name,
-                ),
-              ],
+            child: ExpenseCategoryDropdown(
+              value: widget.creationMap['category'] as String?,
+              isRequired: true,
+              label: "Categoría",
+              onChanged: (value) {
+                setState(() {
+                  widget.creationMap['category'] = value;
+                });
+              },
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return "La categoría es requerida";
+                }
+                widget.creationMap['category'] = value.trim();
+                return null;
+              },
             ),
           ),
           const SizedBox(width: 12),
