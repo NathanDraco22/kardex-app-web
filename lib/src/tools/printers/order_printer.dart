@@ -247,7 +247,7 @@ Future<Uint8List> generateTicketPdfFromOrder(
                         flex: descriptionFlex,
                         child: pw.Text(
                           item.product.name,
-                          maxLines: 2,
+                          maxLines: 3,
                           overflow: pw.TextOverflow.clip,
                           style: pw.TextStyle(
                             fontSize: TicketSettings.contentFontSize(paperSize),
