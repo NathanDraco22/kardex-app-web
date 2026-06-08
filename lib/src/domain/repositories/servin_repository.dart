@@ -36,6 +36,7 @@ class ServinRepository {
       nickname: servinResponse.nickname,
       isActive: servinResponse.isActive,
       isMultiBranch: servinResponse.isMultiBranch,
+      isUsingExpirationDate: servinResponse.isUsingExpirationDate,
     );
 
     await AppConfigManager().setConfig(updatedServin.toJson());
