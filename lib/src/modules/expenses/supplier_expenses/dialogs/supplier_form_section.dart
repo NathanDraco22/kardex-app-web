@@ -108,9 +108,7 @@ class _SupplierFormContentState extends State<_SupplierFormContent> {
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                       decoration: BoxDecoration(
                         border: Border.all(
-                          color: formFieldState.hasError
-                              ? Colors.red
-                              : Theme.of(context).dividerColor,
+                          color: formFieldState.hasError ? Colors.red : Theme.of(context).dividerColor,
                         ),
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -118,9 +116,7 @@ class _SupplierFormContentState extends State<_SupplierFormContent> {
                         children: [
                           Icon(
                             Icons.business,
-                            color: formFieldState.hasError
-                                ? Colors.red
-                                : Colors.grey.shade600,
+                            color: formFieldState.hasError ? Colors.red : Colors.grey.shade600,
                           ),
                           const SizedBox(width: 12),
                           Expanded(
@@ -186,7 +182,9 @@ class _SupplierFormContentState extends State<_SupplierFormContent> {
                 setState(() {
                   dateTimestamp = selectedDate.millisecondsSinceEpoch;
                   if (isCredit && supplierCreditDays != null) {
-                    expirationDateTimestamp = selectedDate.add(Duration(days: supplierCreditDays!)).millisecondsSinceEpoch;
+                    expirationDateTimestamp = selectedDate
+                        .add(Duration(days: supplierCreditDays!))
+                        .millisecondsSinceEpoch;
                   }
                 });
               },
@@ -318,35 +316,35 @@ class _SupplierFormContentState extends State<_SupplierFormContent> {
     }
 
     if (context.isMobile()) {
-      return SafeArea(
-        child: Scaffold(
-          appBar: AppBar(
-            title: Text("$wordPrefix Gasto por Proveedor"),
-          ),
-          bottomNavigationBar: BottomAppBar(
-            child: SizedBox(
-              height: 60,
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 600),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      OutlinedButton(
-                        onPressed: () => context.pop(),
-                        child: const Text("Cancelar"),
-                      ),
-                      ElevatedButton(
-                        onPressed: submitAction,
-                        child: Text("$wordPrefix Gasto"),
-                      ),
-                    ],
-                  ),
+      return Scaffold(
+        appBar: AppBar(
+          title: Text("$wordPrefix Gasto por Proveedor"),
+        ),
+        bottomNavigationBar: BottomAppBar(
+          child: SizedBox(
+            height: 60,
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 600),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    OutlinedButton(
+                      onPressed: () => context.pop(),
+                      child: const Text("Cancelar"),
+                    ),
+                    ElevatedButton(
+                      onPressed: submitAction,
+                      child: Text("$wordPrefix Gasto"),
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
-          body: Center(
+        ),
+        body: SafeArea(
+          child: Center(
             child: Card(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 600),
