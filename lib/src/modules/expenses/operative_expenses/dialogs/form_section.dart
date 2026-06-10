@@ -210,35 +210,35 @@ class _FormContentState extends State<_FormContent> {
     }
 
     if (context.isMobile()) {
-      return SafeArea(
-        child: Scaffold(
-          appBar: AppBar(
-            title: Text("$wordPrefix Gasto"),
-          ),
-          bottomNavigationBar: BottomAppBar(
-            child: SizedBox(
-              height: 60,
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 600),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      OutlinedButton(
-                        onPressed: () => context.pop(),
-                        child: const Text("Cancelar"),
-                      ),
-                      ElevatedButton(
-                        onPressed: submitAction,
-                        child: Text("$wordPrefix Gasto"),
-                      ),
-                    ],
-                  ),
+      return Scaffold(
+        appBar: AppBar(
+          title: Text("$wordPrefix Gasto"),
+        ),
+        bottomNavigationBar: BottomAppBar(
+          child: SizedBox(
+            height: 60,
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 600),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    OutlinedButton(
+                      onPressed: () => context.pop(),
+                      child: const Text("Cancelar"),
+                    ),
+                    ElevatedButton(
+                      onPressed: submitAction,
+                      child: Text("$wordPrefix Gasto"),
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
-          body: Center(
+        ),
+        body: SafeArea(
+          child: Center(
             child: Card(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 600),
