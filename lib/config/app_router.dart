@@ -76,6 +76,7 @@ import 'package:kardex_app_front/src/modules/settings/view/price_to_product/pric
 import 'package:kardex_app_front/src/modules/settings/view/settings_screen.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/units/units_screen.dart';
 import 'package:kardex_app_front/src/modules/settings/view/users/users_screen.dart';
+import 'package:kardex_app_front/src/modules/inactive/inactive_screen.dart';
 import 'package:kardex_app_front/src/modules/splash/splash_screen.dart';
 import 'package:kardex_app_front/src/modules/suppliers_catalog/view/suppliers_catalog_screen.dart';
 import 'package:kardex_app_front/src/modules/settings/view/integrations/integrations_screen.dart';
@@ -105,6 +106,12 @@ class AppRouter {
         path: '/login',
         name: 'login',
         builder: (context, state) => const LoginScreen(),
+      ),
+
+      GoRoute(
+        path: '/inactive',
+        name: 'inactive',
+        builder: (context, state) => const InactiveScreen(),
       ),
 
       GoRoute(
