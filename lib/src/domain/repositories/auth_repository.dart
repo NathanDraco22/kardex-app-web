@@ -3,6 +3,7 @@ import 'package:kardex_app_front/src/data/servin_status_data_source.dart';
 import 'package:kardex_app_front/src/domain/models/common/change_password.dart';
 import 'package:kardex_app_front/src/domain/responses/login_responses.dart';
 import 'package:kardex_app_front/src/domain/responses/servin_status_response.dart';
+import 'package:kardex_app_front/src/domain/responses/user_status_response.dart';
 
 class AuthRepository {
   final AuthDataSource authDataSource;
@@ -33,5 +34,10 @@ class AuthRepository {
   Future<ServinStatusResponse> getServinStatus() async {
     final result = await servinStatusDataSource.getServinStatus();
     return ServinStatusResponse.fromJson(result);
+  }
+
+  Future<UserStatusResponse> getUserStatus(String userId) async {
+    final result = await authDataSource.getUserStatus(userId);
+    return UserStatusResponse.fromJson(result);
   }
 }
