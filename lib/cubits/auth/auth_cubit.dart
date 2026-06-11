@@ -70,6 +70,12 @@ class AuthCubit extends Cubit<AuthState> {
       final servin = servinObj as Servin?;
 
       if (loginResponse != null) {
+        final userStatus = await authRepository.getUserStatus(loginResponse.user.id);
+        if (!userStatus.isActive) {
+          emit(Unauthenticated(servin: currentServin));
+          return;
+        }
+
         final isTokenNearToExpiration = TokenManager().isTokenGotExpired(
           loginResponse.accessToken,
         );

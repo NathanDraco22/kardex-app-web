@@ -47,4 +47,10 @@ class AuthDataSource with HttpService {
     final session = await _sessionManager.getSession();
     return session;
   }
+
+  Future<Map<String, dynamic>> getUserStatus(String userId) async {
+    final uri = HttpTools.generateUri("$_endpoint/user-status/$userId");
+    final res = await getQuery(uri);
+    return res;
+  }
 }

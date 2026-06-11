@@ -351,3 +351,10 @@ Esta estructura se ha seguido para módulos como 'Historial de Facturas', 'Histo
 - Se implementó la vista Móvil en `lib/src/modules/home/view/mobile/home_mobile.dart` empleando una estructura de `ListView` y un widget de tarjetas personalizado premium (`HomeMobileOptionCard`) con icono grande a la izquierda (contenedor de 64x64, tamaño de icono 36px, sin color explícito para heredar el color por defecto oscuro de la versión Web), título del módulo a la derecha e indicador de flecha en el extremo.
 - Se centralizó el listado de opciones de menú mediante la clase `HomeOption` y el método `getHomeOptions(context)` en `home_screen.dart` para evitar la duplicación de rutas y lógica entre Web y Mobile.
 
+## Guía de Estilo Onion Fullstack (Junio 2026)
+- Se creó la guía de estilo unificada `ONION_FULLSTACK_STYLE_GUIDE.md` en la raíz del monorepo.
+- Se consolidaron los flujos de capas, transaccionalidad atómica con sesiones de MongoDB y manejo de excepciones desacoplado para el Backend.
+- Se especificaron los dos patrones de sincronización de datos de Flutter: el enfoque estándar coordinado por UI y el enfoque avanzado desacoplado con `ReactiveRepository`.
+- Se documentó el uso de la herramienta `onion` CLI, detallando todos sus comandos de generación para FastAPI y Flutter y los pasos de ajuste manual post-generación.
+
+

@@ -29,6 +29,10 @@ class _RootScaffold extends StatelessWidget {
         }
 
         if (state is Authenticated) {
+          if (!state.servin.isActive) {
+            context.goNamed("inactive");
+            return;
+          }
           final routeName = NavigationTool.getNavigationAuthenticatedDestination(state.servin, state.session.user);
           context.goNamed(routeName);
         }
@@ -50,7 +54,8 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthCubit, AuthState>(bloc: getIt<AuthCubit>(),
+    return BlocBuilder<AuthCubit, AuthState>(
+      bloc: getIt<AuthCubit>(),
       builder: (context, authState) {
         if (authState is AuthError) {
           return Center(
