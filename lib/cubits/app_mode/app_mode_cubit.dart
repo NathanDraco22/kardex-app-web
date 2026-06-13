@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/app_env.dart';
 import 'package:kardex_app_front/src/core/session_manager.dart';
 import 'package:kardex_app_front/src/tools/http_tool.dart';
 
@@ -8,7 +9,7 @@ class AppModeCubit extends Cubit<AppModeState> {
   AppModeCubit() : super(NormalModeState());
 
   Future<void> switchToPracticeMode() async {
-    HttpTools.practiceUrl = "https://kardex-server-production.up.railway.app";
+    HttpTools.practiceUrl = AppEnv.practiceUrl;
     clearSession();
     emit(PracticeModeState());
   }

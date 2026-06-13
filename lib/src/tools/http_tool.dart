@@ -7,6 +7,7 @@ class HttpTools {
   static String baseUrl = AppEnv.serverUrl;
   static Servin? servin;
   static BranchInDb? currentBranch;
+
   static const String _api = "/api";
 
   static String practiceUrl = "";
