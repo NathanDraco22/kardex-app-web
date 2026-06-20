@@ -10,7 +10,7 @@ class HttpTools {
 
   static const String _api = "/api";
 
-  static String practiceUrl = "http://localhost:8000";
+  static String practiceUrl = "";
 
   static Uri generateUri(String path, {int version = 1, Map<String, String>? queryParameters}) {
     assert(path.startsWith("/"));
