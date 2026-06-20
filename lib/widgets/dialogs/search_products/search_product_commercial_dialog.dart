@@ -72,6 +72,7 @@ class _SearchProductCommercialDialogState extends State<SearchProductCommercialD
       child: SizedBox(
         width: 700,
         child: Dialog(
+          constraints: const BoxConstraints(maxWidth: 700),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -263,7 +264,7 @@ class ProductResultRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 60,
+      height: 70,
       child: InkWell(
         hoverColor: Colors.yellow.shade100,
         focusColor: Colors.yellow.shade100,

@@ -246,12 +246,24 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                               Expanded(
                                 child: Visibility(
                                   visible: isUserAdmin,
-                                  child: TitleLabel(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    title: "Costo",
-                                    bigTitle: NumberFormatter.convertFromCentsToUnitsCurrency(
-                                      widget.product.account.averageCost,
-                                    ),
+                                  child: Row(
+                                    mainAxisAlignment: .spaceEvenly,
+                                    children: [
+                                      TitleLabel(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        title: "Costo",
+                                        bigTitle: NumberFormatter.convertFromCentsToUnitsCurrency(
+                                          widget.product.account.averageCost,
+                                        ),
+                                      ),
+                                      TitleLabel(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        title: "Ult. C",
+                                        bigTitle: NumberFormatter.convertFromCentsToUnitsCurrency(
+                                          widget.product.account.lastCost,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),

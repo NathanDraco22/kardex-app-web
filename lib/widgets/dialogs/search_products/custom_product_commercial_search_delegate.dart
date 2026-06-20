@@ -130,7 +130,7 @@ class _ProductInBranchResultRow extends StatelessWidget {
     String valueToDisplay = NumberFormatter.convertToMoneyLike(value);
 
     return SizedBox(
-      height: 68,
+      height: 88,
       child: InkWell(
         hoverColor: Colors.yellow.shade100,
         focusColor: Colors.yellow.shade100,
