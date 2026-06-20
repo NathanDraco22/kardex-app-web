@@ -56,6 +56,7 @@ class _SearchProductDialogState extends State<SearchProductDialog> {
       child: SizedBox(
         width: 700,
         child: Dialog(
+          constraints: const BoxConstraints(maxWidth: 700),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -213,7 +214,7 @@ class ProductResultRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 44,
+      height: 54,
       child: InkWell(
         hoverColor: Colors.yellow.shade100,
         focusColor: Colors.yellow.shade100,
@@ -225,7 +226,7 @@ class ProductResultRow extends StatelessWidget {
             children: [
               Flexible(
                 fit: FlexFit.tight,
-                flex: 2,
+                flex: 3,
                 child: DisplayProductCode(product: product),
               ),
               Flexible(
@@ -236,11 +237,6 @@ class ProductResultRow extends StatelessWidget {
               Flexible(
                 fit: FlexFit.tight,
                 child: Text(product.unitName),
-              ),
-
-              Flexible(
-                fit: FlexFit.tight,
-                child: Text(product.categoryName ?? "--"),
               ),
               Flexible(
                 fit: FlexFit.tight,

@@ -97,6 +97,7 @@ class CommercialProductDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      constraints: const BoxConstraints(maxWidth: 700),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: SizedBox(
         width: 650,
@@ -276,12 +277,24 @@ class _FormContentState extends State<_FormContent> {
                               Expanded(
                                 child: Visibility(
                                   visible: isUserAdmin,
-                                  child: TitleLabel(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    title: "Costo",
-                                    bigTitle: NumberFormatter.convertFromCentsToUnitsCurrency(
-                                      widget.product.account.averageCost,
-                                    ),
+                                  child: Row(
+                                    mainAxisAlignment: .spaceEvenly,
+                                    children: [
+                                      TitleLabel(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        title: "Costo",
+                                        bigTitle: NumberFormatter.convertFromCentsToUnitsCurrency(
+                                          widget.product.account.averageCost,
+                                        ),
+                                      ),
+                                      TitleLabel(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        title: "Ult. C",
+                                        bigTitle: NumberFormatter.convertFromCentsToUnitsCurrency(
+                                          widget.product.account.lastCost,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
