@@ -68,6 +68,44 @@ class _MobileScaffold extends StatelessWidget {
           child: EntryAppBarMenusButton(),
         ),
       ),
+      endDrawer: Drawer(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        // backgroundColor: Colors.transparent,
+        child: Column(
+          children: [
+            DrawerHeader(
+              padding: EdgeInsets.zero,
+              child: Container(
+                padding: EdgeInsets.all(8),
+                alignment: Alignment.bottomLeft,
+                color: Theme.of(context).colorScheme.primaryContainer,
+                child: Text(
+                  "Opciones de Navegacion",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(FluentIcons.person_12_filled),
+              title: const Text("Lista de Clientes"),
+              onTap: () {
+                context.pushNamed("client-list");
+              },
+              trailing: const Icon(Icons.chevron_right),
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(FluentIcons.building_multiple_20_filled),
+              title: const Text("Lista de Proveedores"),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.pushNamed("suppliers-catalog"),
+            ),
+          ],
+        ),
+      ),
       body: const _MobileBody(),
     );
   }
