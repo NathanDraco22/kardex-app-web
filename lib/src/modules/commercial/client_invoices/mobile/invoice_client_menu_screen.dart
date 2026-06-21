@@ -5,6 +5,7 @@ import 'package:kardex_app_front/src/modules/commercial/client_invoices/view_con
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/client_selector_card.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
 import 'package:kardex_app_front/widgets/text_field_date_selector.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
 
@@ -67,6 +68,11 @@ class _RootScaffold extends StatelessWidget {
           String message = "Factura guardada con éxito";
           if (cubit.isOrder) message = "Orden de compra enviada con éxito";
           await DialogManager.showInfoDialog(context, message);
+          if (!context.mounted) return;
+          if (state.createdInvoice != null) {
+            await showInvoiceViewerDialog(context, state.createdInvoice!);
+          }
+
           if (!context.mounted) return;
           Navigator.pop(context);
           Navigator.pop(context);
