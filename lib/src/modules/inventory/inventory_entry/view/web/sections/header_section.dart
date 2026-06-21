@@ -109,9 +109,6 @@ class _HeaderSection extends StatelessWidget {
                       child: Row(
                         children: [
                           Flexible(
-                            child: SizedBox.expand(),
-                          ),
-                          Flexible(
                             child: MenuActions(),
                           ),
                         ],
@@ -166,9 +163,30 @@ class MenuActions extends StatelessWidget {
     final isDisabled = !mediator.hasAllRequiredFields();
 
     return Row(
+      spacing: 8,
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        ElevatedButton.icon(
+          onPressed: () async {
+            await context.pushNamed("suppliers-catalog");
+          },
+          icon: const Icon(
+            FluentIcons.building_multiple_20_filled,
+          ),
+          label: const Text("Proveedores"),
+        ),
+
+        ElevatedButton.icon(
+          onPressed: () async {
+            await context.pushNamed("product-list");
+          },
+          icon: const Icon(FluentIcons.cube_12_filled),
+          label: const Text("Productos"),
+        ),
+
+        Spacer(),
+
         ElevatedButton.icon(
           onPressed: isDisabled ? null : () => saveAction(context),
           icon: const Icon(Icons.save),
