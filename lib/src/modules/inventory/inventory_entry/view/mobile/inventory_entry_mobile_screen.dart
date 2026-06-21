@@ -76,10 +76,10 @@ class _MobileScaffold extends StatelessWidget {
             DrawerHeader(
               padding: EdgeInsets.zero,
               child: Container(
-                padding: EdgeInsets.all(8),
+                padding: const EdgeInsets.all(8),
                 alignment: Alignment.bottomLeft,
                 color: Theme.of(context).colorScheme.primaryContainer,
-                child: Text(
+                child: const Text(
                   "Opciones de Navegacion",
                   style: TextStyle(
                     color: Colors.white,
