@@ -65,13 +65,13 @@ class WriteInvoiceCubit extends Cubit<WriteInvoiceState> {
         );
 
         await ordersRepository.createOrder(createOrder);
-        emit(WriteInvoiceSuccess());
+        emit(WriteInvoiceSuccess(null));
         emit(WriteInvoiceInitial());
         return;
       }
 
-      await invoicesRepository.createInvoice(currentInvoice);
-      emit(WriteInvoiceSuccess());
+      final createdInvoice = await invoicesRepository.createInvoice(currentInvoice);
+      emit(WriteInvoiceSuccess(createdInvoice));
       emit(WriteInvoiceInitial());
     } catch (error) {
       emit(WriteInvoiceError(error.toString()));
@@ -81,8 +81,8 @@ class WriteInvoiceCubit extends Cubit<WriteInvoiceState> {
   Future<void> updateInvoice(String invoiceId, UpdateInvoice updateInvoice) async {
     emit(WriteInvoiceInProgress());
     try {
-      await invoicesRepository.updateInvoiceById(invoiceId, updateInvoice);
-      emit(WriteInvoiceSuccess());
+      final updatedInvoice = await invoicesRepository.updateInvoiceById(invoiceId, updateInvoice);
+      emit(WriteInvoiceSuccess(updatedInvoice));
       emit(WriteInvoiceInitial());
     } catch (error) {
       emit(WriteInvoiceError(error.toString()));

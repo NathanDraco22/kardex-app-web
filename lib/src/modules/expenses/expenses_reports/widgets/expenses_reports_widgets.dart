@@ -115,8 +115,7 @@ class _HeaderSectionState extends State<HeaderSection> {
                   children: [
                     FilledButton.icon(
                       onPressed: () {
-                        final params = ExpenseQueryParams()
-                          ..branchId = authCubit.currentBranchId;
+                        final params = ExpenseQueryParams()..branchId = authCubit.currentBranchId;
                         if (_startDate != null) {
                           params.startDate = _startDate!.startOfDay().millisecondsSinceEpoch;
                         }
@@ -138,12 +137,8 @@ class _HeaderSectionState extends State<HeaderSection> {
                           final option = await showExportOptionsDialog(context);
                           if (option == null) return;
 
-                          final startText = _startDate != null
-                              ? DateTimeTool.formatddMMyyEs(_startDate!)
-                              : "inicio";
-                          final endText = _endDate != null
-                              ? DateTimeTool.formatddMMyyEs(_endDate!)
-                              : "fin";
+                          final startText = _startDate != null ? DateTimeTool.formatddMMyyEs(_startDate!) : "inicio";
+                          final endText = _endDate != null ? DateTimeTool.formatddMMyyEs(_endDate!) : "fin";
                           final periodText = "${startText}_a_$endText";
 
                           if (option == ExportOption.csv) {
@@ -207,12 +202,33 @@ class DetailedExpensesTable extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
-                Expanded(flex: 2, child: Text("Tipo", style: TextStyle(fontWeight: FontWeight.bold))),
-                Expanded(flex: 2, child: Text("N° Documento", style: TextStyle(fontWeight: FontWeight.bold))),
-                Expanded(flex: 3, child: Text("Concepto / Categoría", style: TextStyle(fontWeight: FontWeight.bold))),
-                Expanded(flex: 2, child: Text("Fecha", style: TextStyle(fontWeight: FontWeight.bold))),
-                Expanded(flex: 2, child: Text("Estado", style: TextStyle(fontWeight: FontWeight.bold))),
-                Expanded(flex: 2, child: Align(alignment: Alignment.centerRight, child: Text("Monto", style: TextStyle(fontWeight: FontWeight.bold)))),
+                Expanded(
+                  flex: 2,
+                  child: Text("Tipo", style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Text("N° Documento", style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+                Expanded(
+                  flex: 3,
+                  child: Text("Concepto / Categoría", style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Text("Fecha", style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Text("Estado", style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Text("Monto", style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                ),
               ],
             ),
           ),
@@ -352,7 +368,7 @@ class ConsolidatedSection extends StatelessWidget {
           children: [
             _buildSectionHeader(
               context,
-              title: "Gastos a Proveedores",
+              title: "Gastos Proveedores",
               totalAmount: totalSupplier,
               icon: Icons.local_shipping,
               iconColor: Colors.teal,
@@ -386,7 +402,7 @@ class ConsolidatedSection extends StatelessWidget {
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      "Gran Total de Gastos",
+                      "Total Gastos",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -477,8 +493,7 @@ class ConsolidatedSection extends StatelessWidget {
       );
     }
 
-    final sortedEntries = data.entries.toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
+    final sortedEntries = data.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
 
     return Card(
       margin: EdgeInsets.zero,
@@ -489,8 +504,14 @@ class ConsolidatedSection extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(nameHeader, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
-                const Text("Total", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
+                Text(
+                  nameHeader,
+                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
+                ),
+                const Text(
+                  "Total",
+                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
+                ),
               ],
             ),
           ),
