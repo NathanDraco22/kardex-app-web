@@ -185,7 +185,7 @@ class MenuActions extends StatelessWidget {
           label: const Text("Productos"),
         ),
 
-        Spacer(),
+        const Spacer(),
 
         ElevatedButton.icon(
           onPressed: isDisabled ? null : () => saveAction(context),
