@@ -56,10 +56,17 @@ class _ContentSection extends StatelessWidget {
                     final rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
 
                     final currentInvoice = invoices[index];
-                    final totalPaid = NumberFormatter.convertToMoneyLike(currentInvoice.total);
-                    final totalCost = NumberFormatter.convertToMoneyLike(currentInvoice.totalCost);
+                    int totalCost = 0;
+                    int totalSales = 0;
+
+                    for (final item in currentInvoice.saleItems) {
+                      totalCost += item.cost * item.quantity;
+                      totalSales += item.total;
+                    }
+                    final totalPaidFormatted = NumberFormatter.convertToMoneyLike(totalSales);
+                    final totalCostFormatted = NumberFormatter.convertToMoneyLike(totalCost);
                     final utility = NumberFormatter.convertToMoneyLike(
-                      currentInvoice.total - currentInvoice.totalCost,
+                      totalSales - totalCost,
                     );
 
                     final paidAtFormatted = DateTimeTool.formatddMMyy(currentInvoice.paidAt ?? DateTime.now());
@@ -77,10 +84,10 @@ class _ContentSection extends StatelessWidget {
                           content: Text(currentInvoice.docNumber),
                         ),
                         BasicTableCell(
-                          content: Text(totalCost),
+                          content: Text(totalCostFormatted),
                         ),
                         BasicTableCell(
-                          content: Text(totalPaid),
+                          content: Text(totalPaidFormatted),
                         ),
                         BasicTableCell(
                           content: Text(utility),
