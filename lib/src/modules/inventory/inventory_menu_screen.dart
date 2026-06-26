@@ -28,6 +28,7 @@ class _RootScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: MenuAppBar(title: "Inventario"),
       body: _Body(),
     );

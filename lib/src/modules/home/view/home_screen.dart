@@ -44,6 +44,7 @@ class _RootScaffold extends StatelessWidget {
 
         if (authState is AuthError) {
           return Scaffold(
+            resizeToAvoidBottomInset: false,
             appBar: AppBar(
               leading: IconButton(
                 icon: const Icon(Icons.logout),
