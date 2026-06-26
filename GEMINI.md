@@ -35,6 +35,8 @@
 - Se implementó el gráfico de pastel de "Gastos por Sucursal" (`_ExpensesPieChartCard`) en el reporte global de administración en `ExecutiveSummaryDetailScreen`.
 - Se agregó la sección de desglose de "Gastos / Egresos" en la tarjeta de resumen específico por sucursal en `BranchExecutiveSummaryScreen`.
 - Se han implementado e integrado los componentes de visualización `showOperativeExpenseViewerDialog` y `showSupplierExpenseViewerDialog` en `lib/widgets/dialogs/viewers/`, que permiten cargar y visualizar los detalles de gastos operativos y a proveedores. Se integraron con gestos tap (`InkWell`) en los listados Web y Móvil de cada módulo.
+- Se implementó el scroll automático centrado (mediante `Scrollable.ensureVisible` con `alignment: 0.5`) y enfoque del teclado para el primer producto móvil que tenga cantidad 0 al intentar guardar una transferencia en `create_transfer_screen_mobile.dart`. Las `GlobalKey<MobileProductCardState>` se aprovisionan a nivel de constructor de `MobileProductCard` para resolver problemas de `currentState == null` y permitir llamar a `setCardColorError()`, pintando la tarjeta de color rojo suave e invalidando el error al ingresar cantidades válidas.
+- Se refactorizó la vista de creación de transferencia en móvil extrayendo la tarjeta del producto (`MobileProductCard`), el botón de guardado (`SaveButton`) y sus componentes relacionados al nuevo archivo `mobile/widgets.dart`, aligerando el archivo de pantalla principal. Asimismo, se incorporó la visualización del Stock Disponible (`availableStock`) y el Costo Unitario con iconos informativos estilizados dentro de la tarjeta móvil de cada producto.
 
 ## Arquitectura de Módulos
 La arquitectura de un módulo en este proyecto Flutter incluye:
