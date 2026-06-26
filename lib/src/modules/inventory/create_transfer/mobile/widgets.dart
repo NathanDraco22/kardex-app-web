@@ -249,6 +249,7 @@ class SaveButton extends StatelessWidget {
       onPressed: isDisabled
           ? null
           : () async {
+              FocusManager.instance.primaryFocus?.unfocus();
               if (mediator.hasProductWithZeroValue()) {
                 final zeroRow = mediator.productTableController.rows.firstWhere((e) => e.quantity == 0);
                 final cardKey = mediator.notifier?.cardKeys[zeroRow.product.id];
