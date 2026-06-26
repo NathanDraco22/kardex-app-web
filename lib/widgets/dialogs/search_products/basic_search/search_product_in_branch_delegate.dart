@@ -115,7 +115,7 @@ class _ProductInBranchResultRow extends StatelessWidget {
     }
 
     return SizedBox(
-      height: 68,
+      height: 84,
       child: InkWell(
         hoverColor: Colors.yellow.shade100,
         focusColor: Colors.yellow.shade100,

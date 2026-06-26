@@ -1,25 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/cubits/transfers/write_transfer_cubit.dart';
-import 'package:kardex_app_front/src/domain/models/common/transfer_item.dart';
-import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
-import 'package:kardex_app_front/src/domain/models/transfer/transfer_in_db.dart';
 import 'package:kardex_app_front/src/modules/inventory/create_transfer/mediator.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
-import 'package:kardex_app_front/src/tools/datetime_tool.dart';
-import 'package:kardex_app_front/src/tools/input_formatter/input_formatter.dart';
-import 'package:kardex_app_front/src/tools/input_formatters.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/selectors/branch_selection_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/search_product_in_branch_delegate.dart';
-import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
 
 import 'package:kardex_app_front/widgets/tables/transfer_product_table.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
 import '../web/create_transfer_screen_web.dart';
+import 'widgets.dart';
 
 class CreateTransferScreenMobile extends StatelessWidget {
   const CreateTransferScreenMobile({super.key});
@@ -91,84 +84,11 @@ class _MobileScaffold extends StatelessWidget {
             "Nueva Transferencia",
           ),
           actions: const [
-            _SaveButton(),
+            SaveButton(),
           ],
         ),
         body: const _MobileBody(),
       ),
-    );
-  }
-}
-
-class _SaveButton extends StatelessWidget {
-  const _SaveButton();
-
-  @override
-  Widget build(BuildContext context) {
-    final mediator = CreateTransferMediator.watch(context)!;
-    final isDisabled = !mediator.hasAllRequiredFields();
-
-    return IconButton(
-      onPressed: isDisabled
-          ? null
-          : () async {
-              if (mediator.hasProductWithZeroValue()) {
-                await DialogManager.showErrorDialog(context, "No se pueden guardar productos con cantidad 0");
-                return;
-              }
-
-              final res = await DialogManager.slideToConfirmActionDialog(
-                context,
-                "¿Deseas Guardar la Transferencia? (No se puede deshacer)",
-              );
-
-              if (res != true) return;
-
-              if (!context.mounted) return;
-
-              final mediatorRead = CreateTransferMediator.read(context)!;
-              final headerData = mediatorRead.headerData;
-              final productTableController = mediatorRead.productTableController;
-
-              final items = productTableController.rows.map((e) {
-                return TransferItem(
-                  id: e.product.id,
-                  name: e.product.name,
-                  code: e.product.code,
-                  unitName: e.product.unitName,
-                  brandName: e.product.brandName,
-                  quantity: e.quantity,
-                  cost: e.unitaryCost,
-                  expirationDate: e.expirationDate?.millisecondsSinceEpoch,
-                  salePrice: e.product.saleProfile.salePrice,
-                  salePrice2: e.product.saleProfile.salePrice2,
-                  salePrice3: e.product.saleProfile.salePrice3,
-                );
-              }).toList();
-
-              final userWithRole = getIt<AuthCubit>().user;
-              if (userWithRole == null) return;
-
-              final originBranch = getIt<AuthCubit>().currentBranch;
-
-              final createTransfer = CreateTransfer(
-                origin: originBranch!.id,
-                originName: originBranch.name,
-                destination: headerData.destinationBranch!.id,
-                destinationName: headerData.destinationBranch!.name,
-                status: TransferStatus.inTransit,
-                description: headerData.observations ?? "",
-                items: items,
-                createdBy: UserInfo(
-                  id: userWithRole.id,
-                  name: userWithRole.username,
-                ),
-                docNumber: "",
-              );
-
-              context.read<WriteTransferCubit>().createTransfer(createTransfer);
-            },
-      icon: const Icon(Icons.save),
     );
   }
 }
@@ -181,21 +101,21 @@ class _MobileBody extends StatefulWidget {
 }
 
 class _MobileBodyState extends State<_MobileBody> {
-  ScrollController scrollController = ScrollController();
-
   @override
   Widget build(BuildContext context) {
     final mediator = CreateTransferMediator.read(context)!;
     return NotificationListener<NewMobileCardNotification>(
       onNotification: (notification) {
-        Future(() {
-          scrollController.jumpTo(1.0);
-        });
+        Scrollable.ensureVisible(
+          notification.cardContext,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          alignment: 0.5,
+        );
         return true;
       },
       child: ListView(
         addAutomaticKeepAlives: true,
-        controller: scrollController,
         padding: const EdgeInsets.only(bottom: 112, top: 8),
         children: [
           const _MobileHeaderSection(
@@ -210,7 +130,10 @@ class _MobileBodyState extends State<_MobileBody> {
               return Column(
                 children: [
                   for (final row in mediator.productTableController.rows)
-                    _MobileProductCard(row: row, key: ValueKey(row.product.id)),
+                    MobileProductCard(
+                      row: row,
+                      key: mediator.notifier?.getOrCreateCardKey(row.product.id),
+                    ),
                 ],
               );
             },
@@ -296,180 +219,6 @@ class _MobileHeaderSectionState extends State<_MobileHeaderSection> with Automat
                   onChanged: (p0) {
                     headerData.observations = p0;
                   },
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class NewMobileCardNotification extends Notification {}
-
-class _MobileProductCard extends StatefulWidget {
-  const _MobileProductCard({required this.row, super.key});
-
-  final TransferProductRow row;
-
-  @override
-  State<_MobileProductCard> createState() => _MobileProductCardState();
-}
-
-class _MobileProductCardState extends State<_MobileProductCard> with AutomaticKeepAliveClientMixin {
-  @override
-  bool get wantKeepAlive => true;
-
-  FocusNode expirationDateFocusNode = FocusNode();
-
-  late final TextEditingController quantityController;
-  late final TextEditingController expirationController;
-
-  @override
-  void initState() {
-    super.initState();
-    quantityController = TextEditingController(
-      text: widget.row.quantity > 0 ? widget.row.quantity.toString() : "",
-    );
-    expirationController = TextEditingController(
-      text: widget.row.expirationDate != null
-          ? DateFormat('MM/yy').format(widget.row.expirationDate!)
-          : "",
-    );
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      expirationDateFocusNode.requestFocus();
-      NewMobileCardNotification().dispatch(context);
-    });
-  }
-
-  @override
-  void dispose() {
-    expirationDateFocusNode.dispose();
-    quantityController.dispose();
-    expirationController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    super.build(context);
-    final mediator = CreateTransferMediator.read(context)!;
-
-    return Card(
-      margin: const EdgeInsets.symmetric(
-        horizontal: 4,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.row.product.name,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          const Icon(Icons.qr_code, size: 12),
-                          Text(widget.row.product.displayCode),
-                        ],
-                      ),
-                      Text(
-                        "${widget.row.product.brandName} - ${widget.row.product.unitName}",
-                        style: const TextStyle(color: Colors.grey),
-                      ),
-                    ],
-                  ),
-                ),
-                IconButton(
-                  onPressed: () {
-                    mediator.productTableController.removeRow(widget.row);
-                  },
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                ),
-              ],
-            ),
-            const Divider(),
-            Row(
-              children: [
-                ExpirationDateGate(
-                  child: Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text("Vencimiento"),
-                        const SizedBox(
-                          height: 6,
-                        ),
-
-                        TextField(
-                          autofocus: true,
-                          controller: expirationController,
-                          inputFormatters: [MonthYearInputFormatter()],
-                          textAlign: TextAlign.start,
-                          keyboardType: .number,
-                          textInputAction: .next,
-                          decoration: const InputDecoration(
-                            hintText: "mm/aa",
-                            isDense: true,
-                          ),
-                          onChanged: (value) {
-                            try {
-                              final date = DateTimeTool.fromMMYY(value);
-                              widget.row.expirationDate = date;
-                            } on Exception catch (_) {
-                              widget.row.expirationDate = null;
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                const ExpirationDateGate(
-                  child: SizedBox(width: 16),
-                ),
-
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text("Cantidad"),
-                      const SizedBox(
-                        height: 6,
-                      ),
-                      TextField(
-                        controller: quantityController,
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                        inputFormatters: [IntegerTextInputFormatter()],
-                        textAlign: TextAlign.center,
-                        textInputAction: .next,
-                        decoration: const InputDecoration(
-                          isDense: true,
-                        ),
-                        onChanged: (value) {
-                          if (value.isEmpty) {
-                            widget.row.quantity = 0;
-                          } else {
-                            widget.row.quantity = int.tryParse(value) ?? 0;
-                          }
-
-                          mediator.refresh();
-                        },
-                      ),
-                    ],
-                  ),
                 ),
               ],
             ),
