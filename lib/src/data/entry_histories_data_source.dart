@@ -34,6 +34,13 @@ class EntryHistoriesDataSource with HttpService {
     return res;
   }
 
+  Future<Map<String, dynamic>> getEntryDocsByProductId(String productId) async {
+    final uri = HttpTools.generateUri("$_endpoint/by-product/$productId");
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
+    return res;
+  }
+
   Future<Map<String, dynamic>> getEntryHistoryById(String id) async {
     final uri = HttpTools.generateUri("$_endpoint/$id");
     final headers = HttpTools.generateAuthHeaders();

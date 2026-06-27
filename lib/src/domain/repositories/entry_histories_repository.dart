@@ -30,6 +30,15 @@ class EntryHistoriesRepository {
     return response;
   }
 
+  Future<ListResponse<EntryHistoryInDb>> getEntryDocsByProductId(String productId) async {
+    final results = await entryHistoriesDataSource.getEntryDocsByProductId(productId);
+    final response = ListResponse<EntryHistoryInDb>.fromJson(
+      results,
+      EntryHistoryInDb.fromJson,
+    );
+    return response;
+  }
+
   Future<EntryHistoryInDb> getEntryHistoryById(String entryHistoryId) async {
     final results = await entryHistoriesDataSource.getEntryHistoryById(entryHistoryId);
     final response = EntryHistoryInDb.fromJson(results);
