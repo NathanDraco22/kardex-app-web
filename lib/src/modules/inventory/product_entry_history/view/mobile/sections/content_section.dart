@@ -71,7 +71,7 @@ class _ContentSection extends StatelessWidget {
                 children: [
                   DisplayProductCode(product: currentProduct),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     spacing: 8,
                     children: [
                       Text(currentProduct.brandName),
@@ -153,14 +153,14 @@ class _ContentSection extends StatelessWidget {
                                     flex: 2,
                                     child: Text(
                                       dateStr,
-                                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                                      style: const TextStyle(fontWeight: FontWeight.w500),
                                     ),
                                   ),
                                   Expanded(
                                     flex: 3,
                                     child: Text(
                                       entryHistory.supplier.name,
-                                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                                      style: const TextStyle(fontWeight: FontWeight.w500),
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
                                     ),
@@ -169,7 +169,7 @@ class _ContentSection extends StatelessWidget {
                                     flex: 2,
                                     child: Text(
                                       costStr,
-                                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                                      style: const TextStyle(fontWeight: FontWeight.w500),
                                       textAlign: TextAlign.end,
                                     ),
                                   ),
