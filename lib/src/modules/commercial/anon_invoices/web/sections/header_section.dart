@@ -56,13 +56,8 @@ class _HeaderSection extends StatelessWidget {
                 child: Column(
                   children: [
                     const Flexible(
-                      child: Row(
-                        children: [
-                          Flexible(child: SizedBox.expand()),
-                          Flexible(
-                            child: MenuActions(),
-                          ),
-                        ],
+                      child: Flexible(
+                        child: MenuActions(),
                       ),
                     ),
                     Flexible(
@@ -115,9 +110,16 @@ class MenuActions extends StatelessWidget {
       listenable: viewController,
       builder: (context, _) {
         return Row(
+          spacing: 4,
           mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            ElevatedButton.icon(
+              onPressed: () => context.pushNamed("invoice-history"),
+              label: const Text("Facturas"),
+              icon: const Icon(Icons.blinds_closed),
+            ),
+
             ElevatedButton.icon(
               onPressed: () => showGlobalStockSearchModal(context),
               label: const Text("Existencias Global"),
