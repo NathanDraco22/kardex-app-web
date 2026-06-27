@@ -70,7 +70,7 @@ class _ContentSection extends StatelessWidget {
               children: [
                 DisplayProductCode(product: currentProduct),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   spacing: 8,
                   children: [
                     Text(currentProduct.brandName),
