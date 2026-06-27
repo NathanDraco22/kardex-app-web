@@ -62,6 +62,7 @@ import 'package:kardex_app_front/src/modules/inventory/adjust_entry/history/adju
 import 'package:kardex_app_front/src/modules/inventory/adjust_exit/history/adjust_exit_history_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/product_price_catalog/product_price_catalog_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/product_movements/view/product_movements_screen.dart';
+import 'package:kardex_app_front/src/modules/inventory/product_entry_history/product_entry_history_screen.dart';
 import 'package:kardex_app_front/src/modules/login/login_screen.dart';
 import 'package:kardex_app_front/src/modules/multi_branch_home/multibranch_home_screen.dart';
 import 'package:kardex_app_front/src/modules/pending_accounts/pending_client_transactions/credit_session_transactions_screen.dart';
@@ -423,6 +424,11 @@ class AppRouter {
             path: "product-movements",
             name: "product-movements",
             builder: (context, state) => const ProductMovementsScreen(),
+          ),
+          GoRoute(
+            path: "product-entry-history",
+            name: "product-entry-history",
+            builder: (context, state) => const ProductEntryHistoryScreen(),
           ),
           GoRoute(
             path: "expiration-logs",
