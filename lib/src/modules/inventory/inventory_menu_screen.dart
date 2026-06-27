@@ -78,6 +78,16 @@ class _Body extends StatelessWidget {
 
           ListTile(
             leading: const Icon(
+              Icons.call_received,
+              color: Colors.orange,
+            ),
+            title: const Text("Historial de Entradas por Producto"),
+            onTap: () => context.pushNamed("product-entry-history"),
+          ),
+          const Divider(height: 0.0),
+
+          ListTile(
+            leading: const Icon(
               Icons.monetization_on,
               color: Colors.green,
             ),
