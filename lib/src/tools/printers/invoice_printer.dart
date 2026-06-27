@@ -92,8 +92,8 @@ Future<Uint8List> generateTicketPdfFromInvoice(
               textAlign: pw.TextAlign.center,
             ),
             if (paperSize == .mm80)
-              pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.center,
                 children: [
                   if (branch.phone.isNotEmpty)
                     pw.Text(
@@ -103,10 +103,9 @@ Future<Uint8List> generateTicketPdfFromInvoice(
                       ),
                       textAlign: pw.TextAlign.center,
                     ),
-
                   if (branch.email.isNotEmpty)
                     pw.Text(
-                      "Email: ${branch.email}",
+                      branch.email,
                       style: pw.TextStyle(
                         fontSize: TicketSettings.contentFontSize(paperSize),
                       ),
