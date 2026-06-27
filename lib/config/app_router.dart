@@ -33,7 +33,6 @@ import 'package:kardex_app_front/src/modules/commercial/invoice_history/invoice_
 import 'package:kardex_app_front/src/modules/commercial/invoice_by_product/invoice_by_product_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/pending_invoice_screen.dart';
 
-
 import 'package:kardex_app_front/src/modules/commercial/proforma/proforma_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/product_movements/view/commercial_product_movements_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/receipt_history/receipt_history_screen.dart';
@@ -53,7 +52,6 @@ import 'package:kardex_app_front/src/modules/inventory/current_tranfers/current_
 import 'package:kardex_app_front/src/modules/inventory/expiration_logs/expiration_logs_screen.dart';
 
 import 'package:kardex_app_front/src/modules/inventory/inventory_menu_screen.dart';
-
 
 import 'package:kardex_app_front/src/modules/inventory/product_inventory_catalog/product_inventory_catalog_screen.dart';
 
@@ -203,14 +201,13 @@ class AppRouter {
         ],
       ),
 
-/*
+      /*
       GoRoute(
         path: '/suppliers-catalog',
         name: 'suppliers-catalog',
         builder: (context, state) => const SuppliersCatalogScreen(),
       ),
 */
-
       GoRoute(
         path: '/commercial',
         name: 'commercial',
@@ -314,7 +311,7 @@ class AppRouter {
             builder: (context, state) => const DevolutionHistoryScreen(),
           ),
 
-/*
+          /*
           GoRoute(
             path: "product-price-setting",
             name: "product-price-setting",
@@ -387,7 +384,7 @@ class AppRouter {
             name: "current-inventory",
             builder: (context, state) => const CurrentInventoryScreen(),
           ),
-/*
+          /*
           GoRoute(
             path: "inventory-entry",
             name: "inventory-entry",
@@ -420,7 +417,7 @@ class AppRouter {
             builder: (context, state) => const CreateTransferScreen(),
           ),
 
-/*
+          /*
           GoRoute(
             path: "product-movements",
             name: "product-movements",
@@ -432,7 +429,7 @@ class AppRouter {
             name: "expiration-logs",
             builder: (context, state) => const ExpirationLogsScreen(),
           ),
-/*
+          /*
           GoRoute(
             path: "adjust-entry",
             name: "adjust-entry",
@@ -449,7 +446,7 @@ class AppRouter {
             builder: (context, state) => const AdjustExitHistoryScreen(),
           ),
 */
-/*
+          /*
           GoRoute(
             path: "product-price-catalog",
             name: "product-price-catalog",
@@ -464,7 +461,7 @@ class AppRouter {
         ],
       ),
 
-/*
+      /*
       GoRoute(
         path: "/advanced-tools",
         name: "advanced-tools",
@@ -483,7 +480,6 @@ class AppRouter {
         ],
       ),
 */
-
       GoRoute(
         path: "/finances",
         name: "finances",
@@ -540,7 +536,7 @@ class AppRouter {
             name: "users",
             builder: (context, state) => const UsersScreen(),
           ),
-/*
+          /*
           GoRoute(
             path: "product-price",
             name: "product-price",

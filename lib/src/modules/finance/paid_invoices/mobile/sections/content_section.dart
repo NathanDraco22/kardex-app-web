@@ -82,7 +82,7 @@ class _ContentSection extends StatelessWidget {
                       totalSales += item.total;
                     }
 
-                    final utility = NumberFormatter.convertToMoneyLike(
+                    final utility = NumberFormatter.convertFromCentsToUnitsCurrency(
                       totalSales - totalCost,
                     );
 
@@ -108,13 +108,13 @@ class _ContentSection extends StatelessWidget {
                         ),
                         BasicTableCell(
                           content: Text(
-                            totalCost.toString(),
+                            NumberFormatter.convertFromCentsToUnitsCurrency(totalCost),
                             textAlign: TextAlign.center,
                           ),
                         ),
                         BasicTableCell(
                           content: Text(
-                            totalSales.toString(),
+                            NumberFormatter.convertFromCentsToUnitsCurrency(totalSales),
                             textAlign: TextAlign.center,
                           ),
                         ),
