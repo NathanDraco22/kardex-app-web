@@ -56,9 +56,7 @@ class _HeaderSection extends StatelessWidget {
                 child: Column(
                   children: [
                     const Flexible(
-                      child: Flexible(
-                        child: MenuActions(),
-                      ),
+                      child: MenuActions(),
                     ),
                     Flexible(
                       flex: 3,
