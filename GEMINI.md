@@ -360,4 +360,10 @@ Esta estructura se ha seguido para módulos como 'Historial de Facturas', 'Histo
 - Se especificaron los dos patrones de sincronización de datos de Flutter: el enfoque estándar coordinado por UI y el enfoque avanzado desacoplado con `ReactiveRepository`.
 - Se documentó el uso de la herramienta `onion` CLI, detallando todos sus comandos de generación para FastAPI y Flutter y los pasos de ajuste manual post-generación.
 
+## Corrección de Reordenamiento en Accesos Directos (Junio 2026)
+- Se corrigió un parpadeo visual molesto al arrastrar y soltar elementos para reordenar la lista en la pantalla de Accesos Directos (`ShortcutsMenuScreen`).
+- El problema inicial se debía a que `buildWhen` en el `BlocBuilder` de la lista de accesos directos comparaba los conjuntos desordenados de rutas (`prev.routes.toSet() != curr.routes.toSet()`), lo que provocaba que evaluara a `false` al reordenar los mismos elementos, bloqueando la reconstrucción del árbol de widgets. Se solucionó utilizando `listEquals` de `package:flutter/foundation.dart` en `buildWhen`.
+- El parpadeo remanente ocurría por el comportamiento asíncrono de `ShortcutsCubit.updateOrder` (y métodos similares). Dado que se realizaba un `await` a la persistencia de Hive antes de emitir el estado (`emit`), había una desincronización temporal (de unos milisegundos) donde la UI se reconstruía con los datos viejos y luego saltaba a los nuevos. Se resolvió emitiendo el estado modificado inmediatamente de forma síncrona en el Cubit, delegando el guardado en Hive en segundo plano sin retrasar el flujo de la UI.
+
+
 

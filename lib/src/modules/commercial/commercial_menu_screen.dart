@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/src/domain/models/user_role/modules.dart';
 import 'package:kardex_app_front/widgets/gates/role_permission_gate.dart';
-import 'package:kardex_app_front/widgets/dialogs/global_stock_search_modal.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/custom_product_commercial_search_delegate.dart';
 import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
 import 'package:kardex_app_front/widgets/menu_app_bar.dart';
+import 'package:kardex_app_front/constants/route_names.dart';
+import 'package:kardex_app_front/widgets/shortcut_addable_list_tile.dart';
 
 class CommercialMenuScreen extends StatelessWidget {
   const CommercialMenuScreen({super.key});
@@ -44,16 +45,19 @@ class _Body extends StatelessWidget {
         children: [
           RolePermissionGate(
             permissions: [CommercialSubModules.createInvoice],
-            child: ListTile(
-              leading: Icon(
-                FluentIcons.building_retail_money_24_filled,
-                size: 32,
-                color: Colors.green.shade600,
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.anonInvoice,
+              child: ListTile(
+                leading: Icon(
+                  FluentIcons.building_retail_money_24_filled,
+                  size: 32,
+                  color: Colors.green.shade600,
+                ),
+                title: const Text("Facturacion de productos"),
+                onTap: () {
+                  context.pushNamed("anon-invoice");
+                },
               ),
-              title: const Text("Facturacion de productos"),
-              onTap: () {
-                context.pushNamed("anon-invoice");
-              },
             ),
           ),
 
@@ -61,16 +65,19 @@ class _Body extends StatelessWidget {
 
           RolePermissionGate(
             permissions: [CommercialSubModules.createInvoice],
-            child: ListTile(
-              leading: Icon(
-                Icons.date_range,
-                size: 32,
-                color: Colors.amber.shade600,
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.dailyInvoice,
+              child: ListTile(
+                leading: Icon(
+                  Icons.date_range,
+                  size: 32,
+                  color: Colors.amber.shade600,
+                ),
+                title: const Text("Ventas diarias"),
+                onTap: () {
+                  context.pushNamed("daily-invoice");
+                },
               ),
-              title: const Text("Ventas diarias"),
-              onTap: () {
-                context.pushNamed("daily-invoice");
-              },
             ),
           ),
 
@@ -78,31 +85,37 @@ class _Body extends StatelessWidget {
 
           RolePermissionGate(
             permissions: [CommercialSubModules.createInvoice],
-            child: ListTile(
-              leading: Icon(
-                Icons.file_open_rounded,
-                size: 32,
-                color: Colors.blueGrey.shade600,
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.anonDevolution,
+              child: ListTile(
+                leading: Icon(
+                  Icons.file_open_rounded,
+                  size: 32,
+                  color: Colors.blueGrey.shade600,
+                ),
+                title: const Text("Devolucion de productos"),
+                onTap: () {
+                  context.pushNamed("anon-devolution");
+                },
               ),
-              title: const Text("Devolucion de productos"),
-              onTap: () {
-                context.pushNamed("anon-devolution");
-              },
             ),
           ),
 
           RolePermissionGate(
             permissions: [CommercialSubModules.createInvoice],
-            child: ListTile(
-              leading: Icon(
-                FluentIcons.person_money_20_filled,
-                size: 32,
-                color: Colors.green.shade600,
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.clientInvoice,
+              child: ListTile(
+                leading: Icon(
+                  FluentIcons.person_money_20_filled,
+                  size: 32,
+                  color: Colors.green.shade600,
+                ),
+                title: const Text("Facturacion a Clientes"),
+                onTap: () {
+                  context.pushNamed("client-invoice");
+                },
               ),
-              title: const Text("Facturacion a Clientes"),
-              onTap: () {
-                context.pushNamed("client-invoice");
-              },
             ),
           ),
 
@@ -114,29 +127,35 @@ class _Body extends StatelessWidget {
           ),
 
           ExpirationDateGate(
-            child: ListTile(
-              leading: const Icon(
-                Icons.timer_sharp,
-                color: Colors.amber,
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.expirationLogs,
+              child: ListTile(
+                leading: const Icon(
+                  Icons.timer_sharp,
+                  color: Colors.amber,
+                ),
+                title: const Text("Bitacora de Vencimientos"),
+                onTap: () => context.pushNamed("expiration-logs"),
               ),
-              title: const Text("Bitacora de Vencimientos"),
-              onTap: () => context.pushNamed("expiration-logs"),
             ),
           ),
           const Divider(height: 0.0),
 
           RolePermissionGate(
             permissions: [CommercialSubModules.createInvoice],
-            child: ListTile(
-              leading: const Icon(
-                Icons.sync,
-                size: 32,
-                color: Colors.teal,
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.commercialProductMovements,
+              child: ListTile(
+                leading: const Icon(
+                  Icons.sync,
+                  size: 32,
+                  color: Colors.teal,
+                ),
+                title: const Text("Movimientos de un Producto"),
+                onTap: () {
+                  context.pushNamed("commercial-product-movements");
+                },
               ),
-              title: const Text("Movimientos de un Producto"),
-              onTap: () {
-                context.pushNamed("commercial-product-movements");
-              },
             ),
           ),
 
@@ -155,10 +174,13 @@ class _Body extends StatelessWidget {
 
           RolePermissionGate(
             permissions: [CommercialSubModules.createInvoice],
-            child: ListTile(
-              leading: const Icon(Icons.search, color: Colors.purple),
-              title: const Text("Consulta de Existencias Globales"),
-              onTap: () => showGlobalStockSearchModal(context),
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.globalStockSearch,
+              child: ListTile(
+                leading: const Icon(Icons.search, color: Colors.purple),
+                title: const Text("Consulta de Existencias Globales"),
+                onTap: () => context.pushNamed("global-stock-search"),
+              ),
             ),
           ),
 
@@ -166,16 +188,19 @@ class _Body extends StatelessWidget {
 
           RolePermissionGate(
             permissions: [CommercialSubModules.createInvoice],
-            child: ListTile(
-              leading: Icon(
-                Icons.content_paste_search_rounded,
-                size: 32,
-                color: Colors.green.shade600,
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.invoiceHistory,
+              child: ListTile(
+                leading: Icon(
+                  Icons.content_paste_search_rounded,
+                  size: 32,
+                  color: Colors.green.shade600,
+                ),
+                title: const Text("Historial de Facturas"),
+                onTap: () {
+                  context.pushNamed("invoice-history");
+                },
               ),
-              title: const Text("Historial de Facturas"),
-              onTap: () {
-                context.pushNamed("invoice-history");
-              },
             ),
           ),
 
@@ -183,16 +208,19 @@ class _Body extends StatelessWidget {
 
           RolePermissionGate(
             permissions: [CommercialSubModules.createInvoice],
-            child: ListTile(
-              leading: Icon(
-                Icons.find_in_page_rounded,
-                size: 32,
-                color: Colors.green.shade800,
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.invoicesByProduct,
+              child: ListTile(
+                leading: Icon(
+                  Icons.find_in_page_rounded,
+                  size: 32,
+                  color: Colors.green.shade800,
+                ),
+                title: const Text("Buscar facturas por producto"),
+                onTap: () {
+                  context.pushNamed("invoices-by-product");
+                },
               ),
-              title: const Text("Buscar facturas por producto"),
-              onTap: () {
-                context.pushNamed("invoices-by-product");
-              },
             ),
           ),
 
@@ -200,16 +228,19 @@ class _Body extends StatelessWidget {
 
           RolePermissionGate(
             permissions: [CommercialSubModules.createInvoice],
-            child: ListTile(
-              leading: Icon(
-                FluentIcons.building_retail_money_24_filled,
-                size: 32,
-                color: Colors.orange.shade600,
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.dailyProductSales,
+              child: ListTile(
+                leading: Icon(
+                  FluentIcons.building_retail_money_24_filled,
+                  size: 32,
+                  color: Colors.orange.shade600,
+                ),
+                title: const Text("Ventas diarias por Producto"),
+                onTap: () {
+                  context.pushNamed("daily-product-sales");
+                },
               ),
-              title: const Text("Ventas diarias por Producto"),
-              onTap: () {
-                context.pushNamed("daily-product-sales");
-              },
             ),
           ),
 
@@ -217,16 +248,19 @@ class _Body extends StatelessWidget {
 
           RolePermissionGate(
             permissions: [CommercialSubModules.createInvoice],
-            child: ListTile(
-              leading: Icon(
-                Icons.calendar_month,
-                size: 32,
-                color: Colors.orange.shade800,
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.dailyClientInvoices,
+              child: ListTile(
+                leading: Icon(
+                  Icons.calendar_month,
+                  size: 32,
+                  color: Colors.orange.shade800,
+                ),
+                title: const Text("Ventas por factura"),
+                onTap: () {
+                  context.pushNamed("daily-client-invoices");
+                },
               ),
-              title: const Text("Ventas por factura"),
-              onTap: () {
-                context.pushNamed("daily-client-invoices");
-              },
             ),
           ),
 
@@ -234,16 +268,19 @@ class _Body extends StatelessWidget {
 
           RolePermissionGate(
             permissions: [CommercialSubModules.createInvoice],
-            child: ListTile(
-              leading: Icon(
-                Icons.list,
-                size: 32,
-                color: Colors.orange.shade600,
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.dailyProductInOrders,
+              child: ListTile(
+                leading: Icon(
+                  Icons.list,
+                  size: 32,
+                  color: Colors.orange.shade600,
+                ),
+                title: const Text("Productos en Ordenes de Compra"),
+                onTap: () {
+                  context.pushNamed("daily-product-in-orders");
+                },
               ),
-              title: const Text("Productos en Ordenes de Compra"),
-              onTap: () {
-                context.pushNamed("daily-product-in-orders");
-              },
             ),
           ),
 
@@ -251,16 +288,19 @@ class _Body extends StatelessWidget {
 
           RolePermissionGate(
             permissions: [CommercialSubModules.createInvoice],
-            child: ListTile(
-              leading: Icon(
-                Icons.analytics_outlined,
-                size: 32,
-                color: Colors.blue.shade800,
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.productDemandVsStock,
+              child: ListTile(
+                leading: Icon(
+                  Icons.analytics_outlined,
+                  size: 32,
+                  color: Colors.blue.shade800,
+                ),
+                title: const Text("Cotizaciones vs Existencias"),
+                onTap: () {
+                  context.pushNamed("product-demand-vs-stock");
+                },
               ),
-              title: const Text("Cotizaciones vs Existencias"),
-              onTap: () {
-                context.pushNamed("product-demand-vs-stock");
-              },
             ),
           ),
           const Divider(height: 0.0),
@@ -272,14 +312,17 @@ class _Body extends StatelessWidget {
 
           RolePermissionGate(
             permissions: [CommercialSubModules.orders],
-            child: ListTile(
-              leading: Icon(
-                FluentIcons.clipboard_search_24_filled,
-                size: 32,
-                color: Colors.blue.shade600,
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.proformaHistory,
+              child: ListTile(
+                leading: Icon(
+                  FluentIcons.clipboard_search_24_filled,
+                  size: 32,
+                  color: Colors.blue.shade600,
+                ),
+                title: const Text("Cotizaciones"),
+                onTap: () => context.pushNamed("proforma-history"),
               ),
-              title: const Text("Cotizaciones"),
-              onTap: () => context.pushNamed("proforma-history"),
             ),
           ),
 
@@ -287,14 +330,17 @@ class _Body extends StatelessWidget {
 
           RolePermissionGate(
             permissions: [CommercialSubModules.createOrder],
-            child: ListTile(
-              leading: Icon(
-                FluentIcons.document_text_24_filled,
-                size: 32,
-                color: Colors.blue.shade600,
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.proforma,
+              child: ListTile(
+                leading: Icon(
+                  FluentIcons.document_text_24_filled,
+                  size: 32,
+                  color: Colors.blue.shade600,
+                ),
+                title: const Text("Crear Cotización"),
+                onTap: () => context.pushNamed("proforma"),
               ),
-              title: const Text("Crear Cotización"),
-              onTap: () => context.pushNamed("proforma"),
             ),
           ),
 
@@ -306,32 +352,38 @@ class _Body extends StatelessWidget {
 
           RolePermissionGate(
             permissions: [CommercialSubModules.orders],
-            child: ListTile(
-              leading: Icon(
-                FluentIcons.receipt_bag_24_filled,
-                size: 32,
-                color: Colors.orange.shade600,
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.currentOrders,
+              child: ListTile(
+                leading: Icon(
+                  FluentIcons.receipt_bag_24_filled,
+                  size: 32,
+                  color: Colors.orange.shade600,
+                ),
+                title: const Text("Ordenes de Compra"),
+                onTap: () {
+                  context.pushNamed("current-orders");
+                },
               ),
-              title: const Text("Ordenes de Compra"),
-              onTap: () {
-                context.pushNamed("current-orders");
-              },
             ),
           ),
           const Divider(height: 0.0),
 
           RolePermissionGate(
             permissions: [CommercialSubModules.createOrder],
-            child: ListTile(
-              leading: Icon(
-                FluentIcons.receipt_add_24_filled,
-                size: 32,
-                color: Colors.lightBlue.shade600,
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.saleOrder,
+              child: ListTile(
+                leading: Icon(
+                  FluentIcons.receipt_add_24_filled,
+                  size: 32,
+                  color: Colors.lightBlue.shade600,
+                ),
+                title: const Text("Crear Orden de Compra"),
+                onTap: () {
+                  context.pushNamed("sale-order");
+                },
               ),
-              title: const Text("Crear Orden de Compra"),
-              onTap: () {
-                context.pushNamed("sale-order");
-              },
             ),
           ),
 
@@ -339,16 +391,19 @@ class _Body extends StatelessWidget {
 
           RolePermissionGate(
             permissions: [CommercialSubModules.pendingInvoices],
-            child: ListTile(
-              leading: Icon(
-                Icons.content_paste_search_rounded,
-                size: 32,
-                color: Colors.teal.shade600,
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.receiptHistory,
+              child: ListTile(
+                leading: Icon(
+                  Icons.content_paste_search_rounded,
+                  size: 32,
+                  color: Colors.teal.shade600,
+                ),
+                title: const Text("Historial de Recibos"),
+                onTap: () {
+                  context.pushNamed("receipt-history");
+                },
               ),
-              title: const Text("Historial de Recibos"),
-              onTap: () {
-                context.pushNamed("receipt-history");
-              },
             ),
           ),
           const Divider(height: 0.0),
@@ -360,33 +415,39 @@ class _Body extends StatelessWidget {
 
           RolePermissionGate(
             permissions: [CommercialSubModules.processDevolution],
-            child: ListTile(
-              leading: Icon(
-                Icons.file_open_rounded,
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.currentDevolution,
+              child: ListTile(
+                leading: Icon(
+                  Icons.file_open_rounded,
 
-                size: 32,
-                color: Colors.orange.shade600,
+                  size: 32,
+                  color: Colors.orange.shade600,
+                ),
+                title: const Text("Devoluciones"),
+                onTap: () {
+                  context.pushNamed("current-devolution");
+                },
               ),
-              title: const Text("Devoluciones"),
-              onTap: () {
-                context.pushNamed("current-devolution");
-              },
             ),
           ),
           const Divider(height: 0.0),
 
           RolePermissionGate(
             permissions: [CommercialSubModules.createDevolution],
-            child: ListTile(
-              leading: Icon(
-                Icons.file_open_rounded,
-                size: 32,
-                color: Colors.blue.shade600,
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.clientDevolution,
+              child: ListTile(
+                leading: Icon(
+                  Icons.file_open_rounded,
+                  size: 32,
+                  color: Colors.blue.shade600,
+                ),
+                title: const Text("Crear Devolucion de Productos a Clientes"),
+                onTap: () {
+                  context.pushNamed("client-devolution");
+                },
               ),
-              title: const Text("Crear Devolucion de Productos a Clientes"),
-              onTap: () {
-                context.pushNamed("client-devolution");
-              },
             ),
           ),
 
@@ -394,16 +455,19 @@ class _Body extends StatelessWidget {
 
           RolePermissionGate(
             permissions: [CommercialSubModules.createDevolution],
-            child: ListTile(
-              leading: Icon(
-                Icons.content_paste_search_rounded,
-                size: 32,
-                color: Colors.orange.shade600,
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.devolutionHistory,
+              child: ListTile(
+                leading: Icon(
+                  Icons.content_paste_search_rounded,
+                  size: 32,
+                  color: Colors.orange.shade600,
+                ),
+                title: const Text("Historial de Devoluciones"),
+                onTap: () {
+                  context.pushNamed("devolution-history");
+                },
               ),
-              title: const Text("Historial de Devoluciones"),
-              onTap: () {
-                context.pushNamed("devolution-history");
-              },
             ),
           ),
 
