@@ -1,8 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/src/domain/models/common/branches_detail.dart';
-import 'package:kardex_app_front/src/domain/models/executive_summary/executive_summary_in_db.dart';
-import 'package:kardex_app_front/src/domain/query_params/daily_summary_params.dart';
-import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 part 'read_branch_executive_summary_state.dart';
 

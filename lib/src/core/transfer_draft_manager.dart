@@ -1,8 +1,6 @@
 import 'dart:convert';
 
-import 'package:kardex_app_front/src/domain/models/branch/branch_model.dart';
-import 'package:kardex_app_front/src/domain/models/product/product_model.dart';
-import 'package:kardex_app_front/src/services/hive_service.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/tables/transfer_product_table.dart';
 
 class TransferDraft {

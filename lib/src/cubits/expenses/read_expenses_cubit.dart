@@ -1,11 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
-import 'package:kardex_app_front/src/domain/models/expense/expense_model.dart';
-import 'package:kardex_app_front/src/domain/models/expense_category_model/expense_category_model.dart';
-import 'package:kardex_app_front/src/domain/query_params/expense_query_params.dart';
-import 'package:kardex_app_front/src/domain/repositories/expenses_repository.dart';
-import 'package:kardex_app_front/src/domain/repositories/expense_categories_repository.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 part 'read_expenses_state.dart';
 

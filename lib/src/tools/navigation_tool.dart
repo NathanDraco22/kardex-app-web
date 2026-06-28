@@ -1,5 +1,4 @@
-import 'package:kardex_app_front/src/domain/models/servin/servin.dart';
-import 'package:kardex_app_front/src/domain/models/user/user_model.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 class NavigationTool {
   static String getNavigationAuthenticatedDestination(Servin servin, UserInDb user) {

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/cubits/read_active_users/read_active_users_cubit.dart';
-import 'package:kardex_app_front/src/domain/models/user/user_model.dart';
-import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 
 Future<UserInDb?> showActiveUserSelectionDialog(BuildContext context) async {

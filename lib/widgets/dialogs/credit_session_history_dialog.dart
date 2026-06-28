@@ -3,10 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/cubits/receipt_history/read_receipt_history_cubit.dart';
-import 'package:kardex_app_front/src/domain/models/client/client.dart';
-import 'package:kardex_app_front/src/domain/repositories/receipt_repository.dart';
-import 'package:kardex_app_front/src/tools/datetime_tool.dart';
-import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/receipt_viewer.dart';
 
 Future<void> showCreditSessionHistoryDialog(BuildContext context, ClientInDb client) async {

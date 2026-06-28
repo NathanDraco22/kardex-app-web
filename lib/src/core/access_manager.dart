@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
-import 'package:kardex_app_front/src/domain/models/user/user_model.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 class AccessManager {
   static final AccessManager _instance = AccessManager._internal();

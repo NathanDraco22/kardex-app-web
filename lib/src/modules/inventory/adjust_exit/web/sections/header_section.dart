@@ -137,6 +137,11 @@ Future<void> saveAction(BuildContext context) async {
   final mediator = AdjustExitMediator.read(context)!;
   if (!mediator.hasAllRequiredFields()) return;
 
+  if (mediator.hasProductWithZeroValue()) {
+    await DialogManager.showErrorDialog(context, "No se pueden guardar productos con cantidad 0");
+    return;
+  }
+
   final res = await DialogManager.slideToConfirmActionDialog(
     context,
     "¿Deseas guardar la Salida? (No se puede deshacer)",

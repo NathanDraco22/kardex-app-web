@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/cubits/adjust_entry_history/read_adjust_entry_history_cubit.dart';
-import 'package:kardex_app_front/src/domain/models/adjust_entry/adjust_entry_model.dart';
-import 'package:kardex_app_front/src/domain/repositories/adjust_entries_repository.dart';
-import 'package:kardex_app_front/src/tools/datetime_tool.dart';
-import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/date_picker_button.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/adjust_entry_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/simple_search_dialog.dart';

@@ -16,6 +16,7 @@ class _SupplierFormContent extends StatefulWidget {
 }
 
 class _SupplierFormContentState extends State<_SupplierFormContent> {
+  final _supplierFieldKey = GlobalKey<FormFieldState<String>>();
   ExpenseType selectedType = ExpenseType.supplier;
   int amountInCents = 0;
   int dateTimestamp = DateTime.now().millisecondsSinceEpoch;
@@ -57,6 +58,7 @@ class _SupplierFormContentState extends State<_SupplierFormContent> {
   Future<void> _selectSupplier() async {
     final selected = await showSupplierSelectionDialog(context);
     if (selected != null) {
+      _supplierFieldKey.currentState?.didChange(selected.id);
       setState(() {
         supplierId = selected.id;
         supplierName = selected.name;
@@ -93,6 +95,7 @@ class _SupplierFormContentState extends State<_SupplierFormContent> {
             onTap: _selectSupplier,
             borderRadius: BorderRadius.circular(8),
             child: FormField<String>(
+              key: _supplierFieldKey,
               initialValue: supplierId,
               validator: (_) {
                 if (supplierId == null || supplierId!.isEmpty) {

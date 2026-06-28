@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kardex_app_front/src/domain/models/common/coordinates.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/map/map_nic_widget.dart';
 import 'package:kardex_app_front/widgets/map/marker_point.dart';
 import 'package:latlong2/latlong.dart';

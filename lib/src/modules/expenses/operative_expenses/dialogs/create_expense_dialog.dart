@@ -4,16 +4,13 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/cubits/expenses/write_expenses_cubit.dart';
-import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
-import 'package:kardex_app_front/src/domain/models/expense/expense_model.dart';
-import 'package:kardex_app_front/src/domain/repositories/expense_categories_repository.dart';
-import 'package:kardex_app_front/src/tools/loading_dialog.dart';
-import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/src/tools/tools.dart';
+
 import 'package:kardex_app_front/widgets/date_picker_button.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
 import 'package:kardex_app_front/widgets/dropdown/expense_category_dropdown.dart';
-import 'package:kardex_app_front/src/tools/extensiones.dart';
 
 part 'form_section.dart';
 

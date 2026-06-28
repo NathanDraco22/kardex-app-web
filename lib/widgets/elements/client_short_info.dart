@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 class ClientShortInfo extends StatelessWidget {
   const ClientShortInfo({

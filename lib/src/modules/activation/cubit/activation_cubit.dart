@@ -1,7 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/src/domain/models/servin/servin.dart';
-import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
-import 'package:kardex_app_front/src/tools/http_tool.dart';
+import 'package:kardex_app_front/src/core/app_kardex_config.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 part 'activation_state.dart';
 
@@ -15,7 +14,7 @@ class ActivationCubit extends Cubit<ActivationState> {
     try {
       final servin = await servinRepository.getActiveServin(apiKey, nickname);
 
-      HttpTools.baseUrl = servin.url;
+      AppKardexConfig().setBaseUrl(servin.url);
       emit(ActivationSuccess(servin));
     } catch (error) {
       emit(ActivationError(error.toString()));

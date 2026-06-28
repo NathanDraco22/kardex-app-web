@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/src/domain/models/expense_category_model/expense_category_model.dart';
-import 'package:kardex_app_front/src/domain/repositories/expense_categories_repository.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 class ExpenseCategoryDropdown extends StatelessWidget {
   const ExpenseCategoryDropdown({

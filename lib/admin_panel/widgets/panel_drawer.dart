@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
-import 'package:kardex_app_front/src/domain/models/user/user_model.dart';
-import 'package:kardex_app_front/src/modules/change_password/change_password_screen.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_app_front/src/modules/change_password/change_password_screen.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
 class PanelEndDrawer extends StatelessWidget {

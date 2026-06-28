@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/src/domain/models/transfer/transfer_in_db.dart';
-import 'package:kardex_app_front/src/domain/repositories/transfers_repository.dart';
-import 'package:kardex_app_front/src/tools/datetime_tool.dart';
-import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 Future<void> showTransferViewerDialog(BuildContext context, TransferInDb transfer) async {
   await Navigator.push(

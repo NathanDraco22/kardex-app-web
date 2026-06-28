@@ -3,14 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
-import 'package:kardex_app_front/src/domain/models/client/client.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/client_list/cubit/client_read_cubit.dart';
 import 'package:kardex_app_front/widgets/dialogs/client_full_details_dialog.dart';
 import 'package:kardex_app_front/widgets/map/map_nic_widget.dart';
 import 'package:kardex_app_front/widgets/map/marker_point.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../../../../domain/repositories/repositories.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 class ClientMapScreenWeb extends StatelessWidget {
   const ClientMapScreenWeb({super.key});

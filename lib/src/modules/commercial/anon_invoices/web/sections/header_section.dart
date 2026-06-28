@@ -56,9 +56,7 @@ class _HeaderSection extends StatelessWidget {
                 child: Column(
                   children: [
                     const Flexible(
-                      child: Flexible(
-                        child: MenuActions(),
-                      ),
+                      child: MenuActions(),
                     ),
                     Flexible(
                       flex: 3,
@@ -101,6 +99,7 @@ class MenuActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewController = AnonInvoiceWebMediator.of(context).viewController;
+    final tableController = AnonInvoiceWebMediator.of(context).tableController;
 
     String saveButtonTitle = "Facturar";
 
@@ -126,10 +125,21 @@ class MenuActions extends StatelessWidget {
               icon: const Icon(Icons.search),
             ),
 
-            ElevatedButton.icon(
-              onPressed: () => saveAnonInvoiceAction(context),
-              icon: Icon(saveIcon),
-              label: Text(saveButtonTitle),
+            ListenableBuilder(
+              listenable: tableController,
+              builder: (context, _) {
+                Function()? callback;
+
+                if (tableController.items.isNotEmpty) {
+                  callback = () => saveAnonInvoiceAction(context);
+                }
+
+                return ElevatedButton.icon(
+                  onPressed: callback,
+                  icon: Icon(saveIcon),
+                  label: Text(saveButtonTitle),
+                );
+              },
             ),
           ],
         );
@@ -143,6 +153,19 @@ Future<void> saveAnonInvoiceAction(
 ) async {
   final viewController = AnonInvoiceWebMediator.of(context).viewController;
   final tableController = AnonInvoiceWebMediator.of(context).tableController;
+  if (tableController.items.isEmpty) {
+    return;
+  }
+
+  final items = tableController.items;
+
+  for (var item in items) {
+    if (item.commercial.quantity == 0) {
+      await DialogManager.showInfoDialog(context, "${item.commercial.product.name} sin cantidad");
+      return;
+    }
+  }
+
   CreateInvoice newInvoice = createAnonInvoiceFromControllers(
     viewController,
     tableController,

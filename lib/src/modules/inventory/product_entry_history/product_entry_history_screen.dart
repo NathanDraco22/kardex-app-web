@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
+import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/inventory/product_entry_history/cubit/read_product_entry_history_cubit.dart';
 import 'package:kardex_app_front/src/modules/inventory/product_entry_history/view/web/product_entry_history_screen_web.dart';
 import 'package:kardex_app_front/src/modules/inventory/product_entry_history/view/mobile/product_entry_history_screen_mobile.dart';

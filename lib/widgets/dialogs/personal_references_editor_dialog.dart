@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
 Future<List<PersonalReference>?> showClientPersonalReferenceEditor(

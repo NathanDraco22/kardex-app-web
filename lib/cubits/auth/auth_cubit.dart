@@ -1,16 +1,9 @@
 import 'dart:developer';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/constants/default_values.dart';
+import 'package:kardex_app_front/src/core/app_kardex_config.dart';
 import 'package:kardex_app_front/src/core/session_manager.dart';
-import 'package:kardex_app_front/src/core/token_manager.dart';
-import 'package:kardex_app_front/src/domain/models/branch/branch.dart';
-import 'package:kardex_app_front/src/domain/models/servin/servin.dart';
-import 'package:kardex_app_front/src/domain/models/user/user_model.dart';
-import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
-import 'package:kardex_app_front/src/domain/responses/login_responses.dart';
-import 'package:kardex_app_front/src/services/exceptions/http_exceptions.dart';
-import 'package:kardex_app_front/src/tools/http_tool.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 part 'auth_state.dart';
 
@@ -186,7 +179,7 @@ class AuthCubit extends Cubit<AuthState> {
     if (currentServin != null) {
       _updateNetworkConfig(servin: currentServin, branch: null);
     } else {
-      HttpTools.currentBranch = null;
+      AppKardexConfig().setBranchId(null);
     }
 
     TokenManager().removeToken();
@@ -205,9 +198,9 @@ class AuthCubit extends Cubit<AuthState> {
     required Servin servin,
     BranchInDb? branch,
   }) {
-    HttpTools.baseUrl = servin.url;
-    HttpTools.servin = servin;
-    HttpTools.currentBranch = branch;
+    AppKardexConfig().setBaseUrl(servin.url);
+    AppKardexConfig().setServinNickname(servin.nickname);
+    AppKardexConfig().setBranchId(branch?.id);
   }
 
   Future<void> _initializeSession({

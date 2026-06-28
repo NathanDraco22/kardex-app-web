@@ -1,12 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/src/domain/models/receipt/receipt_model.dart';
-import 'package:kardex_app_front/src/domain/models/receipt/receipt_total.dart';
-import 'package:kardex_app_front/src/domain/query_params/receipt_query_params.dart';
-import 'package:kardex_app_front/src/domain/repositories/receipt_repository.dart';
-import 'package:kardex_app_front/src/domain/responses/list_responses.dart';
-import 'package:kardex_app_front/src/tools/datetime_tool.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 part 'read_daily_receipt_state.dart';
 

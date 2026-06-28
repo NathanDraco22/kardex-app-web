@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/modules/inventory/expiration_logs/cubit/read_expiration_log_cubit.dart';
 import 'package:kardex_app_front/src/modules/inventory/expiration_logs/modals/create_expiration_log.dart';
 import 'package:kardex_app_front/src/modules/inventory/expiration_logs/modals/expiration_log_viewer.dart';
-import 'package:kardex_app_front/src/tools/datetime_tool.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 
 import '../cubit/write_expiration_log_cubit.dart';

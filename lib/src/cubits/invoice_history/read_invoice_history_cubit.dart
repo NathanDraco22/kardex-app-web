@@ -1,8 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
-import 'package:kardex_app_front/src/domain/models/invoice/invoice_totals.dart';
-import 'package:kardex_app_front/src/domain/query_params/history_params.dart';
-import 'package:kardex_app_front/src/domain/repositories/invoice_repository.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 part 'read_invoice_history_state.dart';
 
