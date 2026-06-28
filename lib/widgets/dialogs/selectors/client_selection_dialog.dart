@@ -44,6 +44,7 @@ class _ClientSelectionDialogState extends State<ClientSelectionDialog> {
     try {
       final clientsRepo = context.read<ClientsRepository>();
       final clients = await clientsRepo.searchClientByKeyword(keyword);
+      if (!mounted) return;
       setState(() {
         _clients = clients;
         _isLoading = false;

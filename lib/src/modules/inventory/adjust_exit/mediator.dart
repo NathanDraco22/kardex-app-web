@@ -53,4 +53,20 @@ class AdjustExitMediator extends InheritedNotifier<AdjustExitNotifier> {
     if (productListViewController.rowCards.isEmpty) return false;
     return true;
   }
+
+  bool hasProductWithZeroValue() {
+    final rows = productTableController.rows;
+    for (var row in rows) {
+      if (row.quantity == 0) return true;
+    }
+    return false;
+  }
+
+  bool hasMobileProductWithZeroValue() {
+    final rows = productListViewController.rowCards;
+    for (var row in rows) {
+      if (row.quantity == 0) return true;
+    }
+    return false;
+  }
 }

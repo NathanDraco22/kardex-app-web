@@ -57,6 +57,7 @@ class _AnonInvoicesScreenWebState extends State<AnonInvoicesScreenWeb> {
           String message = "Factura guardada con éxito";
           await DialogManager.showInfoDialog(context, message);
           if (!context.mounted) return;
+          viewController.description = '';
           rebuild = true;
           setState(() {});
         }

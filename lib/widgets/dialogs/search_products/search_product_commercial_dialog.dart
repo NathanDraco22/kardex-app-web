@@ -134,6 +134,7 @@ class _SearchProductCommercialDialogState extends State<SearchProductCommercialD
                             setState(() {});
                             final branchId = getIt<AuthCubit>().currentBranchId;
                             products = await _productsRepository.searchProductInBranch(value, branchId);
+                            if (!mounted) return;
                             isSearching = false;
                             setState(() {});
                           },

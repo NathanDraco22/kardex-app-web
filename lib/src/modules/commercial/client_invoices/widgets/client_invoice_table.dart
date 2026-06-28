@@ -265,7 +265,8 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
             commercialProductResult: item,
           );
           if (res == null) return;
-          if (widget.restrictQuantity && res.quantity > res.product.account.availableStock) {
+          if (widget.restrictQuantity &&
+              (res.quantity > res.product.account.availableStock || res.product.account.availableStock == 0)) {
             if (!context.mounted) return;
             await DialogManager.showErrorDialog(
               context,

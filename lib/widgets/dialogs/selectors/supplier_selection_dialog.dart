@@ -44,6 +44,7 @@ class _SupplierSelectionDialogState extends State<SupplierSelectionDialog> {
     try {
       final suppliersRepo = context.read<SuppliersRepository>();
       final suppliers = await suppliersRepo.searchSupplierByKeyword(keyword);
+      if (!mounted) return;
       setState(() {
         _suppliers = suppliers;
         _isLoading = false;

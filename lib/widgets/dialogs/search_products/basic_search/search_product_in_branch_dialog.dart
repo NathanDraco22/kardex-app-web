@@ -116,6 +116,7 @@ class _SearchProductInBranchDialogState extends State<SearchProductInBranchDialo
                             setState(() {});
                             final branchId = getIt<AuthCubit>().currentBranchId;
                             products = await _productsRepository.searchProductInBranch(value, branchId);
+                            if (!mounted) return;
                             isSearching = false;
                             setState(() {});
                           },

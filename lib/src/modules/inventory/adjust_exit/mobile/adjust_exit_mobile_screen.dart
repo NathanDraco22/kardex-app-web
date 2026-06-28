@@ -70,10 +70,10 @@ class _MobileScaffold extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.save),
             onPressed: () async {
-              if (!mediator.hasMobileAllRequiredFields()) {
+              if (!mediator.hasMobileAllRequiredFields() || mediator.hasMobileProductWithZeroValue()) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text("Complete todos los campos"),
+                    content: Text("Complete todos los campos y asegúrese de que las cantidades sean mayores a 0"),
                   ),
                 );
                 return;
