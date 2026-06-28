@@ -12,6 +12,8 @@ import 'package:kardex_app_front/src/cubits/finance/read_finance_charts_cubit.da
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
 import 'package:kardex_app_front/src/tools/number_formatter.dart';
 import 'package:kardex_app_front/widgets/menu_app_bar.dart';
+import 'package:kardex_app_front/constants/route_names.dart';
+import 'package:kardex_app_front/widgets/shortcut_addable_list_tile.dart';
 
 class FinancesMenuScreen extends StatelessWidget {
   const FinancesMenuScreen({super.key});
@@ -68,67 +70,85 @@ class _Body extends StatelessWidget {
             _ChartsCard(state: state),
             const SizedBox(height: 12),
             const Divider(height: 0.0),
-            ListTile(
-              leading: const Icon(
-                Icons.analytics_outlined,
-                color: Colors.orange,
+            ShortcutAddableListTile(
+              routeName: RouteNames.dailyOperationsResults,
+              child: ListTile(
+                leading: const Icon(
+                  Icons.analytics_outlined,
+                  color: Colors.orange,
+                ),
+                title: const Text("Resultado de Operaciones Diarias"),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.pushNamed("daily-operations-results"),
               ),
-              title: const Text("Resultado de Operaciones Diarias"),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => context.pushNamed("daily-operations-results"),
             ),
             const Divider(height: 0.0),
-            ListTile(
-              leading: const Icon(
-                FluentIcons.notepad_person_24_filled,
-                color: Colors.blue,
+            ShortcutAddableListTile(
+              routeName: RouteNames.clientAccounts,
+              child: ListTile(
+                leading: const Icon(
+                  FluentIcons.notepad_person_24_filled,
+                  color: Colors.blue,
+                ),
+                title: const Text("Estado de cuenta de Clientes"),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.pushNamed("client-accounts"),
               ),
-              title: const Text("Estado de cuenta de Clientes"),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => context.pushNamed("client-accounts"),
             ),
             const Divider(height: 0.0),
 
-            ListTile(
-              leading: const Icon(
-                Icons.content_paste_search_rounded,
-                color: Colors.green,
+            ShortcutAddableListTile(
+              routeName: RouteNames.detailInvoiceHistory,
+              child: ListTile(
+                leading: const Icon(
+                  Icons.content_paste_search_rounded,
+                  color: Colors.green,
+                ),
+                title: const Text("Historial Detallado de Facturas"),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.pushNamed("detail-invoice-history"),
               ),
-              title: const Text("Historial Detallado de Facturas"),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => context.pushNamed("detail-invoice-history"),
             ),
 
             const Divider(height: 0.0),
 
-            ListTile(
-              leading: const Icon(
-                FluentIcons.receipt_money_24_filled,
-                color: Colors.green,
+            ShortcutAddableListTile(
+              routeName: RouteNames.paidInvoices,
+              child: ListTile(
+                leading: const Icon(
+                  FluentIcons.receipt_money_24_filled,
+                  color: Colors.green,
+                ),
+                title: const Text("Facturas Liquidadas"),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.pushNamed("paid-invoices"),
               ),
-              title: const Text("Facturas Liquidadas"),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => context.pushNamed("paid-invoices"),
             ),
             const Divider(height: 0.0),
-            ListTile(
-              leading: const Icon(
-                Icons.bar_chart_rounded,
-                color: Colors.blue,
+            ShortcutAddableListTile(
+              routeName: RouteNames.branchDailySummary,
+              child: ListTile(
+                leading: const Icon(
+                  Icons.bar_chart_rounded,
+                  color: Colors.blue,
+                ),
+                title: const Text("Resumen Diario"),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.pushNamed("branch-daily-summary"),
               ),
-              title: const Text("Resumen Diario"),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => context.pushNamed("branch-daily-summary"),
             ),
             const Divider(height: 0.0),
-            ListTile(
-              leading: const Icon(
-                Icons.pie_chart_rounded,
-                color: Colors.purple,
+            ShortcutAddableListTile(
+              routeName: RouteNames.branchExecutiveSummary,
+              child: ListTile(
+                leading: const Icon(
+                  Icons.pie_chart_rounded,
+                  color: Colors.purple,
+                ),
+                title: const Text("Resumen Ejecutivo"),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.pushNamed("branch-executive-summary"),
               ),
-              title: const Text("Resumen Ejecutivo"),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => context.pushNamed("branch-executive-summary"),
             ),
             const Divider(height: 0.0),
           ],

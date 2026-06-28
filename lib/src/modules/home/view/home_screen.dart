@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/cubits/shortcuts/shortcuts_cubit.dart';
 import 'package:kardex_app_front/cubits/toast/toast_cubit.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/src/domain/models/user_role/modules.dart';
 import 'package:kardex_app_front/widgets/gates/role_permission_gate.dart';
 import 'package:toastification/toastification.dart';
+import 'package:kardex_app_front/constants/route_names.dart';
 import 'package:kardex_app_front/src/tools/constant.dart';
 import 'package:kardex_app_front/src/domain/models/branch/branch_model.dart';
 
@@ -74,6 +76,9 @@ class _RootScaffold extends StatelessWidget {
 
         final user = authState.session.user;
 
+        final hasShortcuts =
+            context.watch<ShortcutsCubit>().state.shortcuts.isNotEmpty;
+
         return BlocListener<ToastCubit, ToastState>(
           listener: (context, state) {
             if (state is! ToastMessage) {
@@ -87,6 +92,18 @@ class _RootScaffold extends StatelessWidget {
             );
           },
           child: Scaffold(
+            floatingActionButton: hasShortcuts
+                ? FloatingActionButton(
+                    heroTag: null,
+                    onPressed: () => context.pushNamed(RouteNames.shortcuts),
+                    child: const Icon(FluentIcons.bookmark_multiple_24_filled),
+                  )
+                : null,
+            floatingActionButtonLocation: hasShortcuts
+                ? (MediaQuery.sizeOf(context).width < maxPhoneScreenWidth
+                    ? FloatingActionButtonLocation.endFloat
+                    : FloatingActionButtonLocation.centerTop)
+                : null,
             endDrawer: HomeEndDrawer(user: user),
             appBar: AppBar(
               title: const Text("Neptuno App"),

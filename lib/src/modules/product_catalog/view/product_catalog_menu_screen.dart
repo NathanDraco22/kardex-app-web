@@ -1,7 +1,9 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/constants/route_names.dart';
 import 'package:kardex_app_front/src/domain/models/user_role/modules.dart';
+import 'package:kardex_app_front/widgets/shortcut_addable_list_tile.dart';
 
 class ProductCatalogMenuScreen extends StatelessWidget {
   const ProductCatalogMenuScreen({super.key});
@@ -34,34 +36,43 @@ class _Body extends StatelessWidget {
     return Center(
       child: ListView(
         children: [
-          ListTile(
-            leading: const Icon(FluentIcons.cube_12_filled),
-            title: const Text("Lista Global de Productos"),
-            onTap: () {
-              context.pushNamed("product-list");
-            },
-            trailing: const Icon(Icons.chevron_right),
+          ShortcutAddableListTile(
+            routeName: RouteNames.productList,
+            child: ListTile(
+              leading: const Icon(FluentIcons.cube_12_filled),
+              title: const Text("Lista Global de Productos"),
+              onTap: () {
+                context.pushNamed("product-list");
+              },
+              trailing: const Icon(Icons.chevron_right),
+            ),
           ),
           const Divider(
             height: 0.0,
           ),
 
-          ListTile(
-            leading: const Icon(Icons.tag),
-            title: const Text("Unidades de Medida de Productos"),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              context.pushNamed("units");
-            },
+          ShortcutAddableListTile(
+            routeName: RouteNames.units,
+            child: ListTile(
+              leading: const Icon(Icons.tag),
+              title: const Text("Unidades de Medida de Productos"),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                context.pushNamed("units");
+              },
+            ),
           ),
           const Divider(height: 0.0),
-          ListTile(
-            leading: const Icon(Icons.category_rounded),
-            title: const Text("Lista de Categorias de Productos"),
-            onTap: () {
-              context.pushNamed("product-category");
-            },
-            trailing: const Icon(Icons.chevron_right),
+          ShortcutAddableListTile(
+            routeName: RouteNames.productCategory,
+            child: ListTile(
+              leading: const Icon(Icons.category_rounded),
+              title: const Text("Lista de Categorias de Productos"),
+              onTap: () {
+                context.pushNamed("product-category");
+              },
+              trailing: const Icon(Icons.chevron_right),
+            ),
           ),
           const Divider(
             height: 0.0,

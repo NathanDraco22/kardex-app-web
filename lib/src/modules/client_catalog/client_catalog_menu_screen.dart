@@ -2,7 +2,9 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/constants/route_names.dart';
 import 'package:kardex_app_front/src/domain/models/user_role/modules.dart';
+import 'package:kardex_app_front/widgets/shortcut_addable_list_tile.dart';
 import 'package:kardex_app_front/widgets/dialogs/client_full_details_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/simple_search_dialog.dart';
@@ -46,24 +48,30 @@ class _Body extends StatelessWidget {
     return Center(
       child: ListView(
         children: [
-          ListTile(
-            leading: const Icon(FluentIcons.person_12_filled),
-            title: const Text("Lista de Clientes"),
-            onTap: () {
-              context.pushNamed("client-list");
-            },
-            trailing: const Icon(Icons.chevron_right),
+          ShortcutAddableListTile(
+            routeName: RouteNames.clientList,
+            child: ListTile(
+              leading: const Icon(FluentIcons.person_12_filled),
+              title: const Text("Lista de Clientes"),
+              onTap: () {
+                context.pushNamed("client-list");
+              },
+              trailing: const Icon(Icons.chevron_right),
+            ),
           ),
           const Divider(
             height: 0.0,
           ),
-          ListTile(
-            leading: const Icon(Icons.account_balance_wallet_rounded),
-            title: const Text("Saldos Iniciales"),
-            onTap: () {
-              context.pushNamed("initial-balance");
-            },
-            trailing: const Icon(Icons.chevron_right),
+          ShortcutAddableListTile(
+            routeName: RouteNames.initialBalance,
+            child: ListTile(
+              leading: const Icon(Icons.account_balance_wallet_rounded),
+              title: const Text("Saldos Iniciales"),
+              onTap: () {
+                context.pushNamed("initial-balance");
+              },
+              trailing: const Icon(Icons.chevron_right),
+            ),
           ),
           const Divider(
             height: 0.0,
@@ -92,24 +100,30 @@ class _Body extends StatelessWidget {
           const Divider(
             height: 0.0,
           ),
-          ListTile(
-            leading: const Icon(Icons.map_rounded),
-            title: const Text("Mapa de Clientes"),
-            onTap: () {
-              context.pushNamed("client-map");
-            },
-            trailing: const Icon(Icons.chevron_right),
+          ShortcutAddableListTile(
+            routeName: RouteNames.clientMap,
+            child: ListTile(
+              leading: const Icon(Icons.map_rounded),
+              title: const Text("Mapa de Clientes"),
+              onTap: () {
+                context.pushNamed("client-map");
+              },
+              trailing: const Icon(Icons.chevron_right),
+            ),
           ),
           const Divider(
             height: 0.0,
           ),
-          ListTile(
-            leading: const Icon(Icons.group_work_rounded),
-            title: const Text("Grupos de Clientes"),
-            onTap: () {
-              context.pushNamed("client-groups");
-            },
-            trailing: const Icon(Icons.chevron_right),
+          ShortcutAddableListTile(
+            routeName: RouteNames.clientGroups,
+            child: ListTile(
+              leading: const Icon(Icons.group_work_rounded),
+              title: const Text("Grupos de Clientes"),
+              onTap: () {
+                context.pushNamed("client-groups");
+              },
+              trailing: const Icon(Icons.chevron_right),
+            ),
           ),
           const Divider(
             height: 0.0,

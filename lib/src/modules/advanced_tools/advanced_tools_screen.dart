@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/constants/route_names.dart';
 import 'package:kardex_app_front/widgets/menu_app_bar.dart';
+import 'package:kardex_app_front/widgets/shortcut_addable_list_tile.dart';
 
 class AdvancedToolsScreen extends StatelessWidget {
   const AdvancedToolsScreen({super.key});
@@ -31,29 +33,35 @@ class _Body extends StatelessWidget {
     return Center(
       child: ListView(
         children: [
-          ListTile(
-            leading: const Icon(
-              Icons.calculate,
-              color: Colors.blue,
-              size: 28,
+          ShortcutAddableListTile(
+            routeName: RouteNames.productStats,
+            child: ListTile(
+              leading: const Icon(
+                Icons.calculate,
+                color: Colors.blue,
+                size: 28,
+              ),
+              title: const Text("Estimación de Productos por Ventas"),
+              onTap: () {
+                context.pushNamed("product-stats");
+              },
             ),
-            title: const Text("Estimación de Productos por Ventas"),
-            onTap: () {
-              context.pushNamed("product-stats");
-            },
           ),
           const Divider(height: 0.0),
 
-          ListTile(
-            leading: const Icon(
-              Icons.calculate,
-              color: Colors.green,
-              size: 28,
+          ShortcutAddableListTile(
+            routeName: RouteNames.saleProjection,
+            child: ListTile(
+              leading: const Icon(
+                Icons.calculate,
+                color: Colors.green,
+                size: 28,
+              ),
+              title: const Text("Projecion de Ventas"),
+              onTap: () {
+                context.pushNamed("sale-projection");
+              },
             ),
-            title: const Text("Projecion de Ventas"),
-            onTap: () {
-              context.pushNamed("sale-projection");
-            },
           ),
           const Divider(height: 0.0),
         ],

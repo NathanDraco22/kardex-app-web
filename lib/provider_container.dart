@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/app_mode/app_mode_cubit.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/cubits/shortcuts/shortcuts_cubit.dart';
 import 'package:kardex_app_front/cubits/toast/toast_cubit.dart';
 import 'package:kardex_app_front/src/data/data_sources.dart';
 import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
@@ -280,6 +281,7 @@ class _GlobalCubitProviderState extends State<GlobalCubitProvider> {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => AppModeCubit()),
+        BlocProvider(create: (context) => ShortcutsCubit()),
         BlocProvider(
           create: (context) => ToastCubit(
             expirationLogsRepository: expirationLogRepo,

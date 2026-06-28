@@ -7,6 +7,7 @@ import 'package:kardex_app_front/admin_panel/admin_modules/admin_reports/executi
 import 'package:kardex_app_front/admin_panel/admin_panel_screen.dart';
 import 'package:kardex_app_front/src/modules/activation/activation_screen.dart';
 import 'package:kardex_app_front/src/modules/shortcuts/shortcuts_menu_screen.dart';
+import 'package:kardex_app_front/widgets/dialogs/global_stock_search_modal.dart';
 import 'package:kardex_app_front/src/modules/advanced_tools/advanced_tools_screen.dart';
 import 'package:kardex_app_front/src/modules/advanced_tools/product_stats/product_stats_screen.dart';
 import 'package:kardex_app_front/src/modules/advanced_tools/sale_projection/sale_projection_screen.dart';
@@ -131,6 +132,12 @@ class AppRouter {
         path: '/shortcuts',
         name: 'shortcuts',
         builder: (context, state) => const ShortcutsMenuScreen(),
+      ),
+
+      GoRoute(
+        path: '/global-stock-search',
+        name: 'global-stock-search',
+        builder: (context, state) => const GlobalStockSearchModal(),
       ),
 
       GoRoute(
