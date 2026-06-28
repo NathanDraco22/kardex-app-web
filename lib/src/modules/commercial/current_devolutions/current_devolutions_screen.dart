@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/commercial/current_devolutions/cubit/read_devolution_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/current_devolutions/web/current_devolutions_web_screen.dart';
 

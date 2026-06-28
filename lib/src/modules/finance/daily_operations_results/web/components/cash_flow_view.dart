@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kardex_app_front/src/domain/models/models.dart';
-import 'package:kardex_app_front/src/domain/models/receipt/receipt_model.dart';
-import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
-import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
-import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/custom_invoice_list_tile.dart';
 import 'package:kardex_app_front/widgets/custom_receipt_list_tile.dart';
 import 'package:kardex_app_front/widgets/dialogs/inspectors/invoice_inspector.dart';

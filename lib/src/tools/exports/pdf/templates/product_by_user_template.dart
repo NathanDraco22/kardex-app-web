@@ -1,7 +1,4 @@
-import 'package:kardex_app_front/src/domain/models/common/product_sale_total.dart';
-import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
-import 'package:kardex_app_front/src/tools/datetime_tool.dart';
-import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/pdf_template.dart';
 import 'package:kardex_app_front/widgets/pdf/basic_pdf_table_listview.dart';
 import 'package:pdf/pdf.dart';

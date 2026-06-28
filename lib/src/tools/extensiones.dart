@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kardex_app_front/src/domain/models/product_transaction/product_transaction.dart';
-import 'tools.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 extension BuildContextExtension on BuildContext {
   bool isMobile() => MediaQuery.sizeOf(this).width < maxPhoneScreenWidth;

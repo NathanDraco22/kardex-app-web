@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/constants/route_names.dart';
-import 'package:kardex_app_front/src/domain/models/user_role/modules.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/menu_app_bar.dart';
 import 'package:kardex_app_front/widgets/shortcut_addable_list_tile.dart';
 

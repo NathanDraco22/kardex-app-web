@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:kardex_app_front/src/domain/models/models.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/role_tools.dart';
-import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/title_label.dart';
 
 Future<void> showProductInBranchInfoDialog(

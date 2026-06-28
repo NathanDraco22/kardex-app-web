@@ -5,7 +5,7 @@ import 'package:kardex_app_front/src/modules/inventory/current_tranfers/transfer
 import 'package:kardex_app_front/src/modules/inventory/current_tranfers/widget/tranfer_status_badge.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
-import 'package:kardex_app_front/src/tools/datetime_tool.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/basic_table_listview.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 

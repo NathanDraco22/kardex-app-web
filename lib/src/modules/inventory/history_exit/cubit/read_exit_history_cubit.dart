@@ -1,7 +1,6 @@
 import 'dart:developer';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/src/domain/models/exit_history/exit_history_model.dart';
-import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 part 'read_exit_history_state.dart';
 

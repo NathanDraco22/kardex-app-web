@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 import 'package:kardex_app_front/widgets/title_label.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 class ProductInvoiceCard extends StatelessWidget {
   const ProductInvoiceCard({

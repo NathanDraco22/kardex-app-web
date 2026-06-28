@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/current_inventory_template.dart';
@@ -9,6 +8,7 @@ import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 
 import '../cubit/read_current_inventory_cubit.dart';
 import '../widgets/inventory_mobile_row.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 class CurrentInventoryScreenMobile extends StatelessWidget {
   const CurrentInventoryScreenMobile({super.key});

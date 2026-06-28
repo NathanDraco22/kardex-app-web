@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kardex_app_front/src/domain/models/branch/branch_model.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 Future<BranchInDb?> showBranchSelectionDialog(BuildContext context, List<BranchInDb> branches) async {
   return await showDialog<BranchInDb?>(

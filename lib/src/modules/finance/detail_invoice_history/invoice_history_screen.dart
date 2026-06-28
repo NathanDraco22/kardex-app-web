@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/cubits/invoice_history/read_invoice_history_cubit.dart';
-import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/finance/detail_invoice_history/web/invoice_history_web_screen.dart';
 
 class DetailInvoiceHistoryScreen extends StatelessWidget {

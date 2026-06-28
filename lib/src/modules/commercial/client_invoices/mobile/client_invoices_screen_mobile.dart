@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/cubit/write_invoice_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/mobile/mediator.dart';
-import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_modal.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/custom_product_commercial_search_delegate.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 
 import '../widgets/product_invoice_card.dart';
 import 'invoice_client_menu_screen.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 class ClientInvoicesScreenMobile extends StatefulWidget {
   const ClientInvoicesScreenMobile({

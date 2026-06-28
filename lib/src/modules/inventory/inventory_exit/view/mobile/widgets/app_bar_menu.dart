@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
-import 'package:kardex_app_front/src/domain/models/models.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_entry/modals/confirmation_save_modal.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_exit/cubit/write_exit_doc_cubit.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_exit/view/mediator.dart';

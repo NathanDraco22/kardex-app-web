@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/src/domain/models/exit_doc/exit_doc_model.dart';
-import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 part 'write_exit_doc_state.dart';
 

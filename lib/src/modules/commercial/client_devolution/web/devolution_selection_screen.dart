@@ -2,11 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
-import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
-import 'package:kardex_app_front/src/domain/models/devolution/devolution.dart';
-import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
-import 'package:kardex_app_front/src/tools/datetime_tool.dart';
-import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'devolution_confirmation_screen.dart';
 import 'mediators/devolution_selection_mediator.dart';
 

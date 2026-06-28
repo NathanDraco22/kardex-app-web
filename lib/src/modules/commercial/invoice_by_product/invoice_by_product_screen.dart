@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/cubits/invoice_by_product/read_invoice_by_product_cubit.dart';
-import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/commercial/invoice_by_product/web/invoice_by_product_web_screen.dart';
 
 class InvoiceByProductScreen extends StatelessWidget {

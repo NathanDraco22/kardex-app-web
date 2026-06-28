@@ -5,13 +5,10 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 
-import 'package:kardex_app_front/src/domain/models/adjust_exit/adjust_exit_model.dart';
-import 'package:kardex_app_front/src/domain/models/common/exit_items.dart';
-import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
-import 'package:kardex_app_front/src/domain/repositories/adjust_exits_repository.dart';
+import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/inventory/adjust_exit/cubit/write_adjust_exit_cubit.dart';
 
-import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/search_product_in_branch_delegate.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/search_product_in_branch_dialog.dart';
 

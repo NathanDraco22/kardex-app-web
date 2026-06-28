@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:kardex_app_front/src/domain/models/models.dart';
-import 'package:kardex_app_front/src/tools/input_formatter/input_formatter.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_app_front/src/tools/input_formatter/input_formatter.dart';
 import 'package:kardex_app_front/widgets/calculator/calculator_field.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/custom_product_search_delegate.dart';
 import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';

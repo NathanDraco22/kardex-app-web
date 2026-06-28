@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/web/mediator.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/widgets/more_action_row_button.dart';
-import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';

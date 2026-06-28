@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
-import 'package:kardex_app_front/src/domain/models/product_stat/product_stat_in_db.dart';
-import 'package:kardex_app_front/src/tools/datetime_tool.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 class SaleProjectionCsv {
   static Future<void> generateAndSave(

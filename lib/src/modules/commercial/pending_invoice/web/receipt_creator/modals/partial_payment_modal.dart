@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:kardex_app_front/src/domain/models/client/client.dart';
-import 'package:kardex_app_front/src/domain/models/devolution/devolution.dart';
-import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/modals/confirm_receipt_modal.dart';
-import 'package:kardex_app_front/src/tools/tools.dart';
 
 class PartialPaymentResult {
   final Map<String, double> payments;

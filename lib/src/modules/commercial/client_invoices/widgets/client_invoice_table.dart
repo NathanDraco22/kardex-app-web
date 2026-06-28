@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/widgets/display_product_code.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';

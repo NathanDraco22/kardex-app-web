@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kardex_app_front/src/domain/models/branch/branch.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/tables/transfer_product_table.dart';
 
 import 'mobile/widgets.dart';

@@ -4,13 +4,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 
-import 'package:kardex_app_front/src/domain/models/common/entry_items.dart';
-import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
-import 'package:kardex_app_front/src/domain/models/adjust_entry/adjust_entry_model.dart';
-import 'package:kardex_app_front/src/domain/repositories/adjust_entries_repository.dart';
+import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/inventory/adjust_entry/cubit/write_adjust_entry_cubit.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
-import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/search_product_in_branch_delegate.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/search_product_in_branch_dialog.dart';
 

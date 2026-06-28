@@ -1,4 +1,7 @@
 ## Gemini Added Memories
+- Se verificó y validó la migración completa al paquete local `kardex_business` (ubicado en `packages/kardex_business`). Tanto el análisis del paquete (`dart analyze`) como el del proyecto principal de Flutter (`flutter analyze`) se ejecutaron de manera exitosa y no reportaron ningún error ni advertencia estática ("No issues found!").
+- Se movieron las constantes de `lib/constants/default_values.dart` (como `kSaleClientId` y `kOriginBranchId`) al paquete independiente `kardex_business` (dentro de `packages/kardex_business/lib/constants/default_values.dart`), eliminando el archivo local duplicado de la raíz y adaptando las importaciones en `auth_cubit.dart` de forma limpia.
+- Se migró exitosamente la clase `TokenManager` (decodificación y control de expiración de tokens JWT) al subpaquete `kardex_business` (en `packages/kardex_business/lib/src/tools/token_manager.dart`), instalando la dependencia `dart_jsonwebtoken` en el paquete de lógica pura, eliminando el archivo duplicado del frontend y limpiando las importaciones correspondientes en `auth_cubit.dart` y `app_kardex_config.dart`.
 - He revisado y tengo en mi contexto el contenido de los modelos de `receipt` y `invoice`: `receipt_model.dart`, `receipt_total.dart`, `invoice_model.dart`, y `invoice_totals.dart`.
 - He revisado y tengo en mi contexto el contenido del modelo `devolution.dart`.
 - He revisado y tengo en mi contexto el contenido de los archivos `invoice_printer.dart` y `receipt_printer.dart` de la carpeta `tools/printers`.
@@ -365,5 +368,8 @@ Esta estructura se ha seguido para módulos como 'Historial de Facturas', 'Histo
 - El problema inicial se debía a que `buildWhen` en el `BlocBuilder` de la lista de accesos directos comparaba los conjuntos desordenados de rutas (`prev.routes.toSet() != curr.routes.toSet()`), lo que provocaba que evaluara a `false` al reordenar los mismos elementos, bloqueando la reconstrucción del árbol de widgets. Se solucionó utilizando `listEquals` de `package:flutter/foundation.dart` en `buildWhen`.
 - El parpadeo remanente ocurría por el comportamiento asíncrono de `ShortcutsCubit.updateOrder` (y métodos similares). Dado que se realizaba un `await` a la persistencia de Hive antes de emitir el estado (`emit`), había una desincronización temporal (de unos milisegundos) donde la UI se reconstruía con los datos viejos y luego saltaba a los nuevos. Se resolvió emitiendo el estado modificado inmediatamente de forma síncrona en el Cubit, delegando el guardado en Hive en segundo plano sin retrasar el flujo de la UI.
 
-
-
+## Corrección de Advertencias de Importación tras Migración a Paquete (Junio 2026)
+- Se identificó y resolvió una masiva cantidad de advertencias de linter (`implementation_imports`) que surgieron al migrar la lógica de negocio al paquete local `kardex_business`.
+- La causa era la importación directa de archivos privados de la carpeta `src` de otro paquete (ej. `package:kardex_business/src/...`).
+- Se desarrolló e implementó un script de automatización en Python (`fix_imports.py`) para refactorizar recursivamente todos los archivos `.dart` en la carpeta `lib/` de `kardex_app_front`.
+- El script consolidó todas las importaciones privadas en una única importación pública autorizada: `package:kardex_business/kardex_business.dart`, afectando exitosamente a 387 archivos y eliminando las advertencias del linter en la aplicación principal sin romper la compilación.

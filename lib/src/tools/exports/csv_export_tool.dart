@@ -2,9 +2,7 @@ import 'dart:convert';
 
 import 'package:file_saver/file_saver.dart';
 import 'package:flutter/foundation.dart';
-import 'package:kardex_app_front/src/domain/models/common/product_sale_total.dart';
-import 'package:kardex_app_front/src/domain/models/expense/expense_model.dart';
-import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 class CsvExportTool {
   static Future<void> exportProductSalesToCSV({

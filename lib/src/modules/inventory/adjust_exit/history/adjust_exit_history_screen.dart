@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/cubits/adjust_exit_history/read_adjust_exit_history_cubit.dart';
-import 'package:kardex_app_front/src/domain/repositories/adjust_exits_repository.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/inventory/adjust_exit/history/web/adjust_exit_history_web_screen.dart';
 
 class AdjustExitHistoryScreen extends StatelessWidget {

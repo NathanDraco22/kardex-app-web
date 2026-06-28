@@ -1,7 +1,4 @@
-import 'package:kardex_app_front/src/domain/models/branch/branch.dart';
-import 'package:kardex_app_front/src/domain/models/order/order_model.dart';
-import 'package:kardex_app_front/src/tools/datetime_tool.dart';
-import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/pdf_template.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
