@@ -1,9 +1,4 @@
-import 'package:kardex_app_front/src/domain/models/client/client.dart';
-import 'package:kardex_app_front/src/domain/models/common/client_info.dart';
-import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
-import 'package:kardex_app_front/src/domain/models/devolution/devolution.dart';
-import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
-import 'package:kardex_app_front/src/domain/models/receipt/receipt_model.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 class FastReceiptLogic {
   static (CreateReceipt?, String) allocateFastPayment({

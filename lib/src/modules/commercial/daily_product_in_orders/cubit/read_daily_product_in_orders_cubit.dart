@@ -1,8 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/src/domain/models/common/product_sale_total.dart';
-import 'package:kardex_app_front/src/domain/query_params/order_query_params.dart';
-import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
-import 'package:kardex_app_front/src/tools/datetime_tool.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 part 'read_daily_product_in_orders_state.dart';
 

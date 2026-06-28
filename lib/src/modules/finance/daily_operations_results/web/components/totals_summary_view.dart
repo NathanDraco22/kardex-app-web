@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kardex_app_front/src/domain/models/reports/totals_result.dart';
-import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 class TotalsSummaryView extends StatelessWidget {
   final TotalsResult result;

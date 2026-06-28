@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/cubits/product_stats/estimate_product_stats_cubit.dart';
-import 'package:kardex_app_front/src/domain/repositories/product_stats_repository.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/advanced_tools/product_stats/cubits/read_product_stats_cubit.dart';
 import 'web/product_stats_web_screen.dart';
 

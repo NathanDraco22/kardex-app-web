@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kardex_app_front/src/domain/models/models.dart';
-import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
+import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/product_list/cubit/write_product_cubit.dart';
-import 'package:kardex_app_front/src/tools/extensiones.dart';
-import 'package:kardex_app_front/src/tools/loading_dialog.dart';
+
 import 'package:kardex_app_front/widgets/widgets.dart';
 
 import '../cubit/read_product_cubit.dart';

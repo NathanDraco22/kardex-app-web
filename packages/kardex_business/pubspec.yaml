@@ -1,0 +1,19 @@
+name: kardex_business
+description: "Business logic, data sources, and models for the Kardex app. Pure Dart package with no Flutter dependency."
+version: 0.1.0
+publish_to: 'none'
+
+environment:
+  sdk: ^3.11.0
+
+dependencies:
+  dio: ^5.9.0
+  dio_cache_interceptor: ^4.0.5
+  hive_ce: ^2.13.2
+  http: ^1.4.0
+  http_cache_hive_store: ^5.0.1
+  http_parser: ^4.1.2
+  intl: ^0.20.2
+  meta: ^1.12.0
+  dart_jsonwebtoken: ^3.2.0
+

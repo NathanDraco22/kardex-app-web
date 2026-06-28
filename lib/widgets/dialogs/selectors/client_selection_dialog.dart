@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
-import 'package:kardex_app_front/src/domain/repositories/client_repository.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 
 Future<ClientInDb?> showClientSelectionDialog(BuildContext context) async {
@@ -45,6 +44,7 @@ class _ClientSelectionDialogState extends State<ClientSelectionDialog> {
     try {
       final clientsRepo = context.read<ClientsRepository>();
       final clients = await clientsRepo.searchClientByKeyword(keyword);
+      if (!mounted) return;
       setState(() {
         _clients = clients;
         _isLoading = false;

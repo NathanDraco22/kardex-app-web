@@ -2,16 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kardex_app_front/constants/default_values.dart';
-import 'package:kardex_app_front/src/domain/models/common/client_info.dart';
-import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
-import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
-import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
+import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/cubits/write_invoice_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/web/widgets/anon_invoice_table.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/widgets/dialogs/payment_confirmation_dialog.dart';
-import 'package:kardex_app_front/src/tools/loading_dialog.dart';
-import 'package:kardex_app_front/src/tools/number_formatter.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
@@ -62,6 +57,7 @@ class _AnonInvoicesScreenWebState extends State<AnonInvoicesScreenWeb> {
           String message = "Factura guardada con éxito";
           await DialogManager.showInfoDialog(context, message);
           if (!context.mounted) return;
+          viewController.description = '';
           rebuild = true;
           setState(() {});
         }
@@ -177,7 +173,7 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Center(
       child: Padding(
-        padding: EdgeInsets.all(8.0),
+        padding: EdgeInsets.all(4.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [

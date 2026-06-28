@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
-import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
+import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/inventory/current_inventory/cubit/read_current_inventory_cubit.dart';
 import 'package:kardex_app_front/src/modules/inventory/current_inventory/mobile/current_inventory_screen_mobile.dart';
 import 'package:kardex_app_front/src/modules/inventory/current_inventory/web/current_inventory_screen_web.dart';
-import 'package:kardex_app_front/src/tools/tools.dart';
 
 class CurrentInventoryScreen extends StatelessWidget {
   const CurrentInventoryScreen({super.key});

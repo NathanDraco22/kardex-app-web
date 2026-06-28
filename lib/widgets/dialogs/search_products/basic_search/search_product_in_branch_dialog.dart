@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/src/domain/models/product/product_model.dart';
-import 'package:kardex_app_front/src/domain/repositories/product_repository.dart';
-import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/widgets/display_product_code.dart';
 import 'package:kardex_app_front/widgets/no_item.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
@@ -118,6 +116,7 @@ class _SearchProductInBranchDialogState extends State<SearchProductInBranchDialo
                             setState(() {});
                             final branchId = getIt<AuthCubit>().currentBranchId;
                             products = await _productsRepository.searchProductInBranch(value, branchId);
+                            if (!mounted) return;
                             isSearching = false;
                             setState(() {});
                           },

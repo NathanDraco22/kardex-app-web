@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kardex_app_front/src/domain/models/client/client.dart';
-import 'package:kardex_app_front/src/domain/models/devolution/devolution.dart';
-import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 class ViewController extends ChangeNotifier {
   List<InvoiceInDb> _selectedInvoices = [];

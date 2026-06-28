@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kardex_app_front/src/domain/models/transfer/transfer_in_db.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/custom_slider.dart';
 
 Future<bool?> showCancelTransferModal(

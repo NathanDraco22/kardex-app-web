@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/constants/shortcut_registry.dart';
 import 'package:kardex_app_front/cubits/shortcuts/shortcuts_cubit.dart';
-import 'package:kardex_app_front/src/domain/models/shortcut/shortcut_model.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 class ShortcutsMenuScreen extends StatelessWidget {
   const ShortcutsMenuScreen({super.key});

@@ -6,8 +6,7 @@ import 'package:kardex_app_front/admin_panel/widgets/custom_7_charts.dart';
 import 'package:kardex_app_front/admin_panel/widgets/panel_drawer.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
-import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
-import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/selectors/branch_selection_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/global_stock_search_modal.dart';
 

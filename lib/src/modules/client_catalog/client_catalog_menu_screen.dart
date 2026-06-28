@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/constants/route_names.dart';
-import 'package:kardex_app_front/src/domain/models/user_role/modules.dart';
+import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/shortcut_addable_list_tile.dart';
 import 'package:kardex_app_front/widgets/dialogs/client_full_details_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
@@ -12,9 +13,7 @@ import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/clients_catalog_template.dart';
-import 'package:kardex_app_front/src/tools/tools.dart';
 
-import '../../domain/repositories/client_repository.dart';
 
 class ClientCatalogMenuScreen extends StatelessWidget {
   const ClientCatalogMenuScreen({super.key});

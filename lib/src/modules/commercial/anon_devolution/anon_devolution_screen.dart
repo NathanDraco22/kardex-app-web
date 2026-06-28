@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/src/domain/repositories/invoice_repository.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'cubit/read_anon_invoices_cubit.dart';
 
 import 'web/anon_devolution_screen_web.dart';

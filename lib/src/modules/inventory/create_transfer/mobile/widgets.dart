@@ -4,13 +4,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/modules/inventory/create_transfer/mediator.dart';
 import 'package:kardex_app_front/widgets/tables/transfer_product_table.dart';
 import 'package:kardex_app_front/src/tools/input_formatter/input_formatter.dart';
-import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/src/cubits/transfers/write_transfer_cubit.dart';
-import 'package:kardex_app_front/src/domain/models/common/transfer_item.dart';
-import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
-import 'package:kardex_app_front/src/domain/models/transfer/transfer_in_db.dart';
+import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 

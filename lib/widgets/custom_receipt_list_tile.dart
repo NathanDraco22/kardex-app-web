@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kardex_app_front/src/domain/models/receipt/receipt_model.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/elements/elements.dart';
 
 class CustomReceiptListTile extends StatelessWidget {

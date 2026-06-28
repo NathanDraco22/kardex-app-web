@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:kardex_app_front/src/domain/models/expiration_log/expiration_log.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 Future<void> showExpirationLogViewerDialog(
   BuildContext context, {

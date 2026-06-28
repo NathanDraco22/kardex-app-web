@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kardex_app_front/src/domain/models/supplier/supplier_model.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/custom_listviews/inventory_movement_product_list_view.dart';
 import 'package:kardex_app_front/widgets/tables/inventory_movement_product_table.dart';
 

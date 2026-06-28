@@ -2,8 +2,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
-import 'package:kardex_app_front/src/domain/models/shortcut/shortcut_model.dart';
-import 'package:kardex_app_front/src/services/hive_service.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 class ShortcutsState {
   final List<Shortcut> shortcuts;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/client_groups/cubit/read_client_group_cubit.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/client_groups/cubit/write_client_group_cubit.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/client_groups/dialog/client_group_form_dialog.dart';

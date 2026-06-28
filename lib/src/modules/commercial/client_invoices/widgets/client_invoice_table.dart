@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/widgets/display_product_code.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
@@ -265,7 +265,8 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
             commercialProductResult: item,
           );
           if (res == null) return;
-          if (widget.restrictQuantity && res.quantity > res.product.account.availableStock) {
+          if (widget.restrictQuantity &&
+              (res.quantity > res.product.account.availableStock || res.product.account.availableStock == 0)) {
             if (!context.mounted) return;
             await DialogManager.showErrorDialog(
               context,

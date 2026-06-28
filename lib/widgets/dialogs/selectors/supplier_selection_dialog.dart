@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/src/domain/models/supplier/supplier_model.dart';
-import 'package:kardex_app_front/src/domain/repositories/supplier_repository.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 
 Future<SupplierInDb?> showSupplierSelectionDialog(BuildContext context) async {
@@ -45,6 +44,7 @@ class _SupplierSelectionDialogState extends State<SupplierSelectionDialog> {
     try {
       final suppliersRepo = context.read<SuppliersRepository>();
       final suppliers = await suppliersRepo.searchSupplierByKeyword(keyword);
+      if (!mounted) return;
       setState(() {
         _suppliers = suppliers;
         _isLoading = false;

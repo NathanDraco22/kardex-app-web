@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kardex_app_front/src/domain/models/client/client.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:intl/intl.dart';
 import 'package:kardex_app_front/widgets/map/launch_map_button.dart';
 
