@@ -9,11 +9,11 @@ environment:
 dependencies:
   dio: ^5.9.0
   dio_cache_interceptor: ^4.0.5
-  hive_ce: ^2.13.2
-  http: ^1.4.0
+  hive_ce: ^2.19.3
+  http: ^1.6.0
   http_cache_hive_store: ^5.0.1
   http_parser: ^4.1.2
-  intl: ^0.20.2
+  intl: ^0.20.3
   meta: ^1.12.0
-  dart_jsonwebtoken: ^3.2.0
+  dart_jsonwebtoken: ^3.4.1
 

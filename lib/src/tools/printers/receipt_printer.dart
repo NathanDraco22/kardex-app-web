@@ -67,7 +67,7 @@ Future<Uint8List> generateTicketPdfFromReceipt(
 
             pw.Text(
               branch.name,
-              style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+              style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
               textAlign: pw.TextAlign.center,
             ),
             pw.Text(
@@ -98,7 +98,7 @@ Future<Uint8List> generateTicketPdfFromReceipt(
 
             pw.Text(
               'Recibo',
-              style: pw.TextStyle(
+              style: const pw.TextStyle(
                 fontWeight: pw.FontWeight.bold,
                 fontSize: 10,
               ),

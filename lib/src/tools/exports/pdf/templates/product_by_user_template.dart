@@ -54,7 +54,7 @@ class ProductByUserTemplate implements PdfTemplate {
       children: [
         pw.Text(
           title,
-          style: pw.TextStyle(
+          style: const pw.TextStyle(
             fontSize: 24,
             fontWeight: pw.FontWeight.bold,
           ),
@@ -89,9 +89,9 @@ class ProductByUserTemplate implements PdfTemplate {
           pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              pw.Text("Sucursal: $branchName", style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+              pw.Text("Sucursal: $branchName", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold)),
               pw.SizedBox(height: 4),
-              pw.Text("Usuario: ${userInfo?.name ?? 'Todos'}", style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+              pw.Text("Usuario: ${userInfo?.name ?? 'Todos'}", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold)),
               pw.SizedBox(height: 4),
               pw.Text("Periodo: $dateRangeStr"),
             ],
@@ -99,11 +99,11 @@ class ProductByUserTemplate implements PdfTemplate {
           pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.end,
             children: [
-              pw.Text("Total Productos: $count", style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+              pw.Text("Total Productos: $count", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold)),
               pw.SizedBox(height: 4),
               pw.Text(
                 "Monto Total: ${NumberFormatter.convertToMoneyLike(total)}",
-                style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 16),
+                style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 16),
               ),
             ],
           ),
@@ -123,15 +123,15 @@ class ProductByUserTemplate implements PdfTemplate {
       itemCount: items.length,
       columns: [
         BasicPdfTableColumn(
-          label: pw.Text("Producto", style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+          label: pw.Text("Producto", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold)),
           flex: 3,
         ),
         BasicPdfTableColumn(
-          label: pw.Text("Cantidad", style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+          label: pw.Text("Cantidad", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold)),
           flex: 2,
         ),
         BasicPdfTableColumn(
-          label: pw.Text("Importe", style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+          label: pw.Text("Importe", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold)),
           flex: 2,
         ),
       ],

@@ -70,7 +70,7 @@ Future<Uint8List> generateTicketPdfFromDevolution(
               ),
             pw.Text(
               branch.name,
-              style: pw.TextStyle(
+              style: const pw.TextStyle(
                 fontWeight: pw.FontWeight.bold,
                 fontSize: 12,
               ),
@@ -107,7 +107,7 @@ Future<Uint8List> generateTicketPdfFromDevolution(
 
             pw.Text(
               'DEVOLUCIÓN',
-              style: pw.TextStyle(
+              style: const pw.TextStyle(
                 fontWeight: pw.FontWeight.bold,
                 fontSize: 10,
               ),

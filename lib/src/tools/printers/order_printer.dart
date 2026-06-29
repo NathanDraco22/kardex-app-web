@@ -75,7 +75,7 @@ Future<Uint8List> generateTicketPdfFromOrder(
               ),
             pw.Text(
               branch.name,
-              style: pw.TextStyle(
+              style: const pw.TextStyle(
                 fontWeight: pw.FontWeight.bold,
                 fontSize: 12,
               ),
@@ -112,7 +112,7 @@ Future<Uint8List> generateTicketPdfFromOrder(
 
             pw.Text(
               'PEDIDO',
-              style: pw.TextStyle(
+              style: const pw.TextStyle(
                 fontWeight: pw.FontWeight.bold,
                 fontSize: 12,
               ),
