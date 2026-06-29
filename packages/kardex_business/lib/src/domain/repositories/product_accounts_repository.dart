@@ -12,4 +12,28 @@ class ProductAccountsRepository {
     final response = ListResponse<ProductAccountInDb>.fromJson(res, ProductAccountInDb.fromJson);
     return response.data;
   }
+
+  Future<ProductAccountInDb> addProductAccount(
+    String productId,
+    String branchId, {
+    required int currentStock,
+    required int averageCost,
+  }) async {
+    final res = await dataSource.addProductAccount(productId, branchId, {
+      "currentStock": currentStock,
+      "averageCost": averageCost,
+    });
+    return ProductAccountInDb.fromJson(res);
+  }
+
+  Future<ProductAccountInDb> substractProductAccount(
+    String productId,
+    String branchId, {
+    required int currentStock,
+  }) async {
+    final res = await dataSource.substractProductAccount(productId, branchId, {
+      "currentStock": currentStock,
+    });
+    return ProductAccountInDb.fromJson(res);
+  }
 }
