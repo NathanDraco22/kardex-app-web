@@ -1,7 +1,4 @@
-import 'package:kardex_app_front/src/domain/models/branch/branch.dart';
-import 'package:kardex_app_front/src/domain/models/devolution/devolution.dart';
-import 'package:kardex_app_front/src/tools/datetime_tool.dart';
-import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/pdf_template.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -70,7 +67,7 @@ class SingleDevolutionTemplate implements PdfTemplate {
                       children: [
                         pw.Text(
                           branch.name,
-                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
+                          style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
                         ),
                         pw.SizedBox(height: 4),
                         pw.Text(
@@ -94,17 +91,17 @@ class SingleDevolutionTemplate implements PdfTemplate {
               children: [
                 pw.Text(
                   "DEVOLUCIÓN",
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 18, color: PdfColors.red800),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 18, color: PdfColors.red800),
                 ),
                 pw.SizedBox(height: 4),
                 pw.Text(
                   "No. ${devolution.docNumber}",
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
                 ),
                 pw.SizedBox(height: 2),
                 pw.Text(
                   "Factura Origen: #${devolution.originalInvoiceDocNumber}",
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 11),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 11),
                 ),
                 pw.SizedBox(height: 2),
                 pw.Text(
@@ -133,12 +130,12 @@ class SingleDevolutionTemplate implements PdfTemplate {
                   children: [
                     pw.Text(
                       "CLIENTE",
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 9, color: PdfColors.grey600),
+                      style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 9, color: PdfColors.grey600),
                     ),
                     pw.SizedBox(height: 4),
                     pw.Text(
                       clientLabel,
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                      style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
                     ),
                     if (devolution.clientInfo.location != null && devolution.clientInfo.location!.isNotEmpty) ...[
                       pw.SizedBox(height: 2),
@@ -169,7 +166,7 @@ class SingleDevolutionTemplate implements PdfTemplate {
                   children: [
                     pw.Text(
                       "MOTIVO DE LA DEVOLUCIÓN",
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 9, color: PdfColors.grey600),
+                      style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 9, color: PdfColors.grey600),
                     ),
                     pw.SizedBox(height: 4),
                     pw.Text(
@@ -196,14 +193,14 @@ class SingleDevolutionTemplate implements PdfTemplate {
             children: [
               pw.Expanded(
                 flex: 4,
-                child: pw.Text("Producto Devuelto", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
+                child: pw.Text("Producto Devuelto", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
               ),
               pw.Expanded(
                 flex: 1,
                 child: pw.Text(
                   "Cant.",
                   textAlign: pw.TextAlign.center,
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
                 ),
               ),
               pw.Expanded(
@@ -211,7 +208,7 @@ class SingleDevolutionTemplate implements PdfTemplate {
                 child: pw.Text(
                   "Precio",
                   textAlign: pw.TextAlign.center,
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
                 ),
               ),
               pw.Expanded(
@@ -219,7 +216,7 @@ class SingleDevolutionTemplate implements PdfTemplate {
                 child: pw.Text(
                   "Subtotal",
                   textAlign: pw.TextAlign.center,
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
                 ),
               ),
             ],
@@ -282,12 +279,12 @@ class SingleDevolutionTemplate implements PdfTemplate {
               mainAxisAlignment: pw.MainAxisAlignment.end,
               mainAxisSize: pw.MainAxisSize.min,
               children: [
-                pw.Text("Total Devolución:", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
+                pw.Text("Total Devolución:", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
                 pw.SizedBox(
                   width: 110,
                   child: pw.Text(
                     NumberFormatter.convertToMoneyLike(devolution.total),
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
+                    style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
                     textAlign: pw.TextAlign.right,
                   ),
                 ),

@@ -3,11 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/cubits/read_product_in_branch/read_product_in_branch_cubit.dart';
-import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/inventory/product_inventory_catalog/web/product_inventory_catalog_web.dart';
 import 'package:kardex_app_front/src/modules/inventory/product_price_catalog/cubits/export_price_list_cubit.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
-
 class ProductInventoryCatalogScreen extends StatelessWidget {
   const ProductInventoryCatalogScreen({super.key});
 
@@ -39,7 +38,7 @@ class _RootScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Catálogo de Inventario"),
+        title: const Text("Catálogo de Precios"),
         actions: [
           IconButton(
             onPressed: () {
@@ -50,8 +49,8 @@ class _RootScaffold extends StatelessWidget {
                   return BlocProvider.value(
                     value: context.read<ExportPriceListCubit>(),
                     child: AlertDialog(
-                      title: const Text("Exportar Lista de Precios"),
-                      content: const Text("¿Deseas exportar la lista de precios a Excel?"),
+                      title: const Text("Exportar Catálogo"),
+                      content: const Text("¿Deseas exportar el catálogo de precios actual a Excel?"),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.pop(dialogContext),

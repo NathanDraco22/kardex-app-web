@@ -1,8 +1,4 @@
-import 'package:kardex_app_front/src/domain/models/branch/branch.dart';
-import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
-import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
-import 'package:kardex_app_front/src/tools/datetime_tool.dart';
-import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/pdf_template.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -71,7 +67,7 @@ class SingleInvoiceTemplate implements PdfTemplate {
                       children: [
                         pw.Text(
                           branch.name,
-                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
+                          style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
                         ),
                         pw.SizedBox(height: 4),
                         pw.Text(
@@ -95,12 +91,12 @@ class SingleInvoiceTemplate implements PdfTemplate {
               children: [
                 pw.Text(
                   "FACTURA",
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 18, color: PdfColors.blue800),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 18, color: PdfColors.blue800),
                 ),
                 pw.SizedBox(height: 4),
                 pw.Text(
                   "No. ${invoice.docNumber}",
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
                 ),
                 pw.SizedBox(height: 2),
                 pw.Text(
@@ -129,12 +125,12 @@ class SingleInvoiceTemplate implements PdfTemplate {
                   children: [
                     pw.Text(
                       "CLIENTE",
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 9, color: PdfColors.grey600),
+                      style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 9, color: PdfColors.grey600),
                     ),
                     pw.SizedBox(height: 4),
                     pw.Text(
                       clientLabel,
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                      style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
                     ),
                     if (invoice.clientInfo.location != null && invoice.clientInfo.location!.isNotEmpty) ...[
                       pw.SizedBox(height: 2),
@@ -164,7 +160,7 @@ class SingleInvoiceTemplate implements PdfTemplate {
                 children: [
                   pw.Text(
                     "DETALLES",
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 9, color: PdfColors.grey600),
+                    style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 9, color: PdfColors.grey600),
                   ),
                   pw.SizedBox(height: 4),
                   _buildPaymentType(),
@@ -187,7 +183,7 @@ class SingleInvoiceTemplate implements PdfTemplate {
   pw.Widget _buildPaymentType() {
     final label = pw.Text(
       invoice.paymentType.typeLabel,
-      style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold),
+      style: const pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold),
     );
 
     if (invoice.paymentType == PaymentType.card || invoice.paymentType == PaymentType.transfer) {
@@ -196,7 +192,7 @@ class SingleInvoiceTemplate implements PdfTemplate {
           label,
           pw.Text(
             " - Ref: ${invoice.bankReference}",
-            style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold),
+            style: const pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold),
           ),
         ],
       );
@@ -214,14 +210,14 @@ class SingleInvoiceTemplate implements PdfTemplate {
             children: [
               pw.Expanded(
                 flex: 4,
-                child: pw.Text("Producto", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
+                child: pw.Text("Producto", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
               ),
               pw.Expanded(
                 flex: 1,
                 child: pw.Text(
                   "Cant.",
                   textAlign: pw.TextAlign.center,
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
                 ),
               ),
               pw.Expanded(
@@ -229,7 +225,7 @@ class SingleInvoiceTemplate implements PdfTemplate {
                 child: pw.Text(
                   "Precio",
                   textAlign: pw.TextAlign.center,
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
                 ),
               ),
               pw.Expanded(
@@ -237,7 +233,7 @@ class SingleInvoiceTemplate implements PdfTemplate {
                 child: pw.Text(
                   "Total",
                   textAlign: pw.TextAlign.center,
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
                 ),
               ),
             ],
@@ -305,12 +301,12 @@ class SingleInvoiceTemplate implements PdfTemplate {
           pw.Row(
             mainAxisAlignment: pw.MainAxisAlignment.end,
             children: [
-              pw.Text("SubTotal:", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
+              pw.Text("SubTotal:", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
               pw.SizedBox(
                 width: 110,
                 child: pw.Text(
                   NumberFormatter.convertToMoneyLike(invoiceSubTotal),
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
                   textAlign: pw.TextAlign.right,
                 ),
               ),
@@ -320,12 +316,12 @@ class SingleInvoiceTemplate implements PdfTemplate {
           pw.Row(
             mainAxisAlignment: pw.MainAxisAlignment.end,
             children: [
-              pw.Text("Total Descuento:", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
+              pw.Text("Total Descuento:", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
               pw.SizedBox(
                 width: 110,
                 child: pw.Text(
                   NumberFormatter.convertToMoneyLike(totalDiscount),
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
                   textAlign: pw.TextAlign.right,
                 ),
               ),
@@ -339,12 +335,12 @@ class SingleInvoiceTemplate implements PdfTemplate {
               mainAxisAlignment: pw.MainAxisAlignment.end,
               mainAxisSize: pw.MainAxisSize.min,
               children: [
-                pw.Text("Total:", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
+                pw.Text("Total:", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
                 pw.SizedBox(
                   width: 110,
                   child: pw.Text(
                     NumberFormatter.convertToMoneyLike(invoice.total),
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
+                    style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
                     textAlign: pw.TextAlign.right,
                   ),
                 ),

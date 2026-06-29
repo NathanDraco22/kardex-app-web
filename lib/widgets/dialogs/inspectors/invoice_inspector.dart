@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
-import 'package:kardex_app_front/src/domain/models/branch/branch.dart';
-import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
-import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
-import 'package:kardex_app_front/src/tools/datetime_tool.dart';
-import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 Future<void> showInvoiceInspector(BuildContext context, InvoiceInDb invoice) async {
   final currentBranch = (getIt<AuthCubit>().state as Authenticated).branch;

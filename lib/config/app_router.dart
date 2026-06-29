@@ -7,7 +7,7 @@ import 'package:kardex_app_front/admin_panel/admin_modules/admin_reports/executi
 import 'package:kardex_app_front/admin_panel/admin_panel_screen.dart';
 import 'package:kardex_app_front/src/modules/activation/activation_screen.dart';
 import 'package:kardex_app_front/src/modules/shortcuts/shortcuts_menu_screen.dart';
-
+import 'package:kardex_app_front/widgets/dialogs/global_stock_search_modal.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/client_catalog_menu_screen.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/client_groups/client_groups_screen.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/client_list/view/client_catalog_screen.dart';
@@ -38,7 +38,7 @@ import 'package:kardex_app_front/src/modules/commercial/product_movements/view/c
 import 'package:kardex_app_front/src/modules/commercial/receipt_history/receipt_history_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/client_accounts/view/client_account_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/client_movements/view/client_movements_screen.dart';
-import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/finance/detail_invoice_history/invoice_history_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/finances_menu_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/paid_invoices/paid_invoices_screen.dart';
@@ -123,6 +123,12 @@ class AppRouter {
         path: '/shortcuts',
         name: 'shortcuts',
         builder: (context, state) => const ShortcutsMenuScreen(),
+      ),
+
+      GoRoute(
+        path: '/global-stock-search',
+        name: 'global-stock-search',
+        builder: (context, state) => const GlobalStockSearchModal(),
       ),
 
       GoRoute(

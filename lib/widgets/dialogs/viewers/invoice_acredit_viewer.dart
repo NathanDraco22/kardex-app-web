@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
-import 'package:kardex_app_front/src/domain/models/branch/branch.dart';
-import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/web/receipt_creator/modals/fast_payment_modal.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_invoice_template.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
-import 'package:kardex_app_front/src/tools/number_formatter.dart';
 import 'package:kardex_app_front/src/tools/printers/invoice_printer.dart';
 import 'package:kardex_app_front/src/tools/printers/paper_settings.dart';
 import 'package:kardex_app_front/src/tools/printers/print_manager.dart';

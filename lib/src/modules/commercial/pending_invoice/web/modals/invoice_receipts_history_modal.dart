@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
-import 'package:kardex_app_front/src/domain/models/receipt/receipt_model.dart';
-import 'package:kardex_app_front/src/domain/repositories/receipt_repository.dart';
-import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/receipt_viewer.dart';
 
 Future<void> showInvoiceReceiptsHistoryModal(BuildContext context, InvoiceInDb invoice) async {

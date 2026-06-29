@@ -1,7 +1,4 @@
-import 'package:kardex_app_front/src/domain/models/branch/branch.dart';
-import 'package:kardex_app_front/src/domain/models/order/order_model.dart';
-import 'package:kardex_app_front/src/tools/datetime_tool.dart';
-import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/pdf_template.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -70,7 +67,7 @@ class SingleOrderTemplate implements PdfTemplate {
                       children: [
                         pw.Text(
                           branch.name,
-                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
+                          style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
                         ),
                         pw.SizedBox(height: 4),
                         pw.Text(
@@ -94,12 +91,12 @@ class SingleOrderTemplate implements PdfTemplate {
               children: [
                 pw.Text(
                   "PEDIDO",
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 18, color: PdfColors.orange800),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 18, color: PdfColors.orange800),
                 ),
                 pw.SizedBox(height: 4),
                 pw.Text(
                   "No. ${order.docNumber}",
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
                 ),
                 pw.SizedBox(height: 2),
                 pw.Text(
@@ -109,7 +106,7 @@ class SingleOrderTemplate implements PdfTemplate {
                 pw.SizedBox(height: 2),
                 pw.Text(
                   "Estado: ${order.status.tag}",
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10, color: PdfColors.grey700),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10, color: PdfColors.grey700),
                 ),
               ],
             ),
@@ -133,12 +130,12 @@ class SingleOrderTemplate implements PdfTemplate {
                   children: [
                     pw.Text(
                       "CLIENTE",
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 9, color: PdfColors.grey600),
+                      style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 9, color: PdfColors.grey600),
                     ),
                     pw.SizedBox(height: 4),
                     pw.Text(
                       clientLabel,
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                      style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
                     ),
                     if (order.clientInfo.location != null && order.clientInfo.location!.isNotEmpty) ...[
                       pw.SizedBox(height: 2),
@@ -168,12 +165,12 @@ class SingleOrderTemplate implements PdfTemplate {
                 children: [
                   pw.Text(
                     "DETALLES",
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 9, color: PdfColors.grey600),
+                    style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 9, color: PdfColors.grey600),
                   ),
                   pw.SizedBox(height: 4),
                   pw.Text(
                     order.paymentType.typeLabel,
-                    style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold),
+                    style: const pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold),
                   ),
                   if (order.description.isNotEmpty) ...[
                     pw.SizedBox(height: 2),
@@ -200,14 +197,14 @@ class SingleOrderTemplate implements PdfTemplate {
             children: [
               pw.Expanded(
                 flex: 4,
-                child: pw.Text("Producto", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
+                child: pw.Text("Producto", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
               ),
               pw.Expanded(
                 flex: 1,
                 child: pw.Text(
                   "Cant.",
                   textAlign: pw.TextAlign.center,
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
                 ),
               ),
               pw.Expanded(
@@ -215,7 +212,7 @@ class SingleOrderTemplate implements PdfTemplate {
                 child: pw.Text(
                   "Precio",
                   textAlign: pw.TextAlign.center,
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
                 ),
               ),
               pw.Expanded(
@@ -223,7 +220,7 @@ class SingleOrderTemplate implements PdfTemplate {
                 child: pw.Text(
                   "Total",
                   textAlign: pw.TextAlign.center,
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
                 ),
               ),
             ],
@@ -291,12 +288,12 @@ class SingleOrderTemplate implements PdfTemplate {
           pw.Row(
             mainAxisAlignment: pw.MainAxisAlignment.end,
             children: [
-              pw.Text("SubTotal:", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
+              pw.Text("SubTotal:", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
               pw.SizedBox(
                 width: 110,
                 child: pw.Text(
                   NumberFormatter.convertToMoneyLike(orderSubTotal),
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
                   textAlign: pw.TextAlign.right,
                 ),
               ),
@@ -306,12 +303,12 @@ class SingleOrderTemplate implements PdfTemplate {
           pw.Row(
             mainAxisAlignment: pw.MainAxisAlignment.end,
             children: [
-              pw.Text("Total Descuento:", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
+              pw.Text("Total Descuento:", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
               pw.SizedBox(
                 width: 110,
                 child: pw.Text(
                   NumberFormatter.convertToMoneyLike(totalDiscount),
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
                   textAlign: pw.TextAlign.right,
                 ),
               ),
@@ -325,12 +322,12 @@ class SingleOrderTemplate implements PdfTemplate {
               mainAxisAlignment: pw.MainAxisAlignment.end,
               mainAxisSize: pw.MainAxisSize.min,
               children: [
-                pw.Text("Total:", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
+                pw.Text("Total:", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
                 pw.SizedBox(
                   width: 110,
                   child: pw.Text(
                     NumberFormatter.convertToMoneyLike(order.total),
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
+                    style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
                     textAlign: pw.TextAlign.right,
                   ),
                 ),

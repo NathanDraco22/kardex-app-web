@@ -1,5 +1,4 @@
-import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
-import 'package:kardex_app_front/src/tools/datetime_tool.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/pdf_template.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -40,7 +39,7 @@ class ClientsCatalogTemplate implements PdfTemplate {
       children: [
         pw.Text(
           "Catálogo de Clientes",
-          style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 18),
+          style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 18),
           textAlign: pw.TextAlign.center,
         ),
         pw.SizedBox(height: 16),
@@ -56,7 +55,7 @@ class ClientsCatalogTemplate implements PdfTemplate {
             children: [
               pw.Text(
                 "Sucursal: $branchName",
-                style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
+                style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
               ),
               pw.Text(
                 "Generado el: ${DateTimeTool.formatddMMyyEs(DateTime.now())} ${DateTimeTool.formatHHmm(DateTime.now())}",
@@ -84,14 +83,14 @@ class ClientsCatalogTemplate implements PdfTemplate {
             children: [
               pw.Expanded(
                 flex: 4,
-                child: pw.Text("Nombre", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
+                child: pw.Text("Nombre", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
               ),
               pw.Expanded(
                 flex: 2,
                 child: pw.Text(
                   "Teléfono",
                   textAlign: pw.TextAlign.center,
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
                 ),
               ),
               pw.Expanded(
@@ -99,7 +98,7 @@ class ClientsCatalogTemplate implements PdfTemplate {
                 child: pw.Text(
                   "Ubicación",
                   textAlign: pw.TextAlign.left,
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
                 ),
               ),
             ],
@@ -119,7 +118,7 @@ class ClientsCatalogTemplate implements PdfTemplate {
               children: [
                 pw.Expanded(
                   flex: 4,
-                  child: pw.Text(client.name, style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
+                  child: pw.Text(client.name, style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
                 ),
                 pw.Expanded(
                   flex: 2,

@@ -3,18 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
-import 'package:kardex_app_front/src/domain/models/client/client.dart';
-import 'package:kardex_app_front/src/domain/models/common/client_info.dart';
-import 'package:kardex_app_front/src/domain/models/common/user_info.dart';
-import 'package:kardex_app_front/src/domain/models/devolution/devolution.dart';
-import 'package:kardex_app_front/src/domain/models/invoice/invoice_model.dart';
-import 'package:kardex_app_front/src/domain/models/receipt/receipt_model.dart';
-import 'package:kardex_app_front/src/domain/repositories/receipt_repository.dart';
+import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/cubit/read_pending_invoice_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/cubit/write_receipt_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/modals/confirm_receipt_modal.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/web/receipt_creator/modals/partial_payment_modal.dart';
-import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/receipt_viewer.dart';
 

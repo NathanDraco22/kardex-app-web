@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kardex_app_front/src/domain/models/branch/branch_model.dart';
-import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
-import 'package:kardex_app_front/src/domain/models/client/initial_balance_model.dart';
-import 'package:kardex_app_front/src/domain/repositories/branch_repository.dart';
-import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/selectors/branch_selection_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';

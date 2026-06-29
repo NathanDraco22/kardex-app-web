@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kardex_app_front/src/domain/models/transfer/transfer_in_db.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 class TranferStatusBadge extends StatelessWidget {
   const TranferStatusBadge({super.key, required this.status});

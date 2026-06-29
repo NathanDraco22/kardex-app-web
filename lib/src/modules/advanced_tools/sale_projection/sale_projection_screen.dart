@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/src/domain/repositories/product_stats_repository.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/advanced_tools/sale_projection/cubits/read_sale_projection_cubit.dart';
 import 'package:kardex_app_front/src/modules/advanced_tools/sale_projection/web/sale_projection_screen_web.dart';
 

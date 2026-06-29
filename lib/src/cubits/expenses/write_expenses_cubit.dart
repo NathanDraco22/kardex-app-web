@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/src/domain/models/expense/expense_model.dart';
-import 'package:kardex_app_front/src/domain/repositories/expenses_repository.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 part 'write_expenses_state.dart';
 

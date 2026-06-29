@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/cubits/client_transaction/read_client_transaction_cubit.dart';
-import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
-import 'package:kardex_app_front/src/domain/repositories/client_transaction_repository.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/finance/client_movements/view/widgets/movement_mobile_row.dart';
-import 'package:kardex_app_front/src/tools/datetime_tool.dart';
 
 class CreditSessionTransactionsScreen extends StatelessWidget {
   const CreditSessionTransactionsScreen({super.key, required this.client});

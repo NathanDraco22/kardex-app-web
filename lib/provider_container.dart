@@ -3,11 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/app_mode/app_mode_cubit.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/cubits/shortcuts/shortcuts_cubit.dart';
 import 'package:kardex_app_front/cubits/toast/toast_cubit.dart';
-import 'package:kardex_app_front/src/data/data_sources.dart';
-import 'package:kardex_app_front/src/data/expense_categories_data_source.dart';
-import 'package:kardex_app_front/src/domain/repositories/expense_categories_repository.dart';
-import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
+
+import 'package:kardex_app_front/src/core/app_config_manager.dart';
+import 'package:kardex_app_front/src/core/app_kardex_config.dart';
+import 'package:kardex_app_front/src/core/session_manager.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 class ProviderContainer extends StatelessWidget {
   const ProviderContainer({super.key, required this.child});
@@ -16,6 +18,8 @@ class ProviderContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    KardexClient.initialize(AppKardexConfig());
+
     final clientDataSource = ClientsDataSource();
     final supplierDataSource = SuppliersDataSource();
     final productPriceDataSource = ProductPricesDataSource();
@@ -30,7 +34,7 @@ class ProviderContainer extends StatelessWidget {
     final orderDataSource = OrdersDataSource();
     final usersDataSource = UsersDataSource();
     final userRolesDataSource = UserRolesDataSource();
-    final authDataSource = AuthDataSource();
+    final authDataSource = AuthDataSource(sessionStore: SessionManager());
     final servinDataSource = ServinDataSource();
     final productTransactionDataSource = ProductTransactionsDataSource();
     final expirationLogsDataSource = ExpirationLogsDataSource();
@@ -127,6 +131,7 @@ class ProviderContainer extends StatelessWidget {
         RepositoryProvider(
           create: (context) => ServinRepository(
             servinDataSource: servinDataSource,
+            appConfigStore: AppConfigManager(),
           ),
         ),
 
@@ -262,6 +267,7 @@ class _GlobalCubitProviderState extends State<GlobalCubitProvider> {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => AppModeCubit()),
+        BlocProvider(create: (context) => ShortcutsCubit()),
         BlocProvider(
           create: (context) => ToastCubit(
             expirationLogsRepository: expirationLogRepo,

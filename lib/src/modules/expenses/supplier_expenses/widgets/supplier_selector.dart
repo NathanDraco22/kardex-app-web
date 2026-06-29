@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kardex_app_front/src/domain/models/supplier/supplier_model.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/selectors/supplier_selection_dialog.dart';
 
 class SupplierSelector extends StatefulWidget {

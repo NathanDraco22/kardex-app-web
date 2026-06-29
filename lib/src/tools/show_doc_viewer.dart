@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kardex_app_front/src/domain/models/product_transaction/product_transaction.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/adjust_entry_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/adjust_exit_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/devolution_viewer.dart';

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:kardex_app_front/src/domain/models/common/sale_item_model.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/mobile/invoice_anon_menu_screen.dart';
-import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_modal.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/custom_product_commercial_search_delegate.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';

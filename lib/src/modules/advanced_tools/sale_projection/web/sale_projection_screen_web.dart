@@ -4,10 +4,9 @@ import 'package:kardex_app_front/src/modules/advanced_tools/sale_projection/cubi
 import 'package:kardex_app_front/src/modules/advanced_tools/sale_projection/cubits/read_sale_projection_cubit.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
-import 'package:kardex_app_front/src/tools/loading_dialog.dart';
-import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/selectors/branch_selection_dialog.dart';
-import 'package:kardex_app_front/src/domain/models/branch/branch_model.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
 part 'sections/content_section.dart';

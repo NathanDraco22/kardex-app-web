@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kardex_app_front/src/domain/models/user_role/modules.dart';
+import 'package:kardex_app_front/constants/route_names.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/settings/view/local_printer_settings_dialog.dart';
+import 'package:kardex_app_front/widgets/shortcut_addable_list_tile.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -36,34 +38,43 @@ class _Body extends StatelessWidget {
     return Center(
       child: ListView(
         children: [
-          ListTile(
-            leading: const Icon(Icons.person),
-            title: const Text("Usuarios"),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              context.pushNamed("users");
-            },
+          ShortcutAddableListTile(
+            routeName: RouteNames.users,
+            child: ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text("Usuarios"),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                context.pushNamed("users");
+              },
+            ),
           ),
           const Divider(height: 0.0),
 
-          ListTile(
-            leading: const Icon(Icons.other_houses),
-            title: const Text("Ramas/Sucursales"),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              context.pushNamed("branches");
-            },
+          ShortcutAddableListTile(
+            routeName: RouteNames.branches,
+            child: ListTile(
+              leading: const Icon(Icons.other_houses),
+              title: const Text("Ramas/Sucursales"),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                context.pushNamed("branches");
+              },
+            ),
           ),
           const Divider(height: 0.0),
           const Divider(height: 0.0),
 
-          ListTile(
-            leading: const Icon(Icons.integration_instructions),
-            title: const Text("Integraciones"),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              context.pushNamed("integrations");
-            },
+          ShortcutAddableListTile(
+            routeName: RouteNames.integrations,
+            child: ListTile(
+              leading: const Icon(Icons.integration_instructions),
+              title: const Text("Integraciones"),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                context.pushNamed("integrations");
+              },
+            ),
           ),
           const Divider(height: 0.0),
 

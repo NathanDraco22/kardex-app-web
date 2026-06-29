@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:kardex_app_front/src/tools/datetime_tool.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'custom_7_charts.dart';
 
 class Custom7DaysBarChart extends StatelessWidget {

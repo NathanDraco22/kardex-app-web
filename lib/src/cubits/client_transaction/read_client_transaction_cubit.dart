@@ -1,12 +1,7 @@
 import 'dart:developer';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/src/domain/models/client/client_model.dart';
-import 'package:kardex_app_front/src/domain/models/client_transaction/client_transaction.dart';
-import 'package:kardex_app_front/src/domain/query_params/client_transaction_query_params.dart';
-import 'package:kardex_app_front/src/domain/repositories/client_transaction_repository.dart';
-
-import 'package:kardex_app_front/src/tools/constant.dart';
-import 'package:kardex_app_front/src/tools/datetime_tool.dart';
+import 'package:kardex_business/kardex_business.dart' hide TransactionType, TransactionSubType;
+import 'package:kardex_business/client_transaction.dart';
 
 part 'read_client_transaction_state.dart';
 

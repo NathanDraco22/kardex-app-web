@@ -1,7 +1,4 @@
-import 'package:kardex_app_front/src/domain/models/adjust_exit/adjust_exit_model.dart';
-import 'package:kardex_app_front/src/domain/models/branch/branch.dart';
-import 'package:kardex_app_front/src/tools/datetime_tool.dart';
-import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/pdf_template.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -64,7 +61,7 @@ class SingleAdjustExitTemplate implements PdfTemplate {
       children: [
         pw.Text(
           "Salida por $typeLabel",
-          style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 16),
+          style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 16),
           textAlign: pw.TextAlign.center,
         ),
         pw.SizedBox(height: 12),
@@ -74,18 +71,18 @@ class SingleAdjustExitTemplate implements PdfTemplate {
           children: [
             pw.Text(
               "No. ${adjustExit.docNumber}",
-              style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
+              style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
             ),
             pw.Row(
               children: [
                 pw.Text(
                   createdDate,
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
                 ),
                 pw.Text(" | ", style: const pw.TextStyle(fontSize: 14)),
                 pw.Text(
                   createdTime,
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
                 ),
               ],
             ),
@@ -107,11 +104,11 @@ class SingleAdjustExitTemplate implements PdfTemplate {
                 children: [
                   pw.Text(
                     "Sucursal: ${branch.name}",
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
+                    style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
                   ),
                   pw.Text(
                     "Total: ${NumberFormatter.convertToMoneyLike(total)}",
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
+                    style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
                   ),
                 ],
               ),
@@ -119,17 +116,17 @@ class SingleAdjustExitTemplate implements PdfTemplate {
                 pw.SizedBox(height: 4),
                 pw.Text(
                   "Descripción: ${adjustExit.description}",
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.normal, fontSize: 14),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.normal, fontSize: 14),
                 ),
               ],
               pw.SizedBox(height: 8),
               pw.Text(
                 "Elaborado por:",
-                style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
+                style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
               ),
               pw.Text(
                 adjustExit.createdBy.name,
-                style: pw.TextStyle(fontWeight: pw.FontWeight.normal, fontSize: 14),
+                style: const pw.TextStyle(fontWeight: pw.FontWeight.normal, fontSize: 14),
               ),
             ],
           ),
@@ -148,14 +145,14 @@ class SingleAdjustExitTemplate implements PdfTemplate {
             children: [
               pw.Expanded(
                 flex: 4,
-                child: pw.Text("Producto", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
+                child: pw.Text("Producto", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
               ),
               pw.Expanded(
                 flex: 1,
                 child: pw.Text(
                   "Cant.",
                   textAlign: pw.TextAlign.center,
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
                 ),
               ),
               pw.Expanded(
@@ -163,7 +160,7 @@ class SingleAdjustExitTemplate implements PdfTemplate {
                 child: pw.Text(
                   "Costo",
                   textAlign: pw.TextAlign.center,
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
                 ),
               ),
               pw.Expanded(
@@ -171,7 +168,7 @@ class SingleAdjustExitTemplate implements PdfTemplate {
                 child: pw.Text(
                   "Subtotal",
                   textAlign: pw.TextAlign.center,
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
                 ),
               ),
             ],
@@ -252,12 +249,12 @@ class SingleAdjustExitTemplate implements PdfTemplate {
               mainAxisAlignment: pw.MainAxisAlignment.end,
               mainAxisSize: pw.MainAxisSize.min,
               children: [
-                pw.Text("Total:", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
+                pw.Text("Total:", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
                 pw.SizedBox(
                   width: 110,
                   child: pw.Text(
                     NumberFormatter.convertToMoneyLike(total),
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
+                    style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
                     textAlign: pw.TextAlign.right,
                   ),
                 ),

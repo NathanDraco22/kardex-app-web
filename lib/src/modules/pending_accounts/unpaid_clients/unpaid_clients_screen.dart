@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/src/domain/repositories/repositories.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/cubit/read_pending_client_cubit.dart';
-import 'package:kardex_app_front/src/tools/datetime_tool.dart';
-import 'package:kardex_app_front/src/tools/number_formatter.dart';
 import 'package:kardex_app_front/widgets/dialogs/unpaid_client_stats_dialog.dart';
 
 class UnpaidClientsScreen extends StatelessWidget {

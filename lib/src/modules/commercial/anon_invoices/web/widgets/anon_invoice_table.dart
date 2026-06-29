@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/web/mediator.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/widgets/more_action_row_button.dart';
-import 'package:kardex_app_front/src/tools/number_formatter.dart';
+import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
@@ -66,39 +66,43 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Row(
-          children: [
-            Flexible(
-              flex: 3,
-              fit: FlexFit.tight,
-              child: Center(child: Text("Producto")),
-            ),
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 8),
+          child: Row(
+            children: [
+              Flexible(
+                flex: 3,
+                fit: FlexFit.tight,
+                child: Center(child: Text("Producto")),
+              ),
 
-            Flexible(
-              fit: FlexFit.tight,
-              child: Center(child: Text("Cantidad")),
-            ),
-            Flexible(
-              fit: FlexFit.tight,
-              child: Center(child: Text("Precio Unitario")),
-            ),
-            Flexible(
-              fit: FlexFit.tight,
-              child: Center(child: Text("Descuento")),
-            ),
+              Flexible(
+                fit: FlexFit.tight,
+                child: Center(child: Text("Cantidad")),
+              ),
+              Flexible(
+                fit: FlexFit.tight,
+                child: Center(child: Text("Precio Unitario")),
+              ),
+              Flexible(
+                fit: FlexFit.tight,
+                child: Center(child: Text("Descuento")),
+              ),
 
-            Flexible(
-              fit: FlexFit.tight,
-              child: Center(child: Text("IVA")),
-            ),
+              Flexible(
+                fit: FlexFit.tight,
+                child: Center(child: Text("IVA")),
+              ),
 
-            Flexible(
-              fit: FlexFit.tight,
-              child: Center(child: Text("Total")),
-            ),
-          ],
+              Flexible(
+                fit: FlexFit.tight,
+                child: Center(child: Text("Total")),
+              ),
+            ],
+          ),
         ),
         const Divider(
+          height: 0.0,
           thickness: 2,
         ),
 

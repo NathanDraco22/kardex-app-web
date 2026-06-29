@@ -1,8 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/src/domain/models/devolution/devolution.dart';
+import 'package:kardex_business/kardex_business.dart';
 
-import 'package:kardex_app_front/src/domain/query_params/history_params.dart';
-import 'package:kardex_app_front/src/domain/repositories/devolution_repository.dart';
 
 part 'read_devolution_history_state.dart';
 
