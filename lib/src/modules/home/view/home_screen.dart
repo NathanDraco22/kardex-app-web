@@ -232,12 +232,6 @@ List<HomeOption> getHomeOptions(BuildContext context) {
       icon: FluentIcons.contact_card_16_filled,
       onTap: () => context.pushNamed("client-catalog"),
     ),
-    // HomeOption(
-    //   permissions: const [Modules.suppliers],
-    //   title: "Lista de Proveedores",
-    //   icon: FluentIcons.building_multiple_20_filled,
-    //   onTap: () => context.pushNamed("suppliers-catalog"),
-    // ),
     HomeOption(
       permissions: const [Modules.products],
       title: "Catalogo de Productos",
@@ -274,12 +268,6 @@ List<HomeOption> getHomeOptions(BuildContext context) {
       icon: FluentIcons.arrow_trending_lines_24_regular,
       onTap: () => context.pushNamed("finances"),
     ),
-    // HomeOption(
-    //   permissions: const [Modules.advancedTools],
-    //   title: "Herramientas Avanzadas",
-    //   icon: Icons.schema_rounded,
-    //   onTap: () => context.pushNamed("advanced-tools"),
-    // ),
     HomeOption(
       permissions: const [Modules.settings],
       title: "Configuraciones",

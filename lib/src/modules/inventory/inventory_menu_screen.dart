@@ -119,32 +119,6 @@ class _Body extends StatelessWidget {
           ),
           const Divider(height: 0.0),
 
-          // ShortcutAddableListTile(
-          //   routeName: RouteNames.productEntryHistory,
-          //   child: ListTile(
-          //     leading: const Icon(
-          //       Icons.call_received,
-          //       color: Colors.orange,
-          //     ),
-          //     title: const Text("Historial de Entradas por Producto"),
-          //     onTap: () => context.pushNamed("product-entry-history"),
-          //   ),
-          // ),
-          // const Divider(height: 0.0),
-
-          // ShortcutAddableListTile(
-          //   routeName: RouteNames.productPriceCatalog,
-          //   child: ListTile(
-          //     leading: const Icon(
-          //       Icons.monetization_on,
-          //       color: Colors.green,
-          //     ),
-          //     title: const Text("Catalogo de Precios"),
-          //     onTap: () => context.pushNamed("product-price-catalog"),
-          //   ),
-          // ),
-          // const Divider(height: 0.0),
-
           ShortcutAddableListTile(
             routeName: RouteNames.productInventoryCatalog,
             child: ListTile(
@@ -175,56 +149,6 @@ class _Body extends StatelessWidget {
             height: 4.0,
             thickness: 2,
           ),
-
-          // ShortcutAddableListTile(
-          //   routeName: RouteNames.inventoryEntry,
-          //   child: ListTile(
-          //     leading: IconWidgets.entryInventoryIcon,
-          //     title: const Text("Entrada de Inventario"),
-          //     onTap: () => context.pushNamed("inventory-entry"),
-          //   ),
-          // ),
-          // const Divider(height: 0.0),
-          // ShortcutAddableListTile(
-          //   routeName: RouteNames.inventoryExit,
-          //   child: ListTile(
-          //     leading: IconWidgets.exitInventoryIcon,
-          //     title: const Text("Salida de Inventario"),
-          //     onTap: () => context.pushNamed("inventory-exit"),
-          //   ),
-          // ),
-
-          // const Divider(height: 0.0),
-
-          // ShortcutAddableListTile(
-          //   routeName: RouteNames.historyEntry,
-          //   child: ListTile(
-          //     leading: const Icon(
-          //       FluentIcons.history_28_filled,
-          //       color: Colors.blue,
-          //     ),
-          //     title: const Text("Historial de Entradas"),
-          //     onTap: () => context.pushNamed("history-entry"),
-          //   ),
-          // ),
-          // const Divider(height: 0.0),
-          // ShortcutAddableListTile(
-          //   routeName: RouteNames.historyExit,
-          //   child: ListTile(
-          //     leading: const Icon(
-          //       FluentIcons.history_28_filled,
-          //       color: Colors.red,
-          //     ),
-          //     title: const Text("Historial de salidas"),
-          //     onTap: () => context.pushNamed("history-exit"),
-          //   ),
-          // ),
-          // const Divider(height: 0.0),
-
-          // const Divider(
-          //   height: 4.0,
-          //   thickness: 2,
-          // ),
 
           ShortcutAddableListTile(
             routeName: RouteNames.currentTranfers,
@@ -260,74 +184,6 @@ class _Body extends StatelessWidget {
             height: 4.0,
             thickness: 2,
           ),
-
-          // ShortcutAddableListTile(
-          //   routeName: RouteNames.adjustEntry,
-          //   child: ListTile(
-          //     leading: IconWidgets.entryInventoryIcon,
-          //     title: const Text("Entrada por Ajuste"),
-          //     onTap: () => context.pushNamed("adjust-entry"),
-          //   ),
-          // ),
-          // const Divider(height: 0.0),
-
-          // ShortcutAddableListTile(
-          //   routeName: RouteNames.historyAdjustEntry,
-          //   child: ListTile(
-          //     leading: const Icon(
-          //       FluentIcons.history_28_filled,
-          //       color: Colors.blue,
-          //     ),
-          //     title: const Text("Historial de Entradas por Ajuste"),
-          //     onTap: () => context.pushNamed("history-adjust-entry"),
-          //   ),
-          // ),
-
-          // const Divider(height: 0.0),
-
-          // ListTile(
-          //   leading: IconWidgets.exitInventoryIcon,
-          //   title: const Text("Salida por Ajuste"),
-          //   onTap: () => Navigator.push(
-          //     context,
-          //     MaterialPageRoute(
-          //       builder: (context) => const AdjustExitScreen(
-          //         type: AdjustExitType.adjust,
-          //       ),
-          //     ),
-          //   ),
-          // ),
-
-          // const Divider(height: 0.0),
-
-          // ShortcutAddableListTile(
-          //   routeName: RouteNames.historyAdjustExit,
-          //   child: ListTile(
-          //     leading: const Icon(
-          //       FluentIcons.history_28_filled,
-          //       color: Colors.red,
-          //     ),
-          //     title: const Text("Historial de Salidas por Ajuste"),
-          //     onTap: () => context.pushNamed("history-adjust-exit"),
-          //   ),
-          // ),
-
-          // const Divider(height: 0.0),
-
-          // ListTile(
-          //   leading: IconWidgets.exitInventoryIcon,
-          //   title: const Text("Mermas"),
-          //   onTap: () => Navigator.push(
-          //     context,
-          //     MaterialPageRoute(
-          //       builder: (context) => const AdjustExitScreen(
-          //         type: AdjustExitType.loss,
-          //       ),
-          //     ),
-          //   ),
-          // ),
-
-          // const Divider(height: 0.0),
         ],
       ),
     );
