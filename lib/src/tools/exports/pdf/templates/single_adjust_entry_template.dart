@@ -49,7 +49,7 @@ class SingleAdjustEntryTemplate implements PdfTemplate {
       children: [
         pw.Text(
           "Entrada por Ajuste",
-          style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 16),
+          style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 16),
           textAlign: pw.TextAlign.center,
         ),
         pw.SizedBox(height: 12),
@@ -59,18 +59,18 @@ class SingleAdjustEntryTemplate implements PdfTemplate {
           children: [
             pw.Text(
               "No. ${adjustEntry.docNumber}",
-              style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
+              style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
             ),
             pw.Row(
               children: [
                 pw.Text(
                   createdDate,
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
                 ),
                 pw.Text(" | ", style: const pw.TextStyle(fontSize: 14)),
                 pw.Text(
                   createdTime,
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
                 ),
               ],
             ),
@@ -92,11 +92,11 @@ class SingleAdjustEntryTemplate implements PdfTemplate {
                 children: [
                   pw.Text(
                     "Sucursal: ${branch.name}",
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
+                    style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
                   ),
                   pw.Text(
                     "Total: ${NumberFormatter.convertToMoneyLike(total)}",
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
+                    style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
                   ),
                 ],
               ),
@@ -104,17 +104,17 @@ class SingleAdjustEntryTemplate implements PdfTemplate {
                 pw.SizedBox(height: 4),
                 pw.Text(
                   "Descripción: ${adjustEntry.description}",
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.normal, fontSize: 14),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.normal, fontSize: 14),
                 ),
               ],
               pw.SizedBox(height: 8),
               pw.Text(
                 "Elaborado por:",
-                style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
+                style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
               ),
               pw.Text(
                 adjustEntry.createdBy.name,
-                style: pw.TextStyle(fontWeight: pw.FontWeight.normal, fontSize: 14),
+                style: const pw.TextStyle(fontWeight: pw.FontWeight.normal, fontSize: 14),
               ),
             ],
           ),
@@ -133,14 +133,14 @@ class SingleAdjustEntryTemplate implements PdfTemplate {
             children: [
               pw.Expanded(
                 flex: 4,
-                child: pw.Text("Producto", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
+                child: pw.Text("Producto", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
               ),
               pw.Expanded(
                 flex: 1,
                 child: pw.Text(
                   "Cant.",
                   textAlign: pw.TextAlign.center,
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
                 ),
               ),
               pw.Expanded(
@@ -148,7 +148,7 @@ class SingleAdjustEntryTemplate implements PdfTemplate {
                 child: pw.Text(
                   "Costo",
                   textAlign: pw.TextAlign.center,
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
                 ),
               ),
               pw.Expanded(
@@ -156,7 +156,7 @@ class SingleAdjustEntryTemplate implements PdfTemplate {
                 child: pw.Text(
                   "Subtotal",
                   textAlign: pw.TextAlign.center,
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
                 ),
               ),
             ],
@@ -237,12 +237,12 @@ class SingleAdjustEntryTemplate implements PdfTemplate {
               mainAxisAlignment: pw.MainAxisAlignment.end,
               mainAxisSize: pw.MainAxisSize.min,
               children: [
-                pw.Text("Total:", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
+                pw.Text("Total:", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
                 pw.SizedBox(
                   width: 110,
                   child: pw.Text(
                     NumberFormatter.convertToMoneyLike(total),
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
+                    style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
                     textAlign: pw.TextAlign.right,
                   ),
                 ),

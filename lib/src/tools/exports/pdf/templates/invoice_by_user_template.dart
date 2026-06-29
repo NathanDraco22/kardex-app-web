@@ -52,7 +52,7 @@ class InvoiceByUserTemplate implements PdfTemplate {
       children: [
         pw.Text(
           title,
-          style: pw.TextStyle(
+          style: const pw.TextStyle(
             fontSize: 24,
             fontWeight: pw.FontWeight.bold,
           ),
@@ -87,7 +87,7 @@ class InvoiceByUserTemplate implements PdfTemplate {
           pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              pw.Text("Usuario: ${userInfo?.name ?? 'Todos'}", style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+              pw.Text("Usuario: ${userInfo?.name ?? 'Todos'}", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold)),
               pw.SizedBox(height: 4),
               pw.Text("Periodo: $dateRangeStr"),
             ],
@@ -95,11 +95,11 @@ class InvoiceByUserTemplate implements PdfTemplate {
           pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.end,
             children: [
-              pw.Text("Total Facturas: $count", style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+              pw.Text("Total Facturas: $count", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold)),
               pw.SizedBox(height: 4),
               pw.Text(
                 "Monto Total: ${NumberFormatter.convertToMoneyLike(total)}",
-                style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 16),
+                style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 16),
               ),
             ],
           ),
@@ -119,19 +119,19 @@ class InvoiceByUserTemplate implements PdfTemplate {
       itemCount: items.length,
       columns: [
         BasicPdfTableColumn(
-          label: pw.Text("Hora/Fecha", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
+          label: pw.Text("Hora/Fecha", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
           flex: 2,
         ),
         BasicPdfTableColumn(
-          label: pw.Text("Factura", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
+          label: pw.Text("Factura", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
           flex: 2,
         ),
         BasicPdfTableColumn(
-          label: pw.Text("Cliente", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
+          label: pw.Text("Cliente", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
           flex: 3,
         ),
         BasicPdfTableColumn(
-          label: pw.Text("Monto pagado", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
+          label: pw.Text("Monto pagado", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
           flex: 2,
         ),
       ],

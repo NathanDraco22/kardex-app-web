@@ -75,7 +75,7 @@ Future<Uint8List> generateTicketPdfFromInvoice(
               ),
             pw.Text(
               branch.name,
-              style: pw.TextStyle(
+              style: const pw.TextStyle(
                 fontWeight: pw.FontWeight.bold,
                 fontSize: 12,
               ),
@@ -113,7 +113,7 @@ Future<Uint8List> generateTicketPdfFromInvoice(
 
             pw.Text(
               'FACTURA',
-              style: pw.TextStyle(
+              style: const pw.TextStyle(
                 fontWeight: pw.FontWeight.bold,
                 fontSize: 10,
               ),

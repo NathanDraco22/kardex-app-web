@@ -71,7 +71,7 @@ class SingleReceiptTemplate implements PdfTemplate {
                       children: [
                         pw.Text(
                           branch.name,
-                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
+                          style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
                         ),
                         pw.SizedBox(height: 4),
                         pw.Text(
@@ -95,12 +95,12 @@ class SingleReceiptTemplate implements PdfTemplate {
               children: [
                 pw.Text(
                   "RECIBO OFICIAL",
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 18, color: PdfColors.teal800),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 18, color: PdfColors.teal800),
                 ),
                 pw.SizedBox(height: 4),
                 pw.Text(
                   "No. ${receipt.docNumber}",
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
                 ),
                 pw.SizedBox(height: 2),
                 pw.Text(
@@ -129,12 +129,12 @@ class SingleReceiptTemplate implements PdfTemplate {
                   children: [
                     pw.Text(
                       "RECIBIDO DE",
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 9, color: PdfColors.grey600),
+                      style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 9, color: PdfColors.grey600),
                     ),
                     pw.SizedBox(height: 4),
                     pw.Text(
                       clientLabel,
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                      style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
                     ),
                     if (receipt.clientInfo.location != null && receipt.clientInfo.location!.isNotEmpty) ...[
                       pw.SizedBox(height: 2),
@@ -164,12 +164,12 @@ class SingleReceiptTemplate implements PdfTemplate {
                 children: [
                   pw.Text(
                     "DETALLES DE PAGO",
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 9, color: PdfColors.grey600),
+                    style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 9, color: PdfColors.grey600),
                   ),
                   pw.SizedBox(height: 4),
                   pw.Text(
                     "Método: ${receipt.paymentMethod.display}",
-                    style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold),
+                    style: const pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold),
                   ),
                   if (receipt.bankReference.isNotEmpty) ...[
                     pw.SizedBox(height: 2),
@@ -193,7 +193,7 @@ class SingleReceiptTemplate implements PdfTemplate {
       children: [
         pw.Text(
           "FACTURAS APLICADAS",
-          style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 11, color: PdfColors.teal800),
+          style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 11, color: PdfColors.teal800),
         ),
         pw.SizedBox(height: 6),
         pw.Container(
@@ -205,14 +205,14 @@ class SingleReceiptTemplate implements PdfTemplate {
             children: [
               pw.Expanded(
                 flex: 3,
-                child: pw.Text("Número de Factura", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
+                child: pw.Text("Número de Factura", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
               ),
               pw.Expanded(
                 flex: 2,
                 child: pw.Text(
                   "Monto Aplicado",
                   textAlign: pw.TextAlign.right,
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
                 ),
               ),
             ],
@@ -235,7 +235,7 @@ class SingleReceiptTemplate implements PdfTemplate {
                   child: pw.Text(
                     NumberFormatter.convertToMoneyLike(inv.amountApplied),
                     textAlign: pw.TextAlign.right,
-                    style: pw.TextStyle(fontSize: 11, fontWeight: pw.FontWeight.bold),
+                    style: const pw.TextStyle(fontSize: 11, fontWeight: pw.FontWeight.bold),
                   ),
                 ),
               ],
@@ -252,7 +252,7 @@ class SingleReceiptTemplate implements PdfTemplate {
       children: [
         pw.Text(
           "DEVOLUCIONES APLICADAS",
-          style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 11, color: PdfColors.red800),
+          style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 11, color: PdfColors.red800),
         ),
         pw.SizedBox(height: 6),
         pw.Container(
@@ -264,14 +264,14 @@ class SingleReceiptTemplate implements PdfTemplate {
             children: [
               pw.Expanded(
                 flex: 3,
-                child: pw.Text("Número de Devolución", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
+                child: pw.Text("Número de Devolución", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
               ),
               pw.Expanded(
                 flex: 2,
                 child: pw.Text(
                   "Monto Aplicado",
                   textAlign: pw.TextAlign.right,
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
                 ),
               ),
             ],
@@ -294,7 +294,7 @@ class SingleReceiptTemplate implements PdfTemplate {
                   child: pw.Text(
                     NumberFormatter.convertToMoneyLike(dev.amountApplied),
                     textAlign: pw.TextAlign.right,
-                    style: pw.TextStyle(fontSize: 11, fontWeight: pw.FontWeight.bold),
+                    style: const pw.TextStyle(fontSize: 11, fontWeight: pw.FontWeight.bold),
                   ),
                 ),
               ],
@@ -318,12 +318,12 @@ class SingleReceiptTemplate implements PdfTemplate {
               mainAxisAlignment: pw.MainAxisAlignment.end,
               mainAxisSize: pw.MainAxisSize.min,
               children: [
-                pw.Text("Total Recibido:", style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
+                pw.Text("Total Recibido:", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
                 pw.SizedBox(
                   width: 120,
                   child: pw.Text(
                     NumberFormatter.convertToMoneyLike(receipt.total),
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
+                    style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
                     textAlign: pw.TextAlign.right,
                   ),
                 ),
