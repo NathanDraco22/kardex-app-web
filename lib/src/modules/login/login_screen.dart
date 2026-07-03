@@ -2,6 +2,7 @@ import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/config/app_env.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/app_mode/app_mode_cubit.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
@@ -217,6 +218,7 @@ class _ModeButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (AppEnv.practiceUrl.isEmpty) return const SizedBox.shrink();
     final appModeCubit = context.watch<AppModeCubit>();
     return TextButton(
       style: TextButton.styleFrom(
