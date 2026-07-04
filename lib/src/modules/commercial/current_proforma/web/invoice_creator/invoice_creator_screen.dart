@@ -459,31 +459,17 @@ class _BodyState extends State<_Body> {
       yield SaleItemRow(
         onEdit: () async {
           CommercialProductResult? commercial;
-          int defaultPriceLevel = 1;
-          if (_currentOrder != null) {
-            try {
-              final client = await context.read<ClientsRepository>().getClientById(_currentOrder!.clientId);
-              if (client != null) {
-                defaultPriceLevel = client.defaultPriceLevel;
-              }
-            } catch (e) {
-              debugPrint('Error al obtener cliente para defaultPriceLevel: $e');
-            }
-          }
-          if (!context.mounted) return;
           if (context.isMobile()) {
             commercial = await showCommercialProductModalFromId(
               context,
               productId: saleItem.product.id,
               previousSaleItem: saleItem,
-              defaultPriceLevel: defaultPriceLevel,
             );
           } else {
             commercial = await showCommercialProductDialogFromId(
               context,
               productId: saleItem.product.id,
               previousSaleItem: saleItem,
-              defaultPriceLevel: defaultPriceLevel,
             );
           }
 
@@ -568,27 +554,13 @@ class _BodyState extends State<_Body> {
           label: const Text("Agregar producto"),
           onPressed: () async {
             CommercialProductResult? commercial;
-            int defaultPriceLevel = 1;
-            if (_currentOrder != null) {
-              try {
-                final client = await context.read<ClientsRepository>().getClientById(_currentOrder!.clientId);
-                if (client != null) {
-                  defaultPriceLevel = client.defaultPriceLevel;
-                }
-              } catch (e) {
-                debugPrint('Error al obtener cliente para defaultPriceLevel: $e');
-              }
-            }
-            if (!context.mounted) return;
             if (context.isMobile()) {
               commercial = await showCommercialProductSearchDelegate(
                 context,
-                defaultPriceLevel: defaultPriceLevel,
               );
             } else {
               commercial = await showSearchProductCommercialDialog(
                 context,
-                defaultPriceLevel: defaultPriceLevel,
               );
             }
 
