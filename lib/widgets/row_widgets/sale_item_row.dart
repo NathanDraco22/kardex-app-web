@@ -30,7 +30,7 @@ class _SaleItemRowState extends State<SaleItemRow> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 60,
+      height: 70,
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -71,6 +71,19 @@ class _SaleItemRowState extends State<SaleItemRow> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.qr_code_rounded,
+                            size: 14,
+                            color: Colors.grey,
+                          ),
+                          Text(
+                            widget.saleItem.product.code ?? "",
+                            style: const TextStyle(color: Colors.grey),
+                          ),
+                        ],
+                      ),
                       Text(
                         widget.saleItem.product.name,
                         style: const TextStyle(
