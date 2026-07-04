@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/cubit/write_invoice_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/mobile/mediator.dart';
+import 'package:kardex_app_front/src/modules/commercial/client_invoices/view_controller.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_modal.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/custom_product_commercial_search_delegate.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
@@ -25,9 +26,17 @@ class ClientInvoicesScreenMobile extends StatefulWidget {
 }
 
 class _ClientInvoicesScreenMobileState extends State<ClientInvoicesScreenMobile> {
+  late ClientInvoiceViewController viewController;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    viewController = context.read<WriteInvoiceCubit>().viewController;
+    viewController.updatePricesOnClientChange = false;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final viewController = context.read<WriteInvoiceCubit>().viewController;
     return InvoiceMobileMediator(
       viewController: viewController,
       child: const _RootScaffold(),

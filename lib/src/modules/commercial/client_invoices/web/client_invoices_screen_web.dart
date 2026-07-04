@@ -43,10 +43,43 @@ class _ClientInvoicesScreenWebState extends State<ClientInvoicesScreenWeb> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     viewController = context.read<WriteInvoiceCubit>().viewController;
+    viewController.updatePricesOnClientChange = true;
+    viewController.onPricesChanged = () {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.info_outline, color: Colors.white),
+              SizedBox(width: 8),
+              Text(
+                "Se han cambiado los precios",
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.grey[800],
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          margin: EdgeInsets.only(
+            bottom: MediaQuery.of(context).size.height - 100,
+            left: 20,
+            right: 20,
+          ),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    };
   }
 
   @override
   void dispose() {
+    viewController.onPricesChanged = null;
     super.dispose();
   }
 

@@ -15,12 +15,15 @@ class ClientInvoiceViewController extends ChangeNotifier {
 
   ClientInDb? get selectedClient => _selectedClient;
 
+  bool updatePricesOnClientChange = true;
+  VoidCallback? onPricesChanged;
+
   set selectedClient(ClientInDb? value) {
     final hasCredit = value?.isCreditActive ?? false;
     final initValue = hasCredit ? PaymentType.credit : PaymentType.cash;
     selectedPaymentType = initValue;
     _selectedClient = value;
-    if (value != null) {
+    if (value != null && updatePricesOnClientChange) {
       final level = value.defaultPriceLevel;
       items = items.map((item) {
         final priceMap = {
@@ -35,6 +38,9 @@ class ClientInvoiceViewController extends ChangeNotifier {
           selectedPriceLevel: level,
         );
       }).toList();
+      if (items.isNotEmpty) {
+        onPricesChanged?.call();
+      }
     }
     notifyListeners();
   }
