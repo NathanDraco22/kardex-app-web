@@ -7,7 +7,7 @@ class AppKardexConfig implements KardexClientConfig {
   AppKardexConfig._();
 
   String _baseUrl = AppEnv.serverUrl;
-  String _practiceUrl = AppEnv.practiceUrl;
+  String _practiceUrl = "";
   String? _servinNickname;
   String? _branchId;
 

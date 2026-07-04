@@ -381,7 +381,26 @@ class InvoiceViewerContent extends StatelessWidget {
                         children: [
                           Expanded(
                             flex: 4,
-                            child: Text(saleItem.product.name),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              spacing: 4,
+                              children: [
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.qr_code_rounded,
+                                      size: 14,
+                                      color: Colors.grey,
+                                    ),
+                                    Text(
+                                      saleItem.product.code ?? "",
+                                      style: const TextStyle(color: Colors.grey),
+                                    ),
+                                  ],
+                                ),
+                                Text(saleItem.product.name),
+                              ],
+                            ),
                           ),
                           Expanded(
                             child: Text(
