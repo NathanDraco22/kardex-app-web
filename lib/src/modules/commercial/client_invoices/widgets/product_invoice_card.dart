@@ -29,6 +29,8 @@ class ProductInvoiceCard extends StatelessWidget {
     final totalFormatted = NumberFormatter.convertToMoneyLike(item.total);
 
     Offset? offset;
+    final isZeroPrice = item.newPrice <= 0;
+    final cardColor = isZeroPrice ? Colors.red.shade200 : tileColor;
 
     return Material(
       color: Colors.transparent,
@@ -53,7 +55,7 @@ class ProductInvoiceCard extends StatelessWidget {
         child: Ink(
           padding: const EdgeInsets.all(8.0),
           decoration: BoxDecoration(
-            color: tileColor,
+            color: cardColor,
             border: Border.all(
               color: Colors.grey,
             ),

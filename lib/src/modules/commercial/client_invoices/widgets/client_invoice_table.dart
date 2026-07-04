@@ -238,7 +238,10 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
   Iterable<Widget> _buildRow(BuildContext context, ClientInvoiceViewController controller) sync* {
     for (var i = 0; i < controller.items.length; i++) {
       final currentItem = controller.items[i];
-      final color = i.isOdd ? Colors.white : Colors.grey.shade200;
+      final isZeroPrice = currentItem.newPrice <= 0;
+      final color = isZeroPrice 
+          ? Colors.red.shade200 
+          : (i.isOdd ? Colors.white : Colors.grey.shade200);
       yield InvoiceTableRow(
         key: ValueKey(currentItem),
         color: color,

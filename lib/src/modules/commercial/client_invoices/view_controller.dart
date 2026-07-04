@@ -20,8 +20,26 @@ class ClientInvoiceViewController extends ChangeNotifier {
     final initValue = hasCredit ? PaymentType.credit : PaymentType.cash;
     selectedPaymentType = initValue;
     _selectedClient = value;
+    if (value != null) {
+      final level = value.defaultPriceLevel;
+      items = items.map((item) {
+        final priceMap = {
+          1: item.product.saleProfile.salePrice,
+          2: item.product.saleProfile.salePrice2,
+          3: item.product.saleProfile.salePrice3,
+          4: item.product.saleProfile.salePrice4,
+        };
+        final newPrice = priceMap[level] ?? item.product.saleProfile.salePrice;
+        return item.copyWith(
+          newPrice: newPrice,
+          selectedPriceLevel: level,
+        );
+      }).toList();
+    }
     notifyListeners();
   }
+
+  bool get hasZeroPriceItems => items.any((item) => item.newPrice <= 0);
 
   DateTime get selectedDate => _selectedDate ?? DateTime.now();
   set selectedDate(DateTime value) {
