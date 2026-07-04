@@ -50,7 +50,7 @@ Future<CommercialProductResult?> showCommercialProductModalFromId(
         ..quantity = previousSaleItem.quantity
         ..selectedPriceLevel = previousSaleItem.selectedPrice
         ..newPrice = previousSaleItem.price
-        ..selectedDisocunt = appliedDiscount;
+        ..selectedDiscount = appliedDiscount;
     }
 
     return await showCommercialProductModal(
@@ -399,19 +399,19 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                                 commercialProductResult.newPrice !=
                                 commercialProductResult.product.saleProfile.salePrice,
                             child: DropdownButtonFormField(
-                              initialValue: commercialProductResult.selectedDisocunt,
+                              initialValue: commercialProductResult.selectedDiscount,
                               items: discountsAvailable.toList(),
                               decoration: InputDecoration(
                                 suffixIcon: IconButton(
                                   onPressed: () {
-                                    commercialProductResult.selectedDisocunt = null;
+                                    commercialProductResult.selectedDiscount = null;
                                     setState(() {});
                                   },
                                   icon: const Icon(Icons.close),
                                 ),
                               ),
                               onChanged: (value) {
-                                commercialProductResult.selectedDisocunt = value;
+                                commercialProductResult.selectedDiscount = value;
                                 setState(() {});
                               },
                             ),
@@ -501,7 +501,7 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        if (product.saleProfile.salePrice == 0) {
+                        if (commercialProductResult.newPrice == 0) {
                           DialogManager.showErrorDialog(context, "El producto no tiene precio de venta");
                           return;
                         }
