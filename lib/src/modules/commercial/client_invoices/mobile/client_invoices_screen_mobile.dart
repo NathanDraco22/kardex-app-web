@@ -61,7 +61,10 @@ class _RootScaffold extends StatelessWidget {
         visible: MediaQuery.viewInsetsOf(context).bottom == 0.0,
         child: FloatingActionButton.extended(
           onPressed: () async {
-            final res = await showCommercialProductSearchDelegate(context);
+            final res = await showCommercialProductSearchDelegate(
+              context,
+              defaultPriceLevel: viewController.selectedClient?.defaultPriceLevel ?? 1,
+            );
             if (res == null) return;
             if (writeCubit.documentType != CommercialDocumentType.quote &&
                 res.quantity > res.product.account.availableStock) {
@@ -245,7 +248,10 @@ class _Body extends StatelessWidget {
                           );
                         },
                         onChange: () async {
-                          final res = await showCommercialProductSearchDelegate(context);
+                          final res = await showCommercialProductSearchDelegate(
+                            context,
+                            defaultPriceLevel: viewController.selectedClient?.defaultPriceLevel ?? 1,
+                          );
                           if (res == null) return;
                           if (writeCubit.documentType != CommercialDocumentType.quote &&
                               res.quantity > res.product.account.availableStock) {

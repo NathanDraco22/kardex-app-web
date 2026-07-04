@@ -9,12 +9,19 @@ import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/widgets/dialogs/product_in_branch_info_dialog.dart';
 
-Future<CommercialProductResult?> showCommercialProductSearchDelegate(BuildContext context) async {
+Future<CommercialProductResult?> showCommercialProductSearchDelegate(
+  BuildContext context, {
+  int defaultPriceLevel = 1,
+}) async {
   return await Navigator.push<CommercialProductResult?>(
     context,
     MaterialPageRoute(
       builder: (context) => CustomProductSearchDelegate<CommercialProductResult>(
-        onSelect: (ctx, product) => showCommercialProductModal(ctx, product: product),
+        onSelect: (ctx, product) => showCommercialProductModal(
+          ctx,
+          product: product,
+          defaultPriceLevel: defaultPriceLevel,
+        ),
       ),
     ),
   );

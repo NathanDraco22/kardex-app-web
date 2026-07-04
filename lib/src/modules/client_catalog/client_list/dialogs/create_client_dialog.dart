@@ -46,6 +46,7 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
   bool isActive = true;
   bool isCreditActive = true;
   int creditLimit = 0;
+  int defaultPriceLevel = 1;
 
   @override
   void initState() {
@@ -53,8 +54,10 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
       creationMap['coordinates'] = widget.client!.coordinates;
       creationMap['personalReferences'] = List<PersonalReference>.from(widget.client!.personalReferences);
       creditLimit = widget.client!.creditLimit;
+      defaultPriceLevel = widget.client!.defaultPriceLevel;
     } else {
       creationMap['personalReferences'] = <PersonalReference>[];
+      defaultPriceLevel = 1;
     }
     super.initState();
   }
@@ -73,6 +76,7 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
     creationMap['isActive'] = isActive;
     creationMap['isCreditActive'] = isCreditActive;
     creationMap['creditLimit'] = creditLimit;
+    creationMap['defaultPriceLevel'] = defaultPriceLevel;
 
     final currentClient = widget.client;
 
@@ -444,6 +448,29 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
                         }
                         creationMap["creditLimit"] = creditLimit;
                         return null;
+                      },
+                    ),
+
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<int>(
+                      decoration: const InputDecoration(
+                        labelText: 'Nivel de precio predeterminado',
+                        border: OutlineInputBorder(),
+                      ),
+                      initialValue: defaultPriceLevel,
+                      items: const [
+                        DropdownMenuItem(value: 1, child: Text('Precio 1')),
+                        DropdownMenuItem(value: 2, child: Text('Precio 2')),
+                        DropdownMenuItem(value: 3, child: Text('Precio 3')),
+                        DropdownMenuItem(value: 4, child: Text('Precio 4')),
+                      ],
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() {
+                            defaultPriceLevel = value;
+                            creationMap['defaultPriceLevel'] = value;
+                          });
+                        }
                       },
                     ),
 

@@ -3,8 +3,16 @@ import 'package:kardex_business/kardex_business.dart';
 class CommercialProductResult {
   CommercialProductResult({
     required this.product,
+    int defaultPriceLevel = 1,
   }) {
-    _newPrice = product.saleProfile.salePrice;
+    selectedPriceLevel = defaultPriceLevel;
+    final priceMap = {
+      1: product.saleProfile.salePrice,
+      2: product.saleProfile.salePrice2,
+      3: product.saleProfile.salePrice3,
+      4: product.saleProfile.salePrice4,
+    };
+    _newPrice = priceMap[defaultPriceLevel] ?? product.saleProfile.salePrice;
   }
   ProductInDbInBranch product;
   int _newPrice = 0;

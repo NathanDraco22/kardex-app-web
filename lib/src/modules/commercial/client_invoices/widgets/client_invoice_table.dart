@@ -201,6 +201,7 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
                         onPressed: () async {
                           final res = await showSearchProductCommercialDialog(
                             context,
+                            defaultPriceLevel: widget.controller.selectedClient?.defaultPriceLevel ?? 1,
                           );
 
                           if (res == null) return;
@@ -244,7 +245,11 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
         item: currentItem,
         onRemove: (item) => controller.removeItem(item),
         onChange: (item) async {
-          final res = await showSearchProductCommercialDialog(context, product: item.product);
+          final res = await showSearchProductCommercialDialog(
+            context,
+            product: item.product,
+            defaultPriceLevel: widget.controller.selectedClient?.defaultPriceLevel ?? 1,
+          );
           if (res == null) return;
           if (widget.restrictQuantity &&
               (res.quantity > res.product.account.availableStock || res.product.account.availableStock == 0)) {
