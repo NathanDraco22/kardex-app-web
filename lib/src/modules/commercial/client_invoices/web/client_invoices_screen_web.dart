@@ -56,7 +56,7 @@ class _ClientInvoicesScreenWebState extends State<ClientInvoicesScreenWeb> {
               Icon(Icons.info_outline, color: Colors.white),
               SizedBox(width: 8),
               Text(
-                "Se han cambiado los precios",
+                "Recomendado: Verificar los precios",
                 style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
             ],
