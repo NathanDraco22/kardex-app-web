@@ -16,6 +16,7 @@ import '../widgets/client_invoice_table.dart';
 import '../widgets/dialogs/confirm_invoice_dialog.dart';
 import '../cubit/write_invoice_cubit.dart';
 import 'mediator.dart';
+import 'package:toastification/toastification.dart';
 
 part 'sections/header_section.dart';
 part 'sections/content_section.dart';
@@ -46,33 +47,13 @@ class _ClientInvoicesScreenWebState extends State<ClientInvoicesScreenWeb> {
     viewController.updatePricesOnClientChange = true;
     viewController.onPricesChanged = () {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.info_outline, color: Colors.white),
-              SizedBox(width: 8),
-              Text(
-                "Recomendado: Verificar los precios",
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-          backgroundColor: Colors.grey[800],
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          margin: EdgeInsets.only(
-            bottom: MediaQuery.of(context).size.height - 100,
-            left: 20,
-            right: 20,
-          ),
-          duration: const Duration(seconds: 2),
-        ),
+      toastification.show(
+        context: context,
+        type: ToastificationType.warning,
+        title: const Text('Se han cambiado los precios'),
+        description: const Text('Los precios se actualizaron según el nivel del cliente.'),
+        autoCloseDuration: const Duration(seconds: 3),
+        style: ToastificationStyle.flatColored,
       );
     };
   }
