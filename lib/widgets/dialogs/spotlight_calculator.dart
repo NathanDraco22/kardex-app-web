@@ -273,10 +273,12 @@ class _SpotlightCalculatorState extends State<SpotlightCalculator> {
     final isDark = theme.brightness == Brightness.dark;
 
     // Colores premium con transparencia para el estilo macOS Spotlight
-    final backgroundColor = isDark
-        ? const Color(0xFF1E1E1E).withValues(alpha: 0.75)
+    final backgroundColor = isDark 
+        ? const Color(0xFF1E1E1E).withValues(alpha: 0.75) 
         : const Color(0xFFF5F5F7).withValues(alpha: 0.85);
-    final borderColor = isDark ? Colors.white.withValues(alpha: 0.12) : Colors.black.withValues(alpha: 0.08);
+    final borderColor = isDark 
+        ? Colors.white.withValues(alpha: 0.12) 
+        : Colors.black.withValues(alpha: 0.08);
     final textColor = isDark ? Colors.white : Colors.black87;
     final hintColor = isDark ? Colors.white38 : Colors.black38;
 
@@ -294,121 +296,115 @@ class _SpotlightCalculatorState extends State<SpotlightCalculator> {
               borderRadius: BorderRadius.circular(16),
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-                child: KeyboardListener(
-                  focusNode: FocusNode(), // Nodo de foco secundario para capturar la tecla Escape
-                  onKeyEvent: (event) {
-                    if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
-                      Navigator.of(context).pop();
-                    }
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: backgroundColor,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: borderColor, width: 1.5),
-                    ),
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // Fila de Entrada de la calculadora
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.calculate_outlined,
-                              size: 28,
-                              color: isDark ? Colors.white60 : Colors.black45,
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: TextField(
-                                controller: _controller,
-                                focusNode: _focusNode,
-                                style: theme.textTheme.headlineSmall?.copyWith(
-                                  color: textColor,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                                decoration: InputDecoration(
-                                  hintText: 'Escribe una expresión (ej. 100 - 10%)',
-                                  hintStyle: TextStyle(color: hintColor),
-                                  border: InputBorder.none,
-                                  isDense: true,
-                                  contentPadding: const EdgeInsets.symmetric(vertical: 4),
-                                ),
-                                cursorColor: theme.colorScheme.primary,
-                                onChanged: _evaluateExpression,
-                                onSubmitted: (_) => _handleSubmitted(),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: backgroundColor,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: borderColor, width: 1.5),
+                  ),
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Fila de Entrada de la calculadora
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.calculate_outlined,
+                            size: 28,
+                            color: isDark ? Colors.white60 : Colors.black45,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: TextField(
+                              controller: _controller,
+                              focusNode: _focusNode,
+                              style: theme.textTheme.headlineSmall?.copyWith(
+                                color: textColor,
+                                fontWeight: FontWeight.w400,
                               ),
-                            ),
-                            if (_controller.text.isNotEmpty)
-                              IconButton(
-                                icon: const Icon(Icons.close, size: 20),
-                                onPressed: () {
-                                  _controller.clear();
-                                  _evaluateExpression('');
-                                  _focusNode.requestFocus();
-                                },
-                                color: hintColor,
+                              decoration: InputDecoration(
+                                hintText: 'Escribe una expresión (ej. 100 - 10%)',
+                                hintStyle: TextStyle(color: hintColor),
+                                border: InputBorder.none,
+                                isDense: true,
+                                contentPadding: const EdgeInsets.symmetric(vertical: 4),
                               ),
-                          ],
-                        ),
-                        // Sección del resultado si hay texto
-                        AnimatedSize(
-                          duration: const Duration(milliseconds: 150),
-                          curve: Curves.easeInOut,
-                          child: _controller.text.isEmpty
-                              ? const SizedBox.shrink()
-                              : Column(
-                                  children: [
-                                    Divider(
-                                      color: isDark
-                                          ? Colors.white.withValues(alpha: 0.08)
-                                          : Colors.black.withValues(alpha: 0.05),
-                                      height: 20,
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment: CrossAxisAlignment.end,
-                                      children: [
-                                        // Indicaciones o ayuda en la esquina inferior izquierda
-                                        Opacity(
-                                          opacity: _isValidExpression ? 0.6 : 0.4,
+                              cursorColor: theme.colorScheme.primary,
+                              onChanged: _evaluateExpression,
+                              onSubmitted: (_) => _handleSubmitted(),
+                            ),
+                          ),
+                          if (_controller.text.isNotEmpty)
+                            IconButton(
+                              icon: const Icon(Icons.close, size: 20),
+                              onPressed: () {
+                                _controller.clear();
+                                _evaluateExpression('');
+                                _focusNode.requestFocus();
+                              },
+                              color: hintColor,
+                            ),
+                        ],
+                      ),
+                      // Sección del resultado si hay texto
+                      AnimatedSize(
+                        duration: const Duration(milliseconds: 150),
+                        curve: Curves.easeInOut,
+                        child: _controller.text.isEmpty
+                            ? const SizedBox.shrink()
+                            : Column(
+                                children: [
+                                  Divider(
+                                    color: isDark 
+                                        ? Colors.white.withValues(alpha: 0.08) 
+                                        : Colors.black.withValues(alpha: 0.05),
+                                    height: 20,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      // Indicaciones o ayuda en la esquina inferior izquierda
+                                      Opacity(
+                                        opacity: _isValidExpression ? 0.6 : 0.4,
+                                        child: Text(
+                                          _isValidExpression
+                                              ? (_controller.text.trim() == _resultText.trim()
+                                                  ? 'Presiona Enter para copiar'
+                                                  : 'Presiona Enter para calcular')
+                                              : (_controller.text.trim().isEmpty 
+                                                  ? '' 
+                                                  : 'Expresión incompleta...'),
+                                          style: theme.textTheme.bodySmall?.copyWith(
+                                            color: textColor,
+                                          ),
+                                        ),
+                                      ),
+                                      // Resultado a la derecha
+                                      Expanded(
+                                        child: Align(
+                                          alignment: Alignment.centerRight,
                                           child: Text(
-                                            _isValidExpression
-                                                ? (_controller.text.trim() == _resultText.trim()
-                                                      ? 'Presiona Enter para copiar'
-                                                      : 'Presiona Enter para calcular')
-                                                : (_controller.text.trim().isEmpty ? '' : 'Expresión incompleta...'),
-                                            style: theme.textTheme.bodySmall?.copyWith(
-                                              color: textColor,
+                                            _isValidExpression ? _resultText : '—',
+                                            style: theme.textTheme.headlineMedium?.copyWith(
+                                              color: _isValidExpression 
+                                                  ? Colors.tealAccent.shade400 
+                                                  : textColor.withValues(alpha: 0.4),
+                                              fontWeight: FontWeight.bold,
                                             ),
+                                            overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
-                                        // Resultado a la derecha
-                                        Expanded(
-                                          child: Align(
-                                            alignment: Alignment.centerRight,
-                                            child: Text(
-                                              _isValidExpression ? _resultText : '—',
-                                              style: theme.textTheme.headlineMedium?.copyWith(
-                                                color: _isValidExpression
-                                                    ? Colors.teal.shade700
-                                                    : textColor.withValues(alpha: 0.4),
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                        ),
-                      ],
-                    ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                      ),
+                    ],
                   ),
                 ),
               ),
