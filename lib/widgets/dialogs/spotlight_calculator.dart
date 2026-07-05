@@ -273,12 +273,10 @@ class _SpotlightCalculatorState extends State<SpotlightCalculator> {
     final isDark = theme.brightness == Brightness.dark;
 
     // Colores premium con transparencia para el estilo macOS Spotlight
-    final backgroundColor = isDark 
-        ? const Color(0xFF1E1E1E).withValues(alpha: 0.75) 
+    final backgroundColor = isDark
+        ? const Color(0xFF1E1E1E).withValues(alpha: 0.75)
         : const Color(0xFFF5F5F7).withValues(alpha: 0.85);
-    final borderColor = isDark 
-        ? Colors.white.withValues(alpha: 0.12) 
-        : Colors.black.withValues(alpha: 0.08);
+    final borderColor = isDark ? Colors.white.withValues(alpha: 0.12) : Colors.black.withValues(alpha: 0.08);
     final textColor = isDark ? Colors.white : Colors.black87;
     final hintColor = isDark ? Colors.white38 : Colors.black38;
 
@@ -357,8 +355,8 @@ class _SpotlightCalculatorState extends State<SpotlightCalculator> {
                             : Column(
                                 children: [
                                   Divider(
-                                    color: isDark 
-                                        ? Colors.white.withValues(alpha: 0.08) 
+                                    color: isDark
+                                        ? Colors.white.withValues(alpha: 0.08)
                                         : Colors.black.withValues(alpha: 0.05),
                                     height: 20,
                                   ),
@@ -373,11 +371,9 @@ class _SpotlightCalculatorState extends State<SpotlightCalculator> {
                                         child: Text(
                                           _isValidExpression
                                               ? (_controller.text.trim() == _resultText.trim()
-                                                  ? 'Presiona Enter para copiar'
-                                                  : 'Presiona Enter para calcular')
-                                              : (_controller.text.trim().isEmpty 
-                                                  ? '' 
-                                                  : 'Expresión incompleta...'),
+                                                    ? 'Presiona Enter para copiar'
+                                                    : 'Presiona Enter para calcular')
+                                              : (_controller.text.trim().isEmpty ? '' : 'Expresión incompleta...'),
                                           style: theme.textTheme.bodySmall?.copyWith(
                                             color: textColor,
                                           ),
@@ -390,8 +386,8 @@ class _SpotlightCalculatorState extends State<SpotlightCalculator> {
                                           child: Text(
                                             _isValidExpression ? _resultText : '—',
                                             style: theme.textTheme.headlineMedium?.copyWith(
-                                              color: _isValidExpression 
-                                                  ? Colors.tealAccent.shade400 
+                                              color: _isValidExpression
+                                                  ? Colors.teal.shade900
                                                   : textColor.withValues(alpha: 0.4),
                                               fontWeight: FontWeight.bold,
                                             ),
