@@ -293,6 +293,7 @@ class SaveButton extends StatelessWidget {
                   salePrice: e.product.saleProfile.salePrice,
                   salePrice2: e.product.saleProfile.salePrice2,
                   salePrice3: e.product.saleProfile.salePrice3,
+                  salePrice4: e.product.saleProfile.salePrice4,
                 );
               }).toList();
 

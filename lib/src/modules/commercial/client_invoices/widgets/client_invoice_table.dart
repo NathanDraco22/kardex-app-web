@@ -201,6 +201,7 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
                         onPressed: () async {
                           final res = await showSearchProductCommercialDialog(
                             context,
+                            defaultPriceLevel: widget.controller.selectedClient?.defaultPriceLevel ?? 1,
                           );
 
                           if (res == null) return;
@@ -237,14 +238,21 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
   Iterable<Widget> _buildRow(BuildContext context, ClientInvoiceViewController controller) sync* {
     for (var i = 0; i < controller.items.length; i++) {
       final currentItem = controller.items[i];
-      final color = i.isOdd ? Colors.white : Colors.grey.shade200;
+      final isZeroPrice = currentItem.newPrice <= 0;
+      final color = isZeroPrice 
+          ? Colors.red.shade200 
+          : (i.isOdd ? Colors.white : Colors.grey.shade200);
       yield InvoiceTableRow(
         key: ValueKey(currentItem),
         color: color,
         item: currentItem,
         onRemove: (item) => controller.removeItem(item),
         onChange: (item) async {
-          final res = await showSearchProductCommercialDialog(context, product: item.product);
+          final res = await showSearchProductCommercialDialog(
+            context,
+            product: item.product,
+            defaultPriceLevel: widget.controller.selectedClient?.defaultPriceLevel ?? 1,
+          );
           if (res == null) return;
           if (widget.restrictQuantity &&
               (res.quantity > res.product.account.availableStock || res.product.account.availableStock == 0)) {

@@ -251,6 +251,13 @@ class _SendButton extends StatelessWidget {
           onPressed: viewController.selectedClient == null
               ? null
               : () async {
+                  if (viewController.hasZeroPriceItems) {
+                    DialogManager.showErrorDialog(
+                      context,
+                      "No se puede facturar porque hay productos con precio en 0. Por favor, edita o elimina estos productos.",
+                    );
+                    return;
+                  }
                   final createInvoice = viewController.generateCreateInvoice(context);
 
                   if (createInvoice == null) return;

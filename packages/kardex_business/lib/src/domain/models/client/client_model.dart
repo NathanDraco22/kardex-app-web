@@ -52,6 +52,7 @@ class BaseClient {
   final bool isCreditActive;
   final bool isActive;
   final List<PersonalReference> personalReferences;
+  final int defaultPriceLevel;
 
   BaseClient({
     required this.name,
@@ -69,6 +70,7 @@ class BaseClient {
     this.lastReceiptDate,
     this.coordinates,
     this.personalReferences = const [],
+    this.defaultPriceLevel = 1,
   });
 
   factory BaseClient.fromJson(Map json) {
@@ -98,6 +100,7 @@ class BaseClient {
                 .map((e) => PersonalReference.fromJson(e as Map<String, dynamic>))
                 .toList()
           : [],
+      defaultPriceLevel: json['defaultPriceLevel'] as int? ?? 1,
     );
   }
 
@@ -118,6 +121,7 @@ class BaseClient {
       'lastReceiptDate': lastReceiptDate?.millisecondsSinceEpoch,
       'coordinates': coordinates?.toJson(),
       'personalReferences': personalReferences.map((e) => e.toJson()).toList(),
+      'defaultPriceLevel': defaultPriceLevel,
     };
   }
 }
@@ -137,6 +141,7 @@ class CreateClient extends BaseClient {
     super.isActive,
     super.coordinates,
     super.personalReferences,
+    super.defaultPriceLevel = 1,
   });
 
   factory CreateClient.fromJson(Map json) {
@@ -175,6 +180,7 @@ class CreateClient extends BaseClient {
       isActive: json['isActive'] as bool? ?? true,
       coordinates: coordinates,
       personalReferences: personalReferences,
+      defaultPriceLevel: json['defaultPriceLevel'] as int? ?? 1,
     );
   }
 }
@@ -192,6 +198,7 @@ class UpdateClient {
   final int? creditLimit;
   final Coordinates? coordinates;
   final List<PersonalReference>? personalReferences;
+  final int? defaultPriceLevel;
 
   UpdateClient({
     this.name,
@@ -206,6 +213,7 @@ class UpdateClient {
     this.creditLimit,
     this.coordinates,
     this.personalReferences,
+    this.defaultPriceLevel,
   });
 
   factory UpdateClient.fromJson(Map json) {
@@ -243,6 +251,7 @@ class UpdateClient {
       creditLimit: json['creditLimit'] as int?,
       coordinates: coordinates,
       personalReferences: personalReferences,
+      defaultPriceLevel: json['defaultPriceLevel'] as int?,
     );
   }
 
@@ -260,6 +269,7 @@ class UpdateClient {
       'creditLimit': creditLimit,
       'coordinates': coordinates?.toJson(),
       'personalReferences': personalReferences?.map((e) => e.toJson()).toList(),
+      'defaultPriceLevel': defaultPriceLevel,
     };
     data.removeWhere((key, value) => value == null);
     return data;
@@ -292,6 +302,7 @@ class ClientInDb extends BaseClient {
     this.updatedAt,
     super.coordinates,
     super.personalReferences,
+    super.defaultPriceLevel = 1,
   });
 
   factory ClientInDb.fromJson(Map json) {
@@ -325,6 +336,7 @@ class ClientInDb extends BaseClient {
                 .map((e) => PersonalReference.fromJson(e as Map<String, dynamic>))
                 .toList()
           : [],
+      defaultPriceLevel: json['defaultPriceLevel'] as int? ?? 1,
     );
   }
 
