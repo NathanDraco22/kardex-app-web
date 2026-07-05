@@ -197,7 +197,7 @@ class _Body extends StatelessWidget {
                       return ProductInvoiceCard(
                         tileColor: tileColor,
                         item: currentCommercial,
-                        percentDiscount: currentCommercial.selectedDisocunt?.percentValue ?? 0,
+                        percentDiscount: currentCommercial.selectedDiscount?.percentValue ?? 0,
                         onRemove: () => viewController.removeItem(currentCommercial),
                         onEdit: () async {
                           final res = await showCommercialProductModal(

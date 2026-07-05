@@ -126,6 +126,7 @@ class ProductInBranchInfoDialog extends StatelessWidget {
                   buildPriceCopyable("Precio 1", product.saleProfile.salePrice),
                   buildPriceCopyable("Precio 2", product.saleProfile.salePrice2),
                   buildPriceCopyable("Precio 3", product.saleProfile.salePrice3),
+                  buildPriceCopyable("Precio 4", product.saleProfile.salePrice4),
                 ],
               ),
 

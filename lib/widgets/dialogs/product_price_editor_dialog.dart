@@ -75,11 +75,13 @@ class _RootScaffoldState extends State<_RootScaffold> {
   late int currentSalePrice;
   late int currentSalePrice2;
   late int currentSalePrice3;
+  late int currentSalePrice4;
   late List<Discount> currentDiscounts;
 
   FocusNode priceFocus = FocusNode();
   FocusNode priceFocus2 = FocusNode();
   FocusNode priceFocus3 = FocusNode();
+  FocusNode priceFocus4 = FocusNode();
 
   bool hasLowerPrices = false;
 
@@ -89,6 +91,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
     currentSalePrice = widget.product.saleProfile.salePrice;
     currentSalePrice2 = widget.product.saleProfile.salePrice2;
     currentSalePrice3 = widget.product.saleProfile.salePrice3;
+    currentSalePrice4 = widget.product.saleProfile.salePrice4;
     currentDiscounts = [...widget.product.saleProfile.discounts];
     Future(
       () {
@@ -102,6 +105,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
       salePrice: currentSalePrice,
       salePrice2: currentSalePrice2,
       salePrice3: currentSalePrice3,
+      salePrice4: currentSalePrice4,
       discounts: currentDiscounts,
     );
     final branchId = getIt<AuthCubit>().currentBranchId;
@@ -119,6 +123,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
           currentSalePrice,
           if (currentSalePrice2 > 0) currentSalePrice2,
           if (currentSalePrice3 > 0) currentSalePrice3,
+          if (currentSalePrice4 > 0) currentSalePrice4,
         ].any(
           (price) => price < widget.product.account.averageCost,
         );
@@ -368,6 +373,34 @@ class _RootScaffoldState extends State<_RootScaffold> {
 
                           initialValue: NumberFormatter.convertFromCentsToDouble(
                             widget.product.saleProfile.salePrice3,
+                          ).toString(),
+
+                          inputFormatters: [DoubleThousandsFormatter()],
+                        ),
+
+                        const SizedBox(
+                          height: 12,
+                        ),
+
+                        TitleTextField(
+                          key: const Key("price4"),
+                          title: "Precio de Venta 4 (C\$ )",
+                          focusNode: priceFocus4,
+                          keyboardType: TextInputType.number,
+                          onChanged: (value) {
+                            if (value.isEmpty) {
+                              currentSalePrice4 = 0;
+                              setState(() {});
+                              return;
+                            }
+                            final formattedValue = value.replaceAll(",", "");
+                            final cents = ((double.tryParse(formattedValue) ?? 0) * 100).round();
+                            currentSalePrice4 = cents;
+                            setState(() {});
+                          },
+
+                          initialValue: NumberFormatter.convertFromCentsToDouble(
+                            widget.product.saleProfile.salePrice4,
                           ).toString(),
 
                           inputFormatters: [DoubleThousandsFormatter()],

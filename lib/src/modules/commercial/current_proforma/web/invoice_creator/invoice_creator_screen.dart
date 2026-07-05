@@ -555,9 +555,13 @@ class _BodyState extends State<_Body> {
           onPressed: () async {
             CommercialProductResult? commercial;
             if (context.isMobile()) {
-              commercial = await showCommercialProductSearchDelegate(context);
+              commercial = await showCommercialProductSearchDelegate(
+                context,
+              );
             } else {
-              commercial = await showSearchProductCommercialDialog(context);
+              commercial = await showSearchProductCommercialDialog(
+                context,
+              );
             }
 
             if (commercial == null) return;

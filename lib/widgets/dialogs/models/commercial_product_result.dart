@@ -3,13 +3,21 @@ import 'package:kardex_business/kardex_business.dart';
 class CommercialProductResult {
   CommercialProductResult({
     required this.product,
+    int defaultPriceLevel = 1,
   }) {
-    _newPrice = product.saleProfile.salePrice;
+    selectedPriceLevel = defaultPriceLevel;
+    final priceMap = {
+      1: product.saleProfile.salePrice,
+      2: product.saleProfile.salePrice2,
+      3: product.saleProfile.salePrice3,
+      4: product.saleProfile.salePrice4,
+    };
+    _newPrice = priceMap[defaultPriceLevel] ?? product.saleProfile.salePrice;
   }
   ProductInDbInBranch product;
   int _newPrice = 0;
   int selectedPriceLevel = 1;
-  Discount? selectedDisocunt;
+  Discount? selectedDiscount;
   int quantity = 0;
   int get subTotal {
     return quantity * _newPrice;
@@ -18,14 +26,14 @@ class CommercialProductResult {
   int get newPrice => _newPrice;
 
   set newPrice(int value) {
-    selectedDisocunt = null;
+    selectedDiscount = null;
     _newPrice = value;
   }
 
-  int get discountPercent => selectedDisocunt?.percentValue ?? 0;
+  int get discountPercent => selectedDiscount?.percentValue ?? 0;
 
   int get totalDiscount {
-    final decimalResult = subTotal * ((selectedDisocunt?.percentValue ?? 0) / 100);
+    final decimalResult = subTotal * ((selectedDiscount?.percentValue ?? 0) / 100);
     return decimalResult.round();
   }
 
@@ -37,11 +45,12 @@ class CommercialProductResult {
     ProductInDbInBranch? product,
     int? newPrice,
     int? selectedPriceLevel,
-    Discount? selectedDisocunt,
+    Discount? selectedDiscount,
     int? quantity,
   }) {
     final result = CommercialProductResult(
       product: product ?? this.product,
+      defaultPriceLevel: selectedPriceLevel ?? this.selectedPriceLevel,
     );
 
     if (newPrice != null) {
@@ -52,10 +61,10 @@ class CommercialProductResult {
 
     result.selectedPriceLevel = selectedPriceLevel ?? this.selectedPriceLevel;
 
-    if (selectedDisocunt != null) {
-      result.selectedDisocunt = selectedDisocunt;
+    if (selectedDiscount != null) {
+      result.selectedDiscount = selectedDiscount;
     } else if (newPrice == null) {
-      result.selectedDisocunt = this.selectedDisocunt;
+      result.selectedDiscount = this.selectedDiscount;
     }
 
     result.quantity = quantity ?? this.quantity;

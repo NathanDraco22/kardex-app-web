@@ -13,6 +13,7 @@ Future<CommercialProductResult?> showCommercialProductModalFromId(
   BuildContext context, {
   required String productId,
   SaleItem? previousSaleItem,
+  int defaultPriceLevel = 1,
 }) async {
   final authState = getIt<AuthCubit>().state;
   if (authState is! Authenticated) return null;
@@ -49,13 +50,14 @@ Future<CommercialProductResult?> showCommercialProductModalFromId(
         ..quantity = previousSaleItem.quantity
         ..selectedPriceLevel = previousSaleItem.selectedPrice
         ..newPrice = previousSaleItem.price
-        ..selectedDisocunt = appliedDiscount;
+        ..selectedDiscount = appliedDiscount;
     }
 
     return await showCommercialProductModal(
       context,
       product: product,
       commercialProductResult: initialResult,
+      defaultPriceLevel: defaultPriceLevel,
     );
   } catch (e) {
     if (context.mounted) {
@@ -70,6 +72,7 @@ Future<CommercialProductResult?> showCommercialProductModal(
   BuildContext context, {
   required ProductInDbInBranch product,
   CommercialProductResult? commercialProductResult,
+  int defaultPriceLevel = 1,
 }) async {
   return await Navigator.push<CommercialProductResult?>(
     context,
@@ -77,16 +80,23 @@ Future<CommercialProductResult?> showCommercialProductModal(
       builder: (context) => CommercialProductModal(
         product: product,
         commercialProductResult: commercialProductResult,
+        defaultPriceLevel: defaultPriceLevel,
       ),
     ),
   );
 }
 
 class CommercialProductModal extends StatefulWidget {
-  const CommercialProductModal({super.key, required this.product, this.commercialProductResult});
+  const CommercialProductModal({
+    super.key, 
+    required this.product, 
+    this.commercialProductResult,
+    this.defaultPriceLevel = 1,
+  });
 
   final ProductInDbInBranch product;
   final CommercialProductResult? commercialProductResult;
+  final int defaultPriceLevel;
 
   @override
   State<CommercialProductModal> createState() => _CommercialProductModalState();
@@ -104,7 +114,10 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
     if (widget.commercialProductResult != null) {
       commercialProductResult = widget.commercialProductResult!.copyWith();
     } else {
-      commercialProductResult = CommercialProductResult(product: widget.product);
+      commercialProductResult = CommercialProductResult(
+        product: widget.product,
+        defaultPriceLevel: widget.defaultPriceLevel,
+      );
     }
     discountsAvailable = widget.product.saleProfile.discounts.map(
       (e) {
@@ -205,6 +218,12 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                                   "Precio 3 (${NumberFormatter.convertToMoneyLike(product.saleProfile.salePrice3)})",
                                 ),
                               ),
+                              DropdownMenuItem(
+                                value: 4,
+                                child: Text(
+                                  "Precio 4 (${NumberFormatter.convertToMoneyLike(product.saleProfile.salePrice4)})",
+                                ),
+                              ),
                               if (isUserAdmin)
                                 const DropdownMenuItem(
                                   value: 0,
@@ -217,6 +236,7 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                                 1: product.saleProfile.salePrice,
                                 2: product.saleProfile.salePrice2,
                                 3: product.saleProfile.salePrice3,
+                                4: product.saleProfile.salePrice4,
                               };
 
                               if (priceMap[value] == 0) {
@@ -379,19 +399,19 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                                 commercialProductResult.newPrice !=
                                 commercialProductResult.product.saleProfile.salePrice,
                             child: DropdownButtonFormField(
-                              initialValue: commercialProductResult.selectedDisocunt,
+                              initialValue: commercialProductResult.selectedDiscount,
                               items: discountsAvailable.toList(),
                               decoration: InputDecoration(
                                 suffixIcon: IconButton(
                                   onPressed: () {
-                                    commercialProductResult.selectedDisocunt = null;
+                                    commercialProductResult.selectedDiscount = null;
                                     setState(() {});
                                   },
                                   icon: const Icon(Icons.close),
                                 ),
                               ),
                               onChanged: (value) {
-                                commercialProductResult.selectedDisocunt = value;
+                                commercialProductResult.selectedDiscount = value;
                                 setState(() {});
                               },
                             ),
@@ -481,7 +501,7 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        if (product.saleProfile.salePrice == 0) {
+                        if (commercialProductResult.newPrice == 0) {
                           DialogManager.showErrorDialog(context, "El producto no tiene precio de venta");
                           return;
                         }

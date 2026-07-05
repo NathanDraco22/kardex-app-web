@@ -195,6 +195,13 @@ class MenuActions extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: canSave
                   ? () async {
+                      if (viewController.hasZeroPriceItems) {
+                        DialogManager.showErrorDialog(
+                          context,
+                          "No se puede facturar porque hay productos con precio en 0. Por favor, edita o elimina estos productos.",
+                        );
+                        return;
+                      }
                       final newInvoice = viewController.generateCreateInvoice(context);
                       if (newInvoice == null) return;
 

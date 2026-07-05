@@ -19,12 +19,11 @@ class _NumpadCalculatorState extends State<NumpadCalculator> {
   bool _isResultShown = false;
 
   final NumberFormat _formatter = NumberFormat()
-    ..maximumFractionDigits = 4
+    ..maximumFractionDigits = 2
     ..minimumFractionDigits = 0;
 
   @override
   Widget build(BuildContext context) {
-    final isOperation = _expression.contains(RegExp(r'(?<!^)[+\-*/]'));
     return SafeArea(
       child: Container(
         height: 450,
@@ -40,12 +39,12 @@ class _NumpadCalculatorState extends State<NumpadCalculator> {
                 children: [
                   Text(
                     _previousExpression,
-                    style: TextStyle(fontSize: 24, color: Colors.grey.shade600),
+                    style: TextStyle(fontSize: 26, color: Colors.grey.shade600),
                     maxLines: 1,
                   ),
                   Text(
                     _expression.isEmpty ? '0' : _expression,
-                    style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
                     maxLines: 1,
                   ),
                 ],
@@ -87,11 +86,11 @@ class _NumpadCalculatorState extends State<NumpadCalculator> {
               children: [
                 _buildButton('0'),
                 _buildButton('.'),
-                _buildButton('=', onPressed: _calculate),
                 _buildDoneButton(
                   '✓',
-                  onPressed: isOperation ? null : _onDone,
-                  color: isOperation ? Colors.grey : Colors.green,
+                  onPressed: _onDone,
+                  color: Colors.green,
+                  flex: 2,
                 ),
               ],
             ),
@@ -106,9 +105,15 @@ class _NumpadCalculatorState extends State<NumpadCalculator> {
       Navigator.of(context).pop(0.0);
       return;
     }
-    _calculate();
-    final valueToReturn = num.tryParse(_expression.replaceAll(',', '')) ?? 0.0;
-    Navigator.of(context).pop(valueToReturn.toDouble());
+    
+    // Si contiene algún operador pendiente, actúa como "=" evaluando la expresión
+    final hasOperators = _expression.contains(RegExp(r'(?<!^)[+\-*/%]'));
+    if (hasOperators) {
+      _calculate();
+    } else {
+      final valueToReturn = num.tryParse(_expression.replaceAll(',', '')) ?? 0.0;
+      Navigator.of(context).pop(valueToReturn.toDouble());
+    }
   }
 
   Widget _buildButton(String text, {VoidCallback? onPressed, Color? color, int flex = 1}) {
@@ -123,14 +128,15 @@ class _NumpadCalculatorState extends State<NumpadCalculator> {
           }
         },
         child: Ink(
-          width: 120,
-          height: 60,
+          width: double.infinity,
+          height: 55,
           child: Center(
             child: Text(
               text,
-              style: const TextStyle(
-                fontSize: 22,
+              style: TextStyle(
+                fontSize: 26,
                 fontWeight: FontWeight.w500,
+                color: color,
               ),
             ),
           ),
@@ -162,15 +168,15 @@ class _NumpadCalculatorState extends State<NumpadCalculator> {
           }
         },
         child: Ink(
-          width: 120,
-          height: 50,
+          width: double.infinity,
+          height: 55,
           child: Center(
             child: Text(
               text,
-              style: const TextStyle(
-                fontSize: 22,
+              style: TextStyle(
+                fontSize: 32,
                 fontWeight: FontWeight.bold,
-                color: Colors.green,
+                color: color ?? Colors.green,
               ),
             ),
           ),
@@ -218,25 +224,109 @@ class _NumpadCalculatorState extends State<NumpadCalculator> {
     });
   }
 
+  String _preprocessPercentage(String input) {
+    String s = input;
+    int index;
+    while ((index = s.indexOf('%')) != -1) {
+      int j = index - 1;
+      while (j >= 0 && s[j] == ' ') {
+        j--;
+      }
+      if (j < 0) {
+        s = s.replaceRange(index, index + 1, '/100');
+        continue;
+      }
+      int endY = j + 1;
+      int startY;
+      if (s[j] == ')') {
+        int pCount = 1;
+        j--;
+        while (j >= 0 && pCount > 0) {
+          if (s[j] == ')') pCount++;
+          if (s[j] == '(') pCount--;
+          if (pCount > 0) j--;
+        }
+        if (j < 0) {
+          s = s.replaceRange(index, index + 1, '/100');
+          continue;
+        }
+        startY = j;
+      } else {
+        while (j >= 0 && (RegExp(r'[0-9.]').hasMatch(s[j]))) {
+          j--;
+        }
+        startY = j + 1;
+      }
+      final String Y = s.substring(startY, endY);
+      int k = startY - 1;
+      while (k >= 0 && s[k] == ' ') {
+        k--;
+      }
+      if (k < 0) {
+        s = s.replaceRange(startY, index + 1, '(($Y) / 100)');
+      } else {
+        final String op = s[k];
+        if (op == '+' || op == '-' || op == '*' || op == '/') {
+          int startX = 0;
+          int pCount = 0;
+          for (int m = k - 1; m >= 0; m--) {
+            if (s[m] == ')') {
+              pCount++;
+            } else if (s[m] == '(') {
+              if (pCount == 0) {
+                startX = m + 1;
+                break;
+              } else {
+                pCount--;
+              }
+            }
+          }
+          final String X = s.substring(startX, k).trim();
+          if (X.isEmpty) {
+            s = s.replaceRange(startY, index + 1, '(($Y) / 100)');
+          } else {
+            String replacement;
+            if (op == '+' || op == '-') {
+              replacement = '(($X) $op (($X) * ($Y) / 100))';
+            } else {
+              replacement = '($X $op (($Y) / 100))';
+            }
+            s = s.replaceRange(startX, index + 1, replacement);
+          }
+        } else {
+          s = s.replaceRange(startY, index + 1, '(($Y) / 100)');
+        }
+      }
+    }
+    return s;
+  }
+
+  /// Limpia las comas de forma inteligente:
+  /// - Si la coma está seguida por exactamente 3 dígitos (ej. miles en 15,000), se remueve.
+  /// - En cualquier otro caso (ej. 15,5), se reemplaza por punto decimal.
+  String _cleanCommas(String input) {
+    final RegExp thousandRegExp = RegExp(r',(\d{3})(?!\d)');
+    String result = input.replaceAllMapped(thousandRegExp, (match) {
+      return match.group(1)!;
+    });
+    return result.replaceAll(',', '.');
+  }
+
   void _calculate() {
     if (_expression.isEmpty) return;
-    String expressionToParse = _expression.replaceAll(",", "");
+    String expressionToParse = _cleanCommas(_expression);
     num result;
 
     try {
-      final percentageRegex = RegExp(r'^(\d+\.?\d*)\s*([+\-])\s*(\d+\.?\d*)%$');
-      final match = percentageRegex.firstMatch(expressionToParse);
+      // Preprocesar los porcentajes comerciales
+      expressionToParse = _preprocessPercentage(expressionToParse);
 
-      if (match != null) {
-        final baseNumber = double.parse(match.group(1)!);
-        final operator = match.group(2)!;
-        final percentage = double.parse(match.group(3)!);
-        final percentValue = baseNumber * (percentage / 100);
-        result = (operator == '+') ? baseNumber + percentValue : baseNumber - percentValue;
-      } else {
-        final parser = GrammarParser();
-        final expression = parser.parse(expressionToParse);
-        result = RealEvaluator(ContextModel()).evaluate(expression);
+      final parser = GrammarParser();
+      final expression = parser.parse(expressionToParse);
+      result = RealEvaluator(ContextModel()).evaluate(expression);
+
+      if (result.isInfinite || result.isNaN) {
+        throw Exception("Resultado no definido");
       }
 
       setState(() {

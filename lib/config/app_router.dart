@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/src/modules/commercial/product_demand_vs_stock/product_demand_vs_stock_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/daily_operations_results/daily_operations_results_screen.dart';
@@ -88,8 +89,11 @@ import 'package:kardex_app_front/src/modules/expenses/supplier_expenses/view/sup
 import 'package:kardex_app_front/src/modules/expenses/expenses_reports/view/expenses_reports_view.dart';
 import 'package:kardex_app_front/src/modules/expenses/expense_categories/view/expense_categories_view.dart';
 
+final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: "rootNavigatorKey");
+
 class AppRouter {
   static GoRouter router = GoRouter(
+    navigatorKey: rootNavigatorKey,
     initialLocation: '/splash',
     routes: [
       GoRoute(
