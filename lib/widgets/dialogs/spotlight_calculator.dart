@@ -23,7 +23,7 @@ class _SpotlightCalculatorState extends State<SpotlightCalculator> {
   bool _isValidExpression = false;
 
   final NumberFormat _formatter = NumberFormat()
-    ..maximumFractionDigits = 6
+    ..maximumFractionDigits = 2
     ..minimumFractionDigits = 0;
 
   @override
@@ -59,9 +59,8 @@ class _SpotlightCalculatorState extends State<SpotlightCalculator> {
     }
 
     try {
-      // 1. Reemplazar comas por puntos para el parser de math_expressions (en caso de entrada de miles/decimales manuales)
-      // Pero preservando operadores y estructura.
-      String expressionToParse = value.replaceAll(',', '.');
+      // 1. Limpiar comas de forma inteligente (miles vs decimales)
+      String expressionToParse = _cleanCommas(value);
 
       // 2. Preprocesar los porcentajes comerciales
       expressionToParse = _preprocessPercentage(expressionToParse);
@@ -88,6 +87,17 @@ class _SpotlightCalculatorState extends State<SpotlightCalculator> {
         _isValidExpression = false;
       });
     }
+  }
+
+  /// Limpia las comas de forma inteligente:
+  /// - Si la coma está seguida por exactamente 3 dígitos (ej. miles en 15,000), se remueve.
+  /// - En cualquier otro caso (ej. 15,5), se reemplaza por punto decimal.
+  String _cleanCommas(String input) {
+    final RegExp thousandRegExp = RegExp(r',(\d{3})(?!\d)');
+    String result = input.replaceAllMapped(thousandRegExp, (match) {
+      return match.group(1)!;
+    });
+    return result.replaceAll(',', '.');
   }
 
   /// Algoritmo de preprocesamiento de porcentaje comercial.

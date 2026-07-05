@@ -19,7 +19,7 @@ class _NumpadCalculatorState extends State<NumpadCalculator> {
   bool _isResultShown = false;
 
   final NumberFormat _formatter = NumberFormat()
-    ..maximumFractionDigits = 4
+    ..maximumFractionDigits = 2
     ..minimumFractionDigits = 0;
 
   @override
@@ -301,9 +301,20 @@ class _NumpadCalculatorState extends State<NumpadCalculator> {
     return s;
   }
 
+  /// Limpia las comas de forma inteligente:
+  /// - Si la coma está seguida por exactamente 3 dígitos (ej. miles en 15,000), se remueve.
+  /// - En cualquier otro caso (ej. 15,5), se reemplaza por punto decimal.
+  String _cleanCommas(String input) {
+    final RegExp thousandRegExp = RegExp(r',(\d{3})(?!\d)');
+    String result = input.replaceAllMapped(thousandRegExp, (match) {
+      return match.group(1)!;
+    });
+    return result.replaceAll(',', '.');
+  }
+
   void _calculate() {
     if (_expression.isEmpty) return;
-    String expressionToParse = _expression.replaceAll(",", "");
+    String expressionToParse = _cleanCommas(_expression);
     num result;
 
     try {
