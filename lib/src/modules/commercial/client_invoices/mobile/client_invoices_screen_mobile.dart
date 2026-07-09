@@ -1,5 +1,7 @@
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/cubit/write_invoice_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/mobile/mediator.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/view_controller.dart';
@@ -122,6 +124,55 @@ class _RootScaffold extends StatelessWidget {
               );
             },
           ),
+        ),
+      ),
+      endDrawer: Drawer(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: Column(
+          children: [
+            DrawerHeader(
+              padding: EdgeInsets.zero,
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                alignment: Alignment.bottomLeft,
+                color: Theme.of(context).colorScheme.primaryContainer,
+                child: const Text(
+                  "Opciones de Navegacion",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(FluentIcons.person_20_filled),
+              title: const Text("Lista de Clientes"),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                Navigator.pop(context);
+                context.pushNamed("client-list");
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.info_outline, color: Colors.blueAccent),
+              title: const Text("Consulta Rápida de Producto"),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                showProductInfoSearchDelegate(context);
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.search, color: Colors.purple),
+              title: const Text("Consulta de Existencias Globales"),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                context.pushNamed("global-stock-search");
+              },
+            ),
+          ],
         ),
       ),
       body: const _Body(),
