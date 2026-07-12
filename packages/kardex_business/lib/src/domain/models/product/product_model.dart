@@ -11,6 +11,7 @@ class BaseProduct {
   final List<String> tags;
   final bool hasIva;
   final bool isActive;
+  final String image;
 
   String get displayCode => code.isEmpty ? "-" : code;
 
@@ -18,6 +19,7 @@ class BaseProduct {
     required this.name,
     this.description,
     this.code = "",
+    this.image = "",
     required this.brandName,
     required this.unitName,
     required this.categoryName,
@@ -37,6 +39,7 @@ class BaseProduct {
       tags: List<String>.from(json['tags'] as List),
       hasIva: json['hasIva'] as bool,
       isActive: json['isActive'] as bool? ?? true,
+      image: json['image'] as String? ?? "",
     );
   }
 
@@ -45,6 +48,7 @@ class BaseProduct {
       'name': name,
       'description': description,
       'code': code,
+      'image': image,
       'brandName': brandName,
       'unitName': unitName,
       'categoryName': categoryName,
@@ -59,6 +63,7 @@ class CreateProduct extends BaseProduct {
     required super.name,
     super.description,
     super.code,
+    super.image,
     required super.brandName,
     required super.unitName,
     required super.categoryName,
@@ -72,12 +77,28 @@ class CreateProduct extends BaseProduct {
       name: json['name'] as String,
       description: json['description'] as String?,
       code: json['code'] as String? ?? "",
+      image: json['image'] as String? ?? "",
       brandName: json['brandName'] as String,
       unitName: json['unitName'] as String,
       categoryName: json['categoryName'] as String?,
       tags: List<String>.from(json['tags'] as List),
       hasIva: json['hasIva'] as bool,
       isActive: json['isActive'] as bool? ?? true,
+    );
+  }
+
+  CreateProduct copyWithNewImage(String newImageUrl) {
+    return CreateProduct(
+      name: name,
+      description: description,
+      code: code,
+      image: newImageUrl,
+      brandName: brandName,
+      unitName: unitName,
+      categoryName: categoryName,
+      tags: tags,
+      hasIva: hasIva,
+      isActive: isActive,
     );
   }
 }
@@ -92,6 +113,7 @@ class UpdateProduct {
   final List<String>? tags;
   final bool? hasIva;
   final bool? isActive;
+  final String? image;
 
   UpdateProduct({
     this.name,
@@ -103,6 +125,7 @@ class UpdateProduct {
     this.tags,
     this.hasIva,
     this.isActive,
+    this.image,
   });
 
   factory UpdateProduct.fromJson(Map json) {
@@ -116,6 +139,7 @@ class UpdateProduct {
       hasIva: json['hasIva'] as bool?,
       tags: json['tags'] != null ? List<String>.from(json['tags'] as List) : null,
       isActive: json['isActive'] as bool?,
+      image: json['image'] as String?,
     );
   }
 
@@ -130,6 +154,7 @@ class UpdateProduct {
       'tags': tags,
       'hasIva': hasIva,
       'isActive': isActive,
+      'image': image,
     };
     data.removeWhere((key, value) => value == null);
     return data;
@@ -147,6 +172,7 @@ class ProductInDb extends BaseProduct {
     required super.name,
     super.description,
     super.code,
+    super.image,
     required super.brandName,
     required super.unitName,
     required super.categoryName,
@@ -164,6 +190,7 @@ class ProductInDb extends BaseProduct {
       name: json['name'] as String,
       description: json['description'] as String?,
       code: json['code'] as String? ?? "",
+      image: json['image'] as String? ?? "",
       brandName: json['brandName'] as String,
       unitName: json['unitName'] as String,
       categoryName: json['categoryName'] as String?,
@@ -198,6 +225,7 @@ class ProductInDbInBranch extends ProductInDb {
     required super.name,
     super.description,
     super.code,
+    super.image,
     required super.brandName,
     required super.unitName,
     super.categoryName,
@@ -217,6 +245,7 @@ class ProductInDbInBranch extends ProductInDb {
       name: json['name'],
       description: json['description'],
       code: json['code'],
+      image: json['image'] ?? "",
       brandName: json['brandName'],
       unitName: json['unitName'],
       categoryName: json['categoryName'],
@@ -244,6 +273,7 @@ class ProductInDbInBranch extends ProductInDb {
     String? name,
     String? description,
     String? code,
+    String? image,
     String? brandName,
     String? unitName,
     String? categoryName,
@@ -261,6 +291,7 @@ class ProductInDbInBranch extends ProductInDb {
       name: name ?? this.name,
       description: description ?? this.description,
       code: code ?? this.code,
+      image: image ?? this.image,
       brandName: brandName ?? this.brandName,
       unitName: unitName ?? this.unitName,
       categoryName: categoryName ?? this.categoryName,
