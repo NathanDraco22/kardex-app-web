@@ -1,3 +1,4 @@
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/image_viewer_dialog.dart';
@@ -108,22 +109,9 @@ class _ImageViewerWidgetState extends State<ImageViewerWidget> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
-                        Icons.image_not_supported_outlined,
+                        FluentIcons.cube_12_filled,
                         size: widget.width * 0.25,
                         color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
-                      ),
-                      const SizedBox(height: 6),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                        child: Text(
-                          widget.placeholderText,
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
                       ),
                     ],
                   ),
@@ -135,22 +123,13 @@ class _ImageViewerWidgetState extends State<ImageViewerWidget> {
                     duration: const Duration(milliseconds: 200),
                     child: Container(
                       color: Colors.black54,
-                      child: Column(
+                      child: const Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.visibility_outlined,
                             color: Colors.white,
                             size: 24,
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            "Ver más grande",
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                            ),
                           ),
                         ],
                       ),

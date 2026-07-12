@@ -104,6 +104,12 @@ class MobileProductCardState extends State<MobileProductCard> with AutomaticKeep
           children: [
             Row(
               children: [
+                ImageViewerWidget(
+                  imageUrls: widget.row.product.image.isNotEmpty ? [widget.row.product.image] : [],
+                  width: 50,
+                  height: 50,
+                ),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

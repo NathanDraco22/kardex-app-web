@@ -3,9 +3,8 @@ import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/tools/input_formatter/input_formatter.dart';
 import 'package:kardex_app_front/widgets/calculator/calculator_field.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/custom_product_search_delegate.dart';
 import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
-import 'package:kardex_app_front/widgets/title_texfield.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 
 class ProductRowCard {
   ProductRowCard({
@@ -239,26 +238,34 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
                 children: [
                   Row(
                     children: [
-                      Column(
-                        crossAxisAlignment: .start,
-                        children: [
-                          Text(
-                            product.name,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            ),
-                          ),
-                          Row(
-                            children: [
-                              const Icon(Icons.qr_code, size: 16),
-                              Text(
-                                product.displayCode,
-                                style: const TextStyle(fontSize: 16),
+                      ImageViewerWidget(
+                        imageUrls: product.image.isNotEmpty ? [product.image] : [],
+                        width: 50,
+                        height: 50,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: .start,
+                          children: [
+                            Text(
+                              product.name,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
                               ),
-                            ],
-                          ),
-                        ],
+                            ),
+                            Row(
+                              children: [
+                                const Icon(Icons.qr_code, size: 16),
+                                Text(
+                                  product.displayCode,
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),

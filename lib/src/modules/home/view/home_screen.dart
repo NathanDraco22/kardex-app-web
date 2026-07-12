@@ -107,35 +107,6 @@ class _RootScaffold extends StatelessWidget {
             appBar: AppBar(
               title: const Text("Neptuno App"),
               actions: [
-                IconButton(
-                  icon: const Icon(Icons.image_search_outlined),
-                  tooltip: 'Probar Selector de Imagen',
-                  onPressed: () async {
-                    final intent = await showImageSelectorDialog(
-                      context: context,
-                    );
-                    if (context.mounted && intent != null) {
-                      String message = "";
-                      switch (intent) {
-                        case NewImageIntent():
-                          message = "Nueva imagen: ${intent.file.name} (${intent.bytes.length} bytes)";
-                          break;
-                        case ChangeImageIntent():
-                          message = "Imagen cambiada: ${intent.file.name} (${intent.bytes.length} bytes)";
-                          break;
-                        case DeleteImageIntent():
-                          message = "Imagen eliminada";
-                          break;
-                      }
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(message),
-                          backgroundColor: Theme.of(context).colorScheme.primary,
-                        ),
-                      );
-                    }
-                  },
-                ),
                 const AvatarButton(),
                 const SizedBox(width: 12),
               ],
