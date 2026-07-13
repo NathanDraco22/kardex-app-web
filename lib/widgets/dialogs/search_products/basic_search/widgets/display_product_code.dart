@@ -17,7 +17,7 @@ class DisplayProductCode extends StatelessWidget {
       children: [
         Text(
           product.name,
-          maxLines: 2,
+          maxLines: 3,
           overflow: .ellipsis,
           style: const TextStyle(
             fontWeight: FontWeight.w600,

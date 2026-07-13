@@ -89,19 +89,19 @@ class _MobileScaffold extends StatelessWidget {
               ),
             ),
             ListTile(
-              leading: const Icon(FluentIcons.person_12_filled),
-              title: const Text("Lista de Clientes"),
-              onTap: () {
-                context.pushNamed("client-list");
-              },
-              trailing: const Icon(Icons.chevron_right),
-            ),
-            const Divider(),
-            ListTile(
               leading: const Icon(FluentIcons.building_multiple_20_filled),
               title: const Text("Lista de Proveedores"),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => context.pushNamed("suppliers-catalog"),
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(FluentIcons.cube_12_filled),
+              title: const Text("Lista Global de Productos"),
+              onTap: () {
+                context.pushNamed("product-list");
+              },
+              trailing: const Icon(Icons.chevron_right),
             ),
           ],
         ),

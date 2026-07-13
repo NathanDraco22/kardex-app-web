@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 
@@ -15,6 +16,7 @@ import '../widgets/client_invoice_table.dart';
 import '../widgets/dialogs/confirm_invoice_dialog.dart';
 import '../cubit/write_invoice_cubit.dart';
 import 'mediator.dart';
+import 'package:toastification/toastification.dart';
 
 part 'sections/header_section.dart';
 part 'sections/content_section.dart';
@@ -42,10 +44,23 @@ class _ClientInvoicesScreenWebState extends State<ClientInvoicesScreenWeb> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     viewController = context.read<WriteInvoiceCubit>().viewController;
+    viewController.updatePricesOnClientChange = true;
+    viewController.onPricesChanged = () {
+      if (!mounted) return;
+      toastification.show(
+        context: context,
+        type: ToastificationType.warning,
+        title: const Text('Se han cambiado los precios'),
+        description: const Text('Los precios se actualizaron según el nivel del cliente.'),
+        autoCloseDuration: const Duration(seconds: 3),
+        style: ToastificationStyle.flatColored,
+      );
+    };
   }
 
   @override
   void dispose() {
+    viewController.onPricesChanged = null;
     super.dispose();
   }
 

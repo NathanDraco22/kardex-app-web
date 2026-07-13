@@ -112,16 +112,7 @@ class _HeaderSection extends StatelessWidget {
                 child: Column(
                   children: [
                     const Flexible(
-                      child: Row(
-                        children: [
-                          Flexible(
-                            child: SizedBox.expand(),
-                          ),
-                          Flexible(
-                            child: MenuActions(),
-                          ),
-                        ],
-                      ),
+                      child: MenuActions(),
                     ),
                     Flexible(
                       flex: 3,
@@ -191,12 +182,26 @@ class MenuActions extends StatelessWidget {
       builder: (context, _) {
         final canSave = viewController.selectedClient != null && viewController.items.isNotEmpty;
         return Row(
-          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             ElevatedButton.icon(
+              onPressed: () => context.pushNamed("client-list"),
+
+              icon: const Icon(Icons.people),
+              label: const Text("Clientes"),
+            ),
+
+            ElevatedButton.icon(
               onPressed: canSave
                   ? () async {
+                      if (viewController.hasZeroPriceItems) {
+                        DialogManager.showErrorDialog(
+                          context,
+                          "No se puede facturar porque hay productos con precio en 0. Por favor, edita o elimina estos productos.",
+                        );
+                        return;
+                      }
                       final newInvoice = viewController.generateCreateInvoice(context);
                       if (newInvoice == null) return;
 

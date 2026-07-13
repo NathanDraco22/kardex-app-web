@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/widgets/display_product_code.dart';
-import 'package:kardex_app_front/widgets/no_item.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
-import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 
 Future<ProductInDbInBranch?> showSearchProductInBranchDialog(
   BuildContext context, {
@@ -239,7 +238,7 @@ class ProductInBranchResultRow extends StatelessWidget {
     }
 
     return SizedBox(
-      height: 60,
+      height: 70,
       child: InkWell(
         hoverColor: Colors.yellow.shade100,
         focusColor: Colors.yellow.shade100,
@@ -248,12 +247,19 @@ class ProductInBranchResultRow extends StatelessWidget {
           decoration: BoxDecoration(color: color),
           child: Row(
             children: [
+              const SizedBox(width: 8),
+              ImageViewerWidget(
+                imageUrls: product.image.isNotEmpty ? [product.image] : [],
+                width: 44,
+                height: 44,
+              ),
+              const SizedBox(width: 8),
               Flexible(
                 fit: FlexFit.tight,
                 flex: 3,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisAlignment: .center,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     DisplayProductCode(product: product),
                     Row(

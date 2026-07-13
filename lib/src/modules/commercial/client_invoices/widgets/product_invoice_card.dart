@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 import 'package:kardex_app_front/widgets/title_label.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 
 class ProductInvoiceCard extends StatelessWidget {
   const ProductInvoiceCard({
@@ -29,6 +30,8 @@ class ProductInvoiceCard extends StatelessWidget {
     final totalFormatted = NumberFormatter.convertToMoneyLike(item.total);
 
     Offset? offset;
+    final isZeroPrice = item.newPrice <= 0;
+    final cardColor = isZeroPrice ? Colors.red.shade200 : tileColor;
 
     return Material(
       color: Colors.transparent,
@@ -53,7 +56,7 @@ class ProductInvoiceCard extends StatelessWidget {
         child: Ink(
           padding: const EdgeInsets.all(8.0),
           decoration: BoxDecoration(
-            color: tileColor,
+            color: cardColor,
             border: Border.all(
               color: Colors.grey,
             ),
@@ -63,24 +66,43 @@ class ProductInvoiceCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             spacing: 4,
             children: [
-              Text(
-                item.product.name,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.qr_code, size: 12),
-                  Text(item.product.displayCode),
-                ],
-              ),
-              Row(
-                spacing: 12,
-                children: [
-                  Text(item.product.brandName),
-                  Text(item.product.unitName),
+                  ImageViewerWidget(
+                    imageUrls: item.product.image.isNotEmpty ? [item.product.image] : [],
+                    width: 60,
+                    height: 60,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      spacing: 4,
+                      children: [
+                        Text(
+                          item.product.name,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            const Icon(Icons.qr_code, size: 12),
+                            Text(item.product.displayCode),
+                          ],
+                        ),
+                        Row(
+                          spacing: 12,
+                          children: [
+                            Text(item.product.brandName),
+                            Text(item.product.unitName),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
               const Divider(

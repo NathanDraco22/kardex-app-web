@@ -1,20 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/widgets/display_product_code.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_modal.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
-import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/widgets/dialogs/product_in_branch_info_dialog.dart';
 
-Future<CommercialProductResult?> showCommercialProductSearchDelegate(BuildContext context) async {
+Future<CommercialProductResult?> showCommercialProductSearchDelegate(
+  BuildContext context, {
+  int defaultPriceLevel = 1,
+}) async {
   return await Navigator.push<CommercialProductResult?>(
     context,
     MaterialPageRoute(
       builder: (context) => CustomProductSearchDelegate<CommercialProductResult>(
-        onSelect: (ctx, product) => showCommercialProductModal(ctx, product: product),
+        onSelect: (ctx, product) => showCommercialProductModal(
+          ctx,
+          product: product,
+          defaultPriceLevel: defaultPriceLevel,
+        ),
       ),
     ),
   );
@@ -139,6 +146,12 @@ class _ProductInBranchResultRow extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
+                ImageViewerWidget(
+                  imageUrls: product.image.isNotEmpty ? [product.image] : [],
+                  width: 50,
+                  height: 50,
+                ),
+                const SizedBox(width: 8),
                 Flexible(
                   fit: FlexFit.tight,
                   flex: 3,

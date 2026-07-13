@@ -20,6 +20,10 @@ class _FormContentState extends State<_FormContent> {
 
   String tagField = "";
 
+  ImageProvider? _currentImageProvider;
+  Uint8List? _selectedImageBytes;
+  bool _isImageDeleted = false;
+
   @override
   void initState() {
     super.initState();
@@ -28,6 +32,9 @@ class _FormContentState extends State<_FormContent> {
     tagField = "";
     if (widget.currentProduct != null) {
       tagField = widget.currentProduct!.tags.join(" ");
+      if (widget.currentProduct!.image.isNotEmpty) {
+        _currentImageProvider = CachedNetworkImageProvider(widget.currentProduct!.image);
+      }
     }
 
     Future(
@@ -37,6 +44,74 @@ class _FormContentState extends State<_FormContent> {
     );
   }
 
+  Future<void> _submitForm() async {
+    if (!widget.formKey.currentState!.validate()) return;
+
+    final writeCubit = context.read<WriteProductCubit>();
+
+    try {
+      String? imageUrl = widget.currentProduct?.image;
+
+      if (_isImageDeleted) {
+        imageUrl = "";
+      }
+
+      if (_selectedImageBytes != null) {
+        LoadingDialogManager.showLoadingDialog(context);
+        try {
+          imageUrl = await ImageUploader.uploadImage(
+            bytes: _selectedImageBytes!,
+            fileName: "product_${DateTime.now().millisecondsSinceEpoch}.jpg",
+          );
+        } finally {
+          if (mounted) {
+            LoadingDialogManager.closeLoadingDialog(context);
+          }
+        }
+      }
+
+      widget.creationMap['image'] = imageUrl ?? "";
+
+      if (widget.currentProduct == null) {
+        final createProduct = CreateProduct.fromJson(widget.creationMap);
+        writeCubit.createNewProduct(createProduct);
+      } else {
+        final updateProduct = UpdateProduct.fromJson(widget.creationMap);
+        writeCubit.updateProduct(widget.currentProduct!.id, updateProduct);
+      }
+    } catch (e) {
+      if (mounted) {
+        DialogManager.showErrorDialog(context, "Error al guardar imagen: $e");
+      }
+    }
+  }
+
+  void _onImageIntent(ImageSelectorIntent intent) {
+    switch (intent) {
+      case NewImageIntent():
+        setState(() {
+          _selectedImageBytes = intent.bytes;
+          _currentImageProvider = MemoryImage(intent.bytes);
+          _isImageDeleted = false;
+        });
+        break;
+      case ChangeImageIntent():
+        setState(() {
+          _selectedImageBytes = intent.bytes;
+          _currentImageProvider = MemoryImage(intent.bytes);
+          _isImageDeleted = false;
+        });
+        break;
+      case DeleteImageIntent():
+        setState(() {
+          _selectedImageBytes = null;
+          _currentImageProvider = null;
+          _isImageDeleted = true;
+        });
+        break;
+    }
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -44,8 +119,6 @@ class _FormContentState extends State<_FormContent> {
 
   @override
   Widget build(BuildContext context) {
-    final writeCubit = context.read<WriteProductCubit>();
-
     final unitsRepo = context.read<UnitsRepository>();
     final unitsMenuEntries = unitsRepo.units.map(
       (value) {
@@ -83,6 +156,8 @@ class _FormContentState extends State<_FormContent> {
               unitsMenuEntries: unitsMenuEntries,
               productCaterogriesEntries: productCaterogriesEntries,
               controller: controller,
+              imageProvider: _currentImageProvider,
+              onImageIntent: _onImageIntent,
             ),
 
             const SizedBox(height: 24),
@@ -95,17 +170,7 @@ class _FormContentState extends State<_FormContent> {
                 SizedBox(
                   height: 40,
                   child: ElevatedButton(
-                    onPressed: () {
-                      if (!widget.formKey.currentState!.validate()) return;
-
-                      if (widget.currentProduct == null) {
-                        final createProduct = CreateProduct.fromJson(widget.creationMap);
-                        writeCubit.createNewProduct(createProduct);
-                      } else {
-                        final updateClient = UpdateProduct.fromJson(widget.creationMap);
-                        writeCubit.updateProduct(widget.currentProduct!.id, updateClient);
-                      }
-                    },
+                    onPressed: _submitForm,
                     child: Text("$wordPrefix Producto"),
                   ),
                 ),
@@ -141,17 +206,7 @@ class _FormContentState extends State<_FormContent> {
               child: const Text("Cancelar"),
             ),
             ElevatedButton(
-              onPressed: () {
-                if (!widget.formKey.currentState!.validate()) return;
-
-                if (widget.currentProduct == null) {
-                  final createProduct = CreateProduct.fromJson(widget.creationMap);
-                  writeCubit.createNewProduct(createProduct);
-                } else {
-                  final updateClient = UpdateProduct.fromJson(widget.creationMap);
-                  writeCubit.updateProduct(widget.currentProduct!.id, updateClient);
-                }
-              },
+              onPressed: _submitForm,
               child: Text("$wordPrefix Producto"),
             ),
           ],
@@ -160,6 +215,8 @@ class _FormContentState extends State<_FormContent> {
             unitsMenuEntries: unitsMenuEntries,
             productCaterogriesEntries: productCaterogriesEntries,
             controller: controller,
+            imageProvider: _currentImageProvider,
+            onImageIntent: _onImageIntent,
           ),
         ),
       ],
@@ -173,12 +230,16 @@ class _InnerContent extends StatelessWidget {
     required this.unitsMenuEntries,
     required this.productCaterogriesEntries,
     required this.controller,
+    required this.imageProvider,
+    required this.onImageIntent,
   });
 
   final _FormContent widget;
   final Iterable<DropdownMenuEntry<String>> unitsMenuEntries;
   final Iterable<DropdownMenuEntry<String>> productCaterogriesEntries;
   final WordChipTextController controller;
+  final ImageProvider? imageProvider;
+  final void Function(ImageSelectorIntent intent) onImageIntent;
 
   @override
   Widget build(BuildContext context) {
@@ -194,6 +255,16 @@ class _InnerContent extends StatelessWidget {
       width: 350,
       child: Column(
         children: [
+          Center(
+            child: ImageSelectorWidget(
+              image: imageProvider,
+              width: 140,
+              height: 140,
+              placeholderText: "Foto del producto",
+              onIntent: onImageIntent,
+            ),
+          ),
+          const SizedBox(height: 16),
           TitleTextField(
             key: const ValueKey("product_name"),
             title: "Nombre del Producto*",

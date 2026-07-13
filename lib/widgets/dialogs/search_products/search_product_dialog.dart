@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/widgets/display_product_code.dart';
-import 'package:kardex_app_front/widgets/no_item.dart';
-import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
-import 'package:kardex_app_front/widgets/status_tag_label.dart';
 
 Future<ProductInDb?> showSearchProductDialog(BuildContext context, {ProductInDb? product}) async {
   final res = await showDialog<ProductInDb?>(
@@ -223,6 +221,13 @@ class ProductResultRow extends StatelessWidget {
           child: Row(
             crossAxisAlignment: .center,
             children: [
+              const SizedBox(width: 8),
+              ImageViewerWidget(
+                imageUrls: product.image.isNotEmpty ? [product.image] : [],
+                width: 44,
+                height: 44,
+              ),
+              const SizedBox(width: 8),
               Flexible(
                 fit: FlexFit.tight,
                 flex: 3,

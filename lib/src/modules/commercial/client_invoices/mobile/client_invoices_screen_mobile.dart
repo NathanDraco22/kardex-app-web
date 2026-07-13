@@ -1,12 +1,13 @@
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/cubit/write_invoice_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/mobile/mediator.dart';
+import 'package:kardex_app_front/src/modules/commercial/client_invoices/view_controller.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_modal.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/custom_product_commercial_search_delegate.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
-
-import 'package:kardex_app_front/widgets/dialogs/search_products/quick_commercial_product_search_delegate.dart';
 
 import '../widgets/product_invoice_card.dart';
 import 'invoice_client_menu_screen.dart';
@@ -27,9 +28,17 @@ class ClientInvoicesScreenMobile extends StatefulWidget {
 }
 
 class _ClientInvoicesScreenMobileState extends State<ClientInvoicesScreenMobile> {
+  late ClientInvoiceViewController viewController;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    viewController = context.read<WriteInvoiceCubit>().viewController;
+    viewController.updatePricesOnClientChange = false;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final viewController = context.read<WriteInvoiceCubit>().viewController;
     return InvoiceMobileMediator(
       viewController: viewController,
       child: const _RootScaffold(),
@@ -64,18 +73,10 @@ class _RootScaffold extends StatelessWidget {
         child: FloatingActionButton.extended(
           onPressed: () async {
             final isQuote = writeCubit.documentType == CommercialDocumentType.quote;
-
-            if (isQuote) {
-              final res = await showQuickCommercialProductSearchDelegate(
-                context,
-                restrictStock: false,
-              );
-              if (res == null) return;
-              viewController.addMultipleItems(res);
-              return;
-            }
-
-            final res = await showCommercialProductSearchDelegate(context);
+            final res = await showCommercialProductSearchDelegate(
+              context,
+              defaultPriceLevel: viewController.selectedClient?.defaultPriceLevel ?? 1,
+            );
             if (res == null) return;
             if (!isQuote && res.quantity > res.product.account.availableStock) {
               if (!context.mounted) return;
@@ -123,6 +124,55 @@ class _RootScaffold extends StatelessWidget {
               );
             },
           ),
+        ),
+      ),
+      endDrawer: Drawer(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: Column(
+          children: [
+            DrawerHeader(
+              padding: EdgeInsets.zero,
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                alignment: Alignment.bottomLeft,
+                color: Theme.of(context).colorScheme.primaryContainer,
+                child: const Text(
+                  "Opciones de Navegacion",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(FluentIcons.person_20_filled),
+              title: const Text("Lista de Clientes"),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                Navigator.pop(context);
+                context.pushNamed("client-list");
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.info_outline, color: Colors.blueAccent),
+              title: const Text("Consulta Rápida de Producto"),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                showProductInfoSearchDelegate(context);
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.search, color: Colors.purple),
+              title: const Text("Consulta de Existencias Globales"),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                context.pushNamed("global-stock-search");
+              },
+            ),
+          ],
         ),
       ),
       body: const _Body(),
@@ -233,7 +283,7 @@ class _Body extends StatelessWidget {
                       return ProductInvoiceCard(
                         tileColor: tileColor,
                         item: currentCommercial,
-                        percentDiscount: currentCommercial.selectedDisocunt?.percentValue ?? 0,
+                        percentDiscount: currentCommercial.selectedDiscount?.percentValue ?? 0,
                         onRemove: () => viewController.removeItem(currentCommercial),
                         onEdit: () async {
                           final res = await showCommercialProductModal(
@@ -258,7 +308,10 @@ class _Body extends StatelessWidget {
                           );
                         },
                         onChange: () async {
-                          final res = await showCommercialProductSearchDelegate(context);
+                          final res = await showCommercialProductSearchDelegate(
+                            context,
+                            defaultPriceLevel: viewController.selectedClient?.defaultPriceLevel ?? 1,
+                          );
                           if (res == null) return;
                           if (writeCubit.documentType != CommercialDocumentType.quote &&
                               res.quantity > res.product.account.availableStock) {

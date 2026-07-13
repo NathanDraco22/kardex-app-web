@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/widgets/display_product_code.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_dialog.dart';
-import 'package:kardex_app_front/widgets/no_item.dart';
-import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
@@ -16,12 +15,14 @@ Future<CommercialProductResult?> showSearchProductCommercialDialog(
   BuildContext context, {
   ProductInDb? product,
   bool isDirectSale = false,
+  int defaultPriceLevel = 1,
 }) async {
   final res = await showDialog<CommercialProductResult?>(
     context: context,
     builder: (context) => SearchProductCommercialDialog(
       product: product,
       isDirectSale: isDirectSale,
+      defaultPriceLevel: defaultPriceLevel,
     ),
   );
   return res;
@@ -32,10 +33,12 @@ class SearchProductCommercialDialog extends StatefulWidget {
     super.key,
     this.product,
     required this.isDirectSale,
+    this.defaultPriceLevel = 1,
   });
 
   final ProductInDb? product;
   final bool isDirectSale;
+  final int defaultPriceLevel;
 
   @override
   State<SearchProductCommercialDialog> createState() => _SearchProductCommercialDialogState();
@@ -93,6 +96,7 @@ class _SearchProductCommercialDialogState extends State<SearchProductCommercialD
                                 if (widget.isDirectSale) {
                                   final result = CommercialProductResult(
                                     product: products[cursorPosition],
+                                    defaultPriceLevel: widget.defaultPriceLevel,
                                   );
                                   Navigator.pop(context, result);
                                   return KeyEventResult.handled;
@@ -100,6 +104,7 @@ class _SearchProductCommercialDialogState extends State<SearchProductCommercialD
                                 showCommercialProductDialog(
                                   context,
                                   product: products[cursorPosition],
+                                  defaultPriceLevel: widget.defaultPriceLevel,
                                 ).then((value) {
                                   if (value == null) return;
 
@@ -169,6 +174,7 @@ class _SearchProductCommercialDialogState extends State<SearchProductCommercialD
                         products: products,
                         isDirectSale: widget.isDirectSale,
                         cursorPosition: cursorPosition,
+                        defaultPriceLevel: widget.defaultPriceLevel,
                       );
                     },
                   ),
@@ -189,12 +195,14 @@ class ResultTable extends StatefulWidget {
     required this.isDirectSale,
     this.focus,
     this.cursorPosition = 0,
+    this.defaultPriceLevel = 1,
   });
 
   final List<ProductInDbInBranch> products;
   final FocusNode? focus;
   final int cursorPosition;
   final bool isDirectSale;
+  final int defaultPriceLevel;
 
   @override
   State<ResultTable> createState() => _ResultTableState();
@@ -226,6 +234,7 @@ class _ResultTableState extends State<ResultTable> {
             if (widget.isDirectSale) {
               final result = CommercialProductResult(
                 product: product,
+                defaultPriceLevel: widget.defaultPriceLevel,
               );
               Navigator.pop(context, result);
               return;
@@ -234,6 +243,7 @@ class _ResultTableState extends State<ResultTable> {
             final res = await showCommercialProductDialog(
               context,
               product: product,
+              defaultPriceLevel: widget.defaultPriceLevel,
             );
 
             if (res == null) return;
@@ -273,6 +283,13 @@ class ProductResultRow extends StatelessWidget {
           child: Row(
             crossAxisAlignment: .center,
             children: [
+              const SizedBox(width: 8),
+              ImageViewerWidget(
+                imageUrls: product.image.isNotEmpty ? [product.image] : [],
+                width: 50,
+                height: 50,
+              ),
+              const SizedBox(width: 8),
               Flexible(
                 fit: FlexFit.tight,
                 flex: 3,

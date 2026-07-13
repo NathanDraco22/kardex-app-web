@@ -104,6 +104,12 @@ class MobileProductCardState extends State<MobileProductCard> with AutomaticKeep
           children: [
             Row(
               children: [
+                ImageViewerWidget(
+                  imageUrls: widget.row.product.image.isNotEmpty ? [widget.row.product.image] : [],
+                  width: 50,
+                  height: 50,
+                ),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -293,6 +299,7 @@ class SaveButton extends StatelessWidget {
                   salePrice: e.product.saleProfile.salePrice,
                   salePrice2: e.product.saleProfile.salePrice2,
                   salePrice3: e.product.saleProfile.salePrice3,
+                  salePrice4: e.product.saleProfile.salePrice4,
                 );
               }).toList();
 

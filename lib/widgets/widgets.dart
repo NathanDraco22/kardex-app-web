@@ -24,3 +24,8 @@ export 'text_field_date_selector.dart';
 export 'title_texfield.dart';
 export 'modals/basic_bottom_modal.dart';
 export 'modals/map_bottom_modal.dart';
+export 'super_widgets/image_selector_widget.dart';
+export 'dialogs/selectors/image_selector_dialog.dart';
+export 'super_widgets/image_viewer_widget.dart';
+export 'dialogs/viewers/image_viewer_dialog.dart';
+

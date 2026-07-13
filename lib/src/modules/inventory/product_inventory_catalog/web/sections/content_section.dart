@@ -106,44 +106,55 @@ class _ContentSection extends StatelessWidget {
 
             cells: [
               BasicTableCell(
-                content: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                content: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      currentProduct.name,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                    ImageViewerWidget(
+                      imageUrls: currentProduct.image.isNotEmpty ? [currentProduct.image] : [],
+                      width: 50,
+                      height: 50,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            currentProduct.name,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              const Icon(Icons.qr_code, size: 12),
+                              Text(currentProduct.displayCode),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Flexible(
+                                fit: FlexFit.tight,
+                                child: Text(
+                                  currentProduct.brandName,
+                                  style: const TextStyle(
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ),
+                              Flexible(
+                                fit: FlexFit.tight,
+                                child: Text(
+                                  currentProduct.unitName,
+                                  style: const TextStyle(
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                    ),
-                    Row(
-                      children: [
-                        const Icon(Icons.qr_code, size: 12, color: Colors.grey),
-                        const SizedBox(width: 4),
-                        Text(currentProduct.displayCode, style: const TextStyle(color: Colors.grey)),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Flexible(
-                          fit: FlexFit.tight,
-                          child: Text(
-                            currentProduct.brandName,
-                            style: const TextStyle(
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ),
-                        Flexible(
-                          fit: FlexFit.tight,
-                          child: Text(
-                            currentProduct.unitName,
-                            style: const TextStyle(
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ),
-                      ],
                     ),
                   ],
                 ),

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/widgets/display_product_code.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
-import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 
 Future<ProductInDbInBranch?> showSearchProductInBranchDelegate(BuildContext context, bool useAverageCost) async {
   return await Navigator.push<ProductInDbInBranch?>(
@@ -113,7 +113,7 @@ class _ProductInBranchResultRow extends StatelessWidget {
     }
 
     return SizedBox(
-      height: 84,
+      height: 105,
       child: InkWell(
         hoverColor: Colors.yellow.shade100,
         focusColor: Colors.yellow.shade100,
@@ -124,6 +124,12 @@ class _ProductInBranchResultRow extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
+                ImageViewerWidget(
+                  imageUrls: product.image.isNotEmpty ? [product.image] : [],
+                  width: 50,
+                  height: 50,
+                ),
+                const SizedBox(width: 8),
                 Flexible(
                   fit: FlexFit.tight,
                   flex: 3,

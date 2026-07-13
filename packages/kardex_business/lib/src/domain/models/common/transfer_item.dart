@@ -11,6 +11,7 @@ class TransferItem {
   final int salePrice;
   final int salePrice2;
   final int salePrice3;
+  final int salePrice4;
 
   TransferItem({
     required this.id,
@@ -25,6 +26,7 @@ class TransferItem {
     required this.salePrice,
     required this.salePrice2,
     required this.salePrice3,
+    required this.salePrice4,
   });
 
   factory TransferItem.fromJson(Map<String, dynamic> json) => TransferItem(
@@ -40,6 +42,7 @@ class TransferItem {
     salePrice: (json['salePrice'] as num).toInt(),
     salePrice2: (json['salePrice2'] as num).toInt(),
     salePrice3: (json['salePrice3'] as num).toInt(),
+    salePrice4: (json['salePrice4'] as num? ?? 0).toInt(),
   );
 
   Map<String, dynamic> toJson() => {
@@ -55,5 +58,6 @@ class TransferItem {
     'salePrice': salePrice,
     'salePrice2': salePrice2,
     'salePrice3': salePrice3,
+    'salePrice4': salePrice4,
   };
 }

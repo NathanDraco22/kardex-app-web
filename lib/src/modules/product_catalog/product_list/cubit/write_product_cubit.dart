@@ -1,4 +1,7 @@
+import 'dart:typed_data';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/src/tools/uploaders/image_uploader.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 part 'write_product_state.dart';
@@ -8,9 +11,17 @@ class WriteProductCubit extends Cubit<WriteProductState> {
 
   final ProductsRepository productsRepository;
 
-  Future<void> createNewProduct(CreateProduct createProduct) async {
+  Future<void> createNewProduct(CreateProduct createProduct, {Uint8List? imageBytes}) async {
     emit(WriteProductInProgress());
     try {
+      if (imageBytes != null) {
+        final url = await ImageUploader.uploadImage(
+          bytes: imageBytes,
+          fileName: createProduct.name,
+        );
+        createProduct = createProduct.copyWithNewImage(url);
+      }
+
       final product = await productsRepository.createProduct(createProduct);
       emit(WriteProductSuccess(product));
       emit(WriteProductInitial());

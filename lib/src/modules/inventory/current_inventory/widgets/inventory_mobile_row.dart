@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 
 class InventoryRow extends StatelessWidget {
   final String productName;
@@ -8,6 +9,7 @@ class InventoryRow extends StatelessWidget {
   final String stock;
   final String unitCost;
   final String totalValue;
+  final String? image;
   final Color? color;
   final VoidCallback? onTap;
 
@@ -20,6 +22,7 @@ class InventoryRow extends StatelessWidget {
     required this.stock,
     required this.unitCost,
     required this.totalValue,
+    this.image,
     this.color,
     this.onTap,
   });
@@ -36,21 +39,39 @@ class InventoryRow extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                productName,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.qr_code, size: 16),
-                  Text(
-                    code,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                  ImageViewerWidget(
+                    imageUrls: (image != null && image!.isNotEmpty) ? [image!] : [],
+                    width: 50,
+                    height: 50,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          productName,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            const Icon(Icons.qr_code, size: 16),
+                            Text(
+                              code,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ],

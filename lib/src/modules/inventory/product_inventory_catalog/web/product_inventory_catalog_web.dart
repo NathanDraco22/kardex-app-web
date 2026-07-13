@@ -3,10 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/cubits/read_product_in_branch/read_product_in_branch_cubit.dart';
+import 'package:kardex_app_front/widgets/dialogs/product_inventory_editor_dialog.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
-import 'package:kardex_app_front/widgets/basic_table_listview.dart';
-import 'package:kardex_app_front/widgets/dialogs/product_inventory_editor_dialog.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/search_product_in_branch_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/search_product_in_branch_delegate.dart';
 
@@ -84,7 +84,6 @@ class _Body extends StatelessWidget {
                       ),
                     ),
                     const Spacer(),
-
                   ],
                 ),
               ),
