@@ -6,8 +6,7 @@ import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/current_inventory_template.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
-import 'package:kardex_app_front/widgets/basic_table_listview.dart';
-import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 
 part 'sections/content_section.dart';
 part 'sections/header_section.dart';

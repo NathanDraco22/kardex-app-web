@@ -30,6 +30,7 @@ environment:
 dependencies:
   kardex_business:
     path: packages/kardex_business
+  cached_network_image_ce: ^4.9.0
   cupertino_icons: ^1.0.8
   dart_jsonwebtoken: ^3.4.1
   fluentui_system_icons: ^1.1.273
@@ -45,7 +46,8 @@ dependencies:
   file_saver: ^0.4.0
   go_router: ^17.3.0
   hive_ce_flutter: ^2.3.4
-  image_picker: ^1.2.2
+  image_cropper: ^12.2.1
+  image_picker: ^1.2.3
   intl: ^0.20.3
   math_expressions: ^3.1.0
   pdf: ^3.13.0

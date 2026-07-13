@@ -175,6 +175,7 @@ class _Body extends StatelessWidget {
                       stock: inventory.currentStock.toString(),
                       unitCost: NumberFormatter.convertToMoneyLike(inventory.averageCost),
                       totalValue: NumberFormatter.convertToMoneyLike(inventory.total),
+                      image: product.image,
                     );
                   },
                 ),

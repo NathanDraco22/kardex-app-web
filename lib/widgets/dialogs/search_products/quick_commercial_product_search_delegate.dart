@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
-import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/widgets/display_product_code.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
-import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 
 Future<List<CommercialProductResult>?> showQuickCommercialProductSearchDelegate(
   BuildContext context, {
@@ -187,6 +186,12 @@ class _ProductInBranchQuickResultRow extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                ImageViewerWidget(
+                  imageUrls: product.image.isNotEmpty ? [product.image] : [],
+                  width: 50,
+                  height: 50,
+                ),
+                const SizedBox(width: 8),
                 Expanded(
                   flex: 3,
                   child: Column(

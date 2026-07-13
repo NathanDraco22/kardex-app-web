@@ -155,6 +155,14 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Center(
+                child: ImageViewerWidget(
+                  imageUrls: widget.product.image.isNotEmpty ? [widget.product.image] : [],
+                  width: 90,
+                  height: 90,
+                ),
+              ),
+              const SizedBox(height: 8),
               Text(
                 widget.product.name,
                 textAlign: TextAlign.center,
