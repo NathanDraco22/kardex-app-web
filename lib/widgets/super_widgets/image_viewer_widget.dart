@@ -109,8 +109,8 @@ class _ImageViewerWidgetState extends State<ImageViewerWidget> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
-                        FluentIcons.cube_12_filled,
-                        size: widget.width * 0.25,
+                        FluentIcons.cube_12_regular,
+                        size: widget.width * 0.6,
                         color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
                       ),
                     ],

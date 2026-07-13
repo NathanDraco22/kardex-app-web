@@ -14,20 +14,6 @@ class _ContentSection extends StatelessWidget {
         BasicTableColumn(label: const Text("Nombre Producto"), flex: 2),
         BasicTableColumn(
           label: const Text(
-            "Marca",
-            textAlign: TextAlign.center,
-          ),
-          flex: 1,
-        ),
-        BasicTableColumn(
-          label: const Text(
-            "Unidad",
-            textAlign: TextAlign.center,
-          ),
-          flex: 1,
-        ),
-        BasicTableColumn(
-          label: const Text(
             "Existencia",
             textAlign: TextAlign.center,
           ),
@@ -45,18 +31,55 @@ class _ContentSection extends StatelessWidget {
           color: rowColor,
           cells: [
             BasicTableCell(
-              content: Text(product.name),
-            ),
-            BasicTableCell(
-              content: Text(
-                product.brandName,
-                textAlign: TextAlign.center,
-              ),
-            ),
-            BasicTableCell(
-              content: Text(
-                product.unitName,
-                textAlign: TextAlign.center,
+              content: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  ImageViewerWidget(
+                    imageUrls: product.image.isNotEmpty ? [product.image] : [],
+                    width: 50,
+                    height: 50,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.qr_code, size: 12),
+                            Text(product.code ?? "-"),
+                          ],
+                        ),
+                        Text(
+                          product.name,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Row(
+                          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                product.brandName,
+                                textAlign: TextAlign.start,
+                              ),
+                            ),
+                            Expanded(
+                              child: Text(
+                                product.unitName,
+                                textAlign: TextAlign.start,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
             BasicTableCell(

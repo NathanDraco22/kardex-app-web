@@ -7,6 +7,8 @@ import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/current_inventory_template.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 import 'package:kardex_app_front/widgets/basic_table_listview.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/widgets/display_product_code.dart';
+import 'package:kardex_app_front/widgets/super_widgets/image_viewer_widget.dart';
 import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 
 part 'sections/content_section.dart';
