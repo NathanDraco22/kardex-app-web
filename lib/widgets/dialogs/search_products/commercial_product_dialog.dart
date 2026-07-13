@@ -188,6 +188,14 @@ class _FormContentState extends State<_FormContent> {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
+              Center(
+                child: ImageViewerWidget(
+                  imageUrls: widget.product.image.isNotEmpty ? [widget.product.image] : [],
+                  width: 90,
+                  height: 90,
+                ),
+              ),
+              const SizedBox(height: 8),
               Text(
                 widget.product.name,
                 style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),

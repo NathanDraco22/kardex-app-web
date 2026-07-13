@@ -198,6 +198,14 @@ class _RootScaffoldState extends State<_RootScaffold> {
                     constraints: const BoxConstraints(maxWidth: 600),
                     child: ListView(
                       children: [
+                        Center(
+                          child: ImageViewerWidget(
+                            imageUrls: widget.product.image.isNotEmpty ? [widget.product.image] : [],
+                            width: 100,
+                            height: 100,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
                         Text(
                           widget.product.name,
                           style: const TextStyle(

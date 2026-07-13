@@ -9,6 +9,7 @@ class InventoryProduct {
   final String? categoryName;
   final List<String> tags;
   final bool isActive;
+  final String image;
 
   InventoryProduct({
     required this.id,
@@ -20,6 +21,7 @@ class InventoryProduct {
     this.categoryName,
     required this.tags,
     this.isActive = true,
+    this.image = "",
   });
 
   factory InventoryProduct.fromJson(Map<String, dynamic> json) {
@@ -33,6 +35,7 @@ class InventoryProduct {
       categoryName: json['categoryName'] as String?,
       tags: List<String>.from(json['tags'] as List),
       isActive: json['isActive'] as bool? ?? true,
+      image: json['image'] as String? ?? "",
     );
   }
 
@@ -47,6 +50,7 @@ class InventoryProduct {
       'categoryName': categoryName,
       'tags': tags,
       'isActive': isActive,
+      'image': image,
     };
   }
 }
