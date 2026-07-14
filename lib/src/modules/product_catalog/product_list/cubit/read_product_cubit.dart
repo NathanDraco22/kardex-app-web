@@ -68,11 +68,11 @@ class ReadProductCubit extends Cubit<ReadProductState> {
   Future<void> putProductFirst(ProductInDb product) async {
     final currentState = state as ReadProductSuccess;
     _productsCache = [product, ..._productsCache];
-    final freshList = _productsCache;
+    final currentProducts = [product, ...currentState.products];
     if (currentState is HighlightedProduct) {
       emit(
         HighlightedProduct(
-          freshList,
+          currentProducts,
           newProducts: [product, ...currentState.newProducts],
           updatedProducts: currentState.updatedProducts,
         ),
@@ -81,7 +81,7 @@ class ReadProductCubit extends Cubit<ReadProductState> {
     }
     emit(
       HighlightedProduct(
-        freshList,
+        currentProducts,
         newProducts: [product],
       ),
     );
@@ -91,14 +91,20 @@ class ReadProductCubit extends Cubit<ReadProductState> {
     final currentState = state as ReadProductSuccess;
 
     final productIndex = _productsCache.indexWhere((element) => element.id == product.id);
-    _productsCache[productIndex] = product;
+    if (productIndex != -1) {
+      _productsCache[productIndex] = product;
+    }
 
-    final freshList = _productsCache;
+    final currentProducts = List<ProductInDb>.from(currentState.products);
+    final visibleIndex = currentProducts.indexWhere((element) => element.id == product.id);
+    if (visibleIndex != -1) {
+      currentProducts[visibleIndex] = product;
+    }
 
     if (currentState is HighlightedProduct) {
       emit(
         HighlightedProduct(
-          freshList,
+          currentProducts,
           newProducts: currentState.newProducts,
           updatedProducts: [product, ...currentState.updatedProducts],
         ),
@@ -107,7 +113,7 @@ class ReadProductCubit extends Cubit<ReadProductState> {
     }
     emit(
       HighlightedProduct(
-        freshList,
+        currentProducts,
         updatedProducts: [product],
       ),
     );
@@ -116,11 +122,12 @@ class ReadProductCubit extends Cubit<ReadProductState> {
   Future<void> removeProduct(ProductInDb product) async {
     final currentState = state as ReadProductSuccess;
     _productsCache.removeWhere((element) => element.id == product.id);
-    final freshList = _productsCache;
+    final currentProducts = List<ProductInDb>.from(currentState.products);
+    currentProducts.removeWhere((element) => element.id == product.id);
     if (currentState is HighlightedProduct) {
       emit(
         HighlightedProduct(
-          freshList,
+          currentProducts,
           newProducts: currentState.newProducts,
           updatedProducts: currentState.updatedProducts,
         ),
@@ -129,7 +136,7 @@ class ReadProductCubit extends Cubit<ReadProductState> {
     }
     emit(
       HighlightedProduct(
-        freshList,
+        currentProducts,
       ),
     );
   }
