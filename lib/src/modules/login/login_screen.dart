@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -28,7 +29,6 @@ class _RootScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     final authCubit = getIt<AuthCubit>();
     final appModeCubit = context.read<AppModeCubit>();
-    int secretCounter = 0;
     return BlocListener(
       bloc: authCubit,
       listener: (context, state) async {
@@ -69,31 +69,29 @@ class _RootScaffold extends StatelessWidget {
           backgroundColor: Colors.transparent,
           elevation: 0.0,
           leading: IconButton(
-            onPressed: () {
-              secretCounter += 1;
-            },
-            onLongPress: () async {
-              if (secretCounter < 5) return;
-
-              String? buisinessName;
+            onPressed: () async {
+              String? businessName;
               if (authCubit.state is Unauthenticated) {
-                buisinessName = (authCubit.state as Unauthenticated).servin?.name;
+                businessName = (authCubit.state as Unauthenticated).servin?.name;
               }
 
-              final res = await DialogManager.confirmActionDialog(
-                context,
-                "Deseas salir de ${buisinessName ?? "Este Negocio"}?",
+              final res = await showDialog<bool>(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) => _ExitBusinessDialog(
+                  businessName: businessName ?? "este negocio",
+                ),
               );
 
-              if (!res) return;
-
-              await authCubit.exitFromBusiness();
-              if (!context.mounted) return;
-              context.goNamed("activation");
+              if (res == true) {
+                await authCubit.exitFromBusiness();
+                if (!context.mounted) return;
+                context.goNamed("activation");
+              }
             },
             icon: const Icon(
               Icons.close,
-              color: Colors.transparent,
+              color: Colors.white70,
             ),
           ),
         ),
@@ -251,6 +249,110 @@ class _ModeButton extends StatelessWidget {
           return const Text("Cambiar a Modo Normal");
         },
       ),
+    );
+  }
+}
+
+class _ExitBusinessDialog extends StatefulWidget {
+  final String businessName;
+
+  const _ExitBusinessDialog({required this.businessName});
+
+  @override
+  State<_ExitBusinessDialog> createState() => _ExitBusinessDialogState();
+}
+
+class _ExitBusinessDialogState extends State<_ExitBusinessDialog> {
+  int _secondsRemaining = 5;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+  }
+
+  void _startTimer() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_secondsRemaining > 0) {
+        setState(() {
+          _secondsRemaining--;
+        });
+      } else {
+        _timer?.cancel();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text("Salir del Negocio"),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("¿Deseas salir de ${widget.businessName}?"),
+          const SizedBox(height: 16),
+          if (_secondsRemaining > 0)
+            Row(
+              children: [
+                const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  "Espera $_secondsRemaining segundos...",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red,
+                  ),
+                ),
+              ],
+            )
+          else
+            const Row(
+              children: [
+                Icon(Icons.check_circle, color: Colors.green, size: 20),
+                SizedBox(width: 8),
+                Text(
+                  "Ya puedes confirmar la salida.",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green,
+                  ),
+                ),
+              ],
+            ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: const Text("Cancelar"),
+        ),
+        ElevatedButton(
+          onPressed: _secondsRemaining > 0
+              ? null
+              : () => Navigator.of(context).pop(true),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red.shade800,
+            foregroundColor: Colors.white,
+          ),
+          child: const Text("Aceptar"),
+        ),
+      ],
     );
   }
 }
