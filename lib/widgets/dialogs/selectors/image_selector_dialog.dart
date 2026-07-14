@@ -128,19 +128,24 @@ class _ImageSelectorDialogState extends State<ImageSelectorDialog> {
         uiImage = await picture.toImage(maxSize.toInt(), maxSize.toInt());
       }
 
-      // Convertimos el ui.Image a ByteData en formato PNG temporalmente
+      // Obtenemos los bytes de píxeles crudos (RGBA) directamente de la GPU (es instantáneo)
       final byteData = await uiImage.toByteData(
-        format: ui.ImageByteFormat.png,
+        format: ui.ImageByteFormat.rawRgba,
       );
 
       if (byteData == null) return;
-      final pngBytes = byteData.buffer.asUint8List();
+      final rawBytes = byteData.buffer.asUint8List();
 
-      // Convertimos los bytes del PNG a un formato JPEG real usando el paquete image
-      // Esto elimina el canal alfa (transparencia / RGBA) para evitar la excepción
-      // "cannot write mode RGBA as JPEG" en el backend
-      final decodedImage = img.decodeImage(pngBytes);
-      if (decodedImage == null) return;
+      // Creamos el objeto Image a partir de los bytes crudos (RGBA) sin decodificación intermedia
+      final decodedImage = img.Image.fromBytes(
+        width: uiImage.width,
+        height: uiImage.height,
+        bytes: rawBytes.buffer,
+        numChannels: 4,
+        order: img.ChannelOrder.rgba,
+      );
+
+      // Convertimos la imagen a un formato JPEG real (RGB) eliminando el canal alfa para el backend
       final bytes = img.encodeJpg(decodedImage, quality: 80);
 
       setState(() {
