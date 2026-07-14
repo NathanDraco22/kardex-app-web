@@ -384,3 +384,10 @@ Esta estructura se ha seguido para módulos como 'Historial de Facturas', 'Histo
 - La causa era la importación directa de archivos privados de la carpeta `src` de otro paquete (ej. `package:kardex_business/src/...`).
 - Se desarrolló e implementó un script de automatización en Python (`fix_imports.py`) para refactorizar recursivamente todos los archivos `.dart` en la carpeta `lib/` de `kardex_app_front`.
 - El script consolidó todas las importaciones privadas en una única importación pública autorizada: `package:kardex_business/kardex_business.dart`, afectando exitosamente a 387 archivos y eliminando las advertencias del linter en la aplicación principal sin romper la compilación.
+
+## Botón de Salida y Diálogo con Temporizador en Login (Julio 2026)
+- Se hizo visible el botón de salida del negocio (icono de cerrar `Icons.close` en color `Colors.white70` en lugar de `Colors.transparent`) en el `AppBar` de `login_screen.dart`.
+- Se eliminó el flujo anterior que requería pulsar 5 veces de forma invisible más una pulsación larga (`secretCounter`) para poder salir del negocio.
+- Se implementó un diálogo modal privado `_ExitBusinessDialog` (`StatefulWidget`) que se abre al pulsar directamente el botón de salida.
+- El diálogo inicia una cuenta regresiva interactiva de 5 segundos utilizando un `Timer.periodic`. Muestra un indicador circular de progreso rojo con el mensaje "Espera X segundos..." y mantiene deshabilitado el botón "Aceptar".
+- Al llegar a 0 segundos, el diálogo cambia a un estado verde de confirmación ("Ya puedes confirmar la salida.") y habilita el botón "Aceptar" para ejecutar `authCubit.exitFromBusiness()` y redirigir a la pantalla de activación.
