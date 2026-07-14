@@ -1,8 +1,10 @@
 import 'dart:developer';
+import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart' show Uint8List;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:image_cropper/image_cropper.dart';
+import 'package:croppy/croppy.dart';
+import 'package:image/image.dart' as img;
 
 /// Clase base sellada que representa la intención del usuario al salir del diálogo.
 sealed class ImageSelectorIntent {}
@@ -90,50 +92,59 @@ class _ImageSelectorDialogState extends State<ImageSelectorDialog> {
 
       if (pickedFile == null || !mounted) return;
 
-      // Configuramos el recortador (ImageCropper) en modo cuadrado fijo, formato JPG y calidad 80.
-      final croppedFile = await ImageCropper().cropImage(
-        sourcePath: pickedFile.path,
-        aspectRatio: const CropAspectRatio(ratioX: 1.0, ratioY: 1.0),
-        maxWidth: 800,
-        maxHeight: 800,
-        compressFormat: ImageCompressFormat.jpg,
-        compressQuality: 80,
-        uiSettings: [
-          AndroidUiSettings(
-            toolbarTitle: 'Recortar Imagen',
-            toolbarColor: Theme.of(context).colorScheme.primary,
-            toolbarWidgetColor: Colors.white,
-            initAspectRatio: CropAspectRatioPreset.square,
-            lockAspectRatio: true,
-          ),
-          IOSUiSettings(
-            title: 'Recortar Imagen',
-            aspectRatioLockEnabled: true,
-            resetAspectRatioEnabled: false,
-            aspectRatioPickerButtonHidden: true,
-            doneButtonTitle: 'Aceptar',
-            cancelButtonTitle: 'Cancelar',
-          ),
-          WebUiSettings(
-            context: context,
-            presentStyle: WebPresentStyle.dialog,
-            size: const CropperSize(width: 400, height: 400),
-            cropBoxMovable: false,
-            cropBoxResizable: false,
-            dragMode: WebDragMode.move,
-            zoomable: true,
-            zoomOnWheel: true,
-            zoomOnTouch: true,
-          ),
+      // Leemos los bytes del XFile y creamos un MemoryImage
+      final bytesBeforeCrop = await pickedFile.readAsBytes();
+      if (!mounted) return;
+      final imageProvider = MemoryImage(bytesBeforeCrop);
+
+      // Usamos showAdaptiveImageCropper de croppy para mostrar la UI nativa según la plataforma (Material vs Cupertino)
+      final result = await showAdaptiveImageCropper(
+        context,
+        imageProvider: imageProvider,
+        allowedAspectRatios: [
+          const CropAspectRatio(width: 1, height: 1),
         ],
       );
 
-      if (croppedFile == null || !mounted) return;
+      if (result == null || !mounted) return;
 
-      final bytes = await croppedFile.readAsBytes();
+      // Obtenemos el objeto dart:ui.Image del resultado
+      ui.Image uiImage = result.uiImage;
+
+      // Si excede el tamaño máximo (800px), la redimensionamos en memoria usando un Canvas
+      const double maxSize = 800.0;
+      if (uiImage.width > maxSize || uiImage.height > maxSize) {
+        final recorder = ui.PictureRecorder();
+        final canvas = Canvas(recorder, const Rect.fromLTWH(0, 0, maxSize, maxSize));
+        
+        paintImage(
+          canvas: canvas,
+          rect: const Rect.fromLTWH(0, 0, maxSize, maxSize),
+          image: uiImage,
+          fit: BoxFit.fill,
+        );
+
+        final picture = recorder.endRecording();
+        uiImage = await picture.toImage(maxSize.toInt(), maxSize.toInt());
+      }
+
+      // Convertimos el ui.Image a ByteData en formato PNG temporalmente
+      final byteData = await uiImage.toByteData(
+        format: ui.ImageByteFormat.png,
+      );
+
+      if (byteData == null) return;
+      final pngBytes = byteData.buffer.asUint8List();
+
+      // Convertimos los bytes del PNG a un formato JPEG real usando el paquete image
+      // Esto elimina el canal alfa (transparencia / RGBA) para evitar la excepción
+      // "cannot write mode RGBA as JPEG" en el backend
+      final decodedImage = img.decodeImage(pngBytes);
+      if (decodedImage == null) return;
+      final bytes = img.encodeJpg(decodedImage, quality: 80);
 
       setState(() {
-        _tempPickedFile = XFile(croppedFile.path);
+        _tempPickedFile = pickedFile;
         _tempBytes = bytes;
         _tempImageProvider = MemoryImage(bytes);
         _isDeleted = false;
