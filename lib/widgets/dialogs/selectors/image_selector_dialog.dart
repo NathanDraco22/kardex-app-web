@@ -111,12 +111,12 @@ class _ImageSelectorDialogState extends State<ImageSelectorDialog> {
       // Obtenemos el objeto dart:ui.Image del resultado
       ui.Image uiImage = result.uiImage;
 
-      // Si excede el tamaño máximo (800px), la redimensionamos en memoria usando un Canvas
-      const double maxSize = 800.0;
+      // Si excede el tamaño máximo (720px), la redimensionamos en memoria usando un Canvas
+      const double maxSize = 720.0;
       if (uiImage.width > maxSize || uiImage.height > maxSize) {
         final recorder = ui.PictureRecorder();
         final canvas = Canvas(recorder, const Rect.fromLTWH(0, 0, maxSize, maxSize));
-        
+
         paintImage(
           canvas: canvas,
           rect: const Rect.fromLTWH(0, 0, maxSize, maxSize),
@@ -146,7 +146,7 @@ class _ImageSelectorDialogState extends State<ImageSelectorDialog> {
       );
 
       // Convertimos la imagen a un formato JPEG real (RGB) eliminando el canal alfa para el backend
-      final bytes = img.encodeJpg(decodedImage, quality: 80);
+      final bytes = img.encodeJpg(decodedImage, quality: 70);
 
       setState(() {
         _tempPickedFile = pickedFile;
@@ -334,7 +334,9 @@ class _ImageSelectorDialogState extends State<ImageSelectorDialog> {
                   ElevatedButton(
                     onPressed: _confirmAndPop,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: _hasChanges ? theme.colorScheme.primary : theme.colorScheme.primary.withValues(alpha: 0.6),
+                      backgroundColor: _hasChanges
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.primary.withValues(alpha: 0.6),
                       foregroundColor: theme.colorScheme.onPrimary,
                       elevation: _hasChanges ? 2 : 0,
                     ),

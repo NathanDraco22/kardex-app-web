@@ -84,7 +84,11 @@ class _ContentSection extends StatelessWidget {
                 },
 
                 onViewInvoice: () async {
-                  final amount = await showInvoiceAcreditViewerScreen(context, currentInvoice);
+                  final amount = await showInvoiceAcreditViewerScreen(
+                    context,
+                    currentInvoice,
+                    devolutions: devolutions,
+                  );
                   if (amount != null && context.mounted) {
                     final amountCents = (amount * 100).round();
                     final client = viewController.selectedClient!;
