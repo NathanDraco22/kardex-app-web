@@ -9,6 +9,12 @@ import 'package:kardex_app_front/src/modules/commercial/current_orders/modals/co
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
 import 'package:kardex_app_front/widgets/row_widgets/sale_item_row.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/src/tools/printers/order_printer.dart';
+import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
+import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_order_template.dart';
+import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 
 Future<OrderInDb?> showOrderInvoiceCreatorDialog(BuildContext context, OrderInDb order) async {
   final readCubit = context.read<ReadOrderCubit>();
@@ -73,6 +79,15 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authCubit = getIt<AuthCubit>();
+    final authState = authCubit.state;
+    if (authState is! Authenticated) {
+      return const Scaffold(
+        body: Center(
+          child: Text("Error de Autenticación"),
+        ),
+      );
+    }
     final orderContainer = InvoiceCreateMediator.of(context).orderContainer;
     final writeCubit = context.read<WriteOrderCubit>();
     return BlocListener<WriteOrderCubit, WriteOrderState>(
@@ -114,7 +129,35 @@ class _RootScaffold extends StatelessWidget {
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text("Facturar Orden")),
+        appBar: AppBar(
+          title: const Text("Facturar Orden"),
+          actions: [
+            IconButton(
+              tooltip: "Exportar PDF (A4)",
+              onPressed: () async {
+                final template = SingleOrderTemplate(order: orderContainer.order, branch: authState.branch);
+                await PdfExportTool.export(template, fileName: "pedido_${orderContainer.order.docNumber}.pdf");
+              },
+              icon: const Icon(Icons.picture_as_pdf),
+            ),
+            IconButton(
+              tooltip: "Compartir Orden",
+              onPressed: () async {
+                final paperSize = await PrintManager.getLocalPaperSize();
+                shareOrder(orderContainer.order, authState.branch, paperSize: paperSize);
+              },
+              icon: const Icon(Icons.share),
+            ),
+            IconButton(
+              tooltip: "Imprimir Orden",
+              onPressed: () async {
+                final paperSize = await PrintManager.getLocalPaperSize();
+                printOrder(orderContainer.order, authState.branch, paperSize: paperSize);
+              },
+              icon: const Icon(Icons.print),
+            ),
+          ],
+        ),
         body: const _Body(),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: Builder(
