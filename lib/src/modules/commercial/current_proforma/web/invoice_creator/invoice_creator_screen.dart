@@ -12,6 +12,8 @@ import 'package:kardex_app_front/src/tools/printers/order_printer.dart';
 import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
+import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_order_template.dart';
+import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_modal.dart';
@@ -143,6 +145,15 @@ class _RootScaffold extends StatelessWidget {
           title: const Text("Facturar Orden"),
           actions: [
             IconButton(
+              tooltip: "Exportar PDF (A4)",
+              onPressed: () async {
+                final template = SingleOrderTemplate(order: orderContainer.order, branch: authState.branch);
+                await PdfExportTool.export(template, fileName: "cotizacion_${orderContainer.order.docNumber}.pdf");
+              },
+              icon: const Icon(Icons.picture_as_pdf),
+            ),
+            IconButton(
+              tooltip: "Compartir Cotización",
               onPressed: () async {
                 final paperSize = await PrintManager.getLocalPaperSize();
                 shareOrder(orderContainer.order, authState.branch, paperSize: paperSize);
@@ -150,6 +161,7 @@ class _RootScaffold extends StatelessWidget {
               icon: const Icon(Icons.share),
             ),
             IconButton(
+              tooltip: "Imprimir Cotización",
               onPressed: () async {
                 final paperSize = await PrintManager.getLocalPaperSize();
                 printOrder(orderContainer.order, authState.branch, paperSize: paperSize);
