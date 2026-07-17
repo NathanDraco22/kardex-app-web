@@ -205,20 +205,38 @@ class MenuActions extends StatelessWidget {
                       final newInvoice = viewController.generateCreateInvoice(context);
                       if (newInvoice == null) return;
 
-                      final res = await showConfirmationInvoiceDialog(
-                        context,
-                        viewController.selectedClient!,
-                        newInvoice,
-                        isOrder: cubit.isOrder,
-                      );
+                      if (!cubit.isOrder && viewController.selectedPaymentType == PaymentType.cash) {
+                        final paymentResult = await showPaymentConfirmationDialog(
+                          context,
+                          newInvoice.total,
+                        );
+                        if (paymentResult == null) return;
+                        final updatedInvoice = newInvoice.copyWithPaymentMethod(
+                          paymentResult.method,
+                          paymentResult.reference,
+                        );
 
-                      if (res != true) return;
+                        if (!context.mounted) return;
+                        context.read<WriteInvoiceCubit>().createNewInvoice(
+                          updatedInvoice,
+                          viewController.selectedClient!,
+                        );
+                      } else {
+                        final res = await showConfirmationInvoiceDialog(
+                          context,
+                          viewController.selectedClient!,
+                          newInvoice,
+                          isOrder: cubit.isOrder,
+                        );
 
-                      if (!context.mounted) return;
-                      context.read<WriteInvoiceCubit>().createNewInvoice(
-                        newInvoice,
-                        viewController.selectedClient!,
-                      );
+                        if (res != true) return;
+
+                        if (!context.mounted) return;
+                        context.read<WriteInvoiceCubit>().createNewInvoice(
+                          newInvoice,
+                          viewController.selectedClient!,
+                        );
+                      }
                     }
                   : null,
               icon: Icon(saveIcon),
