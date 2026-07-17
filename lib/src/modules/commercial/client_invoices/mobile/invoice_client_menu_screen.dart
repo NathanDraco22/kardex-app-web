@@ -11,6 +11,7 @@ import 'package:kardex_app_front/widgets/title_texfield.dart';
 
 import '../cubit/write_invoice_cubit.dart';
 import '../widgets/confirmation_send_modal.dart';
+import '../widgets/dialogs/payment_confirmation_dialog.dart';
 
 Future<void> showInvoiceClientMenuScreen(
   BuildContext context,
@@ -262,70 +263,88 @@ class _SendButton extends StatelessWidget {
 
                   if (createInvoice == null) return;
 
-                  final res = await showConfirmationSendBottomModal(
-                    context,
-                    title: dialogTitle,
-                    subtitle: dialogSubtitle,
-                    content: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text(
-                          viewController.selectedClient!.name,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
+                  if (!cubit.isOrder && viewController.selectedPaymentType == PaymentType.cash) {
+                    final paymentResult = await showPaymentConfirmationDialog(
+                      context,
+                      createInvoice.total,
+                    );
+                    if (paymentResult == null) return;
+                    final updatedInvoice = createInvoice.copyWithPaymentMethod(
+                      paymentResult.method,
+                      paymentResult.reference,
+                    );
 
-                        Expanded(
-                          child: ListView(
-                            children: [
-                              for (final item in createInvoice.saleItems)
-                                ListTile(
-                                  title: Text(item.product.name),
-                                  subtitle: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        item.quantity.toString(),
-                                      ),
-                                      Text(NumberFormatter.convertFromCentsToUnitsCurrency(item.price).toString()),
-                                      Text(
-                                        NumberFormatter.convertToMoneyLike(
-                                          item.totalDiscount,
-                                        ).toString(),
-                                      ),
-                                      Text(
-                                        NumberFormatter.convertToMoneyLike(item.total).toString(),
-                                        style: TextStyle(color: Theme.of(context).colorScheme.primary),
-                                      ),
-                                    ],
+                    if (!context.mounted) return;
+                    context.read<WriteInvoiceCubit>().createNewInvoice(
+                      updatedInvoice,
+                      viewController.selectedClient!,
+                    );
+                  } else {
+                    final res = await showConfirmationSendBottomModal(
+                      context,
+                      title: dialogTitle,
+                      subtitle: dialogSubtitle,
+                      content: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            viewController.selectedClient!.name,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+
+                          Expanded(
+                            child: ListView(
+                              children: [
+                                for (final item in createInvoice.saleItems)
+                                  ListTile(
+                                    title: Text(item.product.name),
+                                    subtitle: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          item.quantity.toString(),
+                                        ),
+                                        Text(NumberFormatter.convertFromCentsToUnitsCurrency(item.price).toString()),
+                                        Text(
+                                          NumberFormatter.convertToMoneyLike(
+                                            item.totalDiscount,
+                                          ).toString(),
+                                        ),
+                                        Text(
+                                          NumberFormatter.convertToMoneyLike(item.total).toString(),
+                                          style: TextStyle(color: Theme.of(context).colorScheme.primary),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                        const Divider(),
-                        Text(
-                          "Total: ${NumberFormatter.convertToMoneyLike(createInvoice.total)}",
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                          const Divider(),
+                          Text(
+                            "Total: ${NumberFormatter.convertToMoneyLike(createInvoice.total)}",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 16),
-                      ],
-                    ),
-                  );
+                          const SizedBox(height: 16),
+                        ],
+                      ),
+                    );
 
-                  if (res != true) return;
-                  if (!context.mounted) return;
-                  context.read<WriteInvoiceCubit>().createNewInvoice(
-                    createInvoice,
-                    viewController.selectedClient!,
-                  );
+                    if (res != true) return;
+                    if (!context.mounted) return;
+                    context.read<WriteInvoiceCubit>().createNewInvoice(
+                      createInvoice,
+                      viewController.selectedClient!,
+                    );
+                  }
                 },
           icon: const Icon(Icons.send),
           label: Text(label),
