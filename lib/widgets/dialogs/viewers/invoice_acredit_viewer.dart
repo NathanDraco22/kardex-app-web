@@ -10,7 +10,7 @@ import 'package:kardex_app_front/src/tools/printers/paper_settings.dart';
 import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
 
-Future<double?> showInvoiceAcreditViewerScreen(
+Future<FastPaymentResult?> showInvoiceAcreditViewerScreen(
   BuildContext context,
   InvoiceInDb invoice, {
   List<DevolutionInDb> devolutions = const [],
@@ -19,7 +19,7 @@ Future<double?> showInvoiceAcreditViewerScreen(
   if (!context.mounted) return null;
   final paperSize = await PrintManager.getLocalPaperSize();
   if (!context.mounted) return null;
-  return await Navigator.push<double>(
+  return await Navigator.push<FastPaymentResult>(
     context,
     MaterialPageRoute(
       builder: (context) {
@@ -171,14 +171,14 @@ class _InvoiceAcreditViewer extends StatelessWidget {
               onPressed: isPaidOut
                   ? null
                   : () async {
-                      final amountToPay = await showFastPaymentModal(
+                      final paymentResult = await showFastPaymentModal(
                         context,
                         maxAmountToPay: NumberFormatter.convertFromCentsToDouble(remaining),
                         clientName: invoice.clientInfo.name,
                       );
 
-                      if (amountToPay != null && context.mounted) {
-                        Navigator.pop(context, amountToPay);
+                      if (paymentResult != null && context.mounted) {
+                        Navigator.pop(context, paymentResult);
                       }
                     },
               icon: const Icon(Icons.payment),

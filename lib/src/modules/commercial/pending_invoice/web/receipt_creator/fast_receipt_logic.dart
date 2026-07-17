@@ -9,6 +9,8 @@ class FastReceiptLogic {
     required String branchId,
     required String currentUserId,
     required String currentUserName,
+    PaymentMethod paymentMethod = PaymentMethod.cash,
+    String bankReference = "",
   }) {
     if (paymentAmountCents <= 0 && devolutions.isEmpty) {
       return (null, "Debe existir al menos un monto en efectivo o devoluciones pendientes para abonar.");
@@ -58,7 +60,7 @@ class FastReceiptLogic {
         totalAppliedToThisInvoice += cashToApply;
 
         final cashAmountDouble = cashToApply / 100;
-        bodySummary += "• Factura #${invoice.docNumber}: \$${cashAmountDouble.toStringAsFixed(2)} (Efectivo)\n";
+        bodySummary += "• Factura #${invoice.docNumber}: \$${cashAmountDouble.toStringAsFixed(2)} (${paymentMethod.display})\n";
       }
 
       if (totalAppliedToThisInvoice > 0) {
@@ -95,7 +97,8 @@ class FastReceiptLogic {
       clientId: client.id,
       appliedInvoices: appliedInvoices,
       appliedDevolutions: appliedDevolutions,
-      paymentMethod: PaymentMethod.cash,
+      paymentMethod: paymentMethod,
+      bankReference: bankReference,
       total: cashUsed,
       createdBy: UserInfo(
         id: currentUserId,

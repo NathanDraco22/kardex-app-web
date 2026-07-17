@@ -164,6 +164,36 @@ class _ReceiptViewer extends StatelessWidget {
                       fontSize: 16,
                     ),
                   ),
+                  Builder(
+                    builder: (context) {
+                      final label = Text(
+                        receipt.paymentMethod.display,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      );
+
+                      if (receipt.paymentMethod != PaymentMethod.cash &&
+                          receipt.bankReference.isNotEmpty) {
+                        return Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            label,
+                            Text(
+                              " - Ref: ${receipt.bankReference}",
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+
+                      return label;
+                    },
+                  ),
                   Text(
                     "Cliente: ${receipt.clientInfo.name}",
                     style: const TextStyle(
