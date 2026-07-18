@@ -22,7 +22,7 @@ class _RangeFinanceReportScreenWebState extends State<RangeFinanceReportScreenWe
     return Column(
       children: [
         Card(
-          margin: const EdgeInsets.all(16.0),
+          margin: const EdgeInsets.all(4.0),
           child: Padding(
             padding: const EdgeInsets.all(12.0),
             child: Column(

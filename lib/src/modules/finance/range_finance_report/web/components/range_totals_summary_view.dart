@@ -9,7 +9,7 @@ class RangeTotalsSummaryView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 24),
       children: [
         _buildInvoicesSection(),
         const SizedBox(height: 16),
@@ -18,6 +18,7 @@ class RangeTotalsSummaryView extends StatelessWidget {
         _buildCreditsControlSection(),
         const SizedBox(height: 16),
         _buildReceiptsSection(),
+        const SizedBox(height: 16),
       ],
     );
   }
