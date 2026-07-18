@@ -161,7 +161,7 @@ class RangeTotalsSummaryView extends StatelessWidget {
 
     final creditPendingInvoices = creditInvoices.where((inv) => inv.status != InvoiceStatus.paid);
     final countPending = creditPendingInvoices.length;
-    final totalPending = creditPendingInvoices.fold<int>(0, (prev, inv) => prev + inv.total);
+    final totalPending = creditPendingInvoices.fold<int>(0, (prev, inv) => prev + inv.totalRemaining);
 
     return _SectionCard(
       title: "Control de Créditos",
