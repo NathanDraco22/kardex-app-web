@@ -135,7 +135,7 @@ class _ProductInBranchResultRow extends StatelessWidget {
     String valueToDisplay = NumberFormatter.convertToMoneyLike(value);
 
     return SizedBox(
-      height: 88,
+      height: 110,
       child: InkWell(
         hoverColor: Colors.yellow.shade100,
         focusColor: Colors.yellow.shade100,
@@ -172,32 +172,72 @@ class _ProductInBranchResultRow extends StatelessWidget {
                           ),
                         ],
                       ),
+
+                      const Divider(height: 4),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Flexible(
+                            fit: FlexFit.tight,
+                            child: Builder(
+                              builder: (context) {
+                                Color color = Colors.blue;
+
+                                if (product.account.availableStock <= 0) {
+                                  color = Colors.red;
+                                }
+                                return Text(
+                                  product.account.availableStock.toString(),
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                    color: color,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          Flexible(
+                            fit: FlexFit.tight,
+                            child: Text(
+                              valueToDisplay,
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.green,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
 
-                Flexible(
-                  fit: FlexFit.tight,
-                  child: Text(
-                    product.account.availableStock.toString(),
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-                Flexible(
-                  fit: FlexFit.tight,
-                  child: Center(
-                    child: Text(
-                      valueToDisplay,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ),
+                // Flexible(
+                //   fit: FlexFit.tight,
+                //   child: Column(
+                //     children: [
+                //       Text(
+                //         product.account.availableStock.toString(),
+                //         style: const TextStyle(
+                //           fontSize: 15,
+                //           fontWeight: FontWeight.w600,
+                //           color: Colors.blue,
+                //         ),
+                //       ),
+                //       Text(
+                //         valueToDisplay,
+                //         style: const TextStyle(
+                //           fontSize: 15,
+                //           fontWeight: FontWeight.w600,
+                //           color: Colors.green,
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
               ],
             ),
           ),
