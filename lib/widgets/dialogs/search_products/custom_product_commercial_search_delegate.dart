@@ -180,6 +180,17 @@ class _ProductInBranchResultRow extends StatelessWidget {
                         children: [
                           Flexible(
                             fit: FlexFit.tight,
+                            child: Text(
+                              valueToDisplay,
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.green,
+                              ),
+                            ),
+                          ),
+                          Flexible(
+                            fit: FlexFit.tight,
                             child: Builder(
                               builder: (context) {
                                 Color color = Colors.blue;
@@ -196,17 +207,6 @@ class _ProductInBranchResultRow extends StatelessWidget {
                                   ),
                                 );
                               },
-                            ),
-                          ),
-                          Flexible(
-                            fit: FlexFit.tight,
-                            child: Text(
-                              valueToDisplay,
-                              style: const TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.green,
-                              ),
                             ),
                           ),
                         ],
