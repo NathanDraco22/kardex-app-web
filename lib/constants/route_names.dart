@@ -85,6 +85,7 @@ class RouteNames {
   static const branchDailySummary = 'branch-daily-summary';
   static const branchExecutiveSummary = 'branch-executive-summary';
   static const dailyOperationsResults = 'daily-operations-results';
+  static const rangeFinanceReport = 'finance-range-report';
 
   static const settings = 'settings';
   static const users = 'users';
