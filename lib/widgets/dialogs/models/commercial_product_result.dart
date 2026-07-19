@@ -13,14 +13,22 @@ class CommercialProductResult {
       4: product.saleProfile.salePrice4,
     };
     _newPrice = priceMap[defaultPriceLevel] ?? product.saleProfile.salePrice;
+    selectedUnitIndex = product.defaultUnitIndex;
+    conversionFactor = product.defaultUnitFactor;
+    selectedUnitName = product.defaultUnitName;
   }
   ProductInDbInBranch product;
   int _newPrice = 0;
   int selectedPriceLevel = 1;
   Discount? selectedDiscount;
   int quantity = 0;
+  
+  int selectedUnitIndex = 0;
+  int conversionFactor = 1;
+  String selectedUnitName = '';
+
   int get subTotal {
-    return quantity * _newPrice;
+    return quantity * _newPrice * conversionFactor;
   }
 
   int get newPrice => _newPrice;
@@ -47,6 +55,9 @@ class CommercialProductResult {
     int? selectedPriceLevel,
     Discount? selectedDiscount,
     int? quantity,
+    int? selectedUnitIndex,
+    int? conversionFactor,
+    String? selectedUnitName,
   }) {
     final result = CommercialProductResult(
       product: product ?? this.product,
@@ -68,7 +79,11 @@ class CommercialProductResult {
     }
 
     result.quantity = quantity ?? this.quantity;
+    result.selectedUnitIndex = selectedUnitIndex ?? this.selectedUnitIndex;
+    result.conversionFactor = conversionFactor ?? this.conversionFactor;
+    result.selectedUnitName = selectedUnitName ?? this.selectedUnitName;
 
     return result;
   }
 }
+

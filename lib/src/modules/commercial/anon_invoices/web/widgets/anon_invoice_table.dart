@@ -237,7 +237,9 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
 
     final product = widget.item.commercial.product;
 
-    final price = NumberFormatter.convertToMoneyLike(widget.item.commercial.newPrice);
+    final price = NumberFormatter.convertToMoneyLike(
+      widget.item.commercial.newPrice * widget.item.commercial.conversionFactor,
+    );
     final totalDiscount = NumberFormatter.convertToMoneyLike(widget.item.commercial.totalDiscount);
     final percenValue = widget.item.commercial.discountPercent;
     final total = NumberFormatter.convertToMoneyLike(widget.item.commercial.total);
@@ -312,14 +314,19 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
                               ),
                               Expanded(
                                 child: Text(
-                                  product.unitName,
+                                  widget.item.commercial.selectedUnitName.isNotEmpty
+                                      ? widget.item.commercial.selectedUnitName
+                                      : product.unitName,
                                   textAlign: TextAlign.left,
                                 ),
                               ),
 
                               Expanded(
                                 child: Text(
-                                  product.account.availableStock.toString(),
+                                  NumberFormatter.formatDisplayStock(
+                                    product.account.availableStock,
+                                    widget.item.commercial.conversionFactor,
+                                  ),
                                   textAlign: TextAlign.left,
                                 ),
                               ),
@@ -335,7 +342,8 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
               Flexible(
                 fit: FlexFit.tight,
                 child: IncrementalTextField(
-                  maxValue: widget.item.commercial.product.account.availableStock,
+                  maxValue: widget.item.commercial.product.account.availableStock ~/
+                      widget.item.commercial.conversionFactor,
                   initialValue: widget.item.commercial.quantity,
                   onChanged: (value) {
                     widget.item.commercial.quantity = value;

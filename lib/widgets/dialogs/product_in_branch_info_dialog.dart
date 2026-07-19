@@ -49,7 +49,7 @@ class ProductInBranchInfoDialog extends StatelessWidget {
                   ? null
                   : () {
                       final text =
-                          "${product.name} \n${product.brandName} - ${product.unitName} \nPrecio: $priceString";
+                          "${product.name} \n${product.brandName} - ${product.defaultUnitName} \nPrecio: $priceString";
                       Clipboard.setData(ClipboardData(text: text));
                       ScaffoldMessenger.of(context).clearSnackBars();
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -106,7 +106,7 @@ class ProductInBranchInfoDialog extends StatelessWidget {
                   Expanded(
                     child: TitleLabel(
                       title: "Unidad",
-                      bigTitle: product.unitName,
+                      bigTitle: product.defaultUnitName,
                       crossAxisAlignment: CrossAxisAlignment.center,
                     ),
                   ),
@@ -123,10 +123,10 @@ class ProductInBranchInfoDialog extends StatelessWidget {
               Row(
                 spacing: 8,
                 children: [
-                  buildPriceCopyable("Precio 1", product.saleProfile.salePrice),
-                  buildPriceCopyable("Precio 2", product.saleProfile.salePrice2),
-                  buildPriceCopyable("Precio 3", product.saleProfile.salePrice3),
-                  buildPriceCopyable("Precio 4", product.saleProfile.salePrice4),
+                  buildPriceCopyable("Precio 1", product.saleProfile.salePrice * product.defaultUnitFactor),
+                  buildPriceCopyable("Precio 2", product.saleProfile.salePrice2 * product.defaultUnitFactor),
+                  buildPriceCopyable("Precio 3", product.saleProfile.salePrice3 * product.defaultUnitFactor),
+                  buildPriceCopyable("Precio 4", product.saleProfile.salePrice4 * product.defaultUnitFactor),
                 ],
               ),
 
@@ -143,21 +143,21 @@ class ProductInBranchInfoDialog extends StatelessWidget {
                     Expanded(
                       child: TitleLabel(
                         title: "Promedio",
-                        bigTitle: NumberFormatter.convertFromCentsToUnitsCurrency(product.account.averageCost),
+                        bigTitle: NumberFormatter.convertFromCentsToUnitsCurrency(product.account.averageCost * product.defaultUnitFactor),
                         crossAxisAlignment: CrossAxisAlignment.center,
                       ),
                     ),
                     Expanded(
                       child: TitleLabel(
                         title: "Último",
-                        bigTitle: NumberFormatter.convertFromCentsToUnitsCurrency(product.account.lastCost),
+                        bigTitle: NumberFormatter.convertFromCentsToUnitsCurrency(product.account.lastCost * product.defaultUnitFactor),
                         crossAxisAlignment: CrossAxisAlignment.center,
                       ),
                     ),
                     Expanded(
                       child: TitleLabel(
                         title: "Mayor",
-                        bigTitle: NumberFormatter.convertFromCentsToUnitsCurrency(product.account.maximumCost),
+                        bigTitle: NumberFormatter.convertFromCentsToUnitsCurrency(product.account.maximumCost * product.defaultUnitFactor),
                         crossAxisAlignment: CrossAxisAlignment.center,
                       ),
                     ),
@@ -173,7 +173,7 @@ class ProductInBranchInfoDialog extends StatelessWidget {
               const SizedBox(height: 8),
               TitleLabel(
                 title: "Existencia Disponible",
-                bigTitle: product.account.availableStock.toString(),
+                bigTitle: NumberFormatter.formatDisplayStock(product.account.availableStock, product.defaultUnitFactor),
                 crossAxisAlignment: CrossAxisAlignment.center,
               ),
 

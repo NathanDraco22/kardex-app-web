@@ -139,7 +139,7 @@ class _QuickProductSearchDelegateState extends State<QuickProductSearchDelegate>
           final quantity = _getQuantity(product);
 
           bool canIncrement = true;
-          if (widget.restrictStock && quantity >= product.account.availableStock) {
+          if (widget.restrictStock && quantity >= (product.account.availableStock ~/ product.defaultUnitFactor)) {
             canIncrement = false;
           }
 
@@ -173,7 +173,7 @@ class _ProductInBranchQuickResultRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int value = product.saleProfile.salePrice;
+    int value = product.saleProfile.salePrice * product.defaultUnitFactor;
     String valueToDisplay = NumberFormatter.convertToMoneyLike(value);
 
     return DecoratedBox(
@@ -200,7 +200,7 @@ class _ProductInBranchQuickResultRow extends StatelessWidget {
                       DisplayProductCode(product: product),
                       const SizedBox(height: 4),
                       Text(
-                        "${product.brandName} - ${product.unitName}",
+                        "${product.brandName} - ${product.defaultUnitName}",
                         style: const TextStyle(fontSize: 14, color: Colors.grey),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -223,7 +223,7 @@ class _ProductInBranchQuickResultRow extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        "Stock: ${product.account.availableStock}",
+                        "Stock: ${NumberFormatter.formatDisplayStock(product.account.availableStock, product.defaultUnitFactor)}",
                         style: TextStyle(
                           fontSize: 13,
                           color: product.account.availableStock > 0 ? Colors.green.shade700 : Colors.red,

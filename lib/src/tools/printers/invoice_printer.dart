@@ -247,19 +247,33 @@ Future<Uint8List> generateTicketPdfFromInvoice(
                     children: [
                       pw.Expanded(
                         flex: descriptionFlex,
-                        child: pw.Text(
-                          item.product.name,
-                          maxLines: 3,
-                          overflow: pw.TextOverflow.clip,
-                          style: pw.TextStyle(
-                            fontSize: TicketSettings.contentFontSize(paperSize),
-                          ),
+                        child: pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.start,
+                          children: [
+                            pw.Text(
+                              item.product.name,
+                              maxLines: 3,
+                              overflow: pw.TextOverflow.clip,
+                              style: pw.TextStyle(
+                                fontSize: TicketSettings.contentFontSize(paperSize),
+                              ),
+                            ),
+                            pw.Text(
+                              "Unid: ${item.product.unitName}",
+                              style: pw.TextStyle(
+                                fontSize: TicketSettings.contentFontSize(paperSize) - 1,
+                                color: PdfColors.grey700,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       pw.Expanded(
                         flex: 1,
                         child: pw.Text(
-                          item.quantity.toString(),
+                          item.conversionFactor != 1
+                              ? (item.quantity ~/ item.conversionFactor).toString()
+                              : item.quantity.toString(),
                           textAlign: pw.TextAlign.center,
                           style: pw.TextStyle(
                             fontSize: TicketSettings.contentFontSize(paperSize),
@@ -270,7 +284,7 @@ Future<Uint8List> generateTicketPdfFromInvoice(
                         pw.Expanded(
                           flex: 2,
                           child: pw.Text(
-                            NumberFormatter.convertFromCentsToDouble(item.price).toString(),
+                            NumberFormatter.convertFromCentsToDouble(item.price * item.conversionFactor).toString(),
                             textAlign: pw.TextAlign.right,
                             style: pw.TextStyle(
                               fontSize: TicketSettings.contentFontSize(paperSize),

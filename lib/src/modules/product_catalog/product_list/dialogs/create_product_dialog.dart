@@ -14,6 +14,8 @@ import '../cubit/read_product_cubit.dart';
 
 part 'form_section.dart';
 part 'widgets.dart';
+part 'extra_units_section.dart';
+
 
 Future<ProductInDb?> showCreateProductDialog(
   BuildContext context, {

@@ -125,7 +125,7 @@ class _ProductResultRow extends StatelessWidget {
 
                           Flexible(
                             fit: FlexFit.tight,
-                            child: Text(product.unitName),
+                            child: Text(product.defaultUnitName),
                           ),
                         ],
                       ),

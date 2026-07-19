@@ -47,7 +47,7 @@ class _SearchProductInBranchDialogState extends State<SearchProductInBranchDialo
     _productsRepository = context.read<ProductsRepository>();
 
     if (widget.product != null) {
-      title = "Cambiar: ${widget.product!.name} ${widget.product!.brandName} ${widget.product!.unitName}";
+      title = "Cambiar: ${widget.product!.name} ${widget.product!.brandName} ${widget.product!.defaultUnitName}";
     }
   }
 
@@ -225,16 +225,16 @@ class ProductInBranchResultRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final parentWidget = context.findAncestorWidgetOfExactType<SearchProductInBranchDialog>()!;
-    int value = product.saleProfile.salePrice;
+    int value = product.saleProfile.salePrice * product.defaultUnitFactor;
 
     if (parentWidget.useAverageCost == true) {
-      value = product.account.averageCost;
+      value = product.account.averageCost * product.defaultUnitFactor;
     }
 
     String valueToDisplay = NumberFormatter.convertToMoneyLike(value);
 
     if (parentWidget.useAverageCost == true) {
-      valueToDisplay = NumberFormatter.convertFromCentsToDouble(product.account.averageCost).toString();
+      valueToDisplay = NumberFormatter.convertFromCentsToDouble(value).toString();
     }
 
     return SizedBox(
@@ -271,7 +271,7 @@ class ProductInBranchResultRow extends StatelessWidget {
 
                         Flexible(
                           fit: FlexFit.tight,
-                          child: Text(product.unitName),
+                          child: Text(product.defaultUnitName),
                         ),
                       ],
                     ),
@@ -282,7 +282,7 @@ class ProductInBranchResultRow extends StatelessWidget {
               Flexible(
                 fit: FlexFit.tight,
                 child: Text(
-                  product.account.availableStock.toString(),
+                  NumberFormatter.formatDisplayStock(product.account.availableStock, product.defaultUnitFactor),
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w500,

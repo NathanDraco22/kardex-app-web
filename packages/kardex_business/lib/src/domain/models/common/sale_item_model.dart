@@ -76,6 +76,7 @@ class SaleItem {
   final int discountPercentage;
   final int totalDiscount;
   final int total;
+  final int conversionFactor;
 
   SaleItem({
     required this.product,
@@ -88,31 +89,35 @@ class SaleItem {
     this.discountPercentage = 0,
     this.totalDiscount = 0,
     required this.total,
+    this.conversionFactor = 1,
   });
 
   factory SaleItem.fromJson(Map<String, dynamic> json) => SaleItem(
-    product: ProductItem.fromJson(json['product']),
-    selectedPrice: json['selectedPrice'],
-    quantity: json['quantity'],
-    bonQuantity: json['bonQuantity'] ?? 0,
-    cost: json['cost'],
-    price: json['price'],
-    subTotal: json['subTotal'],
-    discountPercentage: json['discountPercentage'] ?? 0,
-    totalDiscount: json['totalDiscount'] ?? 0,
-    total: json['total'],
-  );
+        product: ProductItem.fromJson(json['product']),
+        selectedPrice: json['selectedPrice'],
+        quantity: json['quantity'],
+        bonQuantity: json['bonQuantity'] ?? 0,
+        cost: json['cost'],
+        price: json['price'],
+        subTotal: json['subTotal'],
+        discountPercentage: json['discountPercentage'] ?? 0,
+        totalDiscount: json['totalDiscount'] ?? 0,
+        total: json['total'],
+        conversionFactor: json['conversionFactor'] ?? 1,
+      );
 
   Map<String, dynamic> toJson() => {
-    'product': product.toJson(),
-    'selectedPrice': selectedPrice,
-    'quantity': quantity,
-    'bonQuantity': bonQuantity,
-    'cost': cost,
-    'price': price,
-    'subTotal': subTotal,
-    'discountPercentage': discountPercentage,
-    'totalDiscount': totalDiscount,
-    'total': total,
-  };
+        'product': product.toJson(),
+        'selectedPrice': selectedPrice,
+        'quantity': quantity,
+        'bonQuantity': bonQuantity,
+        'cost': cost,
+        'price': price,
+        'subTotal': subTotal,
+        'discountPercentage': discountPercentage,
+        'totalDiscount': totalDiscount,
+        'total': total,
+        'conversionFactor': conversionFactor,
+      };
 }
+

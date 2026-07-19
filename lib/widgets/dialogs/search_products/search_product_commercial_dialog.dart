@@ -55,7 +55,7 @@ class _SearchProductCommercialDialogState extends State<SearchProductCommercialD
     _productsRepository = context.read<ProductsRepository>();
 
     if (widget.product != null) {
-      title = "Cambiar: ${widget.product!.name} ${widget.product!.brandName} ${widget.product!.unitName}";
+      title = "Cambiar: ${widget.product!.name} ${widget.product!.brandName} ${widget.product!.defaultUnitName}";
     }
   }
 
@@ -307,7 +307,7 @@ class ProductResultRow extends StatelessWidget {
 
                         Flexible(
                           fit: FlexFit.tight,
-                          child: Text(product.unitName),
+                          child: Text(product.defaultUnitName),
                         ),
                       ],
                     ),
@@ -318,7 +318,7 @@ class ProductResultRow extends StatelessWidget {
               Flexible(
                 fit: FlexFit.tight,
                 child: Text(
-                  product.account.availableStock.toString(),
+                  NumberFormatter.formatDisplayStock(product.account.availableStock, product.defaultUnitFactor),
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
@@ -331,7 +331,7 @@ class ProductResultRow extends StatelessWidget {
                   child: Builder(
                     builder: (context) {
                       final price = NumberFormatter.convertToMoneyLike(
-                        product.saleProfile.salePrice,
+                        product.saleProfile.salePrice * product.defaultUnitFactor,
                       );
                       return Text(
                         price,

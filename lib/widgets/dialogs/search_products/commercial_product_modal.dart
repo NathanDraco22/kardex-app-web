@@ -6,6 +6,7 @@ import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
+import 'commercial_product_unit_selector.dart';
 import 'package:kardex_app_front/widgets/title_label.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
@@ -88,8 +89,8 @@ Future<CommercialProductResult?> showCommercialProductModal(
 
 class CommercialProductModal extends StatefulWidget {
   const CommercialProductModal({
-    super.key, 
-    required this.product, 
+    super.key,
+    required this.product,
     this.commercialProductResult,
     this.defaultPriceLevel = 1,
   });
@@ -142,10 +143,20 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
     if (authState is! Authenticated) return const SizedBox.shrink();
     final isUserAdmin = authState.session.user.role == "Admin";
     final product = commercialProductResult.product;
-    double price = NumberFormatter.convertFromCentsToDouble(commercialProductResult.newPrice);
+    double price = NumberFormatter.convertFromCentsToDouble(
+      commercialProductResult.newPrice * commercialProductResult.conversionFactor,
+    );
     final subtotal = NumberFormatter.convertToMoneyLike(commercialProductResult.subTotal);
     final totalDiscount = NumberFormatter.convertToMoneyLike(commercialProductResult.totalDiscount);
     final total = NumberFormatter.convertToMoneyLike(commercialProductResult.total);
+
+    final availableStock = widget.product.account.availableStock;
+    final factor = commercialProductResult.conversionFactor;
+    final unitName = commercialProductResult.selectedUnitName;
+    final baseUnitName = widget.product.unitName;
+    final stockStr = NumberFormatter.formatDisplayStock(availableStock, factor);
+    final displayStock = "$stockStr $unitName";
+
     return Form(
       key: formKey,
       child: Scaffold(
@@ -200,6 +211,11 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
+                          CommercialProductUnitSelector(
+                            result: commercialProductResult,
+                            onChanged: () => setState(() {}),
+                          ),
+                          const SizedBox(height: 12),
                           const Text(
                             "Nivel de Precio",
                             style: TextStyle(fontWeight: FontWeight.bold),
@@ -262,10 +278,25 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                           Row(
                             children: [
                               Expanded(
-                                child: TitleLabel(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  title: "Existencia",
-                                  bigTitle: widget.product.account.availableStock.toString(),
+                                child: Builder(
+                                  builder: (context) {
+                                    Color? stockColor;
+
+                                    if (commercialProductResult.selectedUnitIndex != 0) {
+                                      stockColor = Colors.blue;
+                                    }
+
+                                    if (availableStock <= 0) {
+                                      stockColor = Colors.red;
+                                    }
+
+                                    return TitleLabel(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      title: "Existencia",
+                                      bigTitle: displayStock,
+                                      bigTitleColor: stockColor,
+                                    );
+                                  },
                                 ),
                               ),
                               Expanded(
@@ -278,14 +309,14 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                                         crossAxisAlignment: CrossAxisAlignment.center,
                                         title: "Costo",
                                         bigTitle: NumberFormatter.convertFromCentsToUnitsCurrency(
-                                          widget.product.account.averageCost,
+                                          widget.product.account.averageCost * factor,
                                         ),
                                       ),
                                       TitleLabel(
                                         crossAxisAlignment: CrossAxisAlignment.center,
                                         title: "Ult. C",
                                         bigTitle: NumberFormatter.convertFromCentsToUnitsCurrency(
-                                          widget.product.account.lastCost,
+                                          widget.product.account.lastCost * factor,
                                         ),
                                       ),
                                     ],
@@ -319,6 +350,11 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                                         return "Cantidad invalida";
                                       }
 
+                                      final requestedUnits = numberValue * commercialProductResult.conversionFactor;
+                                      if (requestedUnits > availableStock) {
+                                        return "Supera la existencia ($availableStock $baseUnitName)";
+                                      }
+
                                       return null;
                                     },
                                     titleTextAlign: TextAlign.center,
@@ -342,7 +378,9 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                                   height: 90,
                                   child: TitleTextField(
                                     centerTitle: true,
-                                    key: ValueKey(commercialProductResult.selectedPriceLevel),
+                                    key: ValueKey(
+                                      "${commercialProductResult.selectedPriceLevel}_${commercialProductResult.selectedUnitIndex}",
+                                    ),
                                     readOnly: commercialProductResult.selectedPriceLevel != 0,
                                     titleTextAlign: TextAlign.center,
                                     initialValue: price.toString(),
@@ -354,7 +392,9 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                                       final rowDecimal = double.tryParse(value) ?? 0.0;
                                       final rowInteger = NumberFormatter.convertFromDoubleToCents(rowDecimal);
 
-                                      commercialProductResult.newPrice = int.tryParse(rowInteger.toString()) ?? 0;
+                                      // Guardar el precio convertido a unidad base
+                                      commercialProductResult.newPrice =
+                                          (rowInteger / commercialProductResult.conversionFactor).round();
                                       commercialProductResult.selectedPriceLevel = 0;
                                       setState(() {});
                                     },

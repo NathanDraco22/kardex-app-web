@@ -35,7 +35,7 @@ class _SearchProductDialogState extends State<SearchProductDialog> {
     _productsRepository = context.read<ProductsRepository>();
 
     if (widget.product != null) {
-      title = "Cambiar: ${widget.product!.name} ${widget.product!.brandName} ${widget.product!.unitName}";
+      title = "Cambiar: ${widget.product!.name} ${widget.product!.brandName} ${widget.product!.defaultUnitName}";
     }
   }
 
@@ -240,7 +240,7 @@ class ProductResultRow extends StatelessWidget {
 
               Flexible(
                 fit: FlexFit.tight,
-                child: Text(product.unitName),
+                child: Text(product.defaultUnitName),
               ),
               Flexible(
                 fit: FlexFit.tight,
