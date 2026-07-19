@@ -245,15 +245,21 @@ List<SaleItem> createSaleItemFromCommercial(List<CommercialProductResult> items)
   final saleItems = items.map((commercial) {
     final product = commercial.product;
     return SaleItem(
-      product: ProductItem.fromJson(product.toJson()),
+      product: ProductItem.fromJson({
+        ...product.toJson(),
+        'unitName': commercial.selectedUnitName.isNotEmpty
+            ? commercial.selectedUnitName
+            : product.unitName,
+      }),
       selectedPrice: commercial.selectedPriceLevel,
       cost: product.account.averageCost,
       price: commercial.newPrice,
-      quantity: commercial.quantity,
+      quantity: commercial.quantity * commercial.conversionFactor,
       discountPercentage: commercial.discountPercent,
       totalDiscount: commercial.totalDiscount,
       subTotal: commercial.subTotal,
       total: commercial.total,
+      conversionFactor: commercial.conversionFactor,
     );
   }).toList();
 

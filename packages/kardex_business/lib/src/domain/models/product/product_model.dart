@@ -1,6 +1,26 @@
 import '../product_account/product_account.dart';
 import '../product_sale_profile/product_sale_profile_model.dart';
 
+class ExtraUnit {
+  final String name;
+  final int conversionFactor;
+
+  const ExtraUnit({
+    this.name = '',
+    this.conversionFactor = 1,
+  });
+
+  factory ExtraUnit.fromJson(Map<String, dynamic> json) => ExtraUnit(
+        name: json['name'] as String? ?? '',
+        conversionFactor: (json['conversionFactor'] as num?)?.toInt() ?? 1,
+      );
+
+  Map<String, dynamic> toJson() => {
+        'name': name,
+        'conversionFactor': conversionFactor,
+      };
+}
+
 class BaseProduct {
   final String name;
   final String? description;
@@ -12,8 +32,24 @@ class BaseProduct {
   final bool hasIva;
   final bool isActive;
   final String image;
+  final List<ExtraUnit> extraUnits;
+  final int defaultUnitIndex;
 
   String get displayCode => code.isEmpty ? "-" : code;
+
+  String get defaultUnitName {
+    if (defaultUnitIndex == 0 || extraUnits.isEmpty) return unitName;
+    final idx = defaultUnitIndex - 1;
+    if (idx >= 0 && idx < extraUnits.length) return extraUnits[idx].name;
+    return unitName;
+  }
+
+  int get defaultUnitFactor {
+    if (defaultUnitIndex == 0 || extraUnits.isEmpty) return 1;
+    final idx = defaultUnitIndex - 1;
+    if (idx >= 0 && idx < extraUnits.length) return extraUnits[idx].conversionFactor;
+    return 1;
+  }
 
   BaseProduct({
     required this.name,
@@ -26,6 +62,8 @@ class BaseProduct {
     required this.tags,
     required this.hasIva,
     this.isActive = true,
+    this.extraUnits = const [],
+    this.defaultUnitIndex = 0,
   });
 
   factory BaseProduct.fromJson(Map<String, dynamic> json) {
@@ -40,6 +78,11 @@ class BaseProduct {
       hasIva: json['hasIva'] as bool,
       isActive: json['isActive'] as bool? ?? true,
       image: json['image'] as String? ?? "",
+      extraUnits: (json['extraUnits'] as List?)
+              ?.map((e) => ExtraUnit.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      defaultUnitIndex: (json['defaultUnitIndex'] as num?)?.toInt() ?? 0,
     );
   }
 
@@ -54,6 +97,8 @@ class BaseProduct {
       'categoryName': categoryName,
       'tags': tags,
       'isActive': isActive,
+      'extraUnits': extraUnits.map((e) => e.toJson()).toList(),
+      'defaultUnitIndex': defaultUnitIndex,
     };
   }
 }
@@ -70,6 +115,8 @@ class CreateProduct extends BaseProduct {
     required super.tags,
     required super.hasIva,
     super.isActive,
+    super.extraUnits,
+    super.defaultUnitIndex,
   });
 
   factory CreateProduct.fromJson(Map json) {
@@ -84,6 +131,11 @@ class CreateProduct extends BaseProduct {
       tags: List<String>.from(json['tags'] as List),
       hasIva: json['hasIva'] as bool,
       isActive: json['isActive'] as bool? ?? true,
+      extraUnits: (json['extraUnits'] as List?)
+              ?.map((e) => ExtraUnit.fromJson(Map<String, dynamic>.from(e as Map)))
+              .toList() ??
+          const [],
+      defaultUnitIndex: (json['defaultUnitIndex'] as num?)?.toInt() ?? 0,
     );
   }
 
@@ -99,6 +151,8 @@ class CreateProduct extends BaseProduct {
       tags: tags,
       hasIva: hasIva,
       isActive: isActive,
+      extraUnits: extraUnits,
+      defaultUnitIndex: defaultUnitIndex,
     );
   }
 }
@@ -114,6 +168,8 @@ class UpdateProduct {
   final bool? hasIva;
   final bool? isActive;
   final String? image;
+  final List<ExtraUnit>? extraUnits;
+  final int? defaultUnitIndex;
 
   UpdateProduct({
     this.name,
@@ -126,6 +182,8 @@ class UpdateProduct {
     this.hasIva,
     this.isActive,
     this.image,
+    this.extraUnits,
+    this.defaultUnitIndex,
   });
 
   factory UpdateProduct.fromJson(Map json) {
@@ -140,6 +198,12 @@ class UpdateProduct {
       tags: json['tags'] != null ? List<String>.from(json['tags'] as List) : null,
       isActive: json['isActive'] as bool?,
       image: json['image'] as String?,
+      extraUnits: json['extraUnits'] != null
+          ? (json['extraUnits'] as List)
+              .map((e) => ExtraUnit.fromJson(Map<String, dynamic>.from(e as Map)))
+              .toList()
+          : null,
+      defaultUnitIndex: (json['defaultUnitIndex'] as num?)?.toInt(),
     );
   }
 
@@ -155,6 +219,8 @@ class UpdateProduct {
       'hasIva': hasIva,
       'isActive': isActive,
       'image': image,
+      'extraUnits': extraUnits?.map((e) => e.toJson()).toList(),
+      'defaultUnitIndex': defaultUnitIndex,
     };
     data.removeWhere((key, value) => value == null);
     return data;
@@ -179,6 +245,8 @@ class ProductInDb extends BaseProduct {
     required super.tags,
     required super.hasIva,
     super.isActive,
+    super.extraUnits,
+    super.defaultUnitIndex,
     this.isDeleted = false,
     required this.createdAt,
     this.updatedAt,
@@ -197,6 +265,11 @@ class ProductInDb extends BaseProduct {
       tags: List<String>.from(json['tags'] as List),
       hasIva: json['hasIva'] as bool,
       isActive: json['isActive'] as bool? ?? true,
+      extraUnits: (json['extraUnits'] as List?)
+              ?.map((e) => ExtraUnit.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      defaultUnitIndex: (json['defaultUnitIndex'] as num?)?.toInt() ?? 0,
       isDeleted: json['isDeleted'] as bool? ?? false,
       createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
       updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt'] as int) : null,
@@ -232,6 +305,8 @@ class ProductInDbInBranch extends ProductInDb {
     required super.tags,
     required super.hasIva,
     super.isActive,
+    super.extraUnits,
+    super.defaultUnitIndex,
     super.isDeleted,
     required super.createdAt,
     super.updatedAt,
@@ -252,6 +327,11 @@ class ProductInDbInBranch extends ProductInDb {
       tags: List<String>.from(json['tags']),
       hasIva: json['hasIva'] ?? false,
       isActive: json['isActive'] ?? true,
+      extraUnits: (json['extraUnits'] as List?)
+              ?.map((e) => ExtraUnit.fromJson(Map<String, dynamic>.from(e as Map)))
+              .toList() ??
+          const [],
+      defaultUnitIndex: (json['defaultUnitIndex'] as num?)?.toInt() ?? 0,
       isDeleted: json['isDeleted'] ?? false,
       createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt']),
       updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt']) : null,
@@ -285,6 +365,8 @@ class ProductInDbInBranch extends ProductInDb {
     DateTime? updatedAt,
     ProductAccountInDb? account,
     ProductSaleProfileInDb? saleProfile,
+    List<ExtraUnit>? extraUnits,
+    int? defaultUnitIndex,
   }) {
     return ProductInDbInBranch(
       id: id ?? this.id,
@@ -303,6 +385,8 @@ class ProductInDbInBranch extends ProductInDb {
       updatedAt: updatedAt ?? this.updatedAt,
       account: account ?? this.account,
       saleProfile: saleProfile ?? this.saleProfile,
+      extraUnits: extraUnits ?? this.extraUnits,
+      defaultUnitIndex: defaultUnitIndex ?? this.defaultUnitIndex,
     );
   }
 }
@@ -320,3 +404,4 @@ class GetProductsInBranchRequest {
     };
   }
 }
+

@@ -399,19 +399,25 @@ class InvoiceViewerContent extends StatelessWidget {
                                   ],
                                 ),
                                 Text(saleItem.product.name),
+                                Text(
+                                  "Unidad: ${saleItem.product.unitName}",
+                                  style: const TextStyle(color: Colors.grey, fontSize: 12),
+                                ),
                               ],
                             ),
                           ),
                           Expanded(
                             child: Text(
-                              saleItem.quantity.toString(),
+                              saleItem.conversionFactor != 1
+                                  ? (saleItem.quantity ~/ saleItem.conversionFactor).toString()
+                                  : saleItem.quantity.toString(),
                               textAlign: TextAlign.center,
                             ),
                           ),
                           Expanded(
                             flex: 2,
                             child: Text(
-                              NumberFormatter.convertFromCentsToDouble(saleItem.price).toString(),
+                              NumberFormatter.convertFromCentsToDouble(saleItem.price * saleItem.conversionFactor).toString(),
                               textAlign: TextAlign.center,
                             ),
                           ),

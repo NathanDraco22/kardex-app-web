@@ -199,15 +199,21 @@ CreateInvoice createAnonInvoiceFromControllers(
     (e) {
       final product = e.commercial.product;
       return SaleItem(
-        product: ProductItem.fromJson(product.toJson()),
+        product: ProductItem.fromJson({
+          ...product.toJson(),
+          'unitName': e.commercial.selectedUnitName.isNotEmpty
+              ? e.commercial.selectedUnitName
+              : product.unitName,
+        }),
         selectedPrice: e.commercial.selectedPriceLevel,
         cost: product.account.averageCost,
         price: e.commercial.newPrice,
-        quantity: e.commercial.quantity,
+        quantity: e.commercial.quantity * e.commercial.conversionFactor,
         discountPercentage: e.commercial.discountPercent,
         totalDiscount: e.commercial.totalDiscount,
         subTotal: e.commercial.subTotal,
         total: e.commercial.total,
+        conversionFactor: e.commercial.conversionFactor,
       );
     },
   );

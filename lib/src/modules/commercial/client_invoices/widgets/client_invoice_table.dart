@@ -311,8 +311,8 @@ class InvoiceTableRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final product = item.product;
-    final price = NumberFormatter.convertToMoneyLike(product.saleProfile.salePrice);
-    final edittedPrice = NumberFormatter.convertToMoneyLike(item.newPrice);
+    final price = NumberFormatter.convertToMoneyLike(product.saleProfile.salePrice * item.conversionFactor);
+    final edittedPrice = NumberFormatter.convertToMoneyLike(item.newPrice * item.conversionFactor);
     final subTotal = NumberFormatter.convertToMoneyLike(item.subTotal);
     final totalDiscount = NumberFormatter.convertToMoneyLike(item.totalDiscount);
     final percenValue = item.discountPercent;
@@ -360,7 +360,7 @@ class InvoiceTableRow extends StatelessWidget {
                             ),
                             Expanded(
                               child: Text(
-                                product.unitName,
+                                item.selectedUnitName.isNotEmpty ? item.selectedUnitName : product.unitName,
                                 textAlign: TextAlign.left,
                               ),
                             ),

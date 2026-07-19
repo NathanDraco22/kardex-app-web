@@ -395,7 +395,7 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
                       spacing: 8,
                       children: [
                         Text(product.brandName),
-                        Text(product.unitName),
+                        Text(product.defaultUnitName),
                       ],
                     ),
                   ],

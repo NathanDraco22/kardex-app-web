@@ -130,7 +130,7 @@ class _ProductInBranchResultRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int value = product.saleProfile.salePrice;
+    int value = product.saleProfile.salePrice * product.defaultUnitFactor;
 
     String valueToDisplay = NumberFormatter.convertToMoneyLike(value);
 
@@ -168,7 +168,7 @@ class _ProductInBranchResultRow extends StatelessWidget {
 
                           Flexible(
                             fit: FlexFit.tight,
-                            child: Text(product.unitName),
+                            child: Text(product.defaultUnitName),
                           ),
                         ],
                       ),
@@ -198,14 +198,17 @@ class _ProductInBranchResultRow extends StatelessWidget {
                                 if (product.account.availableStock <= 0) {
                                   color = Colors.red;
                                 }
-                                return Text(
-                                  product.account.availableStock.toString(),
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: color,
-                                  ),
-                                );
+                                  return Text(
+                                    NumberFormatter.formatDisplayStock(
+                                      product.account.availableStock,
+                                      product.defaultUnitFactor,
+                                    ),
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                      color: color,
+                                    ),
+                                  );
                               },
                             ),
                           ),

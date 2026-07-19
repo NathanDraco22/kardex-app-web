@@ -100,16 +100,16 @@ class _ProductInBranchResultRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final parentWidget = context.findAncestorWidgetOfExactType<CustomProductSearchDelegate>()!;
-    int value = product.saleProfile.salePrice;
+    int value = product.saleProfile.salePrice * product.defaultUnitFactor;
 
     if (parentWidget.useAverageCost == true) {
-      value = product.account.averageCost;
+      value = product.account.averageCost * product.defaultUnitFactor;
     }
 
     String valueToDisplay = NumberFormatter.convertToMoneyLike(value);
 
     if (parentWidget.useAverageCost == true) {
-      valueToDisplay = NumberFormatter.convertFromCentsToDouble(product.account.averageCost).toString();
+      valueToDisplay = NumberFormatter.convertFromCentsToDouble(value).toString();
     }
 
     return SizedBox(
@@ -147,7 +147,7 @@ class _ProductInBranchResultRow extends StatelessWidget {
 
                           Flexible(
                             fit: FlexFit.tight,
-                            child: Text(product.unitName),
+                            child: Text(product.defaultUnitName),
                           ),
                         ],
                       ),
@@ -158,7 +158,7 @@ class _ProductInBranchResultRow extends StatelessWidget {
                 Flexible(
                   fit: FlexFit.tight,
                   child: Text(
-                    product.account.availableStock.toString(),
+                    NumberFormatter.formatDisplayStock(product.account.availableStock, product.defaultUnitFactor),
                     style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
