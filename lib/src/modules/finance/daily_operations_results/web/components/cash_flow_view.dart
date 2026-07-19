@@ -45,7 +45,7 @@ class _CashFlowViewState extends State<CashFlowView> {
               ),
               ButtonSegment<int>(
                 value: 1,
-                label: Text("Facturas (Al contado)"),
+                label: Text("Facturas"),
                 icon: Icon(Icons.point_of_sale),
               ),
             ],
@@ -99,12 +99,12 @@ class _TotalsHeader extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           TitleLabel(
-            title: "Total Recibos",
+            title: "Recibos",
             bigTitle: NumberFormatter.convertToMoneyLike(receiptsTotal),
             crossAxisAlignment: CrossAxisAlignment.center,
           ),
           TitleLabel(
-            title: "Total Facturas",
+            title: "Facturas",
             bigTitle: NumberFormatter.convertToMoneyLike(invoicesTotal),
             crossAxisAlignment: CrossAxisAlignment.center,
           ),
@@ -118,7 +118,7 @@ class _TotalsHeader extends StatelessWidget {
             child: DefaultTextStyle.merge(
               style: TextStyle(color: Colors.green.shade800),
               child: TitleLabel(
-                title: "Ingreso Efectivo Total",
+                title: "Ingreso Total",
                 bigTitle: NumberFormatter.convertToMoneyLike(grandTotal),
                 crossAxisAlignment: CrossAxisAlignment.center,
               ),

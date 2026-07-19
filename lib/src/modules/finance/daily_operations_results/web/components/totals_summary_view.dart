@@ -14,6 +14,8 @@ class TotalsSummaryView extends StatelessWidget {
         _buildReceiptsSection(),
         const SizedBox(height: 12),
         _buildInvoicesSection(),
+        const SizedBox(height: 12),
+        _buildIngresosSection(),
       ],
     );
   }
@@ -89,6 +91,82 @@ class TotalsSummaryView extends StatelessWidget {
             cost: totalCost,
             utility: utilidadGeneral,
             totalColor: Colors.blue,
+            isDestacado: true,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildIngresosSection() {
+    // 1. Tarjetas
+    final cardInvoices = result.detailInvoices.where((inv) => inv.paymentType == PaymentType.card);
+    final cardReceipts = result.detailReceipts.where((rec) => rec.paymentMethod == PaymentMethod.card);
+    final totalTarjetas = cardInvoices.fold<int>(0, (prev, inv) => prev + inv.total) +
+        cardReceipts.fold<int>(0, (prev, rec) => prev + rec.total);
+    final countTarjetas = cardInvoices.length + cardReceipts.length;
+
+    // 2. Transferencias
+    final transferInvoices = result.detailInvoices.where((inv) => inv.paymentType == PaymentType.transfer);
+    final transferReceipts = result.detailReceipts.where((rec) => rec.paymentMethod == PaymentMethod.transfer);
+    final totalTransferencias = transferInvoices.fold<int>(0, (prev, inv) => prev + inv.total) +
+        transferReceipts.fold<int>(0, (prev, rec) => prev + rec.total);
+    final countTransferencias = transferInvoices.length + transferReceipts.length;
+
+    // 3. Facturas Contado (Efectivo)
+    final cashInvoices = result.detailInvoices.where((inv) => inv.paymentType == PaymentType.cash);
+    final totalFacturasContado = cashInvoices.fold<int>(0, (prev, inv) => prev + inv.total);
+    final countFacturasContado = cashInvoices.length;
+
+    // 4. Abonos Contado (Efectivo)
+    final cashReceipts = result.detailReceipts.where((rec) => rec.paymentMethod == PaymentMethod.cash);
+    final totalAbonosContado = cashReceipts.fold<int>(0, (prev, rec) => prev + rec.total);
+    final countAbonosContado = cashReceipts.length;
+
+    // Total General de Ingresos
+    final totalIngresos = totalTarjetas + totalTransferencias + totalFacturasContado + totalAbonosContado;
+
+    return _SectionCard(
+      title: "Ingresos (Flujo de Caja)",
+      icon: Icons.account_balance_wallet_outlined,
+      color: Colors.purple,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _SummaryRowItem(
+            icon: Icons.credit_card_outlined,
+            title: "Tarjetas",
+            subtitle: "$countTarjetas movimientos",
+            total: totalTarjetas,
+            totalColor: Colors.black87,
+          ),
+          _SummaryRowItem(
+            icon: Icons.account_balance_outlined,
+            title: "Transferencias",
+            subtitle: "$countTransferencias movimientos",
+            total: totalTransferencias,
+            totalColor: Colors.black87,
+          ),
+          _SummaryRowItem(
+            icon: Icons.point_of_sale_outlined,
+            title: "Facturas Contado",
+            subtitle: "$countFacturasContado movimientos",
+            total: totalFacturasContado,
+            totalColor: Colors.black87,
+          ),
+          _SummaryRowItem(
+            icon: Icons.receipt_long_outlined,
+            title: "Abonos Contado",
+            subtitle: "$countAbonosContado movimientos",
+            total: totalAbonosContado,
+            totalColor: Colors.black87,
+          ),
+          _SummaryRowItem(
+            icon: Icons.savings_outlined,
+            title: "Total General",
+            subtitle: "Total ingresos de caja",
+            total: totalIngresos,
+            totalColor: Colors.purple,
             isDestacado: true,
           ),
         ],

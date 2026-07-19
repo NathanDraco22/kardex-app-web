@@ -84,9 +84,13 @@ class _ContentSection extends StatelessWidget {
                 },
 
                 onViewInvoice: () async {
-                  final amount = await showInvoiceAcreditViewerScreen(context, currentInvoice);
-                  if (amount != null && context.mounted) {
-                    final amountCents = (amount * 100).round();
+                  final paymentResult = await showInvoiceAcreditViewerScreen(
+                    context,
+                    currentInvoice,
+                    devolutions: devolutions,
+                  );
+                  if (paymentResult != null && context.mounted) {
+                    final amountCents = (paymentResult.amount * 100).round();
                     final client = viewController.selectedClient!;
                     final authState = getIt<AuthCubit>().state;
                     if (authState is! Authenticated) throw Exception("User or branch not found");
@@ -103,6 +107,8 @@ class _ContentSection extends StatelessWidget {
                       branchId: currentBranch.id,
                       currentUserId: currentUser.id,
                       currentUserName: currentUser.username,
+                      paymentMethod: paymentResult.method,
+                      bankReference: paymentResult.bankReference,
                     );
 
                     if (createReceipt != null) {

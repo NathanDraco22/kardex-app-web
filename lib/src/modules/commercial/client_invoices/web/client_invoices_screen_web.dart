@@ -14,6 +14,7 @@ import 'package:kardex_app_front/widgets/widgets.dart';
 import '../view_controller.dart';
 import '../widgets/client_invoice_table.dart';
 import '../widgets/dialogs/confirm_invoice_dialog.dart';
+import '../widgets/dialogs/payment_confirmation_dialog.dart';
 import '../cubit/write_invoice_cubit.dart';
 import 'mediator.dart';
 import 'package:toastification/toastification.dart';

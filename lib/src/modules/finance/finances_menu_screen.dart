@@ -82,6 +82,19 @@ class _Body extends StatelessWidget {
             ),
             const Divider(height: 0.0),
             ShortcutAddableListTile(
+              routeName: RouteNames.rangeFinanceReport,
+              child: ListTile(
+                leading: const Icon(
+                  Icons.date_range_outlined,
+                  color: Colors.teal,
+                ),
+                title: const Text("Reporte de Ventas y Flujos"),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.pushNamed("finance-range-report"),
+              ),
+            ),
+            const Divider(height: 0.0),
+            ShortcutAddableListTile(
               routeName: RouteNames.clientAccounts,
               child: ListTile(
                 leading: const Icon(

@@ -123,13 +123,13 @@ class _HeaderSection extends StatelessWidget {
 
                         final maxAmountDouble = total / 100;
 
-                        final amount = await showFastPaymentModal(
+                         final paymentResult = await showFastPaymentModal(
                           context,
                           maxAmountToPay: maxAmountDouble,
                           clientName: selectedClient.name,
                         );
 
-                        if (amount == null || amount <= 0) return;
+                        if (paymentResult == null || paymentResult.amount <= 0) return;
 
                         if (!context.mounted) return;
                         final authState = getIt<AuthCubit>().state;
@@ -137,7 +137,7 @@ class _HeaderSection extends StatelessWidget {
                         final currentUser = authState.session.user;
                         final currentBranch = authState.branch;
 
-                        final amountCents = (amount * 100).round();
+                        final amountCents = (paymentResult.amount * 100).round();
                         final (createReceiptPayload, summary) = FastReceiptLogic.allocateFastPayment(
                           paymentAmountCents: amountCents,
                           invoices: state.invoices,
@@ -146,6 +146,8 @@ class _HeaderSection extends StatelessWidget {
                           branchId: currentBranch.id,
                           currentUserId: currentUser.id,
                           currentUserName: currentUser.username,
+                          paymentMethod: paymentResult.method,
+                          bankReference: paymentResult.bankReference,
                         );
 
                         if (createReceiptPayload == null) return;

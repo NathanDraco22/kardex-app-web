@@ -10,12 +10,16 @@ import 'package:kardex_app_front/src/tools/printers/paper_settings.dart';
 import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
 
-Future<double?> showInvoiceAcreditViewerScreen(BuildContext context, InvoiceInDb invoice) async {
+Future<FastPaymentResult?> showInvoiceAcreditViewerScreen(
+  BuildContext context,
+  InvoiceInDb invoice, {
+  List<DevolutionInDb> devolutions = const [],
+}) async {
   final currentBranch = (getIt<AuthCubit>().state as Authenticated).branch;
   if (!context.mounted) return null;
   final paperSize = await PrintManager.getLocalPaperSize();
   if (!context.mounted) return null;
-  return await Navigator.push<double>(
+  return await Navigator.push<FastPaymentResult>(
     context,
     MaterialPageRoute(
       builder: (context) {
@@ -23,6 +27,7 @@ Future<double?> showInvoiceAcreditViewerScreen(BuildContext context, InvoiceInDb
           invoice: invoice,
           branch: currentBranch,
           paperSize: paperSize,
+          devolutions: devolutions,
         );
       },
     ),
@@ -34,11 +39,13 @@ class _InvoiceAcreditViewer extends StatelessWidget {
     required this.invoice,
     required this.branch,
     required this.paperSize,
+    this.devolutions = const [],
   });
 
   final InvoiceInDb invoice;
   final BranchInDb branch;
   final PaperSize paperSize;
+  final List<DevolutionInDb> devolutions;
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +104,9 @@ class _InvoiceAcreditViewer extends StatelessWidget {
   }
 
   Widget _buildPaymentSummaryRow(BuildContext context) {
-    final int remaining = invoice.total - invoice.amountPaid;
+    final targetDevolution = devolutions.where((d) => d.originalInvoiceId == invoice.id).toList();
+    final int devolutionsTotal = targetDevolution.fold(0, (sum, d) => sum + d.total);
+    final int remaining = invoice.totalRemaining - devolutionsTotal;
     final bool isPaidOut = remaining <= 0;
 
     return Padding(
@@ -108,14 +117,38 @@ class _InvoiceAcreditViewer extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text("Total Abonado:", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              const Text("Total Factura:", style: TextStyle(fontSize: 16, color: Colors.grey)),
               Text(
-                NumberFormatter.convertToMoneyLike(invoice.amountPaid),
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),
+                NumberFormatter.convertToMoneyLike(invoice.total),
+                style: const TextStyle(fontSize: 16, color: Colors.grey),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text("Total Abonado:", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+              Text(
+                NumberFormatter.convertToMoneyLike(invoice.amountPaid),
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.green),
+              ),
+            ],
+          ),
+          if (devolutionsTotal > 0) ...[
+            const SizedBox(height: 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text("Devoluciones:", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                Text(
+                  NumberFormatter.convertToMoneyLike(devolutionsTotal),
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.red),
+                ),
+              ],
+            ),
+          ],
+          const Divider(height: 16, thickness: 1),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -138,14 +171,14 @@ class _InvoiceAcreditViewer extends StatelessWidget {
               onPressed: isPaidOut
                   ? null
                   : () async {
-                      final amountToPay = await showFastPaymentModal(
+                      final paymentResult = await showFastPaymentModal(
                         context,
                         maxAmountToPay: NumberFormatter.convertFromCentsToDouble(remaining),
                         clientName: invoice.clientInfo.name,
                       );
 
-                      if (amountToPay != null && context.mounted) {
-                        Navigator.pop(context, amountToPay);
+                      if (paymentResult != null && context.mounted) {
+                        Navigator.pop(context, paymentResult);
                       }
                     },
               icon: const Icon(Icons.payment),
