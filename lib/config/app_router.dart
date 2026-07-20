@@ -295,9 +295,26 @@ class AppRouter {
           ),
 
           GoRoute(
+            path: "sale-order-wholesale",
+            name: "sale-order-wholesale",
+            builder: (context, state) => const ClientInvoiceScreen(
+              isOrder: true,
+              isWholesale: true,
+            ),
+          ),
+
+          GoRoute(
             path: "client-invoice",
             name: "client-invoice",
             builder: (context, state) => const ClientInvoiceScreen(),
+          ),
+
+          GoRoute(
+            path: "client-invoice-wholesale",
+            name: "client-invoice-wholesale",
+            builder: (context, state) => const ClientInvoiceScreen(
+              isWholesale: true,
+            ),
           ),
 
           GoRoute(
@@ -349,6 +366,14 @@ class AppRouter {
             path: "proforma",
             name: "proforma",
             builder: (context, state) => const ProformaScreen(),
+          ),
+
+          GoRoute(
+            path: "proforma-wholesale",
+            name: "proforma-wholesale",
+            builder: (context, state) => const ProformaScreen(
+              isWholesale: true,
+            ),
           ),
           GoRoute(
             path: "product-demand-vs-stock",

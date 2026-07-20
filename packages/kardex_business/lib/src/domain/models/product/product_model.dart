@@ -34,6 +34,7 @@ class BaseProduct {
   final String image;
   final List<ExtraUnit> extraUnits;
   final int defaultUnitIndex;
+  final int wholesaleUnitIndex;
 
   String get displayCode => code.isEmpty ? "-" : code;
 
@@ -64,6 +65,7 @@ class BaseProduct {
     this.isActive = true,
     this.extraUnits = const [],
     this.defaultUnitIndex = 0,
+    this.wholesaleUnitIndex = 0,
   });
 
   factory BaseProduct.fromJson(Map<String, dynamic> json) {
@@ -83,6 +85,7 @@ class BaseProduct {
               .toList() ??
           const [],
       defaultUnitIndex: (json['defaultUnitIndex'] as num?)?.toInt() ?? 0,
+      wholesaleUnitIndex: (json['wholesaleUnitIndex'] as num?)?.toInt() ?? 0,
     );
   }
 
@@ -99,6 +102,7 @@ class BaseProduct {
       'isActive': isActive,
       'extraUnits': extraUnits.map((e) => e.toJson()).toList(),
       'defaultUnitIndex': defaultUnitIndex,
+      'wholesaleUnitIndex': wholesaleUnitIndex,
     };
   }
 }
@@ -117,6 +121,7 @@ class CreateProduct extends BaseProduct {
     super.isActive,
     super.extraUnits,
     super.defaultUnitIndex,
+    super.wholesaleUnitIndex,
   });
 
   factory CreateProduct.fromJson(Map json) {
@@ -136,6 +141,7 @@ class CreateProduct extends BaseProduct {
               .toList() ??
           const [],
       defaultUnitIndex: (json['defaultUnitIndex'] as num?)?.toInt() ?? 0,
+      wholesaleUnitIndex: (json['wholesaleUnitIndex'] as num?)?.toInt() ?? 0,
     );
   }
 
@@ -153,6 +159,7 @@ class CreateProduct extends BaseProduct {
       isActive: isActive,
       extraUnits: extraUnits,
       defaultUnitIndex: defaultUnitIndex,
+      wholesaleUnitIndex: wholesaleUnitIndex,
     );
   }
 }
@@ -170,6 +177,7 @@ class UpdateProduct {
   final String? image;
   final List<ExtraUnit>? extraUnits;
   final int? defaultUnitIndex;
+  final int? wholesaleUnitIndex;
 
   UpdateProduct({
     this.name,
@@ -184,6 +192,7 @@ class UpdateProduct {
     this.image,
     this.extraUnits,
     this.defaultUnitIndex,
+    this.wholesaleUnitIndex,
   });
 
   factory UpdateProduct.fromJson(Map json) {
@@ -204,6 +213,7 @@ class UpdateProduct {
               .toList()
           : null,
       defaultUnitIndex: (json['defaultUnitIndex'] as num?)?.toInt(),
+      wholesaleUnitIndex: (json['wholesaleUnitIndex'] as num?)?.toInt(),
     );
   }
 
@@ -221,6 +231,7 @@ class UpdateProduct {
       'image': image,
       'extraUnits': extraUnits?.map((e) => e.toJson()).toList(),
       'defaultUnitIndex': defaultUnitIndex,
+      'wholesaleUnitIndex': wholesaleUnitIndex,
     };
     data.removeWhere((key, value) => value == null);
     return data;
@@ -247,6 +258,7 @@ class ProductInDb extends BaseProduct {
     super.isActive,
     super.extraUnits,
     super.defaultUnitIndex,
+    super.wholesaleUnitIndex,
     this.isDeleted = false,
     required this.createdAt,
     this.updatedAt,
@@ -270,6 +282,7 @@ class ProductInDb extends BaseProduct {
               .toList() ??
           const [],
       defaultUnitIndex: (json['defaultUnitIndex'] as num?)?.toInt() ?? 0,
+      wholesaleUnitIndex: (json['wholesaleUnitIndex'] as num?)?.toInt() ?? 0,
       isDeleted: json['isDeleted'] as bool? ?? false,
       createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
       updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt'] as int) : null,
@@ -307,6 +320,7 @@ class ProductInDbInBranch extends ProductInDb {
     super.isActive,
     super.extraUnits,
     super.defaultUnitIndex,
+    super.wholesaleUnitIndex,
     super.isDeleted,
     required super.createdAt,
     super.updatedAt,
@@ -332,6 +346,7 @@ class ProductInDbInBranch extends ProductInDb {
               .toList() ??
           const [],
       defaultUnitIndex: (json['defaultUnitIndex'] as num?)?.toInt() ?? 0,
+      wholesaleUnitIndex: (json['wholesaleUnitIndex'] as num?)?.toInt() ?? 0,
       isDeleted: json['isDeleted'] ?? false,
       createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt']),
       updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt']) : null,
@@ -367,6 +382,7 @@ class ProductInDbInBranch extends ProductInDb {
     ProductSaleProfileInDb? saleProfile,
     List<ExtraUnit>? extraUnits,
     int? defaultUnitIndex,
+    int? wholesaleUnitIndex,
   }) {
     return ProductInDbInBranch(
       id: id ?? this.id,
@@ -387,6 +403,7 @@ class ProductInDbInBranch extends ProductInDb {
       saleProfile: saleProfile ?? this.saleProfile,
       extraUnits: extraUnits ?? this.extraUnits,
       defaultUnitIndex: defaultUnitIndex ?? this.defaultUnitIndex,
+      wholesaleUnitIndex: wholesaleUnitIndex ?? this.wholesaleUnitIndex,
     );
   }
 }

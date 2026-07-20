@@ -77,6 +77,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
   late int currentSalePrice3;
   late int currentSalePrice4;
   late List<Discount> currentDiscounts;
+  ExtraUnit? selectedExtraUnit;
 
   FocusNode priceFocus = FocusNode();
   FocusNode priceFocus2 = FocusNode();
@@ -93,6 +94,9 @@ class _RootScaffoldState extends State<_RootScaffold> {
     currentSalePrice3 = widget.product.saleProfile.salePrice3;
     currentSalePrice4 = widget.product.saleProfile.salePrice4;
     currentDiscounts = [...widget.product.saleProfile.discounts];
+    if (widget.product.extraUnits.isNotEmpty) {
+      selectedExtraUnit = widget.product.extraUnits.first;
+    }
     Future(
       () {
         priceFocus.requestFocus();
@@ -113,6 +117,64 @@ class _RootScaffoldState extends State<_RootScaffold> {
       branchId,
       widget.product.id,
       updatedDto,
+    );
+  }
+
+  Widget _buildPriceInput(
+    String keyStr,
+    String title,
+    FocusNode focusNode,
+    int currentValue,
+    String initialValue,
+    ValueChanged<String> onChanged,
+  ) {
+    final inputField = TitleTextField(
+      key: Key(keyStr),
+      title: title,
+      focusNode: focusNode,
+      keyboardType: TextInputType.number,
+      onChanged: onChanged,
+      initialValue: initialValue,
+      inputFormatters: [DoubleThousandsFormatter()],
+    );
+
+    if (widget.product.extraUnits.isEmpty || selectedExtraUnit == null) {
+      return inputField;
+    }
+
+    final extraUnit = selectedExtraUnit!;
+    final calculatedValue = currentValue * extraUnit.conversionFactor;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Expanded(
+          flex: 3,
+          child: inputField,
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          flex: 2,
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "Por ${extraUnit.name}:",
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  NumberFormatter.convertToMoneyLike(calculatedValue),
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -302,16 +364,78 @@ class _RootScaffoldState extends State<_RootScaffold> {
                           ),
                         ),
 
+                        if (widget.product.extraUnits.isNotEmpty && selectedExtraUnit != null) ...[
+                          const SizedBox(height: 12),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                flex: 3,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      "Precio Base para:",
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.grey,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      widget.product.unitName,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                flex: 2,
+                                child: DropdownButtonFormField<ExtraUnit>(
+                                  decoration: const InputDecoration(
+                                    labelText: 'Calcular para la unidad:',
+                                    border: OutlineInputBorder(),
+                                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  ),
+                                  initialValue: selectedExtraUnit,
+                                  items: widget.product.extraUnits.map((extra) {
+                                    return DropdownMenuItem<ExtraUnit>(
+                                      value: extra,
+                                      child: Text('${extra.name} (x${extra.conversionFactor})'),
+                                    );
+                                  }).toList(),
+                                  onChanged: (value) {
+                                    if (value != null) {
+                                      setState(() {
+                                        selectedExtraUnit = value;
+                                      });
+                                    }
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+
                         const SizedBox(
                           height: 12,
                         ),
 
-                        TitleTextField(
-                          key: const Key("price1"),
-                          title: "Precio de Venta (C\$ )",
-                          focusNode: priceFocus,
-                          keyboardType: TextInputType.number,
-                          onChanged: (value) {
+                        _buildPriceInput(
+                          "price1",
+                          "Precio de Venta (C\$ )",
+                          priceFocus,
+                          currentSalePrice,
+                          NumberFormatter.convertFromCentsToDouble(
+                            widget.product.saleProfile.salePrice,
+                          ).toString(),
+                          (value) {
                             if (value.isEmpty) {
                               currentSalePrice = 0;
                               setState(() {});
@@ -322,24 +446,21 @@ class _RootScaffoldState extends State<_RootScaffold> {
                             currentSalePrice = cents;
                             setState(() {});
                           },
-
-                          initialValue: NumberFormatter.convertFromCentsToDouble(
-                            widget.product.saleProfile.salePrice,
-                          ).toString(),
-
-                          inputFormatters: [DoubleThousandsFormatter()],
                         ),
 
                         const SizedBox(
                           height: 12,
                         ),
 
-                        TitleTextField(
-                          key: const Key("price2"),
-                          title: "Precio de Venta 2 (C\$ )",
-                          focusNode: priceFocus2,
-                          keyboardType: TextInputType.number,
-                          onChanged: (value) {
+                        _buildPriceInput(
+                          "price2",
+                          "Precio de Venta 2 (C\$ )",
+                          priceFocus2,
+                          currentSalePrice2,
+                          NumberFormatter.convertFromCentsToDouble(
+                            widget.product.saleProfile.salePrice2,
+                          ).toString(),
+                          (value) {
                             if (value.isEmpty) {
                               currentSalePrice2 = 0;
                               setState(() {});
@@ -350,24 +471,21 @@ class _RootScaffoldState extends State<_RootScaffold> {
                             currentSalePrice2 = cents;
                             setState(() {});
                           },
-
-                          initialValue: NumberFormatter.convertFromCentsToDouble(
-                            widget.product.saleProfile.salePrice2,
-                          ).toString(),
-
-                          inputFormatters: [DoubleThousandsFormatter()],
                         ),
 
                         const SizedBox(
                           height: 12,
                         ),
 
-                        TitleTextField(
-                          key: const Key("price3"),
-                          title: "Precio de Venta 3 (C\$ )",
-                          focusNode: priceFocus3,
-                          keyboardType: TextInputType.number,
-                          onChanged: (value) {
+                        _buildPriceInput(
+                          "price3",
+                          "Precio de Venta 3 (C\$ )",
+                          priceFocus3,
+                          currentSalePrice3,
+                          NumberFormatter.convertFromCentsToDouble(
+                            widget.product.saleProfile.salePrice3,
+                          ).toString(),
+                          (value) {
                             if (value.isEmpty) {
                               currentSalePrice3 = 0;
                               setState(() {});
@@ -378,24 +496,21 @@ class _RootScaffoldState extends State<_RootScaffold> {
                             currentSalePrice3 = cents;
                             setState(() {});
                           },
-
-                          initialValue: NumberFormatter.convertFromCentsToDouble(
-                            widget.product.saleProfile.salePrice3,
-                          ).toString(),
-
-                          inputFormatters: [DoubleThousandsFormatter()],
                         ),
 
                         const SizedBox(
                           height: 12,
                         ),
 
-                        TitleTextField(
-                          key: const Key("price4"),
-                          title: "Precio de Venta 4 (C\$ )",
-                          focusNode: priceFocus4,
-                          keyboardType: TextInputType.number,
-                          onChanged: (value) {
+                        _buildPriceInput(
+                          "price4",
+                          "Precio de Venta 4 (C\$ )",
+                          priceFocus4,
+                          currentSalePrice4,
+                          NumberFormatter.convertFromCentsToDouble(
+                            widget.product.saleProfile.salePrice4,
+                          ).toString(),
+                          (value) {
                             if (value.isEmpty) {
                               currentSalePrice4 = 0;
                               setState(() {});
@@ -406,42 +521,9 @@ class _RootScaffoldState extends State<_RootScaffold> {
                             currentSalePrice4 = cents;
                             setState(() {});
                           },
-
-                          initialValue: NumberFormatter.convertFromCentsToDouble(
-                            widget.product.saleProfile.salePrice4,
-                          ).toString(),
-
-                          inputFormatters: [DoubleThousandsFormatter()],
                         ),
 
                         const Divider(),
-                        Row(
-                          children: [
-                            const Text(
-                              "Descuentos",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              ),
-                            ),
-                            const Spacer(),
-                            TextButton(
-                              child: const Text("Agregar Descuento"),
-                              onPressed: () async {
-                                final res = await showDiscountDialog(context);
-                                if (res == null) return;
-
-                                currentDiscounts.add(res);
-                                setState(() {});
-                              },
-                            ),
-                          ],
-                        ),
-
-                        _DiscountListViewContainer(
-                          discounts: currentDiscounts,
-                          salePrice: currentSalePrice,
-                        ),
                       ],
                     ),
                   ),

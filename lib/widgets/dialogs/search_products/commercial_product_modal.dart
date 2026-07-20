@@ -15,6 +15,7 @@ Future<CommercialProductResult?> showCommercialProductModalFromId(
   required String productId,
   SaleItem? previousSaleItem,
   int defaultPriceLevel = 1,
+  String preferredUnitType = 'min',
 }) async {
   final authState = getIt<AuthCubit>().state;
   if (authState is! Authenticated) return null;
@@ -47,7 +48,11 @@ Future<CommercialProductResult?> showCommercialProductModalFromId(
         }
       }
 
-      initialResult = CommercialProductResult(product: product)
+      initialResult = CommercialProductResult(
+        product: product,
+        defaultPriceLevel: previousSaleItem.selectedPrice,
+        preferredUnitType: preferredUnitType,
+      )
         ..quantity = previousSaleItem.quantity
         ..selectedPriceLevel = previousSaleItem.selectedPrice
         ..newPrice = previousSaleItem.price
@@ -59,6 +64,7 @@ Future<CommercialProductResult?> showCommercialProductModalFromId(
       product: product,
       commercialProductResult: initialResult,
       defaultPriceLevel: defaultPriceLevel,
+      preferredUnitType: preferredUnitType,
     );
   } catch (e) {
     if (context.mounted) {
@@ -74,6 +80,7 @@ Future<CommercialProductResult?> showCommercialProductModal(
   required ProductInDbInBranch product,
   CommercialProductResult? commercialProductResult,
   int defaultPriceLevel = 1,
+  String preferredUnitType = 'min',
 }) async {
   return await Navigator.push<CommercialProductResult?>(
     context,
@@ -82,6 +89,7 @@ Future<CommercialProductResult?> showCommercialProductModal(
         product: product,
         commercialProductResult: commercialProductResult,
         defaultPriceLevel: defaultPriceLevel,
+        preferredUnitType: preferredUnitType,
       ),
     ),
   );
@@ -93,11 +101,13 @@ class CommercialProductModal extends StatefulWidget {
     required this.product,
     this.commercialProductResult,
     this.defaultPriceLevel = 1,
+    this.preferredUnitType = 'min',
   });
 
   final ProductInDbInBranch product;
   final CommercialProductResult? commercialProductResult;
   final int defaultPriceLevel;
+  final String preferredUnitType;
 
   @override
   State<CommercialProductModal> createState() => _CommercialProductModalState();
@@ -118,6 +128,7 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
       commercialProductResult = CommercialProductResult(
         product: widget.product,
         defaultPriceLevel: widget.defaultPriceLevel,
+        preferredUnitType: widget.preferredUnitType,
       );
     }
     discountsAvailable = widget.product.saleProfile.discounts.map(

@@ -75,6 +75,7 @@ class _RootScaffold extends StatelessWidget {
             final res = await showCommercialProductSearchDelegate(
               context,
               defaultPriceLevel: viewController.selectedClient?.defaultPriceLevel ?? 1,
+              preferredUnitType: viewController.isWholesale ? 'max' : 'min',
             );
             if (res == null) return;
             if (writeCubit.documentType != CommercialDocumentType.quote &&
@@ -95,7 +96,19 @@ class _RootScaffold extends StatelessWidget {
         ),
       ),
       appBar: AppBar(
-        title: Text(title),
+        title: title.contains("(Mayorista)")
+            ? Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(text: "${title.replaceAll("(Mayorista)", "").trim()} "),
+                    const TextSpan(
+                      text: "(Mayorista)",
+                      style: TextStyle(color: Colors.yellow, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              )
+            : Text(title),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(kToolbarHeight),
           child: ListenableBuilder(
@@ -311,6 +324,7 @@ class _Body extends StatelessWidget {
                           final res = await showCommercialProductSearchDelegate(
                             context,
                             defaultPriceLevel: viewController.selectedClient?.defaultPriceLevel ?? 1,
+                            preferredUnitType: viewController.isWholesale ? 'max' : 'min',
                           );
                           if (res == null) return;
                           if (writeCubit.documentType != CommercialDocumentType.quote &&

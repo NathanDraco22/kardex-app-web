@@ -121,6 +121,26 @@ class _Body extends StatelessWidget {
 
           const Divider(height: 0.0),
 
+          RolePermissionGate(
+            permissions: [CommercialSubModules.createInvoice],
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.clientInvoiceWholesale,
+              child: ListTile(
+                leading: Icon(
+                  FluentIcons.person_money_20_filled,
+                  size: 32,
+                  color: Colors.blue.shade600,
+                ),
+                title: const Text("Facturacion a Clientes (Mayorista)"),
+                onTap: () {
+                  context.pushNamed("client-invoice-wholesale");
+                },
+              ),
+            ),
+          ),
+
+          const Divider(height: 0.0),
+
           const Divider(
             height: 4.0,
             thickness: 2,
@@ -345,6 +365,24 @@ class _Body extends StatelessWidget {
           ),
 
           const Divider(height: 0.0),
+
+          RolePermissionGate(
+            permissions: [CommercialSubModules.createOrder],
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.proformaWholesale,
+              child: ListTile(
+                leading: Icon(
+                  FluentIcons.document_text_24_filled,
+                  size: 32,
+                  color: Colors.blue.shade800,
+                ),
+                title: const Text("Crear Cotización (Mayorista)"),
+                onTap: () => context.pushNamed("proforma-wholesale"),
+              ),
+            ),
+          ),
+
+          const Divider(height: 0.0),
           const Divider(
             height: 4.0,
             thickness: 2,
@@ -382,6 +420,26 @@ class _Body extends StatelessWidget {
                 title: const Text("Crear Orden de Compra"),
                 onTap: () {
                   context.pushNamed("sale-order");
+                },
+              ),
+            ),
+          ),
+
+          const Divider(height: 0.0),
+
+          RolePermissionGate(
+            permissions: [CommercialSubModules.createOrder],
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.saleOrderWholesale,
+              child: ListTile(
+                leading: Icon(
+                  FluentIcons.receipt_add_24_filled,
+                  size: 32,
+                  color: Colors.blue.shade600,
+                ),
+                title: const Text("Crear Orden de Compra (Mayorista)"),
+                onTap: () {
+                  context.pushNamed("sale-order-wholesale");
                 },
               ),
             ),

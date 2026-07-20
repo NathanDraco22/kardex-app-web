@@ -202,6 +202,7 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
                           final res = await showSearchProductCommercialDialog(
                             context,
                             defaultPriceLevel: widget.controller.selectedClient?.defaultPriceLevel ?? 1,
+                            preferredUnitType: widget.controller.isWholesale ? 'max' : 'min',
                           );
 
                           if (res == null) return;
@@ -252,6 +253,7 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
             context,
             product: item.product,
             defaultPriceLevel: widget.controller.selectedClient?.defaultPriceLevel ?? 1,
+            preferredUnitType: widget.controller.isWholesale ? 'max' : 'min',
           );
           if (res == null) return;
           if (widget.restrictQuantity &&

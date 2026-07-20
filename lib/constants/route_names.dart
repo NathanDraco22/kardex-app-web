@@ -38,7 +38,9 @@ class RouteNames {
   static const invoicesByProduct = 'invoices-by-product';
   static const currentOrders = 'current-orders';
   static const saleOrder = 'sale-order';
+  static const saleOrderWholesale = 'sale-order-wholesale';
   static const clientInvoice = 'client-invoice';
+  static const clientInvoiceWholesale = 'client-invoice-wholesale';
   static const dailyReceiptHistory = 'daily-receipt-history';
   static const receiptHistory = 'receipt-history';
   static const currentDevolution = 'current-devolution';
@@ -48,6 +50,7 @@ class RouteNames {
   static const commercialProductMovements = 'commercial-product-movements';
   static const proformaHistory = 'proforma-history';
   static const proforma = 'proforma';
+  static const proformaWholesale = 'proforma-wholesale';
   static const productDemandVsStock = 'product-demand-vs-stock';
 
   static const pendingAccounts = 'pending-accounts';

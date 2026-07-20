@@ -6,10 +6,12 @@ import 'package:kardex_app_front/widgets/widgets.dart';
 class ExtraUnitsEditorResult {
   final List<ExtraUnit> extraUnits;
   final int defaultUnitIndex;
+  final int wholesaleUnitIndex;
 
   ExtraUnitsEditorResult({
     required this.extraUnits,
     required this.defaultUnitIndex,
+    required this.wholesaleUnitIndex,
   });
 }
 
@@ -17,6 +19,7 @@ Future<ExtraUnitsEditorResult?> showProductExtraUnitsEditor(
   BuildContext context, {
   required List<ExtraUnit> initialExtraUnits,
   required int initialDefaultUnitIndex,
+  required int initialWholesaleUnitIndex,
   required String baseUnitName,
 }) async {
   return await showDialog<ExtraUnitsEditorResult?>(
@@ -25,6 +28,7 @@ Future<ExtraUnitsEditorResult?> showProductExtraUnitsEditor(
       return ExtraUnitsEditorDialog(
         initialExtraUnits: initialExtraUnits,
         initialDefaultUnitIndex: initialDefaultUnitIndex,
+        initialWholesaleUnitIndex: initialWholesaleUnitIndex,
         baseUnitName: baseUnitName,
       );
     },
@@ -36,11 +40,13 @@ class ExtraUnitsEditorDialog extends StatefulWidget {
     super.key,
     required this.initialExtraUnits,
     required this.initialDefaultUnitIndex,
+    required this.initialWholesaleUnitIndex,
     required this.baseUnitName,
   });
 
   final List<ExtraUnit> initialExtraUnits;
   final int initialDefaultUnitIndex;
+  final int initialWholesaleUnitIndex;
   final String baseUnitName;
 
   @override
@@ -50,18 +56,27 @@ class ExtraUnitsEditorDialog extends StatefulWidget {
 class _ExtraUnitsEditorDialogState extends State<ExtraUnitsEditorDialog> {
   late List<ExtraUnit> extraUnits;
   late int defaultUnitIndex;
+  late int wholesaleUnitIndex;
 
   @override
   void initState() {
     super.initState();
     extraUnits = List.from(widget.initialExtraUnits);
     defaultUnitIndex = widget.initialDefaultUnitIndex;
+    wholesaleUnitIndex = widget.initialWholesaleUnitIndex;
     _validateDefaultUnitIndex();
+    _validateWholesaleUnitIndex();
   }
 
   void _validateDefaultUnitIndex() {
     if (defaultUnitIndex > extraUnits.length) {
       defaultUnitIndex = 0;
+    }
+  }
+
+  void _validateWholesaleUnitIndex() {
+    if (wholesaleUnitIndex > extraUnits.length) {
+      wholesaleUnitIndex = 0;
     }
   }
 
@@ -96,6 +111,12 @@ class _ExtraUnitsEditorDialogState extends State<ExtraUnitsEditorDialog> {
         } else if (defaultUnitIndex > index + 1) {
           defaultUnitIndex--;
         }
+
+        if (wholesaleUnitIndex == index + 1) {
+          wholesaleUnitIndex = 0;
+        } else if (wholesaleUnitIndex > index + 1) {
+          wholesaleUnitIndex--;
+        }
       });
     }
   }
@@ -103,6 +124,9 @@ class _ExtraUnitsEditorDialogState extends State<ExtraUnitsEditorDialog> {
   @override
   Widget build(BuildContext context) {
     final String baseUnitName = widget.baseUnitName.isEmpty ? 'Unidad Base' : widget.baseUnitName;
+    final defaultUnitNameText = defaultUnitIndex == 0
+        ? baseUnitName
+        : extraUnits[defaultUnitIndex - 1].name;
 
     return AlertDialog(
       title: const Text('Unidades de Medida Extra'),
@@ -192,6 +216,44 @@ class _ExtraUnitsEditorDialogState extends State<ExtraUnitsEditorDialog> {
                 },
               ),
               const SizedBox(height: 16),
+              const Text(
+                'Unidad Mayorista',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 6),
+              DropdownButtonFormField<int>(
+                initialValue: wholesaleUnitIndex,
+                isExpanded: true,
+                decoration: const InputDecoration(
+                  isDense: true,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                ),
+                items: [
+                  DropdownMenuItem<int>(
+                    value: 0,
+                    child: Text('Usar Unidad por Defecto ($defaultUnitNameText)'),
+                  ),
+                  ...List.generate(extraUnits.length, (index) {
+                    final uName = extraUnits[index].name;
+                    final factor = extraUnits[index].conversionFactor;
+                    final label = uName.trim().isEmpty
+                        ? 'Unidad Extra ${index + 1}'
+                        : '$uName (x$factor $baseUnitName)';
+                    return DropdownMenuItem<int>(
+                      value: index + 1,
+                      child: Text(label),
+                    );
+                  }),
+                ],
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      wholesaleUnitIndex = value;
+                    });
+                  }
+                },
+              ),
+              const SizedBox(height: 16),
             ],
             ElevatedButton.icon(
               onPressed: _addExtraUnit,
@@ -211,6 +273,7 @@ class _ExtraUnitsEditorDialogState extends State<ExtraUnitsEditorDialog> {
             ExtraUnitsEditorResult(
               extraUnits: extraUnits,
               defaultUnitIndex: defaultUnitIndex,
+              wholesaleUnitIndex: wholesaleUnitIndex,
             ),
           ),
           child: const Text('Guardar'),

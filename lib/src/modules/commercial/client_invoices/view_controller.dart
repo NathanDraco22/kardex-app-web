@@ -5,6 +5,10 @@ import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 
 class ClientInvoiceViewController extends ChangeNotifier {
+  ClientInvoiceViewController({this.isWholesale = false});
+
+  final bool isWholesale;
+
   DateTime? _selectedDate;
 
   String description = '';
