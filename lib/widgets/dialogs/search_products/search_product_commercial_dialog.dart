@@ -16,6 +16,7 @@ Future<CommercialProductResult?> showSearchProductCommercialDialog(
   ProductInDb? product,
   bool isDirectSale = false,
   int defaultPriceLevel = 1,
+  String preferredUnitType = 'min',
 }) async {
   final res = await showDialog<CommercialProductResult?>(
     context: context,
@@ -23,6 +24,7 @@ Future<CommercialProductResult?> showSearchProductCommercialDialog(
       product: product,
       isDirectSale: isDirectSale,
       defaultPriceLevel: defaultPriceLevel,
+      preferredUnitType: preferredUnitType,
     ),
   );
   return res;
@@ -34,11 +36,13 @@ class SearchProductCommercialDialog extends StatefulWidget {
     this.product,
     required this.isDirectSale,
     this.defaultPriceLevel = 1,
+    this.preferredUnitType = 'min',
   });
 
   final ProductInDb? product;
   final bool isDirectSale;
   final int defaultPriceLevel;
+  final String preferredUnitType;
 
   @override
   State<SearchProductCommercialDialog> createState() => _SearchProductCommercialDialogState();
@@ -97,6 +101,7 @@ class _SearchProductCommercialDialogState extends State<SearchProductCommercialD
                                   final result = CommercialProductResult(
                                     product: products[cursorPosition],
                                     defaultPriceLevel: widget.defaultPriceLevel,
+                                    preferredUnitType: widget.preferredUnitType,
                                   );
                                   Navigator.pop(context, result);
                                   return KeyEventResult.handled;
@@ -105,6 +110,7 @@ class _SearchProductCommercialDialogState extends State<SearchProductCommercialD
                                   context,
                                   product: products[cursorPosition],
                                   defaultPriceLevel: widget.defaultPriceLevel,
+                                  preferredUnitType: widget.preferredUnitType,
                                 ).then((value) {
                                   if (value == null) return;
 
@@ -175,6 +181,7 @@ class _SearchProductCommercialDialogState extends State<SearchProductCommercialD
                         isDirectSale: widget.isDirectSale,
                         cursorPosition: cursorPosition,
                         defaultPriceLevel: widget.defaultPriceLevel,
+                        preferredUnitType: widget.preferredUnitType,
                       );
                     },
                   ),
@@ -196,6 +203,7 @@ class ResultTable extends StatefulWidget {
     this.focus,
     this.cursorPosition = 0,
     this.defaultPriceLevel = 1,
+    this.preferredUnitType = 'min',
   });
 
   final List<ProductInDbInBranch> products;
@@ -203,6 +211,7 @@ class ResultTable extends StatefulWidget {
   final int cursorPosition;
   final bool isDirectSale;
   final int defaultPriceLevel;
+  final String preferredUnitType;
 
   @override
   State<ResultTable> createState() => _ResultTableState();
@@ -235,6 +244,7 @@ class _ResultTableState extends State<ResultTable> {
               final result = CommercialProductResult(
                 product: product,
                 defaultPriceLevel: widget.defaultPriceLevel,
+                preferredUnitType: widget.preferredUnitType,
               );
               Navigator.pop(context, result);
               return;
@@ -244,6 +254,7 @@ class _ResultTableState extends State<ResultTable> {
               context,
               product: product,
               defaultPriceLevel: widget.defaultPriceLevel,
+              preferredUnitType: widget.preferredUnitType,
             );
 
             if (res == null) return;

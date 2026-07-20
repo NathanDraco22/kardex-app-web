@@ -4,6 +4,7 @@ class CommercialProductResult {
   CommercialProductResult({
     required this.product,
     int defaultPriceLevel = 1,
+    String preferredUnitType = 'min',
   }) {
     selectedPriceLevel = defaultPriceLevel;
     final priceMap = {
@@ -13,9 +14,23 @@ class CommercialProductResult {
       4: product.saleProfile.salePrice4,
     };
     _newPrice = priceMap[defaultPriceLevel] ?? product.saleProfile.salePrice;
-    selectedUnitIndex = product.defaultUnitIndex;
-    conversionFactor = product.defaultUnitFactor;
-    selectedUnitName = product.defaultUnitName;
+
+    int resolvedUnitIndex;
+    if (preferredUnitType == "max" && product.wholesaleUnitIndex > 0) {
+      resolvedUnitIndex = product.wholesaleUnitIndex;
+    } else {
+      resolvedUnitIndex = product.defaultUnitIndex;
+    }
+
+    selectedUnitIndex = resolvedUnitIndex;
+    if (resolvedUnitIndex == 0) {
+      conversionFactor = 1;
+      selectedUnitName = product.unitName;
+    } else {
+      final extra = product.extraUnits[resolvedUnitIndex - 1];
+      conversionFactor = extra.conversionFactor;
+      selectedUnitName = extra.name;
+    }
   }
   ProductInDbInBranch product;
   int _newPrice = 0;

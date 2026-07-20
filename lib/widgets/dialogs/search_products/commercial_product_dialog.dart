@@ -16,6 +16,7 @@ Future<CommercialProductResult?> showCommercialProductDialogFromId(
   required String productId,
   SaleItem? previousSaleItem,
   int defaultPriceLevel = 1,
+  String preferredUnitType = 'min',
 }) async {
   final authState = getIt<AuthCubit>().state;
   if (authState is! Authenticated) return null;
@@ -48,7 +49,11 @@ Future<CommercialProductResult?> showCommercialProductDialogFromId(
         }
       }
 
-      initialResult = CommercialProductResult(product: product)
+      initialResult = CommercialProductResult(
+        product: product,
+        defaultPriceLevel: previousSaleItem.selectedPrice,
+        preferredUnitType: preferredUnitType,
+      )
         ..quantity = previousSaleItem.quantity
         ..selectedPriceLevel = previousSaleItem.selectedPrice
         ..newPrice = previousSaleItem.price
@@ -60,6 +65,7 @@ Future<CommercialProductResult?> showCommercialProductDialogFromId(
       product: product,
       commercialProductResult: initialResult,
       defaultPriceLevel: defaultPriceLevel,
+      preferredUnitType: preferredUnitType,
     );
   } catch (e) {
     if (context.mounted) {
@@ -75,6 +81,7 @@ Future<CommercialProductResult?> showCommercialProductDialog(
   required ProductInDbInBranch product,
   CommercialProductResult? commercialProductResult,
   int defaultPriceLevel = 1,
+  String preferredUnitType = 'min',
 }) async {
   return await showDialog<CommercialProductResult?>(
     barrierDismissible: false,
@@ -83,6 +90,7 @@ Future<CommercialProductResult?> showCommercialProductDialog(
       product: product,
       commercialProductResult: commercialProductResult,
       defaultPriceLevel: defaultPriceLevel,
+      preferredUnitType: preferredUnitType,
     ),
   );
 }
@@ -93,10 +101,12 @@ class CommercialProductDialog extends StatelessWidget {
     required this.product,
     this.commercialProductResult,
     this.defaultPriceLevel = 1,
+    this.preferredUnitType = 'min',
   });
   final ProductInDbInBranch product;
   final CommercialProductResult? commercialProductResult;
   final int defaultPriceLevel;
+  final String preferredUnitType;
 
   @override
   Widget build(BuildContext context) {
@@ -112,6 +122,7 @@ class CommercialProductDialog extends StatelessWidget {
             product: product,
             commercialProductResult: commercialProductResult,
             defaultPriceLevel: defaultPriceLevel,
+            preferredUnitType: preferredUnitType,
           ),
         ),
       ),
@@ -124,11 +135,13 @@ class _FormContent extends StatefulWidget {
     required this.product,
     this.commercialProductResult,
     this.defaultPriceLevel = 1,
+    this.preferredUnitType = 'min',
   });
 
   final ProductInDbInBranch product;
   final CommercialProductResult? commercialProductResult;
   final int defaultPriceLevel;
+  final String preferredUnitType;
 
   @override
   State<_FormContent> createState() => _FormContentState();
@@ -149,6 +162,7 @@ class _FormContentState extends State<_FormContent> {
       commercialProductResult = CommercialProductResult(
         product: widget.product,
         defaultPriceLevel: widget.defaultPriceLevel,
+        preferredUnitType: widget.preferredUnitType,
       );
     }
 

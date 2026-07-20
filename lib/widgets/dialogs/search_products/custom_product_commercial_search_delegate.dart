@@ -12,6 +12,7 @@ import 'package:kardex_app_front/widgets/dialogs/product_in_branch_info_dialog.d
 Future<CommercialProductResult?> showCommercialProductSearchDelegate(
   BuildContext context, {
   int defaultPriceLevel = 1,
+  String preferredUnitType = 'min',
 }) async {
   return await Navigator.push<CommercialProductResult?>(
     context,
@@ -21,6 +22,7 @@ Future<CommercialProductResult?> showCommercialProductSearchDelegate(
           ctx,
           product: product,
           defaultPriceLevel: defaultPriceLevel,
+          preferredUnitType: preferredUnitType,
         ),
       ),
     ),

@@ -121,7 +121,19 @@ class _RootScaffold extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: title.contains("(Mayorista)")
+            ? Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(text: "${title.replaceAll("(Mayorista)", "").trim()} "),
+                    const TextSpan(
+                      text: "(Mayorista)",
+                      style: TextStyle(color: Colors.yellow, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              )
+            : Text(title),
       ),
       body: const _Body(),
       bottomNavigationBar: BottomAppBar(

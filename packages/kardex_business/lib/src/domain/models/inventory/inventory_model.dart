@@ -13,6 +13,7 @@ class InventoryProduct {
   final String image;
   final List<ExtraUnit> extraUnits;
   final int defaultUnitIndex;
+  final int wholesaleUnitIndex;
 
   InventoryProduct({
     required this.id,
@@ -27,6 +28,7 @@ class InventoryProduct {
     this.image = "",
     this.extraUnits = const [],
     this.defaultUnitIndex = 0,
+    this.wholesaleUnitIndex = 0,
   });
 
   String get defaultUnitName {
@@ -59,6 +61,7 @@ class InventoryProduct {
           ? (json['extraUnits'] as List).map((e) => ExtraUnit.fromJson(e as Map<String, dynamic>)).toList()
           : const [],
       defaultUnitIndex: json['defaultUnitIndex'] as int? ?? 0,
+      wholesaleUnitIndex: json['wholesaleUnitIndex'] as int? ?? 0,
     );
   }
 
@@ -76,6 +79,7 @@ class InventoryProduct {
       'image': image,
       'extraUnits': extraUnits.map((e) => e.toJson()).toList(),
       'defaultUnitIndex': defaultUnitIndex,
+      'wholesaleUnitIndex': wholesaleUnitIndex,
     };
   }
 }

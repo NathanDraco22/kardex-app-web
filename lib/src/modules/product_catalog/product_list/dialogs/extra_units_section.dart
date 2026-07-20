@@ -17,6 +17,7 @@ class ExtraUnitsSection extends StatefulWidget {
 class _ExtraUnitsSectionState extends State<ExtraUnitsSection> {
   final List<ExtraUnit> _extraUnits = [];
   int _defaultUnitIndex = 0;
+  int _wholesaleUnitIndex = 0;
 
   @override
   void initState() {
@@ -24,6 +25,7 @@ class _ExtraUnitsSectionState extends State<ExtraUnitsSection> {
     if (widget.currentProduct != null) {
       _extraUnits.addAll(widget.currentProduct!.extraUnits);
       _defaultUnitIndex = widget.currentProduct!.defaultUnitIndex;
+      _wholesaleUnitIndex = widget.currentProduct!.wholesaleUnitIndex;
     }
     _syncToMap();
   }
@@ -34,6 +36,11 @@ class _ExtraUnitsSectionState extends State<ExtraUnitsSection> {
       _defaultUnitIndex = 0;
     }
     widget.creationMap['defaultUnitIndex'] = _defaultUnitIndex;
+
+    if (_wholesaleUnitIndex > _extraUnits.length) {
+      _wholesaleUnitIndex = 0;
+    }
+    widget.creationMap['wholesaleUnitIndex'] = _wholesaleUnitIndex;
   }
 
   @override
@@ -59,6 +66,7 @@ class _ExtraUnitsSectionState extends State<ExtraUnitsSection> {
                   context,
                   initialExtraUnits: _extraUnits,
                   initialDefaultUnitIndex: _defaultUnitIndex,
+                  initialWholesaleUnitIndex: _wholesaleUnitIndex,
                   baseUnitName: baseUnitName,
                 );
 
@@ -67,6 +75,7 @@ class _ExtraUnitsSectionState extends State<ExtraUnitsSection> {
                     _extraUnits.clear();
                     _extraUnits.addAll(result.extraUnits);
                     _defaultUnitIndex = result.defaultUnitIndex;
+                    _wholesaleUnitIndex = result.wholesaleUnitIndex;
                     _syncToMap();
                   });
                 }
