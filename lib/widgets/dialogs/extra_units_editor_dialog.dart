@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/widgets/dialogs/shorcut_container.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
@@ -124,27 +125,29 @@ class _ExtraUnitsEditorDialogState extends State<ExtraUnitsEditorDialog> {
   @override
   Widget build(BuildContext context) {
     final String baseUnitName = widget.baseUnitName.isEmpty ? 'Unidad Base' : widget.baseUnitName;
-    final defaultUnitNameText = defaultUnitIndex == 0
-        ? baseUnitName
-        : extraUnits[defaultUnitIndex - 1].name;
+    final defaultUnitNameText = defaultUnitIndex == 0 ? baseUnitName : extraUnits[defaultUnitIndex - 1].name;
 
-    return AlertDialog(
-      title: const Text('Unidades de Medida Extra'),
-      content: SizedBox(
-        width: 600,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(
-              child: extraUnits.isEmpty
-                  ? const Center(
-                      child: Text(
-                        "No hay unidades de medida extra configuradas.",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    )
-                  : ListView.separated(
+    return ShortcutContainer(
+      child: AlertDialog(
+        title: const Text('Unidades de Medida Extra'),
+        content: SizedBox(
+          width: 600,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: Builder(
+                  builder: (context) {
+                    if (extraUnits.isEmpty) {
+                      return const Center(
+                        child: Text(
+                          "No hay unidades de medida extra configuradas.",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      );
+                    }
+                    return ListView.separated(
                       shrinkWrap: true,
                       itemCount: extraUnits.length,
                       separatorBuilder: (context, index) => const Divider(),
@@ -174,111 +177,121 @@ class _ExtraUnitsEditorDialogState extends State<ExtraUnitsEditorDialog> {
                           ),
                         );
                       },
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              if (extraUnits.isNotEmpty) ...[
+                const Text(
+                  'Unidad por Defecto para Mostrar',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 6),
+                DropdownButtonFormField<int>(
+                  initialValue: defaultUnitIndex,
+                  isExpanded: true,
+                  decoration: const InputDecoration(
+                    isDense: true,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  ),
+                  items: [
+                    DropdownMenuItem<int>(
+                      value: 0,
+                      child: Text('$baseUnitName (Unidad Base)'),
                     ),
-            ),
-            const SizedBox(height: 16),
-            if (extraUnits.isNotEmpty) ...[
-              const Text(
-                'Unidad por Defecto para Mostrar',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 6),
-              DropdownButtonFormField<int>(
-                initialValue: defaultUnitIndex,
-                isExpanded: true,
-                decoration: const InputDecoration(
-                  isDense: true,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    ...List.generate(extraUnits.length, (index) {
+                      final uName = extraUnits[index].name;
+                      final factor = extraUnits[index].conversionFactor;
+                      final label = uName.trim().isEmpty
+                          ? 'Unidad Extra ${index + 1}'
+                          : '$uName (x$factor $baseUnitName)';
+                      return DropdownMenuItem<int>(
+                        value: index + 1,
+                        child: Text(label),
+                      );
+                    }),
+                  ],
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        defaultUnitIndex = value;
+                      });
+                    }
+                  },
                 ),
-                items: [
-                  DropdownMenuItem<int>(
-                    value: 0,
-                    child: Text('$baseUnitName (Unidad Base)'),
+                const SizedBox(height: 16),
+                const Text(
+                  'Unidad Mayorista',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 6),
+                DropdownButtonFormField<int>(
+                  initialValue: wholesaleUnitIndex,
+                  isExpanded: true,
+                  decoration: const InputDecoration(
+                    isDense: true,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   ),
-                  ...List.generate(extraUnits.length, (index) {
-                    final uName = extraUnits[index].name;
-                    final factor = extraUnits[index].conversionFactor;
-                    final label = uName.trim().isEmpty
-                        ? 'Unidad Extra ${index + 1}'
-                        : '$uName (x$factor $baseUnitName)';
-                    return DropdownMenuItem<int>(
-                      value: index + 1,
-                      child: Text(label),
-                    );
-                  }),
-                ],
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() {
-                      defaultUnitIndex = value;
-                    });
-                  }
+                  items: [
+                    DropdownMenuItem<int>(
+                      value: 0,
+                      child: Text('Usar Unidad por Defecto ($defaultUnitNameText)'),
+                    ),
+                    ...List.generate(extraUnits.length, (index) {
+                      final uName = extraUnits[index].name;
+                      final factor = extraUnits[index].conversionFactor;
+                      final label = uName.trim().isEmpty
+                          ? 'Unidad Extra ${index + 1}'
+                          : '$uName (x$factor $baseUnitName)';
+                      return DropdownMenuItem<int>(
+                        value: index + 1,
+                        child: Text(label),
+                      );
+                    }),
+                  ],
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        wholesaleUnitIndex = value;
+                      });
+                    }
+                  },
+                ),
+                const SizedBox(height: 16),
+              ],
+              Builder(
+                builder: (context) {
+                  RegisShortcutNotification(onAdd: () => _addExtraUnit()).dispatch(context);
+                  return ElevatedButton.icon(
+                    autofocus: true,
+                    onPressed: _addExtraUnit,
+                    icon: const Icon(Icons.add),
+                    label: const Text("Añadir Unidad Extra"),
+                  );
                 },
               ),
-              const SizedBox(height: 16),
-              const Text(
-                'Unidad Mayorista',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 6),
-              DropdownButtonFormField<int>(
-                initialValue: wholesaleUnitIndex,
-                isExpanded: true,
-                decoration: const InputDecoration(
-                  isDense: true,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                ),
-                items: [
-                  DropdownMenuItem<int>(
-                    value: 0,
-                    child: Text('Usar Unidad por Defecto ($defaultUnitNameText)'),
-                  ),
-                  ...List.generate(extraUnits.length, (index) {
-                    final uName = extraUnits[index].name;
-                    final factor = extraUnits[index].conversionFactor;
-                    final label = uName.trim().isEmpty
-                        ? 'Unidad Extra ${index + 1}'
-                        : '$uName (x$factor $baseUnitName)';
-                    return DropdownMenuItem<int>(
-                      value: index + 1,
-                      child: Text(label),
-                    );
-                  }),
-                ],
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() {
-                      wholesaleUnitIndex = value;
-                    });
-                  }
-                },
-              ),
-              const SizedBox(height: 16),
             ],
-            ElevatedButton.icon(
-              onPressed: _addExtraUnit,
-              icon: const Icon(Icons.add),
-              label: const Text("Añadir Unidad Extra"),
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        OutlinedButton(
-          onPressed: () => context.pop(null),
-          child: const Text('Cancelar'),
-        ),
-        ElevatedButton(
-          onPressed: () => context.pop(
-            ExtraUnitsEditorResult(
-              extraUnits: extraUnits,
-              defaultUnitIndex: defaultUnitIndex,
-              wholesaleUnitIndex: wholesaleUnitIndex,
-            ),
           ),
-          child: const Text('Guardar'),
         ),
-      ],
+        actions: [
+          OutlinedButton(
+            onPressed: () => context.pop(null),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () => context.pop(
+              ExtraUnitsEditorResult(
+                extraUnits: extraUnits,
+                defaultUnitIndex: defaultUnitIndex,
+                wholesaleUnitIndex: wholesaleUnitIndex,
+              ),
+            ),
+            child: const Text('Guardar'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -292,6 +305,16 @@ class _ExtraUnitsEditorDialogState extends State<ExtraUnitsEditorDialog> {
       'name': unitToEdit?.name ?? '',
       'conversionFactor': unitToEdit?.conversionFactor ?? 1,
     };
+
+    void addAction() {
+      if (formKey.currentState!.validate()) {
+        final newUnit = ExtraUnit(
+          name: map['name'] as String,
+          conversionFactor: map['conversionFactor'] as int,
+        );
+        Navigator.pop(context, newUnit);
+      }
+    }
 
     return await showDialog<ExtraUnit?>(
       context: context,
@@ -307,6 +330,7 @@ class _ExtraUnitsEditorDialogState extends State<ExtraUnitsEditorDialog> {
                 children: [
                   TitleTextField(
                     key: const ValueKey("unit_name"),
+                    autofocus: true,
                     textInputAction: TextInputAction.next,
                     title: "Nombre de Unidad*",
                     initialValue: map['name'],
@@ -324,6 +348,7 @@ class _ExtraUnitsEditorDialogState extends State<ExtraUnitsEditorDialog> {
                     title: "Factor de Conversión*",
                     initialValue: map['conversionFactor'] == 1 ? '' : map['conversionFactor'].toString(),
                     keyboardType: TextInputType.number,
+                    onEditingComplete: addAction,
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) return "Requerido";
                       final factor = int.tryParse(value) ?? 0;
@@ -342,15 +367,7 @@ class _ExtraUnitsEditorDialogState extends State<ExtraUnitsEditorDialog> {
               child: const Text("Cancelar"),
             ),
             ElevatedButton(
-              onPressed: () {
-                if (formKey.currentState!.validate()) {
-                  final newUnit = ExtraUnit(
-                    name: map['name'] as String,
-                    conversionFactor: map['conversionFactor'] as int,
-                  );
-                  Navigator.pop(context, newUnit);
-                }
-              },
+              onPressed: addAction,
               child: Text(isEditing ? "Guardar Cambios" : "Agregar"),
             ),
           ],
