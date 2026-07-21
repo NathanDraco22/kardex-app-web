@@ -5,6 +5,7 @@ import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_exit/view/mediator.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/search_product_in_branch_delegate.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
+import 'package:kardex_app_front/widgets/dialogs/inventory_unit_picker.dart';
 
 import 'widgets/app_bar_menu.dart';
 
@@ -35,12 +36,18 @@ class _MobileScaffold extends StatelessWidget {
               await DialogManager.showErrorDialog(context, "No se pueden agregar mas de 100 productos");
               return;
             }
+            if (!context.mounted) return;
+            final unit = await showInventoryUnitPicker(context, res);
+            if (unit == null) return;
             final newRow = ProductRowCard(
               product: res,
               quantity: 0,
-              unitaryCost: res.account.averageCost,
+              unitaryCost: (res.account.averageCost * unit.conversionFactor).round(),
               editableCost: false,
               haveExpirationDate: false,
+              selectedUnitIndex: unit.unitIndex,
+              conversionFactor: unit.conversionFactor,
+              selectedUnitName: unit.unitName,
             );
             mediator.productListViewController.addRowCard(newRow);
             mediator.refresh();

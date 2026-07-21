@@ -6,7 +6,9 @@ class ExitItem {
   final String? code;
   final String? brandName;
   final String? unitName;
+  final int? cost;
   final int quantity;
+  final int conversionFactor;
 
   ExitItem({
     required this.productId,
@@ -14,7 +16,9 @@ class ExitItem {
     this.code,
     this.brandName,
     this.unitName,
+    this.cost,
     required this.quantity,
+    this.conversionFactor = 1,
   }) : assert(quantity < 0, 'La cantidad en una salida debe ser negativa.');
 
   factory ExitItem.fromJson(Map<String, dynamic> json) {
@@ -24,7 +28,9 @@ class ExitItem {
       code: json['code'] as String?,
       brandName: json['brandName'] as String?,
       unitName: json['unitName'] as String?,
+      cost: json['cost'] as int?,
       quantity: json['quantity'] as int,
+      conversionFactor: json['conversionFactor'] as int? ?? 1,
     );
   }
 
@@ -35,7 +41,9 @@ class ExitItem {
       'code': code,
       'brandName': brandName,
       'unitName': unitName,
+      'cost': cost,
       'quantity': quantity,
+      'conversionFactor': conversionFactor,
     };
   }
 }

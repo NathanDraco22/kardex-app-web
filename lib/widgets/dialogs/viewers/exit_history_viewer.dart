@@ -275,13 +275,13 @@ class _ExitHistoryViewer extends StatelessWidget {
                                     ),
                                     Expanded(
                                       child: Text(
-                                        item.quantity.toString(),
+                                        NumberFormatter.formatDisplayStock(item.quantity.abs(), item.conversionFactor),
                                         textAlign: TextAlign.center,
                                       ),
                                     ),
                                     Expanded(
                                       child: Text(
-                                        NumberFormatter.convertToMoneyLike(item.cost ?? 0),
+                                        NumberFormatter.convertToMoneyLike(((item.cost ?? 0) * item.conversionFactor).round()),
                                         textAlign: TextAlign.center,
                                       ),
                                     ),

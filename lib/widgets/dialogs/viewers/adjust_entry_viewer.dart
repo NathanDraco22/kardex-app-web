@@ -251,13 +251,13 @@ class _AdjustEntryViewer extends StatelessWidget {
                                     ),
                                     Expanded(
                                       child: Text(
-                                        item.quantity.toString(),
+                                        NumberFormatter.formatDisplayStock(item.quantity, item.conversionFactor),
                                         textAlign: TextAlign.center,
                                       ),
                                     ),
                                     Expanded(
                                       child: Text(
-                                        NumberFormatter.convertToMoneyLike(item.cost),
+                                        NumberFormatter.convertToMoneyLike(item.cost * item.conversionFactor),
                                         textAlign: TextAlign.center,
                                       ),
                                     ),

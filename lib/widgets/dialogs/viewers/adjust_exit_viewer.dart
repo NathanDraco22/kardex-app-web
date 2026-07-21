@@ -261,19 +261,19 @@ class _AdjustExitViewer extends StatelessWidget {
                                     ),
                                     Expanded(
                                       child: Text(
-                                        item.quantity.toString(),
+                                        NumberFormatter.formatDisplayStock(item.quantity.abs(), item.conversionFactor),
                                         textAlign: TextAlign.center,
                                       ),
                                     ),
                                     Expanded(
                                       child: Text(
-                                        NumberFormatter.convertToMoneyLike(item.cost),
+                                        NumberFormatter.convertToMoneyLike(item.cost * item.conversionFactor),
                                         textAlign: TextAlign.center,
                                       ),
                                     ),
                                     Expanded(
                                       child: Text(
-                                        NumberFormatter.convertToMoneyLike(item.cost * item.quantity),
+                                        NumberFormatter.convertToMoneyLike(item.cost * item.quantity.abs()),
                                         textAlign: TextAlign.center,
                                       ),
                                     ),

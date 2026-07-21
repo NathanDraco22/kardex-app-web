@@ -6,6 +6,7 @@ class EntryItem {
   final String? unitName;
   final int cost;
   final int quantity;
+  final int conversionFactor;
   final int? expirationDate;
 
   EntryItem({
@@ -13,6 +14,7 @@ class EntryItem {
     required this.productName,
     required this.cost,
     required this.quantity,
+    this.conversionFactor = 1,
     this.expirationDate,
     this.code,
     this.brandName,
@@ -28,6 +30,7 @@ class EntryItem {
       unitName: json['unitName'] as String?,
       cost: json['cost'] as int,
       quantity: json['quantity'] as int,
+      conversionFactor: json['conversionFactor'] as int? ?? 1,
       expirationDate: json['expirationDate'] as int?,
     );
   }
@@ -38,6 +41,7 @@ class EntryItem {
       'productName': productName,
       'cost': cost,
       'quantity': quantity,
+      'conversionFactor': conversionFactor,
       'expirationDate': expirationDate,
       'code': code,
       'brandName': brandName,

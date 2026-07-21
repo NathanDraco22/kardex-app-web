@@ -11,6 +11,7 @@ import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/se
 
 import 'package:kardex_app_front/widgets/tables/transfer_product_table.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
+import 'package:kardex_app_front/widgets/dialogs/inventory_unit_picker.dart';
 
 import '../web/create_transfer_screen_web.dart';
 import 'widgets.dart';
@@ -60,10 +61,16 @@ class _MobileScaffold extends StatelessWidget {
                 await DialogManager.showErrorDialog(context, "No se pueden agregar mas de 100 productos");
                 return;
               }
+              if (!context.mounted) return;
+              final unit = await showInventoryUnitPicker(context, res);
+              if (unit == null) return;
               final newRow = TransferProductRow(
                 product: res,
                 quantity: 0,
-                unitaryCost: res.account.averageCost,
+                unitaryCost: (res.account.averageCost * unit.conversionFactor).round(),
+                selectedUnitIndex: unit.unitIndex,
+                conversionFactor: unit.conversionFactor,
+                selectedUnitName: unit.unitName,
               );
               mediator.productTableController.addRow(newRow);
               mediator.refresh();
