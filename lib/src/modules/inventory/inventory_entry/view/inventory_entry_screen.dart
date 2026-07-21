@@ -9,6 +9,7 @@ import 'package:kardex_app_front/src/modules/inventory/inventory_entry/cubit/wri
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
+import 'package:kardex_app_front/widgets/dialogs/inventory_unit_picker.dart';
 
 import 'mediator.dart';
 import 'mobile/widgets/appbar_menu.dart';

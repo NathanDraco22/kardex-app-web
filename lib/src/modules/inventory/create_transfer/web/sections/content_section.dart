@@ -19,11 +19,17 @@ class _ContentSection extends StatelessWidget {
           await DialogManager.showErrorDialog(context, "No se pueden agregar mas de 100 productos");
           return;
         }
+        if (!context.mounted) return;
+        final unit = await showInventoryUnitPicker(context, res);
+        if (unit == null) return;
 
         final productRow = TransferProductRow(
           product: res,
           quantity: 0,
-          unitaryCost: res.account.averageCost,
+          unitaryCost: (res.account.averageCost * unit.conversionFactor).round(),
+          selectedUnitIndex: unit.unitIndex,
+          conversionFactor: unit.conversionFactor,
+          selectedUnitName: unit.unitName,
         );
         controller.addRow(productRow);
         mediator.refresh();
@@ -36,10 +42,16 @@ class _ContentSection extends StatelessWidget {
       onUpdateRowAction: (controller, row) async {
         final res = await showSearchProductInBranchDialog(context, product: row.product);
         if (res == null) return;
+        if (!context.mounted) return;
+        final unit = await showInventoryUnitPicker(context, res);
+        if (unit == null) return;
         final newProductRow = TransferProductRow(
           product: res,
           quantity: 0,
-          unitaryCost: 0,
+          unitaryCost: (res.account.averageCost * unit.conversionFactor).round(),
+          selectedUnitIndex: unit.unitIndex,
+          conversionFactor: unit.conversionFactor,
+          selectedUnitName: unit.unitName,
         );
         controller.updateRow(row, newProductRow);
         mediator.refresh();

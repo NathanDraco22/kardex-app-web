@@ -202,11 +202,27 @@ class TransferViewerContent extends StatelessWidget {
                       color: rowColor,
                       child: Row(
                         children: [
-                          Expanded(flex: 2, child: Text(item.name)),
-                          Expanded(child: Text(item.quantity.toString())),
+                          Expanded(
+                            flex: 2,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(item.name),
+                                Text(
+                                  item.unitName,
+                                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                ),
+                              ],
+                            ),
+                          ),
                           Expanded(
                             child: Text(
-                              NumberFormatter.convertToMoneyLike(item.cost),
+                              NumberFormatter.formatDisplayStock(item.quantity, item.conversionFactor),
+                            ),
+                          ),
+                          Expanded(
+                            child: Text(
+                              NumberFormatter.convertToMoneyLike(item.cost * item.conversionFactor),
                             ),
                           ),
                           Expanded(

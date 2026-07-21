@@ -6,12 +6,14 @@ class AdjustExitItem {
   final String? unitName;
   final int cost; // Historical cost at the time of exit
   final int quantity;
+  final int conversionFactor;
 
   AdjustExitItem({
     required this.productId,
     required this.productName,
     required this.cost,
     required this.quantity,
+    this.conversionFactor = 1,
     this.code,
     this.brandName,
     this.unitName,
@@ -26,6 +28,7 @@ class AdjustExitItem {
       unitName: json['unitName'] as String?,
       cost: json['cost'] as int,
       quantity: json['quantity'] as int,
+      conversionFactor: json['conversionFactor'] as int? ?? 1,
     );
   }
 
@@ -35,6 +38,7 @@ class AdjustExitItem {
       'productName': productName,
       'cost': cost,
       'quantity': quantity,
+      'conversionFactor': conversionFactor,
       'code': code,
       'brandName': brandName,
       'unitName': unitName,

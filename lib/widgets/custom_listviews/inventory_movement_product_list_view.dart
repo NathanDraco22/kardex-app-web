@@ -5,6 +5,7 @@ import 'package:kardex_app_front/src/tools/input_formatter/input_formatter.dart'
 import 'package:kardex_app_front/widgets/calculator/calculator_field.dart';
 import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
+import 'package:kardex_app_front/widgets/dialogs/inventory_unit_picker.dart';
 
 class ProductRowCard {
   ProductRowCard({
@@ -14,6 +15,9 @@ class ProductRowCard {
     this.editableCost = false,
     this.expirationDate,
     this.haveExpirationDate = true,
+    this.selectedUnitIndex = 0,
+    this.conversionFactor = 1,
+    this.selectedUnitName = '',
   });
 
   ProductInDb product;
@@ -23,6 +27,10 @@ class ProductRowCard {
 
   bool editableCost;
   bool haveExpirationDate;
+
+  int selectedUnitIndex;
+  int conversionFactor;
+  String selectedUnitName;
 
   int get subTotal => (quantity * unitaryCost);
 }
@@ -138,14 +146,32 @@ class _Content extends StatelessWidget {
         onChange: () async {
           final res = await showProductSearchDelegate(context);
           if (res == null) return;
+          if (!context.mounted) return;
+          final unit = await showInventoryUnitPicker(context, res);
+          if (unit == null) return;
           final newRow = ProductRowCard(
             product: res,
             quantity: 0,
-            unitaryCost: 0,
+            unitaryCost: (res is ProductInDbInBranch) ? (res.account.averageCost * unit.conversionFactor).round() : 0,
             editableCost: true,
+            selectedUnitIndex: unit.unitIndex,
+            conversionFactor: unit.conversionFactor,
+            selectedUnitName: unit.unitName,
           );
 
           controller.updateRowCard(currentRowCardModel, newRow);
+        },
+        onChangeUnit: () async {
+          final unit = await showInventoryUnitPicker(context, currentRowCardModel.product);
+          if (unit == null) return;
+          currentRowCardModel.selectedUnitIndex = unit.unitIndex;
+          currentRowCardModel.conversionFactor = unit.conversionFactor;
+          currentRowCardModel.selectedUnitName = unit.unitName;
+          final averageCost = currentRowCardModel.product is ProductInDbInBranch
+              ? (currentRowCardModel.product as ProductInDbInBranch).account.averageCost
+              : 0;
+          currentRowCardModel.unitaryCost = (averageCost * unit.conversionFactor).round();
+          controller.refresh();
         },
       );
     }
@@ -159,13 +185,14 @@ class EntryRowCard extends StatefulWidget {
     required this.rowCardModel,
     this.onRemove,
     this.onChange,
+    this.onChangeUnit,
   });
 
   final Color rowColor;
   final ProductRowCard rowCardModel;
-
   final VoidCallback? onRemove;
   final VoidCallback? onChange;
+  final VoidCallback? onChangeUnit;
 
   @override
   State<EntryRowCard> createState() => _EntryRowCardState();
@@ -222,6 +249,8 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
             switch (res) {
               case _MenuOptions.change:
                 widget.onChange?.call();
+              case _MenuOptions.changeUnit:
+                widget.onChangeUnit?.call();
               case _MenuOptions.delete:
                 widget.onRemove?.call();
             }
@@ -273,8 +302,27 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
                     children: [
                       Flexible(
                         fit: FlexFit.tight,
-                        child: Text(
-                          product.unitName,
+                        child: Builder(
+                          builder: (context) {
+                            String label = rowCard.selectedUnitName.isNotEmpty
+                                ? rowCard.selectedUnitName
+                                : product.unitName;
+
+                            Color? color;
+
+                            if (rowCard.selectedUnitIndex > 0) {
+                              color = Colors.blue.shade300;
+                              label = "$label(${rowCard.conversionFactor})";
+                            }
+
+                            return Text(
+                              label,
+                              style: TextStyle(
+                                color: color,
+                                fontWeight: rowCard.selectedUnitIndex > 0 ? FontWeight.bold : FontWeight.normal,
+                              ),
+                            );
+                          },
                         ),
                       ),
                       Flexible(
@@ -325,24 +373,40 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
                     children: [
                       Flexible(
                         fit: FlexFit.tight,
-                        child: TitleTextField(
-                          focusNode: focusNode,
-                          inputFormatters: [IntegerTextInputFormatter()],
-                          titleTextAlign: TextAlign.center,
-                          keyboardType: TextInputType.number,
-                          onEditingComplete: () => FocusScope.of(context).nextFocus(),
-                          title: "Cantidad",
-                          onChanged: (value) {
-                            if (value.isEmpty) {
-                              rowCard.quantity = 0;
-                              setState(() {});
-                              return;
-                            }
-                            final numValue = int.tryParse(value);
-                            if (numValue == null) return;
-                            rowCard.quantity = numValue;
-                            setState(() {});
-                          },
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            TitleTextField(
+                              focusNode: focusNode,
+                              inputFormatters: [IntegerTextInputFormatter()],
+                              titleTextAlign: TextAlign.center,
+                              keyboardType: TextInputType.number,
+                              onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                              title: "Cantidad",
+                              onChanged: (value) {
+                                if (value.isEmpty) {
+                                  rowCard.quantity = 0;
+                                  setState(() {});
+                                  return;
+                                }
+                                final numValue = int.tryParse(value);
+                                if (numValue == null) return;
+                                rowCard.quantity = numValue;
+                                setState(() {});
+                              },
+                            ),
+                            if (rowCard.conversionFactor > 1) ...[
+                              const SizedBox(height: 6),
+                              Text(
+                                "= ${rowCard.quantity * rowCard.conversionFactor} ${product.unitName}",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.blue.shade300,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                       ),
                       Flexible(
@@ -364,6 +428,16 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
                                         fontSize: 16,
                                       ),
                                     ),
+                                    if (rowCard.conversionFactor > 1) ...[
+                                      Text(
+                                        "(${NumberFormatter.convertToMoneyLike((rowCard.unitaryCost / rowCard.conversionFactor).round())})",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.blue.shade300,
+                                          fontStyle: FontStyle.italic,
+                                        ),
+                                      ),
+                                    ],
                                   ],
                                 ),
                               );
@@ -387,6 +461,16 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
                                     setState(() {});
                                   },
                                 ),
+                                if (rowCard.conversionFactor > 1) ...[
+                                  Text(
+                                    "(${NumberFormatter.convertFromCentsToUnitsCurrency((rowCard.unitaryCost / rowCard.conversionFactor).round())})",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.blue.shade300,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                  ),
+                                ],
                               ],
                             );
                           },
@@ -431,7 +515,7 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
   }
 }
 
-enum _MenuOptions { change, delete }
+enum _MenuOptions { change, changeUnit, delete }
 
 Future<_MenuOptions?> _showContextMenu(BuildContext context, Offset position) async {
   final result = await showMenu<_MenuOptions>(
@@ -443,6 +527,13 @@ Future<_MenuOptions?> _showContextMenu(BuildContext context, Offset position) as
         child: ListTile(
           leading: Icon(Icons.swap_horiz),
           title: Text('Cambiar'),
+        ),
+      ),
+      const PopupMenuItem(
+        value: _MenuOptions.changeUnit,
+        child: ListTile(
+          leading: Icon(Icons.scale),
+          title: Text('Cambiar Unidad'),
         ),
       ),
       const PopupMenuItem(

@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/tools/input_formatter/input_formatter.dart';
+import 'package:kardex_app_front/widgets/dialogs/inventory_unit_picker.dart';
 import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
 
 class TransferProductRow {
@@ -13,12 +14,19 @@ class TransferProductRow {
     this.quantity = 0,
     this.unitaryCost = 0,
     this.expirationDate,
+    this.selectedUnitIndex = 0,
+    this.conversionFactor = 1,
+    this.selectedUnitName = '',
   });
 
   ProductInDbInBranch product;
   int quantity = 0;
   int unitaryCost = 0;
   DateTime? expirationDate;
+
+  int selectedUnitIndex;
+  int conversionFactor;
+  String selectedUnitName;
 
   int get subTotal => (quantity * unitaryCost);
 }
@@ -104,6 +112,18 @@ class _TransferProductTableState extends State<TransferProductTable> {
     super.initState();
   }
 
+  Future<void> _handleChangeUnit(TransferProductRow row) async {
+    final unit = await showInventoryUnitPicker(context, row.product);
+    if (unit == null) return;
+    setState(() {
+      row.selectedUnitIndex = unit.unitIndex;
+      row.conversionFactor = unit.conversionFactor;
+      row.selectedUnitName = unit.unitName;
+      row.unitaryCost = (row.product.account.averageCost * unit.conversionFactor).round();
+    });
+    _tableController?.refresh();
+  }
+
   @override
   void didUpdateWidget(covariant TransferProductTable oldWidget) {
     if (widget.controller != oldWidget.controller) {
@@ -125,6 +145,10 @@ class _TransferProductTableState extends State<TransferProductTable> {
 
         if (notification is EntryRowChangeNotification) {
           widget.onUpdateRowAction?.call(_tableController!, notification.productRow);
+        }
+
+        if (notification is EntryRowChangeUnitNotification) {
+          _handleChangeUnit(notification.productRow);
         }
 
         if (notification is EntryRowSubtotalChangedNotification) {
@@ -358,7 +382,7 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
     return Ink(
       color: widget.color,
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      height: 60,
+      height: 75,
       child: Row(
         children: [
           Flexible(
@@ -395,7 +419,7 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
                       spacing: 8,
                       children: [
                         Text(product.brandName),
-                        Text(product.defaultUnitName),
+                        Text(widget.rowModel.selectedUnitName.isNotEmpty ? widget.rowModel.selectedUnitName : product.defaultUnitName),
                       ],
                     ),
                   ],
@@ -408,26 +432,35 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
             child: Flexible(
               fit: FlexFit.tight,
               child: Center(
-                child: TextField(
-                  focusNode: expirationFocus,
-                  controller: expirationController,
-                  inputFormatters: [MonthYearInputFormatter()],
-                  textAlign: TextAlign.center,
-                  onEditingComplete: () {
-                    FocusScope.of(context).nextFocus();
-                  },
-                  decoration: const InputDecoration(
-                    hintText: "mm/aa",
-                    isDense: true,
-                  ),
-                  onChanged: (value) {
-                    try {
-                      final date = DateTimeTool.fromMMYY(value);
-                      widget.rowModel.expirationDate = date;
-                    } on Exception catch (_) {
-                      widget.rowModel.expirationDate = null;
-                    }
-                  },
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextField(
+                      focusNode: expirationFocus,
+                      controller: expirationController,
+                      inputFormatters: [MonthYearInputFormatter()],
+                      textAlign: TextAlign.center,
+                      onEditingComplete: () {
+                        FocusScope.of(context).nextFocus();
+                      },
+                      decoration: const InputDecoration(
+                        hintText: "mm/aa",
+                        isDense: true,
+                      ),
+                      onChanged: (value) {
+                        try {
+                          final date = DateTimeTool.fromMMYY(value);
+                          widget.rowModel.expirationDate = date;
+                        } on Exception catch (_) {
+                          widget.rowModel.expirationDate = null;
+                        }
+                      },
+                    ),
+                    if (widget.rowModel.conversionFactor > 1)
+                      const SizedBox(
+                        height: 18,
+                      ),
+                  ],
                 ),
               ),
             ),
@@ -435,35 +468,67 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
           Flexible(
             fit: FlexFit.tight,
             child: Center(
-              child: TextField(
-                focusNode: focusNode,
-                controller: quantityController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                inputFormatters: [IntegerTextInputFormatter()],
-                textAlign: TextAlign.center,
-                onEditingComplete: () => FocusScope.of(context).nextFocus(),
-                onChanged: (value) {
-                  if (value.isEmpty) {
-                    widget.rowModel.quantity = 0;
-                    EntryRowSubtotalChangedNotification(widget.rowModel).dispatch(context);
-                    setState(() {});
-                    return;
-                  }
-                  final numValue = int.tryParse(value);
-                  if (numValue == null) return;
-                  widget.rowModel.quantity = numValue;
-                  EntryRowSubtotalChangedNotification(widget.rowModel).dispatch(context);
-                  setState(() {});
-                },
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  TextField(
+                    focusNode: focusNode,
+                    controller: quantityController,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    inputFormatters: [IntegerTextInputFormatter()],
+                    textAlign: TextAlign.center,
+                    onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                    onChanged: (value) {
+                      if (value.isEmpty) {
+                        widget.rowModel.quantity = 0;
+                        EntryRowSubtotalChangedNotification(widget.rowModel).dispatch(context);
+                        setState(() {});
+                        return;
+                      }
+                      final numValue = int.tryParse(value);
+                      if (numValue == null) return;
+                      widget.rowModel.quantity = numValue;
+                      EntryRowSubtotalChangedNotification(widget.rowModel).dispatch(context);
+                      setState(() {});
+                    },
+                  ),
+                  if (widget.rowModel.conversionFactor > 1) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      "= ${widget.rowModel.quantity * widget.rowModel.conversionFactor} ${product.unitName}",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.blue.shade300,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ),
           ),
           Flexible(
             fit: FlexFit.tight,
             child: Center(
-              child: Text(
-                NumberFormatter.convertToMoneyLike(widget.rowModel.unitaryCost),
-                style: const TextStyle(fontWeight: FontWeight.w500),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    NumberFormatter.convertToMoneyLike(widget.rowModel.unitaryCost),
+                    style: const TextStyle(fontWeight: FontWeight.w500),
+                  ),
+                  if (widget.rowModel.conversionFactor > 1) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      "(${NumberFormatter.convertToMoneyLike((widget.rowModel.unitaryCost / widget.rowModel.conversionFactor).round())})",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.blue.shade300,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ),
           ),
@@ -525,6 +590,18 @@ class MoreActionRowButton extends StatelessWidget {
                   ),
                 ),
                 PopupMenuItem(
+                  child: ListTile(
+                    title: const Text("Cambiar Unidad"),
+                    leading: const Icon(
+                      Icons.scale,
+                    ),
+
+                    onTap: () {
+                      EntryRowChangeUnitNotification(widget.rowModel).dispatch(context);
+                    },
+                  ),
+                ),
+                PopupMenuItem(
                   child: const ListTile(
                     leading: Icon(Icons.delete),
                     title: Text("Eliminar"),
@@ -561,6 +638,10 @@ class EntryRowDeleteNotification extends EntryRowNotification {
 
 class EntryRowChangeNotification extends EntryRowNotification {
   EntryRowChangeNotification(super.productRow);
+}
+
+class EntryRowChangeUnitNotification extends EntryRowNotification {
+  EntryRowChangeUnitNotification(super.productRow);
 }
 
 class EntryRowSubtotalChangedNotification extends EntryRowNotification {

@@ -13,6 +13,7 @@ import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/se
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/search_product_in_branch_dialog.dart';
 
 import 'package:kardex_app_front/widgets/widgets.dart';
+import 'package:kardex_app_front/widgets/dialogs/inventory_unit_picker.dart';
 
 import 'mediator.dart';
 

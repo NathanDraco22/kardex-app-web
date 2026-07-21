@@ -9,6 +9,7 @@ import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/se
 import 'package:kardex_app_front/widgets/tables/transfer_product_table.dart';
 
 import 'package:kardex_app_front/widgets/widgets.dart';
+import 'package:kardex_app_front/widgets/dialogs/inventory_unit_picker.dart';
 
 import '../mediator.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

@@ -151,7 +151,24 @@ class _Body extends StatelessWidget {
                                           spacing: 8,
                                           children: [
                                             Text(item.brandName),
-                                            Text(item.unitName),
+                                            Builder(
+                                              builder: (context) {
+                                                String label = item.unitName;
+                                                Color? color;
+                                                if (item.conversionFactor > 1) {
+                                                  color = Colors.blue.shade300;
+                                                  label = "$label(${item.conversionFactor})";
+                                                }
+                                                return Text(
+                                                  label,
+                                                  style: TextStyle(
+                                                    color: color,
+                                                    fontSize: 12,
+                                                    fontWeight: item.conversionFactor > 1 ? FontWeight.bold : FontWeight.normal,
+                                                  ),
+                                                );
+                                              },
+                                            ),
                                           ],
                                         ),
                                         Text(
@@ -165,7 +182,7 @@ class _Body extends StatelessWidget {
                                   ),
                                   BasicTableCell(
                                     content: Text(
-                                      item.quantity.toString(),
+                                      NumberFormatter.formatDisplayStock(item.quantity, item.conversionFactor),
                                       style: const TextStyle(
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -173,7 +190,7 @@ class _Body extends StatelessWidget {
                                   ),
                                   BasicTableCell(
                                     content: Text(
-                                      NumberFormatter.convertToMoneyLike(item.cost),
+                                      NumberFormatter.convertToMoneyLike(item.cost * item.conversionFactor),
                                       style: const TextStyle(
                                         fontWeight: FontWeight.w500,
                                       ),
