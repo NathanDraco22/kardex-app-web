@@ -218,12 +218,12 @@ Future<void> saveAction(BuildContext context) async {
     return EntryItem(
       productId: e.product.id,
       productName: e.product.name,
-      quantity: e.quantity * e.conversionFactor,
-      cost: e.unitaryCost ~/ e.conversionFactor,
+      quantity: UnitConversionTool.toBaseQuantity(e.quantity, e.conversionFactor),
+      cost: UnitConversionTool.toBaseCost(e.unitaryCost, e.conversionFactor),
       conversionFactor: e.conversionFactor,
       code: e.product.code,
       brandName: e.product.brandName,
-      unitName: e.selectedUnitName.isNotEmpty ? e.selectedUnitName : e.product.unitName,
+      unitName: UnitConversionTool.resolveUnitName(e.selectedUnitName, e.product.unitName),
       expirationDate: e.expirationDate?.millisecondsSinceEpoch,
     );
   }).toList();

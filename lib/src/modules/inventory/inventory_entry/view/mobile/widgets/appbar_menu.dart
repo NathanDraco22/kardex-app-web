@@ -70,10 +70,10 @@ class _SaveButton extends StatelessWidget {
             productId: e.product.id,
             productName: e.product.name,
             brandName: e.product.brandName,
-            unitName: e.selectedUnitName.isNotEmpty ? e.selectedUnitName : e.product.unitName,
+            unitName: UnitConversionTool.resolveUnitName(e.selectedUnitName, e.product.unitName),
             code: e.product.code,
-            quantity: e.quantity * e.conversionFactor,
-            cost: e.unitaryCost ~/ e.conversionFactor,
+            quantity: UnitConversionTool.toBaseQuantity(e.quantity, e.conversionFactor),
+            cost: UnitConversionTool.toBaseCost(e.unitaryCost, e.conversionFactor),
             conversionFactor: e.conversionFactor,
             expirationDate: e.expirationDate?.millisecondsSinceEpoch,
           );

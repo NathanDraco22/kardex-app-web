@@ -99,12 +99,12 @@ class _MobileScaffold extends StatelessWidget {
                 return AdjustExitItem(
                   productId: card.product.id,
                   productName: card.product.name,
-                  cost: card.unitaryCost ~/ card.conversionFactor,
-                  quantity: -(card.quantity * card.conversionFactor),
+                  cost: UnitConversionTool.toBaseCost(card.unitaryCost, card.conversionFactor),
+                  quantity: UnitConversionTool.toBaseQuantity(card.quantity, card.conversionFactor) * -1,
                   conversionFactor: card.conversionFactor,
                   code: card.product.code,
                   brandName: card.product.brandName,
-                  unitName: card.selectedUnitName.isNotEmpty ? card.selectedUnitName : card.product.unitName,
+                  unitName: UnitConversionTool.resolveUnitName(card.selectedUnitName, card.product.unitName),
                 );
               }).toList();
 

@@ -22,6 +22,10 @@ class CommercialProductResult {
       resolvedUnitIndex = product.defaultUnitIndex;
     }
 
+    if (product.extraUnits.isEmpty || resolvedUnitIndex > product.extraUnits.length) {
+      resolvedUnitIndex = 0;
+    }
+
     selectedUnitIndex = resolvedUnitIndex;
     if (resolvedUnitIndex == 0) {
       conversionFactor = 1;
