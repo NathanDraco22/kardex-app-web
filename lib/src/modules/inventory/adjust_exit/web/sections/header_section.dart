@@ -153,12 +153,12 @@ Future<void> saveAction(BuildContext context) async {
     return AdjustExitItem(
       productId: e.product.id,
       productName: e.product.name,
-      cost: e.unitaryCost ~/ e.conversionFactor,
-      quantity: -(e.quantity * e.conversionFactor),
+      cost: UnitConversionTool.toBaseCost(e.unitaryCost, e.conversionFactor),
+      quantity: UnitConversionTool.toBaseQuantity(e.quantity, e.conversionFactor) * -1,
       conversionFactor: e.conversionFactor,
       brandName: e.product.brandName,
       code: e.product.code,
-      unitName: e.selectedUnitName.isNotEmpty ? e.selectedUnitName : e.product.unitName,
+      unitName: UnitConversionTool.resolveUnitName(e.selectedUnitName, e.product.unitName),
     );
   }).toList();
 

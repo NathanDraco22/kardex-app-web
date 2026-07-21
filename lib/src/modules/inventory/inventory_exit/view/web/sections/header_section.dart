@@ -200,9 +200,9 @@ Future<void> saveExit(BuildContext context) async {
     return ExitItem(
       productId: e.product.id,
       productName: e.product.name,
-      quantity: (e.quantity * e.conversionFactor) * -1,
+      quantity: UnitConversionTool.toBaseQuantity(e.quantity, e.conversionFactor) * -1,
       brandName: e.product.brandName,
-      unitName: e.selectedUnitName.isNotEmpty ? e.selectedUnitName : e.product.unitName,
+      unitName: UnitConversionTool.resolveUnitName(e.selectedUnitName, e.product.unitName),
       code: e.product.code,
       conversionFactor: e.conversionFactor,
     );

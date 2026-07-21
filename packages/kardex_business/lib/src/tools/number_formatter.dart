@@ -31,7 +31,8 @@ class NumberFormatter {
   }
 
   static String formatDisplayStock(int stock, int factor) {
-    final val = stock / factor;
+    final safeFactor = factor < 1 ? 1 : factor;
+    final val = stock / safeFactor;
     if (val == val.toInt()) {
       return val.toInt().toString();
     }
