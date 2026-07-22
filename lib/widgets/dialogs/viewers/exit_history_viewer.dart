@@ -266,7 +266,7 @@ class _ExitHistoryViewer extends StatelessWidget {
                                                 item.brandName ?? "",
                                               ),
                                               Text(
-                                                item.unitName ?? "",
+                                                "${item.unitName ?? ''}${item.conversionFactor > 1 ? ' (${item.conversionFactor % 1 == 0 ? item.conversionFactor.toInt() : item.conversionFactor})' : ''}",
                                               ),
                                             ],
                                           ),
@@ -281,7 +281,9 @@ class _ExitHistoryViewer extends StatelessWidget {
                                     ),
                                     Expanded(
                                       child: Text(
-                                        NumberFormatter.convertToMoneyLike(((item.cost ?? 0) * item.conversionFactor).round()),
+                                        NumberFormatter.convertToMoneyLike(
+                                          ((item.cost ?? 0) * item.conversionFactor).round(),
+                                        ),
                                         textAlign: TextAlign.center,
                                       ),
                                     ),
