@@ -243,7 +243,9 @@ class _AdjustEntryViewer extends StatelessWidget {
                                               const SizedBox(width: 4),
                                               Text(item.brandName ?? ""),
                                               const SizedBox(width: 4),
-                                              Text(item.unitName ?? ""),
+                                              Text(
+                                                "${item.unitName ?? ''}${item.conversionFactor > 1 ? ' (${item.conversionFactor % 1 == 0 ? item.conversionFactor.toInt() : item.conversionFactor})' : ''}",
+                                              ),
                                             ],
                                           ),
                                         ],
