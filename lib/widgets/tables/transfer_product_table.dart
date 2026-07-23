@@ -419,7 +419,22 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
                       spacing: 8,
                       children: [
                         Text(product.brandName),
-                        Text(widget.rowModel.selectedUnitName.isNotEmpty ? widget.rowModel.selectedUnitName : product.defaultUnitName),
+                        Builder(
+                          builder: (context) {
+                            final unitName = widget.rowModel.selectedUnitName.isNotEmpty
+                                ? widget.rowModel.selectedUnitName
+                                : product.defaultUnitName;
+                            final displayUnit = widget.rowModel.conversionFactor > 1
+                                ? "$unitName (${widget.rowModel.conversionFactor})"
+                                : unitName;
+                            return Text(
+                              displayUnit,
+                              style: widget.rowModel.conversionFactor > 1
+                                  ? const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)
+                                  : null,
+                            );
+                          },
+                        ),
                       ],
                     ),
                   ],

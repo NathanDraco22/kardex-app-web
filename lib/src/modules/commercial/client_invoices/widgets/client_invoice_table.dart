@@ -361,9 +361,16 @@ class InvoiceTableRow extends StatelessWidget {
                               ),
                             ),
                             Expanded(
-                              child: Text(
-                                item.selectedUnitName.isNotEmpty ? item.selectedUnitName : product.unitName,
-                                textAlign: TextAlign.left,
+                              child: Builder(
+                                builder: (context) {
+                                  final unitName = item.selectedUnitName.isNotEmpty ? item.selectedUnitName : product.unitName;
+                                  final displayUnit = item.conversionFactor > 1 ? "$unitName (${item.conversionFactor})" : unitName;
+                                  return Text(
+                                    displayUnit,
+                                    textAlign: TextAlign.left,
+                                    style: item.conversionFactor > 1 ? const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue) : null,
+                                  );
+                                },
                               ),
                             ),
                           ],

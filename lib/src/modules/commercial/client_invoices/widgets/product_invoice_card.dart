@@ -93,12 +93,23 @@ class ProductInvoiceCard extends StatelessWidget {
                             Text(item.product.displayCode),
                           ],
                         ),
-                        Row(
-                          spacing: 12,
-                          children: [
-                            Text(item.product.brandName),
-                            Text(item.selectedUnitName),
-                          ],
+                        Builder(
+                          builder: (context) {
+                            final unitName = item.selectedUnitName.isNotEmpty ? item.selectedUnitName : item.product.unitName;
+                            final displayUnit = item.conversionFactor > 1 ? "$unitName (${item.conversionFactor})" : unitName;
+                            return Row(
+                              spacing: 12,
+                              children: [
+                                Text(item.product.brandName),
+                                Text(
+                                  displayUnit,
+                                  style: item.conversionFactor > 1
+                                      ? const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)
+                                      : null,
+                                ),
+                              ],
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -113,7 +124,13 @@ class ProductInvoiceCard extends StatelessWidget {
                 spacing: 12,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Text("${item.selectedUnitName}: "),
+                  Builder(
+                    builder: (context) {
+                      final unitName = item.selectedUnitName.isNotEmpty ? item.selectedUnitName : item.product.unitName;
+                      final displayUnit = item.conversionFactor > 1 ? "$unitName (${item.conversionFactor})" : unitName;
+                      return Text("$displayUnit: ");
+                    },
+                  ),
                   Text(
                     item.quantity.toString(),
                     style: const TextStyle(
