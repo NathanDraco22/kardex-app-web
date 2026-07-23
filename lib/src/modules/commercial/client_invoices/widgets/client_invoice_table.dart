@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/widgets/display_product_code.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_dialog.dart';
-import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/search_product_commercial_dialog.dart';
 
@@ -361,16 +361,11 @@ class InvoiceTableRow extends StatelessWidget {
                               ),
                             ),
                             Expanded(
-                              child: Builder(
-                                builder: (context) {
-                                  final unitName = item.selectedUnitName.isNotEmpty ? item.selectedUnitName : product.unitName;
-                                  final displayUnit = item.conversionFactor > 1 ? "$unitName (${item.conversionFactor})" : unitName;
-                                  return Text(
-                                    displayUnit,
-                                    textAlign: TextAlign.left,
-                                    style: item.conversionFactor > 1 ? const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue) : null,
-                                  );
-                                },
+                              child: UnitDisplayer(
+                                unitName: item.selectedUnitName,
+                                conversionFactor: item.conversionFactor,
+                                fallbackUnitName: product.unitName,
+                                textAlign: TextAlign.left,
                               ),
                             ),
                           ],

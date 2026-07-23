@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/tools/input_formatter/input_formatter.dart';
 import 'package:kardex_app_front/widgets/dialogs/inventory_unit_picker.dart';
@@ -419,21 +420,10 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
                       spacing: 8,
                       children: [
                         Text(product.brandName),
-                        Builder(
-                          builder: (context) {
-                            final unitName = widget.rowModel.selectedUnitName.isNotEmpty
-                                ? widget.rowModel.selectedUnitName
-                                : product.defaultUnitName;
-                            final displayUnit = widget.rowModel.conversionFactor > 1
-                                ? "$unitName (${widget.rowModel.conversionFactor})"
-                                : unitName;
-                            return Text(
-                              displayUnit,
-                              style: widget.rowModel.conversionFactor > 1
-                                  ? const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)
-                                  : null,
-                            );
-                          },
+                        UnitDisplayer(
+                          unitName: widget.rowModel.selectedUnitName,
+                          conversionFactor: widget.rowModel.conversionFactor,
+                          fallbackUnitName: product.defaultUnitName,
                         ),
                       ],
                     ),
