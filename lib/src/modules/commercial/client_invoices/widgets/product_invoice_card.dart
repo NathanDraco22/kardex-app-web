@@ -93,23 +93,16 @@ class ProductInvoiceCard extends StatelessWidget {
                             Text(item.product.displayCode),
                           ],
                         ),
-                        Builder(
-                          builder: (context) {
-                            final unitName = item.selectedUnitName.isNotEmpty ? item.selectedUnitName : item.product.unitName;
-                            final displayUnit = item.conversionFactor > 1 ? "$unitName (${item.conversionFactor})" : unitName;
-                            return Row(
-                              spacing: 12,
-                              children: [
-                                Text(item.product.brandName),
-                                Text(
-                                  displayUnit,
-                                  style: item.conversionFactor > 1
-                                      ? const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)
-                                      : null,
-                                ),
-                              ],
-                            );
-                          },
+                        Row(
+                          spacing: 12,
+                          children: [
+                            Text(item.product.brandName),
+                            UnitDisplayer(
+                              unitName: item.selectedUnitName,
+                              conversionFactor: item.conversionFactor,
+                              fallbackUnitName: item.product.unitName,
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -124,12 +117,11 @@ class ProductInvoiceCard extends StatelessWidget {
                 spacing: 12,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Builder(
-                    builder: (context) {
-                      final unitName = item.selectedUnitName.isNotEmpty ? item.selectedUnitName : item.product.unitName;
-                      final displayUnit = item.conversionFactor > 1 ? "$unitName (${item.conversionFactor})" : unitName;
-                      return Text("$displayUnit: ");
-                    },
+                  UnitDisplayer(
+                    unitName: item.selectedUnitName,
+                    conversionFactor: item.conversionFactor,
+                    fallbackUnitName: item.product.unitName,
+                    suffix: ": ",
                   ),
                   Text(
                     item.quantity.toString(),

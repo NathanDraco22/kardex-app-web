@@ -127,18 +127,16 @@ class MobileProductCardState extends State<MobileProductCard> with AutomaticKeep
                           Text(widget.row.product.displayCode),
                         ],
                       ),
-                      Builder(
-                        builder: (context) {
-                          final unitName = widget.row.selectedUnitName.isNotEmpty ? widget.row.selectedUnitName : widget.row.product.unitName;
-                          final displayUnit = widget.row.conversionFactor > 1 ? "$unitName (${widget.row.conversionFactor})" : unitName;
-                          return Text(
-                            "${widget.row.product.brandName} - $displayUnit",
-                            style: TextStyle(
-                              color: widget.row.conversionFactor > 1 ? Colors.blue.shade700 : Colors.grey,
-                              fontWeight: widget.row.conversionFactor > 1 ? FontWeight.bold : FontWeight.normal,
-                            ),
-                          );
-                        },
+                      UnitDisplayer(
+                        unitName: widget.row.selectedUnitName,
+                        conversionFactor: widget.row.conversionFactor,
+                        fallbackUnitName: widget.row.product.unitName,
+                        prefix: "${widget.row.product.brandName} - ",
+                        style: const TextStyle(color: Colors.grey),
+                        highlightStyle: TextStyle(
+                          color: Colors.blue.shade700,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Row(

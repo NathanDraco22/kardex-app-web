@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/web/mediator.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/widgets/more_action_row_button.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_dialog.dart';
-import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/search_product_commercial_dialog.dart';
 import 'package:kardex_app_front/widgets/incremental_textfield.dart';
@@ -313,18 +313,12 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
                                 ),
                               ),
                               Expanded(
-                                child: Builder(
-                                  builder: (context) {
-                                    final comm = widget.item.commercial;
-                                    final unitName = comm.selectedUnitName.isNotEmpty ? comm.selectedUnitName : product.unitName;
-                                    final displayUnit = comm.conversionFactor > 1 ? "$unitName (${comm.conversionFactor})" : unitName;
-                                    return Text(
-                                      displayUnit,
-                                      textAlign: TextAlign.left,
-                                      style: comm.conversionFactor > 1 ? const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue) : null,
-                                    );
-                                  },
-                                ),
+                                child: UnitDisplayer(
+                                 unitName: widget.item.commercial.selectedUnitName,
+                                 conversionFactor: widget.item.commercial.conversionFactor,
+                                 fallbackUnitName: product.unitName,
+                                 textAlign: TextAlign.left,
+                               ),
                               ),
 
                               Expanded(
