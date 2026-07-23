@@ -139,7 +139,7 @@ class _QuickProductSearchDelegateState extends State<QuickProductSearchDelegate>
           final quantity = _getQuantity(product);
 
           bool canIncrement = true;
-          if (widget.restrictStock && quantity >= (product.account.availableStock ~/ product.defaultUnitFactor)) {
+          if (widget.restrictStock && (quantity * product.defaultUnitFactor) >= product.account.availableStock) {
             canIncrement = false;
           }
 

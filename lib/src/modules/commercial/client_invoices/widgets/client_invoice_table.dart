@@ -208,7 +208,7 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
                           if (res == null) return;
                           if (res.quantity == 0) return;
                           if (widget.restrictQuantity &&
-                              (res.quantity > res.product.account.availableStock ||
+                              ((res.quantity * res.conversionFactor) > res.product.account.availableStock ||
                                   res.product.account.availableStock == 0)) {
                             if (!context.mounted) return;
                             await DialogManager.showErrorDialog(
@@ -257,7 +257,7 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
           );
           if (res == null) return;
           if (widget.restrictQuantity &&
-              (res.quantity > res.product.account.availableStock || res.product.account.availableStock == 0)) {
+              ((res.quantity * res.conversionFactor) > res.product.account.availableStock || res.product.account.availableStock == 0)) {
             if (!context.mounted) return;
             await DialogManager.showErrorDialog(
               context,
@@ -276,7 +276,7 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
           );
           if (res == null) return;
           if (widget.restrictQuantity &&
-              (res.quantity > res.product.account.availableStock || res.product.account.availableStock == 0)) {
+              ((res.quantity * res.conversionFactor) > res.product.account.availableStock || res.product.account.availableStock == 0)) {
             if (!context.mounted) return;
             await DialogManager.showErrorDialog(
               context,

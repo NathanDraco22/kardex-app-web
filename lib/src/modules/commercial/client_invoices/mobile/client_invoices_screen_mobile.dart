@@ -79,7 +79,7 @@ class _RootScaffold extends StatelessWidget {
             );
             if (res == null) return;
             if (writeCubit.documentType != CommercialDocumentType.quote &&
-                res.quantity > res.product.account.availableStock) {
+                (res.quantity * res.conversionFactor) > res.product.account.availableStock) {
               if (!context.mounted) return;
               await DialogManager.showErrorDialog(
                 context,
@@ -306,7 +306,7 @@ class _Body extends StatelessWidget {
                           );
                           if (res == null) return;
                           if (writeCubit.documentType != CommercialDocumentType.quote &&
-                              res.quantity > res.product.account.availableStock) {
+                              (res.quantity * res.conversionFactor) > res.product.account.availableStock) {
                             if (!context.mounted) return;
                             await DialogManager.showErrorDialog(
                               context,
@@ -328,7 +328,7 @@ class _Body extends StatelessWidget {
                           );
                           if (res == null) return;
                           if (writeCubit.documentType != CommercialDocumentType.quote &&
-                              res.quantity > res.product.account.availableStock) {
+                              (res.quantity * res.conversionFactor) > res.product.account.availableStock) {
                             if (!context.mounted) return;
                             await DialogManager.showErrorDialog(
                               context,

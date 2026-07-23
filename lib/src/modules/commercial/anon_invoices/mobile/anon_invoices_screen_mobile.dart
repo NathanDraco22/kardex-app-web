@@ -208,7 +208,7 @@ class _Body extends StatelessWidget {
                           if (!context.mounted) return;
                           if (res == null) return;
                           if (res.product.account.availableStock == 0 ||
-                              res.product.account.availableStock < res.quantity) {
+                              res.product.account.availableStock < (res.quantity * res.conversionFactor)) {
                             DialogManager.showInfoDialog(
                               context,
                               "No hay stock disponible",
