@@ -49,15 +49,16 @@ Future<CommercialProductResult?> showCommercialProductDialogFromId(
         }
       }
 
-      initialResult = CommercialProductResult(
-        product: product,
-        defaultPriceLevel: previousSaleItem.selectedPrice,
-        preferredUnitType: preferredUnitType,
-      )
-        ..quantity = previousSaleItem.quantity
-        ..selectedPriceLevel = previousSaleItem.selectedPrice
-        ..newPrice = previousSaleItem.price
-        ..selectedDiscount = appliedDiscount;
+      initialResult =
+          CommercialProductResult(
+              product: product,
+              defaultPriceLevel: previousSaleItem.selectedPrice,
+              preferredUnitType: preferredUnitType,
+            )
+            ..quantity = previousSaleItem.quantity
+            ..selectedPriceLevel = previousSaleItem.selectedPrice
+            ..newPrice = previousSaleItem.price
+            ..selectedDiscount = appliedDiscount;
     }
 
     return await showCommercialProductDialog(
@@ -474,37 +475,6 @@ class _FormContentState extends State<_FormContent> {
                           ),
 
                           const SizedBox(height: 12),
-
-                          const Text(
-                            "Descuentos Disponibles",
-                            textAlign: TextAlign.start,
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-
-                          const SizedBox(height: 12),
-
-                          AbsorbPointer(
-                            absorbing:
-                                commercialProductResult.newPrice !=
-                                commercialProductResult.product.saleProfile.salePrice,
-                            child: DropdownButtonFormField(
-                              initialValue: commercialProductResult.selectedDiscount,
-                              items: discountsAvailable.toList(),
-                              decoration: InputDecoration(
-                                suffixIcon: IconButton(
-                                  onPressed: () {
-                                    commercialProductResult.selectedDiscount = null;
-                                    setState(() {});
-                                  },
-                                  icon: const Icon(Icons.close),
-                                ),
-                              ),
-                              onChanged: (value) {
-                                commercialProductResult.selectedDiscount = value;
-                                setState(() {});
-                              },
-                            ),
-                          ),
                         ],
                       ),
                     ),
