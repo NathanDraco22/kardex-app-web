@@ -171,6 +171,15 @@ Future<void> saveTransfer(BuildContext context) async {
     return;
   }
 
+  final exceedingRow = mediator.getFirstProductExceedingStock();
+  if (exceedingRow != null) {
+    await DialogManager.showErrorDialog(
+      context,
+      "El producto ${exceedingRow.product.name} supera la existencia disponible de la sucursal origen (${exceedingRow.product.account.availableStock} ${exceedingRow.product.unitName}).",
+    );
+    return;
+  }
+
   final res = await DialogManager.slideToConfirmActionDialog(
     context,
     "¿Deseas Guardar la Transferencia? (No se puede deshacer)",

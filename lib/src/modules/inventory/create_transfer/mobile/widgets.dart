@@ -127,9 +127,18 @@ class MobileProductCardState extends State<MobileProductCard> with AutomaticKeep
                           Text(widget.row.product.displayCode),
                         ],
                       ),
-                      Text(
-                        "${widget.row.product.brandName} - ${widget.row.product.unitName}",
-                        style: const TextStyle(color: Colors.grey),
+                      Builder(
+                        builder: (context) {
+                          final unitName = widget.row.selectedUnitName.isNotEmpty ? widget.row.selectedUnitName : widget.row.product.unitName;
+                          final displayUnit = widget.row.conversionFactor > 1 ? "$unitName (${widget.row.conversionFactor})" : unitName;
+                          return Text(
+                            "${widget.row.product.brandName} - $displayUnit",
+                            style: TextStyle(
+                              color: widget.row.conversionFactor > 1 ? Colors.blue.shade700 : Colors.grey,
+                              fontWeight: widget.row.conversionFactor > 1 ? FontWeight.bold : FontWeight.normal,
+                            ),
+                          );
+                        },
                       ),
                       const SizedBox(height: 4),
                       Row(
@@ -259,6 +268,27 @@ class SaveButton extends StatelessWidget {
                 final cardKey = mediator.notifier?.cardKeys[zeroRow.product.id];
 
                 await DialogManager.showErrorDialog(context, "No se pueden guardar productos con cantidad 0");
+                if (cardKey?.currentContext != null) {
+                  Scrollable.ensureVisible(
+                    cardKey!.currentContext!,
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.easeInOut,
+                    alignment: 0.5,
+                  );
+                  if (cardKey.currentState != null) {
+                    cardKey.currentState!.setCardColorError();
+                  }
+                }
+                return;
+              }
+
+              final exceedingRow = mediator.getFirstProductExceedingStock();
+              if (exceedingRow != null) {
+                final cardKey = mediator.notifier?.cardKeys[exceedingRow.product.id];
+                await DialogManager.showErrorDialog(
+                  context,
+                  "El producto ${exceedingRow.product.name} supera la existencia disponible de la sucursal origen (${exceedingRow.product.account.availableStock} ${exceedingRow.product.unitName}).",
+                );
                 if (cardKey?.currentContext != null) {
                   Scrollable.ensureVisible(
                     cardKey!.currentContext!,

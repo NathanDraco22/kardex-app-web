@@ -108,7 +108,20 @@ class _SaleItemRowState extends State<SaleItemRow> {
 
                           Flexible(
                             fit: FlexFit.tight,
-                            child: Text(widget.saleItem.product.unitName),
+                            child: Builder(
+                              builder: (context) {
+                                final unitName = widget.saleItem.product.unitName;
+                                final displayUnit = widget.saleItem.conversionFactor > 1
+                                    ? "$unitName (${widget.saleItem.conversionFactor})"
+                                    : unitName;
+                                return Text(
+                                  displayUnit,
+                                  style: widget.saleItem.conversionFactor > 1
+                                      ? const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)
+                                      : null,
+                                );
+                              },
+                            ),
                           ),
                         ],
                       ),

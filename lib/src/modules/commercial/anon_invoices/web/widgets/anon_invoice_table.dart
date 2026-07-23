@@ -313,11 +313,17 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
                                 ),
                               ),
                               Expanded(
-                                child: Text(
-                                  widget.item.commercial.selectedUnitName.isNotEmpty
-                                      ? widget.item.commercial.selectedUnitName
-                                      : product.unitName,
-                                  textAlign: TextAlign.left,
+                                child: Builder(
+                                  builder: (context) {
+                                    final comm = widget.item.commercial;
+                                    final unitName = comm.selectedUnitName.isNotEmpty ? comm.selectedUnitName : product.unitName;
+                                    final displayUnit = comm.conversionFactor > 1 ? "$unitName (${comm.conversionFactor})" : unitName;
+                                    return Text(
+                                      displayUnit,
+                                      textAlign: TextAlign.left,
+                                      style: comm.conversionFactor > 1 ? const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue) : null,
+                                    );
+                                  },
                                 ),
                               ),
 
