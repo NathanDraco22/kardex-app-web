@@ -8,7 +8,7 @@ class UnitConversionTool {
   }
 
   static int toBaseCost(int unitaryCost, int conversionFactor) {
-    return unitaryCost ~/ ensureSafeFactor(conversionFactor);
+    return (unitaryCost / ensureSafeFactor(conversionFactor)).round();
   }
 
   static num toDisplayQuantity(int baseQuantity, int conversionFactor) {
