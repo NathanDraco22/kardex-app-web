@@ -132,7 +132,7 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
                           if (!context.mounted) return;
                           if (res == null) return;
                           if (res.product.account.availableStock == 0 ||
-                              res.product.account.availableStock < res.quantity) {
+                              res.product.account.availableStock < (res.quantity * res.conversionFactor)) {
                             DialogManager.showInfoDialog(
                               context,
                               "No hay stock disponible",
@@ -173,7 +173,7 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
             isDirectSale: true,
           );
           if (res == null) return;
-          if (res.product.account.availableStock == 0 || res.product.account.availableStock < res.quantity) {
+          if (res.product.account.availableStock == 0 || res.product.account.availableStock < (res.quantity * res.conversionFactor)) {
             if (!context.mounted) return;
             await DialogManager.showErrorDialog(
               context,
@@ -190,7 +190,7 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
             commercialProductResult: item.commercial,
           );
           if (res == null) return;
-          if (res.product.account.availableStock == 0 || res.product.account.availableStock < res.quantity) {
+          if (res.product.account.availableStock == 0 || res.product.account.availableStock < (res.quantity * res.conversionFactor)) {
             if (!context.mounted) return;
             await DialogManager.showErrorDialog(
               context,
