@@ -209,7 +209,9 @@ class TransferViewerContent extends StatelessWidget {
                               children: [
                                 Text(item.name),
                                 Text(
-                                  item.unitName,
+                                  item.conversionFactor > 1
+                                      ? "${item.unitName} (${item.conversionFactor.toInt()})"
+                                      : item.unitName,
                                   style: const TextStyle(fontSize: 12, color: Colors.grey),
                                 ),
                               ],
