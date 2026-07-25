@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/widgets/buttons/back_button.dart';
 import 'package:kardex_app_front/widgets/buttons/elevated_ctrl_button.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
@@ -122,8 +123,10 @@ class _RootScaffold extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: title.contains("(Mayorista)")
-            ? Text.rich(
+        title: Builder(
+          builder: (context) {
+            if (title.contains("(Mayorista)")) {
+              return Text.rich(
                 TextSpan(
                   children: [
                     TextSpan(text: "${title.replaceAll("(Mayorista)", "").trim()} "),
@@ -133,8 +136,11 @@ class _RootScaffold extends StatelessWidget {
                     ),
                   ],
                 ),
-              )
-            : Text(title),
+              );
+            }
+            return Text(title);
+          },
+        ),
       ),
       body: const _Body(),
       bottomNavigationBar: BottomAppBar(
