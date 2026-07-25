@@ -135,6 +135,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
       keyboardType: TextInputType.number,
       onChanged: onChanged,
       initialValue: initialValue,
+      textInputAction: TextInputAction.next,
       inputFormatters: [DoubleThousandsFormatter()],
     );
 
