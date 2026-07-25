@@ -6,7 +6,9 @@ import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
-import '../commercial_product_unit_selector.dart';
+import '../widgets/commercial_product_unit_selector.dart';
+import '../widgets/price_level_dropdown_selector.dart';
+import '../widgets/product_header_info.dart';
 import 'package:kardex_app_front/widgets/title_label.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
@@ -203,40 +205,8 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Center(
-                child: ImageViewerWidget(
-                  imageUrls: widget.product.image.isNotEmpty ? [widget.product.image] : [],
-                  width: 90,
-                  height: 90,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                widget.product.name,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
-              ),
-              Text(
-                widget.product.displayCode,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                spacing: 12,
-                children: [
-                  TitleLabel(
-                    title: "Marca",
-                    bigTitle: widget.product.brandName,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                  ),
-                  TitleLabel(
-                    title: "Unidad",
-                    bigTitle: widget.product.unitName,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                  ),
-                ],
+              ProductHeaderInfo(
+                product: widget.product,
               ),
               Expanded(
                 child: ListView(
@@ -253,63 +223,10 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                             onChanged: () => setState(() {}),
                           ),
                           const SizedBox(height: 12),
-                          const Text(
-                            "Nivel de Precio",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          DropdownButton<int>(
-                            value: commercialProductResult.selectedPriceLevel,
-                            isExpanded: true,
-                            items: [
-                              DropdownMenuItem(
-                                value: 1,
-                                child: Text(
-                                  "Precio 1 (${NumberFormatter.convertToMoneyLike(product.saleProfile.salePrice)})",
-                                ),
-                              ),
-                              DropdownMenuItem(
-                                value: 2,
-                                child: Text(
-                                  "Precio 2 (${NumberFormatter.convertToMoneyLike(product.saleProfile.salePrice2)})",
-                                ),
-                              ),
-                              DropdownMenuItem(
-                                value: 3,
-                                child: Text(
-                                  "Precio 3 (${NumberFormatter.convertToMoneyLike(product.saleProfile.salePrice3)})",
-                                ),
-                              ),
-                              DropdownMenuItem(
-                                value: 4,
-                                child: Text(
-                                  "Precio 4 (${NumberFormatter.convertToMoneyLike(product.saleProfile.salePrice4)})",
-                                ),
-                              ),
-                              if (isUserAdmin)
-                                const DropdownMenuItem(
-                                  value: 0,
-                                  child: Text("Precio manual"),
-                                ),
-                            ],
-                            onChanged: (value) {
-                              if (value == null) return;
-                              final priceMap = {
-                                1: product.saleProfile.salePrice,
-                                2: product.saleProfile.salePrice2,
-                                3: product.saleProfile.salePrice3,
-                                4: product.saleProfile.salePrice4,
-                              };
-
-                              if (priceMap[value] == 0) {
-                                return;
-                              }
-
-                              commercialProductResult.selectedPriceLevel = value;
-                              if (value != 0) {
-                                commercialProductResult.newPrice = priceMap[value]!;
-                              }
-                              setState(() {});
-                            },
+                          PriceLevelDropdownSelector(
+                            result: commercialProductResult,
+                            isUserAdmin: isUserAdmin,
+                            onChanged: () => setState(() {}),
                           ),
                           const SizedBox(height: 12),
                           Row(
