@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:kardex_app_front/widgets/shorcut_container.dart';
 
 import 'ctrl_key_tip.dart';
 
