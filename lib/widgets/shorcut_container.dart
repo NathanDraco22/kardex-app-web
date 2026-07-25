@@ -24,29 +24,30 @@ class ShortcutContainer extends StatefulWidget {
 }
 
 class _ShortcutContainerState extends State<ShortcutContainer> {
-  final activatorMapper = <SingleActivator, VoidCallback>{};
-  final keyMapper = {
-    "A": LogicalKeyboardKey.keyA,
-    "G": LogicalKeyboardKey.keyG,
-    "1": LogicalKeyboardKey.digit1,
-    "2": LogicalKeyboardKey.digit2,
-    "3": LogicalKeyboardKey.digit3,
-    "4": LogicalKeyboardKey.digit4,
-    "5": LogicalKeyboardKey.digit5,
-    "6": LogicalKeyboardKey.digit6,
-    "7": LogicalKeyboardKey.digit7,
-    "8": LogicalKeyboardKey.digit8,
-    "9": LogicalKeyboardKey.digit9,
+  final keyMapper = <String, (LogicalKeyboardKey, bool)>{
+    "A": (LogicalKeyboardKey.keyA, true),
+    "G": (LogicalKeyboardKey.keyG, true),
+    "1": (LogicalKeyboardKey.digit1, true),
+    "2": (LogicalKeyboardKey.digit2, true),
+    "3": (LogicalKeyboardKey.digit3, true),
+    "4": (LogicalKeyboardKey.digit4, true),
+    "5": (LogicalKeyboardKey.digit5, true),
+    "6": (LogicalKeyboardKey.digit6, true),
+    "7": (LogicalKeyboardKey.digit7, true),
+    "8": (LogicalKeyboardKey.digit8, true),
+    "9": (LogicalKeyboardKey.digit9, true),
+    "ESC": (LogicalKeyboardKey.escape, false),
+    "ESCAPE": (LogicalKeyboardKey.escape, false),
   };
 
+  final activatorMapper = <SingleActivator, VoidCallback>{};
   final callBackMapper = <String, void Function()?>{};
 
   @override
   void initState() {
     for (var entry in keyMapper.entries) {
-      final logicalKey = keyMapper[entry.key];
-      if (logicalKey == null) continue;
-      activatorMapper.putIfAbsent(SingleActivator(logicalKey, control: true), () {
+      final (logicalKey, isCtrl) = entry.value;
+      activatorMapper.putIfAbsent(SingleActivator(logicalKey, control: isCtrl), () {
         return () => callBackMapper[entry.key]?.call();
       });
     }
