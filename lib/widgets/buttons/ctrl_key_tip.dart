@@ -70,9 +70,8 @@ class _CtrlKeyTipState extends State<CtrlKeyTip> {
               ),
               child: Text(
                 'CTRL + ${widget.hotKey}',
-                style: TextStyle(
-                  color: Colors.amber.shade300,
-                  fontWeight: FontWeight.w600,
+                style: const TextStyle(
+                  color: Colors.white,
                   fontSize: 10,
                 ),
               ),
