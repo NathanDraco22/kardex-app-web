@@ -167,30 +167,32 @@ class MenuActions extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        ElevatedButton.icon(
+        ElevatedCtrlButton(
+          hotKey: "4",
           onPressed: () async {
             await context.pushNamed("suppliers-catalog");
           },
-          icon: const Icon(
-            FluentIcons.building_multiple_20_filled,
-          ),
-          label: const Text("Proveedores"),
+          icon: FluentIcons.building_multiple_20_filled,
+
+          label: "Proveedores",
         ),
 
-        ElevatedButton.icon(
+        ElevatedCtrlButton(
+          hotKey: "5",
           onPressed: () async {
             await context.pushNamed("product-list");
           },
-          icon: const Icon(FluentIcons.cube_12_filled),
-          label: const Text("Productos"),
+          icon: FluentIcons.cube_12_filled,
+          label: "Productos",
         ),
 
         const Spacer(),
 
-        ElevatedButton.icon(
+        ElevatedCtrlButton(
+          hotKey: "G",
           onPressed: isDisabled ? null : () => saveAction(context),
-          icon: const Icon(Icons.save),
-          label: const Text("Guardar"),
+          icon: Icons.save,
+          label: "Guardar",
         ),
       ],
     );

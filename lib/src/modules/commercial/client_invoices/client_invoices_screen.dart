@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 
@@ -70,8 +71,10 @@ class _RootScaffold extends StatelessWidget {
         if (!context.mounted) return;
         context.pop();
       },
-      child: Scaffold(
-        body: _Body(isWholesale: isWholesale),
+      child: ShortcutContainer(
+        child: Scaffold(
+          body: _Body(isWholesale: isWholesale),
+        ),
       ),
     );
   }

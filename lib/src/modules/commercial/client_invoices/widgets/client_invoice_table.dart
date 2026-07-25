@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kardex_app_front/widgets/buttons/elevated_ctrl_button.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/widgets/display_product_code.dart';
@@ -196,8 +197,10 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
                   Row(
                     children: [
                       const SizedBox(width: 32),
-                      ElevatedButton.icon(
-                        focusNode: FocusNode()..requestFocus(),
+                      ElevatedCtrlButton(
+                        icon: Icons.add,
+                        label: "Agregar Producto",
+                        hotKey: "1",
                         onPressed: () async {
                           final res = await showSearchProductCommercialDialog(
                             context,
@@ -223,8 +226,6 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
                           if (!context.mounted) return;
                           ClientInvoiceWebMediator.of(context).viewController.refresh();
                         },
-                        icon: const Icon(Icons.add),
-                        label: const Text("Agregar Producto"),
                       ),
                     ],
                   ),
