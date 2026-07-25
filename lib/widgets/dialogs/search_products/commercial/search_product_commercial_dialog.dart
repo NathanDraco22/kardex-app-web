@@ -335,7 +335,10 @@ class ProductResultRow extends StatelessWidget {
               Flexible(
                 fit: FlexFit.tight,
                 child: Text(
-                  NumberFormatter.formatDisplayStock(product.account.availableStock, product.defaultUnitFactor),
+                  NumberFormatter.formatDisplayStock(
+                    product.account.availableStock,
+                    product.defaultUnitFactor,
+                  ),
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
@@ -350,6 +353,7 @@ class ProductResultRow extends StatelessWidget {
                       final price = NumberFormatter.convertToMoneyLike(
                         product.saleProfile.salePrice * product.defaultUnitFactor,
                       );
+
                       return Text(
                         price,
                         style: const TextStyle(
