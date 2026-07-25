@@ -166,10 +166,11 @@ class MenuActions extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        ElevatedButton.icon(
+        ElevatedCtrlButton(
+          hotKey: "G",
           onPressed: isDisabled ? null : () => saveExit(context),
-          icon: const Icon(Icons.save),
-          label: const Text("Guardar"),
+          icon: Icons.save,
+          label: "Guardar",
         ),
       ],
     );

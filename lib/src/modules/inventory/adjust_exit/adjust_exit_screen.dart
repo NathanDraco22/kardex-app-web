@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/widgets/buttons/elevated_ctrl_button.dart';
 
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
@@ -62,12 +62,14 @@ class _AdjustExitScreenState extends State<AdjustExitScreen> {
         setState(() {});
         return true;
       },
-      child: BlocProvider(
-        create: (context) => WriteAdjustExitCubit(repository: repo),
-        child: AdjustExitMediator(
-          type: widget.type,
-          notifier: notifier,
-          child: const _RootScaffold(),
+      child: ShortcutContainer(
+        child: BlocProvider(
+          create: (context) => WriteAdjustExitCubit(repository: repo),
+          child: AdjustExitMediator(
+            type: widget.type,
+            notifier: notifier,
+            child: const _RootScaffold(),
+          ),
         ),
       ),
     );
