@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kardex_app_front/widgets/buttons/elevated_ctrl_button.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/web/mediator.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/widgets/more_action_row_button.dart';
@@ -122,8 +123,10 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
                   Row(
                     children: [
                       const SizedBox(width: 32),
-                      ElevatedButton.icon(
-                        focusNode: FocusNode()..requestFocus(),
+                      ElevatedCtrlButton(
+                        hotKey: "1",
+                        icon: Icons.add,
+                        label: "Agregar Producto",
                         onPressed: () async {
                           final res = await showSearchProductCommercialDialog(
                             context,
@@ -143,8 +146,6 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
                           if (!context.mounted) return;
                           // ClientInvoiceWebMediator.of(context).viewController.refresh();
                         },
-                        icon: const Icon(Icons.add),
-                        label: const Text("Agregar Producto"),
                       ),
                     ],
                   ),

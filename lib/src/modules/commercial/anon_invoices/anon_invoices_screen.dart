@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/cubits/write_invoice_cubit.dart';
@@ -14,11 +15,13 @@ class AnonInvoicesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final invoiceRepo = context.read<InvoicesRepository>();
-    return BlocProvider(
-      create: (context) => WriteAnonInvoiceCubit(
-        invoicesRepository: invoiceRepo,
+    return ShortcutContainer(
+      child: BlocProvider(
+        create: (context) => WriteAnonInvoiceCubit(
+          invoicesRepository: invoiceRepo,
+        ),
+        child: const _RootScaffold(),
       ),
-      child: const _RootScaffold(),
     );
   }
 }
