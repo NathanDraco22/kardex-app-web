@@ -9,7 +9,9 @@ import 'package:kardex_app_front/widgets/title_label.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
 import '../../models/commercial_product_result.dart';
-import '../commercial_product_unit_selector.dart';
+import '../widgets/commercial_product_unit_selector.dart';
+import '../widgets/price_level_dropdown_selector.dart';
+import '../widgets/product_header_info.dart';
 
 Future<CommercialProductResult?> showCommercialProductDialogFromId(
   BuildContext context, {
@@ -29,12 +31,15 @@ Future<CommercialProductResult?> showCommercialProductDialogFromId(
         .read<ProductsRepository>()
         .getProductInBranchById(productId, branchId)
         .timeout(const Duration(seconds: 10));
+
     if (!context.mounted) return null;
+
     LoadingDialogManager.closeLoadingDialog(context);
 
     CommercialProductResult? initialResult;
     if (previousSaleItem != null) {
       Discount? appliedDiscount;
+
       if (previousSaleItem.discountPercentage > 0) {
         final match = product.saleProfile.discounts.where(
           (d) => d.percentValue == previousSaleItem.discountPercentage,
@@ -142,7 +147,7 @@ class CommercialProductDialog extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: SizedBox(
         width: 650,
-        height: 600,
+        height: 700,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(12),
           child: _FormContent(
@@ -183,6 +188,7 @@ class _FormContentState extends State<_FormContent> {
   FocusNode focusNode = FocusNode();
   FocusNode acceptFocusNode = FocusNode();
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
   @override
   void initState() {
     super.initState();
@@ -242,38 +248,13 @@ class _FormContentState extends State<_FormContent> {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              Center(
-                child: ImageViewerWidget(
-                  imageUrls: widget.product.image.isNotEmpty ? [widget.product.image] : [],
-                  width: 90,
-                  height: 90,
-                ),
+              ProductHeaderInfo(
+                product: widget.product,
+                rowAlignment: MainAxisAlignment.spaceEvenly,
+                rowSpacing: null,
+                labelCrossAxisAlignment: CrossAxisAlignment.start,
               ),
-              const SizedBox(height: 8),
-              Text(
-                widget.product.name,
-                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
-                textAlign: TextAlign.center,
-              ),
-              Text(
-                widget.product.displayCode,
-                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  TitleLabel(
-                    title: "Marca",
-                    bigTitle: widget.product.brandName,
-                  ),
-                  TitleLabel(
-                    title: "Unidad",
-                    bigTitle: widget.product.unitName,
-                  ),
-                ],
-              ),
+
               Expanded(
                 child: ListView(
                   children: [
@@ -289,63 +270,10 @@ class _FormContentState extends State<_FormContent> {
                             onChanged: () => setState(() {}),
                           ),
                           const SizedBox(height: 12),
-                          const Text(
-                            "Nivel de Precio",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          DropdownButton<int>(
-                            value: commercialProductResult.selectedPriceLevel,
-                            isExpanded: true,
-                            items: [
-                              DropdownMenuItem(
-                                value: 1,
-                                child: Text(
-                                  "Precio 1 (${NumberFormatter.convertToMoneyLike(product.saleProfile.salePrice)})",
-                                ),
-                              ),
-                              DropdownMenuItem(
-                                value: 2,
-                                child: Text(
-                                  "Precio 2 (${NumberFormatter.convertToMoneyLike(product.saleProfile.salePrice2)})",
-                                ),
-                              ),
-                              DropdownMenuItem(
-                                value: 3,
-                                child: Text(
-                                  "Precio 3 (${NumberFormatter.convertToMoneyLike(product.saleProfile.salePrice3)})",
-                                ),
-                              ),
-                              DropdownMenuItem(
-                                value: 4,
-                                child: Text(
-                                  "Precio 4 (${NumberFormatter.convertToMoneyLike(product.saleProfile.salePrice4)})",
-                                ),
-                              ),
-                              if (isUserAdmin)
-                                const DropdownMenuItem(
-                                  value: 0,
-                                  child: Text("Precio manual"),
-                                ),
-                            ],
-                            onChanged: (value) {
-                              if (value == null) return;
-                              final priceMap = {
-                                1: product.saleProfile.salePrice,
-                                2: product.saleProfile.salePrice2,
-                                3: product.saleProfile.salePrice3,
-                                4: product.saleProfile.salePrice4,
-                              };
-
-                              if (priceMap[value] == 0) {
-                                return;
-                              }
-
-                              commercialProductResult.selectedPriceLevel = value;
-                              if (value != 0) {
-                                commercialProductResult.newPrice = priceMap[value]!;
-                              }
-                              setState(() {});
-                            },
+                          PriceLevelDropdownSelector(
+                            result: commercialProductResult,
+                            isUserAdmin: isUserAdmin,
+                            onChanged: () => setState(() {}),
                           ),
                           const SizedBox(height: 8),
                           Row(

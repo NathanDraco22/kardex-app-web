@@ -68,6 +68,8 @@ class _SearchProductCommercialDialogState extends State<SearchProductCommercialD
     }
   }
 
+  List<GlobalKey> _itemKeys = [];
+
   List<ProductInDbInBranch> products = [];
 
   int cursorPosition = 0;
@@ -101,11 +103,13 @@ class _SearchProductCommercialDialogState extends State<SearchProductCommercialD
                     if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
                       cursorPosition = (cursorPosition - 1 + products.length) % products.length;
                       setState(() {});
+                      WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToCursor());
                       return KeyEventResult.handled;
                     }
                     if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
                       cursorPosition = (cursorPosition + 1) % products.length;
                       setState(() {});
+                      WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToCursor());
                       return KeyEventResult.handled;
                     }
 
@@ -143,6 +147,7 @@ class _SearchProductCommercialDialogState extends State<SearchProductCommercialD
                     onSearch: (value) async {
                       if (value.isEmpty) {
                         products = [];
+                        _itemKeys = [];
                         cursorPosition = 0;
                         setState(() {});
                         return;
@@ -152,6 +157,7 @@ class _SearchProductCommercialDialogState extends State<SearchProductCommercialD
                       final branchId = getIt<AuthCubit>().currentBranchId;
                       products = await _productsRepository.searchProductInBranch(value, branchId);
                       if (!mounted) return;
+                      _itemKeys = products.map((_) => GlobalKey()).toList();
                       cursorPosition = 0;
                       isSearching = false;
                       setState(() {});
@@ -186,6 +192,7 @@ class _SearchProductCommercialDialogState extends State<SearchProductCommercialD
                 return ResultTable(
                   products: products,
                   isDirectSale: widget.isDirectSale,
+                  itemKeys: _itemKeys,
                   cursorPosition: cursorPosition,
                   defaultPriceLevel: widget.defaultPriceLevel,
                   preferredUnitType: widget.preferredUnitType,
@@ -198,6 +205,17 @@ class _SearchProductCommercialDialogState extends State<SearchProductCommercialD
       ),
     );
   }
+
+  void _scrollToCursor() {
+    if (cursorPosition >= _itemKeys.length) return;
+    final ctx = _itemKeys[cursorPosition].currentContext;
+    if (ctx == null) return;
+    Scrollable.ensureVisible(
+      ctx,
+      alignment: 0.5,
+      duration: const Duration(milliseconds: 200),
+    );
+  }
 }
 
 class ResultTable extends StatefulWidget {
@@ -205,6 +223,7 @@ class ResultTable extends StatefulWidget {
     super.key,
     required this.products,
     required this.isDirectSale,
+    this.itemKeys,
     this.cursorPosition = 0,
     this.defaultPriceLevel = 1,
     this.preferredUnitType = 'min',
@@ -212,6 +231,7 @@ class ResultTable extends StatefulWidget {
   });
 
   final List<ProductInDbInBranch> products;
+  final List<GlobalKey>? itemKeys;
   final int cursorPosition;
   final bool isDirectSale;
   final int defaultPriceLevel;
@@ -243,6 +263,7 @@ class _ResultTableState extends State<ResultTable> {
         }
 
         return ProductResultRow(
+          key: widget.itemKeys?[index],
           product: product,
           onTap: () async {
             if (widget.isDirectSale) {
