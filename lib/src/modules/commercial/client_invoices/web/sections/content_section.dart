@@ -7,11 +7,11 @@ class _ContentSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = ClientInvoiceWebMediator.of(context).viewController;
     final writeCubit = context.read<WriteInvoiceCubit>();
-    final isRestrictQuantity = writeCubit.documentType != CommercialDocumentType.quote;
+    final isRestrictStock = writeCubit.documentType != CommercialDocumentType.quote;
     return Card(
       child: ClientInvoiceTable(
         controller: controller,
-        restrictQuantity: isRestrictQuantity,
+        restrictStock: isRestrictStock,
       ),
     );
   }

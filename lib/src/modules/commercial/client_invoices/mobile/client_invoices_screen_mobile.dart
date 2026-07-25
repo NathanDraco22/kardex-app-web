@@ -72,15 +72,15 @@ class _RootScaffold extends StatelessWidget {
         visible: MediaQuery.viewInsetsOf(context).bottom == 0.0,
         child: FloatingActionButton.extended(
           onPressed: () async {
-            final isRestrictQuantity = writeCubit.documentType != CommercialDocumentType.quote;
+            final isRestrictStock = writeCubit.documentType != CommercialDocumentType.quote;
             final res = await showCommercialProductSearchDelegate(
               context,
               defaultPriceLevel: viewController.selectedClient?.defaultPriceLevel ?? 1,
               preferredUnitType: viewController.isWholesale ? 'max' : 'min',
-              restrictStock: isRestrictQuantity,
+              restrictStock: isRestrictStock,
             );
             if (res == null) return;
-            if (isRestrictQuantity &&
+            if (isRestrictStock &&
                 (res.quantity * res.conversionFactor) > res.product.account.availableStock) {
               if (!context.mounted) return;
               await DialogManager.showErrorDialog(
@@ -301,15 +301,15 @@ class _Body extends StatelessWidget {
                         percentDiscount: currentCommercial.selectedDiscount?.percentValue ?? 0,
                         onRemove: () => viewController.removeItem(currentCommercial),
                         onEdit: () async {
-                          final isRestrictQuantity = writeCubit.documentType != CommercialDocumentType.quote;
+                          final isRestrictStock = writeCubit.documentType != CommercialDocumentType.quote;
                           final res = await showCommercialProductModal(
                             context,
                             product: currentCommercial.product,
                             commercialProductResult: currentCommercial,
-                            restrictStock: isRestrictQuantity,
+                            restrictStock: isRestrictStock,
                           );
                           if (res == null) return;
-                          if (isRestrictQuantity &&
+                          if (isRestrictStock &&
                               (res.quantity * res.conversionFactor) > res.product.account.availableStock) {
                             if (!context.mounted) return;
                             await DialogManager.showErrorDialog(
@@ -325,15 +325,15 @@ class _Body extends StatelessWidget {
                           );
                         },
                         onChange: () async {
-                          final isRestrictQuantity = writeCubit.documentType != CommercialDocumentType.quote;
+                          final isRestrictStock = writeCubit.documentType != CommercialDocumentType.quote;
                           final res = await showCommercialProductSearchDelegate(
                             context,
                             defaultPriceLevel: viewController.selectedClient?.defaultPriceLevel ?? 1,
                             preferredUnitType: viewController.isWholesale ? 'max' : 'min',
-                            restrictStock: isRestrictQuantity,
+                            restrictStock: isRestrictStock,
                           );
                           if (res == null) return;
-                          if (isRestrictQuantity &&
+                          if (isRestrictStock &&
                               (res.quantity * res.conversionFactor) > res.product.account.availableStock) {
                             if (!context.mounted) return;
                             await DialogManager.showErrorDialog(

@@ -254,7 +254,7 @@ Future<Uint8List> generateTicketPdfFromOrder(
                               ),
                             ),
                             pw.Text(
-                              "Unid: ${item.product.unitName}",
+                              item.product.unitName,
                               style: pw.TextStyle(
                                 fontSize: TicketSettings.contentFontSize(paperSize) - 1,
                                 color: PdfColors.grey700,

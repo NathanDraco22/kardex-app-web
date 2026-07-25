@@ -242,7 +242,7 @@ class SingleOrderTemplate implements PdfTemplate {
                       pw.Text(saleItem.product.name, style: const pw.TextStyle(fontSize: 12)),
                       pw.SizedBox(height: 2),
                       pw.Text(
-                        "Unidad: ${saleItem.product.unitName}",
+                        saleItem.product.unitName,
                         style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey600),
                       ),
                     ],
