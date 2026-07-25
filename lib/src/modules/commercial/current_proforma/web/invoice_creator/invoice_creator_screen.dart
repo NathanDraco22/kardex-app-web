@@ -15,10 +15,10 @@ import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_order_template.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_dialog.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_modal.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/custom_product_commercial_search_delegate.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/search_product_commercial_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/commercial_product_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/commercial_product_modal.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/search_product_commercial_delegate.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/search_product_commercial_dialog.dart';
 import 'package:kardex_app_front/widgets/row_widgets/sale_item_row.dart';
 
 Future<OrderInDb?> showProformaInvoiceCreatorDialog(BuildContext context, OrderInDb order) async {

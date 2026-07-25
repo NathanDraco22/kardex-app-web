@@ -3,7 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/widgets/display_product_code.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/widgets/display_product_code.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/widgets/search_product_dialog_panel.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 
@@ -61,102 +62,94 @@ class _SearchProductInBranchDialogState extends State<SearchProductInBranchDialo
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: SizedBox(
-        width: 700,
-        child: Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Flexible(
-                      flex: 2,
-                      child: Focus(
-                        onKeyEvent: (node, event) {
-                          if (event is KeyDownEvent) {
-                            if (event.logicalKey == LogicalKeyboardKey.enter) {
-                              if (products.isNotEmpty) {
-                                Navigator.pop(context, products[cursorPosition]);
-                                return KeyEventResult.handled;
-                              }
-                              return KeyEventResult.handled;
-                            }
-                            if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
-                              cursorPosition = (cursorPosition - 1 + products.length) % products.length;
-                              setState(() {});
-                              return KeyEventResult.handled;
-                            }
-                            if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
-                              cursorPosition = (cursorPosition + 1) % products.length;
-                              setState(() {});
-                              return KeyEventResult.handled;
-                            }
-                          }
-                          return KeyEventResult.ignored;
-                        },
-                        child: SearchFieldDebounced(
-                          autoFocus: true,
-                          onSearch: (value) async {
-                            if (value.isEmpty) {
-                              products = [];
-                              setState(() {});
-                              return;
-                            }
-                            isSearching = true;
-                            setState(() {});
-                            final branchId = getIt<AuthCubit>().currentBranchId;
-                            products = await _productsRepository.searchProductInBranch(value, branchId);
-                            if (!mounted) return;
-                            isSearching = false;
-                            setState(() {});
-                          },
-                        ),
-                      ),
-                    ),
-                    Flexible(
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: CloseButton(
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const Divider(),
-                isSearching ? const LinearProgressIndicator() : const SizedBox(),
-                SizedBox(
-                  height: 320,
-                  child: Builder(
-                    builder: (context) {
-                      if (products.isEmpty) {
-                        return const Center(
-                          child: NoItemWidget(
-                            icon: Icons.search,
-                            text: "No se encontraron productos",
-                          ),
-                        );
+    return SearchProductDialogPanel(
+      showConstraints: false,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Flexible(
+                flex: 2,
+                child: Focus(
+                  onKeyEvent: (node, event) {
+                    if (event is KeyDownEvent) {
+                      if (event.logicalKey == LogicalKeyboardKey.enter) {
+                        if (products.isNotEmpty) {
+                          Navigator.pop(context, products[cursorPosition]);
+                          return KeyEventResult.handled;
+                        }
+                        return KeyEventResult.handled;
                       }
-                      return ResultTable(
-                        products: products,
-                        cursorPosition: cursorPosition,
-                      );
+                      if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+                        cursorPosition = (cursorPosition - 1 + products.length) % products.length;
+                        setState(() {});
+                        return KeyEventResult.handled;
+                      }
+                      if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+                        cursorPosition = (cursorPosition + 1) % products.length;
+                        setState(() {});
+                        return KeyEventResult.handled;
+                      }
+                    }
+                    return KeyEventResult.ignored;
+                  },
+                  child: SearchFieldDebounced(
+                    autoFocus: true,
+                    onSearch: (value) async {
+                      if (value.isEmpty) {
+                        products = [];
+                        setState(() {});
+                        return;
+                      }
+                      isSearching = true;
+                      setState(() {});
+                      final branchId = getIt<AuthCubit>().currentBranchId;
+                      products = await _productsRepository.searchProductInBranch(value, branchId);
+                      if (!mounted) return;
+                      isSearching = false;
+                      setState(() {});
                     },
                   ),
                 ),
-              ],
+              ),
+              Flexible(
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: CloseButton(
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const Divider(),
+          isSearching ? const LinearProgressIndicator() : const SizedBox(),
+          SizedBox(
+            height: 320,
+            child: Builder(
+              builder: (context) {
+                if (products.isEmpty) {
+                  return const Center(
+                    child: NoItemWidget(
+                      icon: Icons.search,
+                      text: "No se encontraron productos",
+                    ),
+                  );
+                }
+                return ResultTable(
+                  products: products,
+                  cursorPosition: cursorPosition,
+                );
+              },
             ),
           ),
-        ),
+        ],
       ),
     );
   }

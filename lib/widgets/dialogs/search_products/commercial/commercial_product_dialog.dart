@@ -5,12 +5,13 @@ import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
-import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
-import 'commercial_product_unit_selector.dart';
 import 'package:kardex_app_front/widgets/title_label.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
-Future<CommercialProductResult?> showCommercialProductModalFromId(
+import '../../models/commercial_product_result.dart';
+import '../commercial_product_unit_selector.dart';
+
+Future<CommercialProductResult?> showCommercialProductDialogFromId(
   BuildContext context, {
   required String productId,
   SaleItem? previousSaleItem,
@@ -81,7 +82,7 @@ Future<CommercialProductResult?> showCommercialProductModalFromId(
             ..selectedDiscount = appliedDiscount;
     }
 
-    return await showCommercialProductModal(
+    return await showCommercialProductDialog(
       context,
       product: product,
       commercialProductResult: initialResult,
@@ -98,7 +99,7 @@ Future<CommercialProductResult?> showCommercialProductModalFromId(
   }
 }
 
-Future<CommercialProductResult?> showCommercialProductModal(
+Future<CommercialProductResult?> showCommercialProductDialog(
   BuildContext context, {
   required ProductInDbInBranch product,
   CommercialProductResult? commercialProductResult,
@@ -106,22 +107,21 @@ Future<CommercialProductResult?> showCommercialProductModal(
   String preferredUnitType = 'min',
   bool restrictStock = true,
 }) async {
-  return await Navigator.push<CommercialProductResult?>(
-    context,
-    MaterialPageRoute(
-      builder: (context) => CommercialProductModal(
-        product: product,
-        commercialProductResult: commercialProductResult,
-        defaultPriceLevel: defaultPriceLevel,
-        preferredUnitType: preferredUnitType,
-        restrictStock: restrictStock,
-      ),
+  return await showDialog<CommercialProductResult?>(
+    barrierDismissible: false,
+    context: context,
+    builder: (context) => CommercialProductDialog(
+      product: product,
+      commercialProductResult: commercialProductResult,
+      defaultPriceLevel: defaultPriceLevel,
+      preferredUnitType: preferredUnitType,
+      restrictStock: restrictStock,
     ),
   );
 }
 
-class CommercialProductModal extends StatefulWidget {
-  const CommercialProductModal({
+class CommercialProductDialog extends StatelessWidget {
+  const CommercialProductDialog({
     super.key,
     required this.product,
     this.commercialProductResult,
@@ -136,18 +136,56 @@ class CommercialProductModal extends StatefulWidget {
   final bool restrictStock;
 
   @override
-  State<CommercialProductModal> createState() => _CommercialProductModalState();
+  Widget build(BuildContext context) {
+    return Dialog(
+      constraints: const BoxConstraints(maxWidth: 700),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: SizedBox(
+        width: 650,
+        height: 600,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: _FormContent(
+            product: product,
+            commercialProductResult: commercialProductResult,
+            defaultPriceLevel: defaultPriceLevel,
+            preferredUnitType: preferredUnitType,
+            restrictStock: restrictStock,
+          ),
+        ),
+      ),
+    );
+  }
 }
 
-class _CommercialProductModalState extends State<CommercialProductModal> {
+class _FormContent extends StatefulWidget {
+  const _FormContent({
+    required this.product,
+    this.commercialProductResult,
+    this.defaultPriceLevel = 1,
+    this.preferredUnitType = 'min',
+    this.restrictStock = true,
+  });
+
+  final ProductInDbInBranch product;
+  final CommercialProductResult? commercialProductResult;
+  final int defaultPriceLevel;
+  final String preferredUnitType;
+  final bool restrictStock;
+
+  @override
+  State<_FormContent> createState() => _FormContentState();
+}
+
+class _FormContentState extends State<_FormContent> {
   late CommercialProductResult commercialProductResult;
   late Iterable<DropdownMenuItem<Discount>> discountsAvailable;
   FocusNode focusNode = FocusNode();
+  FocusNode acceptFocusNode = FocusNode();
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   @override
   void initState() {
     super.initState();
-
     if (widget.commercialProductResult != null) {
       commercialProductResult = widget.commercialProductResult!.copyWith();
     } else {
@@ -157,6 +195,7 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
         preferredUnitType: widget.preferredUnitType,
       );
     }
+
     discountsAvailable = widget.product.saleProfile.discounts.map(
       (e) {
         return DropdownMenuItem(
@@ -197,11 +236,11 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
     return Form(
       key: formKey,
       child: Scaffold(
-        appBar: AppBar(title: const Text("Busqueda de Producto Comercial")),
+        backgroundColor: Colors.white,
+
         body: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Center(
                 child: ImageViewerWidget(
@@ -213,35 +252,32 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
               const SizedBox(height: 8),
               Text(
                 widget.product.name,
-                textAlign: TextAlign.center,
                 style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+                textAlign: TextAlign.center,
               ),
               Text(
                 widget.product.displayCode,
-                textAlign: TextAlign.center,
                 style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
               Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                spacing: 12,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   TitleLabel(
                     title: "Marca",
                     bigTitle: widget.product.brandName,
-                    crossAxisAlignment: CrossAxisAlignment.center,
                   ),
                   TitleLabel(
                     title: "Unidad",
                     bigTitle: widget.product.unitName,
-                    crossAxisAlignment: CrossAxisAlignment.center,
                   ),
                 ],
               ),
               Expanded(
                 child: ListView(
                   children: [
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8),
 
                     SizedBox(
                       width: 600,
@@ -311,7 +347,7 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                               setState(() {});
                             },
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 8),
                           Row(
                             children: [
                               Expanded(
@@ -375,7 +411,10 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                                   height: 90,
                                   child: TitleTextField(
                                     focusNode: focusNode,
-                                    style: const TextStyle(fontWeight: .w600),
+
+                                    onEditingComplete: () {
+                                      FocusScope.of(context).requestFocus(acceptFocusNode);
+                                    },
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return "";
@@ -395,10 +434,8 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                                       return null;
                                     },
                                     titleTextAlign: TextAlign.center,
-                                    centerTitle: true,
                                     initialValue: commercialProductResult.quantity.toString(),
                                     inputFormatters: [IntegerTextInputFormatter()],
-                                    keyboardType: TextInputType.number,
                                     onChanged: (value) {
                                       commercialProductResult.quantity = int.tryParse(value) ?? 0;
                                       setState(() {});
@@ -412,17 +449,14 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                                 fit: FlexFit.tight,
 
                                 child: SizedBox(
-                                  height: 90,
+                                  height: 80,
                                   child: TitleTextField(
-                                    centerTitle: true,
                                     key: ValueKey(
                                       "${commercialProductResult.selectedPriceLevel}_${commercialProductResult.selectedUnitIndex}",
                                     ),
                                     readOnly: commercialProductResult.selectedPriceLevel != 0,
                                     titleTextAlign: TextAlign.center,
                                     initialValue: price.toString(),
-                                    style: const TextStyle(fontWeight: FontWeight.w600),
-
                                     inputFormatters: [DecimalTextInputFormatter()],
                                     keyboardType: TextInputType.number,
                                     onChanged: (value) {
@@ -479,8 +513,9 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
             ],
           ),
         ),
+
         bottomNavigationBar: BottomAppBar(
-          height: 160,
+          height: 140,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
             child: Column(
@@ -554,9 +589,10 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                       ),
                     ),
                     ElevatedButton(
+                      focusNode: acceptFocusNode,
                       onPressed: () {
                         if (commercialProductResult.newPrice == 0) {
-                          DialogManager.showErrorDialog(context, "El producto no tiene precio de venta");
+                          DialogManager.showErrorDialog(context, "El producto tiene un precio 0, no se puede vender");
                           return;
                         }
 

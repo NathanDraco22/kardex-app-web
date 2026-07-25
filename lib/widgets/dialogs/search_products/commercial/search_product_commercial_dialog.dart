@@ -3,13 +3,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/widgets/display_product_code.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/widgets/display_product_code.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/widgets/search_product_dialog_panel.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/commercial_product_dialog.dart';
 
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 
-import '../models/commercial_product_result.dart';
+import '../../models/commercial_product_result.dart';
 
 Future<CommercialProductResult?> showSearchProductCommercialDialog(
   BuildContext context, {
@@ -67,8 +68,6 @@ class _SearchProductCommercialDialogState extends State<SearchProductCommercialD
     }
   }
 
-  final tableFocus = FocusNode();
-
   List<ProductInDbInBranch> products = [];
 
   int cursorPosition = 0;
@@ -77,125 +76,125 @@ class _SearchProductCommercialDialogState extends State<SearchProductCommercialD
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: SizedBox(
-        width: 700,
-        child: Dialog(
-          constraints: const BoxConstraints(maxWidth: 700),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Flexible(
-                      child: Focus(
-                        onKeyEvent: (node, event) {
-                          if (event is KeyDownEvent) {
-                            if (event.logicalKey == LogicalKeyboardKey.enter) {
-                              if (products.isNotEmpty) {
-                                if (widget.isDirectSale) {
-                                  final result = CommercialProductResult(
-                                    product: products[cursorPosition],
-                                    defaultPriceLevel: widget.defaultPriceLevel,
-                                    preferredUnitType: widget.preferredUnitType,
-                                  );
-                                  Navigator.pop(context, result);
-                                  return KeyEventResult.handled;
-                                }
-                                showCommercialProductDialog(
-                                  context,
-                                  product: products[cursorPosition],
-                                  defaultPriceLevel: widget.defaultPriceLevel,
-                                  preferredUnitType: widget.preferredUnitType,
-                                  restrictStock: widget.restrictStock,
-                                ).then((value) {
-                                  if (value == null) return;
+    return SearchProductDialogPanel(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Flexible(
+                child: Focus(
+                  onKeyEvent: (node, event) {
+                    if (event is! KeyDownEvent) {
+                      return KeyEventResult.ignored;
+                    }
 
-                                  if (!context.mounted) return;
-                                  Navigator.pop(context, value);
-                                });
-                              }
-                              return KeyEventResult.handled;
-                            }
-                            if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
-                              cursorPosition = (cursorPosition - 1 + products.length) % products.length;
-                              setState(() {});
-                              return KeyEventResult.handled;
-                            }
-                            if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
-                              cursorPosition = (cursorPosition + 1) % products.length;
-                              setState(() {});
-                              return KeyEventResult.handled;
-                            }
-                          }
-                          return KeyEventResult.ignored;
-                        },
-                        child: SearchFieldDebounced(
-                          autoFocus: true,
-                          onSearch: (value) async {
-                            if (value.isEmpty) {
-                              products = [];
-                              setState(() {});
-                              return;
-                            }
-                            isSearching = true;
-                            setState(() {});
-                            final branchId = getIt<AuthCubit>().currentBranchId;
-                            products = await _productsRepository.searchProductInBranch(value, branchId);
-                            if (!mounted) return;
-                            isSearching = false;
-                            setState(() {});
-                          },
-                        ),
-                      ),
-                    ),
-                    Flexible(
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: CloseButton(
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const Divider(),
-                isSearching ? const LinearProgressIndicator() : const SizedBox(),
-                SizedBox(
-                  height: 300,
-                  child: Builder(
-                    builder: (context) {
-                      if (products.isEmpty) {
-                        return const Center(
-                          child: NoItemWidget(
-                            icon: Icons.search,
-                            text: "No se encontraron productos",
-                          ),
-                        );
-                      }
-                      return ResultTable(
-                        products: products,
-                        isDirectSale: widget.isDirectSale,
-                        cursorPosition: cursorPosition,
+                    if (products.isEmpty) {
+                      return KeyEventResult.ignored;
+                    }
+
+                    if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+                      cursorPosition = (cursorPosition - 1 + products.length) % products.length;
+                      setState(() {});
+                      return KeyEventResult.handled;
+                    }
+                    if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+                      cursorPosition = (cursorPosition + 1) % products.length;
+                      setState(() {});
+                      return KeyEventResult.handled;
+                    }
+
+                    if (event.logicalKey != LogicalKeyboardKey.enter) {
+                      return KeyEventResult.ignored;
+                    }
+
+                    if (widget.isDirectSale) {
+                      final result = CommercialProductResult(
+                        product: products[cursorPosition],
                         defaultPriceLevel: widget.defaultPriceLevel,
                         preferredUnitType: widget.preferredUnitType,
-                        restrictStock: widget.restrictStock,
                       );
+                      Navigator.pop(context, result);
+                      return KeyEventResult.handled;
+                    }
+
+                    showCommercialProductDialog(
+                      context,
+                      product: products[cursorPosition],
+                      defaultPriceLevel: widget.defaultPriceLevel,
+                      preferredUnitType: widget.preferredUnitType,
+                      restrictStock: widget.restrictStock,
+                    ).then((value) {
+                      if (value == null) return;
+
+                      if (!context.mounted) return;
+                      Navigator.pop(context, value);
+                    });
+
+                    return KeyEventResult.handled;
+                  },
+                  child: SearchFieldDebounced(
+                    autoFocus: true,
+                    onSearch: (value) async {
+                      if (value.isEmpty) {
+                        products = [];
+                        cursorPosition = 0;
+                        setState(() {});
+                        return;
+                      }
+                      isSearching = true;
+                      setState(() {});
+                      final branchId = getIt<AuthCubit>().currentBranchId;
+                      products = await _productsRepository.searchProductInBranch(value, branchId);
+                      if (!mounted) return;
+                      cursorPosition = 0;
+                      isSearching = false;
+                      setState(() {});
                     },
                   ),
                 ),
-              ],
+              ),
+              Flexible(
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: CloseButton(
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const Divider(),
+          isSearching ? const LinearProgressIndicator() : const SizedBox(),
+          SizedBox(
+            height: 300,
+            child: Builder(
+              builder: (context) {
+                if (products.isEmpty) {
+                  return const Center(
+                    child: NoItemWidget(
+                      icon: Icons.search,
+                      text: "No se encontraron productos",
+                    ),
+                  );
+                }
+                return ResultTable(
+                  products: products,
+                  isDirectSale: widget.isDirectSale,
+                  cursorPosition: cursorPosition,
+                  defaultPriceLevel: widget.defaultPriceLevel,
+                  preferredUnitType: widget.preferredUnitType,
+                  restrictStock: widget.restrictStock,
+                );
+              },
             ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -206,7 +205,6 @@ class ResultTable extends StatefulWidget {
     super.key,
     required this.products,
     required this.isDirectSale,
-    this.focus,
     this.cursorPosition = 0,
     this.defaultPriceLevel = 1,
     this.preferredUnitType = 'min',
@@ -214,7 +212,6 @@ class ResultTable extends StatefulWidget {
   });
 
   final List<ProductInDbInBranch> products;
-  final FocusNode? focus;
   final int cursorPosition;
   final bool isDirectSale;
   final int defaultPriceLevel;

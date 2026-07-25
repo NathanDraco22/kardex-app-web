@@ -7,7 +7,7 @@ import 'package:kardex_app_front/src/tools/icon_widgets.dart';
 import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
 import 'package:kardex_app_front/widgets/menu_app_bar.dart';
 
-import 'package:kardex_app_front/widgets/dialogs/search_products/custom_product_commercial_search_delegate.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/search_product_commercial_delegate.dart';
 import 'package:kardex_app_front/constants/route_names.dart';
 import 'package:kardex_app_front/widgets/shortcut_addable_list_tile.dart';
 

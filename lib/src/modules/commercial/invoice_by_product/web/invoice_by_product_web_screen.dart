@@ -9,7 +9,7 @@ import 'package:kardex_app_front/widgets/basic_table_listview.dart';
 import 'package:kardex_app_front/widgets/date_picker_listile.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/custom_product_search_delegate.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/widgets/display_product_code.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/widgets/display_product_code.dart';
 import 'package:kardex_app_front/widgets/no_item.dart';
 
 part 'sections/content_section.dart';

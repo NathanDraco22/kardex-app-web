@@ -7,7 +7,7 @@ import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/inventory/product_movements/cubit/read_product_transaction_cubit.dart';
 import 'package:kardex_app_front/src/tools/extensiones.dart';
 import 'package:kardex_app_front/src/tools/show_doc_viewer.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/widgets/display_product_code.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/widgets/display_product_code.dart';
 
 import 'package:kardex_app_front/widgets/widgets.dart';
 
