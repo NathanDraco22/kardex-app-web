@@ -46,11 +46,13 @@ class _InventoryExitScreenState extends State<InventoryExitScreen> {
         setState(() {});
         return true;
       },
-      child: BlocProvider(
-        create: (context) => WriteExitDocCubit(exitDocRepo),
-        child: InventoryExitMediator(
-          notifier: notifier,
-          child: const _RootScaffold(),
+      child: ShortcutContainer(
+        child: BlocProvider(
+          create: (context) => WriteExitDocCubit(exitDocRepo),
+          child: InventoryExitMediator(
+            notifier: notifier,
+            child: const _RootScaffold(),
+          ),
         ),
       ),
     );

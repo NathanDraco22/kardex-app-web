@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_exit/cubit/write_exit_doc_cubit.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/widgets/buttons/elevated_ctrl_button.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/search_product_in_branch_dialog.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/widgets/dialogs/inventory_unit_picker.dart';
@@ -23,36 +23,28 @@ class InventoryExitScreenWeb extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mediator = InventoryExitMediator.read(context)!;
-    return CallbackShortcuts(
-      bindings: {
-        const SingleActivator(LogicalKeyboardKey.keyG, control: true): () => saveExit(context),
-      },
-      child: Focus(
-        autofocus: true,
-        child: Scaffold(
-          appBar: AppBar(
-            title: const Text("Salida de Inventario"),
-            leading: IconButton(
-              onPressed: () async {
-                final allFields = mediator.hasAllRequiredFields();
-                if (!allFields) {
-                  context.pop();
-                  return;
-                }
-                final res = await DialogManager.confirmActionDialog(
-                  context,
-                  "Deseas salir sin guardar? (Perderas los cambios)",
-                );
-                if (res != true) return;
-                if (!context.mounted) return;
-                context.pop();
-              },
-              icon: const Icon(Icons.arrow_back),
-            ),
-          ),
-          body: const _WebBody(),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Salida de Inventario"),
+        leading: IconButton(
+          onPressed: () async {
+            final allFields = mediator.hasAllRequiredFields();
+            if (!allFields) {
+              context.pop();
+              return;
+            }
+            final res = await DialogManager.confirmActionDialog(
+              context,
+              "Deseas salir sin guardar? (Perderas los cambios)",
+            );
+            if (res != true) return;
+            if (!context.mounted) return;
+            context.pop();
+          },
+          icon: const Icon(Icons.arrow_back),
         ),
       ),
+      body: const _WebBody(),
     );
   }
 }
