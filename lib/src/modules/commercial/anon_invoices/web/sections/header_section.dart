@@ -113,17 +113,21 @@ class MenuActions extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            ElevatedButton.icon(
+            ElevatedCtrlButton(
+              hotKey: "4",
               onPressed: () => context.pushNamed("invoice-history"),
-              label: const Text("Facturas"),
-              icon: const Icon(Icons.blinds_closed),
+              label: "Facturas",
+              icon: Icons.blinds_closed,
             ),
 
-            ElevatedButton.icon(
+            ElevatedCtrlButton(
+              hotKey: "5",
               onPressed: () => showGlobalStockSearchModal(context),
-              label: const Text("Existencias Global"),
-              icon: const Icon(Icons.search),
+              label: "Existencias Global",
+              icon: Icons.search,
             ),
+
+            const Spacer(),
 
             ListenableBuilder(
               listenable: tableController,
@@ -134,10 +138,11 @@ class MenuActions extends StatelessWidget {
                   callback = () => saveAnonInvoiceAction(context);
                 }
 
-                return ElevatedButton.icon(
+                return ElevatedCtrlButton(
+                  hotKey: "G",
                   onPressed: callback,
-                  icon: Icon(saveIcon),
-                  label: Text(saveButtonTitle),
+                  icon: saveIcon,
+                  label: saveButtonTitle,
                 );
               },
             ),
@@ -201,9 +206,7 @@ CreateInvoice createAnonInvoiceFromControllers(
       return SaleItem(
         product: ProductItem.fromJson({
           ...product.toJson(),
-          'unitName': e.commercial.selectedUnitName.isNotEmpty
-              ? e.commercial.selectedUnitName
-              : product.unitName,
+          'unitName': e.commercial.selectedUnitName.isNotEmpty ? e.commercial.selectedUnitName : product.unitName,
         }),
         selectedPrice: e.commercial.selectedPriceLevel,
         cost: product.account.averageCost,
