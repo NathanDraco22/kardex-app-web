@@ -15,11 +15,11 @@ class ClientInvoiceTable extends StatefulWidget {
   const ClientInvoiceTable({
     super.key,
     required this.controller,
-    required this.restrictQuantity,
+    required this.restrictStock,
   });
 
   final ClientInvoiceViewController controller;
-  final bool restrictQuantity;
+  final bool restrictStock;
 
   @override
   State<ClientInvoiceTable> createState() => _ClientInvoiceTableState();
@@ -203,12 +203,12 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
                             context,
                             defaultPriceLevel: widget.controller.selectedClient?.defaultPriceLevel ?? 1,
                             preferredUnitType: widget.controller.isWholesale ? 'max' : 'min',
-                            restrictStock: widget.restrictQuantity,
+                            restrictStock: widget.restrictStock,
                           );
 
                           if (res == null) return;
                           if (res.quantity == 0) return;
-                          if (widget.restrictQuantity &&
+                          if (widget.restrictStock &&
                               ((res.quantity * res.conversionFactor) > res.product.account.availableStock ||
                                   res.product.account.availableStock == 0)) {
                             if (!context.mounted) return;
@@ -253,10 +253,10 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
             product: item.product,
             defaultPriceLevel: widget.controller.selectedClient?.defaultPriceLevel ?? 1,
             preferredUnitType: widget.controller.isWholesale ? 'max' : 'min',
-            restrictStock: widget.restrictQuantity,
+            restrictStock: widget.restrictStock,
           );
           if (res == null) return;
-          if (widget.restrictQuantity &&
+          if (widget.restrictStock &&
               ((res.quantity * res.conversionFactor) > res.product.account.availableStock ||
                   res.product.account.availableStock == 0)) {
             if (!context.mounted) return;
@@ -274,10 +274,10 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
             context,
             product: item.product,
             commercialProductResult: item,
-            restrictStock: widget.restrictQuantity,
+            restrictStock: widget.restrictStock,
           );
           if (res == null) return;
-          if (widget.restrictQuantity &&
+          if (widget.restrictStock &&
               ((res.quantity * res.conversionFactor) > res.product.account.availableStock ||
                   res.product.account.availableStock == 0)) {
             if (!context.mounted) return;

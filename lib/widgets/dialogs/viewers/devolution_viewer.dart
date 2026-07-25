@@ -208,7 +208,7 @@ class _DevolutionViewer extends StatelessWidget {
                                         children: [
                                           Text(item.product.name),
                                           Text(
-                                            "Unidad: ${item.product.unitName}${item.conversionFactor > 1 ? ' (${item.conversionFactor % 1 == 0 ? item.conversionFactor.toInt() : item.conversionFactor})' : ''}",
+                                            "${item.product.unitName}${item.conversionFactor > 1 ? ' (${item.conversionFactor % 1 == 0 ? item.conversionFactor.toInt() : item.conversionFactor})' : ''}",
                                             style: const TextStyle(color: Colors.grey, fontSize: 12),
                                           ),
                                         ],

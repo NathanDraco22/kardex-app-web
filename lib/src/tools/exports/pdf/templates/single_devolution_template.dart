@@ -238,7 +238,7 @@ class SingleDevolutionTemplate implements PdfTemplate {
                       pw.Text(item.product.name, style: const pw.TextStyle(fontSize: 12)),
                       pw.SizedBox(height: 2),
                       pw.Text(
-                        "Unidad: ${item.product.unitName}",
+                        item.product.unitName,
                         style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey600),
                       ),
                     ],
