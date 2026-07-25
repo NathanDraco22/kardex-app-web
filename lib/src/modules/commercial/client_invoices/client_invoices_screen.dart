@@ -6,7 +6,6 @@ import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 
 import 'package:kardex_app_front/src/tools/extensiones.dart';
-import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'cubit/write_invoice_cubit.dart';
 import 'mobile/client_invoices_screen_mobile.dart';
 import 'web/client_invoices_screen_web.dart';
