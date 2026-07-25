@@ -30,4 +30,4 @@ export 'super_widgets/image_selector_widget.dart';
 export 'dialogs/selectors/image_selector_dialog.dart';
 export 'super_widgets/image_viewer_widget.dart';
 export 'dialogs/viewers/image_viewer_dialog.dart';
-
+export 'shorcut_container.dart';

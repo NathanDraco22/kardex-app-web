@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kardex_app_front/widgets/dialogs/shorcut_container.dart';
+import 'package:kardex_app_front/widgets/shorcut_container.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
