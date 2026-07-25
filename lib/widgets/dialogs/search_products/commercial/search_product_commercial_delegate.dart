@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/widgets/display_product_code.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_modal.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/widgets/display_product_code.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/commercial_product_modal.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
@@ -202,17 +202,17 @@ class _ProductInBranchResultRow extends StatelessWidget {
                                 if (product.account.availableStock <= 0) {
                                   color = Colors.red;
                                 }
-                                  return Text(
-                                    NumberFormatter.formatDisplayStock(
-                                      product.account.availableStock,
-                                      product.defaultUnitFactor,
-                                    ),
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w600,
-                                      color: color,
-                                    ),
-                                  );
+                                return Text(
+                                  NumberFormatter.formatDisplayStock(
+                                    product.account.availableStock,
+                                    product.defaultUnitFactor,
+                                  ),
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                    color: color,
+                                  ),
+                                );
                               },
                             ),
                           ),

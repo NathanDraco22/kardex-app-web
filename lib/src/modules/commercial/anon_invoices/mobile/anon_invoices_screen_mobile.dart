@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/mobile/invoice_anon_menu_screen.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_modal.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/custom_product_commercial_search_delegate.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/commercial_product_modal.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/search_product_commercial_delegate.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 
@@ -247,9 +247,7 @@ List<SaleItem> createSaleItemFromCommercial(List<CommercialProductResult> items)
     return SaleItem(
       product: ProductItem.fromJson({
         ...product.toJson(),
-        'unitName': commercial.selectedUnitName.isNotEmpty
-            ? commercial.selectedUnitName
-            : product.unitName,
+        'unitName': commercial.selectedUnitName.isNotEmpty ? commercial.selectedUnitName : product.unitName,
       }),
       selectedPrice: commercial.selectedPriceLevel,
       cost: product.account.averageCost,

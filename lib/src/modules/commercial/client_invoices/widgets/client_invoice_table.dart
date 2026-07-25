@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/widgets/display_product_code.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/widgets/display_product_code.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/commercial_product_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/search_product_commercial_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/search_product_commercial_dialog.dart';
 
 import '../web/mediator.dart';
 import 'more_action_row_button.dart';

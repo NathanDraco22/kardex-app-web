@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/gates/role_permission_gate.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/custom_product_commercial_search_delegate.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/search_product_commercial_delegate.dart';
 import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
 import 'package:kardex_app_front/widgets/menu_app_bar.dart';
 import 'package:kardex_app_front/constants/route_names.dart';

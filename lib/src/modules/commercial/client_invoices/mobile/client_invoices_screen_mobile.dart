@@ -5,8 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/cubit/write_invoice_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/mobile/mediator.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/view_controller.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_modal.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/custom_product_commercial_search_delegate.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/commercial_product_modal.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/search_product_commercial_delegate.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 
 import '../widgets/product_invoice_card.dart';
@@ -80,8 +80,7 @@ class _RootScaffold extends StatelessWidget {
               restrictStock: isRestrictStock,
             );
             if (res == null) return;
-            if (isRestrictStock &&
-                (res.quantity * res.conversionFactor) > res.product.account.availableStock) {
+            if (isRestrictStock && (res.quantity * res.conversionFactor) > res.product.account.availableStock) {
               if (!context.mounted) return;
               await DialogManager.showErrorDialog(
                 context,

@@ -3,9 +3,9 @@ import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/web/mediator.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/widgets/more_action_row_button.dart';
 import 'package:kardex_business/kardex_business.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/commercial_product_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/search_product_commercial_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/search_product_commercial_dialog.dart';
 import 'package:kardex_app_front/widgets/incremental_textfield.dart';
 
 class AnonInvoiceItem {
@@ -173,7 +173,8 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
             isDirectSale: true,
           );
           if (res == null) return;
-          if (res.product.account.availableStock == 0 || res.product.account.availableStock < (res.quantity * res.conversionFactor)) {
+          if (res.product.account.availableStock == 0 ||
+              res.product.account.availableStock < (res.quantity * res.conversionFactor)) {
             if (!context.mounted) return;
             await DialogManager.showErrorDialog(
               context,
@@ -190,7 +191,8 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
             commercialProductResult: item.commercial,
           );
           if (res == null) return;
-          if (res.product.account.availableStock == 0 || res.product.account.availableStock < (res.quantity * res.conversionFactor)) {
+          if (res.product.account.availableStock == 0 ||
+              res.product.account.availableStock < (res.quantity * res.conversionFactor)) {
             if (!context.mounted) return;
             await DialogManager.showErrorDialog(
               context,
@@ -314,11 +316,11 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
                               ),
                               Expanded(
                                 child: UnitDisplayer(
-                                 unitName: widget.item.commercial.selectedUnitName,
-                                 conversionFactor: widget.item.commercial.conversionFactor,
-                                 fallbackUnitName: product.unitName,
-                                 textAlign: TextAlign.left,
-                               ),
+                                  unitName: widget.item.commercial.selectedUnitName,
+                                  conversionFactor: widget.item.commercial.conversionFactor,
+                                  fallbackUnitName: product.unitName,
+                                  textAlign: TextAlign.left,
+                                ),
                               ),
 
                               Expanded(
@@ -342,8 +344,8 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
               Flexible(
                 fit: FlexFit.tight,
                 child: IncrementalTextField(
-                  maxValue: widget.item.commercial.product.account.availableStock ~/
-                      widget.item.commercial.conversionFactor,
+                  maxValue:
+                      widget.item.commercial.product.account.availableStock ~/ widget.item.commercial.conversionFactor,
                   initialValue: widget.item.commercial.quantity,
                   onChanged: (value) {
                     widget.item.commercial.quantity = value;
