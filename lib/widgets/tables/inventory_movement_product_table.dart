@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:kardex_app_front/widgets/buttons/elevated_ctrl_button.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/tools/input_formatter/input_formatter.dart';
@@ -297,14 +298,13 @@ class _InnerRows extends StatelessWidget {
         const SizedBox(height: 8),
         Row(
           children: [
-            ElevatedButton.icon(
+            ElevatedCtrlButton(
+              hotKey: "1",
               onPressed: () {
                 AddNewRowNotification().dispatch(context);
               },
-              icon: const Icon(Icons.add),
-              label: const Text(
-                "Agregar Producto",
-              ),
+              icon: Icons.add,
+              label: "Agregar Producto",
             ),
           ],
         ),

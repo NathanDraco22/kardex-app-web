@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kardex_app_front/widgets/shorcut_container.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
@@ -263,7 +262,7 @@ class _ExtraUnitsEditorDialogState extends State<ExtraUnitsEditorDialog> {
               ],
               Builder(
                 builder: (context) {
-                  RegisShortcutNotification(onAdd: () => _addExtraUnit()).dispatch(context);
+                  // RegisShortcutNotification(onAdd: () => _addExtraUnit()).dispatch(context);
                   return ElevatedButton.icon(
                     autofocus: true,
                     onPressed: _addExtraUnit,
