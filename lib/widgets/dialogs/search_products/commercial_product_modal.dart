@@ -16,6 +16,7 @@ Future<CommercialProductResult?> showCommercialProductModalFromId(
   SaleItem? previousSaleItem,
   int defaultPriceLevel = 1,
   String preferredUnitType = 'min',
+  bool restrictStock = true,
 }) async {
   final authState = getIt<AuthCubit>().state;
   if (authState is! Authenticated) return null;
@@ -48,13 +49,33 @@ Future<CommercialProductResult?> showCommercialProductModalFromId(
         }
       }
 
+      int resolvedUnitIndex = 0;
+      String resolvedUnitName = product.unitName;
+      int resolvedConversionFactor = 1;
+      int resolvedQuantity = previousSaleItem.quantity;
+
+      if (previousSaleItem.conversionFactor > 1 && product.extraUnits.isNotEmpty) {
+        final extraIndex = product.extraUnits.indexWhere(
+          (u) => u.conversionFactor == previousSaleItem.conversionFactor,
+        );
+        if (extraIndex != -1) {
+          resolvedUnitIndex = extraIndex + 1;
+          resolvedUnitName = product.extraUnits[extraIndex].name;
+          resolvedConversionFactor = product.extraUnits[extraIndex].conversionFactor;
+          resolvedQuantity = previousSaleItem.quantity ~/ resolvedConversionFactor;
+        }
+      }
+
       initialResult =
           CommercialProductResult(
               product: product,
               defaultPriceLevel: previousSaleItem.selectedPrice,
               preferredUnitType: preferredUnitType,
             )
-            ..quantity = previousSaleItem.quantity
+            ..selectedUnitIndex = resolvedUnitIndex
+            ..selectedUnitName = resolvedUnitName
+            ..conversionFactor = resolvedConversionFactor
+            ..quantity = resolvedQuantity
             ..selectedPriceLevel = previousSaleItem.selectedPrice
             ..newPrice = previousSaleItem.price
             ..selectedDiscount = appliedDiscount;
@@ -66,6 +87,7 @@ Future<CommercialProductResult?> showCommercialProductModalFromId(
       commercialProductResult: initialResult,
       defaultPriceLevel: defaultPriceLevel,
       preferredUnitType: preferredUnitType,
+      restrictStock: restrictStock,
     );
   } catch (e) {
     if (context.mounted) {
@@ -82,6 +104,7 @@ Future<CommercialProductResult?> showCommercialProductModal(
   CommercialProductResult? commercialProductResult,
   int defaultPriceLevel = 1,
   String preferredUnitType = 'min',
+  bool restrictStock = true,
 }) async {
   return await Navigator.push<CommercialProductResult?>(
     context,
@@ -91,6 +114,7 @@ Future<CommercialProductResult?> showCommercialProductModal(
         commercialProductResult: commercialProductResult,
         defaultPriceLevel: defaultPriceLevel,
         preferredUnitType: preferredUnitType,
+        restrictStock: restrictStock,
       ),
     ),
   );
@@ -103,12 +127,13 @@ class CommercialProductModal extends StatefulWidget {
     this.commercialProductResult,
     this.defaultPriceLevel = 1,
     this.preferredUnitType = 'min',
+    this.restrictStock = true,
   });
-
   final ProductInDbInBranch product;
   final CommercialProductResult? commercialProductResult;
   final int defaultPriceLevel;
   final String preferredUnitType;
+  final bool restrictStock;
 
   @override
   State<CommercialProductModal> createState() => _CommercialProductModalState();
@@ -363,7 +388,7 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                                       }
 
                                       final requestedUnits = numberValue * commercialProductResult.conversionFactor;
-                                      if (requestedUnits > availableStock) {
+                                      if (widget.restrictStock && requestedUnits > availableStock) {
                                         return "Supera la existencia ($availableStock $baseUnitName)";
                                       }
 

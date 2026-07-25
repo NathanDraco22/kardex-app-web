@@ -17,6 +17,7 @@ Future<CommercialProductResult?> showSearchProductCommercialDialog(
   bool isDirectSale = false,
   int defaultPriceLevel = 1,
   String preferredUnitType = 'min',
+  bool restrictStock = true,
 }) async {
   final res = await showDialog<CommercialProductResult?>(
     context: context,
@@ -25,6 +26,7 @@ Future<CommercialProductResult?> showSearchProductCommercialDialog(
       isDirectSale: isDirectSale,
       defaultPriceLevel: defaultPriceLevel,
       preferredUnitType: preferredUnitType,
+      restrictStock: restrictStock,
     ),
   );
   return res;
@@ -37,12 +39,14 @@ class SearchProductCommercialDialog extends StatefulWidget {
     required this.isDirectSale,
     this.defaultPriceLevel = 1,
     this.preferredUnitType = 'min',
+    this.restrictStock = true,
   });
 
   final ProductInDb? product;
   final bool isDirectSale;
   final int defaultPriceLevel;
   final String preferredUnitType;
+  final bool restrictStock;
 
   @override
   State<SearchProductCommercialDialog> createState() => _SearchProductCommercialDialogState();
@@ -111,6 +115,7 @@ class _SearchProductCommercialDialogState extends State<SearchProductCommercialD
                                   product: products[cursorPosition],
                                   defaultPriceLevel: widget.defaultPriceLevel,
                                   preferredUnitType: widget.preferredUnitType,
+                                  restrictStock: widget.restrictStock,
                                 ).then((value) {
                                   if (value == null) return;
 
@@ -182,6 +187,7 @@ class _SearchProductCommercialDialogState extends State<SearchProductCommercialD
                         cursorPosition: cursorPosition,
                         defaultPriceLevel: widget.defaultPriceLevel,
                         preferredUnitType: widget.preferredUnitType,
+                        restrictStock: widget.restrictStock,
                       );
                     },
                   ),
@@ -204,6 +210,7 @@ class ResultTable extends StatefulWidget {
     this.cursorPosition = 0,
     this.defaultPriceLevel = 1,
     this.preferredUnitType = 'min',
+    this.restrictStock = true,
   });
 
   final List<ProductInDbInBranch> products;
@@ -212,6 +219,7 @@ class ResultTable extends StatefulWidget {
   final bool isDirectSale;
   final int defaultPriceLevel;
   final String preferredUnitType;
+  final bool restrictStock;
 
   @override
   State<ResultTable> createState() => _ResultTableState();
@@ -255,6 +263,7 @@ class _ResultTableState extends State<ResultTable> {
               product: product,
               defaultPriceLevel: widget.defaultPriceLevel,
               preferredUnitType: widget.preferredUnitType,
+              restrictStock: widget.restrictStock,
             );
 
             if (res == null) return;

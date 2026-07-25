@@ -17,6 +17,7 @@ Future<CommercialProductResult?> showCommercialProductDialogFromId(
   SaleItem? previousSaleItem,
   int defaultPriceLevel = 1,
   String preferredUnitType = 'min',
+  bool restrictStock = true,
 }) async {
   final authState = getIt<AuthCubit>().state;
   if (authState is! Authenticated) return null;
@@ -49,13 +50,33 @@ Future<CommercialProductResult?> showCommercialProductDialogFromId(
         }
       }
 
+      int resolvedUnitIndex = 0;
+      String resolvedUnitName = product.unitName;
+      int resolvedConversionFactor = 1;
+      int resolvedQuantity = previousSaleItem.quantity;
+
+      if (previousSaleItem.conversionFactor > 1 && product.extraUnits.isNotEmpty) {
+        final extraIndex = product.extraUnits.indexWhere(
+          (u) => u.conversionFactor == previousSaleItem.conversionFactor,
+        );
+        if (extraIndex != -1) {
+          resolvedUnitIndex = extraIndex + 1;
+          resolvedUnitName = product.extraUnits[extraIndex].name;
+          resolvedConversionFactor = product.extraUnits[extraIndex].conversionFactor;
+          resolvedQuantity = previousSaleItem.quantity ~/ resolvedConversionFactor;
+        }
+      }
+
       initialResult =
           CommercialProductResult(
               product: product,
               defaultPriceLevel: previousSaleItem.selectedPrice,
               preferredUnitType: preferredUnitType,
             )
-            ..quantity = previousSaleItem.quantity
+            ..selectedUnitIndex = resolvedUnitIndex
+            ..selectedUnitName = resolvedUnitName
+            ..conversionFactor = resolvedConversionFactor
+            ..quantity = resolvedQuantity
             ..selectedPriceLevel = previousSaleItem.selectedPrice
             ..newPrice = previousSaleItem.price
             ..selectedDiscount = appliedDiscount;
@@ -67,6 +88,7 @@ Future<CommercialProductResult?> showCommercialProductDialogFromId(
       commercialProductResult: initialResult,
       defaultPriceLevel: defaultPriceLevel,
       preferredUnitType: preferredUnitType,
+      restrictStock: restrictStock,
     );
   } catch (e) {
     if (context.mounted) {
@@ -83,6 +105,7 @@ Future<CommercialProductResult?> showCommercialProductDialog(
   CommercialProductResult? commercialProductResult,
   int defaultPriceLevel = 1,
   String preferredUnitType = 'min',
+  bool restrictStock = true,
 }) async {
   return await showDialog<CommercialProductResult?>(
     barrierDismissible: false,
@@ -92,6 +115,7 @@ Future<CommercialProductResult?> showCommercialProductDialog(
       commercialProductResult: commercialProductResult,
       defaultPriceLevel: defaultPriceLevel,
       preferredUnitType: preferredUnitType,
+      restrictStock: restrictStock,
     ),
   );
 }
@@ -103,11 +127,13 @@ class CommercialProductDialog extends StatelessWidget {
     this.commercialProductResult,
     this.defaultPriceLevel = 1,
     this.preferredUnitType = 'min',
+    this.restrictStock = true,
   });
   final ProductInDbInBranch product;
   final CommercialProductResult? commercialProductResult;
   final int defaultPriceLevel;
   final String preferredUnitType;
+  final bool restrictStock;
 
   @override
   Widget build(BuildContext context) {
@@ -124,6 +150,7 @@ class CommercialProductDialog extends StatelessWidget {
             commercialProductResult: commercialProductResult,
             defaultPriceLevel: defaultPriceLevel,
             preferredUnitType: preferredUnitType,
+            restrictStock: restrictStock,
           ),
         ),
       ),
@@ -137,12 +164,14 @@ class _FormContent extends StatefulWidget {
     this.commercialProductResult,
     this.defaultPriceLevel = 1,
     this.preferredUnitType = 'min',
+    this.restrictStock = true,
   });
 
   final ProductInDbInBranch product;
   final CommercialProductResult? commercialProductResult;
   final int defaultPriceLevel;
   final String preferredUnitType;
+  final bool restrictStock;
 
   @override
   State<_FormContent> createState() => _FormContentState();
@@ -379,7 +408,7 @@ class _FormContentState extends State<_FormContent> {
                                 fit: FlexFit.tight,
 
                                 child: SizedBox(
-                                  height: 80,
+                                  height: 90,
                                   child: TitleTextField(
                                     focusNode: focusNode,
 
@@ -398,7 +427,7 @@ class _FormContentState extends State<_FormContent> {
                                       }
 
                                       final requestedUnits = numberValue * commercialProductResult.conversionFactor;
-                                      if (requestedUnits > availableStock) {
+                                      if (widget.restrictStock && requestedUnits > availableStock) {
                                         return "Supera la existencia ($availableStock $baseUnitName)";
                                       }
 
