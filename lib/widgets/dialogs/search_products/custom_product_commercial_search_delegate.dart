@@ -13,6 +13,7 @@ Future<CommercialProductResult?> showCommercialProductSearchDelegate(
   BuildContext context, {
   int defaultPriceLevel = 1,
   String preferredUnitType = 'min',
+  bool restrictStock = true,
 }) async {
   return await Navigator.push<CommercialProductResult?>(
     context,
@@ -23,6 +24,7 @@ Future<CommercialProductResult?> showCommercialProductSearchDelegate(
           product: product,
           defaultPriceLevel: defaultPriceLevel,
           preferredUnitType: preferredUnitType,
+          restrictStock: restrictStock,
         ),
       ),
     ),

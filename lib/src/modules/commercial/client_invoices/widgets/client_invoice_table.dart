@@ -203,6 +203,7 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
                             context,
                             defaultPriceLevel: widget.controller.selectedClient?.defaultPriceLevel ?? 1,
                             preferredUnitType: widget.controller.isWholesale ? 'max' : 'min',
+                            restrictStock: widget.restrictQuantity,
                           );
 
                           if (res == null) return;
@@ -240,9 +241,7 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
     for (var i = 0; i < controller.items.length; i++) {
       final currentItem = controller.items[i];
       final isZeroPrice = currentItem.newPrice <= 0;
-      final color = isZeroPrice 
-          ? Colors.red.shade200 
-          : (i.isOdd ? Colors.white : Colors.grey.shade200);
+      final color = isZeroPrice ? Colors.red.shade200 : (i.isOdd ? Colors.white : Colors.grey.shade200);
       yield InvoiceTableRow(
         key: ValueKey(currentItem),
         color: color,
@@ -254,10 +253,12 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
             product: item.product,
             defaultPriceLevel: widget.controller.selectedClient?.defaultPriceLevel ?? 1,
             preferredUnitType: widget.controller.isWholesale ? 'max' : 'min',
+            restrictStock: widget.restrictQuantity,
           );
           if (res == null) return;
           if (widget.restrictQuantity &&
-              ((res.quantity * res.conversionFactor) > res.product.account.availableStock || res.product.account.availableStock == 0)) {
+              ((res.quantity * res.conversionFactor) > res.product.account.availableStock ||
+                  res.product.account.availableStock == 0)) {
             if (!context.mounted) return;
             await DialogManager.showErrorDialog(
               context,
@@ -273,10 +274,12 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
             context,
             product: item.product,
             commercialProductResult: item,
+            restrictStock: widget.restrictQuantity,
           );
           if (res == null) return;
           if (widget.restrictQuantity &&
-              ((res.quantity * res.conversionFactor) > res.product.account.availableStock || res.product.account.availableStock == 0)) {
+              ((res.quantity * res.conversionFactor) > res.product.account.availableStock ||
+                  res.product.account.availableStock == 0)) {
             if (!context.mounted) return;
             await DialogManager.showErrorDialog(
               context,
