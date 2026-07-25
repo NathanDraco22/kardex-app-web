@@ -110,26 +110,28 @@ class _CreateTransferScreenState extends State<CreateTransferScreen> {
 
     final transferRepo = context.read<TransfersRepository>();
 
-    return NotificationListener<RebuildTransferScreenNotification>(
-      onNotification: (notification) {
-        final branchId = getIt<AuthCubit>().currentBranchId;
-        TransferDraftManager().clearDraft(branchId);
-        notifier = CreateTransferNotifier();
-        rebuildScreen = true;
-        setState(() {});
-        return true;
-      },
-      child: BlocProvider(
-        create: (context) => WriteTransferCubit(repository: transferRepo),
-        child: CreateTransferMediator(
-          notifier: notifier,
-          child: PopScope(
-            canPop: false,
-            onPopInvokedWithResult: (didPop, result) async {
-              if (didPop) return;
-              await _handleExit(context);
-            },
-            child: _RootScaffold(key: ObjectKey(notifier)),
+    return ShortcutContainer(
+      child: NotificationListener<RebuildTransferScreenNotification>(
+        onNotification: (notification) {
+          final branchId = getIt<AuthCubit>().currentBranchId;
+          TransferDraftManager().clearDraft(branchId);
+          notifier = CreateTransferNotifier();
+          rebuildScreen = true;
+          setState(() {});
+          return true;
+        },
+        child: BlocProvider(
+          create: (context) => WriteTransferCubit(repository: transferRepo),
+          child: CreateTransferMediator(
+            notifier: notifier,
+            child: PopScope(
+              canPop: false,
+              onPopInvokedWithResult: (didPop, result) async {
+                if (didPop) return;
+                await _handleExit(context);
+              },
+              child: _RootScaffold(key: ObjectKey(notifier)),
+            ),
           ),
         ),
       ),
