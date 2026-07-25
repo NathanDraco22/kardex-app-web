@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:kardex_app_front/widgets/buttons/elevated_ctrl_button.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
@@ -294,14 +295,13 @@ class _InnerRows extends StatelessWidget {
         const SizedBox(height: 8),
         Row(
           children: [
-            ElevatedButton.icon(
+            ElevatedCtrlButton(
+              hotKey: "1",
+              icon: Icons.add,
+              label: "Agregar Producto",
               onPressed: () {
                 AddNewRowNotification().dispatch(context);
               },
-              icon: const Icon(Icons.add),
-              label: const Text(
-                "Agregar Producto",
-              ),
             ),
           ],
         ),
@@ -351,9 +351,7 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
       text: widget.rowModel.quantity > 0 ? widget.rowModel.quantity.toString() : "",
     );
     expirationController = TextEditingController(
-      text: widget.rowModel.expirationDate != null
-          ? DateFormat('MM/yy').format(widget.rowModel.expirationDate!)
-          : "",
+      text: widget.rowModel.expirationDate != null ? DateFormat('MM/yy').format(widget.rowModel.expirationDate!) : "",
     );
     Future(
       () {
