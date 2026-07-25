@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -46,27 +44,14 @@ class _ShortcutContainerState extends State<ShortcutContainer> {
 
         return true;
       },
-      child: Shortcuts(
-        shortcuts: <LogicalKeySet, Intent>{
-          LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyA): const AddIntent(),
-          LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyS): const SaveIntent(),
+      child: CallbackShortcuts(
+        bindings: <SingleActivator, VoidCallback>{
+          const SingleActivator(LogicalKeyboardKey.keyA, control: true): () => _onAdd?.call(),
+          const SingleActivator(LogicalKeyboardKey.keyG, control: true): () => _onSave?.call(),
         },
-        child: Actions(
-          actions: <Type, Action<Intent>>{
-            AddIntent: CallbackAction<AddIntent>(
-              onInvoke: (intent) {
-                log("Callled");
-                return _onAdd?.call();
-              },
-            ),
-            SaveIntent: CallbackAction<SaveIntent>(
-              onInvoke: (intent) => _onSave?.call(),
-            ),
-          },
-          child: Focus(
-            autofocus: true,
-            child: widget.child,
-          ),
+        child: Focus(
+          autofocus: true,
+          child: widget.child,
         ),
       ),
     );
