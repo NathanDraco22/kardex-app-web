@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/widgets/display_product_code.dart';
@@ -78,6 +79,29 @@ class _QuickProductSearchDelegateState extends State<QuickProductSearchDelegate>
 
   int _getQuantity(ProductInDbInBranch product) {
     return _cart[product.id]?.quantity ?? 0;
+  }
+
+  void _setProductQuantity(ProductInDbInBranch product, int newQuantity) {
+    setState(() {
+      if (newQuantity <= 0) {
+        _cart.remove(product.id);
+        return;
+      }
+
+      int finalQuantity = newQuantity;
+      if (widget.restrictStock && newQuantity * _resolveDisplayFactor(product) > product.account.availableStock) {
+        finalQuantity = (product.account.availableStock / _resolveDisplayFactor(product)).floor();
+      }
+
+      if (!_cart.containsKey(product.id)) {
+        _cart[product.id] = CommercialProductResult(
+          product: product,
+          defaultPriceLevel: widget.defaultPriceLevel,
+          preferredUnitType: widget.preferredUnitType,
+        );
+      }
+      _cart[product.id]!.quantity = finalQuantity;
+    });
   }
 
   int _resolveDisplayFactor(ProductInDbInBranch product) {
@@ -173,6 +197,10 @@ class _QuickProductSearchDelegateState extends State<QuickProductSearchDelegate>
             color: quantity > 0 ? Colors.amber.shade50 : Colors.white,
             onIncrement: canIncrement ? () => _incrementProduct(product) : null,
             onDecrement: quantity > 0 ? () => _decrementProduct(product) : null,
+            onQuantityChanged: (value) {
+              final newQuantity = int.tryParse(value) ?? 0;
+              _setProductQuantity(product, newQuantity);
+            },
           );
         },
       ),
@@ -180,12 +208,13 @@ class _QuickProductSearchDelegateState extends State<QuickProductSearchDelegate>
   }
 }
 
-class _ProductInBranchQuickResultRow extends StatelessWidget {
+class _ProductInBranchQuickResultRow extends StatefulWidget {
   const _ProductInBranchQuickResultRow({
     required this.product,
     required this.quantity,
     this.onIncrement,
     this.onDecrement,
+    this.onQuantityChanged,
     this.preferredUnitType = 'min',
     this.color,
   });
@@ -194,37 +223,67 @@ class _ProductInBranchQuickResultRow extends StatelessWidget {
   final int quantity;
   final VoidCallback? onIncrement;
   final VoidCallback? onDecrement;
+  final ValueChanged<String>? onQuantityChanged;
   final String preferredUnitType;
   final Color? color;
 
+  @override
+  State<_ProductInBranchQuickResultRow> createState() => _ProductInBranchQuickResultRowState();
+}
+
+class _ProductInBranchQuickResultRowState extends State<_ProductInBranchQuickResultRow> {
+  late final TextEditingController _controller;
+
   int get _resolvedUnitIndex {
-    if (preferredUnitType == "max" && product.wholesaleUnitIndex > 0) {
-      return product.wholesaleUnitIndex;
+    if (widget.preferredUnitType == "max" && widget.product.wholesaleUnitIndex > 0) {
+      return widget.product.wholesaleUnitIndex;
     }
-    return product.defaultUnitIndex;
+    return widget.product.defaultUnitIndex;
   }
 
   String get _displayUnitName {
-    if (_resolvedUnitIndex == 0 || product.extraUnits.isEmpty) return product.unitName;
+    if (_resolvedUnitIndex == 0 || widget.product.extraUnits.isEmpty) return widget.product.unitName;
     final idx = _resolvedUnitIndex - 1;
-    if (idx >= 0 && idx < product.extraUnits.length) return product.extraUnits[idx].name;
-    return product.unitName;
+    if (idx >= 0 && idx < widget.product.extraUnits.length) return widget.product.extraUnits[idx].name;
+    return widget.product.unitName;
   }
 
   int get _displayConversionFactor {
-    if (_resolvedUnitIndex == 0 || product.extraUnits.isEmpty) return 1;
+    if (_resolvedUnitIndex == 0 || widget.product.extraUnits.isEmpty) return 1;
     final idx = _resolvedUnitIndex - 1;
-    if (idx >= 0 && idx < product.extraUnits.length) return product.extraUnits[idx].conversionFactor;
+    if (idx >= 0 && idx < widget.product.extraUnits.length) return widget.product.extraUnits[idx].conversionFactor;
     return 1;
   }
 
   @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.quantity == 0 ? "" : widget.quantity.toString());
+  }
+
+  @override
+  void didUpdateWidget(covariant _ProductInBranchQuickResultRow oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.quantity != widget.quantity) {
+      if (int.tryParse(_controller.text) != widget.quantity) {
+        _controller.text = widget.quantity == 0 ? "" : widget.quantity.toString();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    int value = product.saleProfile.salePrice * _displayConversionFactor;
+    int value = widget.product.saleProfile.salePrice * _displayConversionFactor;
     String valueToDisplay = NumberFormatter.convertToMoneyLike(value);
 
     return DecoratedBox(
-      decoration: BoxDecoration(color: color),
+      decoration: BoxDecoration(color: widget.color),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
         child: Column(
@@ -234,7 +293,7 @@ class _ProductInBranchQuickResultRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ImageViewerWidget(
-                  imageUrls: product.image.isNotEmpty ? [product.image] : [],
+                  imageUrls: widget.product.image.isNotEmpty ? [widget.product.image] : [],
                   width: 50,
                   height: 50,
                 ),
@@ -244,13 +303,13 @@ class _ProductInBranchQuickResultRow extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        DisplayProductCode(product: product),
+                        DisplayProductCode(product: widget.product),
                         const SizedBox(height: 4),
                         Row(
                           children: [
                             Flexible(
                               child: Text(
-                                product.brandName,
+                                widget.product.brandName,
                                 style: const TextStyle(fontSize: 14, color: Colors.grey),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -285,10 +344,10 @@ class _ProductInBranchQuickResultRow extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        "Stock: ${NumberFormatter.formatDisplayStock(product.account.availableStock, _displayConversionFactor)}",
+                        "Stock: ${NumberFormatter.formatDisplayStock(widget.product.account.availableStock, _displayConversionFactor)}",
                         style: TextStyle(
                           fontSize: 13,
-                          color: product.account.availableStock > 0 ? Colors.green.shade700 : Colors.red,
+                          color: widget.product.account.availableStock > 0 ? Colors.green.shade700 : Colors.red,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -304,7 +363,7 @@ class _ProductInBranchQuickResultRow extends StatelessWidget {
               children: [
                 Expanded(
                   child: FilledButton(
-                    onPressed: onDecrement,
+                    onPressed: widget.onDecrement,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                       foregroundColor: Colors.white,
@@ -320,19 +379,29 @@ class _ProductInBranchQuickResultRow extends StatelessWidget {
                   ),
                 ),
                 SizedBox(
-                  width: 80,
-                  child: Text(
-                    quantity.toString(),
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                  width: 140,
+                  height: 60,
+                  child: Center(
+                    child: TextField(
+                      decoration: const InputDecoration(
+                        isDense: true,
+                        contentPadding: EdgeInsets.all(12),
+                      ),
+                      controller: _controller,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      inputFormatters: [IntegerTextInputFormatter()],
+                      keyboardType: TextInputType.number,
+                      onChanged: widget.onQuantityChanged,
                     ),
                   ),
                 ),
                 Expanded(
                   child: FilledButton(
-                    onPressed: onIncrement,
+                    onPressed: widget.onIncrement,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                       foregroundColor: Colors.white,
