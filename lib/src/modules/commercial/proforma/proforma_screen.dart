@@ -8,7 +8,6 @@ import 'package:kardex_app_front/src/modules/commercial/client_invoices/cubit/wr
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/mobile/client_invoices_screen_mobile.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/view_controller.dart';
 import 'package:kardex_app_front/src/tools/extensiones.dart';
-import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/web/client_invoices_screen_web.dart';
 
 class ProformaScreen extends StatefulWidget {
