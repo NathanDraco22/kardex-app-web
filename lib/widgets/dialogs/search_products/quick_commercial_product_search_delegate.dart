@@ -10,12 +10,16 @@ import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 Future<List<CommercialProductResult>?> showQuickCommercialProductSearchDelegate(
   BuildContext context, {
   bool restrictStock = true,
+  int defaultPriceLevel = 1,
+  String preferredUnitType = 'min',
 }) async {
   return await Navigator.push<List<CommercialProductResult>?>(
     context,
     MaterialPageRoute(
       builder: (context) => QuickProductSearchDelegate(
         restrictStock: restrictStock,
+        defaultPriceLevel: defaultPriceLevel,
+        preferredUnitType: preferredUnitType,
       ),
     ),
   );
@@ -25,9 +29,13 @@ class QuickProductSearchDelegate extends StatefulWidget {
   const QuickProductSearchDelegate({
     super.key,
     this.restrictStock = true,
+    this.defaultPriceLevel = 1,
+    this.preferredUnitType = 'min',
   });
 
   final bool restrictStock;
+  final int defaultPriceLevel;
+  final String preferredUnitType;
 
   @override
   State<QuickProductSearchDelegate> createState() => _QuickProductSearchDelegateState();
@@ -45,7 +53,11 @@ class _QuickProductSearchDelegateState extends State<QuickProductSearchDelegate>
       if (_cart.containsKey(product.id)) {
         _cart[product.id]!.quantity += 1;
       } else {
-        final result = CommercialProductResult(product: product);
+        final result = CommercialProductResult(
+          product: product,
+          defaultPriceLevel: widget.defaultPriceLevel,
+          preferredUnitType: widget.preferredUnitType,
+        );
         result.quantity = 1;
         _cart[product.id] = result;
       }
@@ -66,6 +78,17 @@ class _QuickProductSearchDelegateState extends State<QuickProductSearchDelegate>
 
   int _getQuantity(ProductInDbInBranch product) {
     return _cart[product.id]?.quantity ?? 0;
+  }
+
+  int _resolveDisplayFactor(ProductInDbInBranch product) {
+    int index;
+    if (widget.preferredUnitType == "max" && product.wholesaleUnitIndex > 0) {
+      index = product.wholesaleUnitIndex;
+    } else {
+      index = product.defaultUnitIndex;
+    }
+    if (product.extraUnits.isEmpty || index > product.extraUnits.length || index == 0) return 1;
+    return product.extraUnits[index - 1].conversionFactor;
   }
 
   @override
@@ -139,13 +162,14 @@ class _QuickProductSearchDelegateState extends State<QuickProductSearchDelegate>
           final quantity = _getQuantity(product);
 
           bool canIncrement = true;
-          if (widget.restrictStock && (quantity * product.defaultUnitFactor) >= product.account.availableStock) {
+          if (widget.restrictStock && (quantity * _resolveDisplayFactor(product)) >= product.account.availableStock) {
             canIncrement = false;
           }
 
           return _ProductInBranchQuickResultRow(
             product: product,
             quantity: quantity,
+            preferredUnitType: widget.preferredUnitType,
             color: quantity > 0 ? Colors.amber.shade50 : Colors.white,
             onIncrement: canIncrement ? () => _incrementProduct(product) : null,
             onDecrement: quantity > 0 ? () => _decrementProduct(product) : null,
@@ -162,6 +186,7 @@ class _ProductInBranchQuickResultRow extends StatelessWidget {
     required this.quantity,
     this.onIncrement,
     this.onDecrement,
+    this.preferredUnitType = 'min',
     this.color,
   });
 
@@ -169,11 +194,33 @@ class _ProductInBranchQuickResultRow extends StatelessWidget {
   final int quantity;
   final VoidCallback? onIncrement;
   final VoidCallback? onDecrement;
+  final String preferredUnitType;
   final Color? color;
+
+  int get _resolvedUnitIndex {
+    if (preferredUnitType == "max" && product.wholesaleUnitIndex > 0) {
+      return product.wholesaleUnitIndex;
+    }
+    return product.defaultUnitIndex;
+  }
+
+  String get _displayUnitName {
+    if (_resolvedUnitIndex == 0 || product.extraUnits.isEmpty) return product.unitName;
+    final idx = _resolvedUnitIndex - 1;
+    if (idx >= 0 && idx < product.extraUnits.length) return product.extraUnits[idx].name;
+    return product.unitName;
+  }
+
+  int get _displayConversionFactor {
+    if (_resolvedUnitIndex == 0 || product.extraUnits.isEmpty) return 1;
+    final idx = _resolvedUnitIndex - 1;
+    if (idx >= 0 && idx < product.extraUnits.length) return product.extraUnits[idx].conversionFactor;
+    return 1;
+  }
 
   @override
   Widget build(BuildContext context) {
-    int value = product.saleProfile.salePrice * product.defaultUnitFactor;
+    int value = product.saleProfile.salePrice * _displayConversionFactor;
     String valueToDisplay = NumberFormatter.convertToMoneyLike(value);
 
     return DecoratedBox(
@@ -194,19 +241,34 @@ class _ProductInBranchQuickResultRow extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   flex: 3,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      DisplayProductCode(product: product),
-                      const SizedBox(height: 4),
-                      Text(
-                        "${product.brandName} - ${product.defaultUnitName}",
-                        style: const TextStyle(fontSize: 14, color: Colors.grey),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        DisplayProductCode(product: product),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                product.brandName,
+                                style: const TextStyle(fontSize: 14, color: Colors.grey),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const Text(
+                              " - ",
+                              style: TextStyle(fontSize: 14, color: Colors.grey),
+                            ),
+                            UnitDisplayer(
+                              unitName: _displayUnitName,
+                              conversionFactor: _displayConversionFactor,
+                              style: const TextStyle(fontSize: 14, color: Colors.grey),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -223,7 +285,7 @@ class _ProductInBranchQuickResultRow extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        "Stock: ${NumberFormatter.formatDisplayStock(product.account.availableStock, product.defaultUnitFactor)}",
+                        "Stock: ${NumberFormatter.formatDisplayStock(product.account.availableStock, _displayConversionFactor)}",
                         style: TextStyle(
                           fontSize: 13,
                           color: product.account.availableStock > 0 ? Colors.green.shade700 : Colors.red,

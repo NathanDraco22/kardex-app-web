@@ -7,6 +7,7 @@ import 'package:kardex_app_front/src/modules/commercial/client_invoices/mobile/m
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/view_controller.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/commercial_product_modal.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/search_product_commercial_delegate.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/quick_commercial_product_search_delegate.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 
 import '../widgets/product_invoice_card.dart';
@@ -73,6 +74,23 @@ class _RootScaffold extends StatelessWidget {
         child: FloatingActionButton.extended(
           onPressed: () async {
             final isRestrictStock = writeCubit.documentType != CommercialDocumentType.quote;
+            final isQuote = writeCubit.documentType == CommercialDocumentType.quote;
+
+            if (isQuote) {
+              final items = await showQuickCommercialProductSearchDelegate(
+                context,
+                restrictStock: false,
+                defaultPriceLevel: viewController.selectedClient?.defaultPriceLevel ?? 1,
+                preferredUnitType: viewController.isWholesale ? 'max' : 'min',
+              );
+              if (items == null || items.isEmpty) return;
+              for (final item in items) {
+                if (item.quantity == 0) continue;
+                viewController.addItem(item);
+              }
+              return;
+            }
+
             final res = await showCommercialProductSearchDelegate(
               context,
               defaultPriceLevel: viewController.selectedClient?.defaultPriceLevel ?? 1,
