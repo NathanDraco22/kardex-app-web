@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/cubit/write_invoice_cubit.dart';
@@ -35,18 +36,20 @@ class _ProformaScreenState extends State<ProformaScreen> {
   Widget build(BuildContext context) {
     final invoiceRepo = context.read<InvoicesRepository>();
     final orderRepo = context.read<OrdersRepository>();
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (context) => WriteInvoiceCubit(
-            invoicesRepository: invoiceRepo,
-            ordersRepository: orderRepo,
-            documentType: CommercialDocumentType.quote,
-            viewController: viewController,
+    return ShortcutContainer(
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) => WriteInvoiceCubit(
+              invoicesRepository: invoiceRepo,
+              ordersRepository: orderRepo,
+              documentType: CommercialDocumentType.quote,
+              viewController: viewController,
+            ),
           ),
-        ),
-      ],
-      child: _RootScaffold(isWholesale: widget.isWholesale),
+        ],
+        child: _RootScaffold(isWholesale: widget.isWholesale),
+      ),
     );
   }
 }
