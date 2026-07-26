@@ -25,7 +25,7 @@ class ProductInvoiceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final priceFormatted = NumberFormatter.convertFromCentsToDouble(item.newPrice);
+    final priceFormatted = NumberFormatter.convertFromCentsToDouble(item.newPrice * item.conversionFactor);
     final discountFormatted = NumberFormatter.convertFromCentsToDouble(item.totalDiscount);
     final totalFormatted = NumberFormatter.convertToMoneyLike(item.total);
 
@@ -97,7 +97,11 @@ class ProductInvoiceCard extends StatelessWidget {
                           spacing: 12,
                           children: [
                             Text(item.product.brandName),
-                            Text(item.product.unitName),
+                            UnitDisplayer(
+                              unitName: item.selectedUnitName,
+                              conversionFactor: item.conversionFactor,
+                              fallbackUnitName: item.product.unitName,
+                            ),
                           ],
                         ),
                       ],
@@ -113,7 +117,12 @@ class ProductInvoiceCard extends StatelessWidget {
                 spacing: 12,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  const Text("Unidades: "),
+                  UnitDisplayer(
+                    unitName: item.selectedUnitName,
+                    conversionFactor: item.conversionFactor,
+                    fallbackUnitName: item.product.unitName,
+                    suffix: ": ",
+                  ),
                   Text(
                     item.quantity.toString(),
                     style: const TextStyle(

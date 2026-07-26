@@ -5,15 +5,21 @@ import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
-import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 import 'package:kardex_app_front/widgets/title_label.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
-Future<CommercialProductResult?> showCommercialProductModalFromId(
+import '../../models/commercial_product_result.dart';
+import '../widgets/commercial_product_unit_selector.dart';
+import '../widgets/price_level_dropdown_selector.dart';
+import '../widgets/product_header_info.dart';
+
+Future<CommercialProductResult?> showCommercialProductDialogFromId(
   BuildContext context, {
   required String productId,
   SaleItem? previousSaleItem,
   int defaultPriceLevel = 1,
+  String preferredUnitType = 'min',
+  bool restrictStock = true,
 }) async {
   final authState = getIt<AuthCubit>().state;
   if (authState is! Authenticated) return null;
@@ -25,12 +31,15 @@ Future<CommercialProductResult?> showCommercialProductModalFromId(
         .read<ProductsRepository>()
         .getProductInBranchById(productId, branchId)
         .timeout(const Duration(seconds: 10));
+
     if (!context.mounted) return null;
+
     LoadingDialogManager.closeLoadingDialog(context);
 
     CommercialProductResult? initialResult;
     if (previousSaleItem != null) {
       Discount? appliedDiscount;
+
       if (previousSaleItem.discountPercentage > 0) {
         final match = product.saleProfile.discounts.where(
           (d) => d.percentValue == previousSaleItem.discountPercentage,
@@ -46,18 +55,45 @@ Future<CommercialProductResult?> showCommercialProductModalFromId(
         }
       }
 
-      initialResult = CommercialProductResult(product: product)
-        ..quantity = previousSaleItem.quantity
-        ..selectedPriceLevel = previousSaleItem.selectedPrice
-        ..newPrice = previousSaleItem.price
-        ..selectedDiscount = appliedDiscount;
+      int resolvedUnitIndex = 0;
+      String resolvedUnitName = product.unitName;
+      int resolvedConversionFactor = 1;
+      int resolvedQuantity = previousSaleItem.quantity;
+
+      if (previousSaleItem.conversionFactor > 1 && product.extraUnits.isNotEmpty) {
+        final extraIndex = product.extraUnits.indexWhere(
+          (u) => u.conversionFactor == previousSaleItem.conversionFactor,
+        );
+        if (extraIndex != -1) {
+          resolvedUnitIndex = extraIndex + 1;
+          resolvedUnitName = product.extraUnits[extraIndex].name;
+          resolvedConversionFactor = product.extraUnits[extraIndex].conversionFactor;
+          resolvedQuantity = previousSaleItem.quantity ~/ resolvedConversionFactor;
+        }
+      }
+
+      initialResult =
+          CommercialProductResult(
+              product: product,
+              defaultPriceLevel: previousSaleItem.selectedPrice,
+              preferredUnitType: preferredUnitType,
+            )
+            ..selectedUnitIndex = resolvedUnitIndex
+            ..selectedUnitName = resolvedUnitName
+            ..conversionFactor = resolvedConversionFactor
+            ..quantity = resolvedQuantity
+            ..selectedPriceLevel = previousSaleItem.selectedPrice
+            ..newPrice = previousSaleItem.price
+            ..selectedDiscount = appliedDiscount;
     }
 
-    return await showCommercialProductModal(
+    return await showCommercialProductDialog(
       context,
       product: product,
       commercialProductResult: initialResult,
       defaultPriceLevel: defaultPriceLevel,
+      preferredUnitType: preferredUnitType,
+      restrictStock: restrictStock,
     );
   } catch (e) {
     if (context.mounted) {
@@ -68,57 +104,104 @@ Future<CommercialProductResult?> showCommercialProductModalFromId(
   }
 }
 
-Future<CommercialProductResult?> showCommercialProductModal(
+Future<CommercialProductResult?> showCommercialProductDialog(
   BuildContext context, {
   required ProductInDbInBranch product,
   CommercialProductResult? commercialProductResult,
   int defaultPriceLevel = 1,
+  String preferredUnitType = 'min',
+  bool restrictStock = true,
 }) async {
-  return await Navigator.push<CommercialProductResult?>(
-    context,
-    MaterialPageRoute(
-      builder: (context) => CommercialProductModal(
-        product: product,
-        commercialProductResult: commercialProductResult,
-        defaultPriceLevel: defaultPriceLevel,
-      ),
+  return await showDialog<CommercialProductResult?>(
+    barrierDismissible: false,
+    context: context,
+    builder: (context) => CommercialProductDialog(
+      product: product,
+      commercialProductResult: commercialProductResult,
+      defaultPriceLevel: defaultPriceLevel,
+      preferredUnitType: preferredUnitType,
+      restrictStock: restrictStock,
     ),
   );
 }
 
-class CommercialProductModal extends StatefulWidget {
-  const CommercialProductModal({
-    super.key, 
-    required this.product, 
+class CommercialProductDialog extends StatelessWidget {
+  const CommercialProductDialog({
+    super.key,
+    required this.product,
     this.commercialProductResult,
     this.defaultPriceLevel = 1,
+    this.preferredUnitType = 'min',
+    this.restrictStock = true,
+  });
+  final ProductInDbInBranch product;
+  final CommercialProductResult? commercialProductResult;
+  final int defaultPriceLevel;
+  final String preferredUnitType;
+  final bool restrictStock;
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      constraints: const BoxConstraints(maxWidth: 700),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: SizedBox(
+        width: 650,
+        height: 700,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: _FormContent(
+            product: product,
+            commercialProductResult: commercialProductResult,
+            defaultPriceLevel: defaultPriceLevel,
+            preferredUnitType: preferredUnitType,
+            restrictStock: restrictStock,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FormContent extends StatefulWidget {
+  const _FormContent({
+    required this.product,
+    this.commercialProductResult,
+    this.defaultPriceLevel = 1,
+    this.preferredUnitType = 'min',
+    this.restrictStock = true,
   });
 
   final ProductInDbInBranch product;
   final CommercialProductResult? commercialProductResult;
   final int defaultPriceLevel;
+  final String preferredUnitType;
+  final bool restrictStock;
 
   @override
-  State<CommercialProductModal> createState() => _CommercialProductModalState();
+  State<_FormContent> createState() => _FormContentState();
 }
 
-class _CommercialProductModalState extends State<CommercialProductModal> {
+class _FormContentState extends State<_FormContent> {
   late CommercialProductResult commercialProductResult;
   late Iterable<DropdownMenuItem<Discount>> discountsAvailable;
   FocusNode focusNode = FocusNode();
+  FocusNode acceptFocusNode = FocusNode();
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
   @override
   void initState() {
     super.initState();
-
     if (widget.commercialProductResult != null) {
       commercialProductResult = widget.commercialProductResult!.copyWith();
     } else {
       commercialProductResult = CommercialProductResult(
         product: widget.product,
         defaultPriceLevel: widget.defaultPriceLevel,
+        preferredUnitType: widget.preferredUnitType,
       );
     }
+
     discountsAvailable = widget.product.saleProfile.discounts.map(
       (e) {
         return DropdownMenuItem(
@@ -142,130 +225,79 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
     if (authState is! Authenticated) return const SizedBox.shrink();
     final isUserAdmin = authState.session.user.role == "Admin";
     final product = commercialProductResult.product;
-    double price = NumberFormatter.convertFromCentsToDouble(commercialProductResult.newPrice);
+    double price = NumberFormatter.convertFromCentsToDouble(
+      commercialProductResult.newPrice * commercialProductResult.conversionFactor,
+    );
     final subtotal = NumberFormatter.convertToMoneyLike(commercialProductResult.subTotal);
     final totalDiscount = NumberFormatter.convertToMoneyLike(commercialProductResult.totalDiscount);
     final total = NumberFormatter.convertToMoneyLike(commercialProductResult.total);
+
+    final availableStock = widget.product.account.availableStock;
+    final factor = commercialProductResult.conversionFactor;
+    final unitName = commercialProductResult.selectedUnitName;
+    final baseUnitName = widget.product.unitName;
+    final stockStr = NumberFormatter.formatDisplayStock(availableStock, factor);
+    final displayStock = "$stockStr $unitName";
+
     return Form(
       key: formKey,
       child: Scaffold(
-        appBar: AppBar(title: const Text("Busqueda de Producto Comercial")),
+        backgroundColor: Colors.white,
+
         body: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Center(
-                child: ImageViewerWidget(
-                  imageUrls: widget.product.image.isNotEmpty ? [widget.product.image] : [],
-                  width: 90,
-                  height: 90,
-                ),
+              ProductHeaderInfo(
+                product: widget.product,
+                rowAlignment: MainAxisAlignment.spaceEvenly,
+                rowSpacing: null,
+                labelCrossAxisAlignment: CrossAxisAlignment.start,
               ),
-              const SizedBox(height: 8),
-              Text(
-                widget.product.name,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
-              ),
-              Text(
-                widget.product.displayCode,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                spacing: 12,
-                children: [
-                  TitleLabel(
-                    title: "Marca",
-                    bigTitle: widget.product.brandName,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                  ),
-                  TitleLabel(
-                    title: "Unidad",
-                    bigTitle: widget.product.unitName,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                  ),
-                ],
-              ),
+
               Expanded(
                 child: ListView(
                   children: [
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8),
 
                     SizedBox(
                       width: 600,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          const Text(
-                            "Nivel de Precio",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          DropdownButton<int>(
-                            value: commercialProductResult.selectedPriceLevel,
-                            isExpanded: true,
-                            items: [
-                              DropdownMenuItem(
-                                value: 1,
-                                child: Text(
-                                  "Precio 1 (${NumberFormatter.convertToMoneyLike(product.saleProfile.salePrice)})",
-                                ),
-                              ),
-                              DropdownMenuItem(
-                                value: 2,
-                                child: Text(
-                                  "Precio 2 (${NumberFormatter.convertToMoneyLike(product.saleProfile.salePrice2)})",
-                                ),
-                              ),
-                              DropdownMenuItem(
-                                value: 3,
-                                child: Text(
-                                  "Precio 3 (${NumberFormatter.convertToMoneyLike(product.saleProfile.salePrice3)})",
-                                ),
-                              ),
-                              DropdownMenuItem(
-                                value: 4,
-                                child: Text(
-                                  "Precio 4 (${NumberFormatter.convertToMoneyLike(product.saleProfile.salePrice4)})",
-                                ),
-                              ),
-                              if (isUserAdmin)
-                                const DropdownMenuItem(
-                                  value: 0,
-                                  child: Text("Precio manual"),
-                                ),
-                            ],
-                            onChanged: (value) {
-                              if (value == null) return;
-                              final priceMap = {
-                                1: product.saleProfile.salePrice,
-                                2: product.saleProfile.salePrice2,
-                                3: product.saleProfile.salePrice3,
-                                4: product.saleProfile.salePrice4,
-                              };
-
-                              if (priceMap[value] == 0) {
-                                return;
-                              }
-
-                              commercialProductResult.selectedPriceLevel = value;
-                              if (value != 0) {
-                                commercialProductResult.newPrice = priceMap[value]!;
-                              }
-                              setState(() {});
-                            },
+                          CommercialProductUnitSelector(
+                            result: commercialProductResult,
+                            onChanged: () => setState(() {}),
                           ),
                           const SizedBox(height: 12),
+                          PriceLevelDropdownSelector(
+                            result: commercialProductResult,
+                            isUserAdmin: isUserAdmin,
+                            onChanged: () => setState(() {}),
+                          ),
+                          const SizedBox(height: 8),
                           Row(
                             children: [
                               Expanded(
-                                child: TitleLabel(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  title: "Existencia",
-                                  bigTitle: widget.product.account.availableStock.toString(),
+                                child: Builder(
+                                  builder: (context) {
+                                    Color? stockColor;
+
+                                    if (commercialProductResult.selectedUnitIndex != 0) {
+                                      stockColor = Colors.blue;
+                                    }
+
+                                    if (availableStock <= 0) {
+                                      stockColor = Colors.red;
+                                    }
+
+                                    return TitleLabel(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      title: "Existencia",
+                                      bigTitle: displayStock,
+                                      bigTitleColor: stockColor,
+                                    );
+                                  },
                                 ),
                               ),
                               Expanded(
@@ -278,14 +310,14 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                                         crossAxisAlignment: CrossAxisAlignment.center,
                                         title: "Costo",
                                         bigTitle: NumberFormatter.convertFromCentsToUnitsCurrency(
-                                          widget.product.account.averageCost,
+                                          widget.product.account.averageCost * factor,
                                         ),
                                       ),
                                       TitleLabel(
                                         crossAxisAlignment: CrossAxisAlignment.center,
                                         title: "Ult. C",
                                         bigTitle: NumberFormatter.convertFromCentsToUnitsCurrency(
-                                          widget.product.account.lastCost,
+                                          widget.product.account.lastCost * factor,
                                         ),
                                       ),
                                     ],
@@ -307,7 +339,10 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                                   height: 90,
                                   child: TitleTextField(
                                     focusNode: focusNode,
-                                    style: const TextStyle(fontWeight: .w600),
+
+                                    onEditingComplete: () {
+                                      FocusScope.of(context).requestFocus(acceptFocusNode);
+                                    },
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return "";
@@ -319,13 +354,16 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                                         return "Cantidad invalida";
                                       }
 
+                                      final requestedUnits = numberValue * commercialProductResult.conversionFactor;
+                                      if (widget.restrictStock && requestedUnits > availableStock) {
+                                        return "Supera la existencia ($availableStock $baseUnitName)";
+                                      }
+
                                       return null;
                                     },
                                     titleTextAlign: TextAlign.center,
-                                    centerTitle: true,
                                     initialValue: commercialProductResult.quantity.toString(),
                                     inputFormatters: [IntegerTextInputFormatter()],
-                                    keyboardType: TextInputType.number,
                                     onChanged: (value) {
                                       commercialProductResult.quantity = int.tryParse(value) ?? 0;
                                       setState(() {});
@@ -339,22 +377,23 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                                 fit: FlexFit.tight,
 
                                 child: SizedBox(
-                                  height: 90,
+                                  height: 80,
                                   child: TitleTextField(
-                                    centerTitle: true,
-                                    key: ValueKey(commercialProductResult.selectedPriceLevel),
+                                    key: ValueKey(
+                                      "${commercialProductResult.selectedPriceLevel}_${commercialProductResult.selectedUnitIndex}",
+                                    ),
                                     readOnly: commercialProductResult.selectedPriceLevel != 0,
                                     titleTextAlign: TextAlign.center,
                                     initialValue: price.toString(),
-                                    style: const TextStyle(fontWeight: FontWeight.w600),
-
                                     inputFormatters: [DecimalTextInputFormatter()],
                                     keyboardType: TextInputType.number,
                                     onChanged: (value) {
                                       final rowDecimal = double.tryParse(value) ?? 0.0;
                                       final rowInteger = NumberFormatter.convertFromDoubleToCents(rowDecimal);
 
-                                      commercialProductResult.newPrice = int.tryParse(rowInteger.toString()) ?? 0;
+                                      // Guardar el precio convertido a unidad base
+                                      commercialProductResult.newPrice =
+                                          (rowInteger / commercialProductResult.conversionFactor).round();
                                       commercialProductResult.selectedPriceLevel = 0;
                                       setState(() {});
                                     },
@@ -393,37 +432,6 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                           ),
 
                           const SizedBox(height: 12),
-
-                          const Text(
-                            "Descuentos Disponibles",
-                            textAlign: TextAlign.start,
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-
-                          const SizedBox(height: 12),
-
-                          AbsorbPointer(
-                            absorbing:
-                                commercialProductResult.newPrice !=
-                                commercialProductResult.product.saleProfile.salePrice,
-                            child: DropdownButtonFormField(
-                              initialValue: commercialProductResult.selectedDiscount,
-                              items: discountsAvailable.toList(),
-                              decoration: InputDecoration(
-                                suffixIcon: IconButton(
-                                  onPressed: () {
-                                    commercialProductResult.selectedDiscount = null;
-                                    setState(() {});
-                                  },
-                                  icon: const Icon(Icons.close),
-                                ),
-                              ),
-                              onChanged: (value) {
-                                commercialProductResult.selectedDiscount = value;
-                                setState(() {});
-                              },
-                            ),
-                          ),
                         ],
                       ),
                     ),
@@ -433,8 +441,9 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
             ],
           ),
         ),
+
         bottomNavigationBar: BottomAppBar(
-          height: 160,
+          height: 140,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
             child: Column(
@@ -508,9 +517,10 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                       ),
                     ),
                     ElevatedButton(
+                      focusNode: acceptFocusNode,
                       onPressed: () {
                         if (commercialProductResult.newPrice == 0) {
-                          DialogManager.showErrorDialog(context, "El producto no tiene precio de venta");
+                          DialogManager.showErrorDialog(context, "El producto tiene un precio 0, no se puede vender");
                           return;
                         }
 

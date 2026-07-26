@@ -5,6 +5,10 @@ import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 
 class ClientInvoiceViewController extends ChangeNotifier {
+  ClientInvoiceViewController({this.isWholesale = false});
+
+  final bool isWholesale;
+
   DateTime? _selectedDate;
 
   String description = '';
@@ -102,15 +106,21 @@ class ClientInvoiceViewController extends ChangeNotifier {
     final saleItems = items.map((commercial) {
       final product = commercial.product;
       return SaleItem(
-        product: ProductItem.fromJson(product.toJson()),
+        product: ProductItem.fromJson({
+          ...product.toJson(),
+          'unitName': commercial.selectedUnitName.isNotEmpty
+              ? commercial.selectedUnitName
+              : product.unitName,
+        }),
         selectedPrice: commercial.selectedPriceLevel,
         cost: product.account.averageCost,
         price: commercial.newPrice,
-        quantity: commercial.quantity,
+        quantity: commercial.quantity * commercial.conversionFactor,
         discountPercentage: commercial.discountPercent,
         totalDiscount: commercial.totalDiscount,
         subTotal: commercial.subTotal,
         total: commercial.total,
+        conversionFactor: commercial.conversionFactor,
       );
     }).toList();
 

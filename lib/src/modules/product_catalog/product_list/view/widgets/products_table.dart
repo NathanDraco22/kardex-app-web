@@ -179,7 +179,7 @@ class _RowWidget extends StatelessWidget {
             ),
             Flexible(
               fit: FlexFit.tight,
-              child: Text(product.unitName),
+              child: Text(product.defaultUnitName),
             ),
             Flexible(
               fit: FlexFit.tight,

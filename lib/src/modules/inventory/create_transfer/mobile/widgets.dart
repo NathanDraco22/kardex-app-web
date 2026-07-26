@@ -127,9 +127,16 @@ class MobileProductCardState extends State<MobileProductCard> with AutomaticKeep
                           Text(widget.row.product.displayCode),
                         ],
                       ),
-                      Text(
-                        "${widget.row.product.brandName} - ${widget.row.product.unitName}",
+                      UnitDisplayer(
+                        unitName: widget.row.selectedUnitName,
+                        conversionFactor: widget.row.conversionFactor,
+                        fallbackUnitName: widget.row.product.unitName,
+                        prefix: "${widget.row.product.brandName} - ",
                         style: const TextStyle(color: Colors.grey),
+                        highlightStyle: TextStyle(
+                          color: Colors.blue.shade700,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Row(
@@ -273,6 +280,27 @@ class SaveButton extends StatelessWidget {
                 return;
               }
 
+              final exceedingRow = mediator.getFirstProductExceedingStock();
+              if (exceedingRow != null) {
+                final cardKey = mediator.notifier?.cardKeys[exceedingRow.product.id];
+                await DialogManager.showErrorDialog(
+                  context,
+                  "El producto ${exceedingRow.product.name} supera la existencia disponible de la sucursal origen (${exceedingRow.product.account.availableStock} ${exceedingRow.product.unitName}).",
+                );
+                if (cardKey?.currentContext != null) {
+                  Scrollable.ensureVisible(
+                    cardKey!.currentContext!,
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.easeInOut,
+                    alignment: 0.5,
+                  );
+                  if (cardKey.currentState != null) {
+                    cardKey.currentState!.setCardColorError();
+                  }
+                }
+                return;
+              }
+
               final res = await DialogManager.slideToConfirmActionDialog(
                 context,
                 "¿Deseas Guardar la Transferencia? (No se puede deshacer)",
@@ -291,10 +319,11 @@ class SaveButton extends StatelessWidget {
                   id: e.product.id,
                   name: e.product.name,
                   code: e.product.code,
-                  unitName: e.product.unitName,
+                  unitName: UnitConversionTool.resolveUnitName(e.selectedUnitName, e.product.unitName),
                   brandName: e.product.brandName,
-                  quantity: e.quantity,
-                  cost: e.unitaryCost,
+                  quantity: UnitConversionTool.toBaseQuantity(e.quantity, e.conversionFactor),
+                  cost: UnitConversionTool.toBaseCost(e.unitaryCost, e.conversionFactor),
+                  conversionFactor: e.conversionFactor,
                   expirationDate: e.expirationDate?.millisecondsSinceEpoch,
                   salePrice: e.product.saleProfile.salePrice,
                   salePrice2: e.product.saleProfile.salePrice2,

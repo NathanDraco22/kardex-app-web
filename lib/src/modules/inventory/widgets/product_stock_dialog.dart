@@ -49,7 +49,7 @@ class ProductStockDialog extends StatelessWidget {
                   ],
                 ),
                 Text(
-                  "${product.unitName} - ${product.brandName}",
+                  "${product.defaultUnitName} - ${product.brandName}",
                   style: TextStyle(
                     fontSize: 18,
                     color: Colors.grey[600],
@@ -61,8 +61,8 @@ class ProductStockDialog extends StatelessWidget {
                   style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                 ),
                 const Divider(),
-                const Expanded(
-                  child: _StockList(),
+                Expanded(
+                  child: _StockList(product: product),
                 ),
               ],
             ),
@@ -74,7 +74,9 @@ class ProductStockDialog extends StatelessWidget {
 }
 
 class _StockList extends StatelessWidget {
-  const _StockList();
+  const _StockList({required this.product});
+
+  final ProductInDb product;
 
   @override
   Widget build(BuildContext context) {
@@ -110,12 +112,12 @@ class _StockList extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      "Stock: ${account.currentStock}",
+                      "Stock: ${NumberFormatter.formatDisplayStock(account.currentStock, product.defaultUnitFactor)}",
                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     if (account.promiseStock > 0)
                       Text(
-                        "Comprometido: ${account.promiseStock}",
+                        "Comprometido: ${NumberFormatter.formatDisplayStock(account.promiseStock, product.defaultUnitFactor)}",
                         style: const TextStyle(fontSize: 12, color: Colors.red),
                       ),
                   ],

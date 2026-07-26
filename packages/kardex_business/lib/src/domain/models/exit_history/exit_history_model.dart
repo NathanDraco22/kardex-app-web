@@ -8,6 +8,7 @@ class ExitItem {
   final String? unitName;
   final int? cost;
   final int quantity;
+  final int conversionFactor;
 
   ExitItem({
     required this.productId,
@@ -17,6 +18,7 @@ class ExitItem {
     this.unitName,
     this.cost,
     required this.quantity,
+    this.conversionFactor = 1,
   });
 
   factory ExitItem.fromJson(Map<String, dynamic> json) {
@@ -28,6 +30,7 @@ class ExitItem {
       unitName: json['unitName'] as String?,
       cost: json['cost'] as int?,
       quantity: json['quantity'] as int,
+      conversionFactor: json['conversionFactor'] as int? ?? 1,
     );
   }
 
@@ -40,6 +43,7 @@ class ExitItem {
       'unitName': unitName,
       'cost': cost,
       'quantity': quantity,
+      'conversionFactor': conversionFactor,
     };
   }
 }

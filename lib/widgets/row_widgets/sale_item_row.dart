@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 
 class SaleItemRow extends StatefulWidget {
   const SaleItemRow({
@@ -56,11 +57,18 @@ class _SaleItemRowState extends State<SaleItemRow> {
                 Flexible(
                   fit: FlexFit.tight,
                   child: Center(
-                    child: Text(
-                      widget.saleItem.quantity.toString(),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w500,
-                      ),
+                    child: Builder(
+                      builder: (context) {
+                        final displayQty = widget.saleItem.conversionFactor > 1
+                            ? (widget.saleItem.quantity ~/ widget.saleItem.conversionFactor).toString()
+                            : widget.saleItem.quantity.toString();
+                        return Text(
+                          displayQty,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        );
+                      }
                     ),
                   ),
                 ),
@@ -101,7 +109,10 @@ class _SaleItemRowState extends State<SaleItemRow> {
 
                           Flexible(
                             fit: FlexFit.tight,
-                            child: Text(widget.saleItem.product.unitName),
+                            child: UnitDisplayer(
+                              unitName: widget.saleItem.product.unitName,
+                              conversionFactor: widget.saleItem.conversionFactor,
+                            ),
                           ),
                         ],
                       ),

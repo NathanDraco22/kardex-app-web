@@ -27,11 +27,17 @@ class _MobileScaffold extends StatelessWidget {
               await DialogManager.showErrorDialog(context, "No se pueden agregar mas de 100 productos");
               return;
             }
+            if (!context.mounted) return;
+            final unit = await showInventoryUnitPicker(context, res);
+            if (unit == null) return;
             final newRow = ProductRowCard(
               product: res,
               quantity: 0,
-              unitaryCost: 0,
+              unitaryCost: (res is ProductInDbInBranch) ? (res.account.averageCost * unit.conversionFactor) : 0,
               editableCost: true,
+              selectedUnitIndex: unit.unitIndex,
+              conversionFactor: unit.conversionFactor,
+              selectedUnitName: unit.unitName,
             );
             mediator.productListViewController.addRowCard(newRow);
             mediator.refresh();

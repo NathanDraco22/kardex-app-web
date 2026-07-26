@@ -4,6 +4,7 @@ class CommercialProductResult {
   CommercialProductResult({
     required this.product,
     int defaultPriceLevel = 1,
+    String preferredUnitType = 'min',
   }) {
     selectedPriceLevel = defaultPriceLevel;
     final priceMap = {
@@ -13,14 +14,40 @@ class CommercialProductResult {
       4: product.saleProfile.salePrice4,
     };
     _newPrice = priceMap[defaultPriceLevel] ?? product.saleProfile.salePrice;
+
+    int resolvedUnitIndex;
+    if (preferredUnitType == "max" && product.wholesaleUnitIndex > 0) {
+      resolvedUnitIndex = product.wholesaleUnitIndex;
+    } else {
+      resolvedUnitIndex = product.defaultUnitIndex;
+    }
+
+    if (product.extraUnits.isEmpty || resolvedUnitIndex > product.extraUnits.length) {
+      resolvedUnitIndex = 0;
+    }
+
+    selectedUnitIndex = resolvedUnitIndex;
+    if (resolvedUnitIndex == 0) {
+      conversionFactor = 1;
+      selectedUnitName = product.unitName;
+    } else {
+      final extra = product.extraUnits[resolvedUnitIndex - 1];
+      conversionFactor = extra.conversionFactor;
+      selectedUnitName = extra.name;
+    }
   }
   ProductInDbInBranch product;
   int _newPrice = 0;
   int selectedPriceLevel = 1;
   Discount? selectedDiscount;
   int quantity = 0;
+  
+  int selectedUnitIndex = 0;
+  int conversionFactor = 1;
+  String selectedUnitName = '';
+
   int get subTotal {
-    return quantity * _newPrice;
+    return quantity * _newPrice * conversionFactor;
   }
 
   int get newPrice => _newPrice;
@@ -47,6 +74,9 @@ class CommercialProductResult {
     int? selectedPriceLevel,
     Discount? selectedDiscount,
     int? quantity,
+    int? selectedUnitIndex,
+    int? conversionFactor,
+    String? selectedUnitName,
   }) {
     final result = CommercialProductResult(
       product: product ?? this.product,
@@ -68,7 +98,11 @@ class CommercialProductResult {
     }
 
     result.quantity = quantity ?? this.quantity;
+    result.selectedUnitIndex = selectedUnitIndex ?? this.selectedUnitIndex;
+    result.conversionFactor = conversionFactor ?? this.conversionFactor;
+    result.selectedUnitName = selectedUnitName ?? this.selectedUnitName;
 
     return result;
   }
 }
+

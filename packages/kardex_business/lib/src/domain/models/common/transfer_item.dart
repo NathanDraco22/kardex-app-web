@@ -7,6 +7,7 @@ class TransferItem {
   final String? categoryName;
   final int quantity;
   final int cost;
+  final int conversionFactor;
   final int? expirationDate;
   final int salePrice;
   final int salePrice2;
@@ -22,6 +23,7 @@ class TransferItem {
     this.categoryName,
     required this.quantity,
     required this.cost,
+    this.conversionFactor = 1,
     this.expirationDate,
     required this.salePrice,
     required this.salePrice2,
@@ -38,6 +40,7 @@ class TransferItem {
     categoryName: json['categoryName'] as String?,
     quantity: json['quantity'] as int,
     cost: (json['cost'] as num).toInt(),
+    conversionFactor: json['conversionFactor'] as int? ?? 1,
     expirationDate: json['expirationDate'] as int?,
     salePrice: (json['salePrice'] as num).toInt(),
     salePrice2: (json['salePrice2'] as num).toInt(),
@@ -54,6 +57,7 @@ class TransferItem {
     'categoryName': categoryName,
     'quantity': quantity,
     'cost': cost,
+    'conversionFactor': conversionFactor,
     'expirationDate': expirationDate,
     'salePrice': salePrice,
     'salePrice2': salePrice2,

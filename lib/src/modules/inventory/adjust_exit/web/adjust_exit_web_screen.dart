@@ -5,15 +5,7 @@ class AdjustExitWebScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CallbackShortcuts(
-      bindings: {
-        const SingleActivator(LogicalKeyboardKey.keyG, control: true): () => saveAction(context),
-      },
-      child: const Focus(
-        autofocus: true,
-        child: _WebScaffold(),
-      ),
-    );
+    return const _WebScaffold();
   }
 }
 

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:kardex_app_front/widgets/buttons/elevated_ctrl_button.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/web/mediator.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/widgets/more_action_row_button.dart';
 import 'package:kardex_business/kardex_business.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_dialog.dart';
-import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/commercial_product_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/search_product_commercial_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/search_product_commercial_dialog.dart';
 import 'package:kardex_app_front/widgets/incremental_textfield.dart';
 
 class AnonInvoiceItem {
@@ -122,8 +123,10 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
                   Row(
                     children: [
                       const SizedBox(width: 32),
-                      ElevatedButton.icon(
-                        focusNode: FocusNode()..requestFocus(),
+                      ElevatedCtrlButton(
+                        hotKey: "1",
+                        icon: Icons.add,
+                        label: "Agregar Producto",
                         onPressed: () async {
                           final res = await showSearchProductCommercialDialog(
                             context,
@@ -132,7 +135,7 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
                           if (!context.mounted) return;
                           if (res == null) return;
                           if (res.product.account.availableStock == 0 ||
-                              res.product.account.availableStock < res.quantity) {
+                              res.product.account.availableStock < (res.quantity * res.conversionFactor)) {
                             DialogManager.showInfoDialog(
                               context,
                               "No hay stock disponible",
@@ -143,8 +146,6 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
                           if (!context.mounted) return;
                           // ClientInvoiceWebMediator.of(context).viewController.refresh();
                         },
-                        icon: const Icon(Icons.add),
-                        label: const Text("Agregar Producto"),
                       ),
                     ],
                   ),
@@ -173,7 +174,8 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
             isDirectSale: true,
           );
           if (res == null) return;
-          if (res.product.account.availableStock == 0 || res.product.account.availableStock < res.quantity) {
+          if (res.product.account.availableStock == 0 ||
+              res.product.account.availableStock < (res.quantity * res.conversionFactor)) {
             if (!context.mounted) return;
             await DialogManager.showErrorDialog(
               context,
@@ -190,7 +192,8 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
             commercialProductResult: item.commercial,
           );
           if (res == null) return;
-          if (res.product.account.availableStock == 0 || res.product.account.availableStock < res.quantity) {
+          if (res.product.account.availableStock == 0 ||
+              res.product.account.availableStock < (res.quantity * res.conversionFactor)) {
             if (!context.mounted) return;
             await DialogManager.showErrorDialog(
               context,
@@ -237,7 +240,9 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
 
     final product = widget.item.commercial.product;
 
-    final price = NumberFormatter.convertToMoneyLike(widget.item.commercial.newPrice);
+    final price = NumberFormatter.convertToMoneyLike(
+      widget.item.commercial.newPrice * widget.item.commercial.conversionFactor,
+    );
     final totalDiscount = NumberFormatter.convertToMoneyLike(widget.item.commercial.totalDiscount);
     final percenValue = widget.item.commercial.discountPercent;
     final total = NumberFormatter.convertToMoneyLike(widget.item.commercial.total);
@@ -311,15 +316,20 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
                                 ),
                               ),
                               Expanded(
-                                child: Text(
-                                  product.unitName,
+                                child: UnitDisplayer(
+                                  unitName: widget.item.commercial.selectedUnitName,
+                                  conversionFactor: widget.item.commercial.conversionFactor,
+                                  fallbackUnitName: product.unitName,
                                   textAlign: TextAlign.left,
                                 ),
                               ),
 
                               Expanded(
                                 child: Text(
-                                  product.account.availableStock.toString(),
+                                  NumberFormatter.formatDisplayStock(
+                                    product.account.availableStock,
+                                    widget.item.commercial.conversionFactor,
+                                  ),
                                   textAlign: TextAlign.left,
                                 ),
                               ),
@@ -335,7 +345,8 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
               Flexible(
                 fit: FlexFit.tight,
                 child: IncrementalTextField(
-                  maxValue: widget.item.commercial.product.account.availableStock,
+                  maxValue:
+                      widget.item.commercial.product.account.availableStock ~/ widget.item.commercial.conversionFactor,
                   initialValue: widget.item.commercial.quantity,
                   onChanged: (value) {
                     widget.item.commercial.quantity = value;

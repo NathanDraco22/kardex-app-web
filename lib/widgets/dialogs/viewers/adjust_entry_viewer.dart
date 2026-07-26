@@ -243,7 +243,9 @@ class _AdjustEntryViewer extends StatelessWidget {
                                               const SizedBox(width: 4),
                                               Text(item.brandName ?? ""),
                                               const SizedBox(width: 4),
-                                              Text(item.unitName ?? ""),
+                                              Text(
+                                                "${item.unitName ?? ''}${item.conversionFactor > 1 ? ' (${item.conversionFactor % 1 == 0 ? item.conversionFactor.toInt() : item.conversionFactor})' : ''}",
+                                              ),
                                             ],
                                           ),
                                         ],
@@ -251,13 +253,13 @@ class _AdjustEntryViewer extends StatelessWidget {
                                     ),
                                     Expanded(
                                       child: Text(
-                                        item.quantity.toString(),
+                                        NumberFormatter.formatDisplayStock(item.quantity, item.conversionFactor),
                                         textAlign: TextAlign.center,
                                       ),
                                     ),
                                     Expanded(
                                       child: Text(
-                                        NumberFormatter.convertToMoneyLike(item.cost),
+                                        NumberFormatter.convertToMoneyLike(item.cost * item.conversionFactor),
                                         textAlign: TextAlign.center,
                                       ),
                                     ),

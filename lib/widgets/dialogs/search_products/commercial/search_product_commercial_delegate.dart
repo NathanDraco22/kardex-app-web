@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/widgets/display_product_code.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_modal.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/widgets/display_product_code.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/commercial_product_modal.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
@@ -12,6 +12,8 @@ import 'package:kardex_app_front/widgets/dialogs/product_in_branch_info_dialog.d
 Future<CommercialProductResult?> showCommercialProductSearchDelegate(
   BuildContext context, {
   int defaultPriceLevel = 1,
+  String preferredUnitType = 'min',
+  bool restrictStock = true,
 }) async {
   return await Navigator.push<CommercialProductResult?>(
     context,
@@ -21,6 +23,8 @@ Future<CommercialProductResult?> showCommercialProductSearchDelegate(
           ctx,
           product: product,
           defaultPriceLevel: defaultPriceLevel,
+          preferredUnitType: preferredUnitType,
+          restrictStock: restrictStock,
         ),
       ),
     ),
@@ -130,7 +134,7 @@ class _ProductInBranchResultRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int value = product.saleProfile.salePrice;
+    int value = product.saleProfile.salePrice * product.defaultUnitFactor;
 
     String valueToDisplay = NumberFormatter.convertToMoneyLike(value);
 
@@ -168,7 +172,7 @@ class _ProductInBranchResultRow extends StatelessWidget {
 
                           Flexible(
                             fit: FlexFit.tight,
-                            child: Text(product.unitName),
+                            child: Text(product.defaultUnitName),
                           ),
                         ],
                       ),
@@ -199,7 +203,10 @@ class _ProductInBranchResultRow extends StatelessWidget {
                                   color = Colors.red;
                                 }
                                 return Text(
-                                  product.account.availableStock.toString(),
+                                  NumberFormatter.formatDisplayStock(
+                                    product.account.availableStock,
+                                    product.defaultUnitFactor,
+                                  ),
                                   style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,

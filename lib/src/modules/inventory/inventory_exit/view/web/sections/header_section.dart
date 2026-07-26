@@ -166,10 +166,11 @@ class MenuActions extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        ElevatedButton.icon(
+        ElevatedCtrlButton(
+          hotKey: "G",
           onPressed: isDisabled ? null : () => saveExit(context),
-          icon: const Icon(Icons.save),
-          label: const Text("Guardar"),
+          icon: Icons.save,
+          label: "Guardar",
         ),
       ],
     );
@@ -200,10 +201,11 @@ Future<void> saveExit(BuildContext context) async {
     return ExitItem(
       productId: e.product.id,
       productName: e.product.name,
-      quantity: (e.quantity * -1),
+      quantity: UnitConversionTool.toBaseQuantity(e.quantity, e.conversionFactor) * -1,
       brandName: e.product.brandName,
-      unitName: e.product.unitName,
+      unitName: UnitConversionTool.resolveUnitName(e.selectedUnitName, e.product.unitName),
       code: e.product.code,
+      conversionFactor: e.conversionFactor,
     );
   }).toList();
 

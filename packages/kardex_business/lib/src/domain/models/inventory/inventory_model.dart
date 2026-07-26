@@ -1,3 +1,5 @@
+import '../product/product_model.dart';
+
 class InventoryProduct {
   final String id;
   final String name;
@@ -9,6 +11,9 @@ class InventoryProduct {
   final List<String> tags;
   final bool isActive;
   final String image;
+  final List<ExtraUnit> extraUnits;
+  final int defaultUnitIndex;
+  final int wholesaleUnitIndex;
 
   InventoryProduct({
     required this.id,
@@ -21,7 +26,24 @@ class InventoryProduct {
     required this.tags,
     this.isActive = true,
     this.image = "",
+    this.extraUnits = const [],
+    this.defaultUnitIndex = 0,
+    this.wholesaleUnitIndex = 0,
   });
+
+  String get defaultUnitName {
+    if (defaultUnitIndex == 0 || extraUnits.isEmpty) return unitName;
+    final idx = defaultUnitIndex - 1;
+    if (idx >= 0 && idx < extraUnits.length) return extraUnits[idx].name;
+    return unitName;
+  }
+
+  int get defaultUnitFactor {
+    if (defaultUnitIndex == 0 || extraUnits.isEmpty) return 1;
+    final idx = defaultUnitIndex - 1;
+    if (idx >= 0 && idx < extraUnits.length) return extraUnits[idx].conversionFactor;
+    return 1;
+  }
 
   factory InventoryProduct.fromJson(Map<String, dynamic> json) {
     return InventoryProduct(
@@ -35,6 +57,11 @@ class InventoryProduct {
       tags: List<String>.from(json['tags'] as List),
       isActive: json['isActive'] as bool? ?? true,
       image: json['image'] as String? ?? "",
+      extraUnits: json['extraUnits'] != null
+          ? (json['extraUnits'] as List).map((e) => ExtraUnit.fromJson(e as Map<String, dynamic>)).toList()
+          : const [],
+      defaultUnitIndex: json['defaultUnitIndex'] as int? ?? 0,
+      wholesaleUnitIndex: json['wholesaleUnitIndex'] as int? ?? 0,
     );
   }
 
@@ -50,6 +77,9 @@ class InventoryProduct {
       'tags': tags,
       'isActive': isActive,
       'image': image,
+      'extraUnits': extraUnits.map((e) => e.toJson()).toList(),
+      'defaultUnitIndex': defaultUnitIndex,
+      'wholesaleUnitIndex': wholesaleUnitIndex,
     };
   }
 }

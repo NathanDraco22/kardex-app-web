@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 
 import 'package:kardex_app_front/src/tools/extensiones.dart';
-import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'cubit/write_invoice_cubit.dart';
 import 'mobile/client_invoices_screen_mobile.dart';
 import 'web/client_invoices_screen_web.dart';
@@ -13,16 +13,27 @@ import 'web/client_invoices_screen_web.dart';
 import 'view_controller.dart';
 
 class ClientInvoiceScreen extends StatefulWidget {
-  const ClientInvoiceScreen({super.key, this.isOrder = false});
+  const ClientInvoiceScreen({
+    super.key,
+    this.isOrder = false,
+    this.isWholesale = false,
+  });
 
   final bool isOrder;
+  final bool isWholesale;
 
   @override
   State<ClientInvoiceScreen> createState() => _ClientInvoiceScreenState();
 }
 
 class _ClientInvoiceScreenState extends State<ClientInvoiceScreen> {
-  final viewController = ClientInvoiceViewController();
+  late final ClientInvoiceViewController viewController;
+
+  @override
+  void initState() {
+    super.initState();
+    viewController = ClientInvoiceViewController(isWholesale: widget.isWholesale);
+  }
 
   @override
   void dispose() {
@@ -45,13 +56,14 @@ class _ClientInvoiceScreenState extends State<ClientInvoiceScreen> {
           ),
         ),
       ],
-      child: const _RootScaffold(),
+      child: _RootScaffold(isWholesale: widget.isWholesale),
     );
   }
 }
 
 class _RootScaffold extends StatelessWidget {
-  const _RootScaffold();
+  const _RootScaffold({required this.isWholesale});
+  final bool isWholesale;
 
   @override
   Widget build(BuildContext context) {
@@ -64,22 +76,31 @@ class _RootScaffold extends StatelessWidget {
         if (!context.mounted) return;
         context.pop();
       },
-      child: const Scaffold(
-        body: _Body(),
+      child: ShortcutContainer(
+        child: Scaffold(
+          body: _Body(isWholesale: isWholesale),
+        ),
       ),
     );
   }
 }
 
 class _Body extends StatelessWidget {
-  const _Body();
+  const _Body({required this.isWholesale});
+  final bool isWholesale;
 
   @override
   Widget build(BuildContext context) {
     final isMobile = context.isMobile();
 
-    if (isMobile) return const ClientInvoicesScreenMobile();
+    if (isMobile) {
+      return ClientInvoicesScreenMobile(
+        pageTitle: isWholesale ? "Facturacion Cliente (Mayorista)" : null,
+      );
+    }
 
-    return const ClientInvoicesScreenWeb();
+    return ClientInvoicesScreenWeb(
+      pageTitle: isWholesale ? "Facturacion Cliente (Mayorista)" : null,
+    );
   }
 }

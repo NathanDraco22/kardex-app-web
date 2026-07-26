@@ -191,35 +191,37 @@ class _FormContentState extends State<_FormContent> {
       );
     }
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        AlertDialog(
-          constraints: const BoxConstraints(minWidth: 600),
-          insetPadding: EdgeInsets.zero,
-          title: Text("$wordPrefix Producto"),
-          actions: [
-            OutlinedButton(
-              onPressed: () {
-                context.pop();
-              },
-              child: const Text("Cancelar"),
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          AlertDialog(
+            constraints: const BoxConstraints(minWidth: 600),
+            insetPadding: EdgeInsets.zero,
+            title: Text("$wordPrefix Producto"),
+            actions: [
+              OutlinedButton(
+                onPressed: () {
+                  context.pop();
+                },
+                child: const Text("Cancelar"),
+              ),
+              ElevatedButton(
+                onPressed: _submitForm,
+                child: Text("$wordPrefix Producto"),
+              ),
+            ],
+            content: _InnerContent(
+              widget: widget,
+              unitsMenuEntries: unitsMenuEntries,
+              productCaterogriesEntries: productCaterogriesEntries,
+              controller: controller,
+              imageProvider: _currentImageProvider,
+              onImageIntent: _onImageIntent,
             ),
-            ElevatedButton(
-              onPressed: _submitForm,
-              child: Text("$wordPrefix Producto"),
-            ),
-          ],
-          content: _InnerContent(
-            widget: widget,
-            unitsMenuEntries: unitsMenuEntries,
-            productCaterogriesEntries: productCaterogriesEntries,
-            controller: controller,
-            imageProvider: _currentImageProvider,
-            onImageIntent: _onImageIntent,
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -425,6 +427,12 @@ class _InnerContent extends StatelessWidget {
               widget.creationMap['tags'] = tags;
               return null;
             },
+          ),
+
+          const SizedBox(height: 16),
+          ExtraUnitsSection(
+            creationMap: widget.creationMap,
+            currentProduct: widget.currentProduct,
           ),
 
           const SizedBox(height: 16),

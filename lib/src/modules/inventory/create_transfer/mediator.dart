@@ -66,6 +66,17 @@ class CreateTransferNotifier extends ChangeNotifier {
     return false;
   }
 
+  TransferProductRow? getFirstProductExceedingStock() {
+    final rows = controller.rows;
+    for (var row in rows) {
+      final baseQuantity = UnitConversionTool.toBaseQuantity(row.quantity, row.conversionFactor);
+      if (baseQuantity > row.product.account.availableStock) {
+        return row;
+      }
+    }
+    return null;
+  }
+
   void refresh() => notifyListeners();
 }
 
@@ -78,6 +89,8 @@ class CreateTransferMediator extends InheritedNotifier<CreateTransferNotifier> {
   bool hasAllRequiredFields() => ![headerData.hasNullFields(), productTableController.rows.isEmpty].contains(true);
 
   bool hasProductWithZeroValue() => notifier!.hasProductWithZeroValue();
+
+  TransferProductRow? getFirstProductExceedingStock() => notifier!.getFirstProductExceedingStock();
 
   void refresh() => notifier!.refresh();
 

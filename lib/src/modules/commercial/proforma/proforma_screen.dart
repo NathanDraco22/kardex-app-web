@@ -11,14 +11,26 @@ import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/web/client_invoices_screen_web.dart';
 
 class ProformaScreen extends StatefulWidget {
-  const ProformaScreen({super.key});
+  const ProformaScreen({
+    super.key,
+    this.isWholesale = false,
+  });
+
+  final bool isWholesale;
 
   @override
   State<ProformaScreen> createState() => _ProformaScreenState();
 }
 
 class _ProformaScreenState extends State<ProformaScreen> {
-  final viewController = ClientInvoiceViewController();
+  late final ClientInvoiceViewController viewController;
+
+  @override
+  void initState() {
+    super.initState();
+    viewController = ClientInvoiceViewController(isWholesale: widget.isWholesale);
+  }
+
   @override
   Widget build(BuildContext context) {
     final invoiceRepo = context.read<InvoicesRepository>();
@@ -34,13 +46,14 @@ class _ProformaScreenState extends State<ProformaScreen> {
           ),
         ),
       ],
-      child: const _RootScaffold(),
+      child: _RootScaffold(isWholesale: widget.isWholesale),
     );
   }
 }
 
 class _RootScaffold extends StatelessWidget {
-  const _RootScaffold();
+  const _RootScaffold({required this.isWholesale});
+  final bool isWholesale;
 
   @override
   Widget build(BuildContext context) {
@@ -53,29 +66,32 @@ class _RootScaffold extends StatelessWidget {
         if (!context.mounted) return;
         context.pop();
       },
-      child: const Scaffold(
-        body: _Body(),
+      child: Scaffold(
+        body: _Body(isWholesale: isWholesale),
       ),
     );
   }
 }
 
 class _Body extends StatelessWidget {
-  const _Body();
+  const _Body({required this.isWholesale});
+  final bool isWholesale;
 
   @override
   Widget build(BuildContext context) {
     final isMobile = context.isMobile();
 
+    final pageTitleWholesale = isWholesale ? "Crear Cotización (Mayorista)" : "Proforma / Cotización";
+
     if (isMobile) {
-      return const ClientInvoicesScreenMobile(
-        pageTitle: "Proforma / Cotización",
-        actionButtonLabel: "Enviar Cotización",
+      return ClientInvoicesScreenMobile(
+        pageTitle: pageTitleWholesale,
+        actionButtonLabel: "Finalizar Cotización",
       );
     }
 
-    return const ClientInvoicesScreenWeb(
-      pageTitle: "Proforma / Cotización",
+    return ClientInvoicesScreenWeb(
+      pageTitle: pageTitleWholesale,
       actionButtonLabel: "Finalizar Cotización",
     );
   }

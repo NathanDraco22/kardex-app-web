@@ -70,7 +70,7 @@ class _ContentSection extends StatelessWidget {
                             ),
                             Expanded(
                               child: Text(
-                                product.unitName,
+                                product.defaultUnitName,
                                 textAlign: TextAlign.start,
                               ),
                             ),
@@ -84,13 +84,13 @@ class _ContentSection extends StatelessWidget {
             ),
             BasicTableCell(
               content: Text(
-                inventory.currentStock.toString(),
+                NumberFormatter.formatDisplayStock(inventory.currentStock, product.defaultUnitFactor),
                 textAlign: TextAlign.center,
               ),
             ),
             BasicTableCell(
               content: Text(
-                NumberFormatter.convertToMoneyLike(inventory.averageCost),
+                NumberFormatter.convertToMoneyLike(inventory.averageCost * product.defaultUnitFactor),
                 textAlign: TextAlign.center,
               ),
             ),

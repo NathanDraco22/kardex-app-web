@@ -3,7 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/widgets/display_product_code.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/widgets/display_product_code.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/widgets/search_product_dialog_panel.dart';
 
 Future<ProductInDb?> showSearchProductDialog(BuildContext context, {ProductInDb? product}) async {
   final res = await showDialog<ProductInDb?>(
@@ -35,7 +36,7 @@ class _SearchProductDialogState extends State<SearchProductDialog> {
     _productsRepository = context.read<ProductsRepository>();
 
     if (widget.product != null) {
-      title = "Cambiar: ${widget.product!.name} ${widget.product!.brandName} ${widget.product!.unitName}";
+      title = "Cambiar: ${widget.product!.name} ${widget.product!.brandName} ${widget.product!.defaultUnitName}";
     }
   }
 
@@ -49,100 +50,90 @@ class _SearchProductDialogState extends State<SearchProductDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: SizedBox(
-        width: 700,
-        child: Dialog(
-          constraints: const BoxConstraints(maxWidth: 700),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Flexible(
-                      child: Focus(
-                        onKeyEvent: (node, event) {
-                          if (event is KeyDownEvent) {
-                            if (event.logicalKey == LogicalKeyboardKey.enter) {
-                              if (products.isNotEmpty) {
-                                Navigator.pop(context, products[cursorPosition]);
-                              }
-                              return KeyEventResult.handled;
-                            }
-                            if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
-                              cursorPosition = (cursorPosition - 1 + products.length) % products.length;
-                              setState(() {});
-                              return KeyEventResult.handled;
-                            }
-                            if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
-                              cursorPosition = (cursorPosition + 1) % products.length;
-                              setState(() {});
-                              return KeyEventResult.handled;
-                            }
-                          }
-                          return KeyEventResult.ignored;
-                        },
-                        child: SearchFieldDebounced(
-                          autoFocus: true,
-                          onSearch: (value) async {
-                            if (value.isEmpty) {
-                              products = [];
-                              setState(() {});
-                              return;
-                            }
-                            isSearching = true;
-                            setState(() {});
-                            products = await _productsRepository.searchProductByKeyword(value);
-                            isSearching = false;
-                            setState(() {});
-                          },
-                        ),
-                      ),
-                    ),
-                    Flexible(
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: CloseButton(
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const Divider(),
-                isSearching ? const LinearProgressIndicator() : const SizedBox(),
-                SizedBox(
-                  height: 300,
-                  child: Builder(
-                    builder: (context) {
-                      if (products.isEmpty) {
-                        return const Center(
-                          child: NoItemWidget(
-                            icon: Icons.search,
-                            text: "No se encontraron productos",
-                          ),
-                        );
+    return SearchProductDialogPanel(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Flexible(
+                child: Focus(
+                  onKeyEvent: (node, event) {
+                    if (event is KeyDownEvent) {
+                      if (event.logicalKey == LogicalKeyboardKey.enter) {
+                        if (products.isNotEmpty) {
+                          Navigator.pop(context, products[cursorPosition]);
+                        }
+                        return KeyEventResult.handled;
                       }
-                      return ResultTable(
-                        products: products,
-
-                        cursorPosition: cursorPosition,
-                      );
+                      if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+                        cursorPosition = (cursorPosition - 1 + products.length) % products.length;
+                        setState(() {});
+                        return KeyEventResult.handled;
+                      }
+                      if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+                        cursorPosition = (cursorPosition + 1) % products.length;
+                        setState(() {});
+                        return KeyEventResult.handled;
+                      }
+                    }
+                    return KeyEventResult.ignored;
+                  },
+                  child: SearchFieldDebounced(
+                    autoFocus: true,
+                    onSearch: (value) async {
+                      if (value.isEmpty) {
+                        products = [];
+                        setState(() {});
+                        return;
+                      }
+                      isSearching = true;
+                      setState(() {});
+                      products = await _productsRepository.searchProductByKeyword(value);
+                      isSearching = false;
+                      setState(() {});
                     },
                   ),
                 ),
-              ],
+              ),
+              Flexible(
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: CloseButton(
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const Divider(),
+          isSearching ? const LinearProgressIndicator() : const SizedBox(),
+          SizedBox(
+            height: 300,
+            child: Builder(
+              builder: (context) {
+                if (products.isEmpty) {
+                  return const Center(
+                    child: NoItemWidget(
+                      icon: Icons.search,
+                      text: "No se encontraron productos",
+                    ),
+                  );
+                }
+                return ResultTable(
+                  products: products,
+
+                  cursorPosition: cursorPosition,
+                );
+              },
             ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -240,7 +231,7 @@ class ProductResultRow extends StatelessWidget {
 
               Flexible(
                 fit: FlexFit.tight,
-                child: Text(product.unitName),
+                child: Text(product.defaultUnitName),
               ),
               Flexible(
                 fit: FlexFit.tight,

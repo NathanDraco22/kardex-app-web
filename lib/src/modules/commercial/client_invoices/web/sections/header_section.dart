@@ -185,14 +185,17 @@ class MenuActions extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            ElevatedButton.icon(
+            ElevatedCtrlButton(
               onPressed: () => context.pushNamed("client-list"),
-
-              icon: const Icon(Icons.people),
-              label: const Text("Clientes"),
+              hotKey: "4",
+              icon: Icons.people,
+              label: "Clientes",
             ),
 
-            ElevatedButton.icon(
+            ElevatedCtrlButton(
+              icon: saveIcon,
+              hotKey: "G",
+              label: saveButtonTitle,
               onPressed: canSave
                   ? () async {
                       if (viewController.hasZeroPriceItems) {
@@ -239,8 +242,6 @@ class MenuActions extends StatelessWidget {
                       }
                     }
                   : null,
-              icon: Icon(saveIcon),
-              label: Text(saveButtonTitle),
             ),
           ],
         );

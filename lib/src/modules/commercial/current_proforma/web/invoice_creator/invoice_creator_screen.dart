@@ -15,10 +15,10 @@ import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_order_template.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_dialog.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_modal.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/custom_product_commercial_search_delegate.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/search_product_commercial_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/commercial_product_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/commercial_product_modal.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/search_product_commercial_delegate.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/search_product_commercial_dialog.dart';
 import 'package:kardex_app_front/widgets/row_widgets/sale_item_row.dart';
 
 Future<OrderInDb?> showProformaInvoiceCreatorDialog(BuildContext context, OrderInDb order) async {
@@ -476,12 +476,14 @@ class _BodyState extends State<_Body> {
               context,
               productId: saleItem.product.id,
               previousSaleItem: saleItem,
+              restrictStock: false,
             );
           } else {
             commercial = await showCommercialProductDialogFromId(
               context,
               productId: saleItem.product.id,
               previousSaleItem: saleItem,
+              restrictStock: false,
             );
           }
 
@@ -492,15 +494,21 @@ class _BodyState extends State<_Body> {
           if (_currentOrder == null) return;
 
           final newItem = SaleItem(
-            product: saleItem.product,
+            product: ProductItem.fromJson({
+              ...saleItem.product.toJson(),
+              'unitName': commercial.selectedUnitName.isNotEmpty
+                  ? commercial.selectedUnitName
+                  : saleItem.product.unitName,
+            }),
             selectedPrice: commercial.selectedPriceLevel,
             cost: commercial.product.account.averageCost,
             price: commercial.newPrice,
-            quantity: commercial.quantity,
+            quantity: commercial.quantity * commercial.conversionFactor,
             discountPercentage: commercial.discountPercent,
             totalDiscount: commercial.totalDiscount,
             subTotal: commercial.subTotal,
             total: commercial.total,
+            conversionFactor: commercial.conversionFactor,
           );
 
           List<SaleItem> newItems = List.from(saleItems);
@@ -569,10 +577,12 @@ class _BodyState extends State<_Body> {
             if (context.isMobile()) {
               commercial = await showCommercialProductSearchDelegate(
                 context,
+                restrictStock: false,
               );
             } else {
               commercial = await showSearchProductCommercialDialog(
                 context,
+                restrictStock: false,
               );
             }
 
@@ -585,15 +595,21 @@ class _BodyState extends State<_Body> {
             List<SaleItem> newItems = List.from(saleItems);
             newItems.add(
               SaleItem(
-                product: ProductItem.fromJson(commercial.product.toJson()),
+                product: ProductItem.fromJson({
+                  ...commercial.product.toJson(),
+                  'unitName': commercial.selectedUnitName.isNotEmpty
+                      ? commercial.selectedUnitName
+                      : commercial.product.unitName,
+                }),
                 selectedPrice: commercial.selectedPriceLevel,
                 cost: commercial.product.account.averageCost,
                 price: commercial.newPrice,
-                quantity: commercial.quantity,
+                quantity: commercial.quantity * commercial.conversionFactor,
                 discountPercentage: commercial.discountPercent,
                 totalDiscount: commercial.totalDiscount,
                 subTotal: commercial.subTotal,
                 total: commercial.total,
+                conversionFactor: commercial.conversionFactor,
               ),
             );
 

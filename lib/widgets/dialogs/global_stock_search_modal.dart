@@ -82,7 +82,7 @@ class _GlobalStockSearchModalState extends State<GlobalStockSearchModal> {
               ],
             ),
             trailing: Text(
-              product.unitName,
+              product.defaultUnitName,
               style: const TextStyle(
                 fontWeight: FontWeight.w500,
               ),

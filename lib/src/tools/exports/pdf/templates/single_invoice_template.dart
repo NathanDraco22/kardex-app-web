@@ -249,12 +249,24 @@ class SingleInvoiceTemplate implements PdfTemplate {
               children: [
                 pw.Expanded(
                   flex: 4,
-                  child: pw.Text(saleItem.product.name, style: const pw.TextStyle(fontSize: 12)),
+                  child: pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      pw.Text(saleItem.product.name, style: const pw.TextStyle(fontSize: 12)),
+                      pw.SizedBox(height: 2),
+                      pw.Text(
+                        saleItem.product.unitName,
+                        style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey600),
+                      ),
+                    ],
+                  ),
                 ),
                 pw.Expanded(
                   flex: 1,
                   child: pw.Text(
-                    saleItem.quantity.toString(),
+                    saleItem.conversionFactor != 1
+                        ? (saleItem.quantity ~/ saleItem.conversionFactor).toString()
+                        : saleItem.quantity.toString(),
                     textAlign: pw.TextAlign.center,
                     style: const pw.TextStyle(fontSize: 12),
                   ),
@@ -262,7 +274,7 @@ class SingleInvoiceTemplate implements PdfTemplate {
                 pw.Expanded(
                   flex: 2,
                   child: pw.Text(
-                    NumberFormatter.convertFromCentsToDouble(saleItem.price).toString(),
+                    NumberFormatter.convertFromCentsToDouble(saleItem.price * saleItem.conversionFactor).toString(),
                     textAlign: pw.TextAlign.center,
                     style: const pw.TextStyle(fontSize: 12),
                   ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/widgets/buttons/elevated_ctrl_button.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/commercial/product_price_setting/cubit/write_product_sale_profile_cubit.dart';
@@ -77,6 +77,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
   late int currentSalePrice3;
   late int currentSalePrice4;
   late List<Discount> currentDiscounts;
+  ExtraUnit? selectedExtraUnit;
 
   FocusNode priceFocus = FocusNode();
   FocusNode priceFocus2 = FocusNode();
@@ -93,6 +94,9 @@ class _RootScaffoldState extends State<_RootScaffold> {
     currentSalePrice3 = widget.product.saleProfile.salePrice3;
     currentSalePrice4 = widget.product.saleProfile.salePrice4;
     currentDiscounts = [...widget.product.saleProfile.discounts];
+    if (widget.product.extraUnits.isNotEmpty) {
+      selectedExtraUnit = widget.product.extraUnits.first;
+    }
     Future(
       () {
         priceFocus.requestFocus();
@@ -113,6 +117,65 @@ class _RootScaffoldState extends State<_RootScaffold> {
       branchId,
       widget.product.id,
       updatedDto,
+    );
+  }
+
+  Widget _buildPriceInput(
+    String keyStr,
+    String title,
+    FocusNode focusNode,
+    int currentValue,
+    String initialValue,
+    ValueChanged<String> onChanged,
+  ) {
+    final inputField = TitleTextField(
+      key: Key(keyStr),
+      title: title,
+      focusNode: focusNode,
+      keyboardType: TextInputType.number,
+      onChanged: onChanged,
+      initialValue: initialValue,
+      textInputAction: TextInputAction.next,
+      inputFormatters: [DoubleThousandsFormatter()],
+    );
+
+    if (widget.product.extraUnits.isEmpty || selectedExtraUnit == null) {
+      return inputField;
+    }
+
+    final extraUnit = selectedExtraUnit!;
+    final calculatedValue = currentValue * extraUnit.conversionFactor;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Expanded(
+          flex: 3,
+          child: inputField,
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          flex: 2,
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "Por ${extraUnit.name}:",
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  NumberFormatter.convertToMoneyLike(calculatedValue),
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -143,307 +206,317 @@ class _RootScaffoldState extends State<_RootScaffold> {
 
         Navigator.pop(context);
       },
-      child: CallbackShortcuts(
-        bindings: {
-          const SingleActivator(LogicalKeyboardKey.keyG, control: true): () => _saveProduct(),
-        },
-        child: Focus(
-          autofocus: true,
-          child: BlocListener<WriteProductSaleProfileCubit, WriteProductSaleProfileState>(
-            listener: (context, state) async {
-              if (state is WriteProductSaleProfileInProgress) {
-                LoadingDialogManager.showLoadingDialog(context);
-              }
+      child: ShortcutContainer(
+        child: BlocListener<WriteProductSaleProfileCubit, WriteProductSaleProfileState>(
+          listener: (context, state) async {
+            if (state is WriteProductSaleProfileInProgress) {
+              LoadingDialogManager.showLoadingDialog(context);
+            }
 
-              if (state is WriteProductSaleProfileSuccess) {
-                LoadingDialogManager.closeLoadingDialog(context);
-                await DialogManager.showInfoDialog(context, "Guardado exitosamente");
-                if (!context.mounted) return;
-                Navigator.pop(context, state.profile);
-              }
-            },
-            child: Scaffold(
-              appBar: AppBar(
-                title: const Text("Configuración de Precios"),
-              ),
-              bottomNavigationBar: BottomAppBar(
-                height: 48,
-                color: Colors.grey.shade200,
-                elevation: 2.4,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: Center(
-                        child: SizedBox(
-                          width: 150,
-                          child: ElevatedButton(
-                            onPressed: _saveProduct,
-                            child: const Text(
-                              "Guardar",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
-                        ),
+            if (state is WriteProductSaleProfileSuccess) {
+              LoadingDialogManager.closeLoadingDialog(context);
+              await DialogManager.showInfoDialog(context, "Guardado exitosamente");
+              if (!context.mounted) return;
+              Navigator.pop(context, state.profile);
+            }
+          },
+          child: Scaffold(
+            appBar: AppBar(
+              title: const Text("Configuración de Precios"),
+            ),
+            bottomNavigationBar: BottomAppBar(
+              height: 48,
+              color: Colors.grey.shade200,
+              elevation: 2.4,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Center(
+                      child: ElevatedCtrlButton(
+                        hotKey: "G",
+                        onPressed: _saveProduct,
+                        label: "Guardar",
+                        icon: Icons.save,
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              backgroundColor: Colors.white,
-              body: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 600),
-                    child: ListView(
-                      children: [
-                        Center(
-                          child: ImageViewerWidget(
-                            imageUrls: widget.product.image.isNotEmpty ? [widget.product.image] : [],
-                            width: 100,
-                            height: 100,
-                          ),
+            ),
+            backgroundColor: Colors.white,
+            body: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 600),
+                  child: ListView(
+                    children: [
+                      Center(
+                        child: ImageViewerWidget(
+                          imageUrls: widget.product.image.isNotEmpty ? [widget.product.image] : [],
+                          width: 100,
+                          height: 100,
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          widget.product.name,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        widget.product.name,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        textAlign: TextAlign.center,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            widget.product.brandName,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+
+                          const SizedBox(
+                            width: 12,
+                          ),
+
+                          Text(
+                            widget.product.unitName,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(
+                        height: 8,
+                      ),
+
+                      SizedBox(
+                        height: 40,
+                        child: Row(
                           children: [
-                            Text(
-                              widget.product.brandName,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
+                            TitleLabel(
+                              title: "Costo",
+                              bigTitle: NumberFormatter.convertToMoneyLike(
+                                widget.product.account.averageCost,
                               ),
-                              textAlign: TextAlign.center,
                             ),
+                            const VerticalDivider(),
 
-                            const SizedBox(
-                              width: 12,
-                            ),
-
-                            Text(
-                              widget.product.unitName,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
+                            TitleLabel(
+                              title: "Ultima Compra",
+                              bigTitle: NumberFormatter.convertToMoneyLike(
+                                widget.product.account.lastCost,
                               ),
-                              textAlign: TextAlign.center,
+                            ),
+                            const VerticalDivider(),
+
+                            TitleLabel(
+                              title: "Costo Maximo",
+                              bigTitle: NumberFormatter.convertToMoneyLike(
+                                widget.product.account.maximumCost,
+                              ),
                             ),
                           ],
                         ),
+                      ),
 
-                        const SizedBox(
-                          height: 8,
-                        ),
+                      const SizedBox(
+                        height: 6,
+                      ),
 
-                        SizedBox(
-                          height: 40,
-                          child: Row(
-                            children: [
-                              TitleLabel(
-                                title: "Costo",
-                                bigTitle: NumberFormatter.convertToMoneyLike(
-                                  widget.product.account.averageCost,
+                      SizedBox(
+                        height: 30,
+                        child: Builder(
+                          builder: (context) {
+                            if (hasLowerPrices) {
+                              return ListTile(
+                                leading: Icon(
+                                  Icons.warning_amber_rounded,
+                                  color: Colors.amber.shade700,
                                 ),
-                              ),
-                              const VerticalDivider(),
-
-                              TitleLabel(
-                                title: "Ultima Compra",
-                                bigTitle: NumberFormatter.convertToMoneyLike(
-                                  widget.product.account.lastCost,
-                                ),
-                              ),
-                              const VerticalDivider(),
-
-                              TitleLabel(
-                                title: "Costo Maximo",
-                                bigTitle: NumberFormatter.convertToMoneyLike(
-                                  widget.product.account.maximumCost,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(
-                          height: 6,
-                        ),
-
-                        SizedBox(
-                          height: 30,
-                          child: Builder(
-                            builder: (context) {
-                              if (hasLowerPrices) {
-                                return ListTile(
-                                  leading: Icon(
-                                    Icons.warning_amber_rounded,
+                                title: Text(
+                                  "Precio de Venta menor al costo",
+                                  style: TextStyle(
                                     color: Colors.amber.shade700,
                                   ),
-                                  title: Text(
-                                    "Precio de Venta menor al costo",
+                                ),
+                              );
+                            }
+                            return const SizedBox.shrink();
+                          },
+                        ),
+                      ),
+
+                      if (widget.product.extraUnits.isNotEmpty && selectedExtraUnit != null) ...[
+                        const SizedBox(height: 12),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              flex: 3,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    "Precio Base para:",
                                     style: TextStyle(
-                                      color: Colors.amber.shade700,
+                                      fontSize: 13,
+                                      color: Colors.grey,
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
-                                );
-                              }
-                              return const SizedBox.shrink();
-                            },
-                          ),
-                        ),
-
-                        const SizedBox(
-                          height: 12,
-                        ),
-
-                        TitleTextField(
-                          key: const Key("price1"),
-                          title: "Precio de Venta (C\$ )",
-                          focusNode: priceFocus,
-                          keyboardType: TextInputType.number,
-                          onChanged: (value) {
-                            if (value.isEmpty) {
-                              currentSalePrice = 0;
-                              setState(() {});
-                              return;
-                            }
-                            final formattedValue = value.replaceAll(",", "");
-                            final cents = ((double.tryParse(formattedValue) ?? 0) * 100).round();
-                            currentSalePrice = cents;
-                            setState(() {});
-                          },
-
-                          initialValue: NumberFormatter.convertFromCentsToDouble(
-                            widget.product.saleProfile.salePrice,
-                          ).toString(),
-
-                          inputFormatters: [DoubleThousandsFormatter()],
-                        ),
-
-                        const SizedBox(
-                          height: 12,
-                        ),
-
-                        TitleTextField(
-                          key: const Key("price2"),
-                          title: "Precio de Venta 2 (C\$ )",
-                          focusNode: priceFocus2,
-                          keyboardType: TextInputType.number,
-                          onChanged: (value) {
-                            if (value.isEmpty) {
-                              currentSalePrice2 = 0;
-                              setState(() {});
-                              return;
-                            }
-                            final formattedValue = value.replaceAll(",", "");
-                            final cents = ((double.tryParse(formattedValue) ?? 0) * 100).round();
-                            currentSalePrice2 = cents;
-                            setState(() {});
-                          },
-
-                          initialValue: NumberFormatter.convertFromCentsToDouble(
-                            widget.product.saleProfile.salePrice2,
-                          ).toString(),
-
-                          inputFormatters: [DoubleThousandsFormatter()],
-                        ),
-
-                        const SizedBox(
-                          height: 12,
-                        ),
-
-                        TitleTextField(
-                          key: const Key("price3"),
-                          title: "Precio de Venta 3 (C\$ )",
-                          focusNode: priceFocus3,
-                          keyboardType: TextInputType.number,
-                          onChanged: (value) {
-                            if (value.isEmpty) {
-                              currentSalePrice3 = 0;
-                              setState(() {});
-                              return;
-                            }
-                            final formattedValue = value.replaceAll(",", "");
-                            final cents = ((double.tryParse(formattedValue) ?? 0) * 100).round();
-                            currentSalePrice3 = cents;
-                            setState(() {});
-                          },
-
-                          initialValue: NumberFormatter.convertFromCentsToDouble(
-                            widget.product.saleProfile.salePrice3,
-                          ).toString(),
-
-                          inputFormatters: [DoubleThousandsFormatter()],
-                        ),
-
-                        const SizedBox(
-                          height: 12,
-                        ),
-
-                        TitleTextField(
-                          key: const Key("price4"),
-                          title: "Precio de Venta 4 (C\$ )",
-                          focusNode: priceFocus4,
-                          keyboardType: TextInputType.number,
-                          onChanged: (value) {
-                            if (value.isEmpty) {
-                              currentSalePrice4 = 0;
-                              setState(() {});
-                              return;
-                            }
-                            final formattedValue = value.replaceAll(",", "");
-                            final cents = ((double.tryParse(formattedValue) ?? 0) * 100).round();
-                            currentSalePrice4 = cents;
-                            setState(() {});
-                          },
-
-                          initialValue: NumberFormatter.convertFromCentsToDouble(
-                            widget.product.saleProfile.salePrice4,
-                          ).toString(),
-
-                          inputFormatters: [DoubleThousandsFormatter()],
-                        ),
-
-                        const Divider(),
-                        Row(
-                          children: [
-                            const Text(
-                              "Descuentos",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    widget.product.unitName,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            const Spacer(),
-                            TextButton(
-                              child: const Text("Agregar Descuento"),
-                              onPressed: () async {
-                                final res = await showDiscountDialog(context);
-                                if (res == null) return;
-
-                                currentDiscounts.add(res);
-                                setState(() {});
-                              },
+                            const SizedBox(width: 16),
+                            Expanded(
+                              flex: 2,
+                              child: DropdownButtonFormField<ExtraUnit>(
+                                decoration: const InputDecoration(
+                                  labelText: 'Calcular para la unidad:',
+                                  border: OutlineInputBorder(),
+                                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                ),
+                                initialValue: selectedExtraUnit,
+                                items: widget.product.extraUnits.map((extra) {
+                                  return DropdownMenuItem<ExtraUnit>(
+                                    value: extra,
+                                    child: Text('${extra.name} (x${extra.conversionFactor})'),
+                                  );
+                                }).toList(),
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    setState(() {
+                                      selectedExtraUnit = value;
+                                    });
+                                  }
+                                },
+                              ),
                             ),
                           ],
                         ),
-
-                        _DiscountListViewContainer(
-                          discounts: currentDiscounts,
-                          salePrice: currentSalePrice,
-                        ),
                       ],
-                    ),
+
+                      const SizedBox(
+                        height: 12,
+                      ),
+
+                      _buildPriceInput(
+                        "price1",
+                        "Precio de Venta (C\$ )",
+                        priceFocus,
+                        currentSalePrice,
+                        NumberFormatter.convertFromCentsToDouble(
+                          widget.product.saleProfile.salePrice,
+                        ).toString(),
+                        (value) {
+                          if (value.isEmpty) {
+                            currentSalePrice = 0;
+                            setState(() {});
+                            return;
+                          }
+                          final formattedValue = value.replaceAll(",", "");
+                          final cents = ((double.tryParse(formattedValue) ?? 0) * 100).round();
+                          currentSalePrice = cents;
+                          setState(() {});
+                        },
+                      ),
+
+                      const SizedBox(
+                        height: 12,
+                      ),
+
+                      _buildPriceInput(
+                        "price2",
+                        "Precio de Venta 2 (C\$ )",
+                        priceFocus2,
+                        currentSalePrice2,
+                        NumberFormatter.convertFromCentsToDouble(
+                          widget.product.saleProfile.salePrice2,
+                        ).toString(),
+                        (value) {
+                          if (value.isEmpty) {
+                            currentSalePrice2 = 0;
+                            setState(() {});
+                            return;
+                          }
+                          final formattedValue = value.replaceAll(",", "");
+                          final cents = ((double.tryParse(formattedValue) ?? 0) * 100).round();
+                          currentSalePrice2 = cents;
+                          setState(() {});
+                        },
+                      ),
+
+                      const SizedBox(
+                        height: 12,
+                      ),
+
+                      _buildPriceInput(
+                        "price3",
+                        "Precio de Venta 3 (C\$ )",
+                        priceFocus3,
+                        currentSalePrice3,
+                        NumberFormatter.convertFromCentsToDouble(
+                          widget.product.saleProfile.salePrice3,
+                        ).toString(),
+                        (value) {
+                          if (value.isEmpty) {
+                            currentSalePrice3 = 0;
+                            setState(() {});
+                            return;
+                          }
+                          final formattedValue = value.replaceAll(",", "");
+                          final cents = ((double.tryParse(formattedValue) ?? 0) * 100).round();
+                          currentSalePrice3 = cents;
+                          setState(() {});
+                        },
+                      ),
+
+                      const SizedBox(
+                        height: 12,
+                      ),
+
+                      _buildPriceInput(
+                        "price4",
+                        "Precio de Venta 4 (C\$ )",
+                        priceFocus4,
+                        currentSalePrice4,
+                        NumberFormatter.convertFromCentsToDouble(
+                          widget.product.saleProfile.salePrice4,
+                        ).toString(),
+                        (value) {
+                          if (value.isEmpty) {
+                            currentSalePrice4 = 0;
+                            setState(() {});
+                            return;
+                          }
+                          final formattedValue = value.replaceAll(",", "");
+                          final cents = ((double.tryParse(formattedValue) ?? 0) * 100).round();
+                          currentSalePrice4 = cents;
+                          setState(() {});
+                        },
+                      ),
+
+                      const Divider(),
+                    ],
                   ),
                 ),
               ),

@@ -146,14 +146,15 @@ class MenuActions extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        ElevatedButton.icon(
+        ElevatedCtrlButton(
+          icon: Icons.save,
+          label: "Guardar",
+          hotKey: "G",
           onPressed: isDisabled
               ? null
               : () async {
                   await saveTransfer(context);
                 },
-          icon: const Icon(Icons.save),
-          label: const Text("Guardar"),
         ),
       ],
     );
@@ -168,6 +169,15 @@ Future<void> saveTransfer(BuildContext context) async {
 
   if (mediator.hasProductWithZeroValue()) {
     await DialogManager.showErrorDialog(context, "No se pueden guardar productos con cantidad 0");
+    return;
+  }
+
+  final exceedingRow = mediator.getFirstProductExceedingStock();
+  if (exceedingRow != null) {
+    await DialogManager.showErrorDialog(
+      context,
+      "El producto ${exceedingRow.product.name} supera la existencia disponible de la sucursal origen (${exceedingRow.product.account.availableStock} ${exceedingRow.product.unitName}).",
+    );
     return;
   }
 
@@ -189,10 +199,11 @@ Future<void> saveTransfer(BuildContext context) async {
       id: e.product.id,
       name: e.product.name,
       code: e.product.code,
-      unitName: e.product.unitName,
+      unitName: UnitConversionTool.resolveUnitName(e.selectedUnitName, e.product.unitName),
       brandName: e.product.brandName,
-      quantity: e.quantity,
-      cost: e.unitaryCost,
+      quantity: UnitConversionTool.toBaseQuantity(e.quantity, e.conversionFactor),
+      cost: UnitConversionTool.toBaseCost(e.unitaryCost, e.conversionFactor),
+      conversionFactor: e.conversionFactor,
       expirationDate: e.expirationDate?.millisecondsSinceEpoch,
       salePrice: e.product.saleProfile.salePrice,
       salePrice2: e.product.saleProfile.salePrice2,

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:kardex_app_front/widgets/buttons/elevated_ctrl_button.dart';
 import 'package:kardex_business/kardex_business.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/widgets/display_product_code.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_dialog.dart';
-import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/widgets/display_product_code.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/commercial_product_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/search_product_commercial_dialog.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/search_product_commercial_dialog.dart';
 
 import '../web/mediator.dart';
 import 'more_action_row_button.dart';
@@ -15,11 +16,11 @@ class ClientInvoiceTable extends StatefulWidget {
   const ClientInvoiceTable({
     super.key,
     required this.controller,
-    required this.restrictQuantity,
+    required this.restrictStock,
   });
 
   final ClientInvoiceViewController controller;
-  final bool restrictQuantity;
+  final bool restrictStock;
 
   @override
   State<ClientInvoiceTable> createState() => _ClientInvoiceTableState();
@@ -196,18 +197,22 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
                   Row(
                     children: [
                       const SizedBox(width: 32),
-                      ElevatedButton.icon(
-                        focusNode: FocusNode()..requestFocus(),
+                      ElevatedCtrlButton(
+                        icon: Icons.add,
+                        label: "Agregar Producto",
+                        hotKey: "1",
                         onPressed: () async {
                           final res = await showSearchProductCommercialDialog(
                             context,
                             defaultPriceLevel: widget.controller.selectedClient?.defaultPriceLevel ?? 1,
+                            preferredUnitType: widget.controller.isWholesale ? 'max' : 'min',
+                            restrictStock: widget.restrictStock,
                           );
 
                           if (res == null) return;
                           if (res.quantity == 0) return;
-                          if (widget.restrictQuantity &&
-                              (res.quantity > res.product.account.availableStock ||
+                          if (widget.restrictStock &&
+                              ((res.quantity * res.conversionFactor) > res.product.account.availableStock ||
                                   res.product.account.availableStock == 0)) {
                             if (!context.mounted) return;
                             await DialogManager.showErrorDialog(
@@ -221,8 +226,6 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
                           if (!context.mounted) return;
                           ClientInvoiceWebMediator.of(context).viewController.refresh();
                         },
-                        icon: const Icon(Icons.add),
-                        label: const Text("Agregar Producto"),
                       ),
                     ],
                   ),
@@ -239,9 +242,7 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
     for (var i = 0; i < controller.items.length; i++) {
       final currentItem = controller.items[i];
       final isZeroPrice = currentItem.newPrice <= 0;
-      final color = isZeroPrice 
-          ? Colors.red.shade200 
-          : (i.isOdd ? Colors.white : Colors.grey.shade200);
+      final color = isZeroPrice ? Colors.red.shade200 : (i.isOdd ? Colors.white : Colors.grey.shade200);
       yield InvoiceTableRow(
         key: ValueKey(currentItem),
         color: color,
@@ -252,10 +253,13 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
             context,
             product: item.product,
             defaultPriceLevel: widget.controller.selectedClient?.defaultPriceLevel ?? 1,
+            preferredUnitType: widget.controller.isWholesale ? 'max' : 'min',
+            restrictStock: widget.restrictStock,
           );
           if (res == null) return;
-          if (widget.restrictQuantity &&
-              (res.quantity > res.product.account.availableStock || res.product.account.availableStock == 0)) {
+          if (widget.restrictStock &&
+              ((res.quantity * res.conversionFactor) > res.product.account.availableStock ||
+                  res.product.account.availableStock == 0)) {
             if (!context.mounted) return;
             await DialogManager.showErrorDialog(
               context,
@@ -271,10 +275,12 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
             context,
             product: item.product,
             commercialProductResult: item,
+            restrictStock: widget.restrictStock,
           );
           if (res == null) return;
-          if (widget.restrictQuantity &&
-              (res.quantity > res.product.account.availableStock || res.product.account.availableStock == 0)) {
+          if (widget.restrictStock &&
+              ((res.quantity * res.conversionFactor) > res.product.account.availableStock ||
+                  res.product.account.availableStock == 0)) {
             if (!context.mounted) return;
             await DialogManager.showErrorDialog(
               context,
@@ -311,8 +317,8 @@ class InvoiceTableRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final product = item.product;
-    final price = NumberFormatter.convertToMoneyLike(product.saleProfile.salePrice);
-    final edittedPrice = NumberFormatter.convertToMoneyLike(item.newPrice);
+    final price = NumberFormatter.convertToMoneyLike(product.saleProfile.salePrice * item.conversionFactor);
+    final edittedPrice = NumberFormatter.convertToMoneyLike(item.newPrice * item.conversionFactor);
     final subTotal = NumberFormatter.convertToMoneyLike(item.subTotal);
     final totalDiscount = NumberFormatter.convertToMoneyLike(item.totalDiscount);
     final percenValue = item.discountPercent;
@@ -359,8 +365,10 @@ class InvoiceTableRow extends StatelessWidget {
                               ),
                             ),
                             Expanded(
-                              child: Text(
-                                product.unitName,
+                              child: UnitDisplayer(
+                                unitName: item.selectedUnitName,
+                                conversionFactor: item.conversionFactor,
+                                fallbackUnitName: product.unitName,
                                 textAlign: TextAlign.left,
                               ),
                             ),

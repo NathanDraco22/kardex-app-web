@@ -171,9 +171,9 @@ class _Body extends StatelessWidget {
                       productName: product.name,
                       code: product.code ?? "--",
                       brandName: product.brandName,
-                      unitName: product.unitName,
-                      stock: inventory.currentStock.toString(),
-                      unitCost: NumberFormatter.convertToMoneyLike(inventory.averageCost),
+                      unitName: product.defaultUnitName,
+                      stock: NumberFormatter.formatDisplayStock(inventory.currentStock, product.defaultUnitFactor),
+                      unitCost: NumberFormatter.convertToMoneyLike(inventory.averageCost * product.defaultUnitFactor),
                       totalValue: NumberFormatter.convertToMoneyLike(inventory.total),
                       image: product.image,
                     );

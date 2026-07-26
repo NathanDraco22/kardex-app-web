@@ -1,14 +1,15 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/widgets/buttons/elevated_ctrl_button.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_entry/cubit/write_entry_doc_cubit.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
+import 'package:kardex_app_front/widgets/dialogs/inventory_unit_picker.dart';
 
 import 'mediator.dart';
 import 'mobile/widgets/appbar_menu.dart';
@@ -56,11 +57,13 @@ class _InventoryEntryScreenState extends State<InventoryEntryScreen> {
         return true;
       },
 
-      child: BlocProvider(
-        create: (context) => WriteEntryDocCubit(entryDocRepo),
-        child: InventoryEntryMediator(
-          notifier: notifier,
-          child: const _RootScaffold(),
+      child: ShortcutContainer(
+        child: BlocProvider(
+          create: (context) => WriteEntryDocCubit(entryDocRepo),
+          child: InventoryEntryMediator(
+            notifier: notifier,
+            child: const _RootScaffold(),
+          ),
         ),
       ),
     );

@@ -5,8 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/cubit/write_invoice_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/mobile/mediator.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/view_controller.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/commercial_product_modal.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/custom_product_commercial_search_delegate.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/commercial_product_modal.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/search_product_commercial_delegate.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 
 import '../widgets/product_invoice_card.dart';
@@ -72,13 +72,15 @@ class _RootScaffold extends StatelessWidget {
         visible: MediaQuery.viewInsetsOf(context).bottom == 0.0,
         child: FloatingActionButton.extended(
           onPressed: () async {
-            final isQuote = writeCubit.documentType == CommercialDocumentType.quote;
+            final isRestrictStock = writeCubit.documentType != CommercialDocumentType.quote;
             final res = await showCommercialProductSearchDelegate(
               context,
               defaultPriceLevel: viewController.selectedClient?.defaultPriceLevel ?? 1,
+              preferredUnitType: viewController.isWholesale ? 'max' : 'min',
+              restrictStock: isRestrictStock,
             );
             if (res == null) return;
-            if (!isQuote && res.quantity > res.product.account.availableStock) {
+            if (isRestrictStock && (res.quantity * res.conversionFactor) > res.product.account.availableStock) {
               if (!context.mounted) return;
               await DialogManager.showErrorDialog(
                 context,
@@ -95,7 +97,19 @@ class _RootScaffold extends StatelessWidget {
         ),
       ),
       appBar: AppBar(
-        title: Text(title),
+        title: title.contains("(Mayorista)")
+            ? Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(text: "${title.replaceAll("(Mayorista)", "").trim()} "),
+                    const TextSpan(
+                      text: "(Mayorista)",
+                      style: TextStyle(color: Colors.yellow, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              )
+            : Text(title),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(kToolbarHeight),
           child: ListenableBuilder(
@@ -286,14 +300,16 @@ class _Body extends StatelessWidget {
                         percentDiscount: currentCommercial.selectedDiscount?.percentValue ?? 0,
                         onRemove: () => viewController.removeItem(currentCommercial),
                         onEdit: () async {
+                          final isRestrictStock = writeCubit.documentType != CommercialDocumentType.quote;
                           final res = await showCommercialProductModal(
                             context,
                             product: currentCommercial.product,
                             commercialProductResult: currentCommercial,
+                            restrictStock: isRestrictStock,
                           );
                           if (res == null) return;
-                          if (writeCubit.documentType != CommercialDocumentType.quote &&
-                              res.quantity > res.product.account.availableStock) {
+                          if (isRestrictStock &&
+                              (res.quantity * res.conversionFactor) > res.product.account.availableStock) {
                             if (!context.mounted) return;
                             await DialogManager.showErrorDialog(
                               context,
@@ -308,13 +324,16 @@ class _Body extends StatelessWidget {
                           );
                         },
                         onChange: () async {
+                          final isRestrictStock = writeCubit.documentType != CommercialDocumentType.quote;
                           final res = await showCommercialProductSearchDelegate(
                             context,
                             defaultPriceLevel: viewController.selectedClient?.defaultPriceLevel ?? 1,
+                            preferredUnitType: viewController.isWholesale ? 'max' : 'min',
+                            restrictStock: isRestrictStock,
                           );
                           if (res == null) return;
-                          if (writeCubit.documentType != CommercialDocumentType.quote &&
-                              res.quantity > res.product.account.availableStock) {
+                          if (isRestrictStock &&
+                              (res.quantity * res.conversionFactor) > res.product.account.availableStock) {
                             if (!context.mounted) return;
                             await DialogManager.showErrorDialog(
                               context,

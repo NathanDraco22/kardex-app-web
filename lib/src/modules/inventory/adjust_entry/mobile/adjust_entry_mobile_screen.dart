@@ -27,13 +27,18 @@ class _MobileScaffold extends StatelessWidget {
               await DialogManager.showErrorDialog(context, "No se pueden agregar mas de 100 productos");
               return;
             }
-
+            if (!context.mounted) return;
+            final unit = await showInventoryUnitPicker(context, res);
+            if (unit == null) return;
             final newRow = ProductRowCard(
               product: res,
               quantity: 0,
-              unitaryCost: res.account.averageCost,
+              unitaryCost: res.account.averageCost * unit.conversionFactor,
               editableCost: false,
               haveExpirationDate: false,
+              selectedUnitIndex: unit.unitIndex,
+              conversionFactor: unit.conversionFactor,
+              selectedUnitName: unit.unitName,
             );
             mediator.productListViewController.addRowCard(newRow);
             mediator.refresh();
@@ -81,12 +86,13 @@ class _MobileScaffold extends StatelessWidget {
                 return EntryItem(
                   productId: card.product.id,
                   productName: card.product.name,
-                  cost: card.unitaryCost,
-                  quantity: card.quantity,
+                  cost: UnitConversionTool.toBaseCost(card.unitaryCost, card.conversionFactor),
+                  quantity: UnitConversionTool.toBaseQuantity(card.quantity, card.conversionFactor),
+                  conversionFactor: card.conversionFactor,
                   expirationDate: card.expirationDate?.millisecondsSinceEpoch,
                   code: card.product.code,
                   brandName: card.product.brandName,
-                  unitName: card.product.unitName,
+                  unitName: UnitConversionTool.resolveUnitName(card.selectedUnitName, card.product.unitName),
                 );
               }).toList();
 

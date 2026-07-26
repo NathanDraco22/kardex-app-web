@@ -201,9 +201,31 @@ class _DevolutionViewer extends StatelessWidget {
                                 color: rowColor,
                                 child: Row(
                                   children: [
-                                    Expanded(flex: 2, child: Text(item.product.name)),
-                                    Expanded(child: Text(item.quantity.toString())),
-                                    Expanded(child: Text(NumberFormatter.convertToMoneyLike(item.price))),
+                                    Expanded(
+                                      flex: 2,
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                                        children: [
+                                          Text(item.product.name),
+                                          Text(
+                                            "${item.product.unitName}${item.conversionFactor > 1 ? ' (${item.conversionFactor % 1 == 0 ? item.conversionFactor.toInt() : item.conversionFactor})' : ''}",
+                                            style: const TextStyle(color: Colors.grey, fontSize: 12),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        item.conversionFactor != 1
+                                            ? (item.quantity ~/ item.conversionFactor).toString()
+                                            : item.quantity.toString(),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        NumberFormatter.convertToMoneyLike(item.price * item.conversionFactor),
+                                      ),
+                                    ),
                                     Expanded(child: Text(NumberFormatter.convertToMoneyLike(item.subTotal))),
                                   ],
                                 ),

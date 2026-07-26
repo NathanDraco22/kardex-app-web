@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/gates/role_permission_gate.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/custom_product_commercial_search_delegate.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/search_product_commercial_delegate.dart';
 import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
 import 'package:kardex_app_front/widgets/menu_app_bar.dart';
 import 'package:kardex_app_front/constants/route_names.dart';
@@ -114,6 +114,26 @@ class _Body extends StatelessWidget {
                 title: const Text("Facturacion a Clientes"),
                 onTap: () {
                   context.pushNamed("client-invoice");
+                },
+              ),
+            ),
+          ),
+
+          const Divider(height: 0.0),
+
+          RolePermissionGate(
+            permissions: [CommercialSubModules.createInvoice],
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.clientInvoiceWholesale,
+              child: ListTile(
+                leading: Icon(
+                  FluentIcons.person_money_20_filled,
+                  size: 32,
+                  color: Colors.blue.shade600,
+                ),
+                title: const Text("Facturacion a Clientes (Mayorista)"),
+                onTap: () {
+                  context.pushNamed("client-invoice-wholesale");
                 },
               ),
             ),
@@ -344,6 +364,24 @@ class _Body extends StatelessWidget {
           ),
 
           const Divider(height: 0.0),
+
+          RolePermissionGate(
+            permissions: [CommercialSubModules.createOrder],
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.proformaWholesale,
+              child: ListTile(
+                leading: Icon(
+                  FluentIcons.document_text_24_filled,
+                  size: 32,
+                  color: Colors.blue.shade800,
+                ),
+                title: const Text("Crear Cotización (Mayorista)"),
+                onTap: () => context.pushNamed("proforma-wholesale"),
+              ),
+            ),
+          ),
+
+          const Divider(height: 0.0),
           const Divider(
             height: 4.0,
             thickness: 2,
@@ -381,6 +419,26 @@ class _Body extends StatelessWidget {
                 title: const Text("Crear Orden de Compra"),
                 onTap: () {
                   context.pushNamed("sale-order");
+                },
+              ),
+            ),
+          ),
+
+          const Divider(height: 0.0),
+
+          RolePermissionGate(
+            permissions: [CommercialSubModules.createOrder],
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.saleOrderWholesale,
+              child: ListTile(
+                leading: Icon(
+                  FluentIcons.receipt_add_24_filled,
+                  size: 32,
+                  color: Colors.blue.shade600,
+                ),
+                title: const Text("Crear Orden de Compra (Mayorista)"),
+                onTap: () {
+                  context.pushNamed("sale-order-wholesale");
                 },
               ),
             ),

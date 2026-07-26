@@ -29,4 +29,14 @@ class NumberFormatter {
 
     return _instance.format(value);
   }
+
+  static String formatDisplayStock(int stock, int factor) {
+    final safeFactor = factor < 1 ? 1 : factor;
+    final val = stock / safeFactor;
+    if (val == val.toInt()) {
+      return val.toInt().toString();
+    }
+    return val.toStringAsFixed(2).replaceAll(RegExp(r'\.?0+$'), '');
+  }
 }
+

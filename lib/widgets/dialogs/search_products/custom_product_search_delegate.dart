@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/widgets/display_product_code.dart';
+import 'package:kardex_app_front/widgets/dialogs/search_products/widgets/display_product_code.dart';
 
 Future<ProductInDb?> showProductSearchDelegate(BuildContext context) async {
   return await Navigator.push<ProductInDb?>(
@@ -125,7 +125,7 @@ class _ProductResultRow extends StatelessWidget {
 
                           Flexible(
                             fit: FlexFit.tight,
-                            child: Text(product.unitName),
+                            child: Text(product.defaultUnitName),
                           ),
                         ],
                       ),

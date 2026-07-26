@@ -2,6 +2,7 @@ export 'package:kardex_business/src/tools/constant.dart';
 export 'package:kardex_business/src/tools/datetime_tool.dart';
 export 'package:kardex_business/src/tools/http_tool.dart';
 export 'package:kardex_business/src/tools/number_formatter.dart';
+export 'package:kardex_business/src/tools/unit_conversion_tool.dart';
 export 'extensiones.dart';
 export 'input_formatters.dart';
 export 'loading_dialog.dart';

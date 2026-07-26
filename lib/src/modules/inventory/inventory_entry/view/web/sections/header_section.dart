@@ -167,30 +167,32 @@ class MenuActions extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        ElevatedButton.icon(
+        ElevatedCtrlButton(
+          hotKey: "4",
           onPressed: () async {
             await context.pushNamed("suppliers-catalog");
           },
-          icon: const Icon(
-            FluentIcons.building_multiple_20_filled,
-          ),
-          label: const Text("Proveedores"),
+          icon: FluentIcons.building_multiple_20_filled,
+
+          label: "Proveedores",
         ),
 
-        ElevatedButton.icon(
+        ElevatedCtrlButton(
+          hotKey: "5",
           onPressed: () async {
             await context.pushNamed("product-list");
           },
-          icon: const Icon(FluentIcons.cube_12_filled),
-          label: const Text("Productos"),
+          icon: FluentIcons.cube_12_filled,
+          label: "Productos",
         ),
 
         const Spacer(),
 
-        ElevatedButton.icon(
+        ElevatedCtrlButton(
+          hotKey: "G",
           onPressed: isDisabled ? null : () => saveAction(context),
-          icon: const Icon(Icons.save),
-          label: const Text("Guardar"),
+          icon: Icons.save,
+          label: "Guardar",
         ),
       ],
     );
@@ -218,11 +220,12 @@ Future<void> saveAction(BuildContext context) async {
     return EntryItem(
       productId: e.product.id,
       productName: e.product.name,
-      quantity: e.quantity,
-      cost: e.unitaryCost,
+      quantity: UnitConversionTool.toBaseQuantity(e.quantity, e.conversionFactor),
+      cost: UnitConversionTool.toBaseCost(e.unitaryCost, e.conversionFactor),
+      conversionFactor: e.conversionFactor,
       code: e.product.code,
       brandName: e.product.brandName,
-      unitName: e.product.unitName,
+      unitName: UnitConversionTool.resolveUnitName(e.selectedUnitName, e.product.unitName),
       expirationDate: e.expirationDate?.millisecondsSinceEpoch,
     );
   }).toList();
