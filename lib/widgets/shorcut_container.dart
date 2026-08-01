@@ -27,6 +27,7 @@ class _ShortcutContainerState extends State<ShortcutContainer> {
   final keyMapper = <String, (LogicalKeyboardKey, bool)>{
     "A": (LogicalKeyboardKey.keyA, true),
     "G": (LogicalKeyboardKey.keyG, true),
+    "0": (LogicalKeyboardKey.digit0, true),
     "1": (LogicalKeyboardKey.digit1, true),
     "2": (LogicalKeyboardKey.digit2, true),
     "3": (LogicalKeyboardKey.digit3, true),
@@ -36,8 +37,6 @@ class _ShortcutContainerState extends State<ShortcutContainer> {
     "7": (LogicalKeyboardKey.digit7, true),
     "8": (LogicalKeyboardKey.digit8, true),
     "9": (LogicalKeyboardKey.digit9, true),
-    "ESC": (LogicalKeyboardKey.escape, false),
-    "ESCAPE": (LogicalKeyboardKey.escape, false),
   };
 
   final activatorMapper = <SingleActivator, VoidCallback>{};
