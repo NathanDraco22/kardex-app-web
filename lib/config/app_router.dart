@@ -42,6 +42,7 @@ import 'package:kardex_app_front/src/modules/commercial/product_price_setting/pr
 import 'package:kardex_app_front/src/modules/commercial/proforma/proforma_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/product_movements/view/commercial_product_movements_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/receipt_history/receipt_history_screen.dart';
+import 'package:kardex_app_front/src/modules/commercial/sale_terminal/sale_terminal_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/client_accounts/view/client_account_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/client_movements/view/client_movements_screen.dart';
 import 'package:kardex_business/kardex_business.dart';
@@ -232,6 +233,12 @@ class AppRouter {
         name: 'commercial',
         builder: (context, state) => const CommercialMenuScreen(),
         routes: [
+          GoRoute(
+            path: "sale-terminal",
+            name: "sale-terminal",
+            builder: (context, state) => const SaleTerminalScreen(),
+          ),
+
           GoRoute(
             path: "anon-invoice",
             name: "anon-invoice",
