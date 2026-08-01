@@ -115,7 +115,7 @@ Future<CommercialProductResult?> showCommercialProductDialog(
   bool restrictStock = true,
 }) async {
   return await showDialog<CommercialProductResult?>(
-    barrierDismissible: false,
+    barrierDismissible: true,
     context: context,
     builder: (context) => CommercialProductDialog(
       product: product,
@@ -544,14 +544,10 @@ class _FormContentState extends State<_FormContent> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   spacing: 36,
                   children: [
-                    CtrlKeyTip(
-                      hotKey: "ESC",
-                      onShortcut: () => Navigator.pop(context),
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text(
-                          "Cancelar",
-                        ),
+                    OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text(
+                        "Cancelar",
                       ),
                     ),
                     ElevatedCtrlButton(
