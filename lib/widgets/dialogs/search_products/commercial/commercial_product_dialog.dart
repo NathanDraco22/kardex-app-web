@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/widgets/buttons/ctrl_key_tip.dart';
+import 'package:kardex_app_front/widgets/buttons/elevated_ctrl_button.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/title_label.dart';
@@ -142,20 +144,22 @@ class CommercialProductDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      constraints: const BoxConstraints(maxWidth: 700),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: SizedBox(
-        width: 650,
-        height: 700,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: _FormContent(
-            product: product,
-            commercialProductResult: commercialProductResult,
-            defaultPriceLevel: defaultPriceLevel,
-            preferredUnitType: preferredUnitType,
-            restrictStock: restrictStock,
+    return ShortcutContainer(
+      child: Dialog(
+        constraints: const BoxConstraints(maxWidth: 700),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: SizedBox(
+          width: 650,
+          height: 700,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: _FormContent(
+              product: product,
+              commercialProductResult: commercialProductResult,
+              defaultPriceLevel: defaultPriceLevel,
+              preferredUnitType: preferredUnitType,
+              restrictStock: restrictStock,
+            ),
           ),
         ),
       ),
@@ -186,8 +190,18 @@ class _FormContentState extends State<_FormContent> {
   late CommercialProductResult commercialProductResult;
   late Iterable<DropdownMenuItem<Discount>> discountsAvailable;
   FocusNode focusNode = FocusNode();
+  FocusNode unitFocusNode = FocusNode();
+  FocusNode priceFocusNode = FocusNode();
   FocusNode acceptFocusNode = FocusNode();
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
+  @override
+  void dispose() {
+    unitFocusNode.dispose();
+    focusNode.dispose();
+    acceptFocusNode.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -265,15 +279,35 @@ class _FormContentState extends State<_FormContent> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          CommercialProductUnitSelector(
-                            result: commercialProductResult,
-                            onChanged: () => setState(() {}),
+                          CtrlKeyTip(
+                            hotKey: "1",
+                            onShortcut: () {
+                              unitFocusNode.requestFocus();
+                              if (unitFocusNode.context != null) {
+                                Actions.invoke(unitFocusNode.context!, const ActivateIntent());
+                              }
+                            },
+                            child: CommercialProductUnitSelector(
+                              focusNode: unitFocusNode,
+                              result: commercialProductResult,
+                              onChanged: () => setState(() {}),
+                            ),
                           ),
                           const SizedBox(height: 12),
-                          PriceLevelDropdownSelector(
-                            result: commercialProductResult,
-                            isUserAdmin: isUserAdmin,
-                            onChanged: () => setState(() {}),
+                          CtrlKeyTip(
+                            hotKey: "2",
+                            onShortcut: () {
+                              priceFocusNode.requestFocus();
+                              if (priceFocusNode.context != null) {
+                                Actions.invoke(priceFocusNode.context!, const ActivateIntent());
+                              }
+                            },
+                            child: PriceLevelDropdownSelector(
+                              focusNode: priceFocusNode,
+                              result: commercialProductResult,
+                              isUserAdmin: isUserAdmin,
+                              onChanged: () => setState(() {}),
+                            ),
                           ),
                           const SizedBox(height: 8),
                           Row(
@@ -510,14 +544,20 @@ class _FormContentState extends State<_FormContent> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   spacing: 36,
                   children: [
-                    OutlinedButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text(
-                        "Cancelar",
+                    CtrlKeyTip(
+                      hotKey: "ESC",
+                      onShortcut: () => Navigator.pop(context),
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text(
+                          "Cancelar",
+                        ),
                       ),
                     ),
-                    ElevatedButton(
-                      focusNode: acceptFocusNode,
+                    ElevatedCtrlButton(
+                      icon: Icons.check,
+                      label: "Aceptar",
+                      hotKey: "G",
                       onPressed: () {
                         if (commercialProductResult.newPrice == 0) {
                           DialogManager.showErrorDialog(context, "El producto tiene un precio 0, no se puede vender");
@@ -535,9 +575,6 @@ class _FormContentState extends State<_FormContent> {
                         }
                         Navigator.pop(context, commercialProductResult);
                       },
-                      child: const Text(
-                        "Aceptar",
-                      ),
                     ),
                   ],
                 ),

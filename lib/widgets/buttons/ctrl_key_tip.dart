@@ -55,7 +55,7 @@ class _CtrlKeyTipState extends State<CtrlKeyTip> {
       clipBehavior: Clip.none,
       children: [
         widget.child,
-        if (ctrlPressed)
+        if (ctrlPressed && widget.hotKey.isNotEmpty)
           Positioned(
             bottom: -1,
             child: Container(

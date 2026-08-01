@@ -8,11 +8,13 @@ class PriceLevelDropdownSelector extends StatelessWidget {
     required this.result,
     required this.isUserAdmin,
     required this.onChanged,
+    this.focusNode,
   });
 
   final CommercialProductResult result;
   final bool isUserAdmin;
   final VoidCallback onChanged;
+  final FocusNode? focusNode;
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +27,7 @@ class PriceLevelDropdownSelector extends StatelessWidget {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         DropdownButton<int>(
+          focusNode: focusNode,
           value: result.selectedPriceLevel,
           isExpanded: true,
           items: [
