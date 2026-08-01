@@ -18,14 +18,20 @@ class PaymentResult {
 
 Future<PaymentResult?> showPaymentConfirmationDialog(
   BuildContext context,
-  int total,
-) async {
+  int total, {
+  bool showCredit = false,
+  PaymentType initialMethod = PaymentType.cash,
+}) async {
   PaymentResult? result;
 
   await showDialog(
     context: context,
     builder: (context) {
-      return _PaymentDialog(total: total);
+      return _PaymentDialog(
+        total: total,
+        showCredit: showCredit,
+        initialMethod: initialMethod,
+      );
     },
   ).then((value) => result = value);
 
@@ -34,23 +40,29 @@ Future<PaymentResult?> showPaymentConfirmationDialog(
 
 class _PaymentDialog extends StatefulWidget {
   final int total;
-  const _PaymentDialog({required this.total});
+  final bool showCredit;
+  final PaymentType initialMethod;
+
+  const _PaymentDialog({
+    required this.total,
+    this.showCredit = false,
+    this.initialMethod = PaymentType.cash,
+  });
 
   @override
   State<_PaymentDialog> createState() => _PaymentDialogState();
 }
 
 class _PaymentDialogState extends State<_PaymentDialog> {
-  PaymentType _selectedMethod = PaymentType.cash;
+  late PaymentType _selectedMethod;
   final TextEditingController _receivedController = TextEditingController();
   final TextEditingController _refController = TextEditingController();
   int _receivedAmount = 0;
 
   @override
-  void dispose() {
-    _receivedController.dispose();
-    _refController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    _selectedMethod = widget.initialMethod;
   }
 
   int get _change {
@@ -62,6 +74,9 @@ class _PaymentDialogState extends State<_PaymentDialog> {
   bool get _canConfirm {
     if (_selectedMethod == PaymentType.cash) {
       return _receivedAmount >= widget.total;
+    }
+    if (_selectedMethod == PaymentType.credit) {
+      return true;
     }
     return _refController.text.isNotEmpty;
   }
@@ -90,18 +105,18 @@ class _PaymentDialogState extends State<_PaymentDialog> {
                   return Colors.black;
                 }),
               ),
-              segments: const [
-                ButtonSegment(
+              segments: [
+                const ButtonSegment(
                   value: PaymentType.cash,
                   label: Text("Efectivo", style: TextStyle(fontSize: 16)),
                   icon: Icon(Icons.money),
                 ),
-                ButtonSegment(
+                const ButtonSegment(
                   value: PaymentType.card,
                   label: Text("Tarjeta", style: TextStyle(fontSize: 16)),
                   icon: Icon(Icons.credit_card),
                 ),
-                ButtonSegment(
+                const ButtonSegment(
                   value: PaymentType.transfer,
                   label: Padding(
                     padding: EdgeInsets.all(4.0),
@@ -109,6 +124,12 @@ class _PaymentDialogState extends State<_PaymentDialog> {
                   ),
                   icon: Icon(Icons.account_balance),
                 ),
+                if (widget.showCredit)
+                  const ButtonSegment(
+                    value: PaymentType.credit,
+                    label: Text("Crédito", style: TextStyle(fontSize: 16)),
+                    icon: Icon(Icons.schedule),
+                  ),
               ],
               selected: {_selectedMethod},
               onSelectionChanged: (newSelection) {
@@ -183,7 +204,9 @@ class _PaymentDialogState extends State<_PaymentDialog> {
                           PaymentResult(
                             method: _selectedMethod,
                             amountReceived: _selectedMethod == PaymentType.cash ? _receivedAmount : widget.total,
-                            reference: _selectedMethod == PaymentType.cash ? null : _refController.text,
+                            reference: (_selectedMethod == PaymentType.cash || _selectedMethod == PaymentType.credit)
+                                ? null
+                                : _refController.text,
                           ),
                         );
                       },

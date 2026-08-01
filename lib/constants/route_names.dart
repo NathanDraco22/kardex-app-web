@@ -28,6 +28,7 @@ class RouteNames {
   static const suppliersCatalog = 'suppliers-catalog';
 
   static const commercial = 'commercial';
+  static const saleTerminal = 'sale-terminal';
   static const anonInvoice = 'anon-invoice';
   static const anonDevolution = 'anon-devolution';
   static const dailyInvoice = 'daily-invoice';
