@@ -115,7 +115,7 @@ Future<CommercialProductResult?> showCommercialProductDialog(
   bool restrictStock = true,
 }) async {
   return await showDialog<CommercialProductResult?>(
-    barrierDismissible: true,
+    barrierDismissible: false,
     context: context,
     builder: (context) => CommercialProductDialog(
       product: product,
