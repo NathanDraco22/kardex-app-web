@@ -1,14 +1,18 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_business/kardex_business.dart';
+import '../view_controller.dart';
+
 part 'write_invoice_state.dart';
 
 class WriteAnonInvoiceCubit extends Cubit<WriteAnonInvoiceState> {
   WriteAnonInvoiceCubit({
     required this.invoicesRepository,
+    required this.viewController,
     this.isOrder = false,
   }) : super(WriteAnonInvoiceInitial());
 
   final InvoicesRepository invoicesRepository;
+  final AnonInvoiceViewController viewController;
 
   final bool isOrder;
 

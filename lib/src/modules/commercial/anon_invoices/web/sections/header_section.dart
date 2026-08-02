@@ -99,7 +99,6 @@ class MenuActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewController = AnonInvoiceWebMediator.of(context).viewController;
-    final tableController = AnonInvoiceWebMediator.of(context).tableController;
 
     String saveButtonTitle = "Facturar";
 
@@ -108,6 +107,12 @@ class MenuActions extends StatelessWidget {
     return ListenableBuilder(
       listenable: viewController,
       builder: (context, _) {
+        Function()? callback;
+
+        if (viewController.items.isNotEmpty) {
+          callback = () => saveAnonInvoiceAction(context);
+        }
+
         return Row(
           spacing: 4,
           mainAxisAlignment: MainAxisAlignment.end,
@@ -119,32 +124,18 @@ class MenuActions extends StatelessWidget {
               label: "Facturas",
               icon: Icons.blinds_closed,
             ),
-
             ElevatedCtrlButton(
               hotKey: "5",
               onPressed: () => showGlobalStockSearchModal(context),
               label: "Existencias Global",
               icon: Icons.search,
             ),
-
             const Spacer(),
-
-            ListenableBuilder(
-              listenable: tableController,
-              builder: (context, _) {
-                Function()? callback;
-
-                if (tableController.items.isNotEmpty) {
-                  callback = () => saveAnonInvoiceAction(context);
-                }
-
-                return ElevatedCtrlButton(
-                  hotKey: "G",
-                  onPressed: callback,
-                  icon: saveIcon,
-                  label: saveButtonTitle,
-                );
-              },
+            ElevatedCtrlButton(
+              hotKey: "G",
+              onPressed: callback,
+              icon: saveIcon,
+              label: saveButtonTitle,
             ),
           ],
         );
@@ -157,23 +148,19 @@ Future<void> saveAnonInvoiceAction(
   BuildContext context,
 ) async {
   final viewController = AnonInvoiceWebMediator.of(context).viewController;
-  final tableController = AnonInvoiceWebMediator.of(context).tableController;
-  if (tableController.items.isEmpty) {
+  if (viewController.items.isEmpty) {
     return;
   }
 
-  final items = tableController.items;
-
-  for (var item in items) {
-    if (item.commercial.quantity == 0) {
-      await DialogManager.showInfoDialog(context, "${item.commercial.product.name} sin cantidad");
+  for (var item in viewController.items) {
+    if (item.quantity == 0) {
+      await DialogManager.showInfoDialog(context, "${item.product.name} sin cantidad");
       return;
     }
   }
 
   CreateInvoice newInvoice = createAnonInvoiceFromControllers(
     viewController,
-    tableController,
     context,
   );
 
@@ -197,29 +184,9 @@ Future<void> saveAnonInvoiceAction(
 
 CreateInvoice createAnonInvoiceFromControllers(
   AnonInvoiceViewController viewController,
-  AnonInvoiceTableController tableController,
   BuildContext context,
 ) {
-  final salesItems = tableController.items.map(
-    (e) {
-      final product = e.commercial.product;
-      return SaleItem(
-        product: ProductItem.fromJson({
-          ...product.toJson(),
-          'unitName': e.commercial.selectedUnitName.isNotEmpty ? e.commercial.selectedUnitName : product.unitName,
-        }),
-        selectedPrice: e.commercial.selectedPriceLevel,
-        cost: product.account.averageCost,
-        price: e.commercial.newPrice,
-        quantity: e.commercial.quantity * e.commercial.conversionFactor,
-        discountPercentage: e.commercial.discountPercent,
-        totalDiscount: e.commercial.totalDiscount,
-        subTotal: e.commercial.subTotal,
-        total: e.commercial.total,
-        conversionFactor: e.commercial.conversionFactor,
-      );
-    },
-  );
+  final salesItems = viewController.createSaleItemFromCommercial();
 
   final totalCost = salesItems.fold<int>(
     0,
@@ -242,7 +209,7 @@ CreateInvoice createAnonInvoiceFromControllers(
     clientInfo: ClientInfo(name: "Sin Cliente", group: ""),
     docNumber: "",
     description: viewController.description,
-    saleItems: salesItems.toList(),
+    saleItems: salesItems,
     status: InvoiceStatus.paid,
     paymentType: PaymentType.cash,
     bankReference: "",
