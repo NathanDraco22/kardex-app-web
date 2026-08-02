@@ -295,6 +295,11 @@ class ShortcutRouteRegistry {
       icon: FluentIcons.calendar_error_24_filled,
       color: Color(0xFFEF5350),
     ),
+    RouteNames.invoicePayments: const ShortcutInfo(
+      title: "Abonos por Factura",
+      icon: FluentIcons.receipt_sparkles_24_filled,
+      color: Color(0xFF00897B),
+    ),
 
     // --- Herramientas Avanzadas ---
     RouteNames.productStats: const ShortcutInfo(
