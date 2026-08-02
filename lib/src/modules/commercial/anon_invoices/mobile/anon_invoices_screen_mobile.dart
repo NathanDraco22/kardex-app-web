@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/src/modules/commercial/anon_invoices/cubits/write_invoice_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/mobile/invoice_anon_menu_screen.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/commercial_product_modal.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/search_product_commercial_delegate.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
-import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 
 import '../../client_invoices/widgets/product_invoice_card.dart';
+import '../view_controller.dart';
 import 'mediator.dart';
 
 class AnonInvoicesScreenMobile extends StatefulWidget {
@@ -17,7 +19,14 @@ class AnonInvoicesScreenMobile extends StatefulWidget {
 }
 
 class _AnonInvoicesScreenMobileState extends State<AnonInvoicesScreenMobile> {
-  final viewController = AnonInvoiceMobileViewController();
+  late AnonInvoiceViewController viewController;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    viewController = context.read<WriteAnonInvoiceCubit>().viewController;
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnonInvoiceMobileMediator(
@@ -78,7 +87,7 @@ class _RootScaffold extends StatelessWidget {
                     onPressed: isEmptyItems
                         ? null
                         : () async {
-                            final saleItems = createSaleItemFromCommercial(viewController.items);
+                            final saleItems = viewController.createSaleItemFromCommercial();
                             await showInvoiceAnonMenuScreen(context, saleItems);
                           },
                     label: const Text("Facturar"),
@@ -239,27 +248,4 @@ class _Body extends StatelessWidget {
       ),
     );
   }
-}
-
-List<SaleItem> createSaleItemFromCommercial(List<CommercialProductResult> items) {
-  final saleItems = items.map((commercial) {
-    final product = commercial.product;
-    return SaleItem(
-      product: ProductItem.fromJson({
-        ...product.toJson(),
-        'unitName': commercial.selectedUnitName.isNotEmpty ? commercial.selectedUnitName : product.unitName,
-      }),
-      selectedPrice: commercial.selectedPriceLevel,
-      cost: product.account.averageCost,
-      price: commercial.newPrice,
-      quantity: commercial.quantity * commercial.conversionFactor,
-      discountPercentage: commercial.discountPercent,
-      totalDiscount: commercial.totalDiscount,
-      subTotal: commercial.subTotal,
-      total: commercial.total,
-      conversionFactor: commercial.conversionFactor,
-    );
-  }).toList();
-
-  return saleItems;
 }

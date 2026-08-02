@@ -16,6 +16,7 @@ import 'package:kardex_app_front/widgets/empty_scaffold.dart';
 import 'package:kardex_app_front/widgets/text_field_date_selector.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
 
+import '../view_controller.dart';
 import 'mediator.dart';
 
 part 'sections/content_section.dart';
@@ -30,14 +31,19 @@ class AnonInvoicesScreenWeb extends StatefulWidget {
 
 class _AnonInvoicesScreenWebState extends State<AnonInvoicesScreenWeb> {
   bool rebuild = false;
-  AnonInvoiceTableController tableController = AnonInvoiceTableController();
-  AnonInvoiceViewController viewController = AnonInvoiceViewController();
+  late AnonInvoiceViewController viewController;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    viewController = context.read<WriteAnonInvoiceCubit>().viewController;
+  }
 
   @override
   Widget build(BuildContext context) {
     if (rebuild) {
       rebuild = false;
-      tableController = AnonInvoiceTableController();
+      context.read<WriteAnonInvoiceCubit>().viewController.clear();
       Future(() => setState(() {}));
       return const EmptyScaffold();
     }
@@ -58,14 +64,13 @@ class _AnonInvoicesScreenWebState extends State<AnonInvoicesScreenWeb> {
           String message = "Factura guardada con éxito";
           await DialogManager.showInfoDialog(context, message);
           if (!context.mounted) return;
-          viewController.description = '';
+          viewController.clear();
           rebuild = true;
           setState(() {});
         }
       },
       child: AnonInvoiceWebMediator(
         viewController: viewController,
-        tableController: tableController,
         child: const _RootScaffold(),
       ),
     );
@@ -91,7 +96,7 @@ class _RootScaffold extends StatelessWidget {
           appBar: AppBar(
             leading: BackButton(
               onPressed: () async {
-                if (AnonInvoiceWebMediator.of(context).tableController.items.isNotEmpty) {
+                if (AnonInvoiceWebMediator.of(context).viewController.items.isNotEmpty) {
                   final res = await DialogManager.confirmActionDialog(context, "Deseas salir sin guardar?");
                   if (res != true) {
                     return;
@@ -118,16 +123,15 @@ class _AnonBottomAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewController = AnonInvoiceWebMediator.of(context).viewController;
-    final tableController = AnonInvoiceWebMediator.of(context).tableController;
 
     return BottomAppBar(
       height: 50,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: ListenableBuilder(
-          listenable: Listenable.merge([viewController, tableController]),
+          listenable: viewController,
           builder: (context, _) {
-            final total = tableController.total;
+            final total = viewController.totalAmount;
             final formattedTotal = NumberFormatter.convertToMoneyLike(total);
             return Row(
               children: [

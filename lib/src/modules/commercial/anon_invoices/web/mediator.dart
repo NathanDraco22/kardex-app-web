@@ -1,21 +1,13 @@
 import 'package:flutter/material.dart';
-import 'widgets/anon_invoice_table.dart';
-
-class AnonInvoiceViewController extends ChangeNotifier {
-  String description = '';
-
-  void refresh() => notifyListeners();
-}
+import '../view_controller.dart';
 
 class AnonInvoiceWebMediator extends InheritedWidget {
   const AnonInvoiceWebMediator({
     super.key,
     required super.child,
-    required this.tableController,
     required this.viewController,
   });
 
-  final AnonInvoiceTableController tableController;
   final AnonInvoiceViewController viewController;
 
   static AnonInvoiceWebMediator of(BuildContext context) {
