@@ -70,6 +70,7 @@ import 'package:kardex_app_front/src/modules/inventory/product_entry_history/pro
 import 'package:kardex_app_front/src/modules/login/login_screen.dart';
 import 'package:kardex_app_front/src/modules/multi_branch_home/multibranch_home_screen.dart';
 import 'package:kardex_app_front/src/modules/pending_accounts/pending_client_transactions/credit_session_transactions_screen.dart';
+import 'package:kardex_app_front/src/modules/pending_accounts/invoice_payments/invoice_payments_menu_screen.dart';
 import 'package:kardex_app_front/src/modules/pending_accounts/pending_accounts_menu_screen.dart';
 import 'package:kardex_app_front/src/modules/pending_accounts/pending_client_transactions/pending_client_transactions_menu_screen.dart';
 import 'package:kardex_app_front/src/modules/pending_accounts/unpaid_clients/unpaid_clients_screen.dart';
@@ -419,6 +420,11 @@ class AppRouter {
             path: "unpaid-clients",
             name: "unpaid-clients",
             builder: (context, state) => const UnpaidClientsScreen(),
+          ),
+          GoRoute(
+            path: "abonos-por-factura",
+            name: "abonos-por-factura",
+            builder: (context, state) => const InvoicePaymentsMenuScreen(),
           ),
         ],
       ),

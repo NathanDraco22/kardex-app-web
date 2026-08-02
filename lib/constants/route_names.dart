@@ -59,6 +59,7 @@ class RouteNames {
   static const pendingClientTransactions = 'pending-client-transactions';
   static const creditSessionTransactions = 'credit-session-transactions';
   static const unpaidClients = 'unpaid-clients';
+  static const invoicePayments = 'abonos-por-factura';
 
   static const inventory = 'inventory';
   static const currentInventory = 'current-inventory';
