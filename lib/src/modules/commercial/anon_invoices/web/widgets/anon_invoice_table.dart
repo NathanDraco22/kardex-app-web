@@ -252,7 +252,7 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
         color: widget.color,
         padding: const EdgeInsets.all(8),
         child: SizedBox(
-          height: 60,
+          height: 72,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -300,6 +300,7 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
                             ),
+                            maxLines: 3,
                           ),
                           Row(
                             children: [
