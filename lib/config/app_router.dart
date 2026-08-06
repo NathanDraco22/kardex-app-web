@@ -18,6 +18,8 @@ import 'package:kardex_app_front/src/modules/client_catalog/client_groups/client
 import 'package:kardex_app_front/src/modules/client_catalog/client_list/view/client_catalog_screen.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/cllient_map/client_map_screen.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/initial_balance/view/initial_balance_screen.dart';
+import 'package:kardex_app_front/src/modules/settings/view/api_keys/api_keys_screen.dart';
+
 
 import 'package:kardex_app_front/src/modules/commercial/anon_devolution/anon_devolution_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/anon_invoices_screen.dart';
@@ -603,8 +605,15 @@ class AppRouter {
             name: "integrations",
             builder: (context, state) => const IntegrationsScreen(),
           ),
+          GoRoute(
+            path: "api-keys",
+            name: "api_keys",
+            builder: (context, state) => const ApiKeysScreen(),
+          ),
+
         ],
       ),
+
 
       GoRoute(
         path: '/expenses',

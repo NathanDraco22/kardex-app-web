@@ -97,6 +97,8 @@ class RouteNames {
   static const productPrice = 'product-price';
   static const branches = 'branches';
   static const integrations = 'integrations';
+  static const apiKeys = 'api_keys';
+
 
   static const expenses = 'expenses';
   static const operativeExpenses = 'operative-expenses';
