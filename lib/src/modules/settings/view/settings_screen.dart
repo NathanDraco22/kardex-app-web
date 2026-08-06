@@ -78,6 +78,20 @@ class _Body extends StatelessWidget {
           ),
           const Divider(height: 0.0),
 
+          ShortcutAddableListTile(
+            routeName: RouteNames.apiKeys,
+            child: ListTile(
+              leading: const Icon(Icons.key),
+              title: const Text("Llaves de API (Neptuno)"),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                context.pushNamed(RouteNames.apiKeys);
+              },
+            ),
+          ),
+          const Divider(height: 0.0),
+
+
           ListTile(
             leading: const Icon(Icons.print),
             title: const Text("Configuración de Impresora Local"),
