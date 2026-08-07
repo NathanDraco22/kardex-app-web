@@ -28,6 +28,7 @@ class RouteNames {
   static const suppliersCatalog = 'suppliers-catalog';
 
   static const commercial = 'commercial';
+  static const saleTerminal = 'sale-terminal';
   static const anonInvoice = 'anon-invoice';
   static const anonDevolution = 'anon-devolution';
   static const dailyInvoice = 'daily-invoice';
@@ -58,6 +59,7 @@ class RouteNames {
   static const pendingClientTransactions = 'pending-client-transactions';
   static const creditSessionTransactions = 'credit-session-transactions';
   static const unpaidClients = 'unpaid-clients';
+  static const invoicePayments = 'abonos-por-factura';
 
   static const inventory = 'inventory';
   static const currentInventory = 'current-inventory';
@@ -96,6 +98,8 @@ class RouteNames {
   static const productPrice = 'product-price';
   static const branches = 'branches';
   static const integrations = 'integrations';
+  static const apiKeys = 'api_keys';
+
 
   static const expenses = 'expenses';
   static const operativeExpenses = 'operative-expenses';

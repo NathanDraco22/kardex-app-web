@@ -6,7 +6,7 @@ class _ContentSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mediator = AnonInvoiceWebMediator.of(context);
-    final controller = mediator.tableController;
+    final controller = mediator.viewController;
     return Card(child: AnonInvoiceTable(controller: controller));
   }
 }

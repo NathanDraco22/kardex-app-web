@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_app_front/widgets/buttons/elevated_ctrl_button.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
-import 'package:kardex_app_front/src/modules/commercial/anon_invoices/web/mediator.dart';
+import 'package:kardex_app_front/src/modules/commercial/anon_invoices/view_controller.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/widgets/more_action_row_button.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/commercial_product_dialog.dart';
@@ -9,54 +9,13 @@ import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_resul
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/search_product_commercial_dialog.dart';
 import 'package:kardex_app_front/widgets/incremental_textfield.dart';
 
-class AnonInvoiceItem {
-  final CommercialProductResult commercial;
-
-  AnonInvoiceItem(this.commercial);
-}
-
-class AnonInvoiceTableController extends ChangeNotifier {
-  List<AnonInvoiceItem> items = [];
-
-  int get total {
-    var total = 0.0;
-
-    for (var item in items) {
-      total += item.commercial.total;
-    }
-    return total.toInt();
-  }
-
-  void addRowIfNotExists(AnonInvoiceItem item) {
-    final isExists = items.any(
-      (element) => element.commercial.product.id == item.commercial.product.id,
-    );
-    if (isExists) return;
-    items.add(item);
-    notifyListeners();
-  }
-
-  void removeRow(AnonInvoiceItem item) {
-    items.remove(item);
-    notifyListeners();
-  }
-
-  void updateRow(AnonInvoiceItem oldItem, AnonInvoiceItem newItem) {
-    final index = items.indexOf(oldItem);
-    items[index] = newItem;
-    notifyListeners();
-  }
-
-  void refresh() => notifyListeners();
-}
-
 class AnonInvoiceTable extends StatefulWidget {
   const AnonInvoiceTable({
     super.key,
     required this.controller,
   });
 
-  final AnonInvoiceTableController controller;
+  final AnonInvoiceViewController controller;
 
   @override
   State<AnonInvoiceTable> createState() => _AnonInvoiceTableState();
@@ -76,7 +35,6 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
                 fit: FlexFit.tight,
                 child: Center(child: Text("Producto")),
               ),
-
               Flexible(
                 fit: FlexFit.tight,
                 child: Center(child: Text("Cantidad")),
@@ -89,12 +47,10 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
                 fit: FlexFit.tight,
                 child: Center(child: Text("Descuento")),
               ),
-
               Flexible(
                 fit: FlexFit.tight,
                 child: Center(child: Text("IVA")),
               ),
-
               Flexible(
                 fit: FlexFit.tight,
                 child: Center(child: Text("Total")),
@@ -106,7 +62,6 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
           height: 0.0,
           thickness: 2,
         ),
-
         Expanded(
           child: ListenableBuilder(
             listenable: widget.controller,
@@ -119,7 +74,6 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
                     height: 0.0,
                   ),
                   const SizedBox(height: 8),
-
                   Row(
                     children: [
                       const SizedBox(width: 32),
@@ -142,9 +96,7 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
                             );
                             return;
                           }
-                          widget.controller.addRowIfNotExists(AnonInvoiceItem(res));
-                          if (!context.mounted) return;
-                          // ClientInvoiceWebMediator.of(context).viewController.refresh();
+                          widget.controller.addItem(res);
                         },
                       ),
                     ],
@@ -158,7 +110,7 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
     );
   }
 
-  Iterable<Widget> _buildRow(BuildContext context, AnonInvoiceTableController controller) sync* {
+  Iterable<Widget> _buildRow(BuildContext context, AnonInvoiceViewController controller) sync* {
     for (var i = 0; i < controller.items.length; i++) {
       final currentItem = controller.items[i];
       final color = i.isOdd ? Colors.white : Colors.grey.shade200;
@@ -166,11 +118,12 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
         key: ValueKey(currentItem),
         color: color,
         item: currentItem,
-        onRemove: (item) => controller.removeRow(item),
+        controller: controller,
+        onRemove: (item) => controller.removeItem(item),
         onChange: (item) async {
           final res = await showSearchProductCommercialDialog(
             context,
-            product: item.commercial.product,
+            product: item.product,
             isDirectSale: true,
           );
           if (res == null) return;
@@ -183,13 +136,13 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
             );
             return;
           }
-          controller.updateRow(item, AnonInvoiceItem(res));
+          controller.updateItem(item, res);
         },
         onEdit: (item) async {
           final res = await showCommercialProductDialog(
             context,
-            product: item.commercial.product,
-            commercialProductResult: item.commercial,
+            product: item.product,
+            commercialProductResult: item,
           );
           if (res == null) return;
           if (res.product.account.availableStock == 0 ||
@@ -201,7 +154,7 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
             );
             return;
           }
-          controller.updateRow(item, AnonInvoiceItem(res));
+          controller.updateItem(item, res);
         },
       );
     }
@@ -213,18 +166,19 @@ class InvoiceTableRow extends StatefulWidget {
     super.key,
     required this.color,
     required this.item,
+    required this.controller,
     required this.onRemove,
     required this.onEdit,
     required this.onChange,
   });
 
   final Color color;
+  final CommercialProductResult item;
+  final AnonInvoiceViewController controller;
 
-  final AnonInvoiceItem item;
-
-  final void Function(AnonInvoiceItem item) onRemove;
-  final void Function(AnonInvoiceItem item) onEdit;
-  final void Function(AnonInvoiceItem item) onChange;
+  final void Function(CommercialProductResult item) onRemove;
+  final void Function(CommercialProductResult item) onEdit;
+  final void Function(CommercialProductResult item) onChange;
 
   @override
   State<InvoiceTableRow> createState() => _InvoiceTableRowState();
@@ -238,21 +192,21 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
   Widget build(BuildContext context) {
     super.build(context);
 
-    final product = widget.item.commercial.product;
+    final product = widget.item.product;
 
     final price = NumberFormatter.convertToMoneyLike(
-      widget.item.commercial.newPrice * widget.item.commercial.conversionFactor,
+      widget.item.newPrice * widget.item.conversionFactor,
     );
-    final totalDiscount = NumberFormatter.convertToMoneyLike(widget.item.commercial.totalDiscount);
-    final percenValue = widget.item.commercial.discountPercent;
-    final total = NumberFormatter.convertToMoneyLike(widget.item.commercial.total);
+    final totalDiscount = NumberFormatter.convertToMoneyLike(widget.item.totalDiscount);
+    final percenValue = widget.item.discountPercent;
+    final total = NumberFormatter.convertToMoneyLike(widget.item.total);
     return Material(
       color: Colors.transparent,
       child: Ink(
         color: widget.color,
         padding: const EdgeInsets.all(8),
         child: SizedBox(
-          height: 60,
+          height: 72,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -278,7 +232,7 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
                           ),
                           onTap: () {
                             widget.onEdit(widget.item);
-                            AnonInvoiceWebMediator.of(context).viewController.refresh();
+                            widget.controller.refresh();
                           },
                         ),
                         PopupMenuItem(
@@ -300,6 +254,7 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
                             ),
+                            maxLines: 3,
                           ),
                           Row(
                             children: [
@@ -317,18 +272,17 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
                               ),
                               Expanded(
                                 child: UnitDisplayer(
-                                  unitName: widget.item.commercial.selectedUnitName,
-                                  conversionFactor: widget.item.commercial.conversionFactor,
+                                  unitName: widget.item.selectedUnitName,
+                                  conversionFactor: widget.item.conversionFactor,
                                   fallbackUnitName: product.unitName,
                                   textAlign: TextAlign.left,
                                 ),
                               ),
-
                               Expanded(
                                 child: Text(
                                   NumberFormatter.formatDisplayStock(
                                     product.account.availableStock,
-                                    widget.item.commercial.conversionFactor,
+                                    widget.item.conversionFactor,
                                   ),
                                   textAlign: TextAlign.left,
                                 ),
@@ -341,16 +295,15 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
                   ],
                 ),
               ),
-
               Flexible(
                 fit: FlexFit.tight,
                 child: IncrementalTextField(
                   maxValue:
-                      widget.item.commercial.product.account.availableStock ~/ widget.item.commercial.conversionFactor,
-                  initialValue: widget.item.commercial.quantity,
+                      widget.item.product.account.availableStock ~/ widget.item.conversionFactor,
+                  initialValue: widget.item.quantity,
                   onChanged: (value) {
-                    widget.item.commercial.quantity = value;
-                    AnonInvoiceWebMediator.of(context).viewController.refresh();
+                    widget.item.quantity = value;
+                    widget.controller.refresh();
                     setState(() {});
                   },
                 ),
@@ -385,7 +338,6 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
                   ],
                 ),
               ),
-
               const Flexible(
                 fit: FlexFit.tight,
                 child: Column(

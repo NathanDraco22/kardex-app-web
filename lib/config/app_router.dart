@@ -15,6 +15,8 @@ import 'package:kardex_app_front/src/modules/client_catalog/client_groups/client
 import 'package:kardex_app_front/src/modules/client_catalog/client_list/view/client_catalog_screen.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/cllient_map/client_map_screen.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/initial_balance/view/initial_balance_screen.dart';
+import 'package:kardex_app_front/src/modules/settings/view/api_keys/api_keys_screen.dart';
+
 
 import 'package:kardex_app_front/src/modules/commercial/anon_devolution/anon_devolution_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/anon_invoices_screen.dart';
@@ -38,6 +40,7 @@ import 'package:kardex_app_front/src/modules/commercial/pending_invoice/pending_
 import 'package:kardex_app_front/src/modules/commercial/proforma/proforma_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/product_movements/view/commercial_product_movements_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/receipt_history/receipt_history_screen.dart';
+import 'package:kardex_app_front/src/modules/commercial/sale_terminal/sale_terminal_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/client_accounts/view/client_account_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/client_movements/view/client_movements_screen.dart';
 import 'package:kardex_business/kardex_business.dart';
@@ -60,6 +63,7 @@ import 'package:kardex_app_front/src/modules/inventory/product_inventory_catalog
 import 'package:kardex_app_front/src/modules/login/login_screen.dart';
 import 'package:kardex_app_front/src/modules/multi_branch_home/multibranch_home_screen.dart';
 import 'package:kardex_app_front/src/modules/pending_accounts/pending_client_transactions/credit_session_transactions_screen.dart';
+import 'package:kardex_app_front/src/modules/pending_accounts/invoice_payments/invoice_payments_menu_screen.dart';
 import 'package:kardex_app_front/src/modules/pending_accounts/pending_accounts_menu_screen.dart';
 import 'package:kardex_app_front/src/modules/pending_accounts/pending_client_transactions/pending_client_transactions_menu_screen.dart';
 import 'package:kardex_app_front/src/modules/pending_accounts/unpaid_clients/unpaid_clients_screen.dart';
@@ -224,6 +228,12 @@ class AppRouter {
         name: 'commercial',
         builder: (context, state) => const CommercialMenuScreen(),
         routes: [
+          GoRoute(
+            path: "sale-terminal",
+            name: "sale-terminal",
+            builder: (context, state) => const SaleTerminalScreen(),
+          ),
+
           GoRoute(
             path: "anon-invoice",
             name: "anon-invoice",
@@ -406,6 +416,11 @@ class AppRouter {
             path: "unpaid-clients",
             name: "unpaid-clients",
             builder: (context, state) => const UnpaidClientsScreen(),
+          ),
+          GoRoute(
+            path: "abonos-por-factura",
+            name: "abonos-por-factura",
+            builder: (context, state) => const InvoicePaymentsMenuScreen(),
           ),
         ],
       ),
@@ -594,8 +609,15 @@ class AppRouter {
             name: "integrations",
             builder: (context, state) => const IntegrationsScreen(),
           ),
+          GoRoute(
+            path: "api-keys",
+            name: "api_keys",
+            builder: (context, state) => const ApiKeysScreen(),
+          ),
+
         ],
       ),
+
 
       GoRoute(
         path: '/expenses',

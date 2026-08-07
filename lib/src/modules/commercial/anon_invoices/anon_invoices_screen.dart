@@ -6,11 +6,25 @@ import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/cubits/write_invoice_cubit.dart';
 import 'package:kardex_app_front/src/tools/extensiones.dart';
 
+import 'view_controller.dart';
 import 'web/anon_invoices_screen_web.dart';
 import 'mobile/anon_invoices_screen_mobile.dart';
 
-class AnonInvoicesScreen extends StatelessWidget {
+class AnonInvoicesScreen extends StatefulWidget {
   const AnonInvoicesScreen({super.key});
+
+  @override
+  State<AnonInvoicesScreen> createState() => _AnonInvoicesScreenState();
+}
+
+class _AnonInvoicesScreenState extends State<AnonInvoicesScreen> {
+  late final AnonInvoiceViewController viewController;
+
+  @override
+  void initState() {
+    super.initState();
+    viewController = AnonInvoiceViewController();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +33,7 @@ class AnonInvoicesScreen extends StatelessWidget {
       child: BlocProvider(
         create: (context) => WriteAnonInvoiceCubit(
           invoicesRepository: invoiceRepo,
+          viewController: viewController,
         ),
         child: const _RootScaffold(),
       ),

@@ -79,6 +79,21 @@ class _Body extends StatelessWidget {
               },
             ),
           ),
+          const Divider(height: 0.0),
+          ShortcutAddableListTile(
+            routeName: RouteNames.invoicePayments,
+            child: ListTile(
+              leading: Icon(
+                FluentIcons.receipt_sparkles_24_filled,
+                size: 32,
+                color: Colors.teal.shade600,
+              ),
+              title: const Text("Abonos por Factura"),
+              onTap: () {
+                context.pushNamed("abonos-por-factura");
+              },
+            ),
+          ),
         ],
       ),
     );

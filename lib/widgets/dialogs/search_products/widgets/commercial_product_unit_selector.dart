@@ -6,10 +6,12 @@ class CommercialProductUnitSelector extends StatelessWidget {
     super.key,
     required this.result,
     required this.onChanged,
+    this.focusNode,
   });
 
   final CommercialProductResult result;
   final VoidCallback onChanged;
+  final FocusNode? focusNode;
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +39,7 @@ class CommercialProductUnitSelector extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         DropdownButtonFormField<int>(
+          focusNode: focusNode,
           initialValue: result.selectedUnitIndex,
           isExpanded: true,
           decoration: const InputDecoration(

@@ -37,7 +37,11 @@ class DatePickerButtonState extends State<DatePickerButton> {
     if (_selectedDate != null) {
       text = DateTimeTool.formatddMMyy(_selectedDate!);
 
-      if (_selectedDate!.day == DateTimeTool.getTodayMidnight().day) {
+      final todayMidnight = DateTimeTool.getTodayMidnight();
+
+      if (_selectedDate!.day == todayMidnight.day &&
+          _selectedDate!.month == todayMidnight.month &&
+          _selectedDate!.year == todayMidnight.year) {
         text = 'Hoy';
       }
     }
