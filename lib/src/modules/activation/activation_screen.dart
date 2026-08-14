@@ -8,6 +8,7 @@ import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/activation/cubit/activation_cubit.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/password_title_textfield.dart';
+import 'package:kardex_app_front/widgets/planet_orbit_logo.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
 
 class ActivationScreen extends StatelessWidget {
@@ -88,6 +89,8 @@ class _BodyState extends State<_Body> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              const PlanetOrbitLogo(size: 140),
+              const SizedBox(height: 12),
               Text(
                 "Bienvenido",
                 style: TextStyle(
@@ -96,7 +99,6 @@ class _BodyState extends State<_Body> {
                   color: Colors.white.withAlpha(210),
                 ),
               ),
-
               const SizedBox(height: 16),
               Card(
                 color: Colors.white.withAlpha(210),

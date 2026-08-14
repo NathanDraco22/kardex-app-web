@@ -62,7 +62,9 @@ class _HomeMobileBody extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 12),
               child: HomeMobileOptionCard(
                 title: option.title,
+                subtitle: option.subtitle,
                 icon: option.icon,
+                accentColor: option.accentColor,
                 onTap: option.onTap,
               ),
             ),
@@ -75,18 +77,24 @@ class _HomeMobileBody extends StatelessWidget {
 
 class HomeMobileOptionCard extends StatelessWidget {
   final String title;
+  final String? subtitle;
   final IconData icon;
+  final Color? accentColor;
   final VoidCallback onTap;
 
   const HomeMobileOptionCard({
     super.key,
     required this.title,
+    this.subtitle,
     required this.icon,
+    this.accentColor,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final effectiveColor = accentColor ?? Colors.indigo;
+
     return Ink(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -111,26 +119,45 @@ class HomeMobileOptionCard extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                width: 64,
-                height: 64,
+                width: 58,
+                height: 58,
                 decoration: BoxDecoration(
-                  color: Colors.indigo.shade50,
-                  borderRadius: BorderRadius.circular(16),
+                  color: effectiveColor.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(
                   icon,
-                  size: 36,
+                  color: effectiveColor,
+                  size: 30,
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 14),
               Expanded(
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
-                  ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 15.5,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    if (subtitle != null) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle!,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ],
                 ),
               ),
               Icon(

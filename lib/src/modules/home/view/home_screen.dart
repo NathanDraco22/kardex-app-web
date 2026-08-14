@@ -6,16 +6,19 @@ import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/cubits/shortcuts/shortcuts_cubit.dart';
 import 'package:kardex_app_front/cubits/toast/toast_cubit.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/src/core/access_manager.dart';
+import 'package:kardex_app_front/src/tools/extensiones.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 import 'package:kardex_app_front/widgets/gates/role_permission_gate.dart';
 import 'package:toastification/toastification.dart';
 import 'package:kardex_app_front/constants/route_names.dart';
-import 'widgets/home_card_option.dart';
+import 'widgets/home_desktop_card.dart';
 import 'widgets/home_end_drawer.dart';
 
-part 'web/home_web.dart';
 part 'mobile/home_mobile.dart';
+part 'tablet/home_tablet.dart';
+part 'desktop/home_desktop.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -193,16 +196,21 @@ class _Body extends StatelessWidget {
     final firstName = userName.split(" ")[0];
     final currentBranch = getIt<AuthCubit>().currentBranch;
 
-    final isMobile = MediaQuery.sizeOf(context).width < maxPhoneScreenWidth;
-
-    if (isMobile) {
+    if (context.isMobile()) {
       return _HomeMobileBody(
         firstName: firstName,
         currentBranch: currentBranch,
       );
     }
 
-    return _HomeWebBody(
+    if (context.isTablet()) {
+      return _HomeTabletBody(
+        firstName: firstName,
+        currentBranch: currentBranch,
+      );
+    }
+
+    return _HomeDesktopBody(
       firstName: firstName,
       currentBranch: currentBranch,
     );
@@ -212,12 +220,16 @@ class _Body extends StatelessWidget {
 class HomeOption {
   final List<Modules> permissions;
   final String title;
+  final String? subtitle;
+  final Color? accentColor;
   final IconData icon;
   final void Function() onTap;
 
   const HomeOption({
     required this.permissions,
     required this.title,
+    this.subtitle,
+    this.accentColor,
     required this.icon,
     required this.onTap,
   });
@@ -228,48 +240,64 @@ List<HomeOption> getHomeOptions(BuildContext context) {
     HomeOption(
       permissions: const [Modules.clients],
       title: "Lista de Clientes",
+      subtitle: "Directorio, saldos y grupos de clientes",
+      accentColor: const Color(0xFF2563EB),
       icon: FluentIcons.contact_card_16_filled,
       onTap: () => context.pushNamed("client-catalog"),
     ),
     HomeOption(
       permissions: const [Modules.products],
-      title: "Catalogo de Productos",
+      title: "Catálogo de Productos",
+      subtitle: "Inventario general, precios y categorías",
+      accentColor: const Color(0xFF7C3AED),
       icon: FluentIcons.receipt_bag_20_filled,
       onTap: () => context.pushNamed("product-catalog"),
     ),
     HomeOption(
       permissions: const [Modules.commercial],
       title: "Comercio",
+      subtitle: "Terminal de venta, facturación y pedidos",
+      accentColor: const Color(0xFF059669),
       icon: FluentIcons.money_calculator_20_filled,
       onTap: () => context.pushNamed("commercial"),
     ),
     HomeOption(
       permissions: const [Modules.pendingInvoices],
       title: "Cuentas por Cobrar",
+      subtitle: "Abonos, facturas pendientes y saldos",
+      accentColor: const Color(0xFFD97706),
       icon: FluentIcons.receipt_money_24_filled,
       onTap: () => context.pushNamed("pending-accounts"),
     ),
     HomeOption(
       permissions: const [Modules.inventory],
       title: "Inventario",
+      subtitle: "Entradas, salidas, ajustes y traslados",
+      accentColor: const Color(0xFFEA580C),
       icon: FluentIcons.box_toolbox_20_filled,
       onTap: () => context.pushNamed("inventory"),
     ),
     HomeOption(
       permissions: const [Modules.expenses],
       title: "Gastos",
+      subtitle: "Gastos operativos, proveedores y reportes",
+      accentColor: const Color(0xFFE11D48),
       icon: FluentIcons.money_24_regular,
       onTap: () => context.pushNamed("expenses"),
     ),
     HomeOption(
       permissions: const [Modules.finance],
       title: "Finanzas",
+      subtitle: "Flujo de caja, resúmenes y reportes",
+      accentColor: const Color(0xFF4F46E5),
       icon: FluentIcons.arrow_trending_lines_24_regular,
       onTap: () => context.pushNamed("finances"),
     ),
     HomeOption(
       permissions: const [Modules.settings],
       title: "Configuraciones",
+      subtitle: "Usuarios, sucursales e integraciones",
+      accentColor: const Color(0xFF475569),
       icon: FluentIcons.settings_20_filled,
       onTap: () => context.pushNamed("settings"),
     ),
