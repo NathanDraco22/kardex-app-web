@@ -9,12 +9,14 @@ class ElevatedCtrlButton extends StatelessWidget {
     required this.label,
     required this.hotKey,
     required this.icon,
+    this.focusNode,
   });
 
   final void Function()? onPressed;
   final String label;
   final String hotKey;
   final IconData icon;
+  final FocusNode? focusNode;
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +25,7 @@ class ElevatedCtrlButton extends StatelessWidget {
       hotKey: hotKey,
       onShortcut: onPressed ?? () {},
       child: ElevatedButton.icon(
+        focusNode: focusNode,
         onPressed: onPressed,
         icon: Icon(icon),
         label: Text(label),

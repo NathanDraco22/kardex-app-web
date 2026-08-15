@@ -28,10 +28,12 @@ class _SaleTerminalScreenState extends State<SaleTerminalScreen> {
       DeviceOrientation.landscapeRight,
     ]);
     viewController = SaleTerminalViewController();
+    viewController.requestSearchFocus();
   }
 
   @override
   void dispose() {
+    viewController.dispose();
     super.dispose();
 
     SystemChrome.setPreferredOrientations([
