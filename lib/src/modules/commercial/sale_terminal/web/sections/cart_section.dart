@@ -1,7 +1,33 @@
 part of '../sale_terminal_screen_web.dart';
 
-class _CartSection extends StatelessWidget {
+class _CartSection extends StatefulWidget {
   const _CartSection();
+
+  @override
+  State<_CartSection> createState() => _CartSectionState();
+}
+
+class _CartSectionState extends State<_CartSection> {
+  final ScrollController _scrollController = ScrollController();
+  int _lastItemCount = 0;
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +43,11 @@ class _CartSection extends StatelessWidget {
           child: ListenableBuilder(
             listenable: viewController,
             builder: (context, _) {
+              if (viewController.items.length > _lastItemCount) {
+                _scrollToBottom();
+              }
+              _lastItemCount = viewController.items.length;
+
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -37,7 +68,10 @@ class _CartSection extends StatelessWidget {
                       TextButton.icon(
                         onPressed: viewController.items.isEmpty
                             ? null
-                            : () => viewController.clear(),
+                            : () {
+                                _lastItemCount = 0;
+                                viewController.clear();
+                              },
                         icon: const Icon(Icons.delete_sweep_outlined, size: 18),
                         label: const Text("Vaciar venta"),
                       ),
@@ -48,6 +82,7 @@ class _CartSection extends StatelessWidget {
                     child: viewController.items.isEmpty
                         ? const _EmptyCart()
                         : ListView.separated(
+                            controller: _scrollController,
                             padding: const EdgeInsets.only(bottom: 8),
                             itemCount: viewController.items.length,
                             separatorBuilder: (context, index) => const SizedBox(height: 4),
