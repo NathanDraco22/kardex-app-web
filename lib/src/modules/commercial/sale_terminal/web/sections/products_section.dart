@@ -39,6 +39,7 @@ class _ProductsSectionState extends State<_ProductsSection> {
     result.quantity = 1;
     if (product.account.availableStock < (result.quantity * result.conversionFactor)) {
       DialogManager.showInfoDialog(context, "No hay stock disponible");
+      viewController.requestSearchFocus();
       return;
     }
     viewController.quickAddItem(result);
@@ -53,35 +54,47 @@ class _ProductsSectionState extends State<_ProductsSection> {
       preferredUnitType: viewController.isWholesale ? 'max' : 'min',
     );
     if (!context.mounted) return;
-    if (res == null) return;
+    if (res == null) {
+      viewController.requestSearchFocus();
+      return;
+    }
     if (res.product.account.availableStock == 0 ||
         res.product.account.availableStock < (res.quantity * res.conversionFactor)) {
       DialogManager.showInfoDialog(context, "No hay stock disponible");
+      viewController.requestSearchFocus();
       return;
     }
-    if (res.quantity == 0) return;
+    if (res.quantity == 0) {
+      viewController.requestSearchFocus();
+      return;
+    }
     viewController.addItem(res);
+    viewController.requestSearchFocus();
   }
 
   @override
   Widget build(BuildContext context) {
     final viewController = SaleTerminalWebMediator.of(context).viewController;
 
-    return Card(
-      margin: EdgeInsets.zero,
-      child: BlocBuilder<ReadTerminalProductCubit, ReadTerminalProductState>(
-        builder: (context, state) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (state is ReadTerminalProductLoading || state is ReadTerminalProductSearching)
-                const LinearProgressIndicator(minHeight: 3),
-              Expanded(
-                child: _buildContent(context, state, viewController),
-              ),
-            ],
-          );
-        },
+    return Focus(
+      canRequestFocus: false,
+      descendantsAreFocusable: false,
+      child: Card(
+        margin: EdgeInsets.zero,
+        child: BlocBuilder<ReadTerminalProductCubit, ReadTerminalProductState>(
+          builder: (context, state) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (state is ReadTerminalProductLoading || state is ReadTerminalProductSearching)
+                  const LinearProgressIndicator(minHeight: 3),
+                Expanded(
+                  child: _buildContent(context, state, viewController),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }

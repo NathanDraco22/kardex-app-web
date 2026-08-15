@@ -77,6 +77,8 @@ class TitleTextField extends StatelessWidget {
           readOnly: readOnly,
           textInputAction: textInputAction,
           onTap: onTap,
+          onTapOutside: (event) {},
+          onTapUpOutside: (event) {},
           style: style ?? const TextStyle(fontWeight: FontWeight.w500),
           textAlign: titleTextAlign ?? TextAlign.start,
           inputFormatters: inputFormatters,

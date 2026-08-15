@@ -59,6 +59,7 @@ class TerminalProductTile extends StatelessWidget {
       surfaceTintColor: Colors.transparent,
       clipBehavior: Clip.antiAlias,
       child: InkWell(
+        canRequestFocus: false,
         onTap: hasStock ? onTap : null,
         onLongPress: hasStock ? onLongPress : null,
         child: Opacity(

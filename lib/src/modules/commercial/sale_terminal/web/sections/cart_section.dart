@@ -7,67 +7,71 @@ class _CartSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewController = SaleTerminalWebMediator.of(context).viewController;
 
-    return Card(
-      margin: EdgeInsets.zero,
-      child: Padding(
-        padding: const EdgeInsets.all(8),
-        child: ListenableBuilder(
-          listenable: viewController,
-          builder: (context, _) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  children: [
-                    Flexible(
-                      child: Text(
-                        "Venta actual (${viewController.totalQuantity})",
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+    return Focus(
+      canRequestFocus: false,
+      descendantsAreFocusable: false,
+      child: Card(
+        margin: EdgeInsets.zero,
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: ListenableBuilder(
+            listenable: viewController,
+            builder: (context, _) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          "Venta actual (${viewController.totalQuantity})",
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
-                    ),
-                    const Spacer(),
-                    TextButton.icon(
-                      onPressed: viewController.items.isEmpty
-                          ? null
-                          : () => viewController.clear(),
-                      icon: const Icon(Icons.delete_sweep_outlined, size: 18),
-                      label: const Text("Vaciar venta"),
-                    ),
-                  ],
-                ),
-                const Divider(),
-                Expanded(
-                  child: viewController.items.isEmpty
-                      ? const _EmptyCart()
-                      : ListView.separated(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          itemCount: viewController.items.length,
-                          separatorBuilder: (context, index) => const SizedBox(height: 4),
-                          itemBuilder: (context, index) {
-                            final item = viewController.items[index];
-                            final color = index.isOdd ? Colors.white : Colors.grey.shade200;
-                            return _CartRow(
-                              key: ValueKey(item),
-                              color: color,
-                              item: item,
-                              onRemove: () => viewController.removeItem(item),
-                              onEdit: () => _editItem(context, viewController, item),
-                            );
-                          },
-                        ),
-                ),
-                const Divider(),
-                _TotalsSummary(viewController: viewController),
-                const SizedBox(height: 10),
-                _PayButton(viewController: viewController),
-              ],
-            );
-          },
+                      const Spacer(),
+                      TextButton.icon(
+                        onPressed: viewController.items.isEmpty
+                            ? null
+                            : () => viewController.clear(),
+                        icon: const Icon(Icons.delete_sweep_outlined, size: 18),
+                        label: const Text("Vaciar venta"),
+                      ),
+                    ],
+                  ),
+                  const Divider(),
+                  Expanded(
+                    child: viewController.items.isEmpty
+                        ? const _EmptyCart()
+                        : ListView.separated(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            itemCount: viewController.items.length,
+                            separatorBuilder: (context, index) => const SizedBox(height: 4),
+                            itemBuilder: (context, index) {
+                              final item = viewController.items[index];
+                              final color = index.isOdd ? Colors.white : Colors.grey.shade200;
+                              return _CartRow(
+                                key: ValueKey(item),
+                                color: color,
+                                item: item,
+                                onRemove: () => viewController.removeItem(item),
+                                onEdit: () => _editItem(context, viewController, item),
+                              );
+                            },
+                          ),
+                  ),
+                  const Divider(),
+                  _TotalsSummary(viewController: viewController),
+                  const SizedBox(height: 10),
+                  _PayButton(viewController: viewController),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
@@ -84,14 +88,22 @@ class _CartSection extends StatelessWidget {
       commercialProductResult: item,
     );
     if (!context.mounted) return;
-    if (res == null) return;
+    if (res == null) {
+      viewController.requestSearchFocus();
+      return;
+    }
     if (res.product.account.availableStock == 0 ||
         res.product.account.availableStock < (res.quantity * res.conversionFactor)) {
       DialogManager.showInfoDialog(context, "No hay stock disponible");
+      viewController.requestSearchFocus();
       return;
     }
-    if (res.quantity == 0) return;
+    if (res.quantity == 0) {
+      viewController.requestSearchFocus();
+      return;
+    }
     viewController.updateItem(item, res);
+    viewController.requestSearchFocus();
   }
 }
 
@@ -118,7 +130,12 @@ class _PayButton extends StatelessWidget {
       message: disabledMessage ?? "",
       child: CtrlKeyTip(
         hotKey: "G",
-        onShortcut: () => startTerminalPayment(context),
+        onShortcut: () async {
+          await startTerminalPayment(context);
+          if (context.mounted) {
+            viewController.requestSearchFocus();
+          }
+        },
         child: SizedBox(
           height: 64,
           width: double.infinity,
@@ -136,7 +153,14 @@ class _PayButton extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            onPressed: enabled ? () => startTerminalPayment(context) : null,
+            onPressed: enabled
+                ? () async {
+                    await startTerminalPayment(context);
+                    if (context.mounted) {
+                      viewController.requestSearchFocus();
+                    }
+                  }
+                : null,
             icon: const Icon(Icons.payments_outlined, size: 28),
             label: const Text("Cobrar"),
           ),
@@ -213,6 +237,7 @@ class _CartRow extends StatelessWidget {
         color: color,
         padding: const EdgeInsets.all(8),
         child: InkWell(
+          canRequestFocus: false,
           onLongPress: () async {
             final box = context.findRenderObject() as RenderBox?;
             final position = box?.localToGlobal(Offset.zero) ?? Offset.zero;

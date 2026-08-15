@@ -37,16 +37,23 @@ class SaleTerminalScreenWeb extends StatelessWidget {
       listener: (context, state) async {
         if (state is WriteTerminalInvoiceInProgress) {
           LoadingDialogManager.showLoadingDialog(context);
+          return;
         }
 
         if (state is WriteTerminalInvoiceError) {
           LoadingDialogManager.closeLoadingDialog(context);
-          DialogManager.showErrorDialog(context, state.message);
+          await DialogManager.showErrorDialog(context, state.message);
+          if (!context.mounted) return;
+          viewController.requestSearchFocus();
+          return;
         }
 
         if (state is WriteTerminalInvoiceSuccess) {
           LoadingDialogManager.closeLoadingDialog(context);
           await handleTerminalSaleCompletion(context, state.invoice);
+          if (!context.mounted) return;
+          viewController.requestSearchFocus();
+          return;
         }
       },
       child: SaleTerminalWebMediator(
@@ -91,34 +98,36 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Padding(
-        padding: EdgeInsets.all(4.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(
-              flex: 64,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  SizedBox(
-                    height: 240,
-                    child: _HeaderSection(),
-                  ),
-                  SizedBox(height: 8),
-                  Expanded(
-                    child: _ProductsSection(),
-                  ),
-                ],
+    return const TextFieldTapRegion(
+      child: Center(
+        child: Padding(
+          padding: EdgeInsets.all(4.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                flex: 64,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    SizedBox(
+                      height: 240,
+                      child: _HeaderSection(),
+                    ),
+                    SizedBox(height: 8),
+                    Expanded(
+                      child: _ProductsSection(),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            SizedBox(width: 8),
-            Expanded(
-              flex: 35,
-              child: _CartSection(),
-            ),
-          ],
+              SizedBox(width: 8),
+              Expanded(
+                flex: 35,
+                child: _CartSection(),
+              ),
+            ],
+          ),
         ),
       ),
     );
