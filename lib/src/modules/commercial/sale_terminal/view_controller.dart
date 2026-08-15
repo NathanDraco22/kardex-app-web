@@ -5,6 +5,8 @@ import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_resul
 import 'package:kardex_business/kardex_business.dart';
 
 class SaleTerminalViewController extends ChangeNotifier {
+  final FocusNode searchFocusNode = FocusNode();
+
   String description = '';
 
   List<CommercialProductResult> items = [];
@@ -111,6 +113,15 @@ class SaleTerminalViewController extends ChangeNotifier {
 
   void refresh() => notifyListeners();
 
+  void requestSearchFocus() {
+    if (searchFocusNode.hasFocus) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!searchFocusNode.hasFocus && searchFocusNode.canRequestFocus) {
+        searchFocusNode.requestFocus();
+      }
+    });
+  }
+
   void clear() {
     description = '';
     items = [];
@@ -118,6 +129,13 @@ class SaleTerminalViewController extends ChangeNotifier {
     _selectedPriceLevel = 1;
     selectedPaymentType = PaymentType.cash;
     notifyListeners();
+    requestSearchFocus();
+  }
+
+  @override
+  void dispose() {
+    searchFocusNode.dispose();
+    super.dispose();
   }
 
   List<SaleItem> createSaleItemFromCommercial() {
