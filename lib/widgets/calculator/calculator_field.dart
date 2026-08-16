@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:kardex_app_front/widgets/calculator/numpad.dart';
 
 class CalculatorField extends StatefulWidget {
-  const CalculatorField({super.key, this.onDone});
+  const CalculatorField({super.key, this.initialValue, this.onDone});
 
+  final String? initialValue;
   final void Function(String value)? onDone;
 
   @override
@@ -11,7 +12,13 @@ class CalculatorField extends StatefulWidget {
 }
 
 class _CalculatorFieldState extends State<CalculatorField> {
-  final TextEditingController _controller = TextEditingController(text: '0.00');
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialValue ?? '0.00');
+  }
 
   Future<void> _openCalculator() async {
     final result = await showModalBottomSheet<double>(

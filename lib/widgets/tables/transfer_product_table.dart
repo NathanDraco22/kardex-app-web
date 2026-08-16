@@ -353,11 +353,14 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
     expirationController = TextEditingController(
       text: widget.rowModel.expirationDate != null ? DateFormat('MM/yy').format(widget.rowModel.expirationDate!) : "",
     );
-    Future(
-      () {
-        expirationFocus.requestFocus();
-      },
-    );
+    if (widget.rowModel.quantity == 0) {
+      Future(
+        () {
+          if (!mounted) return;
+          expirationFocus.requestFocus();
+        },
+      );
+    }
   }
 
   @override

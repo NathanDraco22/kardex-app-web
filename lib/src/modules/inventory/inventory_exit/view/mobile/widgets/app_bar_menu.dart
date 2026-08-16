@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_entry/modals/confirmation_save_modal.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_exit/cubit/write_exit_doc_cubit.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_exit/view/mediator.dart';
-import 'package:kardex_app_front/config/get_it_config.dart';
-import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
 class ExitAppBarMenusButton extends StatelessWidget {
@@ -27,21 +24,20 @@ class _SaveButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mediator = InventoryExitMediator.watch(context)!;
-    final headerData = mediator.headerData;
+    final viewController = InventoryExitMediator.watch(context);
 
     void Function()? onPressed;
 
-    if (mediator.hasMobileAllRequiredFields()) {
+    if (viewController.hasAllRequiredFields) {
       onPressed = () async {
-        if (mediator.hasMobileProductWithZeroValue()) {
+        if (viewController.hasProductWithZeroValue) {
           DialogManager.showErrorDialog(context, "No se pueden guardar productos con valor 0");
           return;
         }
 
-        final rowCards = mediator.productListViewController.rowCards;
+        final rows = viewController.tableController.rows;
 
-        final confirmationItems = rowCards.map(
+        final confirmationItems = rows.map(
           (e) {
             return ConfirmationListItem(
               title: e.product.name,
@@ -65,36 +61,11 @@ class _SaveButton extends StatelessWidget {
 
         if (res != true) return;
 
-        final exitDocItems = mediator.productListViewController.rowCards.map((e) {
-          return ExitItem(
-            productId: e.product.id,
-            productName: e.product.name,
-            quantity: UnitConversionTool.toBaseQuantity(e.quantity, e.conversionFactor) * -1,
-            brandName: e.product.brandName,
-            unitName: UnitConversionTool.resolveUnitName(e.selectedUnitName, e.product.unitName),
-            code: e.product.code,
-            conversionFactor: e.conversionFactor,
-          );
-        });
+        final createExitDoc = viewController.generateCreateExitDoc();
+        if (createExitDoc == null) return;
 
         if (!context.mounted) return;
-
-        final authState = getIt<AuthCubit>().state;
-        if (authState is! Authenticated) throw Exception("User or branch not found");
-        final currentUser = authState.session.user;
-
-        final createExitDoct = CreateExitDoc(
-          clientId: headerData.client!.id,
-          docNumber: headerData.docNumber!,
-          docDate: headerData.docDate!,
-          branchId: getIt<AuthCubit>().currentBranchId,
-          items: exitDocItems.toList(),
-          createdBy: UserInfo(
-            id: currentUser.id,
-            name: currentUser.username,
-          ),
-        );
-        context.read<WriteExitDocCubit>().createNewExitDoc(createExitDoct);
+        context.read<WriteExitDocCubit>().createNewExitDoc(createExitDoc);
       };
     }
     return TextButton.icon(

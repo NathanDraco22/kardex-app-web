@@ -14,8 +14,8 @@ class _MobileScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mediator = AdjustExitMediator.read(context)!;
-    final type = mediator.type;
+    final viewController = AdjustExitMediator.read(context);
+    final type = viewController.type;
     String title = switch (type) {
       .adjust => "Salida por Ajuste de Inventario",
       .devolution => "Devoluciones",
@@ -28,7 +28,7 @@ class _MobileScaffold extends StatelessWidget {
           onPressed: () async {
             final res = await showSearchProductInBranchDelegate(context, true);
             if (res == null) return;
-            if (mediator.productListViewController.rowCards.length > 99) {
+            if (viewController.tableController.rows.length > 99) {
               if (!context.mounted) return;
               await DialogManager.showErrorDialog(context, "No se pueden agregar mas de 100 productos");
               return;
@@ -36,18 +36,17 @@ class _MobileScaffold extends StatelessWidget {
             if (!context.mounted) return;
             final unit = await showInventoryUnitPicker(context, res);
             if (unit == null) return;
-            final newRow = ProductRowCard(
+            final newRow = ProductRow(
               product: res,
               quantity: 0,
-              unitaryCost: res.account.averageCost * unit.conversionFactor,
+              unitaryCost: (res.account.averageCost * unit.conversionFactor).round(),
               editableCost: false,
               haveExpirationDate: false,
               selectedUnitIndex: unit.unitIndex,
               conversionFactor: unit.conversionFactor,
               selectedUnitName: unit.unitName,
             );
-            mediator.productListViewController.addRowCard(newRow);
-            mediator.refresh();
+            viewController.tableController.addRow(newRow);
           },
           label: const Text("Agregar Producto"),
           icon: const Icon(Icons.add),
@@ -56,7 +55,7 @@ class _MobileScaffold extends StatelessWidget {
       appBar: AppBar(
         leading: IconButton(
           onPressed: () async {
-            final allFields = mediator.hasMobileAllRequiredFields();
+            final allFields = viewController.hasAllRequiredFields;
             if (!allFields) {
               context.pop();
               return;
@@ -76,7 +75,7 @@ class _MobileScaffold extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.save),
             onPressed: () async {
-              if (!mediator.hasMobileAllRequiredFields() || mediator.hasMobileProductWithZeroValue()) {
+              if (!viewController.hasAllRequiredFields || viewController.hasProductWithZeroValue) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text("Complete todos los campos y asegúrese de que las cantidades sean mayores a 0"),
@@ -92,32 +91,8 @@ class _MobileScaffold extends StatelessWidget {
               if (res != true) return;
               if (!context.mounted) return;
 
-              final authState = getIt<AuthCubit>().state as Authenticated;
-              final currentUser = authState.session.user;
-
-              final items = mediator.productListViewController.rowCards.map((card) {
-                return AdjustExitItem(
-                  productId: card.product.id,
-                  productName: card.product.name,
-                  cost: UnitConversionTool.toBaseCost(card.unitaryCost, card.conversionFactor),
-                  quantity: UnitConversionTool.toBaseQuantity(card.quantity, card.conversionFactor) * -1,
-                  conversionFactor: card.conversionFactor,
-                  code: card.product.code,
-                  brandName: card.product.brandName,
-                  unitName: UnitConversionTool.resolveUnitName(card.selectedUnitName, card.product.unitName),
-                );
-              }).toList();
-
-              final createDto = CreateAdjustExit(
-                branchId: authState.branch.id,
-                description: mediator.headerData.description ?? "",
-                type: mediator.headerData.type,
-                items: items,
-                createdBy: UserInfo(
-                  id: currentUser.id,
-                  name: currentUser.username,
-                ),
-              );
+              final createDto = viewController.generateCreateAdjustExit();
+              if (createDto == null) return;
 
               context.read<WriteAdjustExitCubit>().createAdjustExit(createDto);
             },
@@ -134,7 +109,7 @@ class _MobileBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mediator = AdjustExitMediator.read(context)!;
+    final viewController = AdjustExitMediator.read(context);
     return Center(
       child: ListView(
         addAutomaticKeepAlives: true,
@@ -145,7 +120,7 @@ class _MobileBody extends StatelessWidget {
           Column(
             children: [
               InventoryMovementProductListView(
-                controller: mediator.productListViewController,
+                controller: viewController.tableController,
               ),
             ],
           ),
@@ -169,8 +144,7 @@ class _MobileHeaderSectionState extends State<_MobileHeaderSection> with Automat
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final mediator = AdjustExitMediator.read(context)!;
-    final headerData = mediator.headerData;
+    final viewController = AdjustExitMediator.watch(context);
     final currentBranch = (getIt<AuthCubit>().state as Authenticated).branch;
 
     return Card(
@@ -186,9 +160,7 @@ class _MobileHeaderSectionState extends State<_MobileHeaderSection> with Automat
                   initialValue: currentBranch.name,
                   readOnly: true,
                 ),
-
                 const SizedBox(height: 12),
-
                 Row(
                   children: [
                     Flexible(
@@ -197,10 +169,9 @@ class _MobileHeaderSectionState extends State<_MobileHeaderSection> with Automat
                           const Text("Fecha Doc"),
                           const SizedBox(height: 6),
                           DateFieldSelector(
-                            initDate: DateTime.now(),
+                            initDate: viewController.docDate,
                             onSelectedDate: (value) {
-                              headerData.docDate = value;
-                              mediator.refresh();
+                              viewController.docDate = value;
                             },
                           ),
                         ],
@@ -212,8 +183,9 @@ class _MobileHeaderSectionState extends State<_MobileHeaderSection> with Automat
                 TitleTextField(
                   title: "Observaciones",
                   maxLines: 2,
+                  initialValue: viewController.description,
                   onChanged: (val) {
-                    headerData.description = val;
+                    viewController.description = val;
                   },
                 ),
               ],

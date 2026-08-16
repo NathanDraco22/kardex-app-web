@@ -15,15 +15,13 @@ import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/widgets/dialogs/inventory_unit_picker.dart';
 
 import 'mediator.dart';
+import 'view_controller.dart';
 
 part 'web/adjust_entry_web_screen.dart';
 part 'web/sections/header_section.dart';
 part 'web/sections/content_section.dart';
 
 part 'mobile/adjust_entry_mobile_screen.dart';
-
-// Notification to rebuild the screen (clear data)
-class RebuildAdjustEntryScreenNotification extends Notification {}
 
 class AdjustEntryScreen extends StatefulWidget {
   const AdjustEntryScreen({super.key});
@@ -33,40 +31,29 @@ class AdjustEntryScreen extends StatefulWidget {
 }
 
 class _AdjustEntryScreenState extends State<AdjustEntryScreen> {
-  late AdjustEntryNotifier notifier;
-  bool rebuildScreen = false;
+  late final AdjustEntryViewController viewController;
 
   @override
   void initState() {
-    notifier = AdjustEntryNotifier();
     super.initState();
+    viewController = AdjustEntryViewController();
+  }
+
+  @override
+  void dispose() {
+    viewController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (rebuildScreen) {
-      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-        rebuildScreen = false;
-        setState(() {});
-      });
-      return const EmptyScaffold();
-    }
-
     final repo = context.read<AdjustEntriesRepository>();
 
-    return NotificationListener<RebuildAdjustEntryScreenNotification>(
-      onNotification: (notification) {
-        notifier = AdjustEntryNotifier();
-        rebuildScreen = true;
-        setState(() {});
-        return true;
-      },
-      child: BlocProvider(
-        create: (context) => WriteAdjustEntryCubit(repository: repo),
-        child: AdjustEntryMediator(
-          notifier: notifier,
-          child: const _RootScaffold(),
-        ),
+    return BlocProvider(
+      create: (context) => WriteAdjustEntryCubit(repository: repo),
+      child: AdjustEntryMediator(
+        viewController: viewController,
+        child: const _RootScaffold(),
       ),
     );
   }
@@ -77,6 +64,8 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final viewController = AdjustEntryMediator.watch(context);
+
     return BlocListener<WriteAdjustEntryCubit, WriteAdjustEntryState>(
       listener: (context, state) async {
         if (state is WriteAdjustEntryLoading) {
@@ -90,16 +79,16 @@ class _RootScaffold extends StatelessWidget {
           LoadingDialogManager.closeLoadingDialog(context);
           await DialogManager.showInfoDialog(context, "Ajuste de inventario guardado correctamente");
           if (!context.mounted) return;
-          RebuildAdjustEntryScreenNotification().dispatch(context);
+          viewController.clear();
         }
       },
-      child: const _RootBody(),
+      child: _RootBody(key: viewController.formKey),
     );
   }
 }
 
 class _RootBody extends StatelessWidget {
-  const _RootBody();
+  const _RootBody({super.key});
 
   @override
   Widget build(BuildContext context) {

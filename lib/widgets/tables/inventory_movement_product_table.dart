@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:kardex_app_front/widgets/buttons/elevated_ctrl_button.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
@@ -46,6 +47,9 @@ class ProductTableController extends ChangeNotifier {
   );
 
   bool get hasRows => rows.isNotEmpty;
+  bool get hasRowCards => rows.isNotEmpty;
+
+  List<ProductRow> get rowCards => rows;
 
   void refresh() => notifyListeners();
 
@@ -64,16 +68,23 @@ class ProductTableController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void addRowCard(ProductRow newRow) => addRow(newRow);
+
   void removeRow(ProductRow row) {
     rows.remove(row);
     notifyListeners();
   }
 
+  void removeRowCard(ProductRow row) => removeRow(row);
+
   void updateRow(ProductRow oldProductRow, ProductRow newProductRow) {
     final index = rows.indexOf(oldProductRow);
+    if (index == -1) return;
     rows[index] = newProductRow;
     notifyListeners();
   }
+
+  void updateRowCard(ProductRow oldProductRow, ProductRow newProductRow) => updateRow(oldProductRow, newProductRow);
 }
 
 class _TableMediator extends InheritedNotifier<ProductTableController> {
@@ -343,22 +354,40 @@ class EntryRow extends StatefulWidget {
 class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin {
   final expirationDateFocus = FocusNode();
   final focusNode = FocusNode();
+  late final TextEditingController expirationController;
+  late final TextEditingController quantityController;
+
   @override
   void initState() {
     super.initState();
-    Future(
-      () {
-        if (widget.rowModel.haveExpirationDate) {
-          expirationDateFocus.requestFocus();
-        } else {
-          focusNode.requestFocus();
-        }
-      },
+    expirationController = TextEditingController(
+      text: widget.rowModel.expirationDate != null
+          ? DateFormat('MM/yy').format(widget.rowModel.expirationDate!)
+          : '',
     );
+    quantityController = TextEditingController(
+      text: widget.rowModel.quantity > 0 ? widget.rowModel.quantity.toString() : '',
+    );
+
+    if (widget.rowModel.quantity == 0) {
+      Future(
+        () {
+          if (!mounted) return;
+          if (widget.rowModel.haveExpirationDate) {
+            expirationDateFocus.requestFocus();
+          } else {
+            focusNode.requestFocus();
+          }
+        },
+      );
+    }
   }
 
   @override
   void dispose() {
+    expirationController.dispose();
+    quantityController.dispose();
+    expirationDateFocus.dispose();
     focusNode.dispose();
     super.dispose();
   }
@@ -431,6 +460,7 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       TextField(
+                        controller: expirationController,
                         focusNode: expirationDateFocus,
                         keyboardType: const TextInputType.numberWithOptions(decimal: false),
                         inputFormatters: [MonthYearInputFormatter()],
@@ -462,6 +492,7 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   TextField(
+                    controller: quantityController,
                     focusNode: focusNode,
                     keyboardType: const TextInputType.numberWithOptions(decimal: false),
                     inputFormatters: [IntegerTextInputFormatter()],
