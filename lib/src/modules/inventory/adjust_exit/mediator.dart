@@ -1,72 +1,27 @@
 import 'package:flutter/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
-import 'package:kardex_app_front/widgets/custom_listviews/inventory_movement_product_list_view.dart';
-import 'package:kardex_app_front/widgets/tables/inventory_movement_product_table.dart';
+import 'view_controller.dart';
 
-class AdjustExitHeaderData {
-  String? description;
-  DateTime? docDate;
-  AdjustExitType type = AdjustExitType.loss; // Default to loss or adjust? Assuming adjust logic applies.
-}
-
-class AdjustExitNotifier extends ChangeNotifier {
-  void refresh() {
-    notifyListeners();
-  }
-}
-
-class AdjustExitMediator extends InheritedNotifier<AdjustExitNotifier> {
-  final AdjustExitType type;
-
-  AdjustExitMediator({
+class AdjustExitMediator extends InheritedNotifier<AdjustExitViewController> {
+  const AdjustExitMediator({
     super.key,
     required super.child,
-    required super.notifier,
-    required this.type,
-  }) {
-    headerData.type = type;
-  }
+    required AdjustExitViewController viewController,
+  }) : super(notifier: viewController);
 
-  static AdjustExitMediator? read(BuildContext context) {
-    final element = context.getElementForInheritedWidgetOfExactType<AdjustExitMediator>();
-    return element?.widget as AdjustExitMediator?;
-  }
+  AdjustExitViewController get viewController => notifier!;
+  AdjustExitType get type => viewController.type;
 
-  static AdjustExitMediator? watch(BuildContext context) {
+  static AdjustExitMediator of(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<AdjustExitMediator>()!;
   }
 
-  final AdjustExitHeaderData headerData = AdjustExitHeaderData();
-  final ProductTableController productTableController = ProductTableController();
-  final ProductListViewController productListViewController = ProductListViewController();
-
-  void refresh() {
-    notifier?.refresh();
+  static AdjustExitViewController read(BuildContext context) {
+    final element = context.getElementForInheritedWidgetOfExactType<AdjustExitMediator>();
+    return (element?.widget as AdjustExitMediator).viewController;
   }
 
-  bool hasAllRequiredFields() {
-    if (productTableController.rows.isEmpty) return false;
-    return true;
-  }
-
-  bool hasMobileAllRequiredFields() {
-    if (productListViewController.rowCards.isEmpty) return false;
-    return true;
-  }
-
-  bool hasProductWithZeroValue() {
-    final rows = productTableController.rows;
-    for (var row in rows) {
-      if (row.quantity == 0) return true;
-    }
-    return false;
-  }
-
-  bool hasMobileProductWithZeroValue() {
-    final rows = productListViewController.rowCards;
-    for (var row in rows) {
-      if (row.quantity == 0) return true;
-    }
-    return false;
+  static AdjustExitViewController watch(BuildContext context) {
+    return of(context).viewController;
   }
 }

@@ -14,13 +14,13 @@ class _WebScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mediator = InventoryEntryMediator.read(context)!;
+    final viewController = InventoryEntryMediator.read(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Entrada de Inventario"),
         leading: IconButton(
           onPressed: () async {
-            final allFields = mediator.hasAllRequiredFields();
+            final allFields = viewController.hasAllRequiredFields;
             if (!allFields) {
               context.pop();
               return;

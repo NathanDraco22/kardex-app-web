@@ -5,15 +5,13 @@ class _HeaderSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mediator = InventoryEntryMediator.read(context)!;
-    final headerData = mediator.headerData;
+    final viewController = InventoryEntryMediator.watch(context);
     return Row(
       children: [
         SizedBox(
           width: 380,
           child: Card(
             margin: EdgeInsets.zero,
-
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
@@ -28,7 +26,8 @@ class _HeaderSection extends StatelessWidget {
                       ),
                       const SizedBox(height: 6),
                       CustomAutocompleteTextfield<SupplierInDb>(
-                        onClose: (value) => headerData.supplier = value,
+                        initValue: viewController.selectedSupplier,
+                        onClose: (value) => viewController.selectedSupplier = value,
                         titleBuilder: (value) => value.name,
                         onSearch: (value) async {
                           final repo = context.read<SuppliersRepository>();
@@ -47,9 +46,8 @@ class _HeaderSection extends StatelessWidget {
                               return ListTile(
                                 title: Text(supplier.name),
                                 onTap: () {
-                                  headerData.supplier = supplier;
+                                  viewController.selectedSupplier = supplier;
                                   close(supplier);
-                                  mediator.refresh();
                                 },
                               );
                             },
@@ -64,9 +62,9 @@ class _HeaderSection extends StatelessWidget {
                       Flexible(
                         child: TitleTextField(
                           title: "Documento",
+                          initialValue: viewController.docNumber,
                           onChanged: (value) {
-                            headerData.docNumber = value;
-                            mediator.refresh();
+                            viewController.docNumber = value;
                           },
                         ),
                       ),
@@ -77,9 +75,9 @@ class _HeaderSection extends StatelessWidget {
                             const Text("Fecha Doc"),
                             const SizedBox(height: 6),
                             DateFieldSelector(
+                              initDate: viewController.docDate,
                               onSelectedDate: (value) {
-                                headerData.docDate = value;
-                                mediator.refresh();
+                                viewController.docDate = value;
                               },
                             ),
                           ],
@@ -93,7 +91,6 @@ class _HeaderSection extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
-
         Flexible(
           fit: FlexFit.tight,
           child: Card(
@@ -127,8 +124,9 @@ class _HeaderSection extends StatelessWidget {
                                 child: TitleTextField(
                                   title: "Observaciones",
                                   maxLines: 2,
-                                  onChanged: (p0) {
-                                    headerData.observations = p0;
+                                  initialValue: viewController.observations,
+                                  onChanged: (value) {
+                                    viewController.observations = value;
                                   },
                                 ),
                               ),
@@ -158,9 +156,9 @@ class MenuActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mediator = InventoryEntryMediator.watch(context)!;
+    final viewController = InventoryEntryMediator.watch(context);
 
-    final isDisabled = !mediator.hasAllRequiredFields();
+    final isDisabled = !viewController.hasAllRequiredFields;
 
     return Row(
       spacing: 8,
@@ -173,10 +171,8 @@ class MenuActions extends StatelessWidget {
             await context.pushNamed("suppliers-catalog");
           },
           icon: FluentIcons.building_multiple_20_filled,
-
           label: "Proveedores",
         ),
-
         ElevatedCtrlButton(
           hotKey: "5",
           onPressed: () async {
@@ -185,9 +181,7 @@ class MenuActions extends StatelessWidget {
           icon: FluentIcons.cube_12_filled,
           label: "Productos",
         ),
-
         const Spacer(),
-
         ElevatedCtrlButton(
           hotKey: "G",
           onPressed: isDisabled ? null : () => saveAction(context),
@@ -200,11 +194,9 @@ class MenuActions extends StatelessWidget {
 }
 
 Future<void> saveAction(BuildContext context) async {
-  final mediator = InventoryEntryMediator.read(context)!;
-  if (!mediator.hasAllRequiredFields()) return;
-  final headerData = mediator.headerData;
-  final productTableController = mediator.productTableController;
-  if (mediator.hasProductWithZeroValue()) {
+  final viewController = InventoryEntryMediator.read(context);
+  if (!viewController.hasAllRequiredFields) return;
+  if (viewController.hasProductWithZeroValue) {
     await DialogManager.showErrorDialog(context, "No se pueden guardar productos con valor 0");
     return;
   }
@@ -216,36 +208,9 @@ Future<void> saveAction(BuildContext context) async {
 
   if (res != true) return;
 
-  final items = productTableController.rows.map((e) {
-    return EntryItem(
-      productId: e.product.id,
-      productName: e.product.name,
-      quantity: UnitConversionTool.toBaseQuantity(e.quantity, e.conversionFactor),
-      cost: UnitConversionTool.toBaseCost(e.unitaryCost, e.conversionFactor),
-      conversionFactor: e.conversionFactor,
-      code: e.product.code,
-      brandName: e.product.brandName,
-      unitName: UnitConversionTool.resolveUnitName(e.selectedUnitName, e.product.unitName),
-      expirationDate: e.expirationDate?.millisecondsSinceEpoch,
-    );
-  }).toList();
+  final createEntryDoc = viewController.generateCreateEntryDoc();
+  if (createEntryDoc == null) return;
 
   if (!context.mounted) return;
-
-  final authState = getIt<AuthCubit>().state;
-  if (authState is! Authenticated) throw Exception("User or branch not found");
-  final currentUser = authState.session.user;
-
-  final createEntryDoct = CreateEntryDoc(
-    supplierId: headerData.supplier!.id,
-    docNumber: headerData.docNumber!,
-    docDate: headerData.docDate!,
-    branchId: getIt<AuthCubit>().currentBranchId,
-    items: items,
-    createdBy: UserInfo(
-      id: currentUser.id,
-      name: currentUser.username,
-    ),
-  );
-  context.read<WriteEntryDocCubit>().createNewEntryDoc(createEntryDoct);
+  context.read<WriteEntryDocCubit>().createNewEntryDoc(createEntryDoc);
 }

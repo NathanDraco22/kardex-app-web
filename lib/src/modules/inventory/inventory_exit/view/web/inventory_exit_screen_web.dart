@@ -3,8 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_exit/cubit/write_exit_doc_cubit.dart';
-import 'package:kardex_app_front/config/get_it_config.dart';
-import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/widgets/buttons/elevated_ctrl_button.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/search_product_in_branch_dialog.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
@@ -22,13 +20,13 @@ class InventoryExitScreenWeb extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mediator = InventoryExitMediator.read(context)!;
+    final viewController = InventoryExitMediator.read(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Salida de Inventario"),
         leading: IconButton(
           onPressed: () async {
-            final allFields = mediator.hasAllRequiredFields();
+            final allFields = viewController.hasAllRequiredFields;
             if (!allFields) {
               context.pop();
               return;

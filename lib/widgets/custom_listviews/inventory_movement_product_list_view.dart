@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/tools/input_formatter/input_formatter.dart';
@@ -7,72 +8,8 @@ import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/widgets/dialogs/inventory_unit_picker.dart';
 
-class ProductRowCard {
-  ProductRowCard({
-    required this.product,
-    this.quantity = 0,
-    this.unitaryCost = 0,
-    this.editableCost = false,
-    this.expirationDate,
-    this.haveExpirationDate = true,
-    this.selectedUnitIndex = 0,
-    this.conversionFactor = 1,
-    this.selectedUnitName = '',
-  });
-
-  ProductInDb product;
-  int quantity = 0;
-  int unitaryCost = 0;
-  DateTime? expirationDate;
-
-  bool editableCost;
-  bool haveExpirationDate;
-
-  int selectedUnitIndex;
-  int conversionFactor;
-  String selectedUnitName;
-
-  int get subTotal => (quantity * unitaryCost);
-}
-
-class ProductListViewController extends ChangeNotifier {
-  List<ProductRowCard> rowCards = [];
-
-  int get total => rowCards.fold<int>(
-    0,
-    (previousValue, element) => previousValue + element.subTotal,
-  );
-
-  bool get hasRowCards => rowCards.isNotEmpty;
-
-  void refresh() => notifyListeners();
-
-  void clear() {
-    rowCards.clear();
-    notifyListeners();
-  }
-
-  void addRowCard(ProductRowCard newRow) {
-    final isAlreadyExists = rowCards.any(
-      (oldRow) => oldRow.product.id == newRow.product.id,
-    );
-    if (isAlreadyExists) return;
-
-    rowCards.add(newRow);
-    notifyListeners();
-  }
-
-  void removeRowCard(ProductRowCard row) {
-    rowCards.remove(row);
-    notifyListeners();
-  }
-
-  void updateRowCard(ProductRowCard oldProductRow, ProductRowCard newProductRow) {
-    final index = rowCards.indexOf(oldProductRow);
-    rowCards[index] = newProductRow;
-    notifyListeners();
-  }
-}
+typedef ProductRowCard = ProductRow;
+typedef ProductListViewController = ProductTableController;
 
 class _ListViewMediator extends InheritedNotifier<ProductListViewController> {
   const _ListViewMediator({
@@ -202,6 +139,8 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
   final focusNode = FocusNode();
   final expirationDateFocusNode = FocusNode();
   final parentFocus = FocusNode();
+  late final TextEditingController expirationController;
+  late final TextEditingController quantityController;
 
   @override
   bool get wantKeepAlive => true;
@@ -209,9 +148,35 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
   @override
   void initState() {
     super.initState();
-    Future(() {
-      expirationDateFocusNode.requestFocus();
-    });
+    expirationController = TextEditingController(
+      text: widget.rowCardModel.expirationDate != null
+          ? DateFormat('MM/yy').format(widget.rowCardModel.expirationDate!)
+          : '',
+    );
+    quantityController = TextEditingController(
+      text: widget.rowCardModel.quantity > 0 ? widget.rowCardModel.quantity.toString() : '',
+    );
+
+    if (widget.rowCardModel.quantity == 0) {
+      Future(() {
+        if (!mounted) return;
+        if (widget.rowCardModel.haveExpirationDate) {
+          expirationDateFocusNode.requestFocus();
+        } else {
+          focusNode.requestFocus();
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    expirationController.dispose();
+    quantityController.dispose();
+    focusNode.dispose();
+    expirationDateFocusNode.dispose();
+    parentFocus.dispose();
+    super.dispose();
   }
 
   Offset? offset;
@@ -275,7 +240,7 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
                       const SizedBox(width: 8),
                       Expanded(
                         child: Column(
-                          crossAxisAlignment: .start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               product.name,
@@ -346,11 +311,12 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
                           Flexible(
                             fit: FlexFit.tight,
                             child: TitleTextField(
+                              controller: expirationController,
                               focusNode: expirationDateFocusNode,
                               inputFormatters: [MonthYearInputFormatter()],
                               titleTextAlign: TextAlign.center,
                               keyboardType: TextInputType.number,
-                              textInputAction: .next,
+                              textInputAction: TextInputAction.next,
                               onEditingComplete: () => FocusScope.of(context).nextFocus(),
                               title: "F. Vencimiento",
                               onChanged: (value) {
@@ -377,6 +343,7 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             TitleTextField(
+                              controller: quantityController,
                               focusNode: focusNode,
                               inputFormatters: [IntegerTextInputFormatter()],
                               titleTextAlign: TextAlign.center,
@@ -448,6 +415,7 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
                               children: [
                                 const Text("Costo Unitario"),
                                 CalculatorField(
+                                  initialValue: formattedCost,
                                   onDone: (value) {
                                     if (value.isEmpty) {
                                       rowCard.unitaryCost = 0;

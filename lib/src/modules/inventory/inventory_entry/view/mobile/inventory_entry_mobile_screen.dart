@@ -14,7 +14,7 @@ class _MobileScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mediator = InventoryEntryMediator.read(context)!;
+    final viewController = InventoryEntryMediator.read(context);
     return Scaffold(
       floatingActionButton: Visibility(
         visible: MediaQuery.viewInsetsOf(context).bottom == 0.0,
@@ -22,7 +22,7 @@ class _MobileScaffold extends StatelessWidget {
           onPressed: () async {
             final res = await showProductSearchDelegate(context);
             if (res == null) return;
-            if (mediator.productListViewController.rowCards.length > 99) {
+            if (viewController.tableController.rows.length > 99) {
               if (!context.mounted) return;
               await DialogManager.showErrorDialog(context, "No se pueden agregar mas de 100 productos");
               return;
@@ -30,17 +30,16 @@ class _MobileScaffold extends StatelessWidget {
             if (!context.mounted) return;
             final unit = await showInventoryUnitPicker(context, res);
             if (unit == null) return;
-            final newRow = ProductRowCard(
+            final newRow = ProductRow(
               product: res,
               quantity: 0,
-              unitaryCost: (res is ProductInDbInBranch) ? (res.account.averageCost * unit.conversionFactor) : 0,
+              unitaryCost: (res is ProductInDbInBranch) ? (res.account.averageCost * unit.conversionFactor).round() : 0,
               editableCost: true,
               selectedUnitIndex: unit.unitIndex,
               conversionFactor: unit.conversionFactor,
               selectedUnitName: unit.unitName,
             );
-            mediator.productListViewController.addRowCard(newRow);
-            mediator.refresh();
+            viewController.tableController.addRow(newRow);
           },
           label: const Text("Agregar Producto"),
           icon: const Icon(Icons.add),
@@ -49,7 +48,7 @@ class _MobileScaffold extends StatelessWidget {
       appBar: AppBar(
         leading: IconButton(
           onPressed: () async {
-            final allFields = mediator.hasMobileAllRequiredFields();
+            final allFields = viewController.hasAllRequiredFields;
             if (!allFields) {
               context.pop();
               return;
@@ -76,7 +75,6 @@ class _MobileScaffold extends StatelessWidget {
       ),
       endDrawer: Drawer(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        // backgroundColor: Colors.transparent,
         child: Column(
           children: [
             DrawerHeader(
@@ -122,7 +120,7 @@ class _MobileBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mediator = InventoryEntryMediator.read(context)!;
+    final viewController = InventoryEntryMediator.read(context);
     return Center(
       child: ListView(
         addAutomaticKeepAlives: true,
@@ -134,11 +132,10 @@ class _MobileBody extends StatelessWidget {
           const SizedBox(
             height: 12,
           ),
-
           Column(
             children: [
               InventoryMovementProductListView(
-                controller: mediator.productListViewController,
+                controller: viewController.tableController,
               ),
             ],
           ),
@@ -162,8 +159,7 @@ class _MobileHeaderSectionState extends State<_MobileHeaderSection> with Automat
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final mediator = InventoryEntryMediator.read(context)!;
-    final headerData = mediator.headerData;
+    final viewController = InventoryEntryMediator.watch(context);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -178,8 +174,8 @@ class _MobileHeaderSectionState extends State<_MobileHeaderSection> with Automat
                 ),
                 const SizedBox(height: 6),
                 CustomAutocompleteTextfield<SupplierInDb>(
-                  initValue: headerData.supplier,
-                  onClose: (value) => headerData.supplier = value,
+                  initValue: viewController.selectedSupplier,
+                  onClose: (value) => viewController.selectedSupplier = value,
                   titleBuilder: (value) => value.name,
                   onSearch: (value) async {
                     final repo = context.read<SuppliersRepository>();
@@ -198,46 +194,39 @@ class _MobileHeaderSectionState extends State<_MobileHeaderSection> with Automat
                         return ListTile(
                           title: Text(supplier.name),
                           onTap: () {
-                            headerData.supplier = supplier;
+                            viewController.selectedSupplier = supplier;
                             close(supplier);
-                            mediator.refresh();
                           },
                         );
                       },
                     );
                   },
                 ),
-
                 const SizedBox(height: 12),
-
                 Row(
                   children: [
                     Flexible(
                       child: TitleTextField(
-                        initialValue: headerData.docNumber,
+                        initialValue: viewController.docNumber,
                         title: "Documento",
                         keyboardType: TextInputType.number,
                         onChanged: (value) {
-                          headerData.docNumber = value;
-                          mediator.refresh();
+                          viewController.docNumber = value;
                         },
                       ),
                     ),
-
                     const SizedBox(
                       width: 12,
                     ),
-
                     Flexible(
                       child: Column(
                         children: [
                           const Text("Fecha Doc"),
                           const SizedBox(height: 6),
                           DateFieldSelector(
-                            initDate: headerData.docDate,
+                            initDate: viewController.docDate,
                             onSelectedDate: (value) {
-                              headerData.docDate = value;
-                              mediator.refresh();
+                              viewController.docDate = value;
                             },
                           ),
                         ],
@@ -245,12 +234,14 @@ class _MobileHeaderSectionState extends State<_MobileHeaderSection> with Automat
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 12),
-
-                const TitleTextField(
+                TitleTextField(
                   title: "Observaciones",
                   maxLines: 2,
+                  initialValue: viewController.observations,
+                  onChanged: (value) {
+                    viewController.observations = value;
+                  },
                 ),
               ],
             ),
