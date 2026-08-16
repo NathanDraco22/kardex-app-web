@@ -68,6 +68,7 @@ class TransferProductTableController extends ChangeNotifier {
 
   void updateRow(TransferProductRow oldProductRow, TransferProductRow newProductRow) {
     final index = rows.indexOf(oldProductRow);
+    if (index == -1) return;
     rows[index] = newProductRow;
     notifyListeners();
   }
