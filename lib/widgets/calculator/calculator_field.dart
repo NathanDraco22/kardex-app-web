@@ -20,6 +20,14 @@ class _CalculatorFieldState extends State<CalculatorField> {
     _controller = TextEditingController(text: widget.initialValue ?? '0.00');
   }
 
+  @override
+  void didUpdateWidget(covariant CalculatorField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialValue != null && widget.initialValue != oldWidget.initialValue) {
+      _controller.text = widget.initialValue!;
+    }
+  }
+
   Future<void> _openCalculator() async {
     final result = await showModalBottomSheet<double>(
       context: context,
