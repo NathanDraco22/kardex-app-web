@@ -104,6 +104,17 @@ class _RootScaffold extends StatelessWidget {
 
         if (state is WriteOrderSuccess) {
           orderContainer.updateOrder(state.order);
+          if (state.order.status == OrderStatus.cancelled) {
+            LoadingDialogManager.closeLoadingDialog(context);
+            String message = "Cotización cancelada con éxito";
+            await DialogManager.showInfoDialog(context, message);
+            if (!context.mounted) return;
+            final readCubit = context.read<ReadProformaCubit>();
+            await readCubit.deleteOrderDraft(state.order.id);
+            if (!context.mounted) return;
+            Navigator.pop(context, state.order);
+            return;
+          }
           if (!context.mounted) return;
           final readCubit = context.read<ReadProformaCubit>();
           await readCubit.updateOrderCache(state.order);
@@ -209,7 +220,10 @@ class _RootScaffold extends StatelessWidget {
                     onPressed: () async {
                       final res = await showCancelOrderInvoiceModal(context, orderContainer.order);
                       if (res != true) return;
-                      writeCubit.deleteOrderDraft(orderContainer.order.id);
+                      writeCubit.updateOrder(
+                        orderContainer.order.id,
+                        UpdateOrder(status: OrderStatus.cancelled),
+                      );
                     },
                     icon: const Icon(Icons.cancel),
                     label: const Text("Cancelar"),

@@ -10,4 +10,18 @@ class InvoiceDevolutionsDataSource with HttpService {
     final res = await getQuery(uri, headers: headers);
     return res;
   }
+
+  Future<Map<String, dynamic>> getInvoicesWithDevolutions(String docNumber) async {
+    final uri = HttpTools.generateUri("$_endpoint/invoice-doc-number/$docNumber");
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
+    return res;
+  }
+
+  Future<Map<String, dynamic>> getInvoiceDevolutionsById(String invoiceId) async {
+    final uri = HttpTools.generateUri("$_endpoint/$invoiceId");
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
+    return res;
+  }
 }

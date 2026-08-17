@@ -71,7 +71,7 @@ class _ContentSection extends StatelessWidget {
                 tileColor: tileColor,
                 onTap: () {
                   if (currentInvoice.amountPaid > 0) {
-                    DialogManager.showInfoDialog(context, "No puedes devolver una factura con pagos");
+                    DialogManager.showInfoDialog(context, "Los clientes de crédito con facturas abonadas no pueden hacer devoluciones de productos");
                     return;
                   }
                   Navigator.push(

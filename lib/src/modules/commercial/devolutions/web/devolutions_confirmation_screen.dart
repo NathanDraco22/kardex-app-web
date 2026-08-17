@@ -4,16 +4,16 @@ import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
-import 'package:kardex_app_front/src/modules/commercial/anon_devolution/cubit/write_anon_devolution_cubit.dart';
+import 'package:kardex_app_front/src/modules/commercial/devolutions/cubit/write_devolution_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_devolution/modals/confirm_devolution_modal.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/devolution_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 
-part 'anon_devolution_confirmation_sections/content_section.dart';
-part 'anon_devolution_confirmation_sections/header_section.dart';
+part 'devolutions_confirmation_sections/content_section.dart';
+part 'devolutions_confirmation_sections/header_section.dart';
 
-class AnonDevolutionConfirmationScreen extends StatelessWidget {
-  const AnonDevolutionConfirmationScreen({
+class DevolutionsConfirmationScreen extends StatelessWidget {
+  const DevolutionsConfirmationScreen({
     super.key,
     required this.invoice,
     required this.selectedItems,
@@ -28,7 +28,7 @@ class AnonDevolutionConfirmationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final devolutionsRepo = context.read<DevolutionsRepository>();
     return BlocProvider(
-      create: (context) => WriteAnonDevolutionCubit(devolutionsRepository: devolutionsRepo),
+      create: (context) => WriteDevolutionCubit(devolutionsRepository: devolutionsRepo),
       child: _RootScaffold(
         invoice: invoice,
         selectedItems: selectedItems,
@@ -51,7 +51,7 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final writeCubit = context.read<WriteAnonDevolutionCubit>();
+    final writeCubit = context.read<WriteDevolutionCubit>();
     final authCubit = getIt<AuthCubit>();
     final authState = authCubit.state;
 
@@ -66,18 +66,18 @@ class _RootScaffold extends StatelessWidget {
     return BlocListener(
       bloc: writeCubit,
       listener: (context, state) async {
-        if (state is WriteAnonDevolutionInProgress) {
+        if (state is WriteDevolutionInProgress) {
           LoadingDialogManager.showLoadingDialog(context);
         }
 
-        if (state is WriteAnonDevolutionError) {
+        if (state is WriteDevolutionError) {
           LoadingDialogManager.closeLoadingDialog(context);
           DialogManager.showErrorDialog(context, state.error);
         }
 
-        if (state is WriteAnonDevolutionSuccess) {
+        if (state is WriteDevolutionSuccess) {
           LoadingDialogManager.closeLoadingDialog(context);
-          await DialogManager.showInfoDialog(context, "Devolución guardada con éxito");
+          await DialogManager.showInfoDialog(context, "Devolución guardada con éxito");
           if (!context.mounted) return;
           await showDevolutionViewerDialog(context, state.devolution);
           if (!context.mounted) return;
@@ -88,7 +88,7 @@ class _RootScaffold extends StatelessWidget {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Confirmar (Anónima)"),
+          title: const Text("Confirmar Devolución"),
         ),
         body: _Body(
           invoice: invoice,
