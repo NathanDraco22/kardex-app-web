@@ -531,25 +531,25 @@ class _Body extends StatelessWidget {
             ),
           ),
 
-          // const Divider(height: 0.0),
+          const Divider(height: 0.0),
 
-          // RolePermissionGate(
-          //   permissions: [CommercialSubModules.createDevolution],
-          //   child: ShortcutAddableListTile(
-          //     routeName: RouteNames.clientDevolution,
-          //     child: ListTile(
-          //       leading: Icon(
-          //         Icons.file_open_rounded,
-          //         size: 32,
-          //         color: Colors.blue.shade600,
-          //       ),
-          //       title: const Text("Crear Devolucion de Productos a Clientes"),
-          //       onTap: () {
-          //         context.pushNamed("client-devolution");
-          //       },
-          //     ),
-          //   ),
-          // ),
+          RolePermissionGate(
+            permissions: [CommercialSubModules.createDevolution],
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.clientDevolution,
+              child: ListTile(
+                leading: Icon(
+                  Icons.file_open_rounded,
+                  size: 32,
+                  color: Colors.blue.shade600,
+                ),
+                title: const Text("Crear Devolucion de Productos a Clientes"),
+                onTap: () {
+                  context.pushNamed("client-devolution");
+                },
+              ),
+            ),
+          ),
           const Divider(height: 0.0),
 
           RolePermissionGate(
