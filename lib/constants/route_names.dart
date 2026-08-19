@@ -30,6 +30,7 @@ class RouteNames {
   static const commercial = 'commercial';
   static const saleTerminal = 'sale-terminal';
   static const anonInvoice = 'anon-invoice';
+  static const devolutions = 'devolutions';
   static const anonDevolution = 'anon-devolution';
   static const dailyInvoice = 'daily-invoice';
   static const dailyClientInvoices = 'daily-client-invoices';
@@ -53,6 +54,7 @@ class RouteNames {
   static const proforma = 'proforma';
   static const proformaWholesale = 'proforma-wholesale';
   static const productDemandVsStock = 'product-demand-vs-stock';
+  static const quotationOrderSearch = 'quotation-order-search';
 
   static const pendingAccounts = 'pending-accounts';
   static const pendingInvoices = 'pending-invoices';

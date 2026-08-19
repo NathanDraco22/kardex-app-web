@@ -21,7 +21,6 @@ import 'package:kardex_app_front/src/modules/client_catalog/initial_balance/view
 import 'package:kardex_app_front/src/modules/settings/view/api_keys/api_keys_screen.dart';
 
 
-import 'package:kardex_app_front/src/modules/commercial/anon_devolution/anon_devolution_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/anon_invoices_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_devolution/client_devolution_screen.dart';
 
@@ -31,6 +30,7 @@ import 'package:kardex_app_front/src/modules/commercial/commercial_menu_screen.d
 import 'package:kardex_app_front/src/modules/commercial/current_devolutions/current_devolutions_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/current_orders/current_orders_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/daily_anon_invoinces/daily_anon_invoices_screen.dart';
+import 'package:kardex_app_front/src/modules/commercial/devolutions/devolutions_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/daily_client_invoices/daily_client_invoices_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/daily_product_in_orders/daily_product_in_orders_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/daily_product_sales/daily_product_sales_screen.dart';
@@ -43,6 +43,7 @@ import 'package:kardex_app_front/src/modules/commercial/product_price_setting/pr
 
 import 'package:kardex_app_front/src/modules/commercial/proforma/proforma_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/product_movements/view/commercial_product_movements_screen.dart';
+import 'package:kardex_app_front/src/modules/commercial/quotation_order_search/quotation_order_search_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/receipt_history/receipt_history_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/sale_terminal_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/client_accounts/view/client_account_screen.dart';
@@ -249,9 +250,15 @@ class AppRouter {
           ),
 
           GoRoute(
+            path: "devolutions",
+            name: "devolutions",
+            builder: (context, state) => const DevolutionsScreen(),
+          ),
+
+          GoRoute(
             path: "anon-devolution",
             name: "anon-devolution",
-            builder: (context, state) => const AnonDevolutionScreen(),
+            redirect: (context, state) => "/commercial/devolutions",
           ),
 
           GoRoute(
@@ -389,6 +396,11 @@ class AppRouter {
             path: "product-demand-vs-stock",
             name: "product-demand-vs-stock",
             builder: (context, state) => const ProductDemandVsStockScreen(),
+          ),
+          GoRoute(
+            path: "quotation-order-search",
+            name: "quotation-order-search",
+            builder: (context, state) => const QuotationOrderSearchScreen(),
           ),
         ],
       ),

@@ -7,6 +7,7 @@ import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/printers/devolution_printer.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_devolution_template.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
+import 'package:kardex_app_front/widgets/elements/devolution_status_chip.dart';
 
 import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 
@@ -149,6 +150,11 @@ class _DevolutionViewer extends StatelessWidget {
                       Text(
                         "Factura No. ${devolution.originalInvoiceDocNumber}",
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                      const SizedBox(height: 8),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: DevolutionStatusChip(status: devolution.status),
                       ),
                       const SizedBox(height: 16),
                       Text(branch.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),

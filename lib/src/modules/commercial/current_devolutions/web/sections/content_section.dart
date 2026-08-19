@@ -5,18 +5,6 @@ class _ContentSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorsMap = {
-      DevolutionStatus.open: Colors.blue.shade400,
-      DevolutionStatus.confirmed: Colors.green.shade400,
-      DevolutionStatus.cancelled: Colors.red.shade400,
-      DevolutionStatus.applied: Colors.grey.shade700,
-    };
-    final tagMap = {
-      DevolutionStatus.open: "Abierta",
-      DevolutionStatus.confirmed: "Confirmada",
-      DevolutionStatus.cancelled: "Cancelada",
-      DevolutionStatus.applied: "Aplicada",
-    };
     return Card(
       child: BlocBuilder<ReadDevolutionCubit, ReadDevolutionState>(
         builder: (context, state) {
@@ -46,21 +34,9 @@ class _ContentSection extends StatelessWidget {
                 onTap: () async {
                   await showDevolutionProcessorDialog(context, currentDevolution);
                 },
-                leading: Container(
-                  width: 100, // Adjusted width for "CONFIRMADA"
-                  height: 30,
-                  alignment: Alignment.center,
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: colorsMap[currentDevolution.status],
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    tagMap[currentDevolution.status] ?? "",
-                    style: const TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
+                leading: DevolutionStatusChip(
+                  status: currentDevolution.status,
+                  width: 100,
                 ),
                 title: Row(
                   children: [

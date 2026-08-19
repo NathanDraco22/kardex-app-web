@@ -3,14 +3,14 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
-import 'anon_devolution_confirmation_screen.dart';
-import 'mediators/anon_devolution_selection_mediator.dart';
+import 'devolutions_confirmation_screen.dart';
+import 'mediators/devolutions_selection_mediator.dart';
 
-part 'anon_devolution_selection_sections/content_section.dart';
-part 'anon_devolution_selection_sections/header_section.dart';
+part 'devolutions_selection_sections/content_section.dart';
+part 'devolutions_selection_sections/header_section.dart';
 
-class AnonDevolutionSelectionScreen extends StatefulWidget {
-  const AnonDevolutionSelectionScreen({
+class DevolutionsSelectionScreen extends StatefulWidget {
+  const DevolutionsSelectionScreen({
     super.key,
     required this.invoice,
     required this.devolutions,
@@ -20,15 +20,15 @@ class AnonDevolutionSelectionScreen extends StatefulWidget {
   final List<DevolutionInDb> devolutions;
 
   @override
-  State<AnonDevolutionSelectionScreen> createState() => _AnonDevolutionSelectionScreenState();
+  State<DevolutionsSelectionScreen> createState() => _DevolutionsSelectionScreenState();
 }
 
-class _AnonDevolutionSelectionScreenState extends State<AnonDevolutionSelectionScreen> {
-  final viewController = AnonDevolutionSelectionViewController();
+class _DevolutionsSelectionScreenState extends State<DevolutionsSelectionScreen> {
+  final viewController = DevolutionsSelectionViewController();
 
   @override
   Widget build(BuildContext context) {
-    return AnonDevolutionSelectionMediator(
+    return DevolutionsSelectionMediator(
       notifier: viewController,
       child: _RootScaffold(
         invoice: widget.invoice,
@@ -47,7 +47,7 @@ class _RootScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Seleccionar para Devolución (Anónima)"),
+        title: const Text("Seleccionar para Devolución"),
       ),
       body: _Body(
         invoice: invoice,
@@ -57,7 +57,7 @@ class _RootScaffold extends StatelessWidget {
         icon: const Icon(Icons.check),
         label: const Text("Crear Devolución"),
         onPressed: () async {
-          final viewController = AnonDevolutionSelectionMediator.of(context).notifier!;
+          final viewController = DevolutionsSelectionMediator.of(context).notifier!;
           bool confirmed = false;
           await showDialog(
             context: context,
@@ -108,7 +108,7 @@ class _RootScaffold extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => AnonDevolutionConfirmationScreen(
+                builder: (context) => DevolutionsConfirmationScreen(
                   invoice: invoice,
                   selectedItems: selectedItems,
                   description: viewController.devolutionDescription,

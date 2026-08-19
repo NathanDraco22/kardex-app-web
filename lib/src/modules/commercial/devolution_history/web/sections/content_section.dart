@@ -60,6 +60,15 @@ class _ContentSection extends StatelessWidget {
                       ),
                       BasicTableColumn(
                         label: const Text(
+                          "Estado",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        flex: 1,
+                      ),
+                      BasicTableColumn(
+                        label: const Text(
                           "Total",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
@@ -112,6 +121,9 @@ class _ContentSection extends StatelessWidget {
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
+                          ),
+                          BasicTableCell(
+                            content: DevolutionStatusChip(status: devolution.status),
                           ),
                           BasicTableCell(
                             content: Text(
