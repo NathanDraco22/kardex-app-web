@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_business/kardex_business.dart';
 
-class AnonDevolutionSelectionViewController extends ChangeNotifier {
+class DevolutionsSelectionViewController extends ChangeNotifier {
   List<SaleItem> _selectedItems = [];
 
   List<SaleItem> get selectedItems => _selectedItems;
@@ -26,10 +26,10 @@ class AnonDevolutionSelectionViewController extends ChangeNotifier {
   bool isInSelected(SaleItem item) => _selectedItems.contains(item);
 }
 
-class AnonDevolutionSelectionMediator extends InheritedNotifier<AnonDevolutionSelectionViewController> {
-  const AnonDevolutionSelectionMediator({super.key, required super.child, required super.notifier});
+class DevolutionsSelectionMediator extends InheritedNotifier<DevolutionsSelectionViewController> {
+  const DevolutionsSelectionMediator({super.key, required super.child, required super.notifier});
 
-  static AnonDevolutionSelectionMediator of(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<AnonDevolutionSelectionMediator>()!;
+  static DevolutionsSelectionMediator of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<DevolutionsSelectionMediator>()!;
   }
 }

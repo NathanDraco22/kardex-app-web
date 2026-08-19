@@ -1,4 +1,4 @@
-part of '../anon_devolution_selection_screen.dart';
+part of '../devolutions_selection_screen.dart';
 
 class _ContentSection extends StatelessWidget {
   const _ContentSection();
@@ -7,7 +7,7 @@ class _ContentSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final invoice = context.findAncestorWidgetOfExactType<_Body>()!.invoice;
     final devolutions = context.findAncestorWidgetOfExactType<_Body>()!.devolutions;
-    final viewController = AnonDevolutionSelectionMediator.of(context).notifier!;
+    final viewController = DevolutionsSelectionMediator.of(context).notifier!;
     final targetDevolutions = devolutions.where((devolution) => devolution.originalInvoiceId == invoice.id).toList();
     final returnedItems = targetDevolutions.fold<List<SaleItem>>(
       [],

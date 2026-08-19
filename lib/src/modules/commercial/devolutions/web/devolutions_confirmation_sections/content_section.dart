@@ -1,4 +1,4 @@
-part of '../anon_devolution_confirmation_screen.dart';
+part of '../devolutions_confirmation_screen.dart';
 
 class _ContentSection extends StatelessWidget {
   const _ContentSection({required this.items});

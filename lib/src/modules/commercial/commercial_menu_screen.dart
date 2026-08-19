@@ -102,26 +102,6 @@ class _Body extends StatelessWidget {
             ),
           ),
 
-          const Divider(height: 0.0),
-
-          RolePermissionGate(
-            permissions: [CommercialSubModules.createInvoice],
-            child: ShortcutAddableListTile(
-              routeName: RouteNames.anonDevolution,
-              child: ListTile(
-                leading: Icon(
-                  Icons.file_open_rounded,
-                  size: 32,
-                  color: Colors.blueGrey.shade600,
-                ),
-                title: const Text("Devolucion de productos"),
-                onTap: () {
-                  context.pushNamed("anon-devolution");
-                },
-              ),
-            ),
-          ),
-
           RolePermissionGate(
             permissions: [CommercialSubModules.createInvoice],
             child: ShortcutAddableListTile(
@@ -404,6 +384,26 @@ class _Body extends StatelessWidget {
           ),
 
           const Divider(height: 0.0),
+
+          RolePermissionGate(
+            permissions: [CommercialSubModules.orders],
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.quotationOrderSearch,
+              child: ListTile(
+                leading: Icon(
+                  Icons.manage_search,
+                  size: 32,
+                  color: Colors.indigo.shade600,
+                ),
+                title: const Text("Buscador de Cotizaciones/Órdenes"),
+                onTap: () {
+                  context.pushNamed("quotation-order-search");
+                },
+              ),
+            ),
+          ),
+
+          const Divider(height: 0.0),
           const Divider(
             height: 4.0,
             thickness: 2,
@@ -510,6 +510,27 @@ class _Body extends StatelessWidget {
               ),
             ),
           ),
+
+          const Divider(height: 0.0),
+
+          RolePermissionGate(
+            permissions: [CommercialSubModules.createInvoice],
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.devolutions,
+              child: ListTile(
+                leading: Icon(
+                  Icons.file_open_rounded,
+                  size: 32,
+                  color: Colors.blueGrey.shade600,
+                ),
+                title: const Text("Crear Devolucion de productos"),
+                onTap: () {
+                  context.pushNamed("devolutions");
+                },
+              ),
+            ),
+          ),
+
           const Divider(height: 0.0),
 
           RolePermissionGate(
@@ -529,7 +550,6 @@ class _Body extends StatelessWidget {
               ),
             ),
           ),
-
           const Divider(height: 0.0),
 
           RolePermissionGate(

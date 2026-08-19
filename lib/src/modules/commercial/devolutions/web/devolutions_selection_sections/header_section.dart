@@ -1,4 +1,4 @@
-part of '../anon_devolution_selection_screen.dart';
+part of '../devolutions_selection_screen.dart';
 
 class _HeaderSection extends StatelessWidget {
   const _HeaderSection({required this.invoice});
@@ -16,7 +16,7 @@ class _HeaderSection extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              "Factura (Anónima)",
+              "Factura",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 16,

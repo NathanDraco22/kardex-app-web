@@ -1,4 +1,4 @@
-part of '../anon_devolution_confirmation_screen.dart';
+part of '../devolutions_confirmation_screen.dart';
 
 class _HeaderSection extends StatelessWidget {
   const _HeaderSection({
@@ -19,7 +19,7 @@ class _HeaderSection extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Resumen de Devolución (Anónima)', style: Theme.of(context).textTheme.headlineSmall),
+            Text('Resumen de Devolución', style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 16),
             Text('Cliente: $clientName'),
             Text('Factura: ${invoice.docNumber}'),

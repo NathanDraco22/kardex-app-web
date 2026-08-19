@@ -1,0 +1,184 @@
+part of '../devolutions_screen_web.dart';
+
+class _HeaderSection extends StatefulWidget {
+  const _HeaderSection();
+
+  @override
+  State<_HeaderSection> createState() => _HeaderSectionState();
+}
+
+class _HeaderSectionState extends State<_HeaderSection> {
+  UserInDb? currentSelectedUser;
+  final docNumberController = TextEditingController();
+
+  @override
+  void dispose() {
+    docNumberController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final (isSellerRole, userInDb) = RoleTools.isSeller();
+
+    if (isSellerRole) {
+      currentSelectedUser = userInDb;
+    }
+
+    final readCubit = context.watch<ReadDevolutionsCubit>();
+
+    return Card(
+      key: ValueKey(readCubit.state),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 350),
+              child: TextField(
+                controller: docNumberController,
+                onSubmitted: (value) {
+                  readCubit.searchByDocNumber(value);
+                },
+                decoration: InputDecoration(
+                  hintText: "Buscar por número de factura",
+                  prefixIcon: const Icon(Icons.search),
+                  suffixIcon: IconButton(
+                    onPressed: () {
+                      docNumberController.clear();
+                      readCubit.clearFilters(getIt<AuthCubit>().currentBranchId);
+                      if (!isSellerRole) {
+                        currentSelectedUser = null;
+                      }
+                      setState(() {});
+                    },
+                    icon: const Icon(Icons.clear),
+                  ),
+                ),
+              ),
+            ),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 600),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton.icon(
+                    onPressed: () {
+                      readCubit.clearFilters(getIt<AuthCubit>().currentBranchId);
+                      if (!isSellerRole) {
+                        currentSelectedUser = null;
+                      }
+                      setState(() {});
+                    },
+                    icon: const Icon(Icons.clear),
+                    label: const Text("Limpiar Filtros"),
+                  ),
+                ],
+              ),
+            ),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 600),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: DatePickerListTile(
+                      key: ValueKey("start_date_${readCubit.startDate.hashCode}"),
+                      defaultDate: readCubit.startDate,
+                      title: "Fecha Inicio",
+                      onSelected: (value) {
+                        readCubit.startDate = value;
+                      },
+                    ),
+                  ),
+                  const VerticalDivider(),
+                  Expanded(
+                    child: DatePickerListTile(
+                      key: ValueKey("end_date_${readCubit.endDate.hashCode}"),
+                      defaultDate: readCubit.endDate,
+                      title: "Fecha Fin",
+                      onSelected: (value) {
+                        readCubit.endDate = value;
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 600),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      if (!isSellerRole)
+                        TextButton.icon(
+                          icon: const Icon(Icons.person),
+                          onPressed: () async {
+                            final user = await showActiveUserSelectionDialog(context);
+                            if (user == null) return;
+                            readCubit.userCreatorId = user.id;
+                            currentSelectedUser = user;
+                            setState(() {});
+                          },
+                          label: currentSelectedUser == null
+                              ? const Text("Seleccionar Usuario")
+                              : Text(currentSelectedUser!.username),
+                        ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      if (readCubit.state is ReadDevolutionsSuccess) ...[
+                        FilledButton.icon(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: Theme.of(context).colorScheme.tertiary,
+                            foregroundColor: Colors.white,
+                          ),
+                          onPressed: () async {
+                            final state = readCubit.state as ReadDevolutionsSuccess;
+
+                            final template = InvoiceByUserTemplate(
+                              title: "Ventas por Factura",
+                              userInfo: currentSelectedUser != null
+                                  ? UserInfo(id: currentSelectedUser!.id, name: currentSelectedUser!.username)
+                                  : null,
+                              startDate: readCubit.startDate,
+                              endDate: readCubit.endDate,
+                              count: state.totalCount,
+                              total: state.totals.total,
+                              items: state.invoices,
+                            );
+
+                            await PdfExportTool.export(
+                              template,
+                              fileName: "ventas_por_factura.pdf",
+                            );
+                          },
+                          label: const Text("Exportar"),
+                          icon: const Icon(Icons.picture_as_pdf),
+                        ),
+                        const SizedBox(width: 8),
+                      ],
+                      FilledButton.icon(
+                        onPressed: () {
+                          readCubit.loadDailyInvoices(getIt<AuthCubit>().currentBranchId);
+                        },
+                        label: const Text("Filtrar"),
+                        icon: const Icon(Icons.filter_alt_rounded),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
