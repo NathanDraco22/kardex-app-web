@@ -65,15 +65,63 @@ class _CartSectionState extends State<_CartSection> {
                         ),
                       ),
                       const Spacer(),
+                      IconButton(
+                        tooltip: "Poner venta en espera",
+                        onPressed: viewController.items.isEmpty
+                            ? null
+                            : () async {
+                                final authState = getIt<AuthCubit>().state;
+                                if (authState is! Authenticated) return;
+                                final draft = viewController.exportToDraft();
+                                await SaleTerminalDraftManager().saveDraft(authState.branch.id, draft);
+                                _lastItemCount = 0;
+                                viewController.clear();
+                                if (!context.mounted) return;
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text("Venta guardada en espera"),
+                                    duration: Duration(seconds: 2),
+                                    behavior: SnackBarBehavior.floating,
+                                  ),
+                                );
+                              },
+                        icon: Icon(
+                          Icons.pause_circle_outline,
+                          size: 20,
+                          color: viewController.items.isEmpty ? Colors.grey.shade400 : Colors.amber.shade800,
+                        ),
+                      ),
+                      IconButton(
+                        tooltip: "Ver ventas en espera",
+                        onPressed: () {
+                          final authState = getIt<AuthCubit>().state;
+                          if (authState is! Authenticated) return;
+                          showHoldSalesDialog(
+                            context,
+                            branchId: authState.branch.id,
+                            viewController: viewController,
+                          );
+                        },
+                        icon: Icon(
+                          Icons.history_toggle_off,
+                          size: 20,
+                          color: Colors.blue.shade700,
+                        ),
+                      ),
                       TextButton.icon(
                         onPressed: viewController.items.isEmpty
                             ? null
-                            : () {
+                            : () async {
+                                final confirm = await DialogManager.confirmActionDialog(
+                                  context,
+                                  "¿Estás seguro de que deseas vaciar todos los productos de la venta actual?",
+                                );
+                                if (confirm != true) return;
                                 _lastItemCount = 0;
                                 viewController.clear();
                               },
                         icon: const Icon(Icons.delete_sweep_outlined, size: 18),
-                        label: const Text("Vaciar venta"),
+                        label: const Text("Vaciar"),
                       ),
                     ],
                   ),
