@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 Future<void> showTransferViewerDialog(BuildContext context, TransferInDb transfer) async {
+  FocusManager.instance.primaryFocus?.unfocus();
+  SystemChannels.textInput.invokeMethod('TextInput.hide');
   await Navigator.push(
     context,
     MaterialPageRoute(
@@ -16,6 +19,8 @@ Future<void> showTransferViewerDialog(BuildContext context, TransferInDb transfe
 }
 
 Future<void> showTransferViewerDialogFromId(BuildContext context, String transferId) async {
+  FocusManager.instance.primaryFocus?.unfocus();
+  SystemChannels.textInput.invokeMethod('TextInput.hide');
   await Navigator.push(
     context,
     MaterialPageRoute(

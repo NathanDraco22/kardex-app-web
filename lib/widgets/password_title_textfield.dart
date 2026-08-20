@@ -4,6 +4,7 @@ class PasswordTextField extends StatefulWidget {
   const PasswordTextField({
     super.key,
     required this.title,
+    this.icon,
     this.controller,
     this.validator,
     this.onChanged,
@@ -11,6 +12,7 @@ class PasswordTextField extends StatefulWidget {
   });
 
   final String title;
+  final IconData? icon;
   final TextEditingController? controller;
   final String? Function(String? value)? validator;
   final void Function(String value)? onChanged;
@@ -41,6 +43,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
           enableSuggestions: false,
 
           decoration: InputDecoration(
+            icon: widget.icon != null ? Icon(widget.icon) : null,
             suffixIcon: IconButton(
               icon: Icon(
                 _isObscured ? Icons.visibility_off : Icons.visibility,

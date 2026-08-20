@@ -43,24 +43,23 @@ class _Body extends StatelessWidget {
     return Center(
       child: ListView(
         children: [
-          if (MediaQuery.sizeOf(context).width >= maxPhoneScreenWidth)
-            RolePermissionGate(
-              permissions: [CommercialSubModules.createInvoice],
-              child: ShortcutAddableListTile(
-                routeName: RouteNames.saleTerminal,
-                child: ListTile(
-                  leading: Icon(
-                    FluentIcons.cart_24_filled,
-                    size: 32,
-                    color: Colors.teal.shade600,
-                  ),
-                  title: const Text("Terminal de Venta"),
-                  onTap: () {
-                    context.pushNamed("sale-terminal");
-                  },
+          RolePermissionGate(
+            permissions: [CommercialSubModules.createInvoice],
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.saleTerminal,
+              child: ListTile(
+                leading: Icon(
+                  FluentIcons.cart_24_filled,
+                  size: 32,
+                  color: Colors.teal.shade600,
                 ),
+                title: const Text("Terminal de Venta"),
+                onTap: () {
+                  context.pushNamed("sale-terminal");
+                },
               ),
             ),
+          ),
 
           const Divider(height: 0.0),
 

@@ -5,6 +5,7 @@ class TitleTextField extends StatelessWidget {
   const TitleTextField({
     super.key,
     required this.title,
+    this.decoration,
     this.keyboardType,
     this.controller,
     this.titleTextAlign,
@@ -25,6 +26,7 @@ class TitleTextField extends StatelessWidget {
     this.centerTitle = false,
   });
 
+  final InputDecoration? decoration;
   final TextInputType? keyboardType;
   final List<TextInputFormatter>? inputFormatters;
   final TextCapitalization textCapitalization;
@@ -76,6 +78,7 @@ class TitleTextField extends StatelessWidget {
         TextFormField(
           readOnly: readOnly,
           textInputAction: textInputAction,
+          decoration: decoration,
           onTap: onTap,
           onTapOutside: (event) {},
           onTapUpOutside: (event) {},

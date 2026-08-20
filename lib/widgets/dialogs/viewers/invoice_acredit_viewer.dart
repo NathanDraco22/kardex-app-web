@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_business/kardex_business.dart';
@@ -15,6 +16,8 @@ Future<FastPaymentResult?> showInvoiceAcreditViewerScreen(
   InvoiceInDb invoice, {
   List<DevolutionInDb> devolutions = const [],
 }) async {
+  FocusManager.instance.primaryFocus?.unfocus();
+  SystemChannels.textInput.invokeMethod('TextInput.hide');
   final currentBranch = (getIt<AuthCubit>().state as Authenticated).branch;
   if (!context.mounted) return null;
   final paperSize = await PrintManager.getLocalPaperSize();

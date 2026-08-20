@@ -12,6 +12,13 @@ class _TabletCartSectionState extends State<_TabletCartSection> {
   int _lastItemCount = 0;
 
   @override
+  void initState() {
+    super.initState();
+    FocusManager.instance.primaryFocus?.unfocus();
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
+  }
+
+  @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
@@ -36,10 +43,9 @@ class _TabletCartSectionState extends State<_TabletCartSection> {
     return Focus(
       canRequestFocus: false,
       descendantsAreFocusable: false,
-      child: Card(
-        margin: EdgeInsets.zero,
+      child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(12),
           child: ListenableBuilder(
             listenable: viewController,
             builder: (context, _) {
@@ -53,6 +59,12 @@ class _TabletCartSectionState extends State<_TabletCartSection> {
                 children: [
                   Row(
                     children: [
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        tooltip: "Cerrar",
+                        onPressed: () => Navigator.of(context).maybePop(),
+                      ),
+                      const SizedBox(width: 4),
                       Flexible(
                         child: Text(
                           "Venta actual (${viewController.totalQuantity})",
@@ -73,7 +85,7 @@ class _TabletCartSectionState extends State<_TabletCartSection> {
                                 viewController.clear();
                               },
                         icon: const Icon(Icons.delete_sweep_outlined, size: 18),
-                        label: const Text("Vaciar venta"),
+                        label: const Text("Vaciar"),
                       ),
                     ],
                   ),
@@ -325,11 +337,11 @@ class _TabletCartRow extends StatelessWidget {
                       children: [
                         Text(
                           item.product.name,
-                          maxLines: 1,
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 14,
+                            fontSize: 16,
                           ),
                         ),
                         Row(
@@ -337,7 +349,7 @@ class _TabletCartRow extends StatelessWidget {
                             Text(
                               item.product.displayCode,
                               style: TextStyle(
-                                fontSize: 12,
+                                fontSize: 14,
                                 color: Colors.grey.shade600,
                               ),
                             ),
@@ -347,7 +359,7 @@ class _TabletCartRow extends StatelessWidget {
                               conversionFactor: item.conversionFactor,
                               fallbackUnitName: item.product.unitName,
                               style: TextStyle(
-                                fontSize: 12,
+                                fontSize: 14,
                                 color: Colors.grey.shade700,
                               ),
                             ),
@@ -355,7 +367,7 @@ class _TabletCartRow extends StatelessWidget {
                             Text(
                               unitPrice,
                               style: TextStyle(
-                                fontSize: 13,
+                                fontSize: 14,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.grey.shade700,
                               ),
@@ -383,7 +395,7 @@ class _TabletCartRow extends StatelessWidget {
                       disabledBackgroundColor: Colors.grey.shade200,
                       disabledForegroundColor: Colors.grey.shade400,
                       padding: EdgeInsets.zero,
-                      minimumSize: const Size(32, 32),
+                      minimumSize: const Size(36, 36),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(6),
                       ),
@@ -415,7 +427,7 @@ class _TabletCartRow extends StatelessWidget {
                       disabledBackgroundColor: Colors.grey.shade200,
                       disabledForegroundColor: Colors.grey.shade400,
                       padding: EdgeInsets.zero,
-                      minimumSize: const Size(32, 32),
+                      minimumSize: const Size(36, 36),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(6),
                       ),
@@ -431,7 +443,7 @@ class _TabletCartRow extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 15,
+                        fontSize: 16,
                       ),
                     ),
                   ),
@@ -462,8 +474,19 @@ class _TabletTotalsSummary extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text("Subtotal", style: TextStyle(color: Colors.grey, fontSize: 13)),
-            Text(NumberFormatter.convertToMoneyLike(subTotal), style: const TextStyle(fontSize: 13)),
+            const Text(
+              "Subtotal",
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: 14,
+              ),
+            ),
+            Text(
+              NumberFormatter.convertToMoneyLike(subTotal),
+              style: const TextStyle(
+                fontSize: 14,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 2),
@@ -473,7 +496,7 @@ class _TabletTotalsSummary extends StatelessWidget {
             const Text("Descuento", style: TextStyle(color: Colors.grey, fontSize: 13)),
             Text(
               "-${NumberFormatter.convertToMoneyLike(totalDiscount)}",
-              style: TextStyle(color: Colors.red.shade600, fontSize: 13),
+              style: TextStyle(color: Colors.red.shade600, fontSize: 14),
             ),
           ],
         ),
@@ -485,14 +508,14 @@ class _TabletTotalsSummary extends StatelessWidget {
               "TOTAL",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 15,
+                fontSize: 16,
               ),
             ),
             Text(
               NumberFormatter.convertToMoneyLike(totalAmount),
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 19,
+                fontSize: 20,
                 color: Colors.green.shade700,
               ),
             ),
