@@ -159,7 +159,7 @@ class _TabletHeaderSectionState extends State<_TabletHeaderSection> {
                     children: [
                       // Price Level dropdown
                       Expanded(
-                        flex: 52,
+                        flex: 50,
                         child: Container(
                           height: 36,
                           decoration: BoxDecoration(
@@ -189,30 +189,27 @@ class _TabletHeaderSectionState extends State<_TabletHeaderSection> {
                       const SizedBox(width: 8),
                       // Unit mode segmented button
                       Expanded(
-                        flex: 48,
-                        child: SizedBox(
-                          height: 36,
-                          child: SegmentedButton<bool>(
-                            showSelectedIcon: false,
-                            style: SegmentedButton.styleFrom(
-                              padding: EdgeInsets.zero,
-                              textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                            ),
-                            segments: const [
-                              ButtonSegment(
-                                value: false,
-                                label: Text("Detalle"),
-                              ),
-                              ButtonSegment(
-                                value: true,
-                                label: Text("Mayorista"),
-                              ),
-                            ],
-                            selected: {viewController.isWholesale},
-                            onSelectionChanged: (selection) {
-                              viewController.isWholesale = selection.first;
-                            },
+                        flex: 50,
+                        child: SegmentedButton<bool>(
+                          showSelectedIcon: false,
+                          style: SegmentedButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                           ),
+                          segments: const [
+                            ButtonSegment(
+                              value: false,
+                              label: Text("Detalle"),
+                            ),
+                            ButtonSegment(
+                              value: true,
+                              label: Text("Mayorista"),
+                            ),
+                          ],
+                          selected: {viewController.isWholesale},
+                          onSelectionChanged: (selection) {
+                            viewController.isWholesale = selection.first;
+                          },
                         ),
                       ),
                     ],

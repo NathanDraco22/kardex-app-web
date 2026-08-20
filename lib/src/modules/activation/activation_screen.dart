@@ -113,6 +113,13 @@ class _BodyState extends State<_Body> {
                         onChanged: (value) {
                           buisnessNickname = value.trim();
                         },
+                        decoration: const InputDecoration(
+                          hintText: "Ingrese el alias de su negocio",
+                          icon: Icon(
+                            Icons.business_outlined,
+                            color: Colors.black54,
+                          ),
+                        ),
                       ),
                       const SizedBox(height: 8),
                       PasswordTextField(
@@ -120,6 +127,7 @@ class _BodyState extends State<_Body> {
                         onChanged: (value) {
                           apiKey = value.trim();
                         },
+                        icon: Icons.key_outlined,
                       ),
 
                       const SizedBox(height: 16),

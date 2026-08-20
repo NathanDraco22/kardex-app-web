@@ -173,23 +173,28 @@ class _TabletProductsSectionState extends State<_TabletProductsSection> {
         Expanded(
           child: filtered.isEmpty
               ? const Center(child: Text("No se encontraron productos"))
-              : GridView.builder(
-                  controller: _scrollController,
-                  padding: const EdgeInsets.all(6),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 6,
-                    mainAxisSpacing: 6,
-                    childAspectRatio: 0.72,
-                  ),
-                  itemCount: filtered.length,
-                  itemBuilder: (context, index) {
-                    final product = filtered[index];
-                    return TerminalProductTile(
-                      product: product,
-                      priceLevelListenable: viewController,
-                      onTap: () => _quickAdd(context, product),
-                      onLongPress: () => _openProduct(context, product),
+              : LayoutBuilder(
+                  builder: (context, constraints) {
+                    final crossAxisCount = (constraints.maxWidth / 190).floor().clamp(2, 5);
+                    return GridView.builder(
+                      controller: _scrollController,
+                      padding: const EdgeInsets.all(6),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: crossAxisCount,
+                        crossAxisSpacing: 6,
+                        mainAxisSpacing: 6,
+                        childAspectRatio: 0.72,
+                      ),
+                      itemCount: filtered.length,
+                      itemBuilder: (context, index) {
+                        final product = filtered[index];
+                        return TerminalProductTile(
+                          product: product,
+                          priceLevelListenable: viewController,
+                          onTap: () => _quickAdd(context, product),
+                          onLongPress: () => _openProduct(context, product),
+                        );
+                      },
                     );
                   },
                 ),

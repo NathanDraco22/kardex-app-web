@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/cubit/read_terminal_product_cubit.dart';
@@ -87,6 +88,14 @@ class _RootScaffold extends StatelessWidget {
         context.pop();
       },
       child: Scaffold(
+        onEndDrawerChanged: (isOpen) {
+          if (isOpen) {
+            FocusManager.instance.primaryFocus?.unfocus();
+            SystemChannels.textInput.invokeMethod('TextInput.hide');
+          } else {
+            viewController.requestSearchFocus();
+          }
+        },
         appBar: AppBar(
           leading: BackButton(
             onPressed: () async {
@@ -102,6 +111,67 @@ class _RootScaffold extends StatelessWidget {
             },
           ),
           title: const Text("Terminal de Venta"),
+          actions: [
+            Builder(
+              builder: (scaffoldContext) {
+                return ListenableBuilder(
+                  listenable: viewController,
+                  builder: (context, _) {
+                    final count = viewController.totalQuantity;
+                    return Badge(
+                      isLabelVisible: count > 0,
+                      label: Text('$count'),
+                      offset: const Offset(-4, 4),
+                      child: IconButton(
+                        icon: const Icon(Icons.shopping_cart_outlined),
+                        tooltip: "Ver Carrito",
+                        onPressed: () {
+                          FocusManager.instance.primaryFocus?.unfocus();
+                          SystemChannels.textInput.invokeMethod('TextInput.hide');
+                          Scaffold.of(scaffoldContext).openEndDrawer();
+                        },
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+            const SizedBox(width: 8),
+          ],
+        ),
+        endDrawer: const Drawer(
+          width: 440,
+          child: _TabletCartSection(),
+        ),
+        floatingActionButton: Builder(
+          builder: (scaffoldContext) {
+            return ListenableBuilder(
+              listenable: viewController,
+              builder: (context, _) {
+                if (viewController.items.isEmpty) return const SizedBox.shrink();
+                final totalQty = viewController.totalQuantity;
+                final totalAmount = NumberFormatter.convertToMoneyLike(viewController.totalAmount);
+                return FloatingActionButton.extended(
+                  backgroundColor: Colors.green.shade700,
+                  foregroundColor: Colors.white,
+                  elevation: 6,
+                  onPressed: () {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    SystemChannels.textInput.invokeMethod('TextInput.hide');
+                    Scaffold.of(scaffoldContext).openEndDrawer();
+                  },
+                  icon: const Icon(Icons.shopping_cart),
+                  label: Text(
+                    "$totalQty items • $totalAmount",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
+                  ),
+                );
+              },
+            );
+          },
         ),
         body: const _Body(),
       ),
@@ -115,35 +185,20 @@ class _Body extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const TextFieldTapRegion(
-      child: Center(
-        child: Padding(
-          padding: EdgeInsets.all(4.0),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                flex: 54,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    SizedBox(
-                      height: 160,
-                      child: _TabletHeaderSection(),
-                    ),
-                    SizedBox(height: 6),
-                    Expanded(
-                      child: _TabletProductsSection(),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(width: 6),
-              Expanded(
-                flex: 46,
-                child: _TabletCartSection(),
-              ),
-            ],
-          ),
+      child: Padding(
+        padding: EdgeInsets.all(6.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(
+              height: 160,
+              child: _TabletHeaderSection(),
+            ),
+            SizedBox(height: 6),
+            Expanded(
+              child: _TabletProductsSection(),
+            ),
+          ],
         ),
       ),
     );

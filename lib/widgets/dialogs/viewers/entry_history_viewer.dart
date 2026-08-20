@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
@@ -8,6 +9,8 @@ import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_entry_hi
 
 // --- FUNCIÓN PARA NAVEGAR CON EL MODELO COMPLETO ---
 Future<void> showEntryHistoryViewerDialog(BuildContext context, EntryHistoryInDb entryHistory) async {
+  FocusManager.instance.primaryFocus?.unfocus();
+  SystemChannels.textInput.invokeMethod('TextInput.hide');
   final currentBranch = (getIt<AuthCubit>().state as Authenticated).branch;
   await Navigator.push(
     context,
@@ -28,6 +31,8 @@ Future<void> showEntryHistoryViewerDialog(BuildContext context, EntryHistoryInDb
 
 // --- FUNCIÓN PARA NAVEGAR CON SOLO EL ID ---
 Future<void> showEntryHistoryViewerDialogFromId(BuildContext context, String entryHistoryId) async {
+  FocusManager.instance.primaryFocus?.unfocus();
+  SystemChannels.textInput.invokeMethod('TextInput.hide');
   final currentBranch = (getIt<AuthCubit>().state as Authenticated).branch;
 
   await Navigator.push(

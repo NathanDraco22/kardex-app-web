@@ -4,6 +4,7 @@ import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/cubit/read_terminal_product_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/cubit/write_terminal_invoice_cubit.dart';
+import 'package:kardex_app_front/src/modules/commercial/sale_terminal/mobile/sale_terminal_screen_mobile.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/tablet/sale_terminal_screen_tablet.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/view_controller.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/web/sale_terminal_screen_web.dart';
@@ -91,6 +92,10 @@ class _Body extends StatelessWidget {
 
     if (context.isDesktop()) {
       return SaleTerminalScreenWeb(viewController: viewController);
+    }
+
+    if (context.isMobile()) {
+      return SaleTerminalScreenMobile(viewController: viewController);
     }
 
     return SaleTerminalScreenTablet(viewController: viewController);

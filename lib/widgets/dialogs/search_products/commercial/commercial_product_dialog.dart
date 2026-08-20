@@ -385,6 +385,7 @@ class _FormContentState extends State<_FormContent> {
                                   child: TitleTextField(
                                     focusNode: focusNode,
                                     textInputAction: TextInputAction.none,
+                                    keyboardType: TextInputType.number,
                                     onEditingComplete: () {
                                       // Actions.invoke(acceptFocusNode.context!, const ActivateIntent());
                                       FocusScope.of(context).requestFocus(acceptFocusNode);

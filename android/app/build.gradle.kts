@@ -17,7 +17,7 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace = "com.example.kardex_app_front"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion ="28.2.13676358"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

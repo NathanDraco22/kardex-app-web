@@ -52,124 +52,169 @@ class TerminalProductTile extends StatelessWidget {
     final stock = product.account.availableStock;
     final hasStock = stock > 0;
 
-    return Card(
-      margin: EdgeInsets.zero,
-      elevation: 10,
-      shadowColor: Colors.black26,
-      surfaceTintColor: Colors.transparent,
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        canRequestFocus: false,
-        onTap: hasStock ? onTap : null,
-        onLongPress: hasStock ? onLongPress : null,
-        child: Opacity(
-          opacity: hasStock ? 1.0 : 0.45,
-            child: Padding(
-              padding: const EdgeInsets.all(8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  SizedBox(
-                    height: 80,
-                    child: Center(
-                      child: ImageViewerWidget(
-                        imageUrls: product.image.isNotEmpty ? [product.image] : [],
-                        width: 80,
-                        height: 80,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Expanded(
+    return ListenableBuilder(
+      listenable: priceLevelListenable,
+      builder: (context, _) {
+        final isWholesale = priceLevelListenable.isWholesale;
+        final unitFactor = _unitFactor(isWholesale);
+        final price = _priceForLevel(priceLevelListenable.selectedPriceLevel) * unitFactor;
+        final convertedStock = unitFactor > 1 ? stock ~/ unitFactor : stock;
+        final cartItem = priceLevelListenable.items.where((i) => i.product.id == product.id).firstOrNull;
+        final inCartQuantity = cartItem?.quantity ?? 0;
+        final isInCart = inCartQuantity > 0;
+
+        return Card(
+          margin: EdgeInsets.zero,
+          elevation: 10,
+          shadowColor: Colors.black26,
+          surfaceTintColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: isInCart
+                ? BorderSide(color: Colors.green.shade600, width: 2)
+                : BorderSide(color: Colors.grey.shade200, width: 0.5),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Stack(
+            children: [
+              InkWell(
+                canRequestFocus: false,
+                onTap: hasStock ? onTap : null,
+                onLongPress: hasStock ? onLongPress : null,
+                child: Opacity(
+                  opacity: hasStock ? 1.0 : 0.45,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            const Icon(Icons.qr_code, size: 14),
-                            Expanded(
-                              child: Text(
-                                product.displayCode,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.grey.shade600,
-                                ),
-                              ),
+                        SizedBox(
+                          height: 80,
+                          child: Center(
+                            child: ImageViewerWidget(
+                              imageUrls: product.image.isNotEmpty ? [product.image] : [],
+                              width: 80,
+                              height: 80,
                             ),
-                          ],
-                        ),
-                        Text(
-                          product.name,
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
                           ),
                         ),
-
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            ListenableBuilder(
-                              listenable: priceLevelListenable,
-                              builder: (context, _) {
-                                final isWholesale = priceLevelListenable.isWholesale;
-                                final unitFactor = _unitFactor(isWholesale);
-                                final price = _priceForLevel(priceLevelListenable.selectedPriceLevel) * unitFactor;
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      NumberFormatter.convertToMoneyLike(price),
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 18,
-                                        color: Colors.green.shade700,
-                                      ),
-                                    ),
-                                    UnitDisplayer(
-                                      unitName: _unitName(isWholesale),
-                                      conversionFactor: unitFactor,
-                                      fallbackUnitName: product.unitName,
+                        const SizedBox(height: 6),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(Icons.qr_code, size: 14),
+                                  Expanded(
+                                    child: Text(
+                                      product.displayCode,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                         fontSize: 13,
                                         color: Colors.grey.shade600,
                                       ),
                                     ),
-                                  ],
-                                );
-                              },
-                            ),
-                            ListenableBuilder(
-                              listenable: priceLevelListenable,
-                              builder: (context, _) {
-                                final unitFactor = _unitFactor(priceLevelListenable.isWholesale);
-                                final convertedStock = unitFactor > 1 ? stock ~/ unitFactor : stock;
-                                return Text(
-                                  NumberFormatter.formatDisplayStock(convertedStock, 1),
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
-                                    color: hasStock ? Colors.blue.shade800 : Colors.red.shade700,
                                   ),
-                                );
-                              },
-                            ),
-                          ],
+                                ],
+                              ),
+                              Text(
+                                product.name,
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        NumberFormatter.convertToMoneyLike(price),
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 18,
+                                          color: Colors.green.shade700,
+                                        ),
+                                      ),
+                                      UnitDisplayer(
+                                        unitName: _unitName(isWholesale),
+                                        conversionFactor: unitFactor,
+                                        fallbackUnitName: product.unitName,
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          color: Colors.grey.shade600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Text(
+                                    NumberFormatter.formatDisplayStock(convertedStock, 1),
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                      color: hasStock ? Colors.blue.shade800 : Colors.red.shade700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
                   ),
-                ],
+                ),
               ),
-            ),
-        ),
-      ),
+              if (isInCart)
+                Positioned(
+                  top: 6,
+                  right: 6,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade700,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.shopping_cart,
+                          size: 13,
+                          color: Colors.white,
+                        ),
+                        const SizedBox(width: 3),
+                        Text(
+                          '$inCartQuantity',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
