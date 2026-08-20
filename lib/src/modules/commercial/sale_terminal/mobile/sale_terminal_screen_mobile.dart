@@ -14,7 +14,6 @@ import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/buttons/ctrl_key_tip.dart';
 import 'package:kardex_app_front/widgets/dialogs/client_full_details_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
-import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/commercial_product_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/commercial_product_modal.dart';
 import 'package:kardex_app_front/widgets/dialogs/selectors/client_selection_dialog.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
