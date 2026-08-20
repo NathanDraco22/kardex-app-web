@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/src/core/terminal_draft_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 import 'package:kardex_business/kardex_business.dart';
 
@@ -128,6 +129,30 @@ class SaleTerminalViewController extends ChangeNotifier {
     _selectedClient = null;
     _selectedPriceLevel = 1;
     selectedPaymentType = PaymentType.cash;
+    notifyListeners();
+    requestSearchFocus();
+  }
+
+  SaleTerminalDraft exportToDraft({String? id}) {
+    return SaleTerminalDraft(
+      id: id ?? DateTime.now().millisecondsSinceEpoch.toString(),
+      savedAt: DateTime.now(),
+      client: selectedClient,
+      selectedPriceLevel: selectedPriceLevel,
+      isWholesale: isWholesale,
+      description: description,
+      selectedPaymentType: selectedPaymentType,
+      items: items.map((i) => SaleTerminalItemDraft.fromCommercialProductResult(i)).toList(),
+    );
+  }
+
+  void loadFromDraft(SaleTerminalDraft draft) {
+    _selectedClient = draft.client;
+    _selectedPriceLevel = draft.selectedPriceLevel;
+    _isWholesale = draft.isWholesale;
+    description = draft.description;
+    selectedPaymentType = draft.selectedPaymentType;
+    items = draft.items.map((i) => i.toCommercialProductResult()).toList();
     notifyListeners();
     requestSearchFocus();
   }
