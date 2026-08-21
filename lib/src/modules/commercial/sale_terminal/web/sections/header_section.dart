@@ -56,8 +56,14 @@ class _HeaderSectionState extends State<_HeaderSection> {
                           onTapOutside: (_) {},
                           onSubmitted: (value) {
                             _debounce?.cancel();
-                            context.read<ReadTerminalProductCubit>().searchProducts(value);
-                            viewController.searchFocusNode.requestFocus();
+                            processTerminalSearch(
+                              context: context,
+                              value: value,
+                              viewController: viewController,
+                              searchController: _searchController,
+                              isSubmitted: true,
+                              onCleared: () => setState(() {}),
+                            );
                           },
                           decoration: InputDecoration(
                             prefixIcon: const Icon(Icons.search),
@@ -82,7 +88,14 @@ class _HeaderSectionState extends State<_HeaderSection> {
                               const Duration(milliseconds: 350),
                               () {
                                 if (!mounted) return;
-                                context.read<ReadTerminalProductCubit>().searchProducts(value);
+                                processTerminalSearch(
+                                  context: context,
+                                  value: value,
+                                  viewController: viewController,
+                                  searchController: _searchController,
+                                  isSubmitted: false,
+                                  onCleared: () => setState(() {}),
+                                );
                               },
                             );
                           },

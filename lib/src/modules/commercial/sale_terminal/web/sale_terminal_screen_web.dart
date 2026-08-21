@@ -3,15 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kardex_app_front/config/get_it_config.dart';
-import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
-import 'package:kardex_app_front/src/core/terminal_draft_manager.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/cubit/read_terminal_product_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/cubit/write_terminal_invoice_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/payment_action.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/sale_completion.dart';
+import 'package:kardex_app_front/src/modules/commercial/sale_terminal/shared_actions.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/view_controller.dart';
-import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/hold_sales_dialog.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/terminal_product_tile.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/buttons/ctrl_key_tip.dart';
@@ -109,15 +106,7 @@ class _RootScaffold extends StatelessWidget {
             IconButton(
               icon: Icon(Icons.pause_circle_outline, color: Colors.amber.shade800),
               tooltip: "Ventas en espera",
-              onPressed: () {
-                final authState = getIt<AuthCubit>().state;
-                if (authState is! Authenticated) return;
-                showHoldSalesDialog(
-                  context,
-                  branchId: authState.branch.id,
-                  viewController: viewController,
-                );
-              },
+              onPressed: () => openHoldSalesModal(context, viewController: viewController),
             ),
             const SizedBox(width: 8),
           ],

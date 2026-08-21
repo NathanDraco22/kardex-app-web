@@ -104,7 +104,7 @@ class _MobileHeaderSectionState extends State<_MobileHeaderSection> {
                 const SizedBox(height: 6),
                 // Search bar
                 SizedBox(
-                  height: 44,
+                  height: 38,
                   child: TextField(
                     controller: _searchController,
                     focusNode: viewController.searchFocusNode,
@@ -113,8 +113,14 @@ class _MobileHeaderSectionState extends State<_MobileHeaderSection> {
                     onTapOutside: (_) {},
                     onSubmitted: (value) {
                       _debounce?.cancel();
-                      context.read<ReadTerminalProductCubit>().searchProducts(value);
-                      viewController.searchFocusNode.requestFocus();
+                      processTerminalSearch(
+                        context: context,
+                        value: value,
+                        viewController: viewController,
+                        searchController: _searchController,
+                        isSubmitted: true,
+                        onCleared: () => setState(() {}),
+                      );
                     },
                     decoration: InputDecoration(
                       isCollapsed: true,
@@ -143,7 +149,14 @@ class _MobileHeaderSectionState extends State<_MobileHeaderSection> {
                         const Duration(milliseconds: 350),
                         () {
                           if (!mounted) return;
-                          context.read<ReadTerminalProductCubit>().searchProducts(value);
+                          processTerminalSearch(
+                            context: context,
+                            value: value,
+                            viewController: viewController,
+                            searchController: _searchController,
+                            isSubmitted: false,
+                            onCleared: () => setState(() {}),
+                          );
                         },
                       );
                     },
