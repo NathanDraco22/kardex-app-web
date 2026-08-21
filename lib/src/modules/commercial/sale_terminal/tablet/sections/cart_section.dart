@@ -81,22 +81,11 @@ class _TabletCartSectionState extends State<_TabletCartSection> {
                         tooltip: "Poner venta en espera",
                         onPressed: viewController.items.isEmpty
                             ? null
-                            : () async {
-                                final authState = getIt<AuthCubit>().state;
-                                if (authState is! Authenticated) return;
-                                final draft = viewController.exportToDraft();
-                                await SaleTerminalDraftManager().saveDraft(authState.branch.id, draft);
-                                _lastItemCount = 0;
-                                viewController.clear();
-                                if (!context.mounted) return;
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text("Venta guardada en espera"),
-                                    duration: Duration(seconds: 2),
-                                    behavior: SnackBarBehavior.floating,
-                                  ),
-                                );
-                              },
+                            : () => holdTerminalSale(
+                                  context,
+                                  viewController: viewController,
+                                  onHoldCompleted: () => _lastItemCount = 0,
+                                ),
                         icon: Icon(
                           Icons.pause_circle_outline,
                           size: 20,
@@ -105,15 +94,7 @@ class _TabletCartSectionState extends State<_TabletCartSection> {
                       ),
                       IconButton(
                         tooltip: "Ver ventas en espera",
-                        onPressed: () {
-                          final authState = getIt<AuthCubit>().state;
-                          if (authState is! Authenticated) return;
-                          showHoldSalesDialog(
-                            context,
-                            branchId: authState.branch.id,
-                            viewController: viewController,
-                          );
-                        },
+                        onPressed: () => openHoldSalesModal(context, viewController: viewController),
                         icon: Icon(
                           Icons.history_toggle_off,
                           size: 20,
@@ -123,15 +104,11 @@ class _TabletCartSectionState extends State<_TabletCartSection> {
                       TextButton.icon(
                         onPressed: viewController.items.isEmpty
                             ? null
-                            : () async {
-                                final confirm = await DialogManager.confirmActionDialog(
+                            : () => confirmAndClearCart(
                                   context,
-                                  "¿Estás seguro de que deseas vaciar todos los productos de la venta actual?",
-                                );
-                                if (confirm != true) return;
-                                _lastItemCount = 0;
-                                viewController.clear();
-                              },
+                                  viewController: viewController,
+                                  onCleared: () => _lastItemCount = 0,
+                                ),
                         icon: const Icon(Icons.delete_sweep_outlined, size: 18),
                         label: const Text("Vaciar"),
                       ),

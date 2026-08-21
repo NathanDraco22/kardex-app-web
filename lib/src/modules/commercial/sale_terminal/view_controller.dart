@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/core/terminal_draft_manager.dart';
+import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 import 'package:kardex_business/kardex_business.dart';
 
@@ -98,6 +99,36 @@ class SaleTerminalViewController extends ChangeNotifier {
     }
     items = [...items, item];
     notifyListeners();
+  }
+
+  bool quickAddProduct(BuildContext context, ProductInDbInBranch product) {
+    final result = CommercialProductResult(
+      product: product,
+      defaultPriceLevel: selectedPriceLevel,
+      preferredUnitType: isWholesale ? 'max' : 'min',
+    );
+    result.quantity = 1;
+
+    final existingIndex = items.indexWhere((i) => i.product.id == product.id);
+    if (existingIndex != -1) {
+      final existing = items[existingIndex];
+      final maxQuantity = existing.product.account.availableStock ~/ existing.conversionFactor;
+      if (existing.quantity >= maxQuantity) {
+        DialogManager.showInfoDialog(context, "No hay más stock disponible para este producto");
+        requestSearchFocus();
+        return false;
+      }
+    } else {
+      if (product.account.availableStock < (result.quantity * result.conversionFactor)) {
+        DialogManager.showInfoDialog(context, "No hay stock disponible para este producto");
+        requestSearchFocus();
+        return false;
+      }
+    }
+
+    quickAddItem(result);
+    requestSearchFocus();
+    return true;
   }
 
   void updateItem(CommercialProductResult oldItem, CommercialProductResult newItem) {

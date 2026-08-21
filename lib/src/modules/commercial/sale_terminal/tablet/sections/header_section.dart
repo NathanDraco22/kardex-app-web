@@ -104,7 +104,7 @@ class _TabletHeaderSectionState extends State<_TabletHeaderSection> {
                 const SizedBox(height: 6),
                 // Search bar
                 SizedBox(
-                  height: 50,
+                  height: 40,
                   child: TextField(
                     controller: _searchController,
                     focusNode: viewController.searchFocusNode,
@@ -114,8 +114,14 @@ class _TabletHeaderSectionState extends State<_TabletHeaderSection> {
                     onTapOutside: (_) {},
                     onSubmitted: (value) {
                       _debounce?.cancel();
-                      context.read<ReadTerminalProductCubit>().searchProducts(value);
-                      viewController.searchFocusNode.requestFocus();
+                      processTerminalSearch(
+                        context: context,
+                        value: value,
+                        viewController: viewController,
+                        searchController: _searchController,
+                        isSubmitted: true,
+                        onCleared: () => setState(() {}),
+                      );
                     },
 
                     decoration: InputDecoration(
@@ -144,7 +150,14 @@ class _TabletHeaderSectionState extends State<_TabletHeaderSection> {
                         const Duration(milliseconds: 350),
                         () {
                           if (!mounted) return;
-                          context.read<ReadTerminalProductCubit>().searchProducts(value);
+                          processTerminalSearch(
+                            context: context,
+                            value: value,
+                            viewController: viewController,
+                            searchController: _searchController,
+                            isSubmitted: false,
+                            onCleared: () => setState(() {}),
+                          );
                         },
                       );
                     },
