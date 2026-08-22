@@ -13,8 +13,7 @@ class _ContentSection extends StatelessWidget {
         children: [
           Builder(
             builder: (context) {
-              if (state is ReadQuotationOrderSearchLoading ||
-                  state is ReadQuotationOrderSearchLoadingMore) {
+              if (state is ReadQuotationOrderSearchLoading || state is ReadQuotationOrderSearchLoadingMore) {
                 return const LinearProgressIndicator();
               }
               return const SizedBox.shrink();

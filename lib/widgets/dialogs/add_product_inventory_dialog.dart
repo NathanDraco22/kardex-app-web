@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:kardex_app_front/src/tools/input_formatter/input_formatter.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
-Future<Map<String, int>?> showAddProductInventoryDialog(
+Future<Map<String, int?>?> showAddProductInventoryDialog(
   BuildContext context, {
   required int currentAverageCost,
 }) async {
-  return await showDialog<Map<String, int>>(
+  return await showDialog<Map<String, int?>>(
     context: context,
     builder: (context) {
       return _AddInventoryDialog(
@@ -30,6 +32,7 @@ class _AddInventoryDialog extends StatefulWidget {
 class _AddInventoryDialogState extends State<_AddInventoryDialog> {
   int stockToAdd = 0;
   int averageCost = 0;
+  String expirationDateText = "";
 
   @override
   void initState() {
@@ -66,6 +69,20 @@ class _AddInventoryDialogState extends State<_AddInventoryDialog> {
                 averageCost = cents;
               },
             ),
+            ExpirationDateGate(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: TitleTextField(
+                  title: "Fecha de Vencimiento (MES/AÑO)",
+                  decoration: const InputDecoration(hintText: "MM/AA"),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [MonthYearInputFormatter()],
+                  onChanged: (val) {
+                    expirationDateText = val.trim();
+                  },
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -84,9 +101,26 @@ class _AddInventoryDialogState extends State<_AddInventoryDialog> {
               DialogManager.showErrorDialog(context, "El costo debe ser mayor a 0");
               return;
             }
+
+            int? expirationDate;
+            if (expirationDateText.isNotEmpty) {
+              if (expirationDateText.length < 5) {
+                DialogManager.showErrorDialog(context, "Formato de fecha de vencimiento inválido (MM/AA)");
+                return;
+              }
+              try {
+                final parsedDate = DateTimeTool.fromMMYY(expirationDateText);
+                expirationDate = parsedDate.millisecondsSinceEpoch;
+              } catch (_) {
+                DialogManager.showErrorDialog(context, "Formato de fecha de vencimiento inválido (MM/AA)");
+                return;
+              }
+            }
+
             Navigator.pop(context, {
               "currentStock": stockToAdd,
               "averageCost": averageCost,
+              "expirationDate": expirationDate,
             });
           },
           child: const Text("Agregar"),

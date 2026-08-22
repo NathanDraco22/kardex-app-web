@@ -18,10 +18,12 @@ class ProductAccountsRepository {
     String branchId, {
     required int currentStock,
     required int averageCost,
+    int? expirationDate,
   }) async {
     final res = await dataSource.addProductAccount(productId, branchId, {
       "currentStock": currentStock,
       "averageCost": averageCost,
+      "expirationDate": ?expirationDate,
     });
     return ProductAccountInDb.fromJson(res);
   }

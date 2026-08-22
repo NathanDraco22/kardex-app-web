@@ -15,6 +15,7 @@ class WriteProductAccountCubit extends Cubit<WriteProductAccountState> {
     String branchId, {
     required int currentStock,
     required int averageCost,
+    int? expirationDate,
   }) async {
     try {
       emit(WriteProductAccountInProgress());
@@ -23,6 +24,7 @@ class WriteProductAccountCubit extends Cubit<WriteProductAccountState> {
         branchId,
         currentStock: currentStock,
         averageCost: averageCost,
+        expirationDate: expirationDate,
       );
       emit(WriteProductAccountSuccess(account));
     } catch (e) {

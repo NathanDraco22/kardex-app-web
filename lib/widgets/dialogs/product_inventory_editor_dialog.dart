@@ -374,6 +374,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
                                     branchId,
                                     currentStock: res['currentStock']!,
                                     averageCost: res['averageCost']!,
+                                    expirationDate: res['expirationDate'],
                                   );
                                 },
                               ),
