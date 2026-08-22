@@ -6,6 +6,7 @@ import 'package:kardex_app_front/src/modules/finance/range_finance_report/range_
 import 'package:kardex_app_front/admin_panel/admin_modules/admin_reports/admin_reports_menu.dart';
 import 'package:kardex_app_front/admin_panel/admin_modules/admin_reports/daily_summary/daily_summary_screen.dart';
 import 'package:kardex_app_front/admin_panel/admin_modules/admin_reports/executive_summary/executive_summary_screen.dart';
+import 'package:kardex_app_front/admin_panel/admin_modules/admin_reports/range_executive_report/admin_range_finance_report_screen.dart';
 import 'package:kardex_app_front/admin_panel/admin_panel_screen.dart';
 import 'package:kardex_app_front/src/modules/activation/activation_screen.dart';
 import 'package:kardex_app_front/src/modules/shortcuts/shortcuts_menu_screen.dart';
@@ -169,6 +170,11 @@ class AppRouter {
                 path: "executive-summary",
                 name: "executive-summary",
                 builder: (context, state) => const ExecutiveSummaryScreen(),
+              ),
+              GoRoute(
+                path: "range-report",
+                name: "admin-range-finance-report",
+                builder: (context, state) => const AdminRangeFinanceReportScreen(),
               ),
             ],
           ),
