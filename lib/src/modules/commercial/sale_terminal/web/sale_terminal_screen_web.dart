@@ -9,6 +9,7 @@ import 'package:kardex_app_front/src/modules/commercial/sale_terminal/payment_ac
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/sale_completion.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/shared_actions.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/view_controller.dart';
+import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/terminal_cart_item_tile.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/terminal_product_tile.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/buttons/ctrl_key_tip.dart';

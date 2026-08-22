@@ -175,7 +175,7 @@ class _TabletProductsSectionState extends State<_TabletProductsSection> {
               ? const Center(child: Text("No se encontraron productos"))
               : LayoutBuilder(
                   builder: (context, constraints) {
-                    final crossAxisCount = (constraints.maxWidth / 190).floor().clamp(2, 5);
+                    final crossAxisCount = (constraints.maxWidth / 320).floor().clamp(2, 3);
                     return GridView.builder(
                       controller: _scrollController,
                       padding: const EdgeInsets.all(6),
@@ -183,7 +183,7 @@ class _TabletProductsSectionState extends State<_TabletProductsSection> {
                         crossAxisCount: crossAxisCount,
                         crossAxisSpacing: 6,
                         mainAxisSpacing: 6,
-                        childAspectRatio: 0.72,
+                        mainAxisExtent: 110,
                       ),
                       itemCount: filtered.length,
                       itemBuilder: (context, index) {
