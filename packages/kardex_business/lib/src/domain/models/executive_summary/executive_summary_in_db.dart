@@ -95,7 +95,8 @@ final class ExecutiveSummaryInDb {
 enum SummaryType {
   weekly,
   monthly,
-  yearly
+  yearly,
+  custom
   ;
 
   String get label {
@@ -106,6 +107,8 @@ enum SummaryType {
         return "Mensual";
       case SummaryType.yearly:
         return "Anual";
+      case SummaryType.custom:
+        return "Personalizado";
     }
   }
 }

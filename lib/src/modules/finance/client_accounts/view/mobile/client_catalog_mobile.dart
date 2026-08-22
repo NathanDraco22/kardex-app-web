@@ -75,16 +75,9 @@ class MobileClientsTable extends StatelessWidget {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            child: Row(
-              children: [
-                SizedBox(
-                  width: MediaQuery.sizeOf(context).width * 0.7,
-                  child: SearchFieldDebounced(
-                    onSearch: (value) => cubit.searchClientByKeyword(value),
-                  ),
-                ),
-              ],
+            padding: const EdgeInsets.fromLTRB(12, 8, 12, 6),
+            child: SearchFieldDebounced(
+              onSearch: (value) => cubit.searchClientByKeyword(value),
             ),
           ),
           BlocBuilder<ReadClientCubit, ReadClientState>(
@@ -93,8 +86,10 @@ class MobileClientsTable extends StatelessWidget {
               return const LinearProgressIndicator();
             },
           ),
-
-          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            child: _MobileTotalsCard(state: state),
+          ),
           const Divider(),
 
           Builder(
@@ -145,6 +140,109 @@ class MobileClientsTable extends StatelessWidget {
               );
             },
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MobileTotalsCard extends StatelessWidget {
+  final ReadClientSuccess state;
+
+  const _MobileTotalsCard({required this.state});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final totalBalanceFormatted = NumberFormatter.convertToMoneyLike(state.totalBalance);
+    final filteredBalanceFormatted = NumberFormatter.convertToMoneyLike(state.filteredBalance);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.primaryContainer.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: theme.colorScheme.primary.withValues(alpha: 0.15),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(7),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primary.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              Icons.account_balance_wallet_outlined,
+              color: theme.colorScheme.primary,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  "Total Cartera por Cobrar",
+                  style: TextStyle(
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black54,
+                  ),
+                ),
+                Text(
+                  totalBalanceFormatted,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+                Text(
+                  "${state.totalDebtorsCount} clientes con saldo pendiente",
+                  style: const TextStyle(fontSize: 10, color: Colors.black45),
+                ),
+              ],
+            ),
+          ),
+          if (state.isSearchActive) ...[
+            Container(
+              height: 32,
+              width: 1,
+              color: Colors.black12,
+            ),
+            const SizedBox(width: 10),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  "Filtrado",
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black54,
+                  ),
+                ),
+                Text(
+                  filteredBalanceFormatted,
+                  style: TextStyle(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.secondary,
+                  ),
+                ),
+                Text(
+                  "${state.clients.length} result.",
+                  style: const TextStyle(fontSize: 9.5, color: Colors.black45),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );

@@ -44,6 +44,12 @@ class _Body extends StatelessWidget {
             title: const Text("Resumen Ejecutivo"),
             onTap: () => context.pushNamed("executive-summary"),
           ),
+          ListTile(
+            leading: const Icon(Icons.date_range_rounded, color: Colors.teal),
+            trailing: const Icon(Icons.arrow_forward_ios_rounded),
+            title: const Text("Reporte Financiero por Rango"),
+            onTap: () => context.pushNamed("admin-range-finance-report"),
+          ),
         ],
       ),
     );

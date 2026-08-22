@@ -29,6 +29,8 @@ class ClientsTable extends StatelessWidget {
                     onSearch: (value) => cubit.searchClientByKeyword(value),
                   ),
                 ),
+                const Spacer(),
+                _WebTotalsSummaryCard(state: state),
               ],
             ),
           ),
@@ -139,6 +141,109 @@ class _RowWidget extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _WebTotalsSummaryCard extends StatelessWidget {
+  final ReadClientSuccess state;
+
+  const _WebTotalsSummaryCard({required this.state});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final totalBalanceFormatted = NumberFormatter.convertToMoneyLike(state.totalBalance);
+    final filteredBalanceFormatted = NumberFormatter.convertToMoneyLike(state.filteredBalance);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.primaryContainer.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: theme.colorScheme.primary.withValues(alpha: 0.25),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (state.isSearchActive) ...[
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  "Total Filtrado",
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black54,
+                  ),
+                ),
+                Text(
+                  filteredBalanceFormatted,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.secondary,
+                  ),
+                ),
+                Text(
+                  "${state.clients.length} coincidencias",
+                  style: const TextStyle(fontSize: 10.5, color: Colors.black45),
+                ),
+              ],
+            ),
+            const SizedBox(width: 16),
+            Container(
+              height: 36,
+              width: 1,
+              color: Colors.black12,
+            ),
+            const SizedBox(width: 16),
+          ],
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primary.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              Icons.account_balance_wallet_outlined,
+              color: theme.colorScheme.primary,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Total Cartera por Cobrar",
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black54,
+                ),
+              ),
+              Text(
+                totalBalanceFormatted,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: state.totalBalance > 0 ? theme.colorScheme.primary : Colors.grey.shade700,
+                ),
+              ),
+              Text(
+                "${state.totalDebtorsCount} clientes con saldo pendiente",
+                style: const TextStyle(fontSize: 11, color: Colors.black45),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
