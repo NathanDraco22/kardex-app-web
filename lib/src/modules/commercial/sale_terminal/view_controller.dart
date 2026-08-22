@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/src/core/terminal_draft_manager.dart';
+import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 class SaleTerminalViewController extends ChangeNotifier {
+  final FocusNode searchFocusNode = FocusNode();
+
   String description = '';
 
   List<CommercialProductResult> items = [];
@@ -97,6 +101,36 @@ class SaleTerminalViewController extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool quickAddProduct(BuildContext context, ProductInDbInBranch product) {
+    final result = CommercialProductResult(
+      product: product,
+      defaultPriceLevel: selectedPriceLevel,
+      preferredUnitType: isWholesale ? 'max' : 'min',
+    );
+    result.quantity = 1;
+
+    final existingIndex = items.indexWhere((i) => i.product.id == product.id);
+    if (existingIndex != -1) {
+      final existing = items[existingIndex];
+      final maxQuantity = existing.product.account.availableStock ~/ existing.conversionFactor;
+      if (existing.quantity >= maxQuantity) {
+        DialogManager.showInfoDialog(context, "No hay más stock disponible para este producto");
+        requestSearchFocus();
+        return false;
+      }
+    } else {
+      if (product.account.availableStock < (result.quantity * result.conversionFactor)) {
+        DialogManager.showInfoDialog(context, "No hay stock disponible para este producto");
+        requestSearchFocus();
+        return false;
+      }
+    }
+
+    quickAddItem(result);
+    requestSearchFocus();
+    return true;
+  }
+
   void updateItem(CommercialProductResult oldItem, CommercialProductResult newItem) {
     final index = items.indexOf(oldItem);
     if (index == -1) return;
@@ -111,6 +145,15 @@ class SaleTerminalViewController extends ChangeNotifier {
 
   void refresh() => notifyListeners();
 
+  void requestSearchFocus() {
+    if (searchFocusNode.hasFocus) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!searchFocusNode.hasFocus && searchFocusNode.canRequestFocus) {
+        searchFocusNode.requestFocus();
+      }
+    });
+  }
+
   void clear() {
     description = '';
     items = [];
@@ -118,6 +161,37 @@ class SaleTerminalViewController extends ChangeNotifier {
     _selectedPriceLevel = 1;
     selectedPaymentType = PaymentType.cash;
     notifyListeners();
+    requestSearchFocus();
+  }
+
+  SaleTerminalDraft exportToDraft({String? id}) {
+    return SaleTerminalDraft(
+      id: id ?? DateTime.now().millisecondsSinceEpoch.toString(),
+      savedAt: DateTime.now(),
+      client: selectedClient,
+      selectedPriceLevel: selectedPriceLevel,
+      isWholesale: isWholesale,
+      description: description,
+      selectedPaymentType: selectedPaymentType,
+      items: items.map((i) => SaleTerminalItemDraft.fromCommercialProductResult(i)).toList(),
+    );
+  }
+
+  void loadFromDraft(SaleTerminalDraft draft) {
+    _selectedClient = draft.client;
+    _selectedPriceLevel = draft.selectedPriceLevel;
+    _isWholesale = draft.isWholesale;
+    description = draft.description;
+    selectedPaymentType = draft.selectedPaymentType;
+    items = draft.items.map((i) => i.toCommercialProductResult()).toList();
+    notifyListeners();
+    requestSearchFocus();
+  }
+
+  @override
+  void dispose() {
+    searchFocusNode.dispose();
+    super.dispose();
   }
 
   List<SaleItem> createSaleItemFromCommercial() {

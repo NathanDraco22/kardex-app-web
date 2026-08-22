@@ -35,6 +35,11 @@ class ShortcutRouteRegistry {
       icon: Icons.date_range,
       color: Color(0xFFFFB300),
     ),
+    RouteNames.devolutions: const ShortcutInfo(
+      title: "Devolución de productos",
+      icon: Icons.file_open_rounded,
+      color: Color(0xFF546E7A),
+    ),
     RouteNames.anonDevolution: const ShortcutInfo(
       title: "Devolución de productos",
       icon: Icons.file_open_rounded,
@@ -99,6 +104,11 @@ class ShortcutRouteRegistry {
       title: "Órdenes de Compra",
       icon: FluentIcons.receipt_bag_24_filled,
       color: Color(0xFFFB8C00),
+    ),
+    RouteNames.quotationOrderSearch: const ShortcutInfo(
+      title: "Buscador de Cotizaciones/Órdenes",
+      icon: Icons.manage_search,
+      color: Color(0xFF3F51B5),
     ),
     RouteNames.saleOrder: const ShortcutInfo(
       title: "Crear Orden de Compra",

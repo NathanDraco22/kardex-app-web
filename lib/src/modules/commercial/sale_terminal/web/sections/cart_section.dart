@@ -1,73 +1,150 @@
 part of '../sale_terminal_screen_web.dart';
 
-class _CartSection extends StatelessWidget {
+class _CartSection extends StatefulWidget {
   const _CartSection();
+
+  @override
+  State<_CartSection> createState() => _CartSectionState();
+}
+
+class _CartSectionState extends State<_CartSection> {
+  final ScrollController _scrollController = ScrollController();
+  int _lastItemCount = 0;
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final viewController = SaleTerminalWebMediator.of(context).viewController;
 
-    return Card(
-      margin: EdgeInsets.zero,
-      child: Padding(
-        padding: const EdgeInsets.all(8),
-        child: ListenableBuilder(
-          listenable: viewController,
-          builder: (context, _) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  children: [
-                    Flexible(
-                      child: Text(
-                        "Venta actual (${viewController.totalQuantity})",
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+    return Focus(
+      canRequestFocus: false,
+      descendantsAreFocusable: false,
+      child: Card(
+        margin: EdgeInsets.zero,
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: ListenableBuilder(
+            listenable: viewController,
+            builder: (context, _) {
+              if (viewController.items.length > _lastItemCount) {
+                _scrollToBottom();
+              }
+              _lastItemCount = viewController.items.length;
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          "Venta actual (${viewController.totalQuantity})",
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
-                    ),
-                    const Spacer(),
-                    TextButton.icon(
-                      onPressed: viewController.items.isEmpty
-                          ? null
-                          : () => viewController.clear(),
-                      icon: const Icon(Icons.delete_sweep_outlined, size: 18),
-                      label: const Text("Vaciar venta"),
-                    ),
-                  ],
-                ),
-                const Divider(),
-                Expanded(
-                  child: viewController.items.isEmpty
-                      ? const _EmptyCart()
-                      : ListView.separated(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          itemCount: viewController.items.length,
-                          separatorBuilder: (context, index) => const SizedBox(height: 4),
-                          itemBuilder: (context, index) {
-                            final item = viewController.items[index];
-                            final color = index.isOdd ? Colors.white : Colors.grey.shade200;
-                            return _CartRow(
-                              key: ValueKey(item),
-                              color: color,
-                              item: item,
-                              onRemove: () => viewController.removeItem(item),
-                              onEdit: () => _editItem(context, viewController, item),
-                            );
-                          },
+                      const Spacer(),
+                      IconButton(
+                        tooltip: "Poner venta en espera",
+                        onPressed: viewController.items.isEmpty
+                            ? null
+                            : () => holdTerminalSale(
+                                  context,
+                                  viewController: viewController,
+                                  onHoldCompleted: () => _lastItemCount = 0,
+                                ),
+                        icon: Icon(
+                          Icons.pause_circle_outline,
+                          size: 20,
+                          color: viewController.items.isEmpty ? Colors.grey.shade400 : Colors.amber.shade800,
                         ),
-                ),
-                const Divider(),
-                _TotalsSummary(viewController: viewController),
-                const SizedBox(height: 10),
-                _PayButton(viewController: viewController),
-              ],
-            );
-          },
+                      ),
+                      IconButton(
+                        tooltip: "Ver ventas en espera",
+                        onPressed: () => openHoldSalesModal(context, viewController: viewController),
+                        icon: Icon(
+                          Icons.history_toggle_off,
+                          size: 20,
+                          color: Colors.blue.shade700,
+                        ),
+                      ),
+                      TextButton.icon(
+                        onPressed: viewController.items.isEmpty
+                            ? null
+                            : () => confirmAndClearCart(
+                                  context,
+                                  viewController: viewController,
+                                  onCleared: () => _lastItemCount = 0,
+                                ),
+                        icon: const Icon(Icons.delete_sweep_outlined, size: 18),
+                        label: const Text("Vaciar"),
+                      ),
+                    ],
+                  ),
+                  const Divider(),
+                  Expanded(
+                    child: viewController.items.isEmpty
+                        ? const _EmptyCart()
+                        : ListView.separated(
+                            controller: _scrollController,
+                            padding: const EdgeInsets.only(bottom: 8),
+                            itemCount: viewController.items.length,
+                            separatorBuilder: (context, index) => const SizedBox(height: 6),
+                            itemBuilder: (context, index) {
+                              final item = viewController.items[index];
+                              final color = index.isOdd ? Colors.white : Colors.grey.shade50;
+                              final maxQuantity = item.product.account.availableStock ~/ item.conversionFactor;
+                              return TerminalCartItemTile(
+                                key: ValueKey(item),
+                                item: item,
+                                backgroundColor: color,
+                                onRemove: () => viewController.removeItem(item),
+                                onEdit: () => _editItem(context, viewController, item),
+                                onQuantityIncrement: item.quantity < maxQuantity
+                                    ? () {
+                                        item.quantity++;
+                                        viewController.refresh();
+                                      }
+                                    : null,
+                                onQuantityDecrement: item.quantity > 0
+                                    ? () {
+                                        item.quantity--;
+                                        viewController.refresh();
+                                      }
+                                    : null,
+                              );
+                            },
+                          ),
+                  ),
+                  const Divider(),
+                  _TotalsSummary(viewController: viewController),
+                  const SizedBox(height: 10),
+                  _PayButton(viewController: viewController),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
@@ -84,14 +161,22 @@ class _CartSection extends StatelessWidget {
       commercialProductResult: item,
     );
     if (!context.mounted) return;
-    if (res == null) return;
+    if (res == null) {
+      viewController.requestSearchFocus();
+      return;
+    }
     if (res.product.account.availableStock == 0 ||
         res.product.account.availableStock < (res.quantity * res.conversionFactor)) {
       DialogManager.showInfoDialog(context, "No hay stock disponible");
+      viewController.requestSearchFocus();
       return;
     }
-    if (res.quantity == 0) return;
+    if (res.quantity == 0) {
+      viewController.requestSearchFocus();
+      return;
+    }
     viewController.updateItem(item, res);
+    viewController.requestSearchFocus();
   }
 }
 
@@ -118,7 +203,12 @@ class _PayButton extends StatelessWidget {
       message: disabledMessage ?? "",
       child: CtrlKeyTip(
         hotKey: "G",
-        onShortcut: () => startTerminalPayment(context),
+        onShortcut: () async {
+          await startTerminalPayment(context);
+          if (context.mounted) {
+            viewController.requestSearchFocus();
+          }
+        },
         child: SizedBox(
           height: 64,
           width: double.infinity,
@@ -136,7 +226,14 @@ class _PayButton extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            onPressed: enabled ? () => startTerminalPayment(context) : null,
+            onPressed: enabled
+                ? () async {
+                    await startTerminalPayment(context);
+                    if (context.mounted) {
+                      viewController.requestSearchFocus();
+                    }
+                  }
+                : null,
             icon: const Icon(Icons.payments_outlined, size: 28),
             label: const Text("Cobrar"),
           ),
@@ -179,207 +276,6 @@ class _EmptyCart extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _CartRow extends StatelessWidget {
-  const _CartRow({
-    super.key,
-    required this.color,
-    required this.item,
-    required this.onRemove,
-    required this.onEdit,
-  });
-
-  final Color color;
-  final CommercialProductResult item;
-  final VoidCallback onRemove;
-  final VoidCallback onEdit;
-
-  @override
-  Widget build(BuildContext context) {
-    final unitPrice = NumberFormatter.convertToMoneyLike(
-      item.newPrice * item.conversionFactor,
-    );
-    final total = NumberFormatter.convertToMoneyLike(item.total);
-    final maxQuantity = item.product.account.availableStock ~/ item.conversionFactor;
-
-    return Material(
-      color: Colors.transparent,
-      child: Ink(
-        color: color,
-        padding: const EdgeInsets.all(8),
-        child: InkWell(
-          onLongPress: () async {
-            final box = context.findRenderObject() as RenderBox?;
-            final position = box?.localToGlobal(Offset.zero) ?? Offset.zero;
-            final size = box?.size ?? Size.zero;
-            final anchor = position + size.center(Offset.zero);
-            final action = await showMenu<String>(
-              context: context,
-              position: RelativeRect.fromLTRB(
-                anchor.dx,
-                anchor.dy,
-                anchor.dx,
-                anchor.dy,
-              ),
-              items: const [
-                PopupMenuItem(
-                  value: 'edit',
-                  child: ListTile(
-                    title: Text("Editar"),
-                    leading: Icon(Icons.edit_outlined),
-                  ),
-                ),
-                PopupMenuItem(
-                  value: 'remove',
-                  child: ListTile(
-                    title: Text("Eliminar"),
-                    leading: Icon(Icons.delete_outline),
-                  ),
-                ),
-              ],
-            );
-            if (!context.mounted) return;
-            if (action == 'edit') onEdit();
-            if (action == 'remove') onRemove();
-          },
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  ImageViewerWidget(
-                    imageUrls: item.product.image.isNotEmpty ? [item.product.image] : [],
-                    width: 56,
-                    height: 56,
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text(
-                          item.product.name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            const Icon(Icons.qr_code, size: 14),
-                            Text(
-                              item.product.displayCode,
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.grey.shade600,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            UnitDisplayer(
-                              unitName: item.selectedUnitName,
-                              conversionFactor: item.conversionFactor,
-                              fallbackUnitName: item.product.unitName,
-                            ),
-                            const Spacer(),
-                            Text(
-                              unitPrice,
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.grey.shade700,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                FilledButton(
-                  onPressed: item.quantity > 0
-                      ? () {
-                          item.quantity--;
-                          SaleTerminalWebMediator.of(context).viewController.refresh();
-                        }
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    foregroundColor: Colors.white,
-                    disabledBackgroundColor: Colors.grey.shade200,
-                    disabledForegroundColor: Colors.grey.shade400,
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                    minimumSize: const Size(38, 38),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: const Icon(Icons.remove, size: 20),
-                ),
-                      const SizedBox(width: 8),
-                      SizedBox(
-                        width: 44,
-                        child: Center(
-                    child: Text(
-                      item.quantity.toString(),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                FilledButton(
-                  onPressed: item.quantity < maxQuantity
-                      ? () {
-                          item.quantity++;
-                          SaleTerminalWebMediator.of(context).viewController.refresh();
-                        }
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    foregroundColor: Colors.white,
-                    disabledBackgroundColor: Colors.grey.shade200,
-                    disabledForegroundColor: Colors.grey.shade400,
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                    minimumSize: const Size(38, 38),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: const Icon(Icons.add, size: 20),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    total,
-                    textAlign: TextAlign.right,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 17,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            ],
-          ),
         ),
       ),
     );

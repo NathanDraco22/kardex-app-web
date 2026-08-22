@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:cached_network_image_ce/cached_network_image.dart';
 
 /// Abre un diálogo modal a pantalla completa para visualizar una lista de imágenes.
@@ -11,6 +12,9 @@ Future<void> showImageViewerDialog(
   int initialIndex = 0,
 }) async {
   if (imageUrls.isEmpty) return;
+
+  FocusManager.instance.primaryFocus?.unfocus();
+  SystemChannels.textInput.invokeMethod('TextInput.hide');
 
   await showDialog<void>(
     context: context,

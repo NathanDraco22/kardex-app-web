@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/commercial/current_devolutions/cubit/read_devolution_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/current_devolutions/web/devolution_processor_screen.dart';
+import 'package:kardex_app_front/widgets/elements/devolution_status_chip.dart';
 import 'package:kardex_app_front/widgets/super_widgets/custom_autocomplete_textfield.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

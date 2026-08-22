@@ -43,24 +43,23 @@ class _Body extends StatelessWidget {
     return Center(
       child: ListView(
         children: [
-          if (MediaQuery.sizeOf(context).width >= maxPhoneScreenWidth)
-            RolePermissionGate(
-              permissions: [CommercialSubModules.createInvoice],
-              child: ShortcutAddableListTile(
-                routeName: RouteNames.saleTerminal,
-                child: ListTile(
-                  leading: Icon(
-                    FluentIcons.cart_24_filled,
-                    size: 32,
-                    color: Colors.teal.shade600,
-                  ),
-                  title: const Text("Terminal de Venta"),
-                  onTap: () {
-                    context.pushNamed("sale-terminal");
-                  },
+          RolePermissionGate(
+            permissions: [CommercialSubModules.createInvoice],
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.saleTerminal,
+              child: ListTile(
+                leading: Icon(
+                  FluentIcons.cart_24_filled,
+                  size: 32,
+                  color: Colors.teal.shade600,
                 ),
+                title: const Text("Terminal de Venta"),
+                onTap: () {
+                  context.pushNamed("sale-terminal");
+                },
               ),
             ),
+          ),
 
           const Divider(height: 0.0),
 
@@ -97,26 +96,6 @@ class _Body extends StatelessWidget {
                 title: const Text("Ventas diarias"),
                 onTap: () {
                   context.pushNamed("daily-invoice");
-                },
-              ),
-            ),
-          ),
-
-          const Divider(height: 0.0),
-
-          RolePermissionGate(
-            permissions: [CommercialSubModules.createInvoice],
-            child: ShortcutAddableListTile(
-              routeName: RouteNames.anonDevolution,
-              child: ListTile(
-                leading: Icon(
-                  Icons.file_open_rounded,
-                  size: 32,
-                  color: Colors.blueGrey.shade600,
-                ),
-                title: const Text("Devolucion de productos"),
-                onTap: () {
-                  context.pushNamed("anon-devolution");
                 },
               ),
             ),
@@ -403,6 +382,26 @@ class _Body extends StatelessWidget {
           ),
 
           const Divider(height: 0.0),
+
+          RolePermissionGate(
+            permissions: [CommercialSubModules.orders],
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.quotationOrderSearch,
+              child: ListTile(
+                leading: Icon(
+                  Icons.manage_search,
+                  size: 32,
+                  color: Colors.indigo.shade600,
+                ),
+                title: const Text("Buscador de Cotizaciones/Órdenes"),
+                onTap: () {
+                  context.pushNamed("quotation-order-search");
+                },
+              ),
+            ),
+          ),
+
+          const Divider(height: 0.0),
           const Divider(
             height: 4.0,
             thickness: 2,
@@ -509,6 +508,27 @@ class _Body extends StatelessWidget {
               ),
             ),
           ),
+
+          const Divider(height: 0.0),
+
+          RolePermissionGate(
+            permissions: [CommercialSubModules.createInvoice],
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.devolutions,
+              child: ListTile(
+                leading: Icon(
+                  Icons.file_open_rounded,
+                  size: 32,
+                  color: Colors.blueGrey.shade600,
+                ),
+                title: const Text("Crear Devolucion de productos"),
+                onTap: () {
+                  context.pushNamed("devolutions");
+                },
+              ),
+            ),
+          ),
+
           const Divider(height: 0.0),
 
           RolePermissionGate(
@@ -528,7 +548,6 @@ class _Body extends StatelessWidget {
               ),
             ),
           ),
-
           const Divider(height: 0.0),
 
           RolePermissionGate(

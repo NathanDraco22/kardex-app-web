@@ -7,7 +7,9 @@ import 'package:kardex_app_front/src/modules/commercial/sale_terminal/cubit/read
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/cubit/write_terminal_invoice_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/payment_action.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/sale_completion.dart';
+import 'package:kardex_app_front/src/modules/commercial/sale_terminal/shared_actions.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/view_controller.dart';
+import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/terminal_cart_item_tile.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/terminal_product_tile.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/buttons/ctrl_key_tip.dart';
@@ -37,16 +39,23 @@ class SaleTerminalScreenWeb extends StatelessWidget {
       listener: (context, state) async {
         if (state is WriteTerminalInvoiceInProgress) {
           LoadingDialogManager.showLoadingDialog(context);
+          return;
         }
 
         if (state is WriteTerminalInvoiceError) {
           LoadingDialogManager.closeLoadingDialog(context);
-          DialogManager.showErrorDialog(context, state.message);
+          await DialogManager.showErrorDialog(context, state.message);
+          if (!context.mounted) return;
+          viewController.requestSearchFocus();
+          return;
         }
 
         if (state is WriteTerminalInvoiceSuccess) {
           LoadingDialogManager.closeLoadingDialog(context);
           await handleTerminalSaleCompletion(context, state.invoice);
+          if (!context.mounted) return;
+          viewController.requestSearchFocus();
+          return;
         }
       },
       child: SaleTerminalWebMediator(
@@ -64,24 +73,47 @@ class _RootScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewController = SaleTerminalWebMediator.of(context).viewController;
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: BackButton(
-          onPressed: () async {
-            if (viewController.items.isNotEmpty) {
-              final res = await DialogManager.confirmActionDialog(
-                context,
-                "Deseas salir sin guardar?",
-              );
-              if (res != true) return;
-            }
-            if (!context.mounted) return;
-            context.pop();
-          },
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        if (viewController.items.isNotEmpty) {
+          final res = await DialogManager.confirmActionDialog(
+            context,
+            "¿Deseas salir de la terminal sin guardar?",
+          );
+          if (res != true) return;
+        }
+        if (!context.mounted) return;
+        context.pop();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: BackButton(
+            onPressed: () async {
+              if (viewController.items.isNotEmpty) {
+                final res = await DialogManager.confirmActionDialog(
+                  context,
+                  "¿Deseas salir de la terminal sin guardar?",
+                );
+                if (res != true) return;
+              }
+              if (!context.mounted) return;
+              context.pop();
+            },
+          ),
+          title: const Text("Terminal de Venta"),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.pause_circle_outline, color: Colors.amber.shade800),
+              tooltip: "Ventas en espera",
+              onPressed: () => openHoldSalesModal(context, viewController: viewController),
+            ),
+            const SizedBox(width: 8),
+          ],
         ),
-        title: const Text("Terminal de Venta"),
+        body: const _Body(),
       ),
-      body: const _Body(),
     );
   }
 }
@@ -91,34 +123,36 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Padding(
-        padding: EdgeInsets.all(4.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(
-              flex: 64,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  SizedBox(
-                    height: 240,
-                    child: _HeaderSection(),
-                  ),
-                  SizedBox(height: 8),
-                  Expanded(
-                    child: _ProductsSection(),
-                  ),
-                ],
+    return const TextFieldTapRegion(
+      child: Center(
+        child: Padding(
+          padding: EdgeInsets.all(4.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                flex: 64,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    SizedBox(
+                      height: 240,
+                      child: _HeaderSection(),
+                    ),
+                    SizedBox(height: 8),
+                    Expanded(
+                      child: _ProductsSection(),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            SizedBox(width: 8),
-            Expanded(
-              flex: 35,
-              child: _CartSection(),
-            ),
-          ],
+              SizedBox(width: 8),
+              Expanded(
+                flex: 35,
+                child: _CartSection(),
+              ),
+            ],
+          ),
         ),
       ),
     );

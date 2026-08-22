@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
@@ -6,6 +7,8 @@ import 'package:kardex_business/kardex_business.dart';
 
 Future<void> showOperativeExpenseViewerDialog(BuildContext context, ExpenseInDb expense) async {
   if (!context.mounted) return;
+  FocusManager.instance.primaryFocus?.unfocus();
+  SystemChannels.textInput.invokeMethod('TextInput.hide');
   await Navigator.push(
     context,
     MaterialPageRoute(
@@ -16,6 +19,8 @@ Future<void> showOperativeExpenseViewerDialog(BuildContext context, ExpenseInDb 
 
 Future<void> showOperativeExpenseViewerDialogFromId(BuildContext context, String expenseId) async {
   if (!context.mounted) return;
+  FocusManager.instance.primaryFocus?.unfocus();
+  SystemChannels.textInput.invokeMethod('TextInput.hide');
   await Navigator.push(
     context,
     MaterialPageRoute(

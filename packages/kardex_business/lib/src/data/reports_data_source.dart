@@ -19,4 +19,14 @@ class ReportsDataSource with HttpService {
     final res = await getQuery(uri, headers: headers);
     return res;
   }
+
+  Future<Map<String, dynamic>> getGeneralReport(Map<String, String> params) async {
+    final uri = HttpTools.generateUri(
+      "$_endpoint/general-report",
+      queryParameters: params,
+    );
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
+    return res;
+  }
 }

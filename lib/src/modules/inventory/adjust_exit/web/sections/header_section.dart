@@ -5,8 +5,7 @@ class _HeaderSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mediator = AdjustExitMediator.read(context)!;
-    final headerData = mediator.headerData;
+    final viewController = AdjustExitMediator.watch(context);
     final currentBranch = (getIt<AuthCubit>().state as Authenticated).branch;
 
     return Row(
@@ -40,10 +39,9 @@ class _HeaderSection extends StatelessWidget {
                             const Text("Fecha Doc"),
                             const SizedBox(height: 6),
                             DateFieldSelector(
-                              initDate: DateTime.now(),
+                              initDate: viewController.docDate,
                               onSelectedDate: (value) {
-                                headerData.docDate = value;
-                                mediator.refresh();
+                                viewController.docDate = value;
                               },
                             ),
                           ],
@@ -89,8 +87,9 @@ class _HeaderSection extends StatelessWidget {
                                 child: TitleTextField(
                                   title: "Observaciones",
                                   maxLines: 2,
+                                  initialValue: viewController.description,
                                   onChanged: (p0) {
-                                    headerData.description = p0;
+                                    viewController.description = p0;
                                   },
                                 ),
                               ),
@@ -116,8 +115,8 @@ class MenuActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mediator = AdjustExitMediator.watch(context)!;
-    final isDisabled = !mediator.hasAllRequiredFields();
+    final viewController = AdjustExitMediator.watch(context);
+    final isDisabled = !viewController.hasAllRequiredFields;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -135,10 +134,10 @@ class MenuActions extends StatelessWidget {
 }
 
 Future<void> saveAction(BuildContext context) async {
-  final mediator = AdjustExitMediator.read(context)!;
-  if (!mediator.hasAllRequiredFields()) return;
+  final viewController = AdjustExitMediator.read(context);
+  if (!viewController.hasAllRequiredFields) return;
 
-  if (mediator.hasProductWithZeroValue()) {
+  if (viewController.hasProductWithZeroValue) {
     await DialogManager.showErrorDialog(context, "No se pueden guardar productos con cantidad 0");
     return;
   }
@@ -150,32 +149,10 @@ Future<void> saveAction(BuildContext context) async {
 
   if (res != true) return;
 
-  final items = mediator.productTableController.rows.map((e) {
-    return AdjustExitItem(
-      productId: e.product.id,
-      productName: e.product.name,
-      cost: UnitConversionTool.toBaseCost(e.unitaryCost, e.conversionFactor),
-      quantity: UnitConversionTool.toBaseQuantity(e.quantity, e.conversionFactor) * -1,
-      conversionFactor: e.conversionFactor,
-      brandName: e.product.brandName,
-      code: e.product.code,
-      unitName: UnitConversionTool.resolveUnitName(e.selectedUnitName, e.product.unitName),
-    );
-  }).toList();
+  final createDto = viewController.generateCreateAdjustExit();
+  if (createDto == null) return;
 
   if (!context.mounted) return;
-
-  final authState = getIt<AuthCubit>().state as Authenticated;
-  final currentUser = authState.session.user;
-
-  final createDto = CreateAdjustExit(
-    branchId: authState.branch.id,
-    description: mediator.headerData.description ?? "",
-    type: mediator.headerData.type,
-    items: items,
-    createdBy: UserInfo(id: currentUser.id, name: currentUser.username),
-  );
-
   context.read<WriteAdjustExitCubit>().createAdjustExit(createDto);
 }
 

@@ -50,18 +50,52 @@ class _HeaderSectionState extends State<_HeaderSection> {
                         height: 48,
                         child: TextField(
                           controller: _searchController,
-                          decoration: const InputDecoration(
-                            prefixIcon: Icon(Icons.search),
+                          focusNode: viewController.searchFocusNode,
+                          autofocus: true,
+                          textInputAction: TextInputAction.none,
+                          onTapOutside: (_) {},
+                          onSubmitted: (value) {
+                            _debounce?.cancel();
+                            processTerminalSearch(
+                              context: context,
+                              value: value,
+                              viewController: viewController,
+                              searchController: _searchController,
+                              isSubmitted: true,
+                              onCleared: () => setState(() {}),
+                            );
+                          },
+                          decoration: InputDecoration(
+                            prefixIcon: const Icon(Icons.search),
+                            suffixIcon: _searchController.text.isNotEmpty
+                                ? IconButton(
+                                    focusNode: FocusNode(canRequestFocus: false),
+                                    icon: const Icon(Icons.clear),
+                                    onPressed: () {
+                                      _searchController.clear();
+                                      context.read<ReadTerminalProductCubit>().searchProducts('');
+                                      setState(() {});
+                                    },
+                                  )
+                                : null,
                             hintText: "Buscar producto por nombre o código...",
-                            border: OutlineInputBorder(),
+                            border: const OutlineInputBorder(),
                           ),
                           onChanged: (value) {
+                            setState(() {});
                             _debounce?.cancel();
                             _debounce = Timer(
                               const Duration(milliseconds: 350),
                               () {
                                 if (!mounted) return;
-                                context.read<ReadTerminalProductCubit>().searchProducts(value);
+                                processTerminalSearch(
+                                  context: context,
+                                  value: value,
+                                  viewController: viewController,
+                                  searchController: _searchController,
+                                  isSubmitted: false,
+                                  onCleared: () => setState(() {}),
+                                );
                               },
                             );
                           },
@@ -73,13 +107,17 @@ class _HeaderSectionState extends State<_HeaderSection> {
                 const SizedBox(width: 12),
                 Expanded(
                   flex: 40,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _PriceLevelSelector(viewController: viewController),
-                      const SizedBox(height: 8),
-                      _UnitTypeSelector(viewController: viewController),
-                    ],
+                  child: Focus(
+                    canRequestFocus: false,
+                    descendantsAreFocusable: false,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _PriceLevelSelector(viewController: viewController),
+                        const SizedBox(height: 8),
+                        _UnitTypeSelector(viewController: viewController),
+                      ],
+                    ),
                   ),
                 ),
               ],

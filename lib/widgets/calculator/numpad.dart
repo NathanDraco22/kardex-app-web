@@ -23,6 +23,16 @@ class _NumpadCalculatorState extends State<NumpadCalculator> {
     ..minimumFractionDigits = 0;
 
   @override
+  void initState() {
+    super.initState();
+    final cleanInit = widget.initialValue.replaceAll(',', '').trim();
+    if (cleanInit.isNotEmpty && cleanInit != '0' && cleanInit != '0.0' && cleanInit != '0.00') {
+      _expression = cleanInit;
+      _isResultShown = true;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Container(
@@ -102,7 +112,9 @@ class _NumpadCalculatorState extends State<NumpadCalculator> {
 
   void _onDone() {
     if (_expression.isEmpty) {
-      Navigator.of(context).pop(0.0);
+      final cleanInit = widget.initialValue.replaceAll(',', '').trim();
+      final parsed = double.tryParse(cleanInit) ?? 0.0;
+      Navigator.of(context).pop(parsed);
       return;
     }
     

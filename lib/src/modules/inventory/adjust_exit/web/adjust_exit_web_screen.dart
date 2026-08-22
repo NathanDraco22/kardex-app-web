@@ -14,8 +14,8 @@ class _WebScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mediator = AdjustExitMediator.read(context)!;
-    final type = mediator.type;
+    final viewController = AdjustExitMediator.read(context);
+    final type = viewController.type;
     String title = switch (type) {
       .adjust => "Salida por Ajuste de Inventario",
       .devolution => "Devoluciones",
@@ -26,7 +26,7 @@ class _WebScaffold extends StatelessWidget {
         title: Text(title),
         leading: IconButton(
           onPressed: () async {
-            final allFields = mediator.hasAllRequiredFields();
+            final allFields = viewController.hasAllRequiredFields;
             if (!allFields) {
               context.pop();
               return;

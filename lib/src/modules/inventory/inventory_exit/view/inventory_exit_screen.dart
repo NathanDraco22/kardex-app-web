@@ -4,9 +4,9 @@ import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_exit/cubit/write_exit_doc_cubit.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_exit/view/mediator.dart';
-
 import 'package:kardex_app_front/widgets/widgets.dart';
 
+import '../view_controller.dart';
 import 'mobile/inventory_exit_screen_mobile.dart';
 import 'web/inventory_exit_screen_web.dart';
 
@@ -18,41 +18,30 @@ class InventoryExitScreen extends StatefulWidget {
 }
 
 class _InventoryExitScreenState extends State<InventoryExitScreen> {
-  late InventoryExitNotifier notifier;
-
-  bool rebuildScreen = false;
+  late final InventoryExitViewController viewController;
 
   @override
   void initState() {
-    notifier = InventoryExitNotifier();
     super.initState();
+    viewController = InventoryExitViewController();
+  }
+
+  @override
+  void dispose() {
+    viewController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (rebuildScreen) {
-      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-        rebuildScreen = false;
-        setState(() {});
-      });
-      return const EmptyScaffold();
-    }
-
     final exitDocRepo = context.read<ExitDocsRepository>();
-    return NotificationListener<RebuildScreeenNotification>(
-      onNotification: (notification) {
-        notifier = InventoryExitNotifier();
-        rebuildScreen = true;
-        setState(() {});
-        return true;
-      },
-      child: ShortcutContainer(
-        child: BlocProvider(
-          create: (context) => WriteExitDocCubit(exitDocRepo),
-          child: InventoryExitMediator(
-            notifier: notifier,
-            child: const _RootScaffold(),
-          ),
+
+    return ShortcutContainer(
+      child: BlocProvider(
+        create: (context) => WriteExitDocCubit(exitDocRepo),
+        child: InventoryExitMediator(
+          viewController: viewController,
+          child: const _RootScaffold(),
         ),
       ),
     );
@@ -64,8 +53,10 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final viewController = InventoryExitMediator.watch(context);
+
     return BlocListener<WriteExitDocCubit, WriteExitDocState>(
-      listener: (context, state) {
+      listener: (context, state) async {
         if (state is WriteExitDocInProgress) {
           LoadingDialogManager.showLoadingDialog(context);
         }
@@ -77,18 +68,18 @@ class _RootScaffold extends StatelessWidget {
 
         if (state is WriteExitDocSuccess) {
           LoadingDialogManager.closeLoadingDialog(context);
-          DialogManager.showInfoDialog(context, "Salida de inventario guardada");
+          await DialogManager.showInfoDialog(context, "Salida de inventario guardada");
           if (!context.mounted) return;
-          RebuildScreeenNotification().dispatch(context);
+          viewController.clear();
         }
       },
-      child: const _RootBody(),
+      child: _RootBody(key: viewController.formKey),
     );
   }
 }
 
 class _RootBody extends StatelessWidget {
-  const _RootBody();
+  const _RootBody({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -18,5 +18,5 @@ samples, guidance on mobile development, and a full API reference.
 
 ```bash
 $env:HOME = "C:\Users\sytru"
-$env:ANDROID_NDK_HOME = "C:\Users\sytru\AppData\Local\Android\Sdk\ndk\26.3.11579264"
+$env:ANDROID_NDK_HOME = "C:\Users\sytru\AppData\Local\Android\Sdk\ndk\28.2.13676358"
 ```

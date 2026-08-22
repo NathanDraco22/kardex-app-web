@@ -49,9 +49,12 @@ class MobileProductCardState extends State<MobileProductCard> with AutomaticKeep
     expirationController = TextEditingController(
       text: widget.row.expirationDate != null ? DateFormat('MM/yy').format(widget.row.expirationDate!) : "",
     );
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      NewMobileCardNotification(context).dispatch(context);
-    });
+    if (widget.row.quantity == 0) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        NewMobileCardNotification(context).dispatch(context);
+      });
+    }
   }
 
   @override

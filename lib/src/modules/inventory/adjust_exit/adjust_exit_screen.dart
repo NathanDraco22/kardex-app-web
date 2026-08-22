@@ -16,14 +16,13 @@ import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/widgets/dialogs/inventory_unit_picker.dart';
 
 import 'mediator.dart';
+import 'view_controller.dart';
 
 part 'web/adjust_exit_web_screen.dart';
 part 'web/sections/header_section.dart';
 part 'web/sections/content_section.dart';
 
 part 'mobile/adjust_exit_mobile_screen.dart';
-
-class RebuildAdjustExitScreenNotification extends Notification {}
 
 class AdjustExitScreen extends StatefulWidget {
   final AdjustExitType type;
@@ -34,42 +33,30 @@ class AdjustExitScreen extends StatefulWidget {
 }
 
 class _AdjustExitScreenState extends State<AdjustExitScreen> {
-  late AdjustExitNotifier notifier;
-  bool rebuildScreen = false;
+  late final AdjustExitViewController viewController;
 
   @override
   void initState() {
-    notifier = AdjustExitNotifier();
     super.initState();
+    viewController = AdjustExitViewController(type: widget.type);
+  }
+
+  @override
+  void dispose() {
+    viewController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (rebuildScreen) {
-      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-        rebuildScreen = false;
-        setState(() {});
-      });
-      return const EmptyScaffold();
-    }
-
     final repo = context.read<AdjustExitsRepository>();
 
-    return NotificationListener<RebuildAdjustExitScreenNotification>(
-      onNotification: (notification) {
-        notifier = AdjustExitNotifier();
-        rebuildScreen = true;
-        setState(() {});
-        return true;
-      },
-      child: ShortcutContainer(
-        child: BlocProvider(
-          create: (context) => WriteAdjustExitCubit(repository: repo),
-          child: AdjustExitMediator(
-            type: widget.type,
-            notifier: notifier,
-            child: const _RootScaffold(),
-          ),
+    return ShortcutContainer(
+      child: BlocProvider(
+        create: (context) => WriteAdjustExitCubit(repository: repo),
+        child: AdjustExitMediator(
+          viewController: viewController,
+          child: const _RootScaffold(),
         ),
       ),
     );
@@ -81,6 +68,8 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final viewController = AdjustExitMediator.watch(context);
+
     return BlocListener<WriteAdjustExitCubit, WriteAdjustExitState>(
       listener: (context, state) async {
         if (state is WriteAdjustExitLoading) {
@@ -94,16 +83,16 @@ class _RootScaffold extends StatelessWidget {
           LoadingDialogManager.closeLoadingDialog(context);
           await DialogManager.showInfoDialog(context, "Salida de inventario guardada correctamente");
           if (!context.mounted) return;
-          RebuildAdjustExitScreenNotification().dispatch(context);
+          viewController.clear();
         }
       },
-      child: const _RootBody(),
+      child: _RootBody(key: viewController.formKey),
     );
   }
 }
 
 class _RootBody extends StatelessWidget {
-  const _RootBody();
+  const _RootBody({super.key});
 
   @override
   Widget build(BuildContext context) {

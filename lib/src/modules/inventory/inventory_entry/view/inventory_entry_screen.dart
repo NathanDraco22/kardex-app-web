@@ -6,11 +6,10 @@ import 'package:kardex_app_front/widgets/buttons/elevated_ctrl_button.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_entry/cubit/write_entry_doc_cubit.dart';
-import 'package:kardex_app_front/config/get_it_config.dart';
-import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/widgets/dialogs/inventory_unit_picker.dart';
 
+import '../view_controller.dart';
 import 'mediator.dart';
 import 'mobile/widgets/appbar_menu.dart';
 
@@ -28,42 +27,30 @@ class InventoryEntryScreen extends StatefulWidget {
 }
 
 class _InventoryEntryScreenState extends State<InventoryEntryScreen> {
-  late InventoryEntryNotifier notifier;
-
-  bool rebuildScreen = false;
+  late final InventoryEntryViewController viewController;
 
   @override
   void initState() {
-    notifier = InventoryEntryNotifier();
     super.initState();
+    viewController = InventoryEntryViewController();
+  }
+
+  @override
+  void dispose() {
+    viewController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (rebuildScreen) {
-      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-        rebuildScreen = false;
-        setState(() {});
-      });
-      return const EmptyScaffold();
-    }
-
     final entryDocRepo = context.read<EntryDocsRepository>();
-    return NotificationListener<RebuildScreeenNotification>(
-      onNotification: (notification) {
-        notifier = InventoryEntryNotifier();
-        rebuildScreen = true;
-        setState(() {});
-        return true;
-      },
 
-      child: ShortcutContainer(
-        child: BlocProvider(
-          create: (context) => WriteEntryDocCubit(entryDocRepo),
-          child: InventoryEntryMediator(
-            notifier: notifier,
-            child: const _RootScaffold(),
-          ),
+    return ShortcutContainer(
+      child: BlocProvider(
+        create: (context) => WriteEntryDocCubit(entryDocRepo),
+        child: InventoryEntryMediator(
+          viewController: viewController,
+          child: const _RootScaffold(),
         ),
       ),
     );
@@ -75,6 +62,8 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final viewController = InventoryEntryMediator.watch(context);
+
     return BlocListener<WriteEntryDocCubit, WriteEntryDocState>(
       listener: (context, state) async {
         if (state is WriteEntryDocInProgress) {
@@ -90,16 +79,16 @@ class _RootScaffold extends StatelessWidget {
           LoadingDialogManager.closeLoadingDialog(context);
           await DialogManager.showInfoDialog(context, "Entrada de inventario guardada");
           if (!context.mounted) return;
-          RebuildScreeenNotification().dispatch(context);
+          viewController.clear();
         }
       },
-      child: const _RootBody(),
+      child: _RootBody(key: viewController.formKey),
     );
   }
 }
 
 class _RootBody extends StatelessWidget {
-  const _RootBody();
+  const _RootBody({super.key});
 
   @override
   Widget build(BuildContext context) {

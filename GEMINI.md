@@ -416,3 +416,19 @@ Esta estructura se ha seguido para módulos como 'Historial de Facturas', 'Histo
 - Se implementó un diálogo modal privado `_ExitBusinessDialog` (`StatefulWidget`) que se abre al pulsar directamente el botón de salida.
 - El diálogo inicia una cuenta regresiva interactiva de 5 segundos utilizando un `Timer.periodic`. Muestra un indicador circular de progreso rojo con el mensaje "Espera X segundos..." y mantiene deshabilitado el botón "Aceptar".
 - Al llegar a 0 segundos, el diálogo cambia a un estado verde de confirmación ("Ya puedes confirmar la salida.") y habilita el botón "Aceptar" para ejecutar `authCubit.exitFromBusiness()` y redirigir a la pantalla de activación.
+
+## Módulo Buscador de Cotizaciones/Órdenes (Agosto 2026)
+- Se implementó el nuevo módulo **Buscador de Cotizaciones/Órdenes** en `lib/src/modules/commercial/quotation_order_search/`, replicando la estructura de `daily_client_invoices` y `devolutions` (screen raíz con `BlocProvider`, `cubit/` y `web/sections/`).
+- El módulo lista y filtra documentos mediante `OrdersRepository.getPaginatedOrders` + `OrderQueryParams`. Usa un `SegmentedButton` para alternar entre **Cotizaciones** (`status: draft`) y **Órdenes** (`neStatus: draft`), con filtros de rango de fechas (`DatePickerListTile`), cliente (`showClientSelectionDialog`), usuario (`showActiveUserSelectionDialog`, solo si no es vendedor) y reseteo con "Limpiar Filtros".
+- La tabla usa `BasicTableListView` con columnas Fecha/Hora, Documento+Cliente, Estado y Total, paginación infinita vía `NotificationListener<ScrollNotification>` (patrón `daily_client_invoices`) y un `_BottomAppBar` con el monto total formateado (`NumberFormatter.convertToMoneyLike`).
+- Al tocar una fila se reutiliza el detalle existente: `showProformaInvoiceCreatorDialog` (cotizaciones) o `showOrderInvoiceCreatorDialog` (órdenes), recargando la lista al volver.
+- Se creó el template PDF `orders_by_user_template.dart` (`lib/src/tools/exports/pdf/templates/`) implementando `PdfTemplate` con `BasicPdfTableListView`, y se integró un botón "Exportar" en el header que exporta con `PdfExportTool.export`.
+- Registro completo: constante `quotationOrderSearch` en `route_names.dart`, `GoRoute` en `app_router.dart` bajo `/commercial`, entrada en `commercial_menu_screen.dart` con `RolePermissionGate([CommercialSubModules.orders])` y entrada en `shortcut_registry.dart`.
+- Requiere el cambio de backend (mínimo) en `orders_collection.py::fetch_paginated_orders` para que aplique el filtro `startDate`/`endDate` sobre `createdAt`. Análisis estático (`flutter analyze`) sin errores.
+
+## Cancelación de Cotizaciones como "cancelled" (Agosto 2026)
+- Se cambió el flujo de cancelación de cotizaciones/proformas (draft) en `current_proforma/web/invoice_creator/invoice_creator_screen.dart`: el botón "Cancelar" ahora llama `writeCubit.updateOrder(order.id, UpdateOrder(status: OrderStatus.cancelled))` en vez de `writeCubit.deleteOrderDraft(order.id)`.
+- El backend ya soportaba esto sin cambios: `PATCH /orders/{id}` (`update_order_draft_by_id`) acepta `status` y solo aplica a órdenes `draft`, dejando el registro con status `cancelled` en vez de borrarlo físicamente.
+- Se ajustó el `BlocListener` de `_RootScaffold` para detectar `state.order.status == OrderStatus.cancelled` tras `WriteOrderSuccess`, mostrar "Cotización cancelada con éxito", remover el draft del caché de `ReadProformaCubit` y cerrar la pantalla.
+- Beneficio: las cotizaciones canceladas permanecen en la base y ahora aparecen en el módulo "Buscador de Cotizaciones/Órdenes" (que ya trae todos los estados) con su chip rojo "Cancelado".
+- Verificación: `flutter analyze` sin errores.

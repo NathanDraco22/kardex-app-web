@@ -144,21 +144,23 @@ class CommercialProductDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ShortcutContainer(
-      child: Dialog(
-        constraints: const BoxConstraints(maxWidth: 700),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: SizedBox(
-          width: 650,
-          height: 700,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: _FormContent(
-              product: product,
-              commercialProductResult: commercialProductResult,
-              defaultPriceLevel: defaultPriceLevel,
-              preferredUnitType: preferredUnitType,
-              restrictStock: restrictStock,
+    return TextFieldTapRegion(
+      child: ShortcutContainer(
+        child: Dialog(
+          constraints: const BoxConstraints(maxWidth: 700),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          child: SizedBox(
+            width: 650,
+            height: 700,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: _FormContent(
+                product: product,
+                commercialProductResult: commercialProductResult,
+                defaultPriceLevel: defaultPriceLevel,
+                preferredUnitType: preferredUnitType,
+                restrictStock: restrictStock,
+              ),
             ),
           ),
         ),
@@ -279,37 +281,46 @@ class _FormContentState extends State<_FormContent> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          CtrlKeyTip(
-                            hotKey: "1",
-                            onShortcut: () {
-                              unitFocusNode.requestFocus();
-                              if (unitFocusNode.context != null) {
-                                Actions.invoke(unitFocusNode.context!, const ActivateIntent());
-                              }
-                            },
-                            child: CommercialProductUnitSelector(
-                              focusNode: unitFocusNode,
-                              result: commercialProductResult,
-                              onChanged: () => setState(() {}),
+                          Focus(
+                            canRequestFocus: false,
+                            descendantsAreFocusable: false,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                CtrlKeyTip(
+                                  hotKey: "1",
+                                  onShortcut: () {
+                                    unitFocusNode.requestFocus();
+                                    if (unitFocusNode.context != null) {
+                                      Actions.invoke(unitFocusNode.context!, const ActivateIntent());
+                                    }
+                                  },
+                                  child: CommercialProductUnitSelector(
+                                    focusNode: unitFocusNode,
+                                    result: commercialProductResult,
+                                    onChanged: () => setState(() {}),
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                CtrlKeyTip(
+                                  hotKey: "2",
+                                  onShortcut: () {
+                                    priceFocusNode.requestFocus();
+                                    if (priceFocusNode.context != null) {
+                                      Actions.invoke(priceFocusNode.context!, const ActivateIntent());
+                                    }
+                                  },
+                                  child: PriceLevelDropdownSelector(
+                                    focusNode: priceFocusNode,
+                                    result: commercialProductResult,
+                                    isUserAdmin: isUserAdmin,
+                                    onChanged: () => setState(() {}),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                              ],
                             ),
                           ),
-                          const SizedBox(height: 12),
-                          CtrlKeyTip(
-                            hotKey: "2",
-                            onShortcut: () {
-                              priceFocusNode.requestFocus();
-                              if (priceFocusNode.context != null) {
-                                Actions.invoke(priceFocusNode.context!, const ActivateIntent());
-                              }
-                            },
-                            child: PriceLevelDropdownSelector(
-                              focusNode: priceFocusNode,
-                              result: commercialProductResult,
-                              isUserAdmin: isUserAdmin,
-                              onChanged: () => setState(() {}),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
                           Row(
                             children: [
                               Expanded(
@@ -373,8 +384,10 @@ class _FormContentState extends State<_FormContent> {
                                   height: 90,
                                   child: TitleTextField(
                                     focusNode: focusNode,
-
+                                    textInputAction: TextInputAction.none,
+                                    keyboardType: TextInputType.number,
                                     onEditingComplete: () {
+                                      // Actions.invoke(acceptFocusNode.context!, const ActivateIntent());
                                       FocusScope.of(context).requestFocus(acceptFocusNode);
                                     },
                                     validator: (value) {
@@ -449,7 +462,9 @@ class _FormContentState extends State<_FormContent> {
 
                           TextButton.icon(
                             onPressed: () {
-                              final priceString = NumberFormatter.convertToMoneyLike(commercialProductResult.newPrice);
+                              final priceString = NumberFormatter.convertToMoneyLike(
+                                commercialProductResult.newPrice,
+                              );
                               final text =
                                   "${product.name} \n${product.brandName} - ${product.unitName} \nPrecio: $priceString";
                               Clipboard.setData(ClipboardData(text: text));
@@ -551,6 +566,7 @@ class _FormContentState extends State<_FormContent> {
                       ),
                     ),
                     ElevatedCtrlButton(
+                      focusNode: acceptFocusNode,
                       icon: Icons.check,
                       label: "Aceptar",
                       hotKey: "G",

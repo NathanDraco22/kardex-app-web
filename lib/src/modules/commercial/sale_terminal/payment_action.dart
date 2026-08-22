@@ -13,6 +13,7 @@ Future<void> startTerminalPayment(BuildContext context) async {
       context,
       "Hay productos sin cantidad. Revisa la venta antes de cobrar.",
     );
+    viewController.requestSearchFocus();
     return;
   }
 
@@ -21,11 +22,15 @@ Future<void> startTerminalPayment(BuildContext context) async {
       context,
       "No se puede cobrar porque hay productos con precio en 0. Por favor, edita o elimina estos productos.",
     );
+    viewController.requestSearchFocus();
     return;
   }
 
   final createInvoice = viewController.generateCreateInvoice();
-  if (createInvoice == null) return;
+  if (createInvoice == null) {
+    viewController.requestSearchFocus();
+    return;
+  }
 
   final hasCredit = viewController.selectedClient?.isCreditActive ?? false;
   final paymentResult = await showTerminalPaymentConfirmationDialog(
@@ -35,7 +40,10 @@ Future<void> startTerminalPayment(BuildContext context) async {
     initialMethod: viewController.selectedPaymentType,
     initialObservations: viewController.description,
   );
-  if (paymentResult == null) return;
+  if (paymentResult == null) {
+    viewController.requestSearchFocus();
+    return;
+  }
   if (!context.mounted) return;
 
   viewController.description = paymentResult.observations ?? '';

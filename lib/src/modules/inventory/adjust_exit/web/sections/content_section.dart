@@ -5,8 +5,8 @@ class _ContentSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mediator = AdjustExitMediator.read(context)!;
-    final tableController = mediator.productTableController;
+    final viewController = AdjustExitMediator.read(context);
+    final tableController = viewController.tableController;
 
     return InventoryMovementProductTable(
       controller: tableController,
@@ -25,7 +25,7 @@ class _ContentSection extends StatelessWidget {
         final productRow = ProductRow(
           product: res,
           quantity: 0,
-          unitaryCost: res.account.averageCost * unit.conversionFactor,
+          unitaryCost: (res.account.averageCost * unit.conversionFactor).round(),
           editableCost: false,
           haveExpirationDate: false,
           selectedUnitIndex: unit.unitIndex,
@@ -33,7 +33,6 @@ class _ContentSection extends StatelessWidget {
           selectedUnitName: unit.unitName,
         );
         controller.addRow(productRow);
-        mediator.refresh();
       },
       onRemoveRowAction: (controller, row) {
         controller.removeRow(row);
@@ -47,7 +46,7 @@ class _ContentSection extends StatelessWidget {
         final newProductRow = ProductRow(
           product: res,
           quantity: 0,
-          unitaryCost: res.account.averageCost * unit.conversionFactor,
+          unitaryCost: (res.account.averageCost * unit.conversionFactor).round(),
           editableCost: false,
           selectedUnitIndex: unit.unitIndex,
           conversionFactor: unit.conversionFactor,

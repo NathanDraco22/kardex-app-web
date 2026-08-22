@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
@@ -7,10 +8,13 @@ import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/printers/devolution_printer.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_devolution_template.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
+import 'package:kardex_app_front/widgets/elements/devolution_status_chip.dart';
 
 import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 
 Future<void> showDevolutionViewerDialog(BuildContext context, DevolutionInDb devolution) async {
+  FocusManager.instance.primaryFocus?.unfocus();
+  SystemChannels.textInput.invokeMethod('TextInput.hide');
   final currentBranch = (getIt<AuthCubit>().state as Authenticated).branch;
   final paperSize = await PrintManager.getLocalPaperSize();
   if (!context.mounted) return;
@@ -36,6 +40,8 @@ Future<void> showDevolutionViewerDialog(BuildContext context, DevolutionInDb dev
 
 // --- FUNCIÓN PARA NAVEGAR CON SOLO EL ID ---
 Future<void> showDevolutionViewerDialogFromId(BuildContext context, String devolutionId) async {
+  FocusManager.instance.primaryFocus?.unfocus();
+  SystemChannels.textInput.invokeMethod('TextInput.hide');
   final currentBranch = (getIt<AuthCubit>().state as Authenticated).branch;
   final paperSize = await PrintManager.getLocalPaperSize();
   if (!context.mounted) return;
@@ -149,6 +155,11 @@ class _DevolutionViewer extends StatelessWidget {
                       Text(
                         "Factura No. ${devolution.originalInvoiceDocNumber}",
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                      const SizedBox(height: 8),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: DevolutionStatusChip(status: devolution.status),
                       ),
                       const SizedBox(height: 16),
                       Text(branch.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),

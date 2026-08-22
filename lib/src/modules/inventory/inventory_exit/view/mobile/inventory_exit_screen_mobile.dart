@@ -23,7 +23,7 @@ class _MobileScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mediator = InventoryExitMediator.read(context)!;
+    final viewController = InventoryExitMediator.read(context);
     return Scaffold(
       floatingActionButton: Visibility(
         visible: MediaQuery.viewInsetsOf(context).bottom == 0.0,
@@ -31,7 +31,7 @@ class _MobileScaffold extends StatelessWidget {
           onPressed: () async {
             final res = await showSearchProductInBranchDelegate(context, true);
             if (res == null) return;
-            if (mediator.productListViewController.rowCards.length > 99) {
+            if (viewController.tableController.rows.length > 99) {
               if (!context.mounted) return;
               await DialogManager.showErrorDialog(context, "No se pueden agregar mas de 100 productos");
               return;
@@ -39,7 +39,7 @@ class _MobileScaffold extends StatelessWidget {
             if (!context.mounted) return;
             final unit = await showInventoryUnitPicker(context, res);
             if (unit == null) return;
-            final newRow = ProductRowCard(
+            final newRow = ProductRow(
               product: res,
               quantity: 0,
               unitaryCost: (res.account.averageCost * unit.conversionFactor).round(),
@@ -49,8 +49,7 @@ class _MobileScaffold extends StatelessWidget {
               conversionFactor: unit.conversionFactor,
               selectedUnitName: unit.unitName,
             );
-            mediator.productListViewController.addRowCard(newRow);
-            mediator.refresh();
+            viewController.tableController.addRow(newRow);
           },
           label: const Text("Agregar Producto"),
           icon: const Icon(Icons.add),
@@ -59,7 +58,7 @@ class _MobileScaffold extends StatelessWidget {
       appBar: AppBar(
         leading: IconButton(
           onPressed: () async {
-            final allFields = mediator.hasMobileAllRequiredFields();
+            final allFields = viewController.hasAllRequiredFields;
             if (!allFields) {
               context.pop();
               return;
@@ -94,7 +93,7 @@ class _MobileBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mediator = InventoryExitMediator.read(context)!;
+    final viewController = InventoryExitMediator.read(context);
     return Center(
       child: ListView(
         addAutomaticKeepAlives: true,
@@ -109,7 +108,7 @@ class _MobileBody extends StatelessWidget {
           Column(
             children: [
               InventoryMovementProductListView(
-                controller: mediator.productListViewController,
+                controller: viewController.tableController,
               ),
             ],
           ),
@@ -135,8 +134,7 @@ class _MobileHeaderSectionState extends State<_MobileHeaderSection> with Automat
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final mediator = InventoryExitMediator.read(context)!;
-    final headerData = mediator.headerData;
+    final viewController = InventoryExitMediator.watch(context);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -151,8 +149,8 @@ class _MobileHeaderSectionState extends State<_MobileHeaderSection> with Automat
                 ),
                 const SizedBox(height: 6),
                 CustomAutocompleteTextfield<ClientInDb>(
-                  initValue: headerData.client,
-                  onClose: (value) => headerData.client = value,
+                  initValue: viewController.selectedClient,
+                  onClose: (value) => viewController.selectedClient = value,
                   titleBuilder: (value) => value.name,
                   onSearch: (value) async {
                     final repo = context.read<ClientsRepository>();
@@ -171,9 +169,8 @@ class _MobileHeaderSectionState extends State<_MobileHeaderSection> with Automat
                         return ListTile(
                           title: Text(client.name),
                           onTap: () {
-                            headerData.client = client;
+                            viewController.selectedClient = client;
                             close(client);
-                            mediator.refresh();
                           },
                         );
                       },
@@ -186,29 +183,25 @@ class _MobileHeaderSectionState extends State<_MobileHeaderSection> with Automat
                     Flexible(
                       child: TitleTextField(
                         title: "Documento",
-                        initialValue: headerData.docNumber,
+                        initialValue: viewController.docNumber,
                         keyboardType: TextInputType.number,
                         onChanged: (value) {
-                          headerData.docNumber = value;
-                          mediator.refresh();
+                          viewController.docNumber = value;
                         },
                       ),
                     ),
-
                     const SizedBox(
                       width: 12,
                     ),
-
                     Flexible(
                       child: Column(
                         children: [
                           const Text("Fecha Doc"),
                           const SizedBox(height: 6),
                           DateFieldSelector(
-                            initDate: headerData.docDate,
+                            initDate: viewController.docDate,
                             onSelectedDate: (value) {
-                              headerData.docDate = value;
-                              mediator.refresh();
+                              viewController.docDate = value;
                             },
                           ),
                         ],
@@ -216,12 +209,14 @@ class _MobileHeaderSectionState extends State<_MobileHeaderSection> with Automat
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 12),
-
-                const TitleTextField(
+                TitleTextField(
                   title: "Observaciones",
                   maxLines: 2,
+                  initialValue: viewController.observations,
+                  onChanged: (value) {
+                    viewController.observations = value;
+                  },
                 ),
               ],
             ),

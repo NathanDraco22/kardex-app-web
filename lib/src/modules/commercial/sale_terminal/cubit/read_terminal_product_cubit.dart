@@ -49,11 +49,11 @@ class ReadTerminalProductCubit extends Cubit<ReadTerminalProductState> {
     }
   }
 
-  Future<void> searchProducts(String keyword) async {
+  Future<List<ProductInDbInBranch>> searchProducts(String keyword) async {
     if (keyword.trim().isEmpty) {
       _isSearching = false;
       emit(ReadTerminalProductSuccess(_productsCache));
-      return;
+      return _productsCache;
     }
 
     if (state is ReadTerminalProductSuccess) {
@@ -64,8 +64,10 @@ class ReadTerminalProductCubit extends Cubit<ReadTerminalProductState> {
     try {
       final results = await productsRepository.searchProductInBranch(keyword.trim(), branchId);
       emit(ReadTerminalProductSuccess(results));
+      return results;
     } catch (error) {
       emit(ReadTerminalProductError(error.toString()));
+      return [];
     } finally {
       _isSearching = false;
     }

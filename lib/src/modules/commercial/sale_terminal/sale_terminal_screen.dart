@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/cubit/read_terminal_product_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/cubit/write_terminal_invoice_cubit.dart';
+import 'package:kardex_app_front/src/modules/commercial/sale_terminal/mobile/sale_terminal_screen_mobile.dart';
+import 'package:kardex_app_front/src/modules/commercial/sale_terminal/tablet/sale_terminal_screen_tablet.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/view_controller.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/web/sale_terminal_screen_web.dart';
+import 'package:kardex_app_front/src/tools/extensiones.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
 
@@ -23,21 +25,14 @@ class _SaleTerminalScreenState extends State<SaleTerminalScreen> {
   @override
   void initState() {
     super.initState();
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ]);
     viewController = SaleTerminalViewController();
+    viewController.requestSearchFocus();
   }
 
   @override
   void dispose() {
+    viewController.dispose();
     super.dispose();
-
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
   }
 
   @override
@@ -95,6 +90,14 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewController = context.read<WriteTerminalInvoiceCubit>().viewController;
 
-    return SaleTerminalScreenWeb(viewController: viewController);
+    if (context.isDesktop()) {
+      return SaleTerminalScreenWeb(viewController: viewController);
+    }
+
+    if (context.isMobile()) {
+      return SaleTerminalScreenMobile(viewController: viewController);
+    }
+
+    return SaleTerminalScreenTablet(viewController: viewController);
   }
 }
