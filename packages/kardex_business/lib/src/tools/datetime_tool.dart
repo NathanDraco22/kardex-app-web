@@ -37,7 +37,7 @@ class DateTimeTool {
     return formatter.format(datetime);
   }
 
-  static DateTime fromMMYY(String date) => DateFormat('M/yy').parse(date);
+  static DateTime fromMMYY(String date) => DateFormat('d/M/yy').parse('01/${date.trim()}');
 
   static DateTime getTodayMidnight() {
     final now = DateTime.now();
