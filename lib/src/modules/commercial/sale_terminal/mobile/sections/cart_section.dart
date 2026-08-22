@@ -122,16 +122,29 @@ class _MobileCartSectionState extends State<_MobileCartSection> {
                             controller: _scrollController,
                             padding: const EdgeInsets.only(bottom: 8),
                             itemCount: viewController.items.length,
-                            separatorBuilder: (context, index) => const SizedBox(height: 4),
+                            separatorBuilder: (context, index) => const SizedBox(height: 6),
                             itemBuilder: (context, index) {
                               final item = viewController.items[index];
-                              final color = index.isOdd ? Colors.white : Colors.grey.shade100;
-                              return _MobileCartRow(
+                              final color = index.isOdd ? Colors.white : Colors.grey.shade50;
+                              final maxQuantity = item.product.account.availableStock ~/ item.conversionFactor;
+                              return TerminalCartItemTile(
                                 key: ValueKey(item),
-                                color: color,
                                 item: item,
+                                backgroundColor: color,
                                 onRemove: () => viewController.removeItem(item),
                                 onEdit: () => _editItem(context, viewController, item),
+                                onQuantityIncrement: item.quantity < maxQuantity
+                                    ? () {
+                                        item.quantity++;
+                                        viewController.refresh();
+                                      }
+                                    : null,
+                                onQuantityDecrement: item.quantity > 0
+                                    ? () {
+                                        item.quantity--;
+                                        viewController.refresh();
+                                      }
+                                    : null,
                               );
                             },
                           ),
@@ -275,207 +288,6 @@ class _MobileEmptyCart extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _MobileCartRow extends StatelessWidget {
-  const _MobileCartRow({
-    super.key,
-    required this.color,
-    required this.item,
-    required this.onRemove,
-    required this.onEdit,
-  });
-
-  final Color color;
-  final CommercialProductResult item;
-  final VoidCallback onRemove;
-  final VoidCallback onEdit;
-
-  @override
-  Widget build(BuildContext context) {
-    final unitPrice = NumberFormatter.convertToMoneyLike(
-      item.newPrice * item.conversionFactor,
-    );
-    final total = NumberFormatter.convertToMoneyLike(item.total);
-    final maxQuantity = item.product.account.availableStock ~/ item.conversionFactor;
-
-    return Material(
-      color: Colors.transparent,
-      child: Ink(
-        color: color,
-        padding: const EdgeInsets.all(6),
-        child: InkWell(
-          canRequestFocus: false,
-          onLongPress: () async {
-            final box = context.findRenderObject() as RenderBox?;
-            final position = box?.localToGlobal(Offset.zero) ?? Offset.zero;
-            final size = box?.size ?? Size.zero;
-            final anchor = position + size.center(Offset.zero);
-            final action = await showMenu<String>(
-              context: context,
-              position: RelativeRect.fromLTRB(
-                anchor.dx,
-                anchor.dy,
-                anchor.dx,
-                anchor.dy,
-              ),
-              items: const [
-                PopupMenuItem(
-                  value: 'edit',
-                  child: ListTile(
-                    title: Text("Editar"),
-                    leading: Icon(Icons.edit_outlined),
-                  ),
-                ),
-                PopupMenuItem(
-                  value: 'remove',
-                  child: ListTile(
-                    title: Text("Eliminar"),
-                    leading: Icon(Icons.delete_outline),
-                  ),
-                ),
-              ],
-            );
-            if (!context.mounted) return;
-            if (action == 'edit') onEdit();
-            if (action == 'remove') onRemove();
-          },
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  ImageViewerWidget(
-                    imageUrls: item.product.image.isNotEmpty ? [item.product.image] : [],
-                    width: 40,
-                    height: 40,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text(
-                          item.product.name,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            Text(
-                              item.product.displayCode,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey.shade600,
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            UnitDisplayer(
-                              unitName: item.selectedUnitName,
-                              conversionFactor: item.conversionFactor,
-                              fallbackUnitName: item.product.unitName,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey.shade700,
-                              ),
-                            ),
-                            const Spacer(),
-                            Text(
-                              unitPrice,
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.grey.shade700,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Row(
-                children: [
-                  FilledButton(
-                    onPressed: item.quantity > 0
-                        ? () {
-                            item.quantity--;
-                            SaleTerminalMobileMediator.of(context).viewController.refresh();
-                          }
-                        : null,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      foregroundColor: Colors.white,
-                      disabledBackgroundColor: Colors.grey.shade200,
-                      disabledForegroundColor: Colors.grey.shade400,
-                      padding: EdgeInsets.zero,
-                      minimumSize: const Size(32, 32),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                    ),
-                    child: const Icon(Icons.remove, size: 14),
-                  ),
-                  SizedBox(
-                    width: 32,
-                    child: Center(
-                      child: Text(
-                        item.quantity.toString(),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                  ),
-                  FilledButton(
-                    onPressed: item.quantity < maxQuantity
-                        ? () {
-                            item.quantity++;
-                            SaleTerminalMobileMediator.of(context).viewController.refresh();
-                          }
-                        : null,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                      disabledBackgroundColor: Colors.grey.shade200,
-                      disabledForegroundColor: Colors.grey.shade400,
-                      padding: EdgeInsets.zero,
-                      minimumSize: const Size(32, 32),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                    ),
-                    child: const Icon(Icons.add, size: 14),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      total,
-                      textAlign: TextAlign.right,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
         ),
       ),
     );

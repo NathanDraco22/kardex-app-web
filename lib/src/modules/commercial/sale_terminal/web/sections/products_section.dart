@@ -105,24 +105,22 @@ class _ProductsSectionState extends State<_ProductsSection> {
     SaleTerminalViewController viewController,
   ) {
     return switch (state) {
-      ReadTerminalProductInitial() || ReadTerminalProductLoading() =>
-        const Center(child: CircularProgressIndicator()),
+      ReadTerminalProductInitial() || ReadTerminalProductLoading() => const Center(child: CircularProgressIndicator()),
       ReadTerminalProductError(:final message) => Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(message),
-              const SizedBox(height: 8),
-              ElevatedButton.icon(
-                onPressed: () => context.read<ReadTerminalProductCubit>().loadProducts(),
-                icon: const Icon(Icons.refresh),
-                label: const Text("Reintentar"),
-              ),
-            ],
-          ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(message),
+            const SizedBox(height: 8),
+            ElevatedButton.icon(
+              onPressed: () => context.read<ReadTerminalProductCubit>().loadProducts(),
+              icon: const Icon(Icons.refresh),
+              label: const Text("Reintentar"),
+            ),
+          ],
         ),
-      ReadTerminalProductSuccess(:final products) =>
-        _buildProductGrid(context, products, viewController),
+      ),
+      ReadTerminalProductSuccess(:final products) => _buildProductGrid(context, products, viewController),
     };
   }
 
@@ -172,9 +170,7 @@ class _ProductsSectionState extends State<_ProductsSection> {
               ? const Center(child: Text("No se encontraron productos"))
               : LayoutBuilder(
                   builder: (context, constraints) {
-                    final crossAxisCount = (constraints.maxWidth / 200).floor().clamp(2, 4);
-                    final tileWidth = constraints.maxWidth / crossAxisCount;
-                    final childAspectRatio = (tileWidth / 216).clamp(0.55, 0.95);
+                    final crossAxisCount = (constraints.maxWidth / 320).floor().clamp(2, 4);
                     return GridView.builder(
                       controller: _scrollController,
                       padding: const EdgeInsets.all(8),
@@ -182,7 +178,7 @@ class _ProductsSectionState extends State<_ProductsSection> {
                         crossAxisCount: crossAxisCount,
                         crossAxisSpacing: 8,
                         mainAxisSpacing: 8,
-                        childAspectRatio: childAspectRatio,
+                        mainAxisExtent: 110,
                       ),
                       itemCount: filtered.length,
                       itemBuilder: (context, index) {

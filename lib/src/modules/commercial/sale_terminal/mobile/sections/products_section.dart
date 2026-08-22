@@ -173,12 +173,11 @@ class _MobileProductsSectionState extends State<_MobileProductsSection> {
               ? const Center(child: Text("No se encontraron productos"))
               : GridView.builder(
                   controller: _scrollController,
-                  padding: const EdgeInsets.all(4),
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 6,
+                    crossAxisCount: 1,
                     mainAxisSpacing: 6,
-                    childAspectRatio: 0.68,
+                    mainAxisExtent: 110,
                   ),
                   itemCount: filtered.length,
                   itemBuilder: (context, index) {
