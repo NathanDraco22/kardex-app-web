@@ -1,10 +1,7 @@
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:kardex_app_front/admin_panel/widgets/pie_chart_row.dart';
+import 'package:kardex_app_front/admin_panel/admin_modules/admin_reports/daily_summary/widgets/widgets.dart';
+import 'package:kardex_app_front/src/tools/extensiones.dart';
 import 'package:kardex_business/kardex_business.dart';
-import 'package:kardex_app_front/config/get_it_config.dart';
-import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
-import 'package:kardex_app_front/src/tools/color_tool.dart';
 
 class DailySummaryDetailScreen extends StatelessWidget {
   const DailySummaryDetailScreen({super.key, required this.summary});
@@ -16,271 +13,150 @@ class DailySummaryDetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Resumen: ${DateTimeTool.formatddMM(
+          "Resumen Diario: ${DateTimeTool.formatddMM(
             DateTime.fromMillisecondsSinceEpoch(summary.startDate),
           )}",
         ),
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 600),
-          child: ListView(
-            padding: const EdgeInsets.only(bottom: 64),
+      body: _Body(summary: summary),
+    );
+  }
+}
+
+class _Body extends StatelessWidget {
+  const _Body({required this.summary});
+
+  final DailySummaryInDb summary;
+
+  @override
+  Widget build(BuildContext context) {
+    if (context.isDesktop()) {
+      return _DailySummaryDesktop(summary: summary);
+    }
+
+    if (context.isTablet()) {
+      return _DailySummaryTablet(summary: summary);
+    }
+
+    return _DailySummaryMobile(summary: summary);
+  }
+}
+
+class _DailySummaryMobile extends StatelessWidget {
+  const _DailySummaryMobile({required this.summary});
+
+  final DailySummaryInDb summary;
+
+  @override
+  Widget build(BuildContext context) {
+    final hasBranches = summary.branches.isNotEmpty;
+
+    return SafeArea(
+      child: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        children: [
+          DailySalesSummaryCard(summary: summary),
+          if (hasBranches) ...[
+            const SizedBox(height: 8),
+            DailySalesPieChartCard(summary: summary),
+          ],
+          const SizedBox(height: 16),
+          DailyCashFlowSummaryCard(summary: summary),
+          const SizedBox(height: 16),
+          DailyOtherStatsCard(summary: summary),
+          const SizedBox(height: 48),
+        ],
+      ),
+    );
+  }
+}
+
+class _DailySummaryTablet extends StatelessWidget {
+  const _DailySummaryTablet({required this.summary});
+
+  final DailySummaryInDb summary;
+
+  @override
+  Widget build(BuildContext context) {
+    final hasBranches = summary.branches.isNotEmpty;
+
+    return SafeArea(
+      child: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        children: [
+          // Fila 1: Ventas y Gráfico de Pastel
+          if (hasBranches)
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: DailySalesSummaryCard(summary: summary)),
+                const SizedBox(width: 12),
+                Expanded(child: DailySalesPieChartCard(summary: summary)),
+              ],
+            )
+          else
+            DailySalesSummaryCard(summary: summary),
+          const SizedBox(height: 16),
+
+          // Fila 2: Flujo de Caja y Otros Datos
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _SalesCard(summary: summary),
-              const SizedBox(height: 12),
-              const Text(
-                "Ventas por Sucursal",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              if (summary.branches.isNotEmpty)
-                PieChartCard(summary: summary)
+              Expanded(child: DailyCashFlowSummaryCard(summary: summary)),
+              const SizedBox(width: 12),
+              Expanded(child: DailyOtherStatsCard(summary: summary)),
+            ],
+          ),
+          const SizedBox(height: 48),
+        ],
+      ),
+    );
+  }
+}
+
+class _DailySummaryDesktop extends StatelessWidget {
+  const _DailySummaryDesktop({required this.summary});
+
+  final DailySummaryInDb summary;
+
+  @override
+  Widget build(BuildContext context) {
+    final hasBranches = summary.branches.isNotEmpty;
+
+    return SafeArea(
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1440),
+          child: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            children: [
+              // Sección 1: Ventas y Distribución por Sucursal
+              if (hasBranches)
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(flex: 5, child: DailySalesSummaryCard(summary: summary)),
+                    const SizedBox(width: 16),
+                    Expanded(flex: 5, child: DailySalesPieChartCard(summary: summary)),
+                  ],
+                )
               else
-                const Center(child: Text("No hay datos de sucursales")),
-              const SizedBox(height: 12),
-              _CashFlowCard(summary: summary),
-              const SizedBox(height: 12),
-              _OtherStatsCard(summary: summary),
-              const SizedBox(height: 12),
+                DailySalesSummaryCard(summary: summary),
+              const SizedBox(height: 20),
+
+              // Sección 2: Flujo de Caja y Métricas Globales
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(flex: 5, child: DailyCashFlowSummaryCard(summary: summary)),
+                  const SizedBox(width: 16),
+                  Expanded(flex: 5, child: DailyOtherStatsCard(summary: summary)),
+                ],
+              ),
+              const SizedBox(height: 48),
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class PieChartCard extends StatelessWidget {
-  const PieChartCard({
-    super.key,
-    required this.summary,
-  });
-
-  final DailySummaryInDb summary;
-
-  @override
-  Widget build(BuildContext context) {
-    final branches = summary.branches
-        .map(
-          (branch) => getIt<AuthCubit>().getBranchById(branch.branchId),
-        )
-        .toList();
-
-    final chartsColor = ColorTool.getChartColors();
-    return Card(
-      child: SizedBox(
-        height: 250,
-        child: Row(
-          children: [
-            Flexible(
-              child: PieChart(
-                PieChartData(
-                  sectionsSpace: 0,
-                  centerSpaceRadius: 40,
-                  sections: List.generate(summary.branches.length, (i) {
-                    final branch = summary.branches[i];
-                    const fontSize = 16.0;
-                    const radius = 50.0;
-                    const shadows = [
-                      Shadow(
-                        color: Colors.black,
-                        blurRadius: 2,
-                      ),
-                    ];
-                    return PieChartSectionData(
-                      color: chartsColor[i % chartsColor.length],
-                      value: branch.total.toDouble(),
-                      title: '${((branch.total / summary.total) * 100).toStringAsFixed(1)}%',
-                      radius: radius,
-                      titleStyle: const TextStyle(
-                        fontSize: fontSize,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        shadows: shadows,
-                      ),
-                    );
-                  }),
-                ),
-              ),
-            ),
-            Flexible(
-              child: ListView(
-                shrinkWrap: true,
-                children: List.generate(summary.branches.length, (i) {
-                  final branch = branches[i];
-                  final branchDetail = summary.branches[i];
-                  return PieChartRow(
-                    title: branch.name,
-                    subtitle: NumberFormatter.convertToMoneyLike(branchDetail.total),
-                    color: chartsColor[i % chartsColor.length],
-                  );
-                }),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _SalesCard extends StatelessWidget {
-  const _SalesCard({required this.summary});
-
-  final DailySummaryInDb summary;
-
-  @override
-  Widget build(BuildContext context) {
-    final ganancia = summary.total - summary.totalCost;
-    final isProfit = ganancia >= 0;
-
-    return Card(
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text("Resumen de Ventas", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            _RowInfo("Ventas al Contado", NumberFormatter.convertToMoneyLike(summary.cashSales)),
-            const Divider(),
-            _RowInfo("Ventas a Crédito", NumberFormatter.convertToMoneyLike(summary.creditSales)),
-            const Divider(),
-            _RowInfo("Total Ventas", NumberFormatter.convertToMoneyLike(summary.total)),
-            const Divider(),
-            _RowInfo("Costo Ventas", NumberFormatter.convertToMoneyLike(summary.totalCost)),
-            const Divider(),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text("Ganancia Estimada", style: TextStyle(fontSize: 16)),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: isProfit ? Colors.green.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      NumberFormatter.convertToMoneyLike(ganancia),
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: isProfit ? Colors.green[700] : Colors.red[700],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _CashFlowCard extends StatelessWidget {
-  const _CashFlowCard({required this.summary});
-
-  final DailySummaryInDb summary;
-
-  @override
-  Widget build(BuildContext context) {
-    final totalIngresoCaja = summary.cashSales + summary.totalReceiptCash;
-
-    return Card(
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text("Flujo de Caja", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            _RowInfo("Ventas al Contado", NumberFormatter.convertToMoneyLike(summary.cashSales)),
-            const Divider(),
-            _RowInfo("Recaudación Efectivo (Recibos)", NumberFormatter.convertToMoneyLike(summary.totalReceiptCash)),
-            const Divider(),
-            _RowInfo(
-              "Total Ingreso en Caja",
-              NumberFormatter.convertToMoneyLike(totalIngresoCaja),
-              isHighlight: true,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _OtherStatsCard extends StatelessWidget {
-  const _OtherStatsCard({required this.summary});
-
-  final DailySummaryInDb summary;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text("Otros Datos", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            _RowInfo("Total de Abonos (Facturas)", NumberFormatter.convertToMoneyLike(summary.totalPaid)),
-            const Divider(),
-            _RowInfo(
-              "CxC Generado",
-              NumberFormatter.convertToMoneyLike(summary.totalOwed),
-              isHighlight: true,
-            ),
-            const Divider(),
-            _RowInfo("Total en Recibos", NumberFormatter.convertToMoneyLike(summary.totalReceipts)),
-            const Divider(),
-            _RowInfo(
-              "Devoluciones Aplicadas (Recibos)",
-              NumberFormatter.convertToMoneyLike(summary.totalReceiptDevolutions),
-            ),
-            const Divider(),
-            _RowInfo("Total Facturas Emitidas", summary.totalInvoices.toString()),
-            const Divider(),
-            _RowInfo("Cantidad Recibos Emitidos", summary.receiptCount.toString()),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _RowInfo extends StatelessWidget {
-  const _RowInfo(this.label, this.value, {this.isHighlight = false});
-
-  final String label;
-  final String value;
-  final bool isHighlight;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: const TextStyle(fontSize: 16)),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: isHighlight ? Theme.of(context).colorScheme.primary : null,
-            ),
-          ),
-        ],
       ),
     );
   }

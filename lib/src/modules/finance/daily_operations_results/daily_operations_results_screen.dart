@@ -3,8 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/cubits/reports/read_reports_cubit.dart';
+import 'package:kardex_app_front/src/modules/finance/daily_operations_results/desktop/daily_operations_results_desktop.dart';
+import 'package:kardex_app_front/src/modules/finance/daily_operations_results/mobile/daily_operations_results_mobile.dart';
+import 'package:kardex_app_front/src/modules/finance/daily_operations_results/tablet/daily_operations_results_tablet.dart';
+import 'package:kardex_app_front/src/tools/extensiones.dart';
 import 'package:kardex_business/kardex_business.dart';
-import 'package:kardex_app_front/src/modules/finance/daily_operations_results/web/daily_operations_results_screen_web.dart';
 
 class DailyOperationsResultsScreen extends StatelessWidget {
   const DailyOperationsResultsScreen({super.key});
@@ -38,6 +41,14 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const DailyOperationsResultsScreenWeb();
+    if (context.isDesktop()) {
+      return const DailyOperationsResultsDesktop();
+    }
+
+    if (context.isTablet()) {
+      return const DailyOperationsResultsTablet();
+    }
+
+    return const DailyOperationsResultsMobile();
   }
 }
