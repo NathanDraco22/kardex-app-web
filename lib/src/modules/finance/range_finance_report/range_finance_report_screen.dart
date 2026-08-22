@@ -3,8 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/cubits/reports/read_reports_cubit.dart';
+import 'package:kardex_app_front/src/modules/finance/range_finance_report/desktop/range_finance_report_desktop.dart';
+import 'package:kardex_app_front/src/modules/finance/range_finance_report/mobile/range_finance_report_mobile.dart';
+import 'package:kardex_app_front/src/modules/finance/range_finance_report/tablet/range_finance_report_tablet.dart';
+import 'package:kardex_app_front/src/tools/extensiones.dart';
 import 'package:kardex_business/kardex_business.dart';
-import 'web/range_finance_report_screen_web.dart';
 
 class FinanceRangeReportScreen extends StatelessWidget {
   const FinanceRangeReportScreen({super.key});
@@ -48,6 +51,14 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const RangeFinanceReportScreenWeb();
+    if (context.isDesktop()) {
+      return const RangeFinanceReportDesktop();
+    }
+
+    if (context.isTablet()) {
+      return const RangeFinanceReportTablet();
+    }
+
+    return const RangeFinanceReportMobile();
   }
 }
