@@ -48,7 +48,6 @@ class _Body extends StatelessWidget {
               leading: const Icon(FluentIcons.cube_12_filled),
               title: const Text("Lista Global de Productos"),
               onTap: () => context.pushNamed("product-list"),
-              trailing: const Icon(Icons.chevron_right),
             ),
           ),
           const Divider(height: 0.0),
@@ -106,25 +105,23 @@ class _Body extends StatelessWidget {
 
           const Divider(height: 0.0),
 
-          ShortcutAddableListTile(
-            routeName: RouteNames.productMovements,
-            child: ListTile(
-              leading: const Icon(
-                Icons.sync,
-                color: Colors.teal,
-              ),
-              title: const Text("Movimientos de un Producto"),
-              onTap: () => context.pushNamed("product-movements"),
-            ),
-          ),
-          const Divider(height: 0.0),
-
+          // ShortcutAddableListTile(
+          //   routeName: RouteNames.productMovements,
+          //   child: ListTile(
+          //     leading: const Icon(
+          //       Icons.sync,
+          //       color: Colors.teal,
+          //     ),
+          //     title: const Text("Movimientos de un Producto"),
+          //     onTap: () => context.pushNamed("product-movements"),
+          //   ),
+          // ),
+          // const Divider(height: 0.0),
           ShortcutAddableListTile(
             routeName: RouteNames.productInventoryCatalog,
             child: ListTile(
               leading: const Icon(Icons.inventory, color: Colors.blueGrey),
               title: const Text("Catálogo de Inventario"),
-              trailing: const Icon(Icons.chevron_right),
               onTap: () => context.pushNamed("product-inventory-catalog"),
             ),
           ),

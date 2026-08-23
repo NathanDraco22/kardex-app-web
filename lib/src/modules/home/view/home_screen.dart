@@ -245,14 +245,14 @@ List<HomeOption> getHomeOptions(BuildContext context) {
       icon: FluentIcons.contact_card_16_filled,
       onTap: () => context.pushNamed("client-catalog"),
     ),
-    HomeOption(
-      permissions: const [Modules.products],
-      title: "Catálogo de Productos",
-      subtitle: "Inventario general, precios y categorías",
-      accentColor: const Color(0xFF7C3AED),
-      icon: FluentIcons.receipt_bag_20_filled,
-      onTap: () => context.pushNamed("product-catalog"),
-    ),
+    // HomeOption(
+    //   permissions: const [Modules.products],
+    //   title: "Catálogo de Productos",
+    //   subtitle: "Inventario general, precios y categorías",
+    //   accentColor: const Color(0xFF7C3AED),
+    //   icon: FluentIcons.receipt_bag_20_filled,
+    //   onTap: () => context.pushNamed("product-catalog"),
+    // ),
     HomeOption(
       permissions: const [Modules.commercial],
       title: "Comercio",
