@@ -63,8 +63,9 @@ class _TerminalPaymentDialogState extends State<_TerminalPaymentDialog> {
   late PaymentType _selectedMethod;
   final TextEditingController _receivedController = TextEditingController();
   final TextEditingController _refController = TextEditingController();
-  late final TextEditingController _observationsController =
-      TextEditingController(text: widget.initialObservations ?? "");
+  late final TextEditingController _observationsController = TextEditingController(
+    text: widget.initialObservations ?? "",
+  );
   int _receivedAmount = 0;
 
   @override
@@ -185,7 +186,8 @@ class _TerminalPaymentDialogState extends State<_TerminalPaymentDialog> {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-            ] else ...[
+            ],
+            if (![PaymentType.cash, PaymentType.credit].contains(_selectedMethod))
               TextField(
                 controller: _refController,
                 autofocus: true,
@@ -200,7 +202,7 @@ class _TerminalPaymentDialogState extends State<_TerminalPaymentDialog> {
                 ),
                 onChanged: (_) => setState(() {}),
               ),
-            ],
+
             const SizedBox(height: 12),
             TextField(
               controller: _observationsController,
