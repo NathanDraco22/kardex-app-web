@@ -5,6 +5,7 @@ import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/core/terminal_draft_manager.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/cubit/read_terminal_product_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/view_controller.dart';
+import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/hold_sale_description_dialog.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/hold_sales_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_business/kardex_business.dart';
@@ -67,6 +68,16 @@ Future<void> holdTerminalSale(
   final authState = getIt<AuthCubit>().state;
   if (authState is! Authenticated) return;
 
+  final enteredDescription = await showHoldSaleDescriptionDialog(
+    context,
+    initialValue: viewController.description,
+    clientName: viewController.selectedClient?.name,
+  );
+
+  // Si el usuario canceló el diálogo, no guardamos
+  if (enteredDescription == null) return;
+
+  viewController.description = enteredDescription;
   final draft = viewController.exportToDraft();
   await SaleTerminalDraftManager().saveDraft(authState.branch.id, draft);
 
@@ -74,10 +85,13 @@ Future<void> holdTerminalSale(
   viewController.clear();
 
   if (!context.mounted) return;
+  final message = enteredDescription.isNotEmpty
+      ? "Venta \"$enteredDescription\" guardada en espera"
+      : "Venta guardada en espera";
   ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(
-      content: Text("Venta guardada en espera"),
-      duration: Duration(seconds: 2),
+    SnackBar(
+      content: Text(message),
+      duration: const Duration(seconds: 2),
       behavior: SnackBarBehavior.floating,
     ),
   );
