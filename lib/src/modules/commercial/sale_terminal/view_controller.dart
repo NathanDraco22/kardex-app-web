@@ -11,6 +11,8 @@ class SaleTerminalViewController extends ChangeNotifier {
 
   String description = '';
 
+  String? currentDraftId;
+
   List<CommercialProductResult> items = [];
 
   ClientInDb? _selectedClient;
@@ -156,6 +158,7 @@ class SaleTerminalViewController extends ChangeNotifier {
 
   void clear() {
     description = '';
+    currentDraftId = null;
     items = [];
     _selectedClient = null;
     _selectedPriceLevel = 1;
@@ -165,8 +168,10 @@ class SaleTerminalViewController extends ChangeNotifier {
   }
 
   SaleTerminalDraft exportToDraft({String? id}) {
+    final draftId = id ?? currentDraftId ?? DateTime.now().millisecondsSinceEpoch.toString();
+    currentDraftId = draftId;
     return SaleTerminalDraft(
-      id: id ?? DateTime.now().millisecondsSinceEpoch.toString(),
+      id: draftId,
       savedAt: DateTime.now(),
       client: selectedClient,
       selectedPriceLevel: selectedPriceLevel,
@@ -178,6 +183,7 @@ class SaleTerminalViewController extends ChangeNotifier {
   }
 
   void loadFromDraft(SaleTerminalDraft draft) {
+    currentDraftId = draft.id;
     _selectedClient = draft.client;
     _selectedPriceLevel = draft.selectedPriceLevel;
     _isWholesale = draft.isWholesale;

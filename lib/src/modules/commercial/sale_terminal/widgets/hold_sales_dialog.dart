@@ -59,7 +59,6 @@ class _HoldSalesDialogContentState extends State<_HoldSalesDialogContent> {
     }
 
     widget.viewController.loadFromDraft(draft);
-    await SaleTerminalDraftManager().removeDraft(widget.branchId, draft.id);
 
     if (!mounted) return;
     Navigator.of(context).pop();
