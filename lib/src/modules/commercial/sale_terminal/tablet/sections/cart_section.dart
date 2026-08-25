@@ -62,7 +62,7 @@ class _TabletCartSectionState extends State<_TabletCartSection> {
                       IconButton(
                         icon: const Icon(Icons.close),
                         tooltip: "Cerrar",
-                        onPressed: () => Navigator.of(context).maybePop(),
+                        onPressed: () => Scaffold.of(context).closeEndDrawer(),
                       ),
                       const SizedBox(width: 4),
                       Flexible(
@@ -82,10 +82,10 @@ class _TabletCartSectionState extends State<_TabletCartSection> {
                         onPressed: viewController.items.isEmpty
                             ? null
                             : () => holdTerminalSale(
-                                  context,
-                                  viewController: viewController,
-                                  onHoldCompleted: () => _lastItemCount = 0,
-                                ),
+                                context,
+                                viewController: viewController,
+                                onHoldCompleted: () => _lastItemCount = 0,
+                              ),
                         icon: Icon(
                           Icons.pause_circle_outline,
                           size: 20,
@@ -105,10 +105,10 @@ class _TabletCartSectionState extends State<_TabletCartSection> {
                         onPressed: viewController.items.isEmpty
                             ? null
                             : () => confirmAndClearCart(
-                                  context,
-                                  viewController: viewController,
-                                  onCleared: () => _lastItemCount = 0,
-                                ),
+                                context,
+                                viewController: viewController,
+                                onCleared: () => _lastItemCount = 0,
+                              ),
                         icon: const Icon(Icons.delete_sweep_outlined, size: 18),
                         label: const Text("Vaciar"),
                       ),
