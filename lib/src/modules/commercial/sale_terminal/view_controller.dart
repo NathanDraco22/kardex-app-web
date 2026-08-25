@@ -9,7 +9,14 @@ import 'package:kardex_business/kardex_business.dart';
 class SaleTerminalViewController extends ChangeNotifier {
   final FocusNode searchFocusNode = FocusNode();
 
+  /// Controla si las acciones automáticas (agregar producto, limpiar carrito, etc.)
+  /// deben reenfocar el buscador. Se activa únicamente en Web / Desktop para evitar
+  /// desplegar el teclado en pantalla en dispositivos móviles y tablets.
+  bool autoFocusSearch = false;
+
   String description = '';
+
+  String? currentDraftId;
 
   List<CommercialProductResult> items = [];
 
@@ -145,7 +152,8 @@ class SaleTerminalViewController extends ChangeNotifier {
 
   void refresh() => notifyListeners();
 
-  void requestSearchFocus() {
+  void requestSearchFocus({bool force = false}) {
+    if (!force && !autoFocusSearch) return;
     if (searchFocusNode.hasFocus) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!searchFocusNode.hasFocus && searchFocusNode.canRequestFocus) {
@@ -156,6 +164,7 @@ class SaleTerminalViewController extends ChangeNotifier {
 
   void clear() {
     description = '';
+    currentDraftId = null;
     items = [];
     _selectedClient = null;
     _selectedPriceLevel = 1;
@@ -165,8 +174,10 @@ class SaleTerminalViewController extends ChangeNotifier {
   }
 
   SaleTerminalDraft exportToDraft({String? id}) {
+    final draftId = id ?? currentDraftId ?? DateTime.now().millisecondsSinceEpoch.toString();
+    currentDraftId = draftId;
     return SaleTerminalDraft(
-      id: id ?? DateTime.now().millisecondsSinceEpoch.toString(),
+      id: draftId,
       savedAt: DateTime.now(),
       client: selectedClient,
       selectedPriceLevel: selectedPriceLevel,
@@ -178,6 +189,7 @@ class SaleTerminalViewController extends ChangeNotifier {
   }
 
   void loadFromDraft(SaleTerminalDraft draft) {
+    currentDraftId = draft.id;
     _selectedClient = draft.client;
     _selectedPriceLevel = draft.selectedPriceLevel;
     _isWholesale = draft.isWholesale;

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/core/terminal_draft_manager.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/cubit/read_terminal_product_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/view_controller.dart';
+import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/hold_sale_description_dialog.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/hold_sales_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_business/kardex_business.dart';
@@ -67,6 +69,16 @@ Future<void> holdTerminalSale(
   final authState = getIt<AuthCubit>().state;
   if (authState is! Authenticated) return;
 
+  final enteredDescription = await showHoldSaleDescriptionDialog(
+    context,
+    initialValue: viewController.description,
+    clientName: viewController.selectedClient?.name,
+  );
+
+  // Si el usuario canceló el diálogo, no guardamos
+  if (enteredDescription == null) return;
+
+  viewController.description = enteredDescription;
   final draft = viewController.exportToDraft();
   await SaleTerminalDraftManager().saveDraft(authState.branch.id, draft);
 
@@ -74,10 +86,13 @@ Future<void> holdTerminalSale(
   viewController.clear();
 
   if (!context.mounted) return;
+  final message = enteredDescription.isNotEmpty
+      ? "Venta \"$enteredDescription\" guardada en espera"
+      : "Venta guardada en espera";
   ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(
-      content: Text("Venta guardada en espera"),
-      duration: Duration(seconds: 2),
+    SnackBar(
+      content: Text(message),
+      duration: const Duration(seconds: 2),
       behavior: SnackBarBehavior.floating,
     ),
   );
@@ -115,3 +130,56 @@ Future<void> confirmAndClearCart(
   onCleared?.call();
   viewController.clear();
 }
+
+/// Intercepta la salida de la terminal cuando hay productos en el carrito,
+/// permitiendo guardar en espera, descartar o continuar vendiendo.
+Future<void> handleTerminalExit(
+  BuildContext context, {
+  required SaleTerminalViewController viewController,
+}) async {
+  if (viewController.items.isEmpty) {
+    if (context.mounted) {
+      context.pop();
+    }
+    return;
+  }
+
+  final option = await DialogManager.showSaveDraftDialog(
+    context,
+    title: "Venta en Progreso",
+    content: "Tienes una venta con productos en el carrito. ¿Deseas guardarla en espera para continuar después?",
+    saveButtonText: "Salir y Guardar en Espera",
+    discardButtonText: "Salir y no guardar",
+    cancelButtonText: "Continuar vendiendo",
+  );
+
+  if (option == 1) {
+    if (!context.mounted) return;
+    final authState = getIt<AuthCubit>().state;
+    if (authState is! Authenticated) return;
+
+    final enteredDescription = await showHoldSaleDescriptionDialog(
+      context,
+      initialValue: viewController.description,
+      clientName: viewController.selectedClient?.name,
+    );
+
+    // Si el usuario canceló el diálogo de descripción, cancelamos la salida
+    if (enteredDescription == null) return;
+
+    viewController.description = enteredDescription;
+    final draft = viewController.exportToDraft();
+    await SaleTerminalDraftManager().saveDraft(authState.branch.id, draft);
+
+    viewController.clear();
+
+    if (!context.mounted) return;
+    context.pop();
+  } else if (option == 2) {
+    viewController.clear();
+    if (context.mounted) {
+      context.pop();
+    }
+  }
+}
+

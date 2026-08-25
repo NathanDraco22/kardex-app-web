@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kardex_app_front/src/core/terminal_draft_manager.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/view_controller.dart';
+import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/hold_sale_description_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_business/kardex_business.dart';
 
@@ -58,7 +59,6 @@ class _HoldSalesDialogContentState extends State<_HoldSalesDialogContent> {
     }
 
     widget.viewController.loadFromDraft(draft);
-    await SaleTerminalDraftManager().removeDraft(widget.branchId, draft.id);
 
     if (!mounted) return;
     Navigator.of(context).pop();
@@ -72,6 +72,34 @@ class _HoldSalesDialogContentState extends State<_HoldSalesDialogContent> {
     if (confirm != true) return;
 
     await SaleTerminalDraftManager().removeDraft(widget.branchId, draft.id);
+    if (!mounted) return;
+    setState(() {
+      _reloadDrafts();
+    });
+  }
+
+  Future<void> _editDescription(SaleTerminalDraft draft) async {
+    final newDescription = await showHoldSaleDescriptionDialog(
+      context,
+      initialValue: draft.description,
+      clientName: draft.client?.name,
+      isEditing: true,
+    );
+
+    if (newDescription == null || newDescription == draft.description) return;
+
+    final updatedDraft = SaleTerminalDraft(
+      id: draft.id,
+      savedAt: draft.savedAt,
+      client: draft.client,
+      selectedPriceLevel: draft.selectedPriceLevel,
+      isWholesale: draft.isWholesale,
+      description: newDescription,
+      selectedPaymentType: draft.selectedPaymentType,
+      items: draft.items,
+    );
+
+    await SaleTerminalDraftManager().saveDraft(widget.branchId, updatedDraft);
     if (!mounted) return;
     setState(() {
       _reloadDrafts();
@@ -115,8 +143,8 @@ class _HoldSalesDialogContentState extends State<_HoldSalesDialogContent> {
         ],
       ),
       content: SizedBox(
-        width: 520,
-        height: 420,
+        width: 560,
+        height: 440,
         child: FutureBuilder<List<SaleTerminalDraft>>(
           future: _draftsFuture,
           builder: (context, snapshot) {
@@ -182,6 +210,8 @@ class _HoldSalesDialogContentState extends State<_HoldSalesDialogContent> {
                     separatorBuilder: (context, index) => const SizedBox(height: 8),
                     itemBuilder: (context, index) {
                       final draft = drafts[index];
+                      final hasDescription = draft.description.trim().isNotEmpty;
+                      final title = hasDescription ? draft.description.trim() : (draft.client?.name ?? "Consumidor Final");
                       final clientName = draft.client?.name ?? "Consumidor Final";
                       final formattedDate = DateFormat('hh:mm a • dd/MM').format(draft.savedAt);
                       final totalAmount = NumberFormatter.convertToMoneyLike(draft.totalAmount);
@@ -196,6 +226,7 @@ class _HoldSalesDialogContentState extends State<_HoldSalesDialogContent> {
                         child: Padding(
                           padding: const EdgeInsets.all(10),
                           child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Container(
                                 width: 42,
@@ -206,7 +237,7 @@ class _HoldSalesDialogContentState extends State<_HoldSalesDialogContent> {
                                   border: Border.all(color: Colors.amber.shade300),
                                 ),
                                 child: Icon(
-                                  Icons.pause_rounded,
+                                  hasDescription ? Icons.bookmark_rounded : Icons.pause_rounded,
                                   color: Colors.amber.shade800,
                                   size: 22,
                                 ),
@@ -217,7 +248,7 @@ class _HoldSalesDialogContentState extends State<_HoldSalesDialogContent> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      clientName,
+                                      title,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(
@@ -226,26 +257,55 @@ class _HoldSalesDialogContentState extends State<_HoldSalesDialogContent> {
                                       ),
                                     ),
                                     const SizedBox(height: 2),
-                                    Text(
-                                      "${draft.totalQuantity} items • $totalAmount",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.green.shade700,
-                                        fontSize: 13,
+                                    if (hasDescription) ...[
+                                      Row(
+                                        children: [
+                                          Icon(Icons.person_outline, size: 13, color: Colors.grey.shade600),
+                                          const SizedBox(width: 3),
+                                          Expanded(
+                                            child: Text(
+                                              clientName,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.grey.shade700,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      "Guardado: $formattedDate",
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        color: Colors.grey.shade600,
-                                      ),
+                                      const SizedBox(height: 2),
+                                    ],
+                                    Row(
+                                      children: [
+                                        Text(
+                                          "${draft.totalQuantity} items • $totalAmount",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.green.shade700,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          "• $formattedDate",
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: Colors.grey.shade600,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: 6),
+                              IconButton(
+                                icon: Icon(Icons.edit_outlined, color: Colors.blueGrey.shade600, size: 20),
+                                tooltip: "Editar referencia",
+                                onPressed: () => _editDescription(draft),
+                              ),
                               IconButton(
                                 icon: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
                                 tooltip: "Descartar",

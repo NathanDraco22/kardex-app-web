@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/cubit/read_terminal_product_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/cubit/write_terminal_invoice_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/payment_action.dart';
@@ -35,6 +34,9 @@ class SaleTerminalScreenWeb extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    viewController.autoFocusSearch = true;
+    viewController.requestSearchFocus();
+
     return BlocListener<WriteTerminalInvoiceCubit, WriteTerminalInvoiceState>(
       listener: (context, state) async {
         if (state is WriteTerminalInvoiceInProgress) {
@@ -77,30 +79,12 @@ class _RootScaffold extends StatelessWidget {
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
-        if (viewController.items.isNotEmpty) {
-          final res = await DialogManager.confirmActionDialog(
-            context,
-            "¿Deseas salir de la terminal sin guardar?",
-          );
-          if (res != true) return;
-        }
-        if (!context.mounted) return;
-        context.pop();
+        await handleTerminalExit(context, viewController: viewController);
       },
       child: Scaffold(
         appBar: AppBar(
           leading: BackButton(
-            onPressed: () async {
-              if (viewController.items.isNotEmpty) {
-                final res = await DialogManager.confirmActionDialog(
-                  context,
-                  "¿Deseas salir de la terminal sin guardar?",
-                );
-                if (res != true) return;
-              }
-              if (!context.mounted) return;
-              context.pop();
-            },
+            onPressed: () => handleTerminalExit(context, viewController: viewController),
           ),
           title: const Text("Terminal de Venta"),
           actions: [

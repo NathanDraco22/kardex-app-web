@@ -62,7 +62,7 @@ class _MobileCartSectionState extends State<_MobileCartSection> {
                       IconButton(
                         icon: const Icon(Icons.close),
                         tooltip: "Cerrar",
-                        onPressed: () => Navigator.of(context).maybePop(),
+                        onPressed: () => Scaffold.of(context).closeEndDrawer(),
                       ),
                       const SizedBox(width: 4),
                       Flexible(
