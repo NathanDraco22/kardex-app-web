@@ -36,6 +36,8 @@ class SaleTerminalScreenMobile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    viewController.autoFocusSearch = false;
+
     return BlocListener<WriteTerminalInvoiceCubit, WriteTerminalInvoiceState>(
       listener: (context, state) async {
         if (state is WriteTerminalInvoiceInProgress) {
@@ -85,8 +87,6 @@ class _RootScaffold extends StatelessWidget {
           if (isOpen) {
             FocusManager.instance.primaryFocus?.unfocus();
             SystemChannels.textInput.invokeMethod('TextInput.hide');
-          } else {
-            viewController.requestSearchFocus();
           }
         },
         appBar: AppBar(

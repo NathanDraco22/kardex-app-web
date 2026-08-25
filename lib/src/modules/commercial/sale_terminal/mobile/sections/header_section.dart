@@ -108,9 +108,9 @@ class _MobileHeaderSectionState extends State<_MobileHeaderSection> {
                   child: TextField(
                     controller: _searchController,
                     focusNode: viewController.searchFocusNode,
-                    autofocus: true,
-                    textInputAction: TextInputAction.none,
-                    onTapOutside: (_) {},
+                    autofocus: false,
+                    textInputAction: TextInputAction.search,
+                    onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
                     onSubmitted: (value) {
                       _debounce?.cancel();
                       processTerminalSearch(

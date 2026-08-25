@@ -108,10 +108,10 @@ class _TabletHeaderSectionState extends State<_TabletHeaderSection> {
                   child: TextField(
                     controller: _searchController,
                     focusNode: viewController.searchFocusNode,
-                    autofocus: true,
-                    textInputAction: TextInputAction.none,
+                    autofocus: false,
+                    textInputAction: TextInputAction.search,
 
-                    onTapOutside: (_) {},
+                    onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
                     onSubmitted: (value) {
                       _debounce?.cancel();
                       processTerminalSearch(

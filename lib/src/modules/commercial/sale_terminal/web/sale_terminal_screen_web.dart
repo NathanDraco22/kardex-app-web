@@ -34,6 +34,9 @@ class SaleTerminalScreenWeb extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    viewController.autoFocusSearch = true;
+    viewController.requestSearchFocus();
+
     return BlocListener<WriteTerminalInvoiceCubit, WriteTerminalInvoiceState>(
       listener: (context, state) async {
         if (state is WriteTerminalInvoiceInProgress) {
