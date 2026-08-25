@@ -9,6 +9,11 @@ import 'package:kardex_business/kardex_business.dart';
 class SaleTerminalViewController extends ChangeNotifier {
   final FocusNode searchFocusNode = FocusNode();
 
+  /// Controla si las acciones automáticas (agregar producto, limpiar carrito, etc.)
+  /// deben reenfocar el buscador. Se activa únicamente en Web / Desktop para evitar
+  /// desplegar el teclado en pantalla en dispositivos móviles y tablets.
+  bool autoFocusSearch = false;
+
   String description = '';
 
   String? currentDraftId;
@@ -147,7 +152,8 @@ class SaleTerminalViewController extends ChangeNotifier {
 
   void refresh() => notifyListeners();
 
-  void requestSearchFocus() {
+  void requestSearchFocus({bool force = false}) {
+    if (!force && !autoFocusSearch) return;
     if (searchFocusNode.hasFocus) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!searchFocusNode.hasFocus && searchFocusNode.canRequestFocus) {

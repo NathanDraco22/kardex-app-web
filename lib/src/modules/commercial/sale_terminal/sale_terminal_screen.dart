@@ -26,7 +26,6 @@ class _SaleTerminalScreenState extends State<SaleTerminalScreen> {
   void initState() {
     super.initState();
     viewController = SaleTerminalViewController();
-    viewController.requestSearchFocus();
   }
 
   @override
