@@ -178,6 +178,7 @@ class _PaymentDialogState extends State<_PaymentDialog> {
                   fontWeight: FontWeight.w500,
                 ),
                 inputFormatters: [IntegerTextInputFormatter()],
+                keyboardType: const TextInputType.numberWithOptions(decimal: false),
                 decoration: const InputDecoration(
                   labelText: "Número de Referencia",
                   border: OutlineInputBorder(),

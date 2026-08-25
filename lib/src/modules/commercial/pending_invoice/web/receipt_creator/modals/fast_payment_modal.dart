@@ -183,6 +183,7 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
                     fontWeight: FontWeight.w500,
                   ),
                   inputFormatters: [IntegerTextInputFormatter()],
+                  keyboardType: const TextInputType.numberWithOptions(decimal: false),
                   decoration: const InputDecoration(
                     labelText: "Número de Referencia",
                     border: OutlineInputBorder(),

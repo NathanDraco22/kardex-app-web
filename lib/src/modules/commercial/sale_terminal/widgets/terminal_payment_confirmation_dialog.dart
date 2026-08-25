@@ -195,6 +195,7 @@ class _TerminalPaymentDialogState extends State<_TerminalPaymentDialog> {
                   fontSize: 18,
                   fontWeight: FontWeight.w500,
                 ),
+                keyboardType: const TextInputType.numberWithOptions(decimal: false),
                 inputFormatters: [IntegerTextInputFormatter()],
                 decoration: const InputDecoration(
                   labelText: "Número de Referencia",
