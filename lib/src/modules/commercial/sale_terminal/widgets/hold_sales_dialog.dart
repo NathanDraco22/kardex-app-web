@@ -211,7 +211,9 @@ class _HoldSalesDialogContentState extends State<_HoldSalesDialogContent> {
                     itemBuilder: (context, index) {
                       final draft = drafts[index];
                       final hasDescription = draft.description.trim().isNotEmpty;
-                      final title = hasDescription ? draft.description.trim() : (draft.client?.name ?? "Consumidor Final");
+                      final title = hasDescription
+                          ? draft.description.trim()
+                          : (draft.client?.name ?? "Consumidor Final");
                       final clientName = draft.client?.name ?? "Consumidor Final";
                       final formattedDate = DateFormat('hh:mm a • dd/MM').format(draft.savedAt);
                       final totalAmount = NumberFormatter.convertToMoneyLike(draft.totalAmount);
@@ -224,30 +226,29 @@ class _HoldSalesDialogContentState extends State<_HoldSalesDialogContent> {
                           side: BorderSide(color: Colors.grey.shade300),
                         ),
                         child: Padding(
-                          padding: const EdgeInsets.all(10),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
+                          padding: const EdgeInsets.all(12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Container(
-                                width: 42,
-                                height: 42,
-                                decoration: BoxDecoration(
-                                  color: Colors.amber.shade50,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.amber.shade300),
-                                ),
-                                child: Icon(
-                                  hasDescription ? Icons.bookmark_rounded : Icons.pause_rounded,
-                                  color: Colors.amber.shade800,
-                                  size: 22,
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 34,
+                                    height: 34,
+                                    decoration: BoxDecoration(
+                                      color: Colors.amber.shade50,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: Colors.amber.shade300),
+                                    ),
+                                    child: Icon(
+                                      hasDescription ? Icons.bookmark_rounded : Icons.pause_rounded,
+                                      color: Colors.amber.shade800,
+                                      size: 18,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
                                       title,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
@@ -256,74 +257,110 @@ class _HoldSalesDialogContentState extends State<_HoldSalesDialogContent> {
                                         fontSize: 14,
                                       ),
                                     ),
-                                    const SizedBox(height: 2),
-                                    if (hasDescription) ...[
-                                      Row(
-                                        children: [
-                                          Icon(Icons.person_outline, size: 13, color: Colors.grey.shade600),
-                                          const SizedBox(width: 3),
-                                          Expanded(
-                                            child: Text(
-                                              clientName,
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.grey.shade700,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
+                                  ),
+                                  const SizedBox(width: 4),
+                                  IconButton(
+                                    icon: Icon(Icons.edit_outlined, color: Colors.blueGrey.shade600, size: 18),
+                                    tooltip: "Editar referencia",
+                                    visualDensity: VisualDensity.compact,
+                                    constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                                    padding: EdgeInsets.zero,
+                                    onPressed: () => _editDescription(draft),
+                                  ),
+                                  const SizedBox(width: 2),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete_outline, color: Colors.red, size: 18),
+                                    tooltip: "Descartar",
+                                    visualDensity: VisualDensity.compact,
+                                    constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                                    padding: EdgeInsets.zero,
+                                    onPressed: () => _deleteDraft(draft),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  ElevatedButton.icon(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.teal.shade600,
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
+                                      minimumSize: Size.zero,
+                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
                                       ),
-                                      const SizedBox(height: 2),
-                                    ],
-                                    Row(
-                                      children: [
-                                        Text(
-                                          "${draft.totalQuantity} items • $totalAmount",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.green.shade700,
-                                            fontSize: 13,
-                                          ),
+                                    ),
+                                    onPressed: () => _loadDraft(draft),
+                                    icon: const Icon(Icons.download, size: 14),
+                                    label: const Text(
+                                      "Cargar",
+                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              const Divider(height: 1, thickness: 0.8),
+                              const SizedBox(height: 8),
+                              if (hasDescription) ...[
+                                Row(
+                                  children: [
+                                    Icon(Icons.person_outline, size: 13, color: Colors.grey.shade600),
+                                    const SizedBox(width: 4),
+                                    Expanded(
+                                      child: Text(
+                                        clientName,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey.shade700,
                                         ),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          "• $formattedDate",
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            color: Colors.grey.shade600,
-                                          ),
-                                        ),
-                                      ],
+                                      ),
                                     ),
                                   ],
                                 ),
-                              ),
-                              const SizedBox(width: 6),
-                              IconButton(
-                                icon: Icon(Icons.edit_outlined, color: Colors.blueGrey.shade600, size: 20),
-                                tooltip: "Editar referencia",
-                                onPressed: () => _editDescription(draft),
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
-                                tooltip: "Descartar",
-                                onPressed: () => _deleteDraft(draft),
-                              ),
-                              const SizedBox(width: 4),
-                              ElevatedButton.icon(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.teal.shade600,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
+                                const SizedBox(height: 4),
+                              ],
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Wrap(
+                                    crossAxisAlignment: WrapCrossAlignment.center,
+                                    spacing: 6,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: Colors.green.shade50,
+                                          borderRadius: BorderRadius.circular(4),
+                                          border: Border.all(color: Colors.green.shade200),
+                                        ),
+                                        child: Text(
+                                          totalAmount,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.green.shade800,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                      ),
+                                      Text(
+                                        "${draft.totalQuantity} items",
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.grey.shade700,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                                onPressed: () => _loadDraft(draft),
-                                icon: const Icon(Icons.download, size: 16),
-                                label: const Text("Cargar", style: TextStyle(fontSize: 12)),
+                                  Text(
+                                    formattedDate,
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: Colors.grey.shade500,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
