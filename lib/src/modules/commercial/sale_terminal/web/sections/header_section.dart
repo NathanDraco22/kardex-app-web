@@ -83,7 +83,6 @@ class _HeaderSectionState extends State<_HeaderSection> {
                     },
                     decoration: InputDecoration(
                       isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                       prefixIcon: const Icon(Icons.search, size: 20),
                       suffixIcon: _searchController.text.isNotEmpty
                           ? IconButton(
