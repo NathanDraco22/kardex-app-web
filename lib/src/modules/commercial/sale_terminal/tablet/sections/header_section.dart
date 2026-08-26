@@ -58,7 +58,6 @@ class _TabletHeaderSectionState extends State<_TabletHeaderSection> {
                         flex: 50,
                         child: TerminalUnitTypeSelector(
                           viewController: viewController,
-                          height: 38,
                           isCompact: true,
                           fontSize: 12,
                         ),
