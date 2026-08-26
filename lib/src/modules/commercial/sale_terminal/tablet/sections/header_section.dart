@@ -29,80 +29,45 @@ class _TabletHeaderSectionState extends State<_TabletHeaderSection> {
         child: ListenableBuilder(
           listenable: viewController,
           builder: (context, _) {
-            final client = viewController.selectedClient;
-
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 // Client selector bar
-                InkWell(
-                  borderRadius: BorderRadius.circular(8),
-                  onTap: () async {
-                    if (client == null) {
-                      final selected = await showClientSelectionDialog(context);
-                      if (selected != null) {
-                        viewController.selectedClient = selected;
-                      }
-                    } else {
-                      showClientFullDetailsDialog(context, client: client);
-                    }
-                  },
-                  child: Container(
-                    height: 38,
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: client == null ? Colors.grey.shade100 : Colors.blue.shade50,
-                      border: Border.all(
-                        color: client == null ? Colors.grey.shade300 : Colors.blue.shade200,
+                TerminalClientBar(viewController: viewController, height: 38),
+                const SizedBox(height: 6),
+                // Price level & unit controls row
+                Focus(
+                  canRequestFocus: false,
+                  descendantsAreFocusable: false,
+                  child: Row(
+                    children: [
+                      // Price Level dropdown
+                      Expanded(
+                        flex: 50,
+                        child: TerminalPriceLevelDropdown(
+                          viewController: viewController,
+                          height: 38,
+                          fontSize: 13,
+                          iconSize: 16,
+                        ),
                       ),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.person_outline,
-                          size: 18,
-                          color: client == null ? Colors.grey.shade700 : Colors.blue.shade700,
+                      const SizedBox(width: 8),
+                      // Unit mode segmented button
+                      Expanded(
+                        flex: 50,
+                        child: TerminalUnitTypeSelector(
+                          viewController: viewController,
+                          height: 38,
+                          isCompact: true,
+                          fontSize: 12,
                         ),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            client == null ? "Cliente: Consumidor Final" : "Cliente: ${client.name}",
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: client == null ? Colors.grey.shade800 : Colors.blue.shade900,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        if (client != null) ...[
-                          IconButton(
-                            icon: const Icon(Icons.close, size: 16, color: Colors.grey),
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                            onPressed: () {
-                              viewController.selectedClient = null;
-                            },
-                          ),
-                        ] else ...[
-                          Text(
-                            "Seleccionar",
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.blue.shade700,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 6),
-                // Search bar
+                // Search bar (at the bottom)
                 SizedBox(
                   height: 40,
                   child: TextField(
@@ -110,7 +75,6 @@ class _TabletHeaderSectionState extends State<_TabletHeaderSection> {
                     focusNode: viewController.searchFocusNode,
                     autofocus: false,
                     textInputAction: TextInputAction.search,
-
                     onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
                     onSubmitted: (value) {
                       _debounce?.cancel();
@@ -123,7 +87,6 @@ class _TabletHeaderSectionState extends State<_TabletHeaderSection> {
                         onCleared: () => setState(() {}),
                       );
                     },
-
                     decoration: InputDecoration(
                       isCollapsed: true,
                       isDense: true,
@@ -161,71 +124,6 @@ class _TabletHeaderSectionState extends State<_TabletHeaderSection> {
                         },
                       );
                     },
-                  ),
-                ),
-                const SizedBox(height: 6),
-                // Price level & unit controls row
-                Focus(
-                  canRequestFocus: false,
-                  descendantsAreFocusable: false,
-                  child: Row(
-                    children: [
-                      // Price Level dropdown
-                      Expanded(
-                        flex: 50,
-                        child: Container(
-                          height: 36,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey.shade300),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton<int>(
-                              value: viewController.selectedPriceLevel,
-                              isDense: true,
-                              isExpanded: true,
-                              icon: const Icon(Icons.arrow_drop_down, size: 18),
-                              items: const [
-                                DropdownMenuItem(value: 1, child: Text("Nivel 1", style: TextStyle(fontSize: 13))),
-                                DropdownMenuItem(value: 2, child: Text("Nivel 2", style: TextStyle(fontSize: 13))),
-                                DropdownMenuItem(value: 3, child: Text("Nivel 3", style: TextStyle(fontSize: 13))),
-                                DropdownMenuItem(value: 4, child: Text("Nivel 4", style: TextStyle(fontSize: 13))),
-                              ],
-                              onChanged: (val) {
-                                if (val != null) viewController.selectedPriceLevel = val;
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      // Unit mode segmented button
-                      Expanded(
-                        flex: 50,
-                        child: SegmentedButton<bool>(
-                          showSelectedIcon: false,
-                          style: SegmentedButton.styleFrom(
-                            padding: EdgeInsets.zero,
-                            textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                          ),
-                          segments: const [
-                            ButtonSegment(
-                              value: false,
-                              label: Text("Detalle"),
-                            ),
-                            ButtonSegment(
-                              value: true,
-                              label: Text("Mayorista"),
-                            ),
-                          ],
-                          selected: {viewController.isWholesale},
-                          onSelectionChanged: (selection) {
-                            viewController.isWholesale = selection.first;
-                          },
-                        ),
-                      ),
-                    ],
                   ),
                 ),
               ],

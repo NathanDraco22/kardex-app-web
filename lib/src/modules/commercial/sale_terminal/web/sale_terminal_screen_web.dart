@@ -4,15 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/cubit/read_terminal_product_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/cubit/write_terminal_invoice_cubit.dart';
-import 'package:kardex_app_front/src/modules/commercial/sale_terminal/payment_action.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/sale_completion.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/shared_actions.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/view_controller.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/terminal_cart_item_tile.dart';
+import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/terminal_desktop_client_card.dart';
+import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/terminal_empty_cart.dart';
+import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/terminal_pay_button.dart';
+import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/terminal_price_level_dropdown.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/terminal_product_tile.dart';
+import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/terminal_totals_summary.dart';
+import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/terminal_unit_type_selector.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
-import 'package:kardex_app_front/widgets/buttons/ctrl_key_tip.dart';
-import 'package:kardex_app_front/widgets/client_selector_card.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/commercial_product_dialog.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
@@ -119,10 +122,7 @@ class _Body extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    SizedBox(
-                      height: 240,
-                      child: _HeaderSection(),
-                    ),
+                    _HeaderSection(),
                     SizedBox(height: 8),
                     Expanded(
                       child: _ProductsSection(),
