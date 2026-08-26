@@ -105,7 +105,7 @@ class _CartSectionState extends State<_CartSection> {
                   const Divider(),
                   Expanded(
                     child: viewController.items.isEmpty
-                        ? const _EmptyCart()
+                        ? const TerminalEmptyCart()
                         : ListView.separated(
                             controller: _scrollController,
                             padding: const EdgeInsets.only(bottom: 8),
@@ -138,9 +138,9 @@ class _CartSectionState extends State<_CartSection> {
                           ),
                   ),
                   const Divider(),
-                  _TotalsSummary(viewController: viewController),
+                  TerminalTotalsSummary(viewController: viewController),
                   const SizedBox(height: 10),
-                  _PayButton(viewController: viewController),
+                  TerminalPayButton(viewController: viewController),
                 ],
               );
             },
@@ -177,165 +177,5 @@ class _CartSectionState extends State<_CartSection> {
     }
     viewController.updateItem(item, res);
     viewController.requestSearchFocus();
-  }
-}
-
-class _PayButton extends StatelessWidget {
-  const _PayButton({required this.viewController});
-
-  final SaleTerminalViewController viewController;
-
-  @override
-  Widget build(BuildContext context) {
-    final hasItems = viewController.items.isNotEmpty;
-    final hasZeroPrice = viewController.hasZeroPriceItems;
-    final hasZeroQuantity = viewController.hasItemsWithZeroQuantity;
-    final enabled = hasItems && !hasZeroPrice && !hasZeroQuantity;
-
-    String? disabledMessage;
-    if (hasZeroPrice) {
-      disabledMessage = "Hay productos con precio en 0. Edítalos o elimínalos para cobrar.";
-    } else if (hasZeroQuantity) {
-      disabledMessage = "Hay productos sin cantidad. Revisa la venta antes de cobrar.";
-    }
-
-    return Tooltip(
-      message: disabledMessage ?? "",
-      child: CtrlKeyTip(
-        hotKey: "G",
-        onShortcut: () async {
-          await startTerminalPayment(context);
-          if (context.mounted) {
-            viewController.requestSearchFocus();
-          }
-        },
-        child: SizedBox(
-          height: 64,
-          width: double.infinity,
-          child: ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green.shade600,
-              foregroundColor: Colors.white,
-              disabledBackgroundColor: Colors.grey.shade300,
-              disabledForegroundColor: Colors.white70,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              textStyle: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            onPressed: enabled
-                ? () async {
-                    await startTerminalPayment(context);
-                    if (context.mounted) {
-                      viewController.requestSearchFocus();
-                    }
-                  }
-                : null,
-            icon: const Icon(Icons.payments_outlined, size: 28),
-            label: const Text("Cobrar"),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _EmptyCart extends StatelessWidget {
-  const _EmptyCart();
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.shopping_cart_outlined,
-              size: 56,
-              color: Colors.grey.shade400,
-            ),
-            const SizedBox(height: 12),
-            const Text(
-              "Venta vacía",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color: Colors.grey,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              "Toca un producto para agregarlo",
-              style: TextStyle(
-                fontSize: 13,
-                color: Colors.grey.shade500,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _TotalsSummary extends StatelessWidget {
-  const _TotalsSummary({required this.viewController});
-
-  final SaleTerminalViewController viewController;
-
-  @override
-  Widget build(BuildContext context) {
-    final totalAmount = viewController.totalAmount;
-    final totalDiscount = viewController.totalDiscount;
-    final subTotal = totalAmount + totalDiscount;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text("Subtotal", style: TextStyle(color: Colors.grey)),
-            Text(NumberFormatter.convertToMoneyLike(subTotal)),
-          ],
-        ),
-        const SizedBox(height: 4),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text("Descuento", style: TextStyle(color: Colors.grey)),
-            Text(
-              "-${NumberFormatter.convertToMoneyLike(totalDiscount)}",
-              style: TextStyle(color: Colors.red.shade600),
-            ),
-          ],
-        ),
-        const Divider(height: 12),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              "TOTAL",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-            Text(
-              NumberFormatter.convertToMoneyLike(totalAmount),
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-                color: Colors.green.shade700,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
   }
 }

@@ -117,7 +117,11 @@ class _TabletCartSectionState extends State<_TabletCartSection> {
                   const Divider(),
                   Expanded(
                     child: viewController.items.isEmpty
-                        ? const _TabletEmptyCart()
+                        ? const TerminalEmptyCart(
+                            iconSize: 48,
+                            titleFontSize: 15,
+                            subtitleFontSize: 12,
+                          )
                         : ListView.separated(
                             controller: _scrollController,
                             padding: const EdgeInsets.only(bottom: 8),
@@ -150,9 +154,18 @@ class _TabletCartSectionState extends State<_TabletCartSection> {
                           ),
                   ),
                   const Divider(),
-                  _TabletTotalsSummary(viewController: viewController),
+                  TerminalTotalsSummary(
+                    viewController: viewController,
+                    totalFontSize: 20,
+                    labelFontSize: 14,
+                  ),
                   const SizedBox(height: 8),
-                  _TabletPayButton(viewController: viewController),
+                  TerminalPayButton(
+                    viewController: viewController,
+                    height: 56,
+                    fontSize: 20,
+                    iconSize: 24,
+                  ),
                 ],
               );
             },
@@ -189,176 +202,5 @@ class _TabletCartSectionState extends State<_TabletCartSection> {
     }
     viewController.updateItem(item, res);
     viewController.requestSearchFocus();
-  }
-}
-
-class _TabletPayButton extends StatelessWidget {
-  const _TabletPayButton({required this.viewController});
-
-  final SaleTerminalViewController viewController;
-
-  @override
-  Widget build(BuildContext context) {
-    final hasItems = viewController.items.isNotEmpty;
-    final hasZeroPrice = viewController.hasZeroPriceItems;
-    final hasZeroQuantity = viewController.hasItemsWithZeroQuantity;
-    final enabled = hasItems && !hasZeroPrice && !hasZeroQuantity;
-
-    String? disabledMessage;
-    if (hasZeroPrice) {
-      disabledMessage = "Hay productos con precio en 0. Edítalos o elimínalos para cobrar.";
-    } else if (hasZeroQuantity) {
-      disabledMessage = "Hay productos sin cantidad. Revisa la venta antes de cobrar.";
-    }
-
-    return Tooltip(
-      message: disabledMessage ?? "",
-      child: CtrlKeyTip(
-        hotKey: "G",
-        onShortcut: () async {
-          await startTerminalPayment(context);
-          if (context.mounted) {
-            viewController.requestSearchFocus();
-          }
-        },
-        child: SizedBox(
-          height: 56,
-          width: double.infinity,
-          child: ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green.shade600,
-              foregroundColor: Colors.white,
-              disabledBackgroundColor: Colors.grey.shade300,
-              disabledForegroundColor: Colors.white70,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              textStyle: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            onPressed: enabled
-                ? () async {
-                    await startTerminalPayment(context);
-                    if (context.mounted) {
-                      viewController.requestSearchFocus();
-                    }
-                  }
-                : null,
-            icon: const Icon(Icons.payments_outlined, size: 24),
-            label: const Text("Cobrar"),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _TabletEmptyCart extends StatelessWidget {
-  const _TabletEmptyCart();
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.shopping_cart_outlined,
-              size: 48,
-              color: Colors.grey.shade400,
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              "Venta vacía",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 15,
-                color: Colors.grey,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              "Toca un producto para agregarlo",
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey.shade500,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _TabletTotalsSummary extends StatelessWidget {
-  const _TabletTotalsSummary({required this.viewController});
-
-  final SaleTerminalViewController viewController;
-
-  @override
-  Widget build(BuildContext context) {
-    final totalAmount = viewController.totalAmount;
-    final totalDiscount = viewController.totalDiscount;
-    final subTotal = totalAmount + totalDiscount;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              "Subtotal",
-              style: TextStyle(
-                color: Colors.grey,
-                fontSize: 14,
-              ),
-            ),
-            Text(
-              NumberFormatter.convertToMoneyLike(subTotal),
-              style: const TextStyle(
-                fontSize: 14,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 2),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text("Descuento", style: TextStyle(color: Colors.grey, fontSize: 13)),
-            Text(
-              "-${NumberFormatter.convertToMoneyLike(totalDiscount)}",
-              style: TextStyle(color: Colors.red.shade600, fontSize: 14),
-            ),
-          ],
-        ),
-        const Divider(height: 10),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              "TOTAL",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-            Text(
-              NumberFormatter.convertToMoneyLike(totalAmount),
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-                color: Colors.green.shade700,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
   }
 }
