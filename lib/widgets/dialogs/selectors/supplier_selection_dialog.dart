@@ -62,10 +62,19 @@ class _SupplierSelectionDialogState extends State<SupplierSelectionDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text("Seleccionar Proveedor"),
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text("Buscar Proveedor"),
+          IconButton(
+            icon: const Icon(Icons.close),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ],
+      ),
       content: SizedBox(
-        width: 500,
-        height: 600,
+        width: 400,
+        height: 300,
         child: Column(
           children: [
             SearchFieldDebounced(
@@ -106,7 +115,7 @@ class _SupplierSelectionDialogState extends State<SupplierSelectionDialog> {
       separatorBuilder: (context, index) => const Divider(),
       itemBuilder: (context, index) {
         final supplier = _suppliers[index];
-        
+
         final subtitleParts = <String>[];
         if (supplier.cardId != null && supplier.cardId!.isNotEmpty) {
           subtitleParts.add("Cédula/RUC: ${supplier.cardId}");
