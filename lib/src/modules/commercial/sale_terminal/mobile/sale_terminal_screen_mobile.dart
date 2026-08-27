@@ -115,15 +115,17 @@ class _RootScaffold extends StatelessWidget {
                     return Badge(
                       isLabelVisible: count > 0,
                       label: Text('$count'),
-                      offset: const Offset(-4, 4),
-                      child: IconButton(
-                        icon: const Icon(Icons.shopping_cart_outlined),
-                        tooltip: "Ver Carrito",
-                        onPressed: () {
-                          FocusManager.instance.primaryFocus?.unfocus();
-                          SystemChannels.textInput.invokeMethod('TextInput.hide');
-                          Scaffold.of(scaffoldContext).openEndDrawer();
-                        },
+                      offset: const Offset(-4, 12),
+                      child: Center(
+                        child: IconButton(
+                          icon: const Icon(Icons.shopping_cart_outlined),
+                          tooltip: "Ver Carrito",
+                          onPressed: () {
+                            FocusManager.instance.primaryFocus?.unfocus();
+                            SystemChannels.textInput.invokeMethod('TextInput.hide');
+                            Scaffold.of(scaffoldContext).openEndDrawer();
+                          },
+                        ),
                       ),
                     );
                   },

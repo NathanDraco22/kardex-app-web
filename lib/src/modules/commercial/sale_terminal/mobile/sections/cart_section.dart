@@ -45,7 +45,7 @@ class _MobileCartSectionState extends State<_MobileCartSection> {
       descendantsAreFocusable: false,
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(12),
           child: ListenableBuilder(
             listenable: viewController,
             builder: (context, _) {
@@ -82,10 +82,10 @@ class _MobileCartSectionState extends State<_MobileCartSection> {
                         onPressed: viewController.items.isEmpty
                             ? null
                             : () => holdTerminalSale(
-                                  context,
-                                  viewController: viewController,
-                                  onHoldCompleted: () => _lastItemCount = 0,
-                                ),
+                                context,
+                                viewController: viewController,
+                                onHoldCompleted: () => _lastItemCount = 0,
+                              ),
                         icon: Icon(
                           Icons.pause_circle_outline,
                           size: 20,
@@ -105,10 +105,10 @@ class _MobileCartSectionState extends State<_MobileCartSection> {
                         onPressed: viewController.items.isEmpty
                             ? null
                             : () => confirmAndClearCart(
-                                  context,
-                                  viewController: viewController,
-                                  onCleared: () => _lastItemCount = 0,
-                                ),
+                                context,
+                                viewController: viewController,
+                                onCleared: () => _lastItemCount = 0,
+                              ),
                         icon: const Icon(Icons.delete_sweep_outlined, size: 18),
                         label: const Text("Vaciar"),
                       ),
