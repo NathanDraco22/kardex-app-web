@@ -62,10 +62,19 @@ class _ClientSelectionDialogState extends State<ClientSelectionDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text("Seleccionar Cliente"),
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text("Seleccionar Cliente"),
+          IconButton(
+            icon: const Icon(Icons.close),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ],
+      ),
       content: SizedBox(
-        width: 500,
-        height: 600,
+        width: 400,
+        height: 300,
         child: Column(
           children: [
             SearchFieldDebounced(
@@ -79,12 +88,6 @@ class _ClientSelectionDialogState extends State<ClientSelectionDialog> {
           ],
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text("Cancelar"),
-        ),
-      ],
     );
   }
 
