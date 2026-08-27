@@ -65,7 +65,7 @@ class _ClientSelectionDialogState extends State<ClientSelectionDialog> {
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text("Seleccionar Cliente"),
+          const Text("Buscar Cliente"),
           IconButton(
             icon: const Icon(Icons.close),
             onPressed: () => Navigator.pop(context),
