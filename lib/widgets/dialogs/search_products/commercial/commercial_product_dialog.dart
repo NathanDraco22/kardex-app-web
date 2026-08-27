@@ -148,10 +148,11 @@ class CommercialProductDialog extends StatelessWidget {
       child: ShortcutContainer(
         child: Dialog(
           constraints: const BoxConstraints(maxWidth: 700),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: SizedBox(
             width: 650,
-            height: 700,
+            height: 600,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: _FormContent(
@@ -261,8 +262,9 @@ class _FormContentState extends State<_FormContent> {
         backgroundColor: Colors.white,
 
         body: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(12.0),
           child: Column(
+            spacing: 12,
             children: [
               ProductHeaderInfo(
                 product: widget.product,
@@ -275,7 +277,6 @@ class _FormContentState extends State<_FormContent> {
                 child: ListView(
                   children: [
                     const SizedBox(height: 8),
-
                     SizedBox(
                       width: 600,
                       child: Column(
@@ -284,43 +285,48 @@ class _FormContentState extends State<_FormContent> {
                           Focus(
                             canRequestFocus: false,
                             descendantsAreFocusable: false,
-                            child: Column(
+                            child: Row(
                               mainAxisSize: MainAxisSize.min,
+                              spacing: 20,
                               children: [
-                                CtrlKeyTip(
-                                  hotKey: "1",
-                                  onShortcut: () {
-                                    unitFocusNode.requestFocus();
-                                    if (unitFocusNode.context != null) {
-                                      Actions.invoke(unitFocusNode.context!, const ActivateIntent());
-                                    }
-                                  },
-                                  child: CommercialProductUnitSelector(
-                                    focusNode: unitFocusNode,
-                                    result: commercialProductResult,
-                                    onChanged: () => setState(() {}),
+                                Expanded(
+                                  child: CtrlKeyTip(
+                                    hotKey: "1",
+                                    onShortcut: () {
+                                      unitFocusNode.requestFocus();
+                                      if (unitFocusNode.context != null) {
+                                        Actions.invoke(unitFocusNode.context!, const ActivateIntent());
+                                      }
+                                    },
+                                    child: CommercialProductUnitSelector(
+                                      focusNode: unitFocusNode,
+                                      result: commercialProductResult,
+                                      onChanged: () => setState(() {}),
+                                    ),
                                   ),
                                 ),
-                                const SizedBox(height: 12),
-                                CtrlKeyTip(
-                                  hotKey: "2",
-                                  onShortcut: () {
-                                    priceFocusNode.requestFocus();
-                                    if (priceFocusNode.context != null) {
-                                      Actions.invoke(priceFocusNode.context!, const ActivateIntent());
-                                    }
-                                  },
-                                  child: PriceLevelDropdownSelector(
-                                    focusNode: priceFocusNode,
-                                    result: commercialProductResult,
-                                    isUserAdmin: isUserAdmin,
-                                    onChanged: () => setState(() {}),
+                                Expanded(
+                                  child: CtrlKeyTip(
+                                    hotKey: "2",
+                                    onShortcut: () {
+                                      priceFocusNode.requestFocus();
+                                      if (priceFocusNode.context != null) {
+                                        Actions.invoke(priceFocusNode.context!, const ActivateIntent());
+                                      }
+                                    },
+                                    child: PriceLevelDropdownSelector(
+                                      focusNode: priceFocusNode,
+                                      result: commercialProductResult,
+                                      isUserAdmin: isUserAdmin,
+                                      onChanged: () => setState(() {}),
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(height: 8),
                               ],
                             ),
                           ),
+                          const SizedBox(height: 8),
                           Row(
                             children: [
                               Expanded(
@@ -372,7 +378,10 @@ class _FormContentState extends State<_FormContent> {
                               const Expanded(child: SizedBox.shrink()),
                             ],
                           ),
-                          const Divider(),
+                          const Divider(
+                            height: 24,
+                          ),
+
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.center,
