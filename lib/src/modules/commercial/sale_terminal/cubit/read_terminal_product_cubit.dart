@@ -20,6 +20,7 @@ class ReadTerminalProductCubit extends Cubit<ReadTerminalProductState> {
   List<ProductInDbInBranch> _productsCache = [];
 
   Future<void> loadProducts() async {
+    _isSearching = false;
     emit(ReadTerminalProductLoading());
     try {
       final products = await productsRepository.getAllProductsInBranch(
