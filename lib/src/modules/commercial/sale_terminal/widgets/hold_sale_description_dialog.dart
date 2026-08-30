@@ -66,11 +66,13 @@ class _HoldSaleDescriptionDialogContentState extends State<_HoldSaleDescriptionD
     final theme = Theme.of(context);
     final titleText = widget.isEditing ? "Editar Referencia de Venta" : "Guardar Venta en Espera";
 
-    return AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-      contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-      actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(viewInsets: EdgeInsets.zero),
+      child: AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+        contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+        actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       title: Row(
         children: [
           Container(
@@ -186,6 +188,7 @@ class _HoldSaleDescriptionDialogContentState extends State<_HoldSaleDescriptionD
           ),
         ),
       ],
-    );
-  }
+    ),
+  );
+}
 }
