@@ -180,21 +180,31 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const TextFieldTapRegion(
-      child: Padding(
-        padding: EdgeInsets.all(6.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(
-              height: 160,
-              child: _TabletHeaderSection(),
-            ),
-            SizedBox(height: 6),
-            Expanded(
-              child: _TabletProductsSection(),
-            ),
-          ],
+    return BlocListener<WriteTerminalInvoiceCubit, WriteTerminalInvoiceState>(
+      listener: (context, state) {
+        if (state is WriteTerminalInvoiceSuccess) {
+          final rootScaffold = Scaffold.maybeOf(context);
+          if (rootScaffold != null && rootScaffold.isEndDrawerOpen) {
+            rootScaffold.closeEndDrawer();
+          }
+        }
+      },
+      child: const TextFieldTapRegion(
+        child: Padding(
+          padding: EdgeInsets.all(6.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(
+                height: 160,
+                child: _TabletHeaderSection(),
+              ),
+              SizedBox(height: 6),
+              Expanded(
+                child: _TabletProductsSection(),
+              ),
+            ],
+          ),
         ),
       ),
     );
