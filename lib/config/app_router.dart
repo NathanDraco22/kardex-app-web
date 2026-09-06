@@ -47,6 +47,7 @@ import 'package:kardex_app_front/src/modules/commercial/product_movements/view/c
 import 'package:kardex_app_front/src/modules/commercial/quotation_order_search/quotation_order_search_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/receipt_history/receipt_history_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/sale_terminal_screen.dart';
+import 'package:kardex_app_front/src/modules/commercial/user_operations_results/user_operations_results_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/client_accounts/view/client_account_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/client_movements/view/client_movements_screen.dart';
 import 'package:kardex_business/kardex_business.dart';
@@ -368,6 +369,12 @@ class AppRouter {
             path: "devolution-history",
             name: "devolution-history",
             builder: (context, state) => const DevolutionHistoryScreen(),
+          ),
+
+          GoRoute(
+            path: "user-operations-results",
+            name: "user-operations-results",
+            builder: (context, state) => const UserOperationsResultsScreen(),
           ),
 
           GoRoute(
