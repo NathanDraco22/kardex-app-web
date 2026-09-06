@@ -94,7 +94,6 @@ class _Body extends StatelessWidget {
                   color: Colors.teal.shade700,
                 ),
                 title: const Text("Arqueo y Resultados por Usuario"),
-                trailing: const Icon(Icons.chevron_right),
                 onTap: () {
                   context.pushNamed("user-operations-results");
                 },
