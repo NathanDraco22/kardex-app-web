@@ -2,6 +2,7 @@ class TotalsQueryParams {
   String? branchId;
   DateTime? startDate;
   DateTime? endDate;
+  String? userId;
 
   Map<String, String> toMap() {
     final Map<String, String> map = {};
@@ -13,6 +14,9 @@ class TotalsQueryParams {
     }
     if (endDate != null) {
       map['endDate'] = endDate!.millisecondsSinceEpoch.toString();
+    }
+    if (userId != null) {
+      map['userId'] = userId!;
     }
     return map;
   }

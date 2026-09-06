@@ -135,6 +135,11 @@ class ShortcutRouteRegistry {
       icon: Icons.content_paste_search_rounded,
       color: Color(0xFFFB8C00),
     ),
+    RouteNames.userOperationsResults: const ShortcutInfo(
+      title: "Arqueo y Resultados por Usuario",
+      icon: Icons.badge_outlined,
+      color: Color(0xFF00897B),
+    ),
 
     // --- Inventario ---
     RouteNames.currentInventory: const ShortcutInfo(
