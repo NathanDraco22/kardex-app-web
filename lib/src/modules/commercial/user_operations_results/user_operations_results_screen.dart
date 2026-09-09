@@ -6,6 +6,8 @@ import 'package:kardex_app_front/src/cubits/user_reports/read_user_reports_cubit
 import 'package:kardex_app_front/src/modules/commercial/user_operations_results/desktop/user_operations_results_desktop.dart';
 import 'package:kardex_app_front/src/modules/commercial/user_operations_results/mobile/user_operations_results_mobile.dart';
 import 'package:kardex_app_front/src/modules/commercial/user_operations_results/tablet/user_operations_results_tablet.dart';
+import 'package:kardex_app_front/src/tools/exports/pdf/templates/user_operations_arqueo_pdf_template.dart';
+import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 import 'package:kardex_app_front/src/tools/extensiones.dart';
 import 'package:kardex_business/kardex_business.dart';
 
@@ -33,8 +35,43 @@ class _RootScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cubitState = context.watch<ReadUserReportsCubit>().state;
+    final cubit = context.read<ReadUserReportsCubit>();
+    final authState = getIt<AuthCubit>().state;
+    final branch = authState is Authenticated ? authState.branch : null;
+
+    final canExport = cubitState is ReadUserReportsSuccess && branch != null;
+
     return Scaffold(
-      appBar: AppBar(title: const Text("Arqueo y Resultados por Usuario")),
+      appBar: AppBar(
+        title: const Text("Arqueo y Resultados por Usuario"),
+        actions: [
+          IconButton(
+            tooltip: "Exportar Arqueo PDF",
+            icon: const Icon(Icons.picture_as_pdf),
+            onPressed: canExport
+                ? () async {
+                    final userName = cubit.selectedUser?.username ?? "todos";
+                    final dateFormatted = cubit.startDate != null
+                        ? DateTimeTool.formatddMMyy(cubit.startDate!)
+                        : "hoy";
+
+                    final template = UserOperationsArqueoPdfTemplate(
+                      result: cubitState.result,
+                      branch: branch,
+                      user: cubit.selectedUser,
+                      date: cubit.startDate,
+                    );
+
+                    await PdfExportTool.export(
+                      template,
+                      fileName: "arqueo_${userName}_$dateFormatted.pdf",
+                    );
+                  }
+                : null,
+          ),
+        ],
+      ),
       body: const _Body(),
     );
   }
