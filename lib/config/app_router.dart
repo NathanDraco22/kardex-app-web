@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/src/modules/commercial/product_demand_vs_stock/product_demand_vs_stock_screen.dart';
+import 'package:kardex_app_front/src/modules/commercial/user_operations_results/user_operations_results_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/daily_operations_results/daily_operations_results_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/range_finance_report/range_finance_report_screen.dart';
 import 'package:kardex_app_front/admin_panel/admin_modules/admin_reports/admin_reports_menu.dart';
@@ -17,7 +18,6 @@ import 'package:kardex_app_front/src/modules/client_catalog/client_list/view/cli
 import 'package:kardex_app_front/src/modules/client_catalog/cllient_map/client_map_screen.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/initial_balance/view/initial_balance_screen.dart';
 import 'package:kardex_app_front/src/modules/settings/view/api_keys/api_keys_screen.dart';
-
 
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/anon_invoices_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_devolution/client_devolution_screen.dart';
@@ -43,7 +43,6 @@ import 'package:kardex_app_front/src/modules/commercial/product_movements/view/c
 import 'package:kardex_app_front/src/modules/commercial/quotation_order_search/quotation_order_search_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/receipt_history/receipt_history_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/sale_terminal_screen.dart';
-import 'package:kardex_app_front/src/modules/commercial/user_operations_results/user_operations_results_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/client_accounts/view/client_account_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/client_movements/view/client_movements_screen.dart';
 import 'package:kardex_business/kardex_business.dart';
@@ -363,13 +362,13 @@ class AppRouter {
             builder: (context, state) => const DevolutionHistoryScreen(),
           ),
 
-          /*
           GoRoute(
             path: "user-operations-results",
             name: "user-operations-results",
             builder: (context, state) => const UserOperationsResultsScreen(),
           ),
 
+          /*
           GoRoute(
             path: "product-price-setting",
             name: "product-price-setting",
@@ -639,10 +638,8 @@ class AppRouter {
             name: "api_keys",
             builder: (context, state) => const ApiKeysScreen(),
           ),
-
         ],
       ),
-
 
       GoRoute(
         path: '/expenses',
