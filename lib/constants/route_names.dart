@@ -55,6 +55,7 @@ class RouteNames {
   static const proformaWholesale = 'proforma-wholesale';
   static const productDemandVsStock = 'product-demand-vs-stock';
   static const quotationOrderSearch = 'quotation-order-search';
+  static const userOperationsResults = 'user-operations-results';
 
   static const pendingAccounts = 'pending-accounts';
   static const pendingInvoices = 'pending-invoices';

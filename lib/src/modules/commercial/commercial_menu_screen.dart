@@ -86,6 +86,25 @@ class _Body extends StatelessWidget {
           RolePermissionGate(
             permissions: [CommercialSubModules.createInvoice],
             child: ShortcutAddableListTile(
+              routeName: RouteNames.userOperationsResults,
+              child: ListTile(
+                leading: Icon(
+                  Icons.badge_outlined,
+                  size: 32,
+                  color: Colors.teal.shade700,
+                ),
+                title: const Text("Arqueo y Resultados por Usuario"),
+                onTap: () {
+                  context.pushNamed("user-operations-results");
+                },
+              ),
+            ),
+          ),
+          const Divider(height: 0.0),
+
+          RolePermissionGate(
+            permissions: [CommercialSubModules.createInvoice],
+            child: ShortcutAddableListTile(
               routeName: RouteNames.dailyInvoice,
               child: ListTile(
                 leading: Icon(
