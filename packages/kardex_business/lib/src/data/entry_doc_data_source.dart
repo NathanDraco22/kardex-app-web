@@ -18,6 +18,13 @@ class EntryDocsDataSource with HttpService {
     return res;
   }
 
+  Future<Map<String, dynamic>> createEntryDocDirect(Map<String, dynamic> entryDoc) async {
+    final uri = HttpTools.generateUri("$_endpoint/direct");
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await postQuery(uri, entryDoc, headers: headers);
+    return res;
+  }
+
   Future<Map<String, dynamic>> getAllEntryDocs() async {
     final uri = HttpTools.generateUri(_endpoint);
     final headers = HttpTools.generateAuthHeaders();

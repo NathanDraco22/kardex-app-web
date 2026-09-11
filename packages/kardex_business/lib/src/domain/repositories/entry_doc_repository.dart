@@ -13,6 +13,12 @@ class EntryDocsRepository {
     return newDoc;
   }
 
+  Future<EntryDocInDb> createEntryDocDirect(CreateEntryDoc createEntryDoc) async {
+    final result = await entryDocsDataSource.createEntryDocDirect(createEntryDoc.toJson());
+    final newDoc = EntryDocInDb.fromJson(result);
+    return newDoc;
+  }
+
   Future<List<EntryDocInDb>> getPaginatedEntryDocs(int offset) async {
     final results = await entryDocsDataSource.getPaginatedEntryDocs(offset);
     final response = ListResponse<EntryDocInDb>.fromJson(

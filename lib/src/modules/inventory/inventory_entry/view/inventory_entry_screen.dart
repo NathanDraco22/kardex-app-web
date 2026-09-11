@@ -47,7 +47,7 @@ class _InventoryEntryScreenState extends State<InventoryEntryScreen> {
 
     return ShortcutContainer(
       child: BlocProvider(
-        create: (context) => WriteEntryDocCubit(entryDocRepo),
+        create: (context) => WriteEntryDocCubit(entryDocRepo, useKardex: false),
         child: InventoryEntryMediator(
           viewController: viewController,
           child: const _RootScaffold(),
