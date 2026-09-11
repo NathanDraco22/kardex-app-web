@@ -245,6 +245,7 @@ List<HomeOption> getHomeOptions(BuildContext context) {
       icon: FluentIcons.contact_card_16_filled,
       onTap: () => context.pushNamed("client-catalog"),
     ),
+
     // HomeOption(
     //   permissions: const [Modules.products],
     //   title: "Catálogo de Productos",
@@ -253,6 +254,14 @@ List<HomeOption> getHomeOptions(BuildContext context) {
     //   icon: FluentIcons.receipt_bag_20_filled,
     //   onTap: () => context.pushNamed("product-catalog"),
     // ),
+    HomeOption(
+      permissions: const [Modules.suppliers],
+      title: "Lista de Proveedores",
+      subtitle: "Directorio de proveedores y compras",
+      accentColor: const Color(0xFF0D9488),
+      icon: FluentIcons.building_multiple_20_filled,
+      onTap: () => context.pushNamed("suppliers-catalog"),
+    ),
     HomeOption(
       permissions: const [Modules.commercial],
       title: "Comercio",

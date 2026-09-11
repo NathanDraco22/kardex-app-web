@@ -148,6 +148,47 @@ class _Body extends StatelessWidget {
           ),
 
           ShortcutAddableListTile(
+            routeName: RouteNames.inventoryEntry,
+            child: ListTile(
+              leading: IconWidgets.entryInventoryIcon,
+              title: const Text("Entrada de Inventario"),
+              onTap: () => context.pushNamed("inventory-entry"),
+            ),
+          ),
+          const Divider(height: 0.0),
+
+          ShortcutAddableListTile(
+            routeName: RouteNames.historyEntry,
+            child: ListTile(
+              leading: const Icon(
+                FluentIcons.history_28_filled,
+                color: Colors.blue,
+              ),
+              title: const Text("Historial de Entradas"),
+              onTap: () => context.pushNamed("history-entry"),
+            ),
+          ),
+          const Divider(height: 0.0),
+
+          ShortcutAddableListTile(
+            routeName: RouteNames.productEntryHistory,
+            child: ListTile(
+              leading: const Icon(
+                Icons.call_received,
+                color: Colors.orange,
+              ),
+              title: const Text("Historial de Entradas por Producto"),
+              onTap: () => context.pushNamed("product-entry-history"),
+            ),
+          ),
+          const Divider(height: 0.0),
+
+          const Divider(
+            height: 4.0,
+            thickness: 2,
+          ),
+
+          ShortcutAddableListTile(
             routeName: RouteNames.currentTranfers,
             child: ListTile(
               leading: const Icon(

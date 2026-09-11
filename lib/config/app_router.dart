@@ -10,7 +10,11 @@ import 'package:kardex_app_front/admin_panel/admin_modules/admin_reports/executi
 import 'package:kardex_app_front/admin_panel/admin_modules/admin_reports/range_executive_report/admin_range_finance_report_screen.dart';
 import 'package:kardex_app_front/admin_panel/admin_panel_screen.dart';
 import 'package:kardex_app_front/src/modules/activation/activation_screen.dart';
+import 'package:kardex_app_front/src/modules/inventory/history_entry/history_entry_screen.dart';
+import 'package:kardex_app_front/src/modules/inventory/inventory_entry/view/inventory_entry_screen.dart';
+import 'package:kardex_app_front/src/modules/inventory/product_entry_history/product_entry_history_screen.dart';
 import 'package:kardex_app_front/src/modules/shortcuts/shortcuts_menu_screen.dart';
+import 'package:kardex_app_front/src/modules/suppliers_catalog/view/suppliers_catalog_screen.dart';
 import 'package:kardex_app_front/widgets/dialogs/global_stock_search_modal.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/client_catalog_menu_screen.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/client_groups/client_groups_screen.dart';
@@ -223,13 +227,12 @@ class AppRouter {
         ],
       ),
 
-      /*
       GoRoute(
         path: '/suppliers-catalog',
         name: 'suppliers-catalog',
         builder: (context, state) => const SuppliersCatalogScreen(),
       ),
-*/
+
       GoRoute(
         path: '/commercial',
         name: 'commercial',
@@ -459,22 +462,26 @@ class AppRouter {
             name: "current-inventory",
             builder: (context, state) => const CurrentInventoryScreen(),
           ),
-          /*
+
           GoRoute(
             path: "inventory-entry",
             name: "inventory-entry",
             builder: (context, state) => const InventoryEntryScreen(),
           ),
-          GoRoute(
-            path: "inventory-exit",
-            name: "inventory-exit",
-            builder: (context, state) => const InventoryExitScreen(),
-          ),
+
           GoRoute(
             path: "history-entry",
             name: "history-entry",
             builder: (context, state) => const HistoryEntryScreen(),
           ),
+          /*
+
+          GoRoute(
+            path: "inventory-exit",
+            name: "inventory-exit",
+            builder: (context, state) => const InventoryExitScreen(),
+          ),
+          
           GoRoute(
             path: "history-exit",
             name: "history-exit",
@@ -499,6 +506,12 @@ class AppRouter {
             builder: (context, state) => const ProductMovementsScreen(),
           ),
 */
+          GoRoute(
+            path: "product-entry-history",
+            name: "product-entry-history",
+            builder: (context, state) => const ProductEntryHistoryScreen(),
+          ),
+
           GoRoute(
             path: "expiration-logs",
             name: "expiration-logs",
