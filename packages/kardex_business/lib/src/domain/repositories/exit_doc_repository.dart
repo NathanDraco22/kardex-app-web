@@ -13,6 +13,12 @@ class ExitDocsRepository {
     return newDoc;
   }
 
+  Future<ExitDocInDb> createExitDocDirect(CreateExitDoc createExitDoc) async {
+    final result = await exitDocsDataSource.createExitDocDirect(createExitDoc.toJson());
+    final newDoc = ExitDocInDb.fromJson(result);
+    return newDoc;
+  }
+
   Future<List<ExitDocInDb>> getPaginatedExitDocs(int offset) async {
     final results = await exitDocsDataSource.getPaginatedExitDocs(offset);
     final response = ListResponse<ExitDocInDb>.fromJson(

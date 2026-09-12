@@ -183,6 +183,28 @@ class _Body extends StatelessWidget {
           ),
           const Divider(height: 0.0),
 
+          ShortcutAddableListTile(
+            routeName: RouteNames.inventoryExit,
+            child: ListTile(
+              leading: IconWidgets.exitInventoryIcon,
+              title: const Text("Salida de Inventario"),
+              onTap: () => context.pushNamed("inventory-exit"),
+            ),
+          ),
+
+          const Divider(height: 0.0),
+          ShortcutAddableListTile(
+            routeName: RouteNames.historyExit,
+            child: ListTile(
+              leading: const Icon(
+                FluentIcons.history_28_filled,
+                color: Colors.red,
+              ),
+              title: const Text("Historial de salidas"),
+              onTap: () => context.pushNamed("history-exit"),
+            ),
+          ),
+
           const Divider(
             height: 4.0,
             thickness: 2,

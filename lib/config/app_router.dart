@@ -11,7 +11,9 @@ import 'package:kardex_app_front/admin_panel/admin_modules/admin_reports/range_e
 import 'package:kardex_app_front/admin_panel/admin_panel_screen.dart';
 import 'package:kardex_app_front/src/modules/activation/activation_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/history_entry/history_entry_screen.dart';
+import 'package:kardex_app_front/src/modules/inventory/history_exit/history_exit_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/inventory_entry/view/inventory_entry_screen.dart';
+import 'package:kardex_app_front/src/modules/inventory/inventory_exit/view/inventory_exit_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/product_entry_history/product_entry_history_screen.dart';
 import 'package:kardex_app_front/src/modules/shortcuts/shortcuts_menu_screen.dart';
 import 'package:kardex_app_front/src/modules/suppliers_catalog/view/suppliers_catalog_screen.dart';
@@ -474,20 +476,19 @@ class AppRouter {
             name: "history-entry",
             builder: (context, state) => const HistoryEntryScreen(),
           ),
-          /*
 
           GoRoute(
             path: "inventory-exit",
             name: "inventory-exit",
             builder: (context, state) => const InventoryExitScreen(),
           ),
-          
+
           GoRoute(
             path: "history-exit",
             name: "history-exit",
             builder: (context, state) => const HistoryExitScreen(),
           ),
-*/
+
           GoRoute(
             path: "current-tranfers",
             name: "current-tranfers",

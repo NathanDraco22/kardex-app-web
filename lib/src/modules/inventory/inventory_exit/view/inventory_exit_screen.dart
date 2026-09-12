@@ -38,7 +38,10 @@ class _InventoryExitScreenState extends State<InventoryExitScreen> {
 
     return ShortcutContainer(
       child: BlocProvider(
-        create: (context) => WriteExitDocCubit(exitDocRepo),
+        create: (context) => WriteExitDocCubit(
+          exitDocRepo,
+          useKardex: false,
+        ),
         child: InventoryExitMediator(
           viewController: viewController,
           child: const _RootScaffold(),

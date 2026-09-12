@@ -50,6 +50,8 @@ class ProviderContainer extends StatelessWidget {
     final transferDataSource = TransfersDataSource();
     final entryDocsDataSource = EntryDocsDataSource();
     final entryHistoryDataSource = EntryHistoriesDataSource();
+    final exitDocsDatasource = ExitDocsDataSource();
+    final exitHistoryDatasource = ExitHistoriesDataSource();
     final adjustEntryDatasource = AdjustEntriesDataSource();
     final adjustExitDatasource = AdjustExitsDataSource();
     final integrationsDataSource = IntegrationsDataSource();
@@ -88,6 +90,14 @@ class ProviderContainer extends StatelessWidget {
 
         RepositoryProvider(
           create: (context) => EntryHistoriesRepository(entryHistoryDataSource),
+        ),
+
+        RepositoryProvider(
+          create: (context) => ExitDocsRepository(exitDocsDatasource),
+        ),
+
+        RepositoryProvider(
+          create: (context) => ExitHistoriesRepository(exitHistoryDatasource),
         ),
 
         RepositoryProvider(
