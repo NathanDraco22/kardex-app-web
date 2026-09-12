@@ -18,6 +18,13 @@ class ExitDocsDataSource with HttpService {
     return res;
   }
 
+  Future<Map<String, dynamic>> createExitDocDirect(Map<String, dynamic> exitDoc) async {
+    final uri = HttpTools.generateUri("$_endpoint/direct");
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await postQuery(uri, exitDoc, headers: headers);
+    return res;
+  }
+
   Future<Map<String, dynamic>> getAllExitDocs() async {
     final uri = HttpTools.generateUri(_endpoint);
     final headers = HttpTools.generateAuthHeaders();
