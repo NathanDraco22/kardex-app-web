@@ -101,9 +101,10 @@ class _TerminalPaymentDialogState extends State<_TerminalPaymentDialog> {
   @override
   Widget build(context) {
     return AlertDialog(
+      contentPadding: const EdgeInsets.all(16),
       title: const Text("Confirmar Pago", textAlign: TextAlign.center),
       content: SizedBox(
-        width: 400,
+        width: 600,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
@@ -144,7 +145,7 @@ class _TerminalPaymentDialogState extends State<_TerminalPaymentDialog> {
                 if (widget.showCredit)
                   const ButtonSegment(
                     value: PaymentType.credit,
-                    label: Text("Crédito", style: TextStyle(fontSize: 16)),
+                    label: Text("Credit", style: TextStyle(fontSize: 16)),
                     icon: Icon(Icons.schedule),
                   ),
               ],
