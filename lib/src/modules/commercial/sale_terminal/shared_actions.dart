@@ -79,8 +79,18 @@ Future<void> holdTerminalSale(
   if (enteredDescription == null) return;
 
   viewController.description = enteredDescription;
-  final draft = viewController.exportToDraft();
-  await SaleTerminalDraftManager().saveDraft(authState.branch.id, draft);
+  final currentUser = authState.session.user;
+  final userInfo = UserInfo(id: currentUser.id, name: currentUser.username);
+
+  final draft = viewController.exportToDraft(
+    branchId: authState.branch.id,
+    createdBy: userInfo,
+  );
+  await SaleTerminalDraftManager().saveDraft(
+    authState.branch.id,
+    draft,
+    existingId: viewController.currentDraftId,
+  );
 
   onHoldCompleted?.call();
   viewController.clear();
@@ -168,8 +178,18 @@ Future<void> handleTerminalExit(
     if (enteredDescription == null) return;
 
     viewController.description = enteredDescription;
-    final draft = viewController.exportToDraft();
-    await SaleTerminalDraftManager().saveDraft(authState.branch.id, draft);
+    final currentUser = authState.session.user;
+    final userInfo = UserInfo(id: currentUser.id, name: currentUser.username);
+
+    final draft = viewController.exportToDraft(
+      branchId: authState.branch.id,
+      createdBy: userInfo,
+    );
+    await SaleTerminalDraftManager().saveDraft(
+      authState.branch.id,
+      draft,
+      existingId: viewController.currentDraftId,
+    );
 
     viewController.clear();
 

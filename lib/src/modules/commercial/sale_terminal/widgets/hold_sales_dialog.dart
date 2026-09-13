@@ -38,6 +38,7 @@ class _HoldSalesDialogContent extends StatefulWidget {
 
 class _HoldSalesDialogContentState extends State<_HoldSalesDialogContent> {
   late Future<List<SaleTerminalDraft>> _draftsFuture;
+  String? _selectedUserId;
 
   @override
   void initState() {
@@ -56,6 +57,27 @@ class _HoldSalesDialogContentState extends State<_HoldSalesDialogContent> {
         "Tienes productos en la venta actual.\n¿Deseas reemplazarla por esta venta en espera?",
       );
       if (confirm != true) return;
+    }
+
+    final lowStockItems = <String>[];
+    for (final item in draft.items) {
+      final requiredUnits = item.quantity * item.conversionFactor;
+      final available = item.product.account.availableStock;
+      if (requiredUnits > available) {
+        final unitStr = item.selectedUnitName.isNotEmpty ? item.selectedUnitName : 'unid.';
+        lowStockItems.add(
+          "• ${item.product.name}: requiere ${item.quantity} $unitStr (disponible en inventario: $available)",
+        );
+      }
+    }
+
+    if (lowStockItems.isNotEmpty) {
+      if (!mounted) return;
+      final proceed = await DialogManager.confirmActionDialog(
+        context,
+        "Atención: Los siguientes productos tienen menos existencias en inventario de las requeridas:\n\n${lowStockItems.join('\n')}\n\n¿Deseas cargar la venta de todos modos?",
+      );
+      if (proceed != true) return;
     }
 
     widget.viewController.loadFromDraft(draft);
@@ -88,18 +110,7 @@ class _HoldSalesDialogContentState extends State<_HoldSalesDialogContent> {
 
     if (newDescription == null || newDescription == draft.description) return;
 
-    final updatedDraft = SaleTerminalDraft(
-      id: draft.id,
-      savedAt: draft.savedAt,
-      client: draft.client,
-      selectedPriceLevel: draft.selectedPriceLevel,
-      isWholesale: draft.isWholesale,
-      description: newDescription,
-      selectedPaymentType: draft.selectedPaymentType,
-      items: draft.items,
-    );
-
-    await SaleTerminalDraftManager().saveDraft(widget.branchId, updatedDraft);
+    await SaleTerminalDraftManager().updateDescription(draft.id, newDescription);
     if (!mounted) return;
     setState(() {
       _reloadDrafts();
@@ -179,14 +190,102 @@ class _HoldSalesDialogContentState extends State<_HoldSalesDialogContent> {
               );
             }
 
+            final allDrafts = drafts;
+
+            // Extraer usuarios únicos que tienen ventas en espera
+            final Map<String, String> userMap = {};
+            for (final d in allDrafts) {
+              if (d.createdBy != null && d.createdBy!.id.isNotEmpty) {
+                userMap[d.createdBy!.id] = d.createdBy!.name;
+              }
+            }
+
+            // Si el usuario seleccionado ya no tiene ventas, resetear a null
+            if (_selectedUserId != null && !userMap.containsKey(_selectedUserId)) {
+              _selectedUserId = null;
+            }
+
+            // Filtrar los drafts por usuario si está seleccionado
+            final filteredDrafts = _selectedUserId == null
+                ? allDrafts
+                : allDrafts.where((d) => d.createdBy?.id == _selectedUserId).toList();
+
+            final selectedUserName = _selectedUserId != null ? userMap[_selectedUserId] : null;
+
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                if (userMap.isNotEmpty) ...[
+                  Row(
+                    children: [
+                      Expanded(
+                        child: InputDecorator(
+                          decoration: InputDecoration(
+                            isDense: true,
+                            prefixIcon: const Icon(Icons.person_outline, size: 18),
+                            labelText: "Filtrar por vendedor",
+                            labelStyle: const TextStyle(fontSize: 12),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<String?>(
+                              value: _selectedUserId,
+                              isDense: true,
+                              isExpanded: true,
+                              items: [
+                                const DropdownMenuItem<String?>(
+                                  value: null,
+                                  child: Text(
+                                    "Todos los usuarios",
+                                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                                  ),
+                                ),
+                                ...userMap.entries.map((entry) {
+                                  return DropdownMenuItem<String?>(
+                                    value: entry.key,
+                                    child: Text(
+                                      entry.value,
+                                      style: const TextStyle(fontSize: 13),
+                                    ),
+                                  );
+                                }),
+                              ],
+                              onChanged: (val) {
+                                setState(() {
+                                  _selectedUserId = val;
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                      if (_selectedUserId != null) ...[
+                        const SizedBox(width: 6),
+                        IconButton(
+                          icon: const Icon(Icons.clear, size: 18),
+                          tooltip: "Limpiar filtro",
+                          visualDensity: VisualDensity.compact,
+                          padding: EdgeInsets.zero,
+                          onPressed: () {
+                            setState(() {
+                              _selectedUserId = null;
+                            });
+                          },
+                        ),
+                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                ],
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "${drafts.length} ${drafts.length == 1 ? 'venta guardada' : 'ventas guardadas'}",
+                      _selectedUserId != null
+                          ? "${filteredDrafts.length} de ${allDrafts.length} ventas (${selectedUserName ?? ''})"
+                          : "${allDrafts.length} ${allDrafts.length == 1 ? 'venta guardada' : 'ventas guardadas'}",
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -205,169 +304,186 @@ class _HoldSalesDialogContentState extends State<_HoldSalesDialogContent> {
                 ),
                 const Divider(height: 8),
                 Expanded(
-                  child: ListView.separated(
-                    itemCount: drafts.length,
-                    separatorBuilder: (context, index) => const SizedBox(height: 8),
-                    itemBuilder: (context, index) {
-                      final draft = drafts[index];
-                      final hasDescription = draft.description.trim().isNotEmpty;
-                      final title = hasDescription
-                          ? draft.description.trim()
-                          : (draft.client?.name ?? "Consumidor Final");
-                      final clientName = draft.client?.name ?? "Consumidor Final";
-                      final formattedDate = DateFormat('hh:mm a • dd/MM').format(draft.savedAt);
-                      final totalAmount = NumberFormatter.convertToMoneyLike(draft.totalAmount);
-
-                      return Card(
-                        margin: EdgeInsets.zero,
-                        elevation: 1,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          side: BorderSide(color: Colors.grey.shade300),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(12),
+                  child: filteredDrafts.isEmpty
+                      ? Center(
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    width: 34,
-                                    height: 34,
-                                    decoration: BoxDecoration(
-                                      color: Colors.amber.shade50,
-                                      shape: BoxShape.circle,
-                                      border: Border.all(color: Colors.amber.shade300),
-                                    ),
-                                    child: Icon(
-                                      hasDescription ? Icons.bookmark_rounded : Icons.pause_rounded,
-                                      color: Colors.amber.shade800,
-                                      size: 18,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      title,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  IconButton(
-                                    icon: Icon(Icons.edit_outlined, color: Colors.blueGrey.shade600, size: 18),
-                                    tooltip: "Editar referencia",
-                                    visualDensity: VisualDensity.compact,
-                                    constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                                    padding: EdgeInsets.zero,
-                                    onPressed: () => _editDescription(draft),
-                                  ),
-                                  const SizedBox(width: 2),
-                                  IconButton(
-                                    icon: const Icon(Icons.delete_outline, color: Colors.red, size: 18),
-                                    tooltip: "Descartar",
-                                    visualDensity: VisualDensity.compact,
-                                    constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                                    padding: EdgeInsets.zero,
-                                    onPressed: () => _deleteDraft(draft),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  ElevatedButton.icon(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.teal.shade600,
-                                      foregroundColor: Colors.white,
-                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
-                                      minimumSize: Size.zero,
-                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                    onPressed: () => _loadDraft(draft),
-                                    icon: const Icon(Icons.download, size: 14),
-                                    label: const Text(
-                                      "Cargar",
-                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                              Icon(Icons.person_search_outlined, size: 40, color: Colors.grey.shade400),
                               const SizedBox(height: 8),
-                              const Divider(height: 1, thickness: 0.8),
-                              const SizedBox(height: 8),
-                              if (hasDescription) ...[
-                                Row(
-                                  children: [
-                                    Icon(Icons.person_outline, size: 13, color: Colors.grey.shade600),
-                                    const SizedBox(width: 4),
-                                    Expanded(
-                                      child: Text(
-                                        clientName,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.grey.shade700,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 4),
-                              ],
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Wrap(
-                                    crossAxisAlignment: WrapCrossAlignment.center,
-                                    spacing: 6,
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                        decoration: BoxDecoration(
-                                          color: Colors.green.shade50,
-                                          borderRadius: BorderRadius.circular(4),
-                                          border: Border.all(color: Colors.green.shade200),
-                                        ),
-                                        child: Text(
-                                          totalAmount,
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.green.shade800,
-                                            fontSize: 13,
-                                          ),
-                                        ),
-                                      ),
-                                      Text(
-                                        "${draft.totalQuantity} items",
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.grey.shade700,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Text(
-                                    formattedDate,
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: Colors.grey.shade500,
-                                    ),
-                                  ),
-                                ],
+                              Text(
+                                "No hay ventas de este usuario",
+                                style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
                               ),
                             ],
                           ),
+                        )
+                      : ListView.separated(
+                          itemCount: filteredDrafts.length,
+                          separatorBuilder: (context, index) => const SizedBox(height: 8),
+                          itemBuilder: (context, index) {
+                            final draft = filteredDrafts[index];
+                            final hasDescription = draft.description.trim().isNotEmpty;
+                            final title = hasDescription
+                                ? draft.description.trim()
+                                : (draft.client?.name ?? "Consumidor Final");
+                            final clientName = draft.client?.name ?? "Consumidor Final";
+                            final formattedDate = DateFormat('hh:mm a • dd/MM').format(draft.savedAt);
+                            final creatorLabel = draft.createdBy != null && draft.createdBy!.name.isNotEmpty
+                                ? " • ${draft.createdBy!.name}"
+                                : "";
+                            final totalAmount = NumberFormatter.convertToMoneyLike(draft.computedTotalAmount);
+
+                            return Card(
+                              margin: EdgeInsets.zero,
+                              elevation: 1,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                side: BorderSide(color: Colors.grey.shade300),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(12),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Container(
+                                          width: 34,
+                                          height: 34,
+                                          decoration: BoxDecoration(
+                                            color: Colors.amber.shade50,
+                                            shape: BoxShape.circle,
+                                            border: Border.all(color: Colors.amber.shade300),
+                                          ),
+                                          child: Icon(
+                                            hasDescription ? Icons.bookmark_rounded : Icons.pause_rounded,
+                                            color: Colors.amber.shade800,
+                                            size: 18,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Text(
+                                            title,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        IconButton(
+                                          icon: Icon(Icons.edit_outlined, color: Colors.blueGrey.shade600, size: 18),
+                                          tooltip: "Editar referencia",
+                                          visualDensity: VisualDensity.compact,
+                                          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                                          padding: EdgeInsets.zero,
+                                          onPressed: () => _editDescription(draft),
+                                        ),
+                                        const SizedBox(width: 2),
+                                        IconButton(
+                                          icon: const Icon(Icons.delete_outline, color: Colors.red, size: 18),
+                                          tooltip: "Descartar",
+                                          visualDensity: VisualDensity.compact,
+                                          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                                          padding: EdgeInsets.zero,
+                                          onPressed: () => _deleteDraft(draft),
+                                        ),
+                                        const SizedBox(width: 6),
+                                        ElevatedButton.icon(
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.teal.shade600,
+                                            foregroundColor: Colors.white,
+                                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
+                                            minimumSize: Size.zero,
+                                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                          ),
+                                          onPressed: () => _loadDraft(draft),
+                                          icon: const Icon(Icons.download, size: 14),
+                                          label: const Text(
+                                            "Cargar",
+                                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 8),
+                                    const Divider(height: 1, thickness: 0.8),
+                                    const SizedBox(height: 8),
+                                    if (hasDescription) ...[
+                                      Row(
+                                        children: [
+                                          Icon(Icons.person_outline, size: 13, color: Colors.grey.shade600),
+                                          const SizedBox(width: 4),
+                                          Expanded(
+                                            child: Text(
+                                              clientName,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.grey.shade700,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 4),
+                                    ],
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Wrap(
+                                          crossAxisAlignment: WrapCrossAlignment.center,
+                                          spacing: 6,
+                                          children: [
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                              decoration: BoxDecoration(
+                                                color: Colors.green.shade50,
+                                                borderRadius: BorderRadius.circular(4),
+                                                border: Border.all(color: Colors.green.shade200),
+                                              ),
+                                              child: Text(
+                                                totalAmount,
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.green.shade800,
+                                                  fontSize: 13,
+                                                ),
+                                              ),
+                                            ),
+                                            Text(
+                                              "${draft.computedTotalQuantity} items",
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.grey.shade700,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Text(
+                                          formattedDate + creatorLabel,
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: Colors.grey.shade500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
                         ),
-                      );
-                    },
-                  ),
                 ),
               ],
             );
