@@ -53,10 +53,14 @@ class _CreateProductPriceDialogState extends State<CreateProductPriceDialog> {
   XFile? _imageFile;
 
   final creationMap = <String, dynamic>{};
+  bool _isCommerce = true;
+
   @override
   void initState() {
     super.initState();
     creationMap['coordinates'] = widget.branch?.coordinates;
+    _isCommerce = widget.branch?.isCommerce ?? true;
+    creationMap['isCommerce'] = _isCommerce;
   }
 
   @override
@@ -254,6 +258,30 @@ class _CreateProductPriceDialogState extends State<CreateProductPriceDialog> {
                                 if (value == null) return null;
                                 creationMap['description'] = value.trim();
                                 return null;
+                              },
+                            ),
+
+                            const SizedBox(height: 12),
+
+                            SwitchListTile(
+                              contentPadding: EdgeInsets.zero,
+                              value: _isCommerce,
+                              title: const Text(
+                                "Sucursal Comercial",
+                                style: TextStyle(fontWeight: FontWeight.w500),
+                              ),
+                              subtitle: const Text(
+                                "Determina si esta sucursal opera como punto de venta / comercio",
+                              ),
+                              secondary: Icon(
+                                _isCommerce ? Icons.storefront : Icons.warehouse_outlined,
+                                color: _isCommerce ? Theme.of(context).primaryColor : Colors.grey,
+                              ),
+                              onChanged: (value) {
+                                setState(() {
+                                  _isCommerce = value;
+                                  creationMap['isCommerce'] = value;
+                                });
                               },
                             ),
 

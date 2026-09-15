@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/product_demand_vs_stock/product_demand_vs_stock_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/daily_operations_results/daily_operations_results_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/range_finance_report/range_finance_report_screen.dart';
@@ -242,6 +244,11 @@ class AppRouter {
       GoRoute(
         path: '/commercial',
         name: 'commercial',
+        redirect: (context, state) {
+          final isCommerce = getIt<AuthCubit>().currentBranch?.isCommerce ?? true;
+          if (!isCommerce) return '/home';
+          return null;
+        },
         builder: (context, state) => const CommercialMenuScreen(),
         routes: [
           GoRoute(
@@ -421,6 +428,11 @@ class AppRouter {
       GoRoute(
         path: '/pending-accounts',
         name: 'pending-accounts',
+        redirect: (context, state) {
+          final isCommerce = getIt<AuthCubit>().currentBranch?.isCommerce ?? true;
+          if (!isCommerce) return '/home';
+          return null;
+        },
         builder: (context, state) => const PendingAccountsMenuScreen(),
         routes: [
           GoRoute(
