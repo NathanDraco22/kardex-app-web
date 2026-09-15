@@ -11,7 +11,7 @@ class _HomeDesktopBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final allowedOptions = getHomeOptions(context).where((opt) {
+    final allowedOptions = getHomeOptions(context, currentBranch).where((opt) {
       return opt.permissions.any(
         (p) => AccessManager().hasCurrentAccess(context, p.name),
       );
@@ -122,13 +122,23 @@ class _HomeDesktopBody extends StatelessWidget {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: Colors.amber.shade50,
+                  color: currentBranch!.isCommerce
+                      ? Colors.amber.shade50
+                      : Colors.blueGrey.shade50,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.amber.shade200),
+                  border: Border.all(
+                    color: currentBranch!.isCommerce
+                        ? Colors.amber.shade200
+                        : Colors.blueGrey.shade200,
+                  ),
                 ),
                 child: Icon(
-                  FluentIcons.building_shop_24_filled,
-                  color: Colors.amber.shade800,
+                  currentBranch!.isCommerce
+                      ? FluentIcons.building_shop_24_filled
+                      : Icons.warehouse_rounded,
+                  color: currentBranch!.isCommerce
+                      ? Colors.amber.shade800
+                      : Colors.blueGrey.shade700,
                   size: 22,
                 ),
               ),

@@ -15,22 +15,60 @@ class _HomeMobileBody extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       children: [
         if (currentBranch != null) ...[
-          Text(
-            currentBranch!.name,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            currentBranch!.address,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey.shade600,
-            ),
+          Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: currentBranch!.isCommerce
+                      ? Colors.amber.shade50
+                      : Colors.blueGrey.shade50,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: currentBranch!.isCommerce
+                        ? Colors.amber.shade200
+                        : Colors.blueGrey.shade200,
+                  ),
+                ),
+                child: Icon(
+                  currentBranch!.isCommerce
+                      ? FluentIcons.building_shop_24_filled
+                      : Icons.warehouse_rounded,
+                  color: currentBranch!.isCommerce
+                      ? Colors.amber.shade800
+                      : Colors.blueGrey.shade700,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      currentBranch!.name,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      currentBranch!.address,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey.shade600,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
 
@@ -55,7 +93,7 @@ class _HomeMobileBody extends StatelessWidget {
         ),
         const SizedBox(height: 12),
 
-        ...getHomeOptions(context).map((option) {
+        ...getHomeOptions(context, currentBranch).map((option) {
           return RolePermissionGate(
             permissions: option.permissions,
             child: Padding(

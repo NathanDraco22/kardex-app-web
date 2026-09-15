@@ -117,8 +117,51 @@ class _WebBody extends StatelessWidget {
                         (index) {
                           final branch = branches[index];
                           return ListTile(
-                            title: Text(branch.name),
-                            subtitle: Text(branch.description),
+                            leading: Icon(
+                              branch.isCommerce ? Icons.storefront : Icons.warehouse_outlined,
+                              color: branch.isCommerce ? Theme.of(context).primaryColor : Colors.grey,
+                            ),
+                            title: Row(
+                              children: [
+                                Text(branch.name),
+                                const SizedBox(width: 8),
+                                 if (branch.isCommerce)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: Colors.green.withValues(alpha: 0.12),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: const Text(
+                                      "Comercio",
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: Colors.green,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  )
+                                else
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey.withValues(alpha: 0.15),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: const Text(
+                                      "No comercial",
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: Colors.grey,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            subtitle: Text(
+                              branch.description.isNotEmpty ? branch.description : "Sin descripción",
+                            ),
                             trailing: IconButton(
                               onPressed: () async {
                                 final res = await showCreateBranchPriceDialog(

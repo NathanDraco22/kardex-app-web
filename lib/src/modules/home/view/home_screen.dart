@@ -235,7 +235,10 @@ class HomeOption {
   });
 }
 
-List<HomeOption> getHomeOptions(BuildContext context) {
+List<HomeOption> getHomeOptions(BuildContext context, [BranchInDb? branch]) {
+  final currentBranch = branch ?? getIt<AuthCubit>().currentBranch;
+  final isCommerce = currentBranch?.isCommerce ?? true;
+
   return [
     HomeOption(
       permissions: const [Modules.clients],
@@ -261,22 +264,24 @@ List<HomeOption> getHomeOptions(BuildContext context) {
       icon: FluentIcons.receipt_bag_20_filled,
       onTap: () => context.pushNamed("product-catalog"),
     ),
-    HomeOption(
-      permissions: const [Modules.commercial],
-      title: "Comercio",
-      subtitle: "Terminal de venta, facturación y pedidos",
-      accentColor: const Color(0xFF059669),
-      icon: FluentIcons.money_calculator_20_filled,
-      onTap: () => context.pushNamed("commercial"),
-    ),
-    HomeOption(
-      permissions: const [Modules.pendingInvoices],
-      title: "Cuentas por Cobrar",
-      subtitle: "Abonos, facturas pendientes y saldos",
-      accentColor: const Color(0xFFD97706),
-      icon: FluentIcons.receipt_money_24_filled,
-      onTap: () => context.pushNamed("pending-accounts"),
-    ),
+    if (isCommerce)
+      HomeOption(
+        permissions: const [Modules.commercial],
+        title: "Comercio",
+        subtitle: "Terminal de venta, facturación y pedidos",
+        accentColor: const Color(0xFF059669),
+        icon: FluentIcons.money_calculator_20_filled,
+        onTap: () => context.pushNamed("commercial"),
+      ),
+    if (isCommerce)
+      HomeOption(
+        permissions: const [Modules.pendingInvoices],
+        title: "Cuentas por Cobrar",
+        subtitle: "Abonos, facturas pendientes y saldos",
+        accentColor: const Color(0xFFD97706),
+        icon: FluentIcons.receipt_money_24_filled,
+        onTap: () => context.pushNamed("pending-accounts"),
+      ),
     HomeOption(
       permissions: const [Modules.inventory],
       title: "Inventario",
