@@ -26,6 +26,8 @@ export 'src/domain/query_params/receipt_query_params.dart';
 export 'src/domain/query_params/totals_query_params.dart';
 export 'src/domain/query_params/transaction_query_params.dart';
 export 'src/domain/query_params/transfer_query_params.dart';
+export 'src/domain/query_params/hold_sale_filter_params.dart';
+
 
 export 'src/services/http_service.dart';
 export 'src/services/dio_http_service.dart';

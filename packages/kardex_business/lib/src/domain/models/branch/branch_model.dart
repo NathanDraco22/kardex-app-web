@@ -10,6 +10,7 @@ class BaseBranch {
   final String email;
   final String phone;
   final String description;
+  final bool isCommerce;
   Uint8List? image;
   Coordinates? coordinates;
 
@@ -20,6 +21,7 @@ class BaseBranch {
     required this.email,
     required this.phone,
     this.description = "",
+    this.isCommerce = true,
     this.image,
     this.coordinates,
   });
@@ -33,6 +35,7 @@ class BaseBranch {
       phone: json['phone'] as String,
       image: (json['image'] as String?) == null ? null : base64Decode(json['image']),
       description: json['description'] as String? ?? "",
+      isCommerce: json['isCommerce'] as bool? ?? true,
       coordinates: json['coordinates'] != null ? Coordinates.fromJson(json['coordinates']) : null,
     );
   }
@@ -46,6 +49,7 @@ class BaseBranch {
       'phone': phone,
       'image': image != null ? base64Encode(image!) : "",
       'description': description,
+      'isCommerce': isCommerce,
       'coordinates': coordinates?.toJson(),
     };
   }
@@ -59,6 +63,7 @@ class CreateBranch extends BaseBranch {
     required super.address,
     required super.email,
     required super.phone,
+    super.isCommerce = true,
     super.image,
     super.coordinates,
   });
@@ -82,6 +87,7 @@ class CreateBranch extends BaseBranch {
       phone: json['phone'] as String,
       image: (json['image'] as String?) == null ? null : base64Decode(json['image']),
       description: json['description'] as String? ?? "",
+      isCommerce: json['isCommerce'] as bool? ?? true,
       coordinates: coordinates,
     );
   }
@@ -95,6 +101,7 @@ class UpdateBranch {
   String? phone;
   String? description;
   String? image;
+  bool? isCommerce;
   Coordinates? coordinates;
 
   UpdateBranch({
@@ -105,6 +112,7 @@ class UpdateBranch {
     this.email,
     this.phone,
     this.image,
+    this.isCommerce,
     this.coordinates,
   });
 
@@ -127,6 +135,7 @@ class UpdateBranch {
       email: json['email'] as String?,
       phone: json['phone'] as String?,
       image: json['image'] as String?,
+      isCommerce: json['isCommerce'] as bool?,
       coordinates: coordinates,
     );
   }
@@ -140,6 +149,7 @@ class UpdateBranch {
       'email': email,
       'phone': phone,
       'image': image,
+      'isCommerce': isCommerce,
       'coordinates': coordinates?.toJson(),
     };
     data.removeWhere((key, value) => value == null);
@@ -156,6 +166,7 @@ class BranchInDb extends BaseBranch {
     required this.id,
     required super.name,
     super.description,
+    super.isCommerce = true,
     required this.createdAt,
     this.updatedAt,
     required super.idCard,
@@ -177,6 +188,7 @@ class BranchInDb extends BaseBranch {
       image: (json['image'] as String?) == null ? null : base64Decode(json['image']),
       coordinates: json['coordinates'] != null ? Coordinates.fromJson(json['coordinates']) : null,
       description: json['description'] as String? ?? "",
+      isCommerce: json['isCommerce'] as bool? ?? true,
       createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
       updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt'] as int) : null,
     );

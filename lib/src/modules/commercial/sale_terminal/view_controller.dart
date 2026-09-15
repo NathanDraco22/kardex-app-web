@@ -173,22 +173,25 @@ class SaleTerminalViewController extends ChangeNotifier {
     requestSearchFocus();
   }
 
-  SaleTerminalDraft exportToDraft({String? id}) {
-    final draftId = id ?? currentDraftId ?? DateTime.now().millisecondsSinceEpoch.toString();
-    currentDraftId = draftId;
-    return SaleTerminalDraft(
-      id: draftId,
-      savedAt: DateTime.now(),
+  CreateHoldSale exportToDraft({
+    required String branchId,
+    UserInfo? createdBy,
+  }) {
+    return CreateHoldSale(
+      branchId: branchId,
       client: selectedClient,
       selectedPriceLevel: selectedPriceLevel,
       isWholesale: isWholesale,
       description: description,
       selectedPaymentType: selectedPaymentType,
-      items: items.map((i) => SaleTerminalItemDraft.fromCommercialProductResult(i)).toList(),
+      items: items.map((i) => i.toHoldSaleItem()).toList(),
+      totalQuantity: totalQuantity,
+      totalAmount: totalAmount,
+      createdBy: createdBy,
     );
   }
 
-  void loadFromDraft(SaleTerminalDraft draft) {
+  void loadFromDraft(HoldSaleInDb draft) {
     currentDraftId = draft.id;
     _selectedClient = draft.client;
     _selectedPriceLevel = draft.selectedPriceLevel;
