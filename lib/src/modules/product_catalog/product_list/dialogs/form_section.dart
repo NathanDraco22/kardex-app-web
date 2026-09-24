@@ -282,25 +282,22 @@ class _InnerContent extends StatelessWidget {
           ),
           const SizedBox(height: 8),
 
+          TitleTextField(
+            key: const ValueKey("product_brand"),
+            textCapitalization: TextCapitalization.words,
+            initialValue: widget.currentProduct?.brandName,
+            onEditingComplete: () => FocusScope.of(context).nextFocus(),
+            title: "Marca*",
+            validator: (value) {
+              if (value == null || value.isEmpty) return "Campo requerido";
+              widget.creationMap['brandName'] = value.trim();
+              return null;
+            },
+          ),
+          const SizedBox(height: 8),
+
           Row(
             children: [
-              Flexible(
-                child: TitleTextField(
-                  key: const ValueKey("product_brand"),
-                  textCapitalization: TextCapitalization.words,
-                  initialValue: widget.currentProduct?.brandName,
-                  onEditingComplete: () => FocusScope.of(context).nextFocus(),
-                  title: "Marca*",
-                  validator: (value) {
-                    if (value == null || value.isEmpty) return "Campo requerido";
-                    widget.creationMap['brandName'] = value.trim();
-                    return null;
-                  },
-                ),
-              ),
-
-              const SizedBox(width: 12),
-
               Flexible(
                 child: TitleTextField(
                   key: const ValueKey("product_code"),
@@ -313,6 +310,22 @@ class _InnerContent extends StatelessWidget {
                       return null;
                     }
                     widget.creationMap['code'] = value.trim();
+                    return null;
+                  },
+                ),
+              ),
+
+              const SizedBox(width: 12),
+
+              Flexible(
+                child: TitleTextField(
+                  key: const ValueKey("product_alt_code"),
+                  tooltip: "Código alternativo o de barras secundario",
+                  initialValue: widget.currentProduct?.altCode,
+                  onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                  title: "Código Alternativo",
+                  validator: (value) {
+                    widget.creationMap['altCode'] = value?.trim() ?? "";
                     return null;
                   },
                 ),
