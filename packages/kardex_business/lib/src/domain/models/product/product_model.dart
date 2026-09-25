@@ -25,6 +25,7 @@ class BaseProduct {
   final String name;
   final String? description;
   final String code;
+  final String altCode;
   final String brandName;
   final String unitName;
   final String? categoryName;
@@ -56,6 +57,7 @@ class BaseProduct {
     required this.name,
     this.description,
     this.code = "",
+    this.altCode = "",
     this.image = "",
     required this.brandName,
     required this.unitName,
@@ -73,6 +75,7 @@ class BaseProduct {
       name: json['name'] as String,
       description: json['description'] as String?,
       code: json['code'] as String? ?? "",
+      altCode: json['altCode'] as String? ?? "",
       brandName: json['brandName'] as String,
       unitName: json['unitName'] as String,
       categoryName: json['categoryName'] as String?,
@@ -94,6 +97,7 @@ class BaseProduct {
       'name': name,
       'description': description,
       'code': code,
+      'altCode': altCode,
       'image': image,
       'brandName': brandName,
       'unitName': unitName,
@@ -112,6 +116,7 @@ class CreateProduct extends BaseProduct {
     required super.name,
     super.description,
     super.code,
+    super.altCode,
     super.image,
     required super.brandName,
     required super.unitName,
@@ -129,6 +134,7 @@ class CreateProduct extends BaseProduct {
       name: json['name'] as String,
       description: json['description'] as String?,
       code: json['code'] as String? ?? "",
+      altCode: json['altCode'] as String? ?? "",
       image: json['image'] as String? ?? "",
       brandName: json['brandName'] as String,
       unitName: json['unitName'] as String,
@@ -150,6 +156,7 @@ class CreateProduct extends BaseProduct {
       name: name,
       description: description,
       code: code,
+      altCode: altCode,
       image: newImageUrl,
       brandName: brandName,
       unitName: unitName,
@@ -168,6 +175,7 @@ class UpdateProduct {
   final String? name;
   final String? description;
   final String? code;
+  final String? altCode;
   final String? brandName;
   final String? unitName;
   final String? categoryName;
@@ -183,6 +191,7 @@ class UpdateProduct {
     this.name,
     this.description,
     this.code,
+    this.altCode,
     this.brandName,
     this.unitName,
     this.categoryName,
@@ -200,6 +209,7 @@ class UpdateProduct {
       name: json['name'] as String?,
       description: json['description'] as String?,
       code: json['code'] as String?,
+      altCode: json['altCode'] as String?,
       brandName: json['brandName'] as String?,
       unitName: json['unitName'] as String?,
       categoryName: json['categoryName'] as String?,
@@ -222,6 +232,7 @@ class UpdateProduct {
       'name': name,
       'description': description,
       'code': code,
+      'altCode': altCode,
       'brandName': brandName,
       'unitName': unitName,
       'categoryName': categoryName,
@@ -249,6 +260,7 @@ class ProductInDb extends BaseProduct {
     required super.name,
     super.description,
     super.code,
+    super.altCode,
     super.image,
     required super.brandName,
     required super.unitName,
@@ -270,6 +282,7 @@ class ProductInDb extends BaseProduct {
       name: json['name'] as String,
       description: json['description'] as String?,
       code: json['code'] as String? ?? "",
+      altCode: json['altCode'] as String? ?? "",
       image: json['image'] as String? ?? "",
       brandName: json['brandName'] as String,
       unitName: json['unitName'] as String,
@@ -311,6 +324,7 @@ class ProductInDbInBranch extends ProductInDb {
     required super.name,
     super.description,
     super.code,
+    super.altCode,
     super.image,
     required super.brandName,
     required super.unitName,
@@ -334,6 +348,7 @@ class ProductInDbInBranch extends ProductInDb {
       name: json['name'],
       description: json['description'],
       code: json['code'],
+      altCode: json['altCode'] as String? ?? "",
       image: json['image'] ?? "",
       brandName: json['brandName'],
       unitName: json['unitName'],
@@ -368,6 +383,7 @@ class ProductInDbInBranch extends ProductInDb {
     String? name,
     String? description,
     String? code,
+    String? altCode,
     String? image,
     String? brandName,
     String? unitName,
@@ -389,6 +405,7 @@ class ProductInDbInBranch extends ProductInDb {
       name: name ?? this.name,
       description: description ?? this.description,
       code: code ?? this.code,
+      altCode: altCode ?? this.altCode,
       image: image ?? this.image,
       brandName: brandName ?? this.brandName,
       unitName: unitName ?? this.unitName,

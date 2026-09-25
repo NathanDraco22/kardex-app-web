@@ -86,6 +86,7 @@ class _CreateProductDialogState extends State<CreateProductDialog> {
 
     creationMap['isActive'] = isActive;
     creationMap['hasIva'] = hasIva;
+    creationMap['altCode'] = widget.product?.altCode ?? "";
 
     final currentProduct = widget.product;
 
