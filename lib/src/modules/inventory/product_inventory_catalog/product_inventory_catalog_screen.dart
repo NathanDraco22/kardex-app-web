@@ -6,7 +6,9 @@ import 'package:kardex_app_front/src/cubits/read_product_in_branch/read_product_
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/inventory/product_inventory_catalog/web/product_inventory_catalog_web.dart';
 import 'package:kardex_app_front/src/modules/inventory/product_price_catalog/cubits/export_price_list_cubit.dart';
+import 'package:kardex_app_front/src/modules/product_catalog/product_list/view/product_list_screen.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
+
 class ProductInventoryCatalogScreen extends StatelessWidget {
   const ProductInventoryCatalogScreen({super.key});
 
@@ -40,6 +42,21 @@ class _RootScaffold extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Catálogo de Precios"),
         actions: [
+          IconButton(
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ProductListScreen(),
+                ),
+              );
+              if (context.mounted) {
+                context.read<ReadProductInBranchCubit>().getProducts(getIt<AuthCubit>().currentBranchId);
+              }
+            },
+            icon: const Icon(Icons.inventory_2_outlined),
+            tooltip: "Lista Global de Productos",
+          ),
           IconButton(
             onPressed: () {
               showDialog(
@@ -78,7 +95,10 @@ class _RootScaffold extends StatelessWidget {
                             }
                             return ElevatedButton.icon(
                               onPressed: () {
-                                context.read<ExportPriceListCubit>().exportExcel(branchName: getIt<AuthCubit>().currentBranchName, branchId: getIt<AuthCubit>().currentBranchId);
+                                context.read<ExportPriceListCubit>().exportExcel(
+                                  branchName: getIt<AuthCubit>().currentBranchName,
+                                  branchId: getIt<AuthCubit>().currentBranchId,
+                                );
                               },
                               icon: const Icon(Icons.file_download),
                               label: const Text("Exportar a Excel"),

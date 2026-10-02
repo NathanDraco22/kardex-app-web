@@ -12,6 +12,8 @@ import 'package:kardex_app_front/widgets/dialogs/add_product_inventory_dialog.da
 import 'package:kardex_app_front/widgets/dialogs/substract_product_inventory_dialog.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/src/modules/product_catalog/product_list/cubit/write_product_cubit.dart';
+import 'package:kardex_app_front/src/modules/product_catalog/product_list/dialogs/create_product_dialog.dart';
 
 Future<ProductInDbInBranch?> showProductInventoryEditor(
   BuildContext context,
@@ -19,6 +21,7 @@ Future<ProductInDbInBranch?> showProductInventoryEditor(
 ) async {
   final saleProfilesRepository = context.read<ProductSaleProfilesRepository>();
   final productAccountsRepository = context.read<ProductAccountsRepository>();
+  final productsRepository = context.read<ProductsRepository>();
 
   return await Navigator.push(
     context,
@@ -34,6 +37,9 @@ Future<ProductInDbInBranch?> showProductInventoryEditor(
             create: (context) => WriteProductAccountCubit(
               productAccountsRepository: productAccountsRepository,
             ),
+          ),
+          BlocProvider(
+            create: (context) => WriteProductCubit(productsRepository),
           ),
         ],
         child: ProductInventoryEditorScreen(initialProduct: product),
@@ -76,6 +82,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
 
   bool hasLowerPrices = false;
   bool stockWasModified = false;
+  bool productWasModified = false;
 
   @override
   void initState() {
@@ -143,8 +150,8 @@ class _RootScaffoldState extends State<_RootScaffold> {
 
         if (!context.mounted) return;
 
-        // If stock was modified, we return the modified product even though price weren't saved
-        if (stockWasModified) {
+        // If stock or product details were modified, we return the modified product even though price weren't saved
+        if (stockWasModified || productWasModified) {
           Navigator.pop(context, currentProduct);
         } else {
           Navigator.pop(context);
@@ -205,6 +212,32 @@ class _RootScaffoldState extends State<_RootScaffold> {
             child: Scaffold(
               appBar: AppBar(
                 title: const Text("Editor de Inventario y Precios"),
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.edit_outlined),
+                    tooltip: "Editar Producto",
+                    onPressed: () async {
+                      final updatedProduct = await showCreateProductDialog(
+                        context,
+                        product: currentProduct,
+                      );
+
+                      if (updatedProduct == null) return;
+                      if (!context.mounted) return;
+
+                      if (updatedProduct.isDeleted) {
+                        Navigator.pop(context, currentProduct.copyWith(isDeleted: true));
+                        return;
+                      }
+
+                      setState(() {
+                        currentProduct = currentProduct.updateWithProduct(updatedProduct);
+                        productWasModified = true;
+                      });
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                ],
               ),
               bottomNavigationBar: BottomAppBar(
                 height: 48,

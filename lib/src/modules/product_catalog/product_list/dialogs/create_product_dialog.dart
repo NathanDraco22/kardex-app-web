@@ -20,9 +20,26 @@ part 'extra_units_section.dart';
 Future<ProductInDb?> showCreateProductDialog(
   BuildContext context, {
   ProductInDb? product,
+  WriteProductCubit? writeProductCubit,
+  ReadProductCubit? readProductCubit,
 }) async {
-  final writeCubit = context.read<WriteProductCubit>();
-  final readCubit = context.read<ReadProductCubit>();
+  final writeCubit = writeProductCubit ??
+      (() {
+        try {
+          return context.read<WriteProductCubit>();
+        } catch (_) {
+          return WriteProductCubit(context.read<ProductsRepository>());
+        }
+      })();
+
+  ReadProductCubit? readCubit = readProductCubit;
+  if (readCubit == null) {
+    try {
+      readCubit = context.read<ReadProductCubit>();
+    } catch (_) {
+      readCubit = null;
+    }
+  }
 
   final productCateRepo = context.read<ProductCategoriesRepository>();
   final unitRepo = context.read<UnitsRepository>();
@@ -35,7 +52,7 @@ Future<ProductInDb?> showCreateProductDialog(
     child: MultiBlocProvider(
       providers: [
         BlocProvider.value(value: writeCubit),
-        BlocProvider.value(value: readCubit),
+        if (readCubit != null) BlocProvider.value(value: readCubit),
       ],
       child: CreateProductDialog(product: product),
     ),
@@ -108,15 +125,12 @@ class _CreateProductDialogState extends State<CreateProductDialog> {
 
         if (state is DeleteProductSuccess) {
           LoadingDialogManager.closeLoadingDialog(context);
-          context.read<ReadProductCubit>().removeProduct(state.product);
+          try {
+            context.read<ReadProductCubit>().removeProduct(state.product);
+          } catch (_) {}
           await DialogManager.showInfoDialog(context, "Se ha borrado el producto ${state.product.name}");
           if (!context.mounted) return;
           context.pop(state.product);
-        }
-
-        if (state is WriteProductError) {
-          LoadingDialogManager.closeLoadingDialog(context);
-          DialogManager.showErrorDialog(context, state.error);
         }
       },
       child: Form(
