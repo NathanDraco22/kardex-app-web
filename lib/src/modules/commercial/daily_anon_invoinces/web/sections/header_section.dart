@@ -42,7 +42,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                     ),
                   ),
                   const VerticalDivider(),
-                  TextButton.icon(
+                  SecondaryMenuButton(
                     onPressed: () {
                       readCubit.clearFilters();
                       if (!isSellerRole) {

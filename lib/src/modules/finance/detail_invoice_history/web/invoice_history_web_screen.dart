@@ -29,7 +29,7 @@ class _RootScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Historial de Facturas"),
+        title: const Text("Historial Detallado de Facturas"),
       ),
       body: const _Body(),
     );

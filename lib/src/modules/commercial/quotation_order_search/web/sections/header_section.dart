@@ -32,7 +32,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  TextButton.icon(
+                  SecondaryMenuButton(
                     onPressed: () {
                       readCubit.clearFilters(getIt<AuthCubit>().currentBranchId);
                       if (!isSellerRole) {
@@ -86,7 +86,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                 runSpacing: 4,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  TextButton.icon(
+                  SecondaryMenuButton(
                     onPressed: () async {
                       final client = await showClientSelectionDialog(context);
                       if (client == null) return;
@@ -111,11 +111,9 @@ class _HeaderSectionState extends State<_HeaderSection> {
                     ),
                   const SizedBox(width: 8),
                   if (readCubit.state is ReadQuotationOrderSearchSuccess) ...[
-                    FilledButton.icon(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.tertiary,
-                        foregroundColor: Colors.white,
-                      ),
+                    PrimaryMenuButton(
+                      backgroundColor: Theme.of(context).colorScheme.tertiary,
+                      foregroundColor: Colors.white,
                       onPressed: () async {
                         final state = readCubit.state as ReadQuotationOrderSearchSuccess;
 
@@ -144,7 +142,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                     ),
                     const SizedBox(width: 8),
                   ],
-                  FilledButton.icon(
+                  PrimaryMenuButton(
                     onPressed: () {
                       readCubit.loadDocuments(getIt<AuthCubit>().currentBranchId);
                     },

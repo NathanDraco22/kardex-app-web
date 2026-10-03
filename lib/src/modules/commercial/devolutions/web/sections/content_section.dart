@@ -157,7 +157,7 @@ class _ContentSection extends StatelessWidget {
               ),
             ),
             BasicTableCell(
-              content: TextButton.icon(
+              content: SecondaryMenuButton(
                 onPressed: () async {
                   if (currentInvoice.clientId != kSaleClientId && currentInvoice.amountPaid > 0) {
                     DialogManager.showInfoDialog(context, "Los clientes de crédito con facturas abonadas no pueden hacer devoluciones de productos");

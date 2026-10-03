@@ -41,7 +41,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                     ),
                   ),
                   const VerticalDivider(),
-                  TextButton.icon(
+                  SecondaryMenuButton(
                     onPressed: () {
                       readCubit.clearFilters(getIt<AuthCubit>().currentBranchId);
                       if (!isSellerRole) {
@@ -74,7 +74,9 @@ class _HeaderSectionState extends State<_HeaderSection> {
                     ),
                   const Spacer(),
                   if (readCubit.state is ReadDailyProductSalesSuccess)
-                    FilledButton.icon(
+                    PrimaryMenuButton(
+                      label: const Text("Exportar"),
+                      icon: const Icon(Icons.picture_as_pdf),
                       onPressed: () async {
                         final option = await showExportOptionsDialog(context);
                         if (option == null) return;
@@ -106,8 +108,6 @@ class _HeaderSectionState extends State<_HeaderSection> {
                           );
                         }
                       },
-                      icon: const Icon(Icons.import_export),
-                      label: const Text("Exportar"),
                     ),
                 ],
               ),

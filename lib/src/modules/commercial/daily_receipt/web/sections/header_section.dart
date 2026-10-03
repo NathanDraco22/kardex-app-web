@@ -84,7 +84,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                 ),
                 Row(
                   children: [
-                    TextButton.icon(
+                    SecondaryMenuButton(
                       onPressed: () {
                         readCubit.clearFilterParams();
                         setState(() {});

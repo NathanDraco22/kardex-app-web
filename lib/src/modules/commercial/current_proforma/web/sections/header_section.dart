@@ -32,7 +32,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
               spacing: 4,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TextButton.icon(
+                SecondaryMenuButton(
                   onPressed: () async {
                     final client = await showClientSelectionDialog(context);
                     if (client == null) return;
@@ -67,7 +67,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                 ),
               ],
             ),
-            TextButton.icon(
+            SecondaryMenuButton(
               onPressed: () {
                 setState(() {
                   currentSelectedUser = null;

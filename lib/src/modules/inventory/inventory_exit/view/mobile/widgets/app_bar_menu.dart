@@ -68,10 +68,9 @@ class _SaveButton extends StatelessWidget {
         context.read<WriteExitDocCubit>().createNewExitDoc(createExitDoc);
       };
     }
-    return TextButton.icon(
-      style: TextButton.styleFrom(
-        foregroundColor: Colors.white,
-      ),
+    return SecondaryMenuButton(
+      foregroundColor: Colors.white,
+      borderColor: Colors.white70,
       onPressed: onPressed,
       label: const Text("Guardar"),
       icon: const Icon(Icons.save),

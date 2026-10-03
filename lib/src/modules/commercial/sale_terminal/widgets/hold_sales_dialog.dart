@@ -3,8 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:kardex_app_front/src/core/terminal_draft_manager.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/view_controller.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/hold_sale_description_dialog.dart';
-import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
-import 'package:kardex_app_front/widgets/dialogs/selectors/user_dropdown_selector.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/src/tools/role_tools.dart';
 import 'package:kardex_business/kardex_business.dart';
 
@@ -254,12 +253,14 @@ class _HoldSalesDialogContentState extends State<_HoldSalesDialogContent> {
                         color: Colors.grey.shade700,
                       ),
                     ),
-                    TextButton.icon(
+                    SecondaryMenuButton(
                       onPressed: _clearAll,
-                      icon: const Icon(Icons.delete_sweep_outlined, size: 16, color: Colors.red),
+                      borderColor: Colors.red.shade200,
+                      foregroundColor: Colors.red,
+                      icon: const Icon(Icons.delete_sweep_outlined, size: 16),
                       label: const Text(
                         "Vaciar todas",
-                        style: TextStyle(color: Colors.red, fontSize: 12),
+                        style: TextStyle(fontSize: 12),
                       ),
                     ),
                   ],

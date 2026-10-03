@@ -25,7 +25,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                TextButton.icon(
+                SecondaryMenuButton(
                   onPressed: () async {
                     selectedProduct = await showProductSearchDelegate(context);
                     if (selectedProduct == null) return;

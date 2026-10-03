@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/widgets/buttons/secondary_menu_button.dart';
 import 'package:kardex_app_front/widgets/dialogs/client_full_details_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/selectors/client_selection_dialog.dart';
 
@@ -33,7 +34,7 @@ class _ClientSelectorCardState extends State<ClientSelectorCard> {
       mainAxisAlignment: .center,
       children: [
         Expanded(
-          child: TextButton.icon(
+          child: SecondaryMenuButton(
             onPressed: () async {
               _selectedClient = await showClientSelectionDialog(context);
               widget.onChange(_selectedClient);
@@ -60,7 +61,7 @@ class _ClientSelectorCardState extends State<ClientSelectorCard> {
                     "Datos del Cliente",
                     style: TextStyle(fontWeight: .w500, color: Colors.grey),
                   ),
-                  TextButton.icon(
+                  SecondaryMenuButton(
                     onPressed: () async {
                       showClientFullDetailsDialog(context, client: _selectedClient!);
                     },

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/show_client_with_balance_search_dialog.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 
 import '../cubits/read_pending_client_cubit.dart';
 import 'no_paid_invoice_web_screen.dart';
@@ -56,7 +57,7 @@ class _Body extends StatelessWidget {
                       ),
                     ),
 
-                    TextButton.icon(
+                    SecondaryMenuButton(
                       icon: const Icon(Icons.search),
                       onPressed: () async {
                         final client = await showClientWithBalanceSearch(context);

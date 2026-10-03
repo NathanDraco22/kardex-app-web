@@ -30,7 +30,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  TextButton.icon(
+                  SecondaryMenuButton(
                     onPressed: () {
                       readCubit.setDefaultParams(getIt<AuthCubit>().currentBranchId);
                       widget.onProductSelected(null);
@@ -78,7 +78,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  TextButton.icon(
+                  SecondaryMenuButton(
                     icon: const Icon(Icons.shopping_bag_outlined),
                     onPressed: () async {
                       final product = await showProductSearchDelegate(context);
@@ -89,7 +89,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                         ? const Text("Seleccionar Producto")
                         : const Text("Cambiar Producto"),
                   ),
-                  FilledButton.icon(
+                  PrimaryMenuButton(
                     onPressed: widget.selectedProduct == null
                         ? null
                         : () {

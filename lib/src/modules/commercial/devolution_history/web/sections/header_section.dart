@@ -29,7 +29,7 @@ class _HeaderSection extends StatelessWidget {
                         readCubit.loadDevolutionsHistory();
                       },
                     ),
-                    TextButton.icon(
+                    SecondaryMenuButton(
                       onPressed: () {
                         final devolutionRepo = context.read<DevolutionsRepository>();
                         showSimpleSearchDialog<DevolutionInDb>(
@@ -114,7 +114,7 @@ class _HeaderSection extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const SizedBox(width: 16),
-                    TextButton.icon(
+                    SecondaryMenuButton(
                       onPressed: () {
                         readCubit.setDefaultParams();
                       },
