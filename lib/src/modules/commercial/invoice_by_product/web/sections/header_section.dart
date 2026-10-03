@@ -30,14 +30,14 @@ class _HeaderSectionState extends State<_HeaderSection> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  TextButton.icon(
+                  SecondaryMenuButton(
                     onPressed: () {
                       readCubit.setDefaultParams(getIt<AuthCubit>().currentBranchId);
                       widget.onProductSelected(null);
                       setState(() {});
                     },
                     icon: const Icon(Icons.clear),
-                    label: const Text("Limpiar Filtros"),
+                    label: const Text("Limpiar"),
                   ),
                 ],
               ),
@@ -78,7 +78,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  TextButton.icon(
+                  SecondaryMenuButton(
                     icon: const Icon(Icons.shopping_bag_outlined),
                     onPressed: () async {
                       final product = await showProductSearchDelegate(context);
@@ -89,11 +89,14 @@ class _HeaderSectionState extends State<_HeaderSection> {
                         ? const Text("Seleccionar Producto")
                         : const Text("Cambiar Producto"),
                   ),
-                  FilledButton.icon(
+                  PrimaryMenuButton(
                     onPressed: widget.selectedProduct == null
                         ? null
                         : () {
-                            readCubit.loadInvoicesByProduct(widget.selectedProduct!.id, getIt<AuthCubit>().currentBranchId);
+                            readCubit.loadInvoicesByProduct(
+                              widget.selectedProduct!.id,
+                              getIt<AuthCubit>().currentBranchId,
+                            );
                           },
                     label: const Text("Filtrar"),
                     icon: const Icon(Icons.filter_alt_rounded),

@@ -5,11 +5,18 @@ import 'package:kardex_business/kardex_business.dart';
 part 'read_daily_anon_invoices_state.dart';
 
 class ReadDailyAnonInvoicesCubit extends Cubit<ReadDailyAnonInvoicesState> {
-  ReadDailyAnonInvoicesCubit({required this.invoicesRepository}) : super(ReadDailyAnonInvoicesInitial()) {
+  ReadDailyAnonInvoicesCubit({
+    required this.invoicesRepository,
+    this.defaultCreatorId,
+  }) : super(ReadDailyAnonInvoicesInitial()) {
     final todayMidnight = DateTimeTool.getTodayMidnight();
     startDate = todayMidnight;
+    if (defaultCreatorId != null) {
+      userCreatorId = defaultCreatorId;
+    }
   }
 
+  final String? defaultCreatorId;
   DateTime? startDate;
   int offset = 0;
   String? userCreatorId;
@@ -25,9 +32,7 @@ class ReadDailyAnonInvoicesCubit extends Cubit<ReadDailyAnonInvoicesState> {
     if (startDate != null) {
       this.startDate = startDate;
     }
-    if (userCreatorId != null) {
-      this.userCreatorId = userCreatorId;
-    }
+    this.userCreatorId = defaultCreatorId ?? userCreatorId ?? this.userCreatorId;
     offset = 0;
     try {
       final topEndDate = this.startDate?.add(const Duration(days: 1));
@@ -98,9 +103,9 @@ class ReadDailyAnonInvoicesCubit extends Cubit<ReadDailyAnonInvoicesState> {
   void clearFilters() {
     startDate = DateTimeTool.getTodayMidnight();
     offset = 0;
-    userCreatorId = null;
+    userCreatorId = defaultCreatorId;
     if (_lastBranchId != null) {
-      loadDailyPaidAnonInvoices(_lastBranchId!, startDate: startDate);
+      loadDailyPaidAnonInvoices(_lastBranchId!, startDate: startDate, userCreatorId: userCreatorId);
     }
   }
 }

@@ -25,7 +25,7 @@ class _HeaderSection extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  TextButton.icon(
+                  SecondaryMenuButton(
                     onPressed: () {
                       final adjustRepo = context.read<AdjustEntriesRepository>();
                       showSimpleSearchDialog<AdjustEntryInDb>(
@@ -43,7 +43,7 @@ class _HeaderSection extends StatelessWidget {
                     icon: const Icon(Icons.search),
                   ),
                   const SizedBox(width: 16),
-                  TextButton.icon(
+                  SecondaryMenuButton(
                     onPressed: () {
                       readCubit.setDefaultParams(getIt<AuthCubit>().currentBranchId);
                     },

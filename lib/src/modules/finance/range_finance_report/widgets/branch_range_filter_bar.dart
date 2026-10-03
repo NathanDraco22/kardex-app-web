@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/cubits/reports/read_reports_cubit.dart';
-import 'package:kardex_app_front/widgets/date_picker_listile.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 class BranchRangeFilterBar extends StatefulWidget {
@@ -64,15 +64,15 @@ class _BranchRangeFilterBarState extends State<BranchRangeFilterBar> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  FilledButton.icon(
+                  PrimaryMenuButton(
                     onPressed: () {
                       readCubit.loadReports(getIt<AuthCubit>().currentBranchId);
                     },
                     label: const Text("Filtrar"),
                     icon: const Icon(Icons.filter_alt_rounded),
                   ),
-                  const SizedBox(width: 12),
-                  FilledButton.tonal(
+                  const SizedBox(width: 8),
+                  SecondaryMenuButton(
                     onPressed: () {
                       final now = DateTime.now();
                       readCubit.startDate = DateTime(now.year, now.month, 1);
@@ -80,7 +80,8 @@ class _BranchRangeFilterBarState extends State<BranchRangeFilterBar> {
                       setState(() {});
                       readCubit.loadReports(getIt<AuthCubit>().currentBranchId);
                     },
-                    child: const Icon(Icons.clear),
+                    label: const Text("Limpiar"),
+                    icon: const Icon(Icons.clear),
                   ),
                 ],
               ),
@@ -133,15 +134,15 @@ class _BranchRangeFilterBarState extends State<BranchRangeFilterBar> {
               ),
             ),
             const SizedBox(width: 24),
-            FilledButton.icon(
+            PrimaryMenuButton(
               onPressed: () {
                 readCubit.loadReports(getIt<AuthCubit>().currentBranchId);
               },
               label: const Text("Filtrar"),
               icon: const Icon(Icons.filter_alt_rounded, size: 18),
             ),
-            const SizedBox(width: 10),
-            IconButton.filledTonal(
+            const SizedBox(width: 8),
+            SecondaryMenuButton(
               tooltip: "Limpiar Filtros",
               onPressed: () {
                 final now = DateTime.now();
@@ -150,6 +151,7 @@ class _BranchRangeFilterBarState extends State<BranchRangeFilterBar> {
                 setState(() {});
                 readCubit.loadReports(getIt<AuthCubit>().currentBranchId);
               },
+              label: const Text("Limpiar"),
               icon: const Icon(Icons.clear, size: 18),
             ),
           ],

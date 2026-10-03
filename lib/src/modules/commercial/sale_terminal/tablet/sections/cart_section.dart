@@ -101,7 +101,7 @@ class _TabletCartSectionState extends State<_TabletCartSection> {
                           color: Colors.blue.shade700,
                         ),
                       ),
-                      TextButton.icon(
+                      SecondaryMenuButton(
                         onPressed: viewController.items.isEmpty
                             ? null
                             : () => confirmAndClearCart(

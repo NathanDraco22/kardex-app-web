@@ -88,13 +88,13 @@ class _Body extends StatelessWidget {
     if (isMobile) {
       return ClientInvoicesScreenMobile(
         pageTitle: pageTitleWholesale,
-        actionButtonLabel: "Finalizar Cotización",
+        actionButtonLabel: "Enviar Cotización",
       );
     }
 
     return ClientInvoicesScreenWeb(
       pageTitle: pageTitleWholesale,
-      actionButtonLabel: "Finalizar Cotización",
+      actionButtonLabel: "Enviar Cotización",
     );
   }
 }

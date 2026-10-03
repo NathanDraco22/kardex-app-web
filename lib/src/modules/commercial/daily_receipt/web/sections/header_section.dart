@@ -84,7 +84,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                 ),
                 Row(
                   children: [
-                    TextButton.icon(
+                    SecondaryMenuButton(
                       onPressed: () {
                         readCubit.clearFilterParams();
                         setState(() {});
@@ -92,7 +92,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                       icon: const Icon(
                         Icons.clear,
                       ),
-                      label: const Text("Limpiar Filtros"),
+                      label: const Text("Limpiar"),
                     ),
                   ],
                 ),

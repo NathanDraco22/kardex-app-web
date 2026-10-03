@@ -29,7 +29,7 @@ class _RootScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Historial de Facturas"),
+        title: const Text("Historial Detallado de Facturas"),
       ),
       body: const _Body(),
     );
@@ -48,10 +48,7 @@ class _Body extends StatelessWidget {
           spacing: 8,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            SizedBox(
-              height: 180,
-              child: _HeaderSection(),
-            ),
+            _HeaderSection(),
             Expanded(
               child: _ContentSection(),
             ),

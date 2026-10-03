@@ -112,7 +112,7 @@ class _ExpirationLogCreationScreenState extends State<ExpirationLogCreationScree
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  TextButton.icon(
+                  SecondaryMenuButton(
                     onPressed: () async {
                       final isMobile = context.isMobile();
 

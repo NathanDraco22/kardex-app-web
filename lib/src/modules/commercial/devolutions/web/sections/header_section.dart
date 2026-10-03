@@ -61,25 +61,6 @@ class _HeaderSectionState extends State<_HeaderSection> {
             ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 600),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton.icon(
-                    onPressed: () {
-                      readCubit.clearFilters(getIt<AuthCubit>().currentBranchId);
-                      if (!isSellerRole) {
-                        currentSelectedUser = null;
-                      }
-                      setState(() {});
-                    },
-                    icon: const Icon(Icons.clear),
-                    label: const Text("Limpiar Filtros"),
-                  ),
-                ],
-              ),
-            ),
-            ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 600),
-              child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Expanded(
@@ -107,7 +88,22 @@ class _HeaderSectionState extends State<_HeaderSection> {
                 ],
               ),
             ),
-            const SizedBox(height: 8),
+            if (!isSellerRole) ...[
+              const SizedBox(height: 8),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 600),
+                child: UserDropdownSelector(
+                  width: 280,
+                  selectedUser: currentSelectedUser,
+                  onChanged: (user) {
+                    readCubit.userCreatorId = user?.id;
+                    currentSelectedUser = user;
+                    setState(() {});
+                  },
+                ),
+              ),
+            ],
+            const SizedBox(height: 12),
             ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 600),
               child: Row(
@@ -115,30 +111,10 @@ class _HeaderSectionState extends State<_HeaderSection> {
                 children: [
                   Row(
                     children: [
-                      if (!isSellerRole)
-                        TextButton.icon(
-                          icon: const Icon(Icons.person),
-                          onPressed: () async {
-                            final user = await showActiveUserSelectionDialog(context);
-                            if (user == null) return;
-                            readCubit.userCreatorId = user.id;
-                            currentSelectedUser = user;
-                            setState(() {});
-                          },
-                          label: currentSelectedUser == null
-                              ? const Text("Seleccionar Usuario")
-                              : Text(currentSelectedUser!.username),
-                        ),
-                    ],
-                  ),
-                  Row(
-                    children: [
                       if (readCubit.state is ReadDevolutionsSuccess) ...[
-                        FilledButton.icon(
-                          style: FilledButton.styleFrom(
-                            backgroundColor: Theme.of(context).colorScheme.tertiary,
-                            foregroundColor: Colors.white,
-                          ),
+                        PrimaryMenuButton(
+                          backgroundColor: Theme.of(context).colorScheme.tertiary,
+                          foregroundColor: Colors.white,
                           onPressed: () async {
                             final state = readCubit.state as ReadDevolutionsSuccess;
 
@@ -164,7 +140,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                         ),
                         const SizedBox(width: 8),
                       ],
-                      FilledButton.icon(
+                      PrimaryMenuButton(
                         onPressed: () {
                           readCubit.loadDailyInvoices(getIt<AuthCubit>().currentBranchId);
                         },
@@ -172,6 +148,17 @@ class _HeaderSectionState extends State<_HeaderSection> {
                         icon: const Icon(Icons.filter_alt_rounded),
                       ),
                     ],
+                  ),
+                  SecondaryMenuButton(
+                    onPressed: () {
+                      readCubit.clearFilters(getIt<AuthCubit>().currentBranchId);
+                      if (!isSellerRole) {
+                        currentSelectedUser = null;
+                      }
+                      setState(() {});
+                    },
+                    icon: const Icon(Icons.clear),
+                    label: const Text("Limpiar"),
                   ),
                 ],
               ),

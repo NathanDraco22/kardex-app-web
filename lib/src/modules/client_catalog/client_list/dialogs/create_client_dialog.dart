@@ -301,7 +301,7 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
                             ],
                           ),
                         ),
-                        TextButton.icon(
+                        SecondaryMenuButton(
                           label: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -479,7 +479,9 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          TextButton.icon(
+                          SecondaryMenuButton(
+                            foregroundColor: Colors.red,
+                            borderColor: Colors.red.shade200,
                             onPressed: () async {
                               final res = await DialogManager.slideToConfirmDeleteActionDialog(
                                 context,
@@ -488,7 +490,6 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
                               if (!res) return;
                               writeCubit.deleteClient(currentClient.id);
                             },
-                            style: TextButton.styleFrom(foregroundColor: Colors.red),
                             label: const Text("Eliminar Cliente"),
                             icon: const Icon(
                               Icons.delete,

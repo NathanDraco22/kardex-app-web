@@ -35,12 +35,15 @@ class _HeaderSectionState extends State<_HeaderSection> {
                       defaultDate: readCubit.startDate,
                       title: "Fecha",
                       onSelected: (value) {
-                        readCubit.loadDailyProductInOrders(branchId: getIt<AuthCubit>().currentBranchId, startDate: value);
+                        readCubit.loadDailyProductInOrders(
+                          branchId: getIt<AuthCubit>().currentBranchId,
+                          startDate: value,
+                        );
                       },
                     ),
                   ),
                   const VerticalDivider(),
-                  TextButton.icon(
+                  SecondaryMenuButton(
                     onPressed: () {
                       readCubit.clearFilters(getIt<AuthCubit>().currentBranchId);
                       if (!isSellerRole) {
@@ -49,7 +52,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                       setState(() {});
                     },
                     icon: const Icon(Icons.clear),
-                    label: const Text("Limpiar Filtros"),
+                    label: const Text("Limpiar"),
                   ),
                 ],
               ),
@@ -59,22 +62,23 @@ class _HeaderSectionState extends State<_HeaderSection> {
               child: Row(
                 children: [
                   if (!isSellerRole)
-                    TextButton.icon(
-                      onPressed: () async {
-                        final user = await showActiveUserSelectionDialog(context);
-                        if (user == null) return;
-                        readCubit.loadDailyProductInOrders(branchId: getIt<AuthCubit>().currentBranchId, userCreatorId: user.id);
+                    UserDropdownSelector(
+                      width: 250,
+                      selectedUser: currentSelectedUser,
+                      onChanged: (user) {
                         currentSelectedUser = user;
+                        readCubit.loadDailyProductInOrders(
+                          branchId: getIt<AuthCubit>().currentBranchId,
+                          userCreatorId: user?.id,
+                        );
                         setState(() {});
                       },
-                      icon: const Icon(Icons.person),
-                      label: currentSelectedUser == null
-                          ? const Text("Seleccionar Usuario")
-                          : Text(currentSelectedUser!.username),
                     ),
                   const Spacer(),
                   if (readCubit.state is ReadDailyProductInOrdersSuccess)
-                    FilledButton.icon(
+                    PrimaryMenuButton(
+                      label: const Text("Exportar"),
+                      icon: const Icon(Icons.picture_as_pdf),
                       onPressed: () async {
                         // Importar export_options_dialog en daily_product_in_orders_screen_web
                         final option = await showExportOptionsDialog(context);
@@ -107,8 +111,6 @@ class _HeaderSectionState extends State<_HeaderSection> {
                           );
                         }
                       },
-                      icon: const Icon(Icons.import_export),
-                      label: const Text("Exportar"),
                     ),
                 ],
               ),

@@ -75,7 +75,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                 ],
               ),
             ),
-            TextButton.icon(
+            SecondaryMenuButton(
               onPressed: () {
                 readCubit.clearFilterParams(getIt<AuthCubit>().currentBranchId);
                 setState(() {});

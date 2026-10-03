@@ -17,19 +17,6 @@ class _HeaderSectionState extends State<_HeaderSection> {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                FilledButton(
-                  onPressed: () {
-                    readCubit.clearFilters();
-                    setState(() {});
-                    readCubit.loadPaidInvoices(getIt<AuthCubit>().currentBranchId);
-                  },
-                  child: const Icon(Icons.clear),
-                ),
-              ],
-            ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -100,12 +87,22 @@ class _HeaderSectionState extends State<_HeaderSection> {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                FilledButton.icon(
+                PrimaryMenuButton(
                   onPressed: () {
                     readCubit.loadPaidInvoices(getIt<AuthCubit>().currentBranchId);
                   },
                   label: const Text("Filtrar"),
                   icon: const Icon(Icons.filter_alt_rounded),
+                ),
+                const SizedBox(width: 8),
+                SecondaryMenuButton(
+                  onPressed: () {
+                    readCubit.clearFilters();
+                    setState(() {});
+                    readCubit.loadPaidInvoices(getIt<AuthCubit>().currentBranchId);
+                  },
+                  label: const Text("Limpiar"),
+                  icon: const Icon(Icons.clear),
                 ),
               ],
             ),

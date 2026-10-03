@@ -140,12 +140,15 @@ class _QuickProductSearchDelegateState extends State<QuickProductSearchDelegate>
         ),
         actions: [
           if (_cart.isNotEmpty)
-            TextButton.icon(
-              onPressed: () {
-                Navigator.pop(context, _cart.values.toList());
-              },
-              icon: const Icon(Icons.check),
-              label: Text("Listo ($cartItemsCount)"),
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: PrimaryMenuButton(
+                onPressed: () {
+                  Navigator.pop(context, _cart.values.toList());
+                },
+                icon: const Icon(Icons.check),
+                label: Text("Listo ($cartItemsCount)"),
+              ),
             ),
         ],
         bottom: PreferredSize(

@@ -32,7 +32,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
               spacing: 4,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TextButton.icon(
+                SecondaryMenuButton(
                   onPressed: () async {
                     final client = await showClientSelectionDialog(context);
                     if (client == null) return;
@@ -50,10 +50,10 @@ class _HeaderSectionState extends State<_HeaderSection> {
                 ),
                 Visibility(
                   visible: !isSeller,
-                  child: TextButton.icon(
-                    onPressed: () async {
-                      final user = await showActiveUserSelectionDialog(context);
-                      if (user == null) return;
+                  child: UserDropdownSelector(
+                    width: 250,
+                    selectedUser: currentSelectedUser,
+                    onChanged: (user) {
                       setState(() {
                         currentSelectedUser = user;
                       });
@@ -63,13 +63,11 @@ class _HeaderSectionState extends State<_HeaderSection> {
                       );
                       readCubit.loadPaginatedOrders(getIt<AuthCubit>().currentBranchId);
                     },
-                    icon: const Icon(Icons.person),
-                    label: Text(currentSelectedUser?.username ?? "Seleccionar usuario"),
                   ),
                 ),
               ],
             ),
-            TextButton.icon(
+            SecondaryMenuButton(
               onPressed: () {
                 setState(() {
                   currentSelectedUser = null;

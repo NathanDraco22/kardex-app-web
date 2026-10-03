@@ -97,21 +97,22 @@ class _HeaderSectionState extends State<_HeaderSection> {
                           flex: 2,
                           child: Row(
                             children: [
-                              FilledButton.icon(
+                              PrimaryMenuButton(
                                 onPressed: () {
                                   readCubit.loadPaidInvoices(getIt<AuthCubit>().currentBranchId);
                                 },
                                 label: const Text("Filtrar"),
                                 icon: const Icon(Icons.filter_alt_rounded),
                               ),
-                              const SizedBox(width: 12),
-                              FilledButton(
+                              const SizedBox(width: 8),
+                              SecondaryMenuButton(
                                 onPressed: () {
                                   readCubit.clearFilters();
                                   setState(() {});
                                   readCubit.loadPaidInvoices(getIt<AuthCubit>().currentBranchId);
                                 },
-                                child: const Icon(Icons.clear),
+                                label: const Text("Limpiar"),
+                                icon: const Icon(Icons.clear),
                               ),
                             ],
                           ),

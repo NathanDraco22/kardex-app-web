@@ -41,7 +41,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                     ),
                   ),
                   const VerticalDivider(),
-                  TextButton.icon(
+                  SecondaryMenuButton(
                     onPressed: () {
                       readCubit.clearFilters(getIt<AuthCubit>().currentBranchId);
                       if (!isSellerRole) {
@@ -50,7 +50,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                       setState(() {});
                     },
                     icon: const Icon(Icons.clear),
-                    label: const Text("Limpiar Filtros"),
+                    label: const Text("Limpiar"),
                   ),
                 ],
               ),
@@ -60,22 +60,23 @@ class _HeaderSectionState extends State<_HeaderSection> {
               child: Row(
                 children: [
                   if (!isSellerRole)
-                    TextButton.icon(
-                      onPressed: () async {
-                        final user = await showActiveUserSelectionDialog(context);
-                        if (user == null) return;
-                        readCubit.loadDailyProductSales(branchId: getIt<AuthCubit>().currentBranchId, userCreatorId: user.id);
+                    UserDropdownSelector(
+                      width: 250,
+                      selectedUser: currentSelectedUser,
+                      onChanged: (user) {
                         currentSelectedUser = user;
+                        readCubit.loadDailyProductSales(
+                          branchId: getIt<AuthCubit>().currentBranchId,
+                          userCreatorId: user?.id,
+                        );
                         setState(() {});
                       },
-                      icon: const Icon(Icons.person),
-                      label: currentSelectedUser == null
-                          ? const Text("Seleccionar Usuario")
-                          : Text(currentSelectedUser!.username),
                     ),
                   const Spacer(),
                   if (readCubit.state is ReadDailyProductSalesSuccess)
-                    FilledButton.icon(
+                    PrimaryMenuButton(
+                      label: const Text("Exportar"),
+                      icon: const Icon(Icons.picture_as_pdf),
                       onPressed: () async {
                         final option = await showExportOptionsDialog(context);
                         if (option == null) return;
@@ -107,8 +108,6 @@ class _HeaderSectionState extends State<_HeaderSection> {
                           );
                         }
                       },
-                      icon: const Icon(Icons.import_export),
-                      label: const Text("Exportar"),
                     ),
                 ],
               ),

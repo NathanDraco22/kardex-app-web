@@ -63,7 +63,7 @@ class _Body extends StatelessWidget {
                     ),
                     Flexible(
                       flex: 2,
-                      child: TextButton.icon(
+                      child: SecondaryMenuButton(
                         onPressed: () async {
                           ProductInDbInBranch? selectedProduct;
                           if (!context.isMobile()) {

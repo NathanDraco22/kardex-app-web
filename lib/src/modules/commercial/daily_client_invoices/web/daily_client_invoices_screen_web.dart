@@ -6,11 +6,9 @@ import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/tools/role_tools.dart';
-import 'package:kardex_app_front/widgets/basic_table_listview.dart';
-import 'package:kardex_app_front/widgets/date_picker_listile.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
-import 'package:kardex_app_front/widgets/dialogs/selectors/user_selection_dialog.dart';
 import 'package:kardex_app_front/widgets/title_label.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/invoice_by_user_template.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
