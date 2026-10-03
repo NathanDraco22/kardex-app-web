@@ -41,7 +41,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 if (widget.initialClient == null)
-                  TextButton.icon(
+                  SecondaryMenuButton(
                     onPressed: () async {
                       final client = await showClientSelectionDialog(context);
                       if (client == null) return;

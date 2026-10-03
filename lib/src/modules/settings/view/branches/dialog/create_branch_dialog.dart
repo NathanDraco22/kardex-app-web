@@ -6,11 +6,9 @@ import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/settings/view/branches/cubit/read_branch_cubit.dart';
 import 'package:kardex_app_front/src/modules/settings/view/branches/cubit/write_branch_cubit.dart';
-import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
-import 'package:kardex_app_front/widgets/modals/map_bottom_modal.dart';
 import 'package:kardex_app_front/widgets/pick_img_widget.dart';
-import 'package:kardex_app_front/widgets/title_texfield.dart';
 import 'package:latlong2/latlong.dart';
 
 Future<BranchInDb?> showCreateBranchPriceDialog(
@@ -170,7 +168,7 @@ class _CreateProductPriceDialogState extends State<CreateProductPriceDialog> {
                                     },
                                   ),
                                 ),
-                                TextButton.icon(
+                                SecondaryMenuButton(
                                   label: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [

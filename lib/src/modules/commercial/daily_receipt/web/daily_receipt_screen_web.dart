@@ -3,10 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/commercial/daily_receipt/cubit/read_daily_receipt_cubit.dart';
-import 'package:kardex_app_front/widgets/basic_table_listview.dart';
-import 'package:kardex_app_front/widgets/super_widgets/custom_autocomplete_textfield.dart';
-import 'package:kardex_app_front/widgets/date_picker_listile.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/receipt_viewer.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 
 part 'sections/header_section.dart';
 part 'sections/content_section.dart';

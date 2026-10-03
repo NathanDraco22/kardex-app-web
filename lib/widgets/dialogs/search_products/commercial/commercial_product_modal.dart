@@ -368,7 +368,7 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                             ],
                           ),
 
-                          TextButton.icon(
+                          SecondaryMenuButton(
                             onPressed: () {
                               final priceString = NumberFormatter.convertToMoneyLike(commercialProductResult.newPrice);
                               final text =

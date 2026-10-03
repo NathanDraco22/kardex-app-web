@@ -4,11 +4,9 @@ import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/finance/paid_invoices/cubit/read_paid_invoices_cubit.dart';
-import 'package:kardex_app_front/widgets/basic_table_listview.dart';
 import 'package:kardex_app_front/widgets/dialogs/inspectors/invoice_inspector.dart';
-import 'package:kardex_app_front/widgets/super_widgets/custom_autocomplete_textfield.dart';
-import 'package:kardex_app_front/widgets/date_picker_listile.dart';
 import 'package:kardex_app_front/widgets/title_label.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 
 part 'sections/header_section.dart';
 part 'sections/content_section.dart';

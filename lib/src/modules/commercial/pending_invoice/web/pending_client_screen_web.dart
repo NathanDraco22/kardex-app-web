@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/cubit/read_pending_client_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/web/pending_invoice_web_screen.dart';
 import 'package:kardex_business/kardex_business.dart';
-import 'package:kardex_app_front/widgets/client_list_tile.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/widgets/dialogs/show_client_with_balance_search_dialog.dart';
 
 class PendingClientScreenWeb extends StatelessWidget {
@@ -51,7 +51,7 @@ class _Body extends StatelessWidget {
                         fontSize: 20,
                       ),
                     ),
-                    TextButton.icon(
+                    SecondaryMenuButton(
                       icon: const Icon(Icons.search),
                       onPressed: () async {
                         final client = await showClientWithBalanceSearch(context);

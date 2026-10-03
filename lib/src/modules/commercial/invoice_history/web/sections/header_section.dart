@@ -29,7 +29,7 @@ class _HeaderSection extends StatelessWidget {
                         readCubit.loadInvoicesHistory(getIt<AuthCubit>().currentBranchId);
                       },
                     ),
-                    TextButton.icon(
+                    SecondaryMenuButton(
                       onPressed: () {
                         final invoiceRepo = context.read<InvoicesRepository>();
                         showSimpleSearchDialog<InvoiceInDb>(
@@ -114,7 +114,7 @@ class _HeaderSection extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const SizedBox(width: 16),
-                    TextButton.icon(
+                    SecondaryMenuButton(
                       onPressed: () {
                         readCubit.setDefaultParams(getIt<AuthCubit>().currentBranchId);
                       },

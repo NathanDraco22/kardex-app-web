@@ -36,7 +36,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                         readCubit.loadInvoicesHistory(getIt<AuthCubit>().currentBranchId);
                       },
                     ),
-                    TextButton.icon(
+                    SecondaryMenuButton(
                       onPressed: () {
                         final invoiceRepo = context.read<InvoicesRepository>();
                         showSimpleSearchDialog<InvoiceInDb>(
@@ -60,7 +60,6 @@ class _HeaderSectionState extends State<_HeaderSection> {
               ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 600),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     ClientDropdownSelector(
                       width: 280,
@@ -72,7 +71,16 @@ class _HeaderSectionState extends State<_HeaderSection> {
                         setState(() {});
                       },
                     ),
-                    TextButton.icon(
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 600),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    SecondaryMenuButton(
                       onPressed: () {
                         currentSelectedClient = null;
                         readCubit.setDefaultParams(getIt<AuthCubit>().currentBranchId);

@@ -5,12 +5,11 @@ import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/commercial/daily_anon_invoinces/cubit/read_daily_anon_invoices_cubit.dart';
-import 'package:kardex_app_front/widgets/basic_table_listview.dart';
+import 'package:kardex_app_front/src/tools/role_tools.dart';
 import 'package:kardex_app_front/widgets/date_picker_button.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
-import 'package:kardex_app_front/src/tools/role_tools.dart';
-import 'package:kardex_app_front/widgets/dialogs/selectors/user_dropdown_selector.dart';
 import 'package:kardex_app_front/widgets/title_label.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 
 part 'sections/content_section.dart';
 part 'sections/header_section.dart';

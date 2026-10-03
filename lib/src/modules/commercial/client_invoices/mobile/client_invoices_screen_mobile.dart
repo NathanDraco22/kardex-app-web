@@ -7,7 +7,7 @@ import 'package:kardex_app_front/src/modules/commercial/client_invoices/mobile/m
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/view_controller.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/commercial_product_modal.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/search_product_commercial_delegate.dart';
-import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 
 import '../widgets/product_invoice_card.dart';
 import 'invoice_client_menu_screen.dart';
@@ -120,10 +120,9 @@ class _RootScaffold extends StatelessWidget {
               return Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  TextButton.icon(
-                    style: TextButton.styleFrom(
-                      foregroundColor: Colors.white,
-                    ),
+                  SecondaryMenuButton(
+                    foregroundColor: Colors.white,
+                    borderColor: Colors.white70,
                     onPressed: isEmptyItems
                         ? null
                         : () async {
@@ -132,7 +131,7 @@ class _RootScaffold extends StatelessWidget {
                             );
                           },
                     label: Text(saveButton),
-                    icon: Icon(saveIcon),
+                    icon: Icon(saveIcon, color: Colors.white),
                   ),
                 ],
               );

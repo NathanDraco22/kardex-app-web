@@ -89,7 +89,7 @@ class _CartSectionState extends State<_CartSection> {
                           color: Colors.blue.shade700,
                         ),
                       ),
-                      TextButton.icon(
+                      SecondaryMenuButton(
                         onPressed: viewController.items.isEmpty
                             ? null
                             : () => confirmAndClearCart(

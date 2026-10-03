@@ -5,7 +5,7 @@ import 'package:kardex_app_front/src/modules/commercial/anon_invoices/cubits/wri
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/mobile/invoice_anon_menu_screen.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/commercial_product_modal.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/search_product_commercial_delegate.dart';
-import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 
 import '../../client_invoices/widgets/product_invoice_card.dart';
 import '../view_controller.dart';
@@ -80,10 +80,9 @@ class _RootScaffold extends StatelessWidget {
               return Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  TextButton.icon(
-                    style: TextButton.styleFrom(
-                      foregroundColor: Colors.white,
-                    ),
+                  SecondaryMenuButton(
+                    foregroundColor: Colors.white,
+                    borderColor: Colors.white70,
                     onPressed: isEmptyItems
                         ? null
                         : () async {
@@ -93,6 +92,7 @@ class _RootScaffold extends StatelessWidget {
                     label: const Text("Facturar"),
                     icon: const Icon(
                       Icons.save,
+                      color: Colors.white,
                     ),
                   ),
                 ],

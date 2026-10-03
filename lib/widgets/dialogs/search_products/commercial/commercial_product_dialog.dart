@@ -469,7 +469,7 @@ class _FormContentState extends State<_FormContent> {
                             ],
                           ),
 
-                          TextButton.icon(
+                          SecondaryMenuButton(
                             onPressed: () {
                               final priceString = NumberFormatter.convertToMoneyLike(
                                 commercialProductResult.newPrice,

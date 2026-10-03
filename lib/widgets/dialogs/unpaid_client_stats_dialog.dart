@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/widgets/buttons/secondary_menu_button.dart';
 import 'package:kardex_app_front/widgets/dialogs/client_full_details_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -51,7 +52,7 @@ class UnpaidClientStatsDialog extends StatelessWidget {
           Row(
             mainAxisAlignment: .spaceBetween,
             children: [
-              TextButton.icon(
+              SecondaryMenuButton(
                 icon: const Icon(Icons.phone),
                 onPressed: () {
                   if (client.phone != null) {
@@ -61,7 +62,7 @@ class UnpaidClientStatsDialog extends StatelessWidget {
                 label: Text(client.phone ?? "Sin teléfono"),
               ),
 
-              TextButton.icon(
+              SecondaryMenuButton(
                 icon: const Icon(Icons.email),
                 onPressed: () {
                   if (client.email != null) {
@@ -87,7 +88,7 @@ class UnpaidClientStatsDialog extends StatelessWidget {
             color: client.lastReceiptDate == null ? Colors.red.shade100 : _getColorForDays(daysSinceAbono),
           ),
 
-          TextButton.icon(
+          SecondaryMenuButton(
             icon: const Icon(Icons.person),
             onPressed: () {
               showClientFullDetailsDialog(context, client: client);

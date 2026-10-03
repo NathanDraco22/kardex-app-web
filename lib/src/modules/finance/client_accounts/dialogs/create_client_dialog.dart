@@ -4,8 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/client_list/cubit/client_write_cubit.dart';
-import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
-import 'package:kardex_app_front/widgets/title_texfield.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 
 Future<ClientInDb?> showCreateClientDialog(BuildContext context, {ClientInDb? client}) async {
   final writeCubit = context.read<WriteClientCubit>();
@@ -233,7 +232,9 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          TextButton.icon(
+                          SecondaryMenuButton(
+                            foregroundColor: Colors.red,
+                            borderColor: Colors.red.shade200,
                             onPressed: () async {
                               final res = await DialogManager.slideToConfirmDeleteActionDialog(
                                 context,
@@ -242,7 +243,6 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
                               if (!res) return;
                               writeCubit.deleteClient(currentClient.id);
                             },
-                            style: TextButton.styleFrom(foregroundColor: Colors.red),
                             label: const Text("Eliminar Cliente"),
                             icon: const Icon(
                               Icons.delete,

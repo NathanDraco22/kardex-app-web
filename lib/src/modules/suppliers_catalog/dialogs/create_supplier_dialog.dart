@@ -4,9 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/suppliers_catalog/cubit/supplier_write_cubit.dart';
-import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
-
-import 'package:kardex_app_front/widgets/title_texfield.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 
 Future<SupplierInDb?> showCreateSupplierDialog(BuildContext context, {SupplierInDb? supplier}) async {
   final writeCubit = context.read<WriteSupplierCubit>();
@@ -231,7 +229,7 @@ class _CreateSupplierDialogState extends State<CreateSupplierDialog> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          TextButton.icon(
+                          SecondaryMenuButton(
                             onPressed: () async {
                               final res = await DialogManager.slideToConfirmDeleteActionDialog(
                                 context,
@@ -240,7 +238,8 @@ class _CreateSupplierDialogState extends State<CreateSupplierDialog> {
                               if (!res) return;
                               writeCubit.deleteSupplier(currentSupplier.id);
                             },
-                            style: TextButton.styleFrom(foregroundColor: Colors.red),
+                            foregroundColor: Colors.red,
+                            borderColor: Colors.red.shade200,
                             label: const Text("Eliminar Proveedor"),
                             icon: const Icon(
                               Icons.delete,

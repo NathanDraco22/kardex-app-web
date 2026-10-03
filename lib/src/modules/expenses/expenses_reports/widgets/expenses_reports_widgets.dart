@@ -7,9 +7,8 @@ import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/exports/csv_export_tool.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/expenses_report_template.dart';
-import 'package:kardex_app_front/widgets/date_picker_listile.dart';
 import 'package:kardex_app_front/widgets/dialogs/export_options_dialog.dart';
-import 'package:kardex_app_front/widgets/no_item.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 
 class HeaderSection extends StatefulWidget {
   const HeaderSection({super.key});
@@ -57,7 +56,7 @@ class _HeaderSectionState extends State<HeaderSection> {
                   "Filtros de Reporte",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
-                TextButton.icon(
+                SecondaryMenuButton(
                   onPressed: () {
                     final today = DateTime.now();
                     setState(() {
@@ -110,7 +109,7 @@ class _HeaderSectionState extends State<HeaderSection> {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    FilledButton.icon(
+                    PrimaryMenuButton(
                       onPressed: () {
                         final params = ExpenseQueryParams()..branchId = authCubit.currentBranchId;
                         if (_startDate != null) {

@@ -8,6 +8,7 @@ import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 import 'package:kardex_app_front/widgets/custom_receipt_list_tile.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/receipt_viewer.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 
 Future<void> showInvoicePaymentsDetailScreen(BuildContext context, InvoiceInDb invoice) async {
   await Navigator.push(
@@ -195,7 +196,7 @@ class _InvoicePaymentsDetailScreenState extends State<InvoicePaymentsDetailScree
               ],
             ),
             const SizedBox(height: 8),
-            FilledButton.icon(
+            PrimaryMenuButton(
               onPressed: () {
                 showInvoiceViewerDialog(context, invoice);
               },
@@ -224,7 +225,7 @@ class _InvoicePaymentsDetailScreenState extends State<InvoicePaymentsDetailScree
                 style: const TextStyle(color: Colors.grey),
               ),
               const SizedBox(height: 8),
-              TextButton.icon(
+              SecondaryMenuButton(
                 onPressed: _fetchReceipts,
                 icon: const Icon(Icons.refresh),
                 label: const Text("Reintentar"),
