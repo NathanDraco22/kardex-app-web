@@ -71,7 +71,7 @@ class _HeaderSectionState extends State<HeaderSection> {
                     cubit.getAll(params);
                   },
                   icon: const Icon(Icons.clear_all),
-                  label: const Text("Limpiar Filtros"),
+                  label: const Text("Limpiar"),
                 ),
               ],
             ),

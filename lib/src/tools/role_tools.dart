@@ -8,6 +8,8 @@ class RoleTools {
     if (authState is! Authenticated) {
       return (false, null);
     }
-    return (authState.session.user.role == "Vendedor", authState.session.user);
+    final role = authState.session.user.role;
+    final isSellerRole = role == "Vendedor" || role == "Pre-Venta";
+    return (isSellerRole, authState.session.user);
   }
 }

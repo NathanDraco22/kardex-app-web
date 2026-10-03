@@ -4,8 +4,7 @@ import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/cubits/user_reports/read_user_reports_cubit.dart';
 import 'package:kardex_app_front/widgets/date_picker_button.dart';
-import 'package:kardex_app_front/widgets/dialogs/selectors/user_selection_dialog.dart';
-import 'package:kardex_app_front/src/tools/role_tools.dart';
+import 'package:kardex_app_front/widgets/dialogs/selectors/user_dropdown_selector.dart';
 
 enum UserOperationsFilterBarMode {
   mobile,
@@ -25,61 +24,15 @@ class UserOperationsFilterBar extends StatelessWidget {
     this.mode = UserOperationsFilterBarMode.desktop,
   });
 
-  Future<void> _pickUser(BuildContext context, ReadUserReportsCubit cubit) async {
-    final (isSeller, _) = RoleTools.isSeller();
-    if (isSeller) return;
-
-    final selected = await showActiveUserSelectionDialog(context);
-    if (selected != null) {
-      cubit.setUser(selected, getIt<AuthCubit>().currentBranchId);
-    }
-  }
-
   Widget _buildUserSelector(BuildContext context, ReadUserReportsCubit cubit, {bool isExpanded = false}) {
-    final (isSeller, _) = RoleTools.isSeller();
-    final user = cubit.selectedUser;
-    final userName = user != null ? user.username : "Todos los Usuarios";
-
-    final btn = OutlinedButton.icon(
-      style: OutlinedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        alignment: Alignment.centerLeft,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-      icon: Icon(
-        user != null ? Icons.person : Icons.group_outlined,
-        color: Theme.of(context).colorScheme.primary,
-        size: 20,
-      ),
-      label: Row(
-        mainAxisSize: isExpanded ? MainAxisSize.max : MainAxisSize.min,
-        children: [
-          Expanded(
-            child: Text(
-              userName,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-            ),
-          ),
-          if (user != null && !isSeller)
-            InkWell(
-              borderRadius: BorderRadius.circular(12),
-              onTap: () {
-                cubit.setUser(null, getIt<AuthCubit>().currentBranchId);
-              },
-              child: const Padding(
-                padding: EdgeInsets.all(2.0),
-                child: Icon(Icons.close, size: 16, color: Colors.grey),
-              ),
-            )
-          else if (!isSeller)
-            const Icon(Icons.arrow_drop_down, size: 20, color: Colors.grey),
-        ],
-      ),
-      onPressed: isSeller ? null : () => _pickUser(context, cubit),
+    return UserDropdownSelector(
+      selectedUser: cubit.selectedUser,
+      isExpanded: isExpanded,
+      allOptionText: "Todos los Usuarios",
+      onChanged: (selected) {
+        cubit.setUser(selected, getIt<AuthCubit>().currentBranchId);
+      },
     );
-
-    return btn;
   }
 
   @override

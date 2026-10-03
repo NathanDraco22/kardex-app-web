@@ -12,6 +12,11 @@ class _HeaderSectionState extends State<_HeaderSection> {
 
   @override
   Widget build(BuildContext context) {
+    final (isSellerRole, userInDb) = RoleTools.isSeller();
+    if (isSellerRole) {
+      currentSelectedUser = userInDb;
+    }
+
     final readCubit = context.read<ReadDailyAnonInvoicesCubit>();
     return Card(
       key: ValueKey(readCubit.state),
@@ -40,34 +45,32 @@ class _HeaderSectionState extends State<_HeaderSection> {
                   TextButton.icon(
                     onPressed: () {
                       readCubit.clearFilters();
-                      currentSelectedUser = null;
+                      if (!isSellerRole) {
+                        currentSelectedUser = null;
+                      }
                       setState(() {});
                     },
                     icon: const Icon(Icons.clear),
-                    label: const Text("Limpiar Filtros"),
+                    label: const Text("Limpiar"),
                   ),
                 ],
               ),
             ),
-            TextButton(
-              onPressed: () async {
-                final user = await showActiveUserSelectionDialog(context);
-                if (user == null) return;
-                readCubit.loadDailyPaidAnonInvoices(getIt<AuthCubit>().currentBranchId, userCreatorId: user.id);
-                currentSelectedUser = user;
-                setState(() {});
-              },
-              child: const Text("Seleccionar Usuario"),
-            ),
-
-            if (currentSelectedUser != null)
-              Text(
-                currentSelectedUser!.username,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 16,
-                ),
+            if (!isSellerRole) ...[
+              const SizedBox(height: 8),
+              UserDropdownSelector(
+                width: 280,
+                selectedUser: currentSelectedUser,
+                onChanged: (user) {
+                  currentSelectedUser = user;
+                  readCubit.loadDailyPaidAnonInvoices(
+                    getIt<AuthCubit>().currentBranchId,
+                    userCreatorId: user?.id,
+                  );
+                  setState(() {});
+                },
               ),
+            ],
           ],
         ),
       ),

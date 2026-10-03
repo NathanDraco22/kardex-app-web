@@ -1,7 +1,14 @@
 part of '../invoice_history_web_screen.dart';
 
-class _HeaderSection extends StatelessWidget {
+class _HeaderSection extends StatefulWidget {
   const _HeaderSection();
+
+  @override
+  State<_HeaderSection> createState() => _HeaderSectionState();
+}
+
+class _HeaderSectionState extends State<_HeaderSection> {
+  ClientInDb? currentSelectedClient;
 
   @override
   Widget build(BuildContext context) {
@@ -9,11 +16,11 @@ class _HeaderSection extends StatelessWidget {
     return Card(
       key: ValueKey(readCubit.params),
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(12.0),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 600),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ConstrainedBox(
@@ -49,74 +56,27 @@ class _HeaderSection extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(
-                height: 70,
-                child: Row(
-                  children: [
-                    Flexible(
-                      fit: FlexFit.tight,
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 600, minWidth: 100),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              "Cliente",
-                              textAlign: TextAlign.left,
-                            ),
-                            const SizedBox(height: 6),
-
-                            Flexible(
-                              child: ConstrainedBox(
-                                constraints: const BoxConstraints(maxWidth: 600),
-                                child: CustomAutocompleteTextfield<ClientInDb>(
-                                  onClose: (value) {
-                                    readCubit.params.clientId = value.id;
-                                    readCubit.loadInvoicesHistory(getIt<AuthCubit>().currentBranchId);
-                                  },
-                                  titleBuilder: (value) => value.name,
-                                  onSearch: (value) async {
-                                    final repo = context.read<ClientsRepository>();
-                                    try {
-                                      final res = await repo.searchClientByKeyword(value);
-                                      return res;
-                                    } catch (e) {
-                                      return [];
-                                    }
-                                  },
-                                  suggestionBuilder: (value, close) {
-                                    return ListView.builder(
-                                      itemCount: value.length,
-                                      itemBuilder: (context, index) {
-                                        final client = value[index];
-                                        return ListTile(
-                                          title: Text(client.name),
-                                          onTap: () {
-                                            close(client);
-                                          },
-                                        );
-                                      },
-                                    );
-                                  },
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              const SizedBox(height: 12),
               ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 600),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const SizedBox(width: 16),
+                    ClientDropdownSelector(
+                      width: 280,
+                      selectedClient: currentSelectedClient,
+                      onChanged: (client) {
+                        currentSelectedClient = client;
+                        readCubit.params.clientId = client?.id;
+                        readCubit.loadInvoicesHistory(getIt<AuthCubit>().currentBranchId);
+                        setState(() {});
+                      },
+                    ),
                     TextButton.icon(
                       onPressed: () {
+                        currentSelectedClient = null;
                         readCubit.setDefaultParams(getIt<AuthCubit>().currentBranchId);
+                        setState(() {});
                       },
                       label: const Text("Limpiar"),
                       icon: const Icon(Icons.clear),
@@ -131,3 +91,4 @@ class _HeaderSection extends StatelessWidget {
     );
   }
 }
+

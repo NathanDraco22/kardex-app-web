@@ -35,7 +35,10 @@ class _HeaderSectionState extends State<_HeaderSection> {
                       defaultDate: readCubit.startDate,
                       title: "Fecha",
                       onSelected: (value) {
-                        readCubit.loadDailyProductInOrders(branchId: getIt<AuthCubit>().currentBranchId, startDate: value);
+                        readCubit.loadDailyProductInOrders(
+                          branchId: getIt<AuthCubit>().currentBranchId,
+                          startDate: value,
+                        );
                       },
                     ),
                   ),
@@ -49,7 +52,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                       setState(() {});
                     },
                     icon: const Icon(Icons.clear),
-                    label: const Text("Limpiar Filtros"),
+                    label: const Text("Limpiar"),
                   ),
                 ],
               ),
@@ -59,18 +62,17 @@ class _HeaderSectionState extends State<_HeaderSection> {
               child: Row(
                 children: [
                   if (!isSellerRole)
-                    TextButton.icon(
-                      onPressed: () async {
-                        final user = await showActiveUserSelectionDialog(context);
-                        if (user == null) return;
-                        readCubit.loadDailyProductInOrders(branchId: getIt<AuthCubit>().currentBranchId, userCreatorId: user.id);
+                    UserDropdownSelector(
+                      width: 250,
+                      selectedUser: currentSelectedUser,
+                      onChanged: (user) {
                         currentSelectedUser = user;
+                        readCubit.loadDailyProductInOrders(
+                          branchId: getIt<AuthCubit>().currentBranchId,
+                          userCreatorId: user?.id,
+                        );
                         setState(() {});
                       },
-                      icon: const Icon(Icons.person),
-                      label: currentSelectedUser == null
-                          ? const Text("Seleccionar Usuario")
-                          : Text(currentSelectedUser!.username),
                     ),
                   const Spacer(),
                   if (readCubit.state is ReadDailyProductInOrdersSuccess)
