@@ -12,6 +12,7 @@ class SecondaryMenuButton extends StatelessWidget {
     required this.label,
     this.icon,
     this.borderColor,
+    this.borderOpacity,
     this.backgroundColor,
     this.foregroundColor,
     this.padding,
@@ -28,8 +29,11 @@ class SecondaryMenuButton extends StatelessWidget {
   /// Icono opcional que acompaña a la etiqueta (generalmente [Icon]).
   final Widget? icon;
 
-  /// Color del borde. Si se omite, usa `colorScheme.outline` con opacidad suave.
+  /// Color del borde. Si se omite, usa `colorScheme.outline` con opacidad suave [borderOpacity].
   final Color? borderColor;
+
+  /// Opacidad aplicada al borde del botón por defecto (0.25 para un trazo sutil).
+  final double? borderOpacity;
 
   /// Color de fondo opcional (por defecto transparente o definido por el tema).
   final Color? backgroundColor;
@@ -48,11 +52,12 @@ class SecondaryMenuButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final opacity = borderOpacity ?? 0.25;
     final effectiveStyle = OutlinedButton.styleFrom(
       backgroundColor: backgroundColor,
       foregroundColor: foregroundColor,
       side: BorderSide(
-        color: borderColor ?? Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+        color: borderColor ?? Theme.of(context).colorScheme.outline.withValues(alpha: opacity),
       ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       visualDensity: VisualDensity.compact,
