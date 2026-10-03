@@ -41,7 +41,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                       setState(() {});
                     },
                     icon: const Icon(Icons.clear),
-                    label: const Text("Limpiar Filtros"),
+                    label: const Text("Limpiar"),
                   ),
                 ],
               ),
@@ -100,18 +100,14 @@ class _HeaderSectionState extends State<_HeaderSection> {
                         : Text(currentSelectedClient!.name),
                   ),
                   if (!isSellerRole)
-                    TextButton.icon(
-                      onPressed: () async {
-                        final user = await showActiveUserSelectionDialog(context);
-                        if (user == null) return;
-                        readCubit.userCreatorId = user.id;
+                    UserDropdownSelector(
+                      width: 250,
+                      selectedUser: currentSelectedUser,
+                      onChanged: (user) {
+                        readCubit.userCreatorId = user?.id;
                         currentSelectedUser = user;
                         setState(() {});
                       },
-                      icon: const Icon(Icons.person),
-                      label: currentSelectedUser == null
-                          ? const Text("Seleccionar Usuario")
-                          : Text(currentSelectedUser!.username),
                     ),
                   const SizedBox(width: 8),
                   if (readCubit.state is ReadQuotationOrderSearchSuccess) ...[

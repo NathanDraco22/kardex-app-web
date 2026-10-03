@@ -8,7 +8,8 @@ import 'package:kardex_app_front/src/modules/commercial/daily_anon_invoinces/cub
 import 'package:kardex_app_front/widgets/basic_table_listview.dart';
 import 'package:kardex_app_front/widgets/date_picker_button.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
-import 'package:kardex_app_front/widgets/dialogs/selectors/user_selection_dialog.dart';
+import 'package:kardex_app_front/src/tools/role_tools.dart';
+import 'package:kardex_app_front/widgets/dialogs/selectors/user_dropdown_selector.dart';
 import 'package:kardex_app_front/widgets/title_label.dart';
 
 part 'sections/content_section.dart';

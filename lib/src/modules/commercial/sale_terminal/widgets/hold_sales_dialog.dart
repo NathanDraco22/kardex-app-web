@@ -4,6 +4,8 @@ import 'package:kardex_app_front/src/core/terminal_draft_manager.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/view_controller.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/hold_sale_description_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
+import 'package:kardex_app_front/widgets/dialogs/selectors/user_dropdown_selector.dart';
+import 'package:kardex_app_front/src/tools/role_tools.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 Future<void> showHoldSalesDialog(
@@ -190,6 +192,7 @@ class _HoldSalesDialogContentState extends State<_HoldSalesDialogContent> {
               );
             }
 
+            final (isSeller, sellerUser) = RoleTools.isSeller();
             final allDrafts = drafts;
 
             // Extraer usuarios únicos que tienen ventas en espera
@@ -200,82 +203,41 @@ class _HoldSalesDialogContentState extends State<_HoldSalesDialogContent> {
               }
             }
 
-            // Si el usuario seleccionado ya no tiene ventas, resetear a null
-            if (_selectedUserId != null && !userMap.containsKey(_selectedUserId)) {
+            // Si es vendedor o preventa, restringir forzosamente a su propio usuario
+            final effectiveUserId = isSeller ? sellerUser?.id : _selectedUserId;
+
+            // Si el usuario seleccionado ya no tiene ventas, resetear a null (solo si no es vendedor)
+            if (!isSeller && _selectedUserId != null && !userMap.containsKey(_selectedUserId)) {
               _selectedUserId = null;
             }
 
-            // Filtrar los drafts por usuario si está seleccionado
-            final filteredDrafts = _selectedUserId == null
+            // Filtrar los drafts por usuario si está seleccionado o si es vendedor/preventa
+            final filteredDrafts = effectiveUserId == null
                 ? allDrafts
-                : allDrafts.where((d) => d.createdBy?.id == _selectedUserId).toList();
+                : allDrafts.where((d) => d.createdBy?.id == effectiveUserId).toList();
 
-            final selectedUserName = _selectedUserId != null ? userMap[_selectedUserId] : null;
+            final selectedUserName = effectiveUserId != null
+                ? (userMap[effectiveUserId] ?? (isSeller ? sellerUser?.username : null))
+                : null;
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                if (userMap.isNotEmpty) ...[
-                  Row(
-                    children: [
-                      Expanded(
-                        child: InputDecorator(
-                          decoration: InputDecoration(
-                            isDense: true,
-                            prefixIcon: const Icon(Icons.person_outline, size: 18),
-                            labelText: "Filtrar por vendedor",
-                            labelStyle: const TextStyle(fontSize: 12),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton<String?>(
-                              value: _selectedUserId,
-                              isDense: true,
-                              isExpanded: true,
-                              items: [
-                                const DropdownMenuItem<String?>(
-                                  value: null,
-                                  child: Text(
-                                    "Todos los usuarios",
-                                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-                                  ),
-                                ),
-                                ...userMap.entries.map((entry) {
-                                  return DropdownMenuItem<String?>(
-                                    value: entry.key,
-                                    child: Text(
-                                      entry.value,
-                                      style: const TextStyle(fontSize: 13),
-                                    ),
-                                  );
-                                }),
-                              ],
-                              onChanged: (val) {
-                                setState(() {
-                                  _selectedUserId = val;
-                                });
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                      if (_selectedUserId != null) ...[
-                        const SizedBox(width: 6),
-                        IconButton(
-                          icon: const Icon(Icons.clear, size: 18),
-                          tooltip: "Limpiar filtro",
-                          visualDensity: VisualDensity.compact,
-                          padding: EdgeInsets.zero,
-                          onPressed: () {
-                            setState(() {
-                              _selectedUserId = null;
-                            });
-                          },
-                        ),
-                      ],
-                    ],
+                if (!isSeller && userMap.isNotEmpty) ...[
+                  UserDropdownSelector(
+                    selectedUserId: _selectedUserId,
+                    selectedUserName: selectedUserName,
+                    usersMap: userMap,
+                    onIdChanged: (val) {
+                      setState(() {
+                        _selectedUserId = val;
+                      });
+                    },
+                    onChanged: (user) {
+                      setState(() {
+                        _selectedUserId = user?.id;
+                      });
+                    },
                   ),
                   const SizedBox(height: 8),
                 ],

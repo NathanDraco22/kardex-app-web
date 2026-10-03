@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/src/tools/role_tools.dart';
 import 'package:kardex_app_front/src/modules/commercial/daily_anon_invoinces/web/daily_invoices_screen_web.dart';
 
 import 'cubit/read_daily_anon_invoices_cubit.dart';
@@ -13,10 +14,12 @@ class DailyAnonInvoicesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final invoiceRepo = context.read<InvoicesRepository>();
+    final (isSellerRole, userInDb) = RoleTools.isSeller();
     return BlocProvider(
       create: (context) =>
           ReadDailyAnonInvoicesCubit(
             invoicesRepository: invoiceRepo,
+            defaultCreatorId: isSellerRole ? userInDb?.id : null,
           )..loadDailyPaidAnonInvoices(
             getIt<AuthCubit>().currentBranchId,
             startDate: DateTimeTool.getTodayMidnight(),
