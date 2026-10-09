@@ -354,17 +354,96 @@ class _BodyState extends State<_Body> {
                         ),
                         Builder(
                           builder: (context) {
-                            String paymentType = "CREDITO";
+                            final isDraft = order.status == OrderStatus.draft;
+                            final isSaleClient = order.clientId == kSaleClientId;
+                            final isCash = order.paymentType == PaymentType.cash;
 
-                            if (order.paymentType == PaymentType.cash) {
-                              paymentType = "CONTADO";
+                            if (!isDraft) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 2.0),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                      decoration: BoxDecoration(
+                                        color: isCash ? Colors.green.shade50 : Colors.indigo.shade50,
+                                        borderRadius: BorderRadius.circular(6),
+                                        border: Border.all(
+                                          color: isCash ? Colors.green.shade300 : Colors.indigo.shade300,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            isCash ? Icons.payments_outlined : Icons.credit_score_outlined,
+                                            size: 16,
+                                            color: isCash ? Colors.green.shade800 : Colors.indigo.shade800,
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            isCash ? "CONTADO" : "CRÉDITO",
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.bold,
+                                              color: isCash ? Colors.green.shade800 : Colors.indigo.shade800,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
                             }
 
-                            return Text(
-                              paymentType,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4.0),
+                              child: Row(
+                                children: [
+                                  const Text(
+                                    "Condición:",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  SegmentedButton<PaymentType>(
+                                    showSelectedIcon: true,
+                                    segments: [
+                                      const ButtonSegment<PaymentType>(
+                                        value: PaymentType.cash,
+                                        label: Text("CONTADO", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                                        icon: Icon(Icons.payments_outlined, size: 16),
+                                      ),
+                                      ButtonSegment<PaymentType>(
+                                        value: PaymentType.credit,
+                                        enabled: !isSaleClient,
+                                        tooltip: isSaleClient ? "Cliente Ocasional no puede tener crédito" : null,
+                                        label: const Text("CRÉDITO", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                                        icon: const Icon(Icons.credit_score_outlined, size: 16),
+                                      ),
+                                    ],
+                                    selected: {order.paymentType},
+                                    onSelectionChanged: (newSelection) {
+                                      final newType = newSelection.first;
+                                      if (newType == order.paymentType) return;
+                                      context.read<WriteOrderCubit>().updateOrder(
+                                        order.id,
+                                        UpdateOrder(paymentType: newType),
+                                      );
+                                    },
+                                    style: ButtonStyle(
+                                      visualDensity: VisualDensity.compact,
+                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                      shape: WidgetStatePropertyAll(
+                                        RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             );
                           },
