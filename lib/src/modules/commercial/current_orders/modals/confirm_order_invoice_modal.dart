@@ -45,6 +45,38 @@ Future<bool?> showConfirmOrderInvoiceModal(
                     ),
                     textAlign: TextAlign.center,
                   ),
+                  const SizedBox(height: 8),
+                  Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: order.paymentType == PaymentType.cash ? Colors.green.shade50 : Colors.indigo.shade50,
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(
+                          color: order.paymentType == PaymentType.cash ? Colors.green.shade300 : Colors.indigo.shade300,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            order.paymentType == PaymentType.cash ? Icons.payments_outlined : Icons.credit_score_outlined,
+                            size: 16,
+                            color: order.paymentType == PaymentType.cash ? Colors.green.shade800 : Colors.indigo.shade800,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            "Condición: ${order.paymentType == PaymentType.cash ? 'CONTADO' : 'CRÉDITO'}",
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: order.paymentType == PaymentType.cash ? Colors.green.shade800 : Colors.indigo.shade800,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                   const SizedBox(
                     height: 16,
                   ),
