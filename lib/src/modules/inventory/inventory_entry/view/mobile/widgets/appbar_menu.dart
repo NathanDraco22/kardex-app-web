@@ -68,9 +68,8 @@ class _SaveButton extends StatelessWidget {
         context.read<WriteEntryDocCubit>().createNewEntryDoc(createEntryDoc);
       };
     }
-    return SecondaryMenuButton(
+    return TertiaryMenuButton(
       foregroundColor: Colors.white,
-      borderColor: Colors.white70,
       onPressed: onPressed,
       label: const Text("Guardar"),
       icon: const Icon(Icons.save),

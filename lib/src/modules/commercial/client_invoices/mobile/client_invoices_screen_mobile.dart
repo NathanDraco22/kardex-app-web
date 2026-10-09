@@ -120,9 +120,8 @@ class _RootScaffold extends StatelessWidget {
               return Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  SecondaryMenuButton(
+                  TertiaryMenuButton(
                     foregroundColor: Colors.white,
-                    borderColor: Colors.white70,
                     onPressed: isEmptyItems
                         ? null
                         : () async {

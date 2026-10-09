@@ -35,3 +35,4 @@ export 'dialogs/selectors/user_dropdown_selector.dart';
 export 'dialogs/selectors/client_dropdown_selector.dart';
 export 'buttons/primary_menu_button.dart';
 export 'buttons/secondary_menu_button.dart';
+export 'buttons/tertiary_menu_button.dart';
