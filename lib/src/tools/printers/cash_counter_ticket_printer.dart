@@ -148,7 +148,11 @@ Future<Uint8List> generateTicketPdfFromCashCount(
 
             // Metadatos
             pw.SizedBox(height: 3),
-            _buildTicketKeyValue("Fecha:", "${dateF.format(record.date)} ${timeF.format(record.updatedAt)}", contentFontSize),
+            _buildTicketKeyValue(
+              "Fecha:",
+              "${dateF.format(record.date)} ${timeF.format(record.updatedAt)}",
+              contentFontSize,
+            ),
             _buildTicketKeyValue("Cajero:", userName ?? "Usuario", contentFontSize),
             _buildTicketKeyValue("Sucursal:", branch.name, contentFontSize),
 
@@ -161,23 +165,36 @@ Future<Uint8List> generateTicketPdfFromCashCount(
 
             // Sección Córdobas
             pw.Text(
-              "CÓRDOBAS (C\$)",
+              "CÓRDOBAS",
               style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: contentFontSize),
             ),
             pw.SizedBox(height: 2),
             if (activeCordobas.isEmpty)
-              pw.Text(" (Sin billetes contados)", style: pw.TextStyle(fontSize: contentFontSize - 1, color: PdfColors.grey700))
+              pw.Text(
+                " (Sin billetes contados)",
+                style: pw.TextStyle(fontSize: contentFontSize - 1, color: PdfColors.grey700),
+              )
             else
               for (final den in activeCordobas) ...[
                 _buildDenominationLine(
-                  den.label,
+                  den.value == den.value.toInt() ? den.value.toInt().toString() : den.value.toStringAsFixed(2),
                   record.getCordobaCount(den.value),
-                  "C\$ ${f.format(den.value * record.getCordobaCount(den.value))}",
+                  f.format(den.value * record.getCordobaCount(den.value)),
                   contentFontSize,
                 ),
               ],
-            pw.SizedBox(height: 2),
-            _buildTicketKeyValue("Subtotal C\$:", "C\$ ${f.format(record.totalCordobas)} (${record.totalCordobaPieces} pzs)", contentFontSize, isBold: true),
+            pw.SizedBox(height: 3),
+            _buildTicketKeyValue(
+              "Piezas:",
+              "${record.totalCordobaPieces}",
+              contentFontSize,
+            ),
+            _buildTicketKeyValue(
+              "Subtotal:",
+              f.format(record.totalCordobas),
+              contentFontSize,
+              isBold: true,
+            ),
 
             pw.SizedBox(height: 4),
             pw.Text(
@@ -193,7 +210,10 @@ Future<Uint8List> generateTicketPdfFromCashCount(
             ),
             pw.SizedBox(height: 2),
             if (activeDollars.isEmpty)
-              pw.Text(" (Sin dólares contados)", style: pw.TextStyle(fontSize: contentFontSize - 1, color: PdfColors.grey700))
+              pw.Text(
+                " (Sin dólares contados)",
+                style: pw.TextStyle(fontSize: contentFontSize - 1, color: PdfColors.grey700),
+              )
             else
               for (final den in activeDollars) ...[
                 _buildDenominationLine(
@@ -203,10 +223,24 @@ Future<Uint8List> generateTicketPdfFromCashCount(
                   contentFontSize,
                 ),
               ],
-            pw.SizedBox(height: 2),
-            _buildTicketKeyValue("Subtotal USD:", "\$ ${f.format(record.totalDollars)} (${record.totalDollarPieces} pzs)", contentFontSize, isBold: true),
-            _buildTicketKeyValue("Tasa de Cambio:", "1 USD = C\$ ${rateF.format(record.exchangeRate)}", contentFontSize - 1),
-            _buildTicketKeyValue("Equiv. en C\$:", "C\$ ${f.format(record.totalDollarsInCordobas)}", contentFontSize),
+            pw.SizedBox(height: 3),
+            _buildTicketKeyValue(
+              "Piezas:",
+              "${record.totalDollarPieces}",
+              contentFontSize,
+            ),
+            _buildTicketKeyValue(
+              "Subtotal USD:",
+              "\$ ${f.format(record.totalDollars)}",
+              contentFontSize,
+              isBold: true,
+            ),
+            _buildTicketKeyValue(
+              "Tasa de Cambio:",
+              "1 USD = ${rateF.format(record.exchangeRate)}",
+              contentFontSize - 1,
+            ),
+            _buildTicketKeyValue("Equiv. Córdobas:", f.format(record.totalDollarsInCordobas), contentFontSize),
 
             pw.SizedBox(height: 5),
             pw.Text(
@@ -224,7 +258,7 @@ Future<Uint8List> generateTicketPdfFromCashCount(
                   style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: titleFontSize + 1),
                 ),
                 pw.Text(
-                  "C\$ ${f.format(record.grandTotalCordobas)}",
+                  f.format(record.grandTotalCordobas),
                   style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: titleFontSize + 2),
                 ),
               ],
@@ -233,12 +267,12 @@ Future<Uint8List> generateTicketPdfFromCashCount(
             // Comparativa de Sistema
             if (expected != null && diff != null) ...[
               pw.SizedBox(height: 4),
-              _buildTicketKeyValue("Efectivo Sistema:", "C\$ ${f.format(expected)}", contentFontSize),
+              _buildTicketKeyValue("Efectivo Sistema:", f.format(expected), contentFontSize),
               _buildTicketKeyValue(
                 "Diferencia:",
                 diff.abs() < 0.01
-                    ? "C\$ 0.00 (CUADRADO)"
-                    : (diff > 0 ? "+ C\$ ${f.format(diff)} (SOBRANTE)" : "- C\$ ${f.format(diff.abs())} (FALTANTE)"),
+                    ? "0.00 (CUADRADO)"
+                    : (diff > 0 ? "+ ${f.format(diff)}" : "- ${f.format(diff.abs())}"),
                 contentFontSize,
                 isBold: true,
               ),
@@ -288,8 +322,14 @@ pw.Widget _buildTicketKeyValue(String key, String value, double fontSize, {bool 
     child: pw.Row(
       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
       children: [
-        pw.Text(key, style: pw.TextStyle(fontSize: fontSize, fontWeight: isBold ? pw.FontWeight.bold : pw.FontWeight.normal)),
-        pw.Text(value, style: pw.TextStyle(fontSize: fontSize, fontWeight: isBold ? pw.FontWeight.bold : pw.FontWeight.normal)),
+        pw.Text(
+          key,
+          style: pw.TextStyle(fontSize: fontSize, fontWeight: isBold ? pw.FontWeight.bold : pw.FontWeight.normal),
+        ),
+        pw.Text(
+          value,
+          style: pw.TextStyle(fontSize: fontSize, fontWeight: isBold ? pw.FontWeight.bold : pw.FontWeight.normal),
+        ),
       ],
     ),
   );
@@ -302,7 +342,10 @@ pw.Widget _buildDenominationLine(String label, int qty, String subtotal, double 
       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
       children: [
         pw.Text("${label.padRight(8)} x ${qty.toString().padLeft(3)}", style: pw.TextStyle(fontSize: fontSize - 0.5)),
-        pw.Text(subtotal, style: pw.TextStyle(fontSize: fontSize - 0.5, fontWeight: pw.FontWeight.bold)),
+        pw.Text(
+          subtotal,
+          style: pw.TextStyle(fontSize: fontSize - 0.5, fontWeight: pw.FontWeight.bold),
+        ),
       ],
     ),
   );

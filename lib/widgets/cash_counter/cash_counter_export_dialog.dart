@@ -1,19 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/cash_counter_pdf_template.dart';
 import 'package:kardex_app_front/src/tools/printers/cash_counter_ticket_printer.dart';
 import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:printing/printing.dart';
 import 'package:toastification/toastification.dart';
 
 import 'cash_counter_models.dart';
+
+enum CashCounterExportAction {
+  print,
+  share,
+}
 
 class CashCounterExportDialog extends StatelessWidget {
   final CashCountRecord record;
   final BranchInDb branch;
   final String? userName;
   final double? expectedCash;
+  final CashCounterExportAction action;
 
   const CashCounterExportDialog({
     super.key,
@@ -21,9 +27,11 @@ class CashCounterExportDialog extends StatelessWidget {
     required this.branch,
     this.userName,
     this.expectedCash,
+    this.action = CashCounterExportAction.print,
   });
 
-  static Future<void> show(
+  /// Abre el diálogo para seleccionar formato de Impresión (Rollo o Hoja)
+  static Future<void> showPrint(
     BuildContext context, {
     required CashCountRecord record,
     required BranchInDb branch,
@@ -38,11 +46,50 @@ class CashCounterExportDialog extends StatelessWidget {
         branch: branch,
         userName: userName,
         expectedCash: expectedCash,
+        action: CashCounterExportAction.print,
       ),
     );
   }
 
-  Future<void> _exportFullPage(BuildContext context) async {
+  /// Abre el diálogo para seleccionar formato para Compartir (Rollo o Hoja)
+  static Future<void> showShare(
+    BuildContext context, {
+    required CashCountRecord record,
+    required BranchInDb branch,
+    String? userName,
+    double? expectedCash,
+  }) {
+    return showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => CashCounterExportDialog(
+        record: record,
+        branch: branch,
+        userName: userName,
+        expectedCash: expectedCash,
+        action: CashCounterExportAction.share,
+      ),
+    );
+  }
+
+  /// Compatibilidad general de exportación
+  static Future<void> show(
+    BuildContext context, {
+    required CashCountRecord record,
+    required BranchInDb branch,
+    String? userName,
+    double? expectedCash,
+  }) {
+    return showPrint(
+      context,
+      record: record,
+      branch: branch,
+      userName: userName,
+      expectedCash: expectedCash,
+    );
+  }
+
+  Future<void> _handleFullPage(BuildContext context) async {
     Navigator.of(context).pop();
     try {
       final template = CashCounterPdfTemplate(
@@ -52,17 +99,28 @@ class CashCounterExportDialog extends StatelessWidget {
         date: record.date,
         expectedCash: expectedCash,
       );
+      final doc = await template.buildDocument();
+      final bytes = await doc.save();
       final dateStr = DateFormat('yyyyMMdd').format(record.date);
-      await PdfExportTool.export(
-        template,
-        fileName: 'arqueo_hoja_completa_$dateStr.pdf',
-      );
+      final fileName = 'arqueo_hoja_completa_$dateStr.pdf';
+
+      if (action == CashCounterExportAction.print) {
+        await Printing.layoutPdf(
+          onLayout: (_) => bytes,
+          name: fileName,
+        );
+      } else {
+        await Printing.sharePdf(
+          bytes: bytes,
+          filename: fileName,
+        );
+      }
     } catch (e) {
       if (context.mounted) {
         toastification.show(
           context: context,
           type: ToastificationType.error,
-          title: const Text('Error al exportar'),
+          title: Text(action == CashCounterExportAction.print ? 'Error al imprimir' : 'Error al compartir'),
           description: Text(e.toString()),
           autoCloseDuration: const Duration(seconds: 3),
         );
@@ -70,23 +128,33 @@ class CashCounterExportDialog extends StatelessWidget {
     }
   }
 
-  Future<void> _exportTicket(BuildContext context) async {
+  Future<void> _handleTicket(BuildContext context) async {
     Navigator.of(context).pop();
     try {
       final paperSize = await PrintManager.getLocalPaperSize();
-      await printCashCounterTicket(
-        record,
-        branch,
-        userName: userName,
-        expectedCash: expectedCash,
-        paperSize: paperSize,
-      );
+      if (action == CashCounterExportAction.print) {
+        await printCashCounterTicket(
+          record,
+          branch,
+          userName: userName,
+          expectedCash: expectedCash,
+          paperSize: paperSize,
+        );
+      } else {
+        await shareCashCounterTicket(
+          record,
+          branch,
+          userName: userName,
+          expectedCash: expectedCash,
+          paperSize: paperSize,
+        );
+      }
     } catch (e) {
       if (context.mounted) {
         toastification.show(
           context: context,
           type: ToastificationType.error,
-          title: const Text('Error al imprimir ticket'),
+          title: Text(action == CashCounterExportAction.print ? 'Error al imprimir ticket' : 'Error al compartir ticket'),
           description: Text(e.toString()),
           autoCloseDuration: const Duration(seconds: 3),
         );
@@ -96,13 +164,18 @@ class CashCounterExportDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isPrint = action == CashCounterExportAction.print;
+    final titleText = isPrint ? 'Imprimir Arqueo' : 'Compartir Arqueo';
+    final headerIcon = isPrint ? Icons.print_outlined : Icons.share_outlined;
+    final headerColor = isPrint ? Colors.teal : Colors.deepOrange;
+
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      title: const Row(
+      title: Row(
         children: [
-          Icon(Icons.picture_as_pdf_rounded, color: Colors.teal),
-          SizedBox(width: 10),
-          Text('Exportar Arqueo a PDF', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+          Icon(headerIcon, color: headerColor),
+          const SizedBox(width: 10),
+          Text(titleText, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
         ],
       ),
       content: SizedBox(
@@ -111,27 +184,29 @@ class CashCounterExportDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
-              'Seleccione el formato en el que desea generar o imprimir el arqueo físico de caja:',
-              style: TextStyle(fontSize: 13.5, color: Colors.black87),
+            Text(
+              isPrint
+                  ? 'Seleccione el formato en el que desea imprimir el arqueo de caja:'
+                  : 'Seleccione el formato en el que desea compartir el PDF del arqueo:',
+              style: const TextStyle(fontSize: 13.5, color: Colors.black87),
             ),
             const SizedBox(height: 16),
+            _OptionCard(
+              icon: Icons.receipt_long_rounded,
+              iconColor: Colors.deepOrange.shade700,
+              iconBgColor: Colors.deepOrange.shade50,
+              title: 'Rollo Térmico (Ticket POS)',
+              subtitle: 'Formato angosto para impresora de tickets (80mm / 58mm). Solo imprime denominaciones activas.',
+              onTap: () => _handleTicket(context),
+            ),
+            const SizedBox(height: 10),
             _OptionCard(
               icon: Icons.description_rounded,
               iconColor: Colors.teal.shade700,
               iconBgColor: Colors.teal.shade50,
               title: 'Hoja Completa (A4 / Carta)',
               subtitle: 'Formato formal con membrete, tablas detalladas de denominaciones y firmas de entrega.',
-              onTap: () => _exportFullPage(context),
-            ),
-            const SizedBox(height: 10),
-            _OptionCard(
-              icon: Icons.receipt_long_rounded,
-              iconColor: Colors.deepOrange.shade700,
-              iconBgColor: Colors.deepOrange.shade50,
-              title: 'Rollo Térmico (Ticket POS)',
-              subtitle: 'Formato angosto para impresora térmica (80mm / 58mm). Solo imprime denominaciones activas.',
-              onTap: () => _exportTicket(context),
+              onTap: () => _handleFullPage(context),
             ),
           ],
         ),
