@@ -112,6 +112,7 @@ lib/
 
 Para conocer a detalle la lógica, vistas, cubits y repositorios de cada módulo funcional, consulta:
 
+- 🗺️ **[Sistema de Navegación y Arquitectura (sistema_navegacion.md)](./sistema_navegacion.md)** - Guía maestra de navegación: Split Hub (Desktop), Drill-Down (Mobile), permisos de roles, fallback seguro y diferencias entre ramas `main` y `lite`.
 - 📋 **[Índice de Módulos (modules_index.md)](./modules/modules_index.md)** - Resumen ejecutivo de todos los módulos.
 - 🛒 **[Comercial (modules/commercial.md)](./modules/commercial.md)** - Terminal POS, facturas, recibos, proformas y devoluciones.
 - 📦 **[Inventario (modules/inventory.md)](./modules/inventory.md)** - Stock, entradas/salidas (kárdex y directo), transferencias y ajustes.

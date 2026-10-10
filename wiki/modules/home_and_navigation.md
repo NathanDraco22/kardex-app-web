@@ -40,10 +40,12 @@ lib/src/modules/
   - Guarda tokens JWT (Access Token y Refresh Token).
   - Almacena información del usuario activo (`UserInDb`), rol y lista de sucursales autorizadas.
 
-### 2.3. Menú Principal (`home`)
-- **Propósito:** Hub central de navegación desde donde se accede a todos los módulos operativos.
+### 2.3. Menú Principal y Sistema de Navegación (`home`)
+- **Propósito:** Hub central de navegación (Launchpad) desde donde se accede a todos los módulos operativos y se entra en modo pantalla completa.
+- **Documentación Maestra:** Para la arquitectura exhaustiva, componentes (`MenuOptionCard`, `MenuSectionDivider`, `DesktopModuleSidebar`, `DesktopSubmenuPanel`), control de roles y diferencias entre `main` y `lite`, consulta:
+  👉 **[Sistema de Navegación y Arquitectura Completa (`wiki/sistema_navegacion.md`)](../sistema_navegacion.md)**.
 - **Vistas Responsivas:**
-  - `HomeScreen`: Wrapper que selecciona `HomeDesktop`, `HomeTablet` o `HomeMobile`.
+  - `HomeScreen`: Wrapper que selecciona `HomeDesktop` (Split Hub adaptativo de 2 columnas con búsqueda en tiempo real), `HomeTablet` o `HomeMobile` (drill-down táctil con `MenuOptionCard`).
 - **Comportamiento Dinámico Comercial vs Bodega:**
   - Evalúa la propiedad `isCommerce` de la sucursal activa (`currentBranch`).
   - Si `isCommerce == false`: Excluye del menú los accesos a **Comercial** (`/commercial`) y **Cuentas por Cobrar** (`/pending-accounts`), adaptando además el icono del encabezado a un almacén (`Icons.warehouse_rounded`) en tonos neutros/pizarra.
