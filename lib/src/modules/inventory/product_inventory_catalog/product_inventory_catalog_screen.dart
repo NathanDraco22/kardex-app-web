@@ -6,8 +6,7 @@ import 'package:kardex_app_front/src/cubits/read_product_in_branch/read_product_
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/inventory/product_inventory_catalog/web/product_inventory_catalog_web.dart';
 import 'package:kardex_app_front/src/modules/inventory/product_price_catalog/cubits/export_price_list_cubit.dart';
-import 'package:kardex_app_front/src/modules/product_catalog/product_list/view/product_list_screen.dart';
-import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 
 class ProductInventoryCatalogScreen extends StatelessWidget {
   const ProductInventoryCatalogScreen({super.key});
@@ -15,12 +14,16 @@ class ProductInventoryCatalogScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final productsRepo = context.read<ProductsRepository>();
+    final unitsRepo = context.read<UnitsRepository>();
+    final categoriesRepo = context.read<ProductCategoriesRepository>();
     return MultiBlocProvider(
       providers: [
         BlocProvider(
           create: (context) {
             return ReadProductInBranchCubit(
               productsRepository: productsRepo,
+              unitsRepository: unitsRepo,
+              categoriesRepository: categoriesRepo,
             )..getProducts(getIt<AuthCubit>().currentBranchId);
           },
         ),
@@ -44,18 +47,13 @@ class _RootScaffold extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () async {
-              await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ProductListScreen(),
-                ),
-              );
-              if (context.mounted) {
-                context.read<ReadProductInBranchCubit>().getProducts(getIt<AuthCubit>().currentBranchId);
+              final newProduct = await showCreateProductWithDataDialog(context);
+              if (newProduct != null && context.mounted) {
+                context.read<ReadProductInBranchCubit>().putProductFirst(newProduct);
               }
             },
-            icon: const Icon(Icons.inventory_2_outlined),
-            tooltip: "Lista Global de Productos",
+            icon: const Icon(Icons.add),
+            tooltip: "Crear Producto",
           ),
           IconButton(
             onPressed: () {

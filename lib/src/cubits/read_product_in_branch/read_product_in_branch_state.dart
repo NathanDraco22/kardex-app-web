@@ -9,10 +9,12 @@ final class ReadProductInBranchLoading extends ReadProductInBranchState {}
 class ReadProductInBranchSuccess extends ReadProductInBranchState {
   final List<ProductInDbInBranch> products;
   final List<ProductInDbInBranch> editedProducts;
+  final List<ProductInDbInBranch> newProducts;
 
   ReadProductInBranchSuccess({
     required this.products,
     this.editedProducts = const [],
+    this.newProducts = const [],
   });
 }
 
@@ -20,6 +22,7 @@ final class ReadProductInBranchFetchingMore extends ReadProductInBranchSuccess {
   ReadProductInBranchFetchingMore({
     required super.products,
     required super.editedProducts,
+    super.newProducts,
   });
 }
 
@@ -30,6 +33,7 @@ final class ReadProductInBranchErrorPagination extends ReadProductInBranchSucces
     required this.message,
     required super.products,
     required super.editedProducts,
+    super.newProducts,
   });
 }
 

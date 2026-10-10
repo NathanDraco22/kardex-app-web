@@ -6,9 +6,13 @@ part 'read_product_in_branch_state.dart';
 class ReadProductInBranchCubit extends Cubit<ReadProductInBranchState> {
   ReadProductInBranchCubit({
     required this.productsRepository,
+    this.unitsRepository,
+    this.categoriesRepository,
   }) : super(ReadProductInBranchInitial());
 
   final ProductsRepository productsRepository;
+  final UnitsRepository? unitsRepository;
+  final ProductCategoriesRepository? categoriesRepository;
 
   ProductQueryParams _params = ProductQueryParams(offset: 0, limit: 50);
   bool isLastPage = false;
@@ -19,6 +23,13 @@ class ReadProductInBranchCubit extends Cubit<ReadProductInBranchState> {
     isLastPage = false;
 
     try {
+      if (unitsRepository != null || categoriesRepository != null) {
+        await Future.wait([
+          if (unitsRepository != null) unitsRepository!.getAllUnits(),
+          if (categoriesRepository != null) categoriesRepository!.getAllProductCategories(),
+        ]);
+      }
+
       final products = await productsRepository.getAllProductsInBranch(_params, branchId);
 
       if (products.length < _params.limit) {
@@ -47,6 +58,7 @@ class ReadProductInBranchCubit extends Cubit<ReadProductInBranchState> {
       ReadProductInBranchFetchingMore(
         products: currentState.products,
         editedProducts: currentState.editedProducts,
+        newProducts: currentState.newProducts,
       ),
     );
 
@@ -67,6 +79,7 @@ class ReadProductInBranchCubit extends Cubit<ReadProductInBranchState> {
         ReadProductInBranchSuccess(
           products: [...currentState.products, ...products],
           editedProducts: currentState.editedProducts,
+          newProducts: currentState.newProducts,
         ),
       );
     } catch (e) {
@@ -75,9 +88,41 @@ class ReadProductInBranchCubit extends Cubit<ReadProductInBranchState> {
           message: e.toString(),
           products: currentState.products,
           editedProducts: currentState.editedProducts,
+          newProducts: currentState.newProducts,
         ),
       );
     }
+  }
+
+  void putProductFirst(ProductInDbInBranch product) {
+    if (state is! ReadProductInBranchSuccess) {
+      emit(
+        ReadProductInBranchSuccess(
+          products: [product],
+          editedProducts: const [],
+          newProducts: [product],
+        ),
+      );
+      return;
+    }
+    final currentState = state as ReadProductInBranchSuccess;
+
+    final currentProducts = [
+      product,
+      ...currentState.products.where((p) => p.id != product.id),
+    ];
+    final currentNew = [
+      product,
+      ...currentState.newProducts.where((p) => p.id != product.id),
+    ];
+
+    emit(
+      ReadProductInBranchSuccess(
+        products: currentProducts,
+        editedProducts: currentState.editedProducts,
+        newProducts: currentNew,
+      ),
+    );
   }
 
   void markProductAsEdited(ProductInDbInBranch product) {
@@ -97,6 +142,7 @@ class ReadProductInBranchCubit extends Cubit<ReadProductInBranchState> {
       ReadProductInBranchSuccess(
         products: currentState.products,
         editedProducts: currentEdited,
+        newProducts: currentState.newProducts,
       ),
     );
   }

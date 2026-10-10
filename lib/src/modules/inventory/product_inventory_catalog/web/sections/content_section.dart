@@ -81,7 +81,9 @@ class _ContentSection extends StatelessWidget {
           final editedIndex = state.editedProducts.indexWhere((p) => p.id == product.id);
           final currentProduct = editedIndex >= 0 ? state.editedProducts[editedIndex] : product;
 
-          if (editedIndex >= 0) {
+          if (state.newProducts.any((p) => p.id == product.id)) {
+            color = Colors.yellow.shade200;
+          } else if (editedIndex >= 0) {
             color = Colors.blue.shade100;
           }
 

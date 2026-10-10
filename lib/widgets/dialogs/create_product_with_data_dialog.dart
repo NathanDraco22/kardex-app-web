@@ -6,6 +6,7 @@ import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/tools/uploaders/image_uploader.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/product_list/cubit/write_product_cubit.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
@@ -22,6 +23,14 @@ Future<ProductInDbInBranch?> showCreateProductWithDataDialog(
     writeCubit = context.read<WriteProductCubit>();
   } catch (_) {
     writeCubit = WriteProductCubit(productRepo);
+  }
+
+  if (unitRepo.units.isEmpty || productCateRepo.productCategories.isEmpty) {
+    await Future.wait([
+      if (unitRepo.units.isEmpty) unitRepo.getAllUnits(),
+      if (productCateRepo.productCategories.isEmpty) productCateRepo.getAllProductCategories(),
+    ]);
+    if (!context.mounted) return null;
   }
 
   final widget = MultiRepositoryProvider(
@@ -153,7 +162,7 @@ class _FormContentState extends State<_FormContent> {
     if (!widget.formKey.currentState!.validate()) return;
 
     final writeCubit = context.read<WriteProductCubit>();
-    final authCubit = context.read<AuthCubit>();
+    final authCubit = getIt<AuthCubit>();
 
     try {
       String imageUrl = "";
@@ -368,7 +377,7 @@ class _InnerContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authCubit = context.read<AuthCubit>();
+    final authCubit = getIt<AuthCubit>();
     final branchName = authCubit.currentBranchName;
 
     return SizedBox(
