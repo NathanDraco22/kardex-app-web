@@ -2,13 +2,12 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/constants/route_names.dart';
 import 'package:kardex_app_front/src/modules/inventory/adjust_exit/adjust_exit_screen.dart';
-import 'package:kardex_app_front/src/tools/icon_widgets.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
 import 'package:kardex_app_front/widgets/menu_app_bar.dart';
-
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/search_product_commercial_delegate.dart';
-import 'package:kardex_app_front/constants/route_names.dart';
 import 'package:kardex_app_front/widgets/shortcut_addable_list_tile.dart';
 
 class InventoryMenuScreen extends StatelessWidget {
@@ -42,206 +41,175 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: ListView(
+        padding: const EdgeInsets.only(bottom: 24),
         children: [
+          const MenuSectionDivider(
+            title: "Existencias y Consultas",
+            isFirst: true,
+          ),
           ShortcutAddableListTile(
             routeName: RouteNames.currentInventory,
-            child: ListTile(
-              leading: IconWidgets.currentInventoryIcon,
-              title: const Text("Inventario Actual"),
+            child: MenuOptionCard(
+              icon: FluentIcons.archive_24_filled,
+              accentColor: Colors.teal.shade600,
+              title: "Inventario Actual",
+              subtitle: "Existencias en tiempo real por sucursal",
               onTap: () => context.pushNamed("current-inventory"),
             ),
           ),
-          const Divider(height: 0.0),
-
-          ListTile(
-            leading: const Icon(Icons.info_outline, color: Colors.blueAccent),
-            title: const Text("Consulta Rápida de Producto"),
+          MenuOptionCard(
+            icon: Icons.info_outline,
+            accentColor: Colors.blueAccent,
+            title: "Consulta Rápida de Producto",
+            subtitle: "Búsqueda ágil de existencias y precios",
             onTap: () => showProductInfoSearchDelegate(context),
           ),
-
-          const Divider(height: 0.0),
-
           ShortcutAddableListTile(
             routeName: RouteNames.globalStockSearch,
-            child: ListTile(
-              leading: const Icon(Icons.search, color: Colors.purple),
-              title: const Text("Consulta de Existencias Globales"),
+            child: MenuOptionCard(
+              icon: Icons.search,
+              accentColor: Colors.purple.shade600,
+              title: "Consulta de Existencias Globales",
+              subtitle: "Stock consolidado en todas las bodegas",
               onTap: () => context.pushNamed("global-stock-search"),
             ),
           ),
-
-          const Divider(height: 0.0),
-
           ShortcutAddableListTile(
             routeName: RouteNames.productMovements,
-            child: ListTile(
-              leading: const Icon(
-                Icons.sync,
-                color: Colors.teal,
-              ),
-              title: const Text("Movimientos de un Producto"),
+            child: MenuOptionCard(
+              icon: Icons.sync,
+              accentColor: Colors.teal.shade600,
+              title: "Movimientos de un Producto",
+              subtitle: "Kárdex físico y auditoría de inventario",
               onTap: () => context.pushNamed("product-movements"),
             ),
           ),
-          const Divider(height: 0.0),
-
           ShortcutAddableListTile(
             routeName: RouteNames.productEntryHistory,
-            child: ListTile(
-              leading: const Icon(
-                Icons.call_received,
-                color: Colors.orange,
-              ),
-              title: const Text("Historial de Entradas por Producto"),
+            child: MenuOptionCard(
+              icon: Icons.call_received,
+              accentColor: Colors.orange.shade700,
+              title: "Historial de Entradas por Producto",
+              subtitle: "Detalle cronológico de abastecimiento",
               onTap: () => context.pushNamed("product-entry-history"),
             ),
           ),
-          const Divider(height: 0.0),
-
           ShortcutAddableListTile(
             routeName: RouteNames.productPriceCatalog,
-            child: ListTile(
-              leading: const Icon(
-                Icons.monetization_on,
-                color: Colors.green,
-              ),
-              title: const Text("Catalogo de Precios"),
+            child: MenuOptionCard(
+              icon: Icons.monetization_on,
+              accentColor: Colors.green.shade600,
+              title: "Catálogo de Precios",
+              subtitle: "Tarifas mayoristas, minoristas y costos",
               onTap: () => context.pushNamed("product-price-catalog"),
             ),
           ),
-          const Divider(height: 0.0),
-
           ExpirationDateGate(
             child: ShortcutAddableListTile(
               routeName: RouteNames.expirationLogs,
-              child: ListTile(
-                leading: const Icon(
-                  Icons.timer_sharp,
-                  color: Colors.amber,
-                ),
-                title: const Text("Bitacora de Vencimientos"),
+              child: MenuOptionCard(
+                icon: Icons.timer_sharp,
+                accentColor: Colors.amber.shade700,
+                title: "Bitácora de Vencimientos",
+                subtitle: "Lotes próximos a caducar y alertas",
                 onTap: () => context.pushNamed("expiration-logs"),
               ),
             ),
           ),
-          const Divider(height: 0.0),
 
-          const Divider(
-            height: 4.0,
-            thickness: 2,
-          ),
+          const MenuSectionDivider(title: "Entradas y Salidas de Mercancía"),
 
           ShortcutAddableListTile(
             routeName: RouteNames.inventoryEntry,
-            child: ListTile(
-              leading: IconWidgets.entryInventoryIcon,
-              title: const Text("Entrada de Inventario"),
+            child: MenuOptionCard(
+              icon: FluentIcons.arrow_download_24_filled,
+              accentColor: Colors.blue.shade600,
+              title: "Entrada de Inventario",
+              subtitle: "Recepción y abastecimiento de mercancía",
               onTap: () => context.pushNamed("inventory-entry"),
             ),
           ),
-          const Divider(height: 0.0),
           ShortcutAddableListTile(
             routeName: RouteNames.inventoryExit,
-            child: ListTile(
-              leading: IconWidgets.exitInventoryIcon,
-              title: const Text("Salida de Inventario"),
+            child: MenuOptionCard(
+              icon: FluentIcons.arrow_upload_24_filled,
+              accentColor: Colors.red.shade600,
+              title: "Salida de Inventario",
+              subtitle: "Descarga formal de existencias",
               onTap: () => context.pushNamed("inventory-exit"),
             ),
           ),
-
-          const Divider(height: 0.0),
-
           ShortcutAddableListTile(
             routeName: RouteNames.historyEntry,
-            child: ListTile(
-              leading: const Icon(
-                FluentIcons.history_28_filled,
-                color: Colors.blue,
-              ),
-              title: const Text("Historial de Entradas"),
+            child: MenuOptionCard(
+              icon: FluentIcons.history_24_filled,
+              accentColor: Colors.blue.shade600,
+              title: "Historial de Entradas",
+              subtitle: "Auditoría de ingresos completados",
               onTap: () => context.pushNamed("history-entry"),
             ),
           ),
-          const Divider(height: 0.0),
           ShortcutAddableListTile(
             routeName: RouteNames.historyExit,
-            child: ListTile(
-              leading: const Icon(
-                FluentIcons.history_28_filled,
-                color: Colors.red,
-              ),
-              title: const Text("Historial de salidas"),
+            child: MenuOptionCard(
+              icon: FluentIcons.history_24_filled,
+              accentColor: Colors.red.shade600,
+              title: "Historial de Salidas",
+              subtitle: "Auditoría de egresos procesados",
               onTap: () => context.pushNamed("history-exit"),
             ),
           ),
-          const Divider(height: 0.0),
-          const Divider(
-            height: 4.0,
-            thickness: 2,
-          ),
+
+          const MenuSectionDivider(title: "Transferencias entre Sucursales"),
 
           ShortcutAddableListTile(
             routeName: RouteNames.currentTranfers,
-            child: ListTile(
-              leading: const Icon(
-                Icons.swap_vertical_circle_outlined,
-                color: Colors.teal,
-                size: 28,
-              ),
-              title: const Text("Transferencias"),
+            child: MenuOptionCard(
+              icon: Icons.swap_vertical_circle_outlined,
+              accentColor: Colors.teal.shade600,
+              title: "Transferencias",
+              subtitle: "Envíos en tránsito entre almacenes",
               onTap: () => context.pushNamed("current-tranfers"),
             ),
           ),
-
-          const Divider(height: 0.0),
-
           ShortcutAddableListTile(
             routeName: RouteNames.createTransfer,
-            child: ListTile(
-              leading: const Icon(
-                Icons.swap_vert_circle_outlined,
-                size: 28,
-                color: Colors.red,
-              ),
-              title: const Text("Crear Transferencia"),
+            child: MenuOptionCard(
+              icon: Icons.swap_vert_circle_outlined,
+              accentColor: Colors.indigo.shade600,
+              title: "Crear Transferencia",
+              subtitle: "Traslado intersucursal de mercancía",
               onTap: () => context.pushNamed("create-transfer"),
             ),
           ),
 
-          const Divider(height: 0.0),
-
-          const Divider(
-            height: 4.0,
-            thickness: 2,
-          ),
+          const MenuSectionDivider(title: "Ajustes y Mermas"),
 
           ShortcutAddableListTile(
             routeName: RouteNames.adjustEntry,
-            child: ListTile(
-              leading: IconWidgets.entryInventoryIcon,
-              title: const Text("Entrada por Ajuste"),
+            child: MenuOptionCard(
+              icon: Icons.add_circle_outline_rounded,
+              accentColor: Colors.blue.shade600,
+              title: "Entrada por Ajuste",
+              subtitle: "Regularización positiva de inventario",
               onTap: () => context.pushNamed("adjust-entry"),
             ),
           ),
-          const Divider(height: 0.0),
-
           ShortcutAddableListTile(
             routeName: RouteNames.historyAdjustEntry,
-            child: ListTile(
-              leading: const Icon(
-                FluentIcons.history_28_filled,
-                color: Colors.blue,
-              ),
-              title: const Text("Historial de Entradas por Ajuste"),
+            child: MenuOptionCard(
+              icon: FluentIcons.history_24_filled,
+              accentColor: Colors.blue.shade600,
+              title: "Historial de Entradas por Ajuste",
+              subtitle: "Auditoría de ajustes de entrada",
               onTap: () => context.pushNamed("history-adjust-entry"),
             ),
           ),
-
-          const Divider(height: 0.0),
-
-          ListTile(
-            leading: IconWidgets.exitInventoryIcon,
-            title: const Text("Salida por Ajuste"),
+          MenuOptionCard(
+            icon: Icons.remove_circle_outline_rounded,
+            accentColor: Colors.red.shade600,
+            title: "Salida por Ajuste",
+            subtitle: "Corrección negativa por conteo físico",
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
@@ -251,26 +219,21 @@ class _Body extends StatelessWidget {
               ),
             ),
           ),
-
-          const Divider(height: 0.0),
-
           ShortcutAddableListTile(
             routeName: RouteNames.historyAdjustExit,
-            child: ListTile(
-              leading: const Icon(
-                FluentIcons.history_28_filled,
-                color: Colors.red,
-              ),
-              title: const Text("Historial de Salidas por Ajuste"),
+            child: MenuOptionCard(
+              icon: FluentIcons.history_24_filled,
+              accentColor: Colors.red.shade600,
+              title: "Historial de Salidas por Ajuste",
+              subtitle: "Auditoría de correcciones de salida",
               onTap: () => context.pushNamed("history-adjust-exit"),
             ),
           ),
-
-          const Divider(height: 0.0),
-
-          ListTile(
-            leading: IconWidgets.exitInventoryIcon,
-            title: const Text("Mermas"),
+          MenuOptionCard(
+            icon: Icons.delete_sweep_rounded,
+            accentColor: Colors.red.shade700,
+            title: "Mermas",
+            subtitle: "Registro de productos dañados o pérdida",
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
@@ -280,8 +243,6 @@ class _Body extends StatelessWidget {
               ),
             ),
           ),
-
-          const Divider(height: 0.0),
         ],
       ),
     );

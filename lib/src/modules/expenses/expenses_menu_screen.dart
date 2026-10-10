@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/constants/route_names.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/widgets/menu_app_bar.dart';
 import 'package:kardex_app_front/widgets/shortcut_addable_list_tile.dart';
 
@@ -35,43 +36,48 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: ListView(
+        padding: const EdgeInsets.only(top: 8, bottom: 24),
         children: [
           ShortcutAddableListTile(
             routeName: RouteNames.operativeExpenses,
-            child: ListTile(
-              leading: const Icon(Icons.monetization_on, color: Colors.green),
-              title: const Text("Gastos Operativos"),
+            child: MenuOptionCard(
+              icon: Icons.monetization_on,
+              accentColor: Colors.green.shade600,
+              title: "Gastos Operativos",
+              subtitle: "Salidas diarias de caja y servicios operativos",
               onTap: () => context.pushNamed("operative-expenses"),
             ),
           ),
-          const Divider(height: 0.0),
           ShortcutAddableListTile(
             routeName: RouteNames.supplierExpenses,
-            child: ListTile(
-              leading: const Icon(Icons.shopping_cart, color: Colors.orange),
-              title: const Text("Compras a Proveedores"),
+            child: MenuOptionCard(
+              icon: Icons.shopping_cart,
+              accentColor: Colors.orange.shade700,
+              title: "Compras a Proveedores",
+              subtitle: "Registro de pagos de mercadería y compras",
               onTap: () => context.pushNamed("supplier-expenses"),
             ),
           ),
-          const Divider(height: 0.0),
           ShortcutAddableListTile(
             routeName: RouteNames.expenseCategories,
-            child: ListTile(
-              leading: const Icon(Icons.category, color: Colors.indigo),
-              title: const Text("Categorías de Gastos"),
+            child: MenuOptionCard(
+              icon: Icons.category,
+              accentColor: Colors.indigo.shade600,
+              title: "Categorías de Gastos",
+              subtitle: "Clasificación de conceptos y rubros de egreso",
               onTap: () => context.pushNamed("expense-categories"),
             ),
           ),
-          const Divider(height: 0.0),
           ShortcutAddableListTile(
             routeName: RouteNames.expensesReport,
-            child: ListTile(
-              leading: const Icon(Icons.assessment, color: Colors.blue),
-              title: const Text("Reporte de Gastos"),
+            child: MenuOptionCard(
+              icon: Icons.assessment,
+              accentColor: Colors.blue.shade600,
+              title: "Reporte de Gastos",
+              subtitle: "Análisis y consolidado de egresos por período",
               onTap: () => context.pushNamed("expenses-report"),
             ),
           ),
-          const Divider(height: 0.0),
         ],
       ),
     );
