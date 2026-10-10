@@ -38,3 +38,6 @@ export 'buttons/secondary_menu_button.dart';
 export 'buttons/tertiary_menu_button.dart';
 export 'dividers/menu_section_divider.dart';
 export 'cards/menu_option_card.dart';
+export 'cash_counter/cash_counter_dialog.dart';
+export 'cash_counter/cash_counter_models.dart';
+export 'cash_counter/cash_counter_export_dialog.dart';

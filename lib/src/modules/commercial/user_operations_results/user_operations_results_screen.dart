@@ -9,6 +9,7 @@ import 'package:kardex_app_front/src/modules/commercial/user_operations_results/
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/user_operations_arqueo_pdf_template.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 import 'package:kardex_app_front/src/tools/extensiones.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 class UserOperationsResultsScreen extends StatelessWidget {
@@ -46,6 +47,36 @@ class _RootScaffold extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Arqueo y Resultados por Usuario"),
         actions: [
+          IconButton(
+            tooltip: "Contador de Billetes y Monedas",
+            icon: const Icon(Icons.calculate_outlined),
+            onPressed: () {
+              final selectedUser = cubit.selectedUser ?? getIt<AuthCubit>().user;
+              final userId = selectedUser?.id ?? "general";
+              final userName = selectedUser?.username ?? "General";
+              final date = cubit.startDate ?? DateTime.now();
+
+              double? expectedCash;
+              if (cubitState is ReadUserReportsSuccess) {
+                final cashInvoices = cubitState.result.detailInvoices
+                    .where((inv) => inv.paymentType == PaymentType.cash);
+                final cashReceipts = cubitState.result.detailReceipts
+                    .where((rec) => rec.paymentMethod == PaymentMethod.cash);
+                final totalFacturasEfectivo = cashInvoices.fold<int>(0, (prev, inv) => prev + inv.total);
+                final totalAbonosEfectivo = cashReceipts.fold<int>(0, (prev, rec) => prev + rec.total);
+                expectedCash = (totalFacturasEfectivo + totalAbonosEfectivo) / 100.0;
+              }
+
+              CashCounterDialog.show(
+                context,
+                branchId: getIt<AuthCubit>().currentBranchId,
+                userId: userId,
+                userName: userName,
+                date: date,
+                expectedCash: expectedCash,
+              );
+            },
+          ),
           IconButton(
             tooltip: "Exportar Arqueo PDF",
             icon: const Icon(Icons.picture_as_pdf),
