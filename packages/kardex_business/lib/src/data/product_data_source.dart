@@ -18,6 +18,13 @@ class ProductsDataSource with HttpService {
     return res;
   }
 
+  Future<Map<String, dynamic>> createProductWithData(Map<String, dynamic> data) async {
+    final uri = HttpTools.generateUri("$_endpoint/create-product-with-data");
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await postQuery(uri, data, headers: headers);
+    return res;
+  }
+
   Future<Map<String, dynamic>> getAllProducts() async {
     final uri = HttpTools.generateUri(_endpoint);
     final headers = HttpTools.generateAuthHeaders();

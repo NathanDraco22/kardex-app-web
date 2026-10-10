@@ -41,3 +41,4 @@ export 'cards/menu_option_card.dart';
 export 'cash_counter/cash_counter_dialog.dart';
 export 'cash_counter/cash_counter_models.dart';
 export 'cash_counter/cash_counter_export_dialog.dart';
+export 'dialogs/create_product_with_data_dialog.dart';

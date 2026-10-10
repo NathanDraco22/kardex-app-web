@@ -14,6 +14,11 @@ class ProductsRepository {
     return newProduct;
   }
 
+  Future<ProductInDbInBranch> createProductWithData(CreateProductWithData data) async {
+    final result = await productsDataSource.createProductWithData(data.toJson());
+    return ProductInDbInBranch.fromJson(result);
+  }
+
   Future<List<ProductInDb>> getPaginatedProducts(int offset) async {
     final results = await productsDataSource.getPaginatedProducts(offset);
     final response = ListResponse.fromJson(results, ProductInDb.fromJson);
