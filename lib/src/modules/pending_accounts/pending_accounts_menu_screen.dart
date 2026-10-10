@@ -2,6 +2,7 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/constants/route_names.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/widgets/shortcut_addable_list_tile.dart';
 
 class PendingAccountsMenuScreen extends StatelessWidget {
@@ -34,64 +35,46 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: ListView(
+        padding: const EdgeInsets.only(top: 8, bottom: 24),
         children: [
           ShortcutAddableListTile(
             routeName: RouteNames.pendingInvoices,
-            child: ListTile(
-              leading: Icon(
-                FluentIcons.document_endnote_24_filled,
-                size: 32,
-                color: Colors.amber.shade600,
-              ),
-              title: const Text("Facturas por Cobrar"),
-              onTap: () {
-                context.pushNamed("pending-invoices");
-              },
+            child: MenuOptionCard(
+              icon: FluentIcons.document_endnote_24_filled,
+              accentColor: Colors.amber.shade700,
+              title: "Facturas por Cobrar",
+              subtitle: "Créditos pendientes y abonos parciales",
+              onTap: () => context.pushNamed("pending-invoices"),
             ),
           ),
-          const Divider(height: 0.0),
           ShortcutAddableListTile(
             routeName: RouteNames.pendingClientTransactions,
-            child: ListTile(
-              leading: Icon(
-                FluentIcons.history_24_filled,
-                size: 32,
-                color: Colors.blue.shade600,
-              ),
-              title: const Text("Transacciones con Saldo Pendiente"),
-              onTap: () {
-                context.pushNamed("pending-client-transactions");
-              },
+            child: MenuOptionCard(
+              icon: FluentIcons.history_24_filled,
+              accentColor: Colors.blue.shade600,
+              title: "Transacciones con Saldo Pendiente",
+              subtitle: "Gestión de sesiones de crédito y clientes deudores",
+              onTap: () => context.pushNamed("pending-client-transactions"),
             ),
           ),
-          const Divider(height: 0.0),
           ShortcutAddableListTile(
             routeName: RouteNames.unpaidClients,
-            child: ListTile(
-              leading: Icon(
-                FluentIcons.calendar_error_24_filled,
-                size: 32,
-                color: Colors.red.shade400,
-              ),
-              title: const Text("Días de Impago"),
-              onTap: () {
-                context.pushNamed("unpaid-clients");
-              },
+            child: MenuOptionCard(
+              icon: FluentIcons.calendar_error_24_filled,
+              accentColor: Colors.red.shade500,
+              title: "Días de Impago",
+              subtitle: "Antigüedad de saldos y alertas de morosidad",
+              onTap: () => context.pushNamed("unpaid-clients"),
             ),
           ),
-          const Divider(height: 0.0),
           ShortcutAddableListTile(
             routeName: RouteNames.invoicePayments,
-            child: ListTile(
-              leading: Icon(
-                FluentIcons.receipt_sparkles_24_filled,
-                size: 32,
-                color: Colors.teal.shade600,
-              ),
-              title: const Text("Abonos por Factura"),
-              onTap: () {
-                context.pushNamed("abonos-por-factura");
-              },
+            child: MenuOptionCard(
+              icon: FluentIcons.receipt_sparkles_24_filled,
+              accentColor: Colors.teal.shade600,
+              title: "Abonos por Factura",
+              subtitle: "Historial y registro de pagos por factura",
+              onTap: () => context.pushNamed("abonos-por-factura"),
             ),
           ),
         ],

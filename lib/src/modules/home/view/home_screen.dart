@@ -15,6 +15,9 @@ import 'package:toastification/toastification.dart';
 import 'package:kardex_app_front/constants/route_names.dart';
 import 'widgets/home_desktop_card.dart';
 import 'widgets/home_end_drawer.dart';
+import '../data/home_modules_registry.dart';
+import 'desktop/widgets/desktop_module_sidebar.dart';
+import 'desktop/widgets/desktop_submenu_panel.dart';
 
 part 'mobile/home_mobile.dart';
 part 'tablet/home_tablet.dart';

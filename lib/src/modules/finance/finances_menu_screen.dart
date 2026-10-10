@@ -9,6 +9,7 @@ import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/cubits/finance/read_finance_charts_cubit.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/widgets/menu_app_bar.dart';
 import 'package:kardex_app_front/constants/route_names.dart';
 import 'package:kardex_app_front/widgets/shortcut_addable_list_tile.dart';
@@ -23,7 +24,8 @@ class FinancesMenuScreen extends StatelessWidget {
     final adminPanelRepo = context.read<AdminPanelRepository>();
     return BlocProvider(
       create: (context) {
-        return ReadFinanceChartsCubit(adminPanelRepo)..getChartsCurrentBranch(getIt<AuthCubit>().currentBranchId);
+        return ReadFinanceChartsCubit(adminPanelRepo)
+          ..getChartsCurrentBranch(getIt<AuthCubit>().currentBranchId);
       },
       child: const _RootScaffold(),
     );
@@ -67,101 +69,76 @@ class _Body extends StatelessWidget {
           children: [
             _ChartsCard(state: state),
             const SizedBox(height: 12),
-            const Divider(height: 0.0),
             ShortcutAddableListTile(
               routeName: RouteNames.dailyOperationsResults,
-              child: ListTile(
-                leading: const Icon(
-                  Icons.analytics_outlined,
-                  color: Colors.orange,
-                ),
-                title: const Text("Resultado de Operaciones Diarias"),
-                trailing: const Icon(Icons.chevron_right),
+              child: MenuOptionCard(
+                icon: Icons.analytics_outlined,
+                accentColor: Colors.orange.shade700,
+                title: "Resultado de Operaciones Diarias",
+                subtitle: "Balance de ingresos y egresos diarios",
                 onTap: () => context.pushNamed("daily-operations-results"),
               ),
             ),
-            const Divider(height: 0.0),
             ShortcutAddableListTile(
               routeName: RouteNames.rangeFinanceReport,
-              child: ListTile(
-                leading: const Icon(
-                  Icons.date_range_outlined,
-                  color: Colors.teal,
-                ),
-                title: const Text("Reporte de Ventas y Flujos"),
-                trailing: const Icon(Icons.chevron_right),
+              child: MenuOptionCard(
+                icon: Icons.date_range_outlined,
+                accentColor: Colors.teal.shade600,
+                title: "Reporte de Ventas y Flujos",
+                subtitle: "Ingresos y egresos en rango de fechas",
                 onTap: () => context.pushNamed("finance-range-report"),
               ),
             ),
-            const Divider(height: 0.0),
             ShortcutAddableListTile(
               routeName: RouteNames.clientAccounts,
-              child: ListTile(
-                leading: const Icon(
-                  FluentIcons.notepad_person_24_filled,
-                  color: Colors.blue,
-                ),
-                title: const Text("Estado de cuenta de Clientes"),
-                trailing: const Icon(Icons.chevron_right),
+              child: MenuOptionCard(
+                icon: FluentIcons.notepad_person_24_filled,
+                accentColor: Colors.blue.shade600,
+                title: "Estado de Cuenta de Clientes",
+                subtitle: "Extractos detallados y movimientos por cliente",
                 onTap: () => context.pushNamed("client-accounts"),
               ),
             ),
-            const Divider(height: 0.0),
-
             ShortcutAddableListTile(
               routeName: RouteNames.detailInvoiceHistory,
-              child: ListTile(
-                leading: const Icon(
-                  Icons.content_paste_search_rounded,
-                  color: Colors.green,
-                ),
-                title: const Text("Historial Detallado de Facturas"),
-                trailing: const Icon(Icons.chevron_right),
+              child: MenuOptionCard(
+                icon: Icons.content_paste_search_rounded,
+                accentColor: Colors.green.shade600,
+                title: "Historial Detallado de Facturas",
+                subtitle: "Auditoría integral con condición y pagos",
                 onTap: () => context.pushNamed("detail-invoice-history"),
               ),
             ),
-
-            const Divider(height: 0.0),
-
             ShortcutAddableListTile(
               routeName: RouteNames.paidInvoices,
-              child: ListTile(
-                leading: const Icon(
-                  FluentIcons.receipt_money_24_filled,
-                  color: Colors.green,
-                ),
-                title: const Text("Facturas Liquidadas"),
-                trailing: const Icon(Icons.chevron_right),
+              child: MenuOptionCard(
+                icon: FluentIcons.receipt_money_24_filled,
+                accentColor: Colors.green.shade700,
+                title: "Facturas Liquidadas",
+                subtitle: "Ventas saldadas en su totalidad",
                 onTap: () => context.pushNamed("paid-invoices"),
               ),
             ),
-            const Divider(height: 0.0),
             ShortcutAddableListTile(
               routeName: RouteNames.branchDailySummary,
-              child: ListTile(
-                leading: const Icon(
-                  Icons.bar_chart_rounded,
-                  color: Colors.blue,
-                ),
-                title: const Text("Resumen Diario"),
-                trailing: const Icon(Icons.chevron_right),
+              child: MenuOptionCard(
+                icon: Icons.bar_chart_rounded,
+                accentColor: Colors.blue.shade600,
+                title: "Resumen Diario",
+                subtitle: "Cierre de caja y métricas clave del día",
                 onTap: () => context.pushNamed("branch-daily-summary"),
               ),
             ),
-            const Divider(height: 0.0),
             ShortcutAddableListTile(
               routeName: RouteNames.branchExecutiveSummary,
-              child: ListTile(
-                leading: const Icon(
-                  Icons.pie_chart_rounded,
-                  color: Colors.purple,
-                ),
-                title: const Text("Resumen Ejecutivo"),
-                trailing: const Icon(Icons.chevron_right),
+              child: MenuOptionCard(
+                icon: Icons.pie_chart_rounded,
+                accentColor: Colors.purple.shade600,
+                title: "Resumen Ejecutivo",
+                subtitle: "Visión panorámica financiera del negocio",
                 onTap: () => context.pushNamed("branch-executive-summary"),
               ),
             ),
-            const Divider(height: 0.0),
           ],
         ),
       ),
@@ -184,6 +161,7 @@ class _ChartsCard extends StatelessWidget {
     );
 
     return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -209,14 +187,16 @@ class _ChartsCard extends StatelessWidget {
               spacing: 16,
               children: [
                 TitleAmount(
-                  title: "Ultimos 7 dias",
+                  title: "Últimos 7 días",
                   amount: NumberFormatter.convertToMoneyLike(last7DaysTotalAmount),
                 ),
                 Custom7DaysBarChart(
                   data: List.generate(
                     charts.last7DaysTotals.length,
                     (index) => CustomChartData(
-                      value: NumberFormatter.convertFromCentsToDouble(charts.last7DaysTotals[index].total),
+                      value: NumberFormatter.convertFromCentsToDouble(
+                        charts.last7DaysTotals[index].total,
+                      ),
                     ),
                   ),
                 ),

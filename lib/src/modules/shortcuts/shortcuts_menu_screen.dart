@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/constants/shortcut_registry.dart';
 import 'package:kardex_app_front/cubits/shortcuts/shortcuts_cubit.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 class ShortcutsMenuScreen extends StatelessWidget {
@@ -77,6 +78,7 @@ class _Body extends StatelessWidget {
 
         return Center(
           child: ReorderableListView(
+            padding: const EdgeInsets.only(top: 8, bottom: 24),
             buildDefaultDragHandles: false,
             onReorderItem: (oldIndex, newIndex) {
               final list = [...state.shortcuts];
@@ -116,60 +118,45 @@ class _ShortcutTile extends StatelessWidget {
     final icon = info?.icon ?? Icons.link;
     final color = info?.color;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: GestureDetector(
-                onLongPress: () async {
-                  final renderBox = context.findRenderObject() as RenderBox;
-                  final offset = renderBox.localToGlobal(Offset.zero);
-                  final size = renderBox.size;
+    return GestureDetector(
+      onLongPress: () async {
+        final renderBox = context.findRenderObject() as RenderBox;
+        final offset = renderBox.localToGlobal(Offset.zero);
+        final size = renderBox.size;
 
-                  final result = await showMenu<String>(
-                    context: context,
-                    position: RelativeRect.fromLTRB(
-                      offset.dx,
-                      offset.dy + size.height / 2,
-                      offset.dx + size.width,
-                      offset.dy + size.height / 2,
-                    ),
-                    items: const [
-                      PopupMenuItem<String>(
-                        value: 'remove',
-                        child: Text('Remover de accesos directos'),
-                      ),
-                    ],
-                  );
-
-                  if (result == 'remove' && context.mounted) {
-                    context.read<ShortcutsCubit>().removeShortcut(shortcut.routeName);
-                  }
-                },
-                child: ListTile(
-                  leading: Icon(
-                    icon,
-                    size: 32,
-                    color: color ?? Colors.indigo.shade400,
-                  ),
-                  title: Text(title),
-                  onTap: () => context.pushNamed(shortcut.routeName),
-                ),
-              ),
-            ),
-            ReorderableDragStartListener(
-              index: index,
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 12),
-                child: Icon(Icons.drag_handle, size: 28, color: Colors.grey),
-              ),
+        final result = await showMenu<String>(
+          context: context,
+          position: RelativeRect.fromLTRB(
+            offset.dx,
+            offset.dy + size.height / 2,
+            offset.dx + size.width,
+            offset.dy + size.height / 2,
+          ),
+          items: const [
+            PopupMenuItem<String>(
+              value: 'remove',
+              child: Text('Remover de accesos directos'),
             ),
           ],
+        );
+
+        if (result == 'remove' && context.mounted) {
+          context.read<ShortcutsCubit>().removeShortcut(shortcut.routeName);
+        }
+      },
+      child: MenuOptionCard(
+        title: title,
+        icon: icon,
+        accentColor: color ?? Colors.indigo.shade400,
+        onTap: () => context.pushNamed(shortcut.routeName),
+        trailing: ReorderableDragStartListener(
+          index: index,
+          child: const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 4),
+            child: Icon(Icons.drag_handle, size: 26, color: Colors.grey),
+          ),
         ),
-        const Divider(height: 0.0),
-      ],
+      ),
     );
   }
 }
