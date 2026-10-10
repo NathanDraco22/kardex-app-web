@@ -6,7 +6,6 @@ import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/tools/extensiones.dart';
 import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
-import 'package:kardex_app_front/widgets/buttons/secondary_menu_button.dart';
 import 'package:toastification/toastification.dart';
 
 import 'cash_counter_export_dialog.dart';
@@ -327,10 +326,10 @@ class _CashCounterDialogState extends State<CashCounterDialog> {
     });
   }
 
-  void _openExportOptions() {
+  void _openPrintOptions() {
     final authState = getIt<AuthCubit>().state;
     if (authState is Authenticated) {
-      CashCounterExportDialog.show(
+      CashCounterExportDialog.showPrint(
         context,
         record: _record,
         branch: authState.branch,
@@ -342,7 +341,29 @@ class _CashCounterDialogState extends State<CashCounterDialog> {
         context: context,
         type: ToastificationType.warning,
         title: const Text('Sucursal no disponible'),
-        description: const Text('No se pudo obtener la información de la sucursal activa para el reporte.'),
+        description: const Text('No se pudo obtener la información de la sucursal activa.'),
+        autoCloseDuration: const Duration(seconds: 3),
+        style: ToastificationStyle.flatColored,
+      );
+    }
+  }
+
+  void _openShareOptions() {
+    final authState = getIt<AuthCubit>().state;
+    if (authState is Authenticated) {
+      CashCounterExportDialog.showShare(
+        context,
+        record: _record,
+        branch: authState.branch,
+        userName: widget.userName,
+        expectedCash: widget.expectedCash,
+      );
+    } else {
+      toastification.show(
+        context: context,
+        type: ToastificationType.warning,
+        title: const Text('Sucursal no disponible'),
+        description: const Text('No se pudo obtener la información de la sucursal activa.'),
         autoCloseDuration: const Duration(seconds: 3),
         style: ToastificationStyle.flatColored,
       );
@@ -520,26 +541,20 @@ class _CashCounterDialogState extends State<CashCounterDialog> {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       color: Colors.grey.shade50,
       child: SegmentedButton<int>(
-        segments: [
+        segments: const [
           ButtonSegment<int>(
             value: 0,
-            label: Text(
-              'Córdobas (C\$ ${_moneyFmt.format(_record.totalCordobas)})',
-              style: const TextStyle(fontSize: 12),
-            ),
-            icon: const Icon(Icons.money_rounded, size: 16),
+            label: Text('Córdobas', style: TextStyle(fontSize: 12.5)),
+            icon: Icon(Icons.money_rounded, size: 16),
           ),
           ButtonSegment<int>(
             value: 1,
-            label: Text(
-              'Dólares (\$ ${_moneyFmt.format(_record.totalDollars)})',
-              style: const TextStyle(fontSize: 12),
-            ),
-            icon: const Icon(Icons.attach_money_rounded, size: 16),
+            label: Text('Dólares', style: TextStyle(fontSize: 12.5)),
+            icon: Icon(Icons.attach_money_rounded, size: 16),
           ),
-          const ButtonSegment<int>(
+          ButtonSegment<int>(
             value: 2,
-            label: Text('Resumen & Arqueo', style: TextStyle(fontSize: 12)),
+            label: Text('Resumen & Arqueo', style: TextStyle(fontSize: 12.5)),
             icon: Icon(Icons.analytics_outlined, size: 16),
           ),
         ],
@@ -992,31 +1007,47 @@ class _CashCounterDialogState extends State<CashCounterDialog> {
 
   Widget _buildFooter({required bool isDialog}) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: isDialog ? const BorderRadius.vertical(bottom: Radius.circular(16)) : null,
       ),
       child: Row(
         children: [
-          SecondaryMenuButton(
-            icon: const Icon(Icons.delete_sweep_outlined, size: 18),
-            label: const Text('Limpiar'),
+          // Botón Borrar / Limpiar
+          _buildCompactIconButton(
+            icon: Icons.delete_sweep_outlined,
+            color: Colors.red.shade700,
+            bgColor: Colors.red.shade50,
+            tooltip: 'Reiniciar conteo a 0',
             onPressed: _confirmClear,
           ),
           const SizedBox(width: 8),
-          SecondaryMenuButton(
-            icon: const Icon(Icons.copy_rounded, size: 18),
-            label: const Text('Copiar'),
+          // Botón Copiar al Portapapeles
+          _buildCompactIconButton(
+            icon: Icons.copy_rounded,
+            color: Colors.blueGrey.shade800,
+            bgColor: Colors.blueGrey.shade50,
             tooltip: 'Copiar desglose al portapapeles',
             onPressed: _copySummaryToClipboard,
           ),
           const SizedBox(width: 8),
-          SecondaryMenuButton(
-            icon: const Icon(Icons.picture_as_pdf_outlined, size: 18),
-            label: const Text('Exportar'),
-            tooltip: 'Exportar a PDF (Hoja Completa o Ticket)',
-            onPressed: _openExportOptions,
+          // Botón Imprimir (Rollo u Hoja)
+          _buildCompactIconButton(
+            icon: Icons.print_outlined,
+            color: Colors.teal.shade800,
+            bgColor: Colors.teal.shade50,
+            tooltip: 'Imprimir Arqueo (Rollo u Hoja)',
+            onPressed: _openPrintOptions,
+          ),
+          const SizedBox(width: 8),
+          // Botón Compartir (Rollo u Hoja)
+          _buildCompactIconButton(
+            icon: Icons.share_outlined,
+            color: Colors.deepOrange.shade800,
+            bgColor: Colors.deepOrange.shade50,
+            tooltip: 'Compartir PDF (Rollo u Hoja)',
+            onPressed: _openShareOptions,
           ),
           const Spacer(),
           if (isDialog) ...[
@@ -1045,6 +1076,35 @@ class _CashCounterDialogState extends State<CashCounterDialog> {
             onPressed: () => Navigator.of(context).pop(_record),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildCompactIconButton({
+    required IconData icon,
+    required Color color,
+    required Color bgColor,
+    required String tooltip,
+    required VoidCallback onPressed,
+  }) {
+    return Tooltip(
+      message: tooltip,
+      child: Material(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(10),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: onPressed,
+          child: Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: color.withAlpha(50)),
+            ),
+            child: Icon(icon, size: 20, color: color),
+          ),
+        ),
       ),
     );
   }
