@@ -36,3 +36,5 @@ export 'dialogs/selectors/client_dropdown_selector.dart';
 export 'buttons/primary_menu_button.dart';
 export 'buttons/secondary_menu_button.dart';
 export 'buttons/tertiary_menu_button.dart';
+export 'dividers/menu_section_divider.dart';
+export 'cards/menu_option_card.dart';

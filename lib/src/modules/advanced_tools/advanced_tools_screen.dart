@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/constants/route_names.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/widgets/menu_app_bar.dart';
 import 'package:kardex_app_front/widgets/shortcut_addable_list_tile.dart';
 
@@ -32,38 +33,28 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: ListView(
+        padding: const EdgeInsets.only(top: 8, bottom: 24),
         children: [
           ShortcutAddableListTile(
             routeName: RouteNames.productStats,
-            child: ListTile(
-              leading: const Icon(
-                Icons.calculate,
-                color: Colors.blue,
-                size: 28,
-              ),
-              title: const Text("Estimación de Productos por Ventas"),
-              onTap: () {
-                context.pushNamed("product-stats");
-              },
+            child: MenuOptionCard(
+              icon: Icons.calculate,
+              accentColor: Colors.blue.shade600,
+              title: "Estimación de Productos por Ventas",
+              subtitle: "Cálculo de reposición óptima de inventario",
+              onTap: () => context.pushNamed("product-stats"),
             ),
           ),
-          const Divider(height: 0.0),
-
           ShortcutAddableListTile(
             routeName: RouteNames.saleProjection,
-            child: ListTile(
-              leading: const Icon(
-                Icons.calculate,
-                color: Colors.green,
-                size: 28,
-              ),
-              title: const Text("Projecion de Ventas"),
-              onTap: () {
-                context.pushNamed("sale-projection");
-              },
+            child: MenuOptionCard(
+              icon: Icons.auto_graph_rounded,
+              accentColor: Colors.green.shade600,
+              title: "Proyección de Ventas",
+              subtitle: "Modelos predictivos de demanda mensual",
+              onTap: () => context.pushNamed("sale-projection"),
             ),
           ),
-          const Divider(height: 0.0),
         ],
       ),
     );

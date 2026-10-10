@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/constants/route_names.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/settings/view/local_printer_settings_dialog.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/widgets/shortcut_addable_list_tile.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -37,70 +38,55 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: ListView(
+        padding: const EdgeInsets.only(top: 8, bottom: 24),
         children: [
           ShortcutAddableListTile(
             routeName: RouteNames.users,
-            child: ListTile(
-              leading: const Icon(Icons.person),
-              title: const Text("Usuarios"),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                context.pushNamed("users");
-              },
+            child: MenuOptionCard(
+              icon: Icons.person,
+              accentColor: Colors.blue.shade600,
+              title: "Usuarios",
+              subtitle: "Cuentas de usuario, roles y permisos",
+              onTap: () => context.pushNamed("users"),
             ),
           ),
-          const Divider(height: 0.0),
-
           ShortcutAddableListTile(
             routeName: RouteNames.branches,
-            child: ListTile(
-              leading: const Icon(Icons.other_houses),
-              title: const Text("Ramas/Sucursales"),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                context.pushNamed("branches");
-              },
+            child: MenuOptionCard(
+              icon: Icons.other_houses,
+              accentColor: Colors.teal.shade600,
+              title: "Ramas / Sucursales",
+              subtitle: "Gestión de sedes, almacenes y parámetros",
+              onTap: () => context.pushNamed("branches"),
             ),
           ),
-          const Divider(height: 0.0),
-          const Divider(height: 0.0),
-
           ShortcutAddableListTile(
             routeName: RouteNames.integrations,
-            child: ListTile(
-              leading: const Icon(Icons.integration_instructions),
-              title: const Text("Integraciones"),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                context.pushNamed("integrations");
-              },
+            child: MenuOptionCard(
+              icon: Icons.integration_instructions,
+              accentColor: Colors.indigo.shade600,
+              title: "Integraciones",
+              subtitle: "Servicios periféricos y conexiones",
+              onTap: () => context.pushNamed("integrations"),
             ),
           ),
-          const Divider(height: 0.0),
-
           ShortcutAddableListTile(
             routeName: RouteNames.apiKeys,
-            child: ListTile(
-              leading: const Icon(Icons.key),
-              title: const Text("Llaves de API (Neptuno)"),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                context.pushNamed(RouteNames.apiKeys);
-              },
+            child: MenuOptionCard(
+              icon: Icons.key,
+              accentColor: Colors.amber.shade700,
+              title: "Llaves de API (Neptuno)",
+              subtitle: "Credenciales de comunicación y sincronización",
+              onTap: () => context.pushNamed(RouteNames.apiKeys),
             ),
           ),
-          const Divider(height: 0.0),
-
-
-          ListTile(
-            leading: const Icon(Icons.print),
-            title: const Text("Configuración de Impresora Local"),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              showLocalPrinterSettingsDialog(context);
-            },
+          MenuOptionCard(
+            icon: Icons.print,
+            accentColor: Colors.blueGrey.shade700,
+            title: "Configuración de Impresora Local",
+            subtitle: "Configuración de tickets e impresión térmica",
+            onTap: () => showLocalPrinterSettingsDialog(context),
           ),
-          const Divider(height: 0.0),
         ],
       ),
     );

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/constants/route_names.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/widgets/shortcut_addable_list_tile.dart';
 
 class ProductCatalogMenuScreen extends StatelessWidget {
@@ -22,7 +23,7 @@ class _RootScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Catalogo de Productos")),
+      appBar: AppBar(title: const Text("Catálogo de Productos")),
       body: const _Body(),
     );
   }
@@ -35,47 +36,37 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: ListView(
+        padding: const EdgeInsets.only(top: 8, bottom: 24),
         children: [
           ShortcutAddableListTile(
             routeName: RouteNames.productList,
-            child: ListTile(
-              leading: const Icon(FluentIcons.cube_12_filled),
-              title: const Text("Lista Global de Productos"),
-              onTap: () {
-                context.pushNamed("product-list");
-              },
-              trailing: const Icon(Icons.chevron_right),
+            child: MenuOptionCard(
+              icon: FluentIcons.cube_12_filled,
+              accentColor: const Color(0xFF7C3AED),
+              title: "Lista Global de Productos",
+              subtitle: "Inventario maestro, precios y códigos de barra",
+              onTap: () => context.pushNamed("product-list"),
             ),
           ),
-          const Divider(
-            height: 0.0,
-          ),
-
           ShortcutAddableListTile(
             routeName: RouteNames.units,
-            child: ListTile(
-              leading: const Icon(Icons.tag),
-              title: const Text("Unidades de Medida de Productos"),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                context.pushNamed("units");
-              },
+            child: MenuOptionCard(
+              icon: Icons.tag,
+              accentColor: Colors.blue.shade600,
+              title: "Unidades de Medida de Productos",
+              subtitle: "Factores de conversión y unidades de empaque",
+              onTap: () => context.pushNamed("units"),
             ),
           ),
-          const Divider(height: 0.0),
           ShortcutAddableListTile(
             routeName: RouteNames.productCategory,
-            child: ListTile(
-              leading: const Icon(Icons.category_rounded),
-              title: const Text("Lista de Categorias de Productos"),
-              onTap: () {
-                context.pushNamed("product-category");
-              },
-              trailing: const Icon(Icons.chevron_right),
+            child: MenuOptionCard(
+              icon: Icons.category_rounded,
+              accentColor: Colors.orange.shade700,
+              title: "Lista de Categorías de Productos",
+              subtitle: "Clasificación de familias y líneas de producto",
+              onTap: () => context.pushNamed("product-category"),
             ),
-          ),
-          const Divider(
-            height: 0.0,
           ),
         ],
       ),
