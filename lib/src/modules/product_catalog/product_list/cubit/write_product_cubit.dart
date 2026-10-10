@@ -30,6 +30,25 @@ class WriteProductCubit extends Cubit<WriteProductState> {
     }
   }
 
+  Future<void> createProductWithData(CreateProductWithData data, {Uint8List? imageBytes}) async {
+    emit(WriteProductInProgress());
+    try {
+      if (imageBytes != null) {
+        final url = await ImageUploader.uploadImage(
+          bytes: imageBytes,
+          fileName: data.createProduct.name,
+        );
+        data = data.copyWithNewImage(url);
+      }
+
+      final product = await productsRepository.createProductWithData(data);
+      emit(WriteProductSuccess(product));
+      emit(WriteProductInitial());
+    } catch (error) {
+      emit(WriteProductError(error.toString()));
+    }
+  }
+
   Future<void> updateProduct(String productId, UpdateProduct updateProduct) async {
     emit(WriteProductInProgress());
     try {

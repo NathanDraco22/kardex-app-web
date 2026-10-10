@@ -439,3 +439,65 @@ class GetProductsInBranchRequest {
   }
 }
 
+class InventoryInfo {
+  final int quantity;
+  final int cost;
+  final int price;
+
+  InventoryInfo({
+    required this.quantity,
+    required this.cost,
+    required this.price,
+  });
+
+  factory InventoryInfo.fromJson(Map<String, dynamic> json) {
+    return InventoryInfo(
+      quantity: (json['quantity'] as num?)?.toInt() ?? 0,
+      cost: (json['cost'] as num?)?.toInt() ?? 0,
+      price: (json['price'] as num?)?.toInt() ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'quantity': quantity,
+        'cost': cost,
+        'price': price,
+      };
+}
+
+class CreateProductWithData {
+  final CreateProduct createProduct;
+  final String branchId;
+  final InventoryInfo inventoryInfo;
+
+  CreateProductWithData({
+    required this.createProduct,
+    required this.branchId,
+    required this.inventoryInfo,
+  });
+
+  factory CreateProductWithData.fromJson(Map<String, dynamic> json) {
+    return CreateProductWithData(
+      createProduct: CreateProduct.fromJson(json['createProduct'] as Map),
+      branchId: json['branchId'] as String,
+      inventoryInfo: InventoryInfo.fromJson(
+        Map<String, dynamic>.from(json['inventoryInfo'] as Map),
+      ),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'createProduct': createProduct.toJson(),
+        'branchId': branchId,
+        'inventoryInfo': inventoryInfo.toJson(),
+      };
+
+  CreateProductWithData copyWithNewImage(String newImageUrl) {
+    return CreateProductWithData(
+      createProduct: createProduct.copyWithNewImage(newImageUrl),
+      branchId: branchId,
+      inventoryInfo: inventoryInfo,
+    );
+  }
+}
+
