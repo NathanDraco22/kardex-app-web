@@ -14,6 +14,7 @@ import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/product_list/cubit/write_product_cubit.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/product_list/dialogs/create_product_dialog.dart';
+import 'package:kardex_app_front/src/cubits/app_settings/app_settings_cubit.dart';
 
 Future<ProductInDbInBranch?> showProductInventoryEditor(
   BuildContext context,
@@ -76,6 +77,8 @@ class _RootScaffoldState extends State<_RootScaffold> {
   late int currentSalePrice3;
   late List<Discount> currentDiscounts;
 
+  late final TextEditingController price1Controller;
+
   FocusNode priceFocus = FocusNode();
   FocusNode priceFocus2 = FocusNode();
   FocusNode priceFocus3 = FocusNode();
@@ -92,11 +95,22 @@ class _RootScaffoldState extends State<_RootScaffold> {
     currentSalePrice2 = currentProduct.saleProfile.salePrice2;
     currentSalePrice3 = currentProduct.saleProfile.salePrice3;
     currentDiscounts = [...currentProduct.saleProfile.discounts];
+    price1Controller = TextEditingController(
+      text: NumberFormatter.convertFromCentsToDouble(
+        widget.initialProduct.saleProfile.salePrice,
+      ).toString(),
+    );
     Future(
       () {
         priceFocus.requestFocus();
       },
     );
+  }
+
+  @override
+  void dispose() {
+    price1Controller.dispose();
+    super.dispose();
   }
 
   void _saveProduct() {
@@ -446,11 +460,78 @@ class _RootScaffoldState extends State<_RootScaffold> {
                           height: 12,
                         ),
 
+                        Builder(
+                          builder: (context) {
+                            final appSettings = getIt<AppSettingsCubit>();
+                            if (!appSettings.useDefaultProfitMargin) {
+                              return const SizedBox.shrink();
+                            }
+                            final profitMargin = appSettings.defaultProfitMargin;
+                            final costInCents = currentProduct.account.averageCost > 0
+                                ? currentProduct.account.averageCost
+                                : currentProduct.account.lastCost;
+                            if (costInCents <= 0) {
+                              return const SizedBox.shrink();
+                            }
+                            final suggestedPriceInCents = (costInCents * (1 + profitMargin / 100)).round();
+                            final suggestedDouble = NumberFormatter.convertFromCentsToDouble(suggestedPriceInCents);
+
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 12),
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.shade50,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: Colors.blue.shade200),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.auto_awesome, size: 20, color: Colors.blue.shade700),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Precio Sugerido (+${profitMargin.toStringAsFixed(profitMargin.truncateToDouble() == profitMargin ? 0 : 1)}%): ${NumberFormatter.convertToMoneyLike(suggestedPriceInCents)}",
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.blue.shade900,
+                                          ),
+                                        ),
+                                        Text(
+                                          "Calculado sobre costo (${NumberFormatter.convertToMoneyLike(costInCents)})",
+                                          style: TextStyle(fontSize: 11, color: Colors.blue.shade700),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  FilledButton.tonal(
+                                    style: FilledButton.styleFrom(
+                                      visualDensity: VisualDensity.compact,
+                                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                                      textStyle: const TextStyle(color: Colors.white),
+                                    ),
+                                    onPressed: () {
+                                      currentSalePrice = suggestedPriceInCents;
+                                      price1Controller.text = suggestedDouble.toString();
+                                      setState(() {});
+                                    },
+                                    child: const Text("Usar Precio Sugerido", style: TextStyle(color: Colors.white)),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+
                         TitleTextField(
                           key: const Key("price1"),
                           title: "Precio de Venta (C\$ )",
                           focusNode: priceFocus,
                           keyboardType: TextInputType.number,
+                          controller: price1Controller,
                           onChanged: (value) {
                             if (value.isEmpty) {
                               currentSalePrice = 0;
@@ -462,11 +543,6 @@ class _RootScaffoldState extends State<_RootScaffold> {
                             currentSalePrice = cents;
                             setState(() {});
                           },
-
-                          initialValue: NumberFormatter.convertFromCentsToDouble(
-                            currentProduct.saleProfile.salePrice,
-                          ).toString(),
-
                           inputFormatters: [DoubleThousandsFormatter()],
                         ),
 

@@ -34,7 +34,7 @@ lib/src/modules/inventory/
   - `CurrentInventoryScreen`: Adaptable a Web y Móvil.
   - Integra tabla de alta densidad con filtros por categoría, búsqueda por nombre, código y código alternativo (`altCode`).
 - **Cubits:** `CurrentInventoryCubit`, `ReadProductInBranchCubit`.
-- **Editor de Inventario:** Permite abrir el diálogo `showProductInventoryEditor` para ajustar parámetros de inventario por sucursal, cambiar umbrales de reabastecimiento o abrir el editor completo de producto.
+- **Editor de Inventario:** Permite abrir el diálogo `showProductInventoryEditor` para ajustar parámetros de inventario por sucursal, cambiar umbrales de reabastecimiento o abrir el editor completo de producto. Integra banner de **Precio Sugerido** reactivo a `AppSettings.useDefaultProfitMargin` y `AppSettings.defaultProfitMargin`, permitiendo aplicar en un solo toque el precio sugerido sobre el costo promedio o último costo en el campo Precio 1.
 
 ### 2.2. Entradas de Inventario (`inventory_entry` & `history_entry`)
 - **Propósito:** Registro de documentos de entrada provenientes de proveedores o producción.
