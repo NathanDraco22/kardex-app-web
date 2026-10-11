@@ -103,3 +103,17 @@ lib/src/modules/commercial/
 - `/commercial/devolutions`: Registro de devoluciones.
 - `/commercial/devolution-history`: Historial de devoluciones.
 - `/commercial/user-operations-results`: Arqueo y resultados por usuario.
+
+---
+
+## 5. Control de Visibilidad y Reglas Globales (`AppSettings` & Gates)
+
+El módulo Comercial interactúa de forma directa y reactiva con la configuración global del sistema (`AppSettingsCubit`) a través de componentes **Gate**:
+
+| Bandera en `AppSettings` | Gate Asociado | Herramientas y Submódulos Afectados | Comportamiento si está Deshabilitado |
+| :--- | :--- | :--- | :--- |
+| `useOrders` | `OrdersGate` | Órdenes de Compra (`current-orders`), Crear Orden (`sale-order`), Crear Orden Mayorista (`sale-order-wholesale`), Productos en Órdenes (`daily-product-in-orders`). | Oculta automáticamente las tarjetas y opciones en Desktop y Móvil. |
+| `useQuotations` | `QuotationsGate` | Historial de Cotizaciones (`proforma-history`), Crear Cotización (`proforma`), Crear Cotización Mayorista (`proforma-wholesale`), Cotizaciones vs Existencias (`product-demand-vs-stock`). | Oculta las opciones y el separador completo de sección de cotizaciones. |
+| `useOrders` o `useQuotations` | `QuotationsOrOrdersGate` | Buscador de Cotizaciones / Órdenes (`quotation-order-search`). | Solo se muestra si al menos una de las dos modalidades está activa en la configuración. |
+| `useExpirationDates` | `ExpirationDateGate` | Bitácora de Vencimientos (`expiration-logs`), columnas de lotes y fechas de caducidad. | Oculta la herramienta si la sucursal o las configuraciones globales tienen apagado el control de caducidad. |
+

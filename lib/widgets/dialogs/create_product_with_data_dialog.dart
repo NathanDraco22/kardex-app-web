@@ -8,6 +8,7 @@ import 'package:kardex_app_front/src/tools/uploaders/image_uploader.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/product_list/cubit/write_product_cubit.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/src/cubits/app_settings/app_settings_cubit.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
 Future<ProductInDbInBranch?> showCreateProductWithDataDialog(
@@ -625,6 +626,67 @@ class _InnerContent extends StatelessWidget {
                       ),
                     ),
                   ],
+                ),
+                AnimatedBuilder(
+                  animation: costController,
+                  builder: (context, _) {
+                    final appSettings = getIt<AppSettingsCubit>();
+                    if (!appSettings.useDefaultProfitMargin) {
+                      return const SizedBox.shrink();
+                    }
+                    final profitMargin = appSettings.defaultProfitMargin;
+                    final costVal = double.tryParse(costController.text.trim().replaceAll(',', '')) ?? 0.0;
+                    if (costVal <= 0) {
+                      return const SizedBox.shrink();
+                    }
+                    final suggestedPrice = costVal * (1 + profitMargin / 100);
+
+                    return Container(
+                      margin: const EdgeInsets.only(top: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.shade50,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.blue.shade200),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.auto_awesome, size: 18, color: Colors.blue.shade700),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Precio Sugerido (+${profitMargin.toStringAsFixed(profitMargin.truncateToDouble() == profitMargin ? 0 : 1)}%): $defaultCoinSymbol ${suggestedPrice.toStringAsFixed(2)}",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.blue.shade900,
+                                  ),
+                                ),
+                                Text(
+                                  "Calculado sobre costo ($defaultCoinSymbol ${costVal.toStringAsFixed(2)})",
+                                  style: TextStyle(fontSize: 11, color: Colors.blue.shade700),
+                                ),
+                              ],
+                            ),
+                          ),
+                          FilledButton.tonal(
+                            style: FilledButton.styleFrom(
+                              visualDensity: VisualDensity.compact,
+                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                              textStyle: const TextStyle(color: Colors.white),
+                            ),
+                            onPressed: () {
+                              priceController.text = suggestedPrice.toStringAsFixed(2);
+                            },
+                            child: const Text("Usar Precio Sugerido", style: TextStyle(color: Colors.white)),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
               ],
             ),

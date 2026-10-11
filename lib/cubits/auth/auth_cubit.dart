@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/core/app_kardex_config.dart';
 import 'package:kardex_app_front/src/core/session_manager.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/src/cubits/app_settings/app_settings_cubit.dart';
 
 part 'auth_state.dart';
 
@@ -232,6 +234,14 @@ class AuthCubit extends Cubit<AuthState> {
       servin: refreshedServin ?? currentServin,
       branch: branch,
     );
+
+    try {
+      if (getIt.isRegistered<AppSettingsCubit>()) {
+        getIt<AppSettingsCubit>().loadSettings();
+      }
+    } catch (e) {
+      log(e.toString());
+    }
 
     emit(
       Authenticated(

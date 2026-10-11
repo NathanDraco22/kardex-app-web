@@ -61,7 +61,7 @@ lib/src/modules/settings/
 - **Ubicación en Navegación:**
   - Móvil (`SettingsScreen`): Tarjeta `MenuOptionCard` al final del listado, justo después de *Configuración de Impresora Local*.
   - Escritorio (`home_modules_registry.dart`): Submódulo `HomeSubmoduleItem` al final de la categoría `Modules.settings`, después de *Impresora Local*.
-- **Cubit / Estado:** `AppSettingsCubit` y `AppSettingsState` (`lib/src/cubits/app_settings/`), inyectado globalmente en `ProviderContainer` con carga automática al inicio.
+- **Cubit / Estado:** `AppSettingsCubit` y `AppSettingsState` (`lib/src/cubits/app_settings/`), inyectado globalmente en `ProviderContainer` como Singleton en `getIt<AppSettingsCubit>()` y precargado en `SplashScreen`.
 - **Parámetros Configurados (`AppSettingModel` / `UpdateAppSetting`):**
   - `useDefaultProfitMargin` (bool): Habilitar o no el cálculo automático de margen de ganancia por defecto.
   - `defaultProfitMargin` (double): Porcentaje de margen sugerido (ej. 20.0%).
@@ -72,6 +72,14 @@ lib/src/modules/settings/
   - `alertMinStock` (bool): Activar alertas visuales de existencia mínima.
   - `defaultPaymentTermDays` (int): Días de crédito predeterminados para facturación.
   - `useHoldSales` (bool): Permitir pausar carritos en terminal de venta.
+
+#### Uso Operativo del Margen de Ganancia Sugerido:
+1. **Editor de Precios de Producto (`ProductPriceEditorScreen`):**
+   - Si `useDefaultProfitMargin` está encendido y el producto cuenta con costo registrado (`averageCost` o `lastCost`), se renderiza una tarjeta destacada con el porcentaje configurado y el precio sugerido calculado ($\text{Costo} \times [1 + \frac{\text{Margen}}{100}]$).
+   - Al pulsar el botón **"Usar Precio Sugerido"**, se carga inmediatamente dicho valor en el Precio de Venta principal (`currentSalePrice` y su campo de texto).
+2. **Creación Rápida de Producto con Datos (`CreateProductWithDataDialog`):**
+   - Al tipear el costo unitario en el formulario, un `AnimatedBuilder` calcula en tiempo real el precio de venta sugerido y despliega el botón **"Usar Precio Sugerido"** para transferirlo directamente al campo `priceController`.
+
 
 ---
 

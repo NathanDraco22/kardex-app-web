@@ -22,7 +22,6 @@ class _RootScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authCubit = getIt<AuthCubit>()..checkSession();
-    getIt<AppSettingsCubit>().loadSettings();
     return BlocListener(
       bloc: authCubit,
       listener: (context, state) async {
@@ -31,6 +30,7 @@ class _RootScaffold extends StatelessWidget {
         }
 
         if (state is Authenticated) {
+          getIt<AppSettingsCubit>().loadSettings();
           if (!state.servin.isActive) {
             context.goNamed("inactive");
             return;
@@ -40,6 +40,7 @@ class _RootScaffold extends StatelessWidget {
         }
 
         if (state is Unauthenticated || state is AuthError) {
+          getIt<AppSettingsCubit>().loadSettings();
           context.goNamed("login");
         }
       },

@@ -159,10 +159,50 @@ final activeId = _selectedModuleId != null &&
 - **Nunca abre un módulo no autorizado por defecto.**
 - Si el usuario no tiene permisos en ningún módulo, se renderiza una vista de advertencia: *"No tienes permisos asignados para acceder a los módulos de esta sucursal"*.
 
-### 5.4. Filtrado de Roles y Permisos (`RolePermissionGate` y `AccessManager`)
-1. **Nivel 1 (Módulos Raíz):** Se evalúan con `AccessManager().hasCurrentAccess(context, p.name)` contra los permisos del usuario (`user.userRole.access`). Si el permiso no está presente (y el rol no tiene `"all"`), el módulo entero desaparece del Sidebar y del Home.
-2. **Nivel 2 (Sub-herramientas):** Cada tarjeta se envuelve en `RolePermissionGate(permissions: item.permissions)`. Si el rol no tiene el permiso asignado, el widget genera `SizedBox.shrink()` y no se renderiza.
-3. **Nivel 3 (Bitácoras y Lotes):** Se protegen con `ExpirationDateGate` validando `servin.isUsingExpirationDate`.
+### 5.4. Sistema de Gates Reactivos y Filtrado de Opciones (`AppSettingsCubit`)
+
+El sistema cuenta con una arquitectura de protección y filtrado multinivel mediante componentes **Gate** reactivos suscritos a los cubits globales:
+
+```mermaid
+flowchart TD
+    AppSettingsCubit["AppSettingsCubit (Singleton en getIt)"]
+    AuthCubit["AuthCubit (Sesión y Roles)"]
+
+    subgraph Gates ["Componentes Gate Reactivos"]
+        RoleGate["RolePermissionGate (Permisos de Rol)"]
+        OrdersGate["OrdersGate (useOrders)"]
+        QuotGate["QuotationsGate (useQuotations)"]
+        QuotOrOrdersGate["QuotationsOrOrdersGate (useOrders || useQuotations)"]
+        ExpGate["ExpirationDateGate (isUsingExpirationDate && useExpirationDates)"]
+    end
+
+    AppSettingsCubit --> OrdersGate
+    AppSettingsCubit --> QuotGate
+    AppSettingsCubit --> QuotOrOrdersGate
+    AppSettingsCubit --> ExpGate
+    AuthCubit --> RoleGate
+    AuthCubit --> ExpGate
+
+    Gates --> UI["Renderizado Condicional (Widget o SizedBox.shrink)"]
+```
+
+1. **Inyección y Precarga Global:**
+   - `AppSettingsCubit` se instancia y registra como Singleton en `getIt` dentro de `ProviderContainer` (idéntico a `AuthCubit`), y se provee en el árbol de widgets mediante `BlocProvider.value`.
+   - Se precarga automáticamente en `SplashScreen` (`getIt<AppSettingsCubit>().loadSettings()`) en paralelo con la verificación de sesión `checkSession()`.
+2. **`RolePermissionGate`:**
+   - Evalúa los permisos del rol activo contra `AccessManager().hasCurrentAccess(context, p.name)`. Si el rol carece del permiso, retorna `const SizedBox.shrink()`.
+3. **`OrdersGate` (`lib/widgets/gates/orders_gate.dart`):**
+   - Se suscribe reactivamente a `AppSettingsCubit`.
+   - Si `useOrders == false`, oculta automáticamente las opciones de creación y seguimiento de órdenes de compra tanto en el panel de escritorio como en el menú móvil.
+4. **`QuotationsGate` y `QuotationsOrOrdersGate` (`lib/widgets/gates/quotations_gate.dart`):**
+   - Oculta reactivamente las opciones de proformas/cotizaciones (`useQuotations == false`).
+   - `QuotationsOrOrdersGate` protege herramientas híbridas (como el buscador conjunto de órdenes y cotizaciones) mostrándolas si al menos una de las dos banderas está encendida.
+   - En escritorio, el divisor de sección `MenuSectionDivider` de *Cotizaciones y Proformas* se envuelve en `QuotationsGate` para ocultar la sección completa si está deshabilitada.
+5. **`ExpirationDateGate` (`lib/widgets/gates/expiration_date_gate.dart`):**
+   - Combina la validación de servidor (`authState.servin.isUsingExpirationDate`) con la bandera global del sistema (`getIt<AppSettingsCubit>().useExpirationDates`).
+   - Si cualquiera es falsa, oculta las opciones de bitácoras de vencimiento y columnas de lotes.
+6. **Banderas en `HomeSubmoduleItem` (`home_modules_registry.dart`):**
+   - Los elementos del catálogo maestro cuentan con las banderas booleanas `isExpirationGate`, `isOrdersGate`, `isQuotationsGate` e `isQuotationsOrOrdersGate`, aplicadas de forma declarativa y procesadas automáticamente por `DesktopSubmenuPanel`.
 
 ---
 
