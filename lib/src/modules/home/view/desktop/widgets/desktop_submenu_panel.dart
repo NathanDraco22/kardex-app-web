@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/src/modules/home/data/home_modules_registry.dart';
 import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
+import 'package:kardex_app_front/widgets/gates/orders_gate.dart';
+import 'package:kardex_app_front/widgets/gates/quotations_gate.dart';
 import 'package:kardex_app_front/widgets/gates/role_permission_gate.dart';
 import 'package:kardex_app_front/widgets/dividers/menu_section_divider.dart';
 import 'desktop_submenu_card.dart';
@@ -121,18 +123,22 @@ class _DesktopSubmenuPanelState extends State<DesktopSubmenuPanel> {
       final sectionName = entry.key;
       final sectionItems = entry.value;
 
-      sectionWidgets.add(
-        MenuSectionDivider(
-          title: sectionName,
-          isFirst: sectionIndex == 0,
-          padding: EdgeInsets.only(
-            top: sectionIndex == 0 ? 4 : 22,
-            bottom: 8,
-            left: 4,
-            right: 4,
-          ),
+      Widget divider = MenuSectionDivider(
+        title: sectionName,
+        isFirst: sectionIndex == 0,
+        padding: EdgeInsets.only(
+          top: sectionIndex == 0 ? 4 : 22,
+          bottom: 8,
+          left: 4,
+          right: 4,
         ),
       );
+
+      if (sectionName == "Cotizaciones y Proformas") {
+        divider = QuotationsGate(child: divider);
+      }
+
+      sectionWidgets.add(divider);
 
       for (int i = 0; i < sectionItems.length; i++) {
         sectionWidgets.add(
@@ -171,6 +177,18 @@ class _DesktopSubmenuPanelState extends State<DesktopSubmenuPanel> {
 
     if (item.isExpirationGate) {
       card = ExpirationDateGate(child: card);
+    }
+
+    if (item.isOrdersGate) {
+      card = OrdersGate(child: card);
+    }
+
+    if (item.isQuotationsGate) {
+      card = QuotationsGate(child: card);
+    }
+
+    if (item.isQuotationsOrOrdersGate) {
+      card = QuotationsOrOrdersGate(child: card);
     }
 
     if (item.permissions.isNotEmpty) {

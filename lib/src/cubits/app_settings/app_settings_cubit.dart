@@ -7,6 +7,22 @@ class AppSettingsCubit extends Cubit<AppSettingsState> {
 
   AppSettingsCubit(this.appSettingsRepository) : super(AppSettingsInitial());
 
+  AppSettingModel? get currentSettings {
+    if (state is AppSettingsLoaded) return (state as AppSettingsLoaded).settings;
+    if (state is AppSettingsSaving) return (state as AppSettingsSaving).currentSettings;
+    return appSettingsRepository.currentAppSettings;
+  }
+
+  bool get useExpirationDates => currentSettings?.useExpirationDates ?? true;
+  bool get useOrders => currentSettings?.useOrders ?? true;
+  bool get useQuotations => currentSettings?.useQuotations ?? true;
+  bool get useDefaultProfitMargin => currentSettings?.useDefaultProfitMargin ?? false;
+  double get defaultProfitMargin => currentSettings?.defaultProfitMargin ?? 20.0;
+  bool get allowNegativeStock => currentSettings?.allowNegativeStock ?? false;
+  bool get alertMinStock => currentSettings?.alertMinStock ?? true;
+  int get defaultPaymentTermDays => currentSettings?.defaultPaymentTermDays ?? 30;
+  bool get useHoldSales => currentSettings?.useHoldSales ?? true;
+
   Future<void> loadSettings() async {
     emit(AppSettingsLoading());
     try {

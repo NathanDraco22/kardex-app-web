@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/config/app_theme.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/src/cubits/app_settings/app_settings_cubit.dart';
 import 'package:kardex_app_front/src/tools/navigation_tool.dart';
 
 class SplashScreen extends StatelessWidget {
@@ -21,6 +22,7 @@ class _RootScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authCubit = getIt<AuthCubit>()..checkSession();
+    getIt<AppSettingsCubit>().loadSettings();
     return BlocListener(
       bloc: authCubit,
       listener: (context, state) async {

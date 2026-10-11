@@ -38,6 +38,9 @@ class HomeSubmoduleItem {
   final void Function(BuildContext context)? customAction;
   final List<Enum> permissions;
   final bool isExpirationGate;
+  final bool isOrdersGate;
+  final bool isQuotationsGate;
+  final bool isQuotationsOrOrdersGate;
   final String? section;
 
   const HomeSubmoduleItem({
@@ -49,6 +52,9 @@ class HomeSubmoduleItem {
     this.customAction,
     this.permissions = const [],
     this.isExpirationGate = false,
+    this.isOrdersGate = false,
+    this.isQuotationsGate = false,
+    this.isQuotationsOrOrdersGate = false,
     this.section,
   });
 }
@@ -388,6 +394,7 @@ List<HomeModuleCategory> getHomeModuleCategories(
             accentColor: Color(0xFF2563EB),
             routeName: "proforma-history",
             permissions: [CommercialSubModules.orders],
+            isQuotationsGate: true,
           ),
           const HomeSubmoduleItem(
             section: "Cotizaciones y Proformas",
@@ -397,6 +404,7 @@ List<HomeModuleCategory> getHomeModuleCategories(
             accentColor: Color(0xFF3B82F6),
             routeName: "proforma",
             permissions: [CommercialSubModules.createOrder],
+            isQuotationsGate: true,
           ),
           const HomeSubmoduleItem(
             section: "Cotizaciones y Proformas",
@@ -406,6 +414,7 @@ List<HomeModuleCategory> getHomeModuleCategories(
             accentColor: Color(0xFF1D4ED8),
             routeName: "proforma-wholesale",
             permissions: [CommercialSubModules.createOrder],
+            isQuotationsGate: true,
           ),
           const HomeSubmoduleItem(
             section: "Cotizaciones y Proformas",
@@ -415,6 +424,7 @@ List<HomeModuleCategory> getHomeModuleCategories(
             accentColor: Color(0xFF4F46E5),
             routeName: "quotation-order-search",
             permissions: [CommercialSubModules.orders],
+            isQuotationsOrOrdersGate: true,
           ),
 
           // Sección 4: Órdenes de Compra y Cobranza
@@ -426,6 +436,7 @@ List<HomeModuleCategory> getHomeModuleCategories(
             accentColor: Color(0xFFEA580C),
             routeName: "current-orders",
             permissions: [CommercialSubModules.orders],
+            isOrdersGate: true,
           ),
           const HomeSubmoduleItem(
             section: "Órdenes de Compra y Recibos",
@@ -435,6 +446,7 @@ List<HomeModuleCategory> getHomeModuleCategories(
             accentColor: Color(0xFF0284C7),
             routeName: "sale-order",
             permissions: [CommercialSubModules.createOrder],
+            isOrdersGate: true,
           ),
           const HomeSubmoduleItem(
             section: "Órdenes de Compra y Recibos",
@@ -444,6 +456,7 @@ List<HomeModuleCategory> getHomeModuleCategories(
             accentColor: Color(0xFF2563EB),
             routeName: "sale-order-wholesale",
             permissions: [CommercialSubModules.createOrder],
+            isOrdersGate: true,
           ),
           const HomeSubmoduleItem(
             section: "Órdenes de Compra y Recibos",
