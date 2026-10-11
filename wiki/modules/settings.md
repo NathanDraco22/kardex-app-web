@@ -16,7 +16,8 @@ lib/src/modules/settings/
 │   ├── users/                           # Usuarios, cajeros y asignación de roles
 │   ├── api_keys/                        # Llaves de acceso y tokens de servicios externos
 │   ├── integrations/                    # Impresoras térmicas, básculas y pasarelas
-│   └── price_to_product/                # Matriz de precios por producto y sucursal
+│   ├── price_to_product/                # Matriz de precios por producto y sucursal
+│   └── app_settings/                    # Configuraciones y reglas globales del sistema
 ```
 
 ---
@@ -54,6 +55,24 @@ lib/src/modules/settings/
 - **Propósito:** Parametrizar y sincronizar márgenes de ganancia, precios mínimos y precios mayoristas entre diferentes sucursales.
 - **Vistas:** `PriceToProductScreen`.
 
+### 2.6. Configuraciones del Sistema (`app_settings`)
+- **Propósito:** Parametrizar reglas operativas y banderas globales que rigen el comportamiento comercial, logístico y financiero en toda la aplicación.
+- **Vistas:** `AppSettingsScreen` (`lib/src/modules/settings/view/app_settings/app_settings_screen.dart`).
+- **Ubicación en Navegación:**
+  - Móvil (`SettingsScreen`): Tarjeta `MenuOptionCard` al final del listado, justo después de *Configuración de Impresora Local*.
+  - Escritorio (`home_modules_registry.dart`): Submódulo `HomeSubmoduleItem` al final de la categoría `Modules.settings`, después de *Impresora Local*.
+- **Cubit / Estado:** `AppSettingsCubit` y `AppSettingsState` (`lib/src/cubits/app_settings/`), inyectado globalmente en `ProviderContainer` con carga automática al inicio.
+- **Parámetros Configurados (`AppSettingModel` / `UpdateAppSetting`):**
+  - `useDefaultProfitMargin` (bool): Habilitar o no el cálculo automático de margen de ganancia por defecto.
+  - `defaultProfitMargin` (double): Porcentaje de margen sugerido (ej. 20.0%).
+  - `useExpirationDates` (bool): Habilitar seguimiento de lotes y alertas de caducidad.
+  - `useOrders` (bool): Habilitar módulo comercial de órdenes y pedidos.
+  - `useQuotations` (bool): Habilitar emisión de cotizaciones y presupuestos/proformas.
+  - `allowNegativeStock` (bool): Permitir ventas aun sin existencias físicas en la sucursal.
+  - `alertMinStock` (bool): Activar alertas visuales de existencia mínima.
+  - `defaultPaymentTermDays` (int): Días de crédito predeterminados para facturación.
+  - `useHoldSales` (bool): Permitir pausar carritos en terminal de venta.
+
 ---
 
 ## 3. Repositorios y Fuentes de Datos Involucrados
@@ -63,6 +82,7 @@ lib/src/modules/settings/
 | Sucursales | `BranchesDataSource` | `BranchesRepository` |
 | Usuarios | `UsersDataSource` | `UsersRepository` |
 | Integraciones | Almacenamiento local / Preferencias | `SharedPreferences` / Hive |
+| Configuraciones del Sistema | `AppSettingsDataSource` | `AppSettingsRepository` |
 
 ---
 
@@ -74,3 +94,4 @@ lib/src/modules/settings/
 - `/settings/api-keys`: Gestión de credenciales de API.
 - `/settings/integrations`: Integraciones de periféricos.
 - `/settings/price-to-product`: Asignación de precios a productos.
+- `/settings/app-settings`: Parámetros y reglas globales del sistema.
