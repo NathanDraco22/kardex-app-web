@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/src/cubits/app_settings/app_settings_cubit.dart';
 import 'package:kardex_app_front/src/cubits/app_settings/app_settings_state.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
@@ -39,6 +40,13 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
     super.initState();
     _profitMarginController = TextEditingController();
     _paymentTermController = TextEditingController();
+
+    final cubit = getIt<AppSettingsCubit>();
+    if (cubit.currentSettings != null) {
+      _syncWithSettings(cubit.currentSettings!);
+    } else if (cubit.state is! AppSettingsLoaded) {
+      cubit.loadSettings();
+    }
   }
 
   @override
@@ -80,7 +88,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
     );
 
     final success =
-        await context.read<AppSettingsCubit>().updateSettings(update);
+        await getIt<AppSettingsCubit>().updateSettings(update);
 
     if (mounted) {
       if (success) {
@@ -116,12 +124,13 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
               setState(() {
                 _initialized = false;
               });
-              context.read<AppSettingsCubit>().loadSettings();
+              getIt<AppSettingsCubit>().loadSettings();
             },
           ),
         ],
       ),
       body: BlocConsumer<AppSettingsCubit, AppSettingsState>(
+        bloc: getIt<AppSettingsCubit>(),
         listener: (context, state) {
           if (state is AppSettingsLoaded) {
             _syncWithSettings(state.settings);
@@ -138,6 +147,42 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
         builder: (context, state) {
           if (state is AppSettingsLoading && !_initialized) {
             return const Center(child: CircularProgressIndicator());
+          }
+
+          if (state is AppSettingsError && !_initialized) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.error_outline_rounded,
+                      size: 48,
+                      color: Colors.redAccent,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      state.message,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    FilledButton.icon(
+                      onPressed: () {
+                        setState(() => _initialized = false);
+                        getIt<AppSettingsCubit>().loadSettings();
+                      },
+                      icon: const Icon(Icons.refresh_rounded),
+                      label: const Text("Reintentar"),
+                    ),
+                  ],
+                ),
+              ),
+            );
           }
 
           if (state is AppSettingsLoaded) {

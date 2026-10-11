@@ -34,11 +34,13 @@ class AppSettingsCubit extends Cubit<AppSettingsState> {
   }
 
   Future<bool> updateSettings(UpdateAppSetting update) async {
-    final current = state is AppSettingsLoaded
-        ? (state as AppSettingsLoaded).settings
-        : state is AppSettingsSaving
-            ? (state as AppSettingsSaving).currentSettings
-            : appSettingsRepository.currentAppSettings;
+    var current = currentSettings;
+
+    if (current == null) {
+      try {
+        current = await appSettingsRepository.getCurrentAppSettings();
+      } catch (_) {}
+    }
 
     if (current == null) {
       emit(AppSettingsError("No hay configuración activa cargada"));
