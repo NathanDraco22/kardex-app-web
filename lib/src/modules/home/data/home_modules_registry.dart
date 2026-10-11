@@ -773,6 +773,14 @@ List<HomeModuleCategory> getHomeModuleCategories(
           accentColor: const Color(0xFF475569),
           customAction: (ctx) => showLocalPrinterSettingsDialog(ctx),
         ),
+        const HomeSubmoduleItem(
+          title: "Configuraciones del Sistema",
+          subtitle:
+              "Margen de ganancia, vencimientos, órdenes y reglas globales",
+          icon: Icons.tune_rounded,
+          accentColor: Color(0xFF7C3AED),
+          routeName: "app-settings",
+        ),
       ],
     ),
   ];

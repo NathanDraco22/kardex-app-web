@@ -87,6 +87,17 @@ class _Body extends StatelessWidget {
             subtitle: "Configuración de tickets e impresión térmica",
             onTap: () => showLocalPrinterSettingsDialog(context),
           ),
+          ShortcutAddableListTile(
+            routeName: RouteNames.appSettings,
+            child: MenuOptionCard(
+              icon: Icons.tune_rounded,
+              accentColor: Colors.deepPurple.shade600,
+              title: "Configuraciones del Sistema",
+              subtitle:
+                  "Margen de ganancia, vencimientos, órdenes y reglas globales",
+              onTap: () => context.pushNamed("app-settings"),
+            ),
+          ),
         ],
       ),
     );

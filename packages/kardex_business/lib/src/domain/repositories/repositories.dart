@@ -39,3 +39,4 @@ export 'transfers_repository.dart';
 export 'unit_repository.dart';
 export 'user_repository.dart';
 export 'user_roles_repository.dart';
+export 'app_settings_repository.dart';

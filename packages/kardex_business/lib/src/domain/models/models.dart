@@ -64,5 +64,6 @@ export 'user_role/modules.dart';
 export 'user_role/user_role_model.dart';
 export 'api_key/api_key_model.dart';
 export 'hold_sale/hold_sale_model.dart';
+export 'app_setting/app_setting_model.dart';
 
 
