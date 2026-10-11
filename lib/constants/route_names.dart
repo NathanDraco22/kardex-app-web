@@ -101,6 +101,7 @@ class RouteNames {
   static const branches = 'branches';
   static const integrations = 'integrations';
   static const apiKeys = 'api_keys';
+  static const appSettings = 'app-settings';
 
 
   static const expenses = 'expenses';
