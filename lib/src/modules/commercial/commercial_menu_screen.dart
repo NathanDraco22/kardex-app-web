@@ -6,6 +6,8 @@ import 'package:kardex_app_front/constants/route_names.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/widgets/gates/role_permission_gate.dart';
 import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
+import 'package:kardex_app_front/widgets/gates/orders_gate.dart';
+import 'package:kardex_app_front/widgets/gates/quotations_gate.dart';
 import 'package:kardex_app_front/widgets/menu_app_bar.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/search_product_commercial_delegate.dart';
 import 'package:kardex_app_front/widgets/shortcut_addable_list_tile.dart';
@@ -230,126 +232,146 @@ class _Body extends StatelessWidget {
               ),
             ),
           ),
-          RolePermissionGate(
-            permissions: [CommercialSubModules.createInvoice],
-            child: ShortcutAddableListTile(
-              routeName: RouteNames.dailyProductInOrders,
-              child: MenuOptionCard(
-                icon: Icons.list,
-                accentColor: Colors.orange.shade600,
-                title: "Productos en Órdenes de Compra",
-                subtitle: "Seguimiento de pedidos activos",
-                onTap: () => context.pushNamed("daily-product-in-orders"),
+          OrdersGate(
+            child: RolePermissionGate(
+              permissions: [CommercialSubModules.createInvoice],
+              child: ShortcutAddableListTile(
+                routeName: RouteNames.dailyProductInOrders,
+                child: MenuOptionCard(
+                  icon: Icons.list,
+                  accentColor: Colors.orange.shade600,
+                  title: "Productos en Órdenes de Compra",
+                  subtitle: "Seguimiento de pedidos activos",
+                  onTap: () => context.pushNamed("daily-product-in-orders"),
+                ),
               ),
             ),
           ),
-          RolePermissionGate(
-            permissions: [CommercialSubModules.createInvoice],
-            child: ShortcutAddableListTile(
-              routeName: RouteNames.productDemandVsStock,
-              child: MenuOptionCard(
-                icon: Icons.analytics_outlined,
-                accentColor: Colors.blue.shade800,
-                title: "Cotizaciones vs Existencias",
-                subtitle: "Demanda potencial comparada con almacén",
-                onTap: () => context.pushNamed("product-demand-vs-stock"),
+          QuotationsGate(
+            child: RolePermissionGate(
+              permissions: [CommercialSubModules.createInvoice],
+              child: ShortcutAddableListTile(
+                routeName: RouteNames.productDemandVsStock,
+                child: MenuOptionCard(
+                  icon: Icons.analytics_outlined,
+                  accentColor: Colors.blue.shade800,
+                  title: "Cotizaciones vs Existencias",
+                  subtitle: "Demanda potencial comparada con almacén",
+                  onTap: () => context.pushNamed("product-demand-vs-stock"),
+                ),
               ),
             ),
           ),
 
-          const MenuSectionDivider(title: "Cotizaciones y Proformas"),
+          const QuotationsGate(
+            child: MenuSectionDivider(title: "Cotizaciones y Proformas"),
+          ),
 
-          RolePermissionGate(
-            permissions: [CommercialSubModules.orders],
-            child: ShortcutAddableListTile(
-              routeName: RouteNames.proformaHistory,
-              child: MenuOptionCard(
-                icon: FluentIcons.clipboard_search_24_filled,
-                accentColor: Colors.blue.shade600,
-                title: "Cotizaciones",
-                subtitle: "Historial y seguimiento de presupuestos",
-                onTap: () => context.pushNamed("proforma-history"),
+          QuotationsGate(
+            child: RolePermissionGate(
+              permissions: [CommercialSubModules.orders],
+              child: ShortcutAddableListTile(
+                routeName: RouteNames.proformaHistory,
+                child: MenuOptionCard(
+                  icon: FluentIcons.clipboard_search_24_filled,
+                  accentColor: Colors.blue.shade600,
+                  title: "Cotizaciones",
+                  subtitle: "Historial y seguimiento de presupuestos",
+                  onTap: () => context.pushNamed("proforma-history"),
+                ),
               ),
             ),
           ),
-          RolePermissionGate(
-            permissions: [CommercialSubModules.createOrder],
-            child: ShortcutAddableListTile(
-              routeName: RouteNames.proforma,
-              child: MenuOptionCard(
-                icon: FluentIcons.document_text_24_filled,
-                accentColor: Colors.blue.shade600,
-                title: "Crear Cotización",
-                subtitle: "Nuevo presupuesto para cliente",
-                onTap: () => context.pushNamed("proforma"),
+          QuotationsGate(
+            child: RolePermissionGate(
+              permissions: [CommercialSubModules.createOrder],
+              child: ShortcutAddableListTile(
+                routeName: RouteNames.proforma,
+                child: MenuOptionCard(
+                  icon: FluentIcons.document_text_24_filled,
+                  accentColor: Colors.blue.shade600,
+                  title: "Crear Cotización",
+                  subtitle: "Nuevo presupuesto para cliente",
+                  onTap: () => context.pushNamed("proforma"),
+                ),
               ),
             ),
           ),
-          RolePermissionGate(
-            permissions: [CommercialSubModules.createOrder],
-            child: ShortcutAddableListTile(
-              routeName: RouteNames.proformaWholesale,
-              child: MenuOptionCard(
-                icon: FluentIcons.document_text_24_filled,
-                accentColor: Colors.blue.shade800,
-                title: "Crear Cotización (Mayorista)",
-                subtitle: "Cotización con tarifas al por mayor",
-                onTap: () => context.pushNamed("proforma-wholesale"),
+          QuotationsGate(
+            child: RolePermissionGate(
+              permissions: [CommercialSubModules.createOrder],
+              child: ShortcutAddableListTile(
+                routeName: RouteNames.proformaWholesale,
+                child: MenuOptionCard(
+                  icon: FluentIcons.document_text_24_filled,
+                  accentColor: Colors.blue.shade800,
+                  title: "Crear Cotización (Mayorista)",
+                  subtitle: "Cotización con tarifas al por mayor",
+                  onTap: () => context.pushNamed("proforma-wholesale"),
+                ),
               ),
             ),
           ),
-          RolePermissionGate(
-            permissions: [CommercialSubModules.orders],
-            child: ShortcutAddableListTile(
-              routeName: RouteNames.quotationOrderSearch,
-              child: MenuOptionCard(
-                icon: Icons.manage_search,
-                accentColor: Colors.indigo.shade600,
-                title: "Buscador de Cotizaciones/Órdenes",
-                subtitle: "Rastreo por folio, fecha o cliente",
-                onTap: () => context.pushNamed("quotation-order-search"),
+          QuotationsOrOrdersGate(
+            child: RolePermissionGate(
+              permissions: [CommercialSubModules.orders],
+              child: ShortcutAddableListTile(
+                routeName: RouteNames.quotationOrderSearch,
+                child: MenuOptionCard(
+                  icon: Icons.manage_search,
+                  accentColor: Colors.indigo.shade600,
+                  title: "Buscador de Cotizaciones/Órdenes",
+                  subtitle: "Rastreo por folio, fecha o cliente",
+                  onTap: () => context.pushNamed("quotation-order-search"),
+                ),
               ),
             ),
           ),
 
           const MenuSectionDivider(title: "Órdenes de Compra y Recibos"),
 
-          RolePermissionGate(
-            permissions: [CommercialSubModules.orders],
-            child: ShortcutAddableListTile(
-              routeName: RouteNames.currentOrders,
-              child: MenuOptionCard(
-                icon: FluentIcons.receipt_bag_24_filled,
-                accentColor: Colors.orange.shade600,
-                title: "Órdenes de Compra",
-                subtitle: "Control y facturación de pedidos pendientes",
-                onTap: () => context.pushNamed("current-orders"),
+          OrdersGate(
+            child: RolePermissionGate(
+              permissions: [CommercialSubModules.orders],
+              child: ShortcutAddableListTile(
+                routeName: RouteNames.currentOrders,
+                child: MenuOptionCard(
+                  icon: FluentIcons.receipt_bag_24_filled,
+                  accentColor: Colors.orange.shade600,
+                  title: "Órdenes de Compra",
+                  subtitle: "Control y facturación de pedidos pendientes",
+                  onTap: () => context.pushNamed("current-orders"),
+                ),
               ),
             ),
           ),
-          RolePermissionGate(
-            permissions: [CommercialSubModules.createOrder],
-            child: ShortcutAddableListTile(
-              routeName: RouteNames.saleOrder,
-              child: MenuOptionCard(
-                icon: FluentIcons.receipt_add_24_filled,
-                accentColor: Colors.lightBlue.shade600,
-                title: "Crear Órden de Compra",
-                subtitle: "Nuevo pedido formal de compra",
-                onTap: () => context.pushNamed("sale-order"),
+          OrdersGate(
+            child: RolePermissionGate(
+              permissions: [CommercialSubModules.createOrder],
+              child: ShortcutAddableListTile(
+                routeName: RouteNames.saleOrder,
+                child: MenuOptionCard(
+                  icon: FluentIcons.receipt_add_24_filled,
+                  accentColor: Colors.lightBlue.shade600,
+                  title: "Crear Órden de Compra",
+                  subtitle: "Nuevo pedido formal de compra",
+                  onTap: () => context.pushNamed("sale-order"),
+                ),
               ),
             ),
           ),
-          RolePermissionGate(
-            permissions: [CommercialSubModules.createOrder],
-            child: ShortcutAddableListTile(
-              routeName: RouteNames.saleOrderWholesale,
-              child: MenuOptionCard(
-                icon: FluentIcons.receipt_add_24_filled,
-                accentColor: Colors.blue.shade600,
-                title: "Crear Órden de Compra (Mayorista)",
-                subtitle: "Nuevo pedido con tarifas de volumen",
-                onTap: () => context.pushNamed("sale-order-wholesale"),
+          OrdersGate(
+            child: RolePermissionGate(
+              permissions: [CommercialSubModules.createOrder],
+              child: ShortcutAddableListTile(
+                routeName: RouteNames.saleOrderWholesale,
+                child: MenuOptionCard(
+                  icon: FluentIcons.receipt_add_24_filled,
+                  accentColor: Colors.blue.shade600,
+                  title: "Crear Órden de Compra (Mayorista)",
+                  subtitle: "Nuevo pedido con tarifas de volumen",
+                  onTap: () => context.pushNamed("sale-order-wholesale"),
+                ),
               ),
             ),
           ),

@@ -265,6 +265,7 @@ class GlobalCubitProvider extends StatefulWidget {
 
 class _GlobalCubitProviderState extends State<GlobalCubitProvider> {
   late final AuthCubit _authCubit;
+  late final AppSettingsCubit _appSettingsCubit;
 
   @override
   void initState() {
@@ -273,6 +274,7 @@ class _GlobalCubitProviderState extends State<GlobalCubitProvider> {
     final branchRepo = context.read<BranchesRepository>();
     final servinRepo = context.read<ServinRepository>();
     final clientGroupRepo = context.read<ClientGroupsRepository>();
+    final appSettingsRepo = context.read<AppSettingsRepository>();
 
     _authCubit = AuthCubit(
       authRepository: authRepo,
@@ -281,12 +283,17 @@ class _GlobalCubitProviderState extends State<GlobalCubitProvider> {
       clientGroupRepository: clientGroupRepo,
     );
     getIt.registerSingleton<AuthCubit>(_authCubit);
+
+    _appSettingsCubit = AppSettingsCubit(appSettingsRepo);
+    getIt.registerSingleton<AppSettingsCubit>(_appSettingsCubit);
   }
 
   @override
   void dispose() {
     getIt.unregister<AuthCubit>();
     _authCubit.close();
+    getIt.unregister<AppSettingsCubit>();
+    _appSettingsCubit.close();
     super.dispose();
   }
 
@@ -302,11 +309,7 @@ class _GlobalCubitProviderState extends State<GlobalCubitProvider> {
             expirationLogsRepository: expirationLogRepo,
           ),
         ),
-        BlocProvider(
-          create: (context) => AppSettingsCubit(
-            context.read<AppSettingsRepository>(),
-          )..loadSettings(),
-        ),
+        BlocProvider.value(value: _appSettingsCubit),
       ],
       child: widget.child,
     );
