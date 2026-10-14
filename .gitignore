@@ -49,3 +49,6 @@ secrets.json
 secrets_dev.json
 secrets_prod.json
 secrets_script.json
+
+# Local scripts and build automation
+scripts/
