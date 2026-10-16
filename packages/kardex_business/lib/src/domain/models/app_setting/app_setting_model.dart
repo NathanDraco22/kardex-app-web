@@ -9,6 +9,7 @@ class AppSettingModel {
   final bool alertMinStock;
   final int defaultPaymentTermDays;
   final bool useHoldSales;
+  final bool useQuickProductSearch;
   final int createdAt;
   final int? updatedAt;
 
@@ -23,6 +24,7 @@ class AppSettingModel {
     this.alertMinStock = true,
     this.defaultPaymentTermDays = 30,
     this.useHoldSales = true,
+    this.useQuickProductSearch = false,
     required this.createdAt,
     this.updatedAt,
   });
@@ -39,6 +41,7 @@ class AppSettingModel {
       alertMinStock: json['alertMinStock'] as bool? ?? true,
       defaultPaymentTermDays: json['defaultPaymentTermDays'] as int? ?? 30,
       useHoldSales: json['useHoldSales'] as bool? ?? true,
+      useQuickProductSearch: json['useQuickProductSearch'] as bool? ?? false,
       createdAt: json['createdAt'] as int? ?? 0,
       updatedAt: json['updatedAt'] as int?,
     );
@@ -56,6 +59,7 @@ class AppSettingModel {
       'alertMinStock': alertMinStock,
       'defaultPaymentTermDays': defaultPaymentTermDays,
       'useHoldSales': useHoldSales,
+      'useQuickProductSearch': useQuickProductSearch,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };
@@ -72,6 +76,7 @@ class AppSettingModel {
     bool? alertMinStock,
     int? defaultPaymentTermDays,
     bool? useHoldSales,
+    bool? useQuickProductSearch,
     int? createdAt,
     int? updatedAt,
   }) {
@@ -88,6 +93,8 @@ class AppSettingModel {
       defaultPaymentTermDays:
           defaultPaymentTermDays ?? this.defaultPaymentTermDays,
       useHoldSales: useHoldSales ?? this.useHoldSales,
+      useQuickProductSearch:
+          useQuickProductSearch ?? this.useQuickProductSearch,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -104,6 +111,7 @@ class UpdateAppSetting {
   final bool? alertMinStock;
   final int? defaultPaymentTermDays;
   final bool? useHoldSales;
+  final bool? useQuickProductSearch;
 
   const UpdateAppSetting({
     this.useDefaultProfitMargin,
@@ -115,6 +123,7 @@ class UpdateAppSetting {
     this.alertMinStock,
     this.defaultPaymentTermDays,
     this.useHoldSales,
+    this.useQuickProductSearch,
   });
 
   Map<String, dynamic> toJson() {
@@ -145,6 +154,9 @@ class UpdateAppSetting {
     }
     if (useHoldSales != null) {
       data['useHoldSales'] = useHoldSales;
+    }
+    if (useQuickProductSearch != null) {
+      data['useQuickProductSearch'] = useQuickProductSearch;
     }
     return data;
   }

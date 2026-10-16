@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/widgets/display_product_code.dart';
@@ -10,12 +11,16 @@ import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 Future<List<CommercialProductResult>?> showQuickCommercialProductSearchDelegate(
   BuildContext context, {
   bool restrictStock = true,
+  int defaultPriceLevel = 1,
+  String preferredUnitType = 'min',
 }) async {
   return await Navigator.push<List<CommercialProductResult>?>(
     context,
     MaterialPageRoute(
       builder: (context) => QuickProductSearchDelegate(
         restrictStock: restrictStock,
+        defaultPriceLevel: defaultPriceLevel,
+        preferredUnitType: preferredUnitType,
       ),
     ),
   );
@@ -25,9 +30,13 @@ class QuickProductSearchDelegate extends StatefulWidget {
   const QuickProductSearchDelegate({
     super.key,
     this.restrictStock = true,
+    this.defaultPriceLevel = 1,
+    this.preferredUnitType = 'min',
   });
 
   final bool restrictStock;
+  final int defaultPriceLevel;
+  final String preferredUnitType;
 
   @override
   State<QuickProductSearchDelegate> createState() => _QuickProductSearchDelegateState();
@@ -45,7 +54,11 @@ class _QuickProductSearchDelegateState extends State<QuickProductSearchDelegate>
       if (_cart.containsKey(product.id)) {
         _cart[product.id]!.quantity += 1;
       } else {
-        final result = CommercialProductResult(product: product);
+        final result = CommercialProductResult(
+          product: product,
+          defaultPriceLevel: widget.defaultPriceLevel,
+          preferredUnitType: widget.preferredUnitType,
+        );
         result.quantity = 1;
         _cart[product.id] = result;
       }
@@ -66,6 +79,40 @@ class _QuickProductSearchDelegateState extends State<QuickProductSearchDelegate>
 
   int _getQuantity(ProductInDbInBranch product) {
     return _cart[product.id]?.quantity ?? 0;
+  }
+
+  void _setProductQuantity(ProductInDbInBranch product, int newQuantity) {
+    setState(() {
+      if (newQuantity <= 0) {
+        _cart.remove(product.id);
+        return;
+      }
+
+      int finalQuantity = newQuantity;
+      if (widget.restrictStock && newQuantity * _resolveDisplayFactor(product) > product.account.availableStock) {
+        finalQuantity = (product.account.availableStock / _resolveDisplayFactor(product)).floor();
+      }
+
+      if (!_cart.containsKey(product.id)) {
+        _cart[product.id] = CommercialProductResult(
+          product: product,
+          defaultPriceLevel: widget.defaultPriceLevel,
+          preferredUnitType: widget.preferredUnitType,
+        );
+      }
+      _cart[product.id]!.quantity = finalQuantity;
+    });
+  }
+
+  int _resolveDisplayFactor(ProductInDbInBranch product) {
+    int index;
+    if (widget.preferredUnitType == "max" && product.wholesaleUnitIndex > 0) {
+      index = product.wholesaleUnitIndex;
+    } else {
+      index = product.defaultUnitIndex;
+    }
+    if (product.extraUnits.isEmpty || index > product.extraUnits.length || index == 0) return 1;
+    return product.extraUnits[index - 1].conversionFactor;
   }
 
   @override
@@ -142,16 +189,22 @@ class _QuickProductSearchDelegateState extends State<QuickProductSearchDelegate>
           final quantity = _getQuantity(product);
 
           bool canIncrement = true;
-          if (widget.restrictStock && (quantity * product.defaultUnitFactor) >= product.account.availableStock) {
+          if (widget.restrictStock && (quantity * _resolveDisplayFactor(product)) >= product.account.availableStock) {
             canIncrement = false;
           }
 
           return _ProductInBranchQuickResultRow(
             product: product,
             quantity: quantity,
+            preferredUnitType: widget.preferredUnitType,
+            defaultPriceLevel: widget.defaultPriceLevel,
             color: quantity > 0 ? Colors.amber.shade50 : Colors.white,
             onIncrement: canIncrement ? () => _incrementProduct(product) : null,
             onDecrement: quantity > 0 ? () => _decrementProduct(product) : null,
+            onQuantityChanged: (value) {
+              final newQuantity = int.tryParse(value) ?? 0;
+              _setProductQuantity(product, newQuantity);
+            },
           );
         },
       ),
@@ -159,12 +212,15 @@ class _QuickProductSearchDelegateState extends State<QuickProductSearchDelegate>
   }
 }
 
-class _ProductInBranchQuickResultRow extends StatelessWidget {
+class _ProductInBranchQuickResultRow extends StatefulWidget {
   const _ProductInBranchQuickResultRow({
     required this.product,
     required this.quantity,
     this.onIncrement,
     this.onDecrement,
+    this.onQuantityChanged,
+    this.preferredUnitType = 'min',
+    this.defaultPriceLevel = 1,
     this.color,
   });
 
@@ -172,15 +228,81 @@ class _ProductInBranchQuickResultRow extends StatelessWidget {
   final int quantity;
   final VoidCallback? onIncrement;
   final VoidCallback? onDecrement;
+  final ValueChanged<String>? onQuantityChanged;
+  final String preferredUnitType;
+  final int defaultPriceLevel;
   final Color? color;
 
   @override
+  State<_ProductInBranchQuickResultRow> createState() => _ProductInBranchQuickResultRowState();
+}
+
+class _ProductInBranchQuickResultRowState extends State<_ProductInBranchQuickResultRow> {
+  late final TextEditingController _controller;
+
+  int get _resolvedUnitIndex {
+    if (widget.preferredUnitType == "max" && widget.product.wholesaleUnitIndex > 0) {
+      return widget.product.wholesaleUnitIndex;
+    }
+    return widget.product.defaultUnitIndex;
+  }
+
+  String get _displayUnitName {
+    if (_resolvedUnitIndex == 0 || widget.product.extraUnits.isEmpty) return widget.product.unitName;
+    final idx = _resolvedUnitIndex - 1;
+    if (idx >= 0 && idx < widget.product.extraUnits.length) return widget.product.extraUnits[idx].name;
+    return widget.product.unitName;
+  }
+
+  int get _displayConversionFactor {
+    if (_resolvedUnitIndex == 0 || widget.product.extraUnits.isEmpty) return 1;
+    final idx = _resolvedUnitIndex - 1;
+    if (idx >= 0 && idx < widget.product.extraUnits.length) return widget.product.extraUnits[idx].conversionFactor;
+    return 1;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.quantity == 0 ? "" : widget.quantity.toString());
+  }
+
+  @override
+  void didUpdateWidget(covariant _ProductInBranchQuickResultRow oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.quantity != widget.quantity) {
+      if (int.tryParse(_controller.text) != widget.quantity) {
+        _controller.text = widget.quantity == 0 ? "" : widget.quantity.toString();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  int get _displayPrice {
+    switch (widget.defaultPriceLevel) {
+      case 2:
+        return widget.product.saleProfile.salePrice2;
+      case 3:
+        return widget.product.saleProfile.salePrice3;
+      case 4:
+        return widget.product.saleProfile.salePrice4;
+      default:
+        return widget.product.saleProfile.salePrice;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    int value = product.saleProfile.salePrice * product.defaultUnitFactor;
+    int value = _displayPrice * _displayConversionFactor;
     String valueToDisplay = NumberFormatter.convertToMoneyLike(value);
 
     return DecoratedBox(
-      decoration: BoxDecoration(color: color),
+      decoration: BoxDecoration(color: widget.color),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
         child: Column(
@@ -190,26 +312,41 @@ class _ProductInBranchQuickResultRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ImageViewerWidget(
-                  imageUrls: product.image.isNotEmpty ? [product.image] : [],
+                  imageUrls: widget.product.image.isNotEmpty ? [widget.product.image] : [],
                   width: 50,
                   height: 50,
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   flex: 3,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      DisplayProductCode(product: product),
-                      const SizedBox(height: 4),
-                      Text(
-                        "${product.brandName} - ${product.defaultUnitName}",
-                        style: const TextStyle(fontSize: 14, color: Colors.grey),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        DisplayProductCode(product: widget.product),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                widget.product.brandName,
+                                style: const TextStyle(fontSize: 14, color: Colors.grey),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const Text(
+                              " - ",
+                              style: TextStyle(fontSize: 14, color: Colors.grey),
+                            ),
+                            UnitDisplayer(
+                              unitName: _displayUnitName,
+                              conversionFactor: _displayConversionFactor,
+                              style: const TextStyle(fontSize: 14, color: Colors.grey),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -226,10 +363,10 @@ class _ProductInBranchQuickResultRow extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        "Stock: ${NumberFormatter.formatDisplayStock(product.account.availableStock, product.defaultUnitFactor)}",
+                        "Stock: ${NumberFormatter.formatDisplayStock(widget.product.account.availableStock, _displayConversionFactor)}",
                         style: TextStyle(
                           fontSize: 13,
-                          color: product.account.availableStock > 0 ? Colors.green.shade700 : Colors.red,
+                          color: widget.product.account.availableStock > 0 ? Colors.green.shade700 : Colors.red,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -245,7 +382,7 @@ class _ProductInBranchQuickResultRow extends StatelessWidget {
               children: [
                 Expanded(
                   child: FilledButton(
-                    onPressed: onDecrement,
+                    onPressed: widget.onDecrement,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                       foregroundColor: Colors.white,
@@ -261,19 +398,29 @@ class _ProductInBranchQuickResultRow extends StatelessWidget {
                   ),
                 ),
                 SizedBox(
-                  width: 80,
-                  child: Text(
-                    quantity.toString(),
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                  width: 140,
+                  height: 60,
+                  child: Center(
+                    child: TextField(
+                      decoration: const InputDecoration(
+                        isDense: true,
+                        contentPadding: EdgeInsets.all(12),
+                      ),
+                      controller: _controller,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      inputFormatters: [IntegerTextInputFormatter()],
+                      keyboardType: TextInputType.number,
+                      onChanged: widget.onQuantityChanged,
                     ),
                   ),
                 ),
                 Expanded(
                   child: FilledButton(
-                    onPressed: onIncrement,
+                    onPressed: widget.onIncrement,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                       foregroundColor: Colors.white,

@@ -72,6 +72,7 @@ lib/src/modules/settings/
   - `alertMinStock` (bool): Activar alertas visuales de existencia mínima.
   - `defaultPaymentTermDays` (int): Días de crédito predeterminados para facturación.
   - `useHoldSales` (bool): Permitir pausar carritos en terminal de venta.
+  - `useQuickProductSearch` (bool): Abrir directamente el buscador rápido con botones de agregar y quitar cantidad al agregar productos en móvil (facturas, órdenes y cotizaciones; por defecto: `false`).
 
 #### Uso Operativo del Margen de Ganancia Sugerido:
 1. **Editor de Precios de Producto (`ProductPriceEditorScreen`):**

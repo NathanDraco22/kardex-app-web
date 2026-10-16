@@ -22,6 +22,7 @@ class AppSettingsCubit extends Cubit<AppSettingsState> {
   bool get alertMinStock => currentSettings?.alertMinStock ?? true;
   int get defaultPaymentTermDays => currentSettings?.defaultPaymentTermDays ?? 30;
   bool get useHoldSales => currentSettings?.useHoldSales ?? true;
+  bool get useQuickProductSearch => currentSettings?.useQuickProductSearch ?? false;
 
   Future<void> loadSettings() async {
     emit(AppSettingsLoading());
