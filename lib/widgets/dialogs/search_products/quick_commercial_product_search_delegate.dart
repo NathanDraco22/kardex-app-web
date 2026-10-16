@@ -197,6 +197,7 @@ class _QuickProductSearchDelegateState extends State<QuickProductSearchDelegate>
             product: product,
             quantity: quantity,
             preferredUnitType: widget.preferredUnitType,
+            defaultPriceLevel: widget.defaultPriceLevel,
             color: quantity > 0 ? Colors.amber.shade50 : Colors.white,
             onIncrement: canIncrement ? () => _incrementProduct(product) : null,
             onDecrement: quantity > 0 ? () => _decrementProduct(product) : null,
@@ -219,6 +220,7 @@ class _ProductInBranchQuickResultRow extends StatefulWidget {
     this.onDecrement,
     this.onQuantityChanged,
     this.preferredUnitType = 'min',
+    this.defaultPriceLevel = 1,
     this.color,
   });
 
@@ -228,6 +230,7 @@ class _ProductInBranchQuickResultRow extends StatefulWidget {
   final VoidCallback? onDecrement;
   final ValueChanged<String>? onQuantityChanged;
   final String preferredUnitType;
+  final int defaultPriceLevel;
   final Color? color;
 
   @override
@@ -280,9 +283,22 @@ class _ProductInBranchQuickResultRowState extends State<_ProductInBranchQuickRes
     super.dispose();
   }
 
+  int get _displayPrice {
+    switch (widget.defaultPriceLevel) {
+      case 2:
+        return widget.product.saleProfile.salePrice2;
+      case 3:
+        return widget.product.saleProfile.salePrice3;
+      case 4:
+        return widget.product.saleProfile.salePrice4;
+      default:
+        return widget.product.saleProfile.salePrice;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    int value = widget.product.saleProfile.salePrice * _displayConversionFactor;
+    int value = _displayPrice * _displayConversionFactor;
     String valueToDisplay = NumberFormatter.convertToMoneyLike(value);
 
     return DecoratedBox(

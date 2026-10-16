@@ -34,6 +34,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
   bool _allowNegativeStock = false;
   bool _alertMinStock = true;
   bool _useHoldSales = true;
+  bool _useQuickProductSearch = false;
 
   @override
   void initState() {
@@ -67,6 +68,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
       _alertMinStock = settings.alertMinStock;
       _paymentTermController.text = settings.defaultPaymentTermDays.toString();
       _useHoldSales = settings.useHoldSales;
+      _useQuickProductSearch = settings.useQuickProductSearch;
       _initialized = true;
     }
   }
@@ -85,6 +87,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
       alertMinStock: _alertMinStock,
       defaultPaymentTermDays: paymentTerm,
       useHoldSales: _useHoldSales,
+      useQuickProductSearch: _useQuickProductSearch,
     );
 
     final success =
@@ -326,6 +329,24 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                           onChanged: isSaving
                               ? null
                               : (val) => setState(() => _useQuotations = val),
+                        ),
+                        const Divider(height: 1),
+                        SwitchListTile(
+                          secondary: const Icon(Icons.flash_on_rounded, color: Colors.amber),
+                          title: const Text(
+                            "Búsqueda rápida de productos",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: const Text(
+                            "Abre el buscador con botones de agregar y quitar cantidad al agregar productos en móvil (facturas, órdenes y cotizaciones)",
+                            style:
+                                TextStyle(fontSize: 13, color: Colors.black54),
+                          ),
+                          value: _useQuickProductSearch,
+                          onChanged: isSaving
+                              ? null
+                              : (val) => setState(
+                                  () => _useQuickProductSearch = val),
                         ),
                         const Divider(height: 1),
                         SwitchListTile(
