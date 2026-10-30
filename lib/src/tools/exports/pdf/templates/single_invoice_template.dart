@@ -164,6 +164,22 @@ class SingleInvoiceTemplate implements PdfTemplate {
                   ),
                   pw.SizedBox(height: 4),
                   _buildPaymentType(),
+                  if (invoice.orderInfo != null) ...[
+                    pw.SizedBox(height: 2),
+                    pw.Text(
+                      "Pedido No. ${invoice.orderInfo!.docNumber}",
+                      style: const pw.TextStyle(
+                        fontSize: 10,
+                        fontWeight: pw.FontWeight.bold,
+                        color: PdfColors.blueGrey800,
+                      ),
+                    ),
+                    pw.SizedBox(height: 2),
+                    pw.Text(
+                      "Fecha Ped: ${DateTimeTool.formatddMMyy(invoice.orderInfo!.createdAt)}",
+                      style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey700),
+                    ),
+                  ],
                   if (invoice.description.isNotEmpty) ...[
                     pw.SizedBox(height: 2),
                     pw.Text(

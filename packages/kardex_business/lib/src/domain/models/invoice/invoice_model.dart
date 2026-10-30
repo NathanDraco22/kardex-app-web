@@ -1,4 +1,5 @@
 import 'package:kardex_business/src/domain/models/common/client_info.dart';
+import 'package:kardex_business/src/domain/models/common/order_info.dart';
 import 'package:kardex_business/src/domain/models/common/sale_item_model.dart';
 import 'package:kardex_business/src/domain/models/common/user_info.dart';
 
@@ -9,6 +10,8 @@ class BaseInvoice {
   final String clientId;
   final ClientInfo clientInfo;
   final String docNumber;
+  final String orderNumber;
+  final OrderInfo? orderInfo;
   final List<SaleItem> saleItems;
   final String description;
   final int amountPaid;
@@ -25,6 +28,8 @@ class BaseInvoice {
     required this.clientId,
     required this.clientInfo,
     required this.docNumber,
+    this.orderNumber = "",
+    this.orderInfo,
     required this.saleItems,
     this.description = "",
     this.amountPaid = 0,
@@ -43,7 +48,9 @@ class BaseInvoice {
     branchId: json['branchId'],
     clientId: json['clientId'],
     clientInfo: ClientInfo.fromJson(json['clientInfo']),
-    docNumber: json['docNumber'],
+    docNumber: json['docNumber'] ?? "",
+    orderNumber: json['orderNumber'] ?? "",
+    orderInfo: json['orderInfo'] != null ? OrderInfo.fromJson(json['orderInfo']) : null,
     saleItems: (json['saleItems'] as List).map((e) => SaleItem.fromJson(e)).toList(),
     description: json['description'] ?? "",
     amountPaid: json['amountPaid'] ?? 0,
@@ -61,6 +68,8 @@ class BaseInvoice {
     'clientId': clientId,
     'clientInfo': clientInfo.toJson(),
     'docNumber': docNumber,
+    'orderNumber': orderNumber,
+    if (orderInfo != null) 'orderInfo': orderInfo!.toJson(),
     'saleItems': saleItems.map((e) => e.toJson()).toList(),
     'description': description,
     'amountPaid': amountPaid,
@@ -80,6 +89,8 @@ class CreateInvoice extends BaseInvoice {
     required super.clientId,
     required super.clientInfo,
     required super.docNumber,
+    super.orderNumber = "",
+    super.orderInfo,
     required super.saleItems,
     super.description,
     super.amountPaid,
@@ -95,7 +106,9 @@ class CreateInvoice extends BaseInvoice {
     branchId: json['branchId'],
     clientId: json['clientId'],
     clientInfo: ClientInfo.fromJson(json['clientInfo']),
-    docNumber: json['docNumber'],
+    docNumber: json['docNumber'] ?? "",
+    orderNumber: json['orderNumber'] ?? "",
+    orderInfo: json['orderInfo'] != null ? OrderInfo.fromJson(json['orderInfo']) : null,
     saleItems: (json['saleItems'] as List).map((e) => SaleItem.fromJson(e)).toList(),
     description: json['description'] ?? "",
     amountPaid: json['amountPaid'] ?? 0,
@@ -113,6 +126,8 @@ class CreateInvoice extends BaseInvoice {
       clientId: clientId,
       clientInfo: clientInfo,
       docNumber: docNumber,
+      orderNumber: orderNumber,
+      orderInfo: orderInfo,
       saleItems: saleItems,
       description: description,
       amountPaid: amountPaid,
@@ -164,6 +179,8 @@ class InvoiceInDb extends BaseInvoice {
     required super.clientId,
     required super.clientInfo,
     required super.docNumber,
+    super.orderNumber = "",
+    super.orderInfo,
     required super.saleItems,
     super.description,
     super.amountPaid,
@@ -183,7 +200,9 @@ class InvoiceInDb extends BaseInvoice {
     branchId: json['branchId'],
     clientId: json['clientId'],
     clientInfo: ClientInfo.fromJson(json['clientInfo']),
-    docNumber: json['docNumber'],
+    docNumber: json['docNumber'] ?? "",
+    orderNumber: json['orderNumber'] ?? "",
+    orderInfo: json['orderInfo'] != null ? OrderInfo.fromJson(json['orderInfo']) : null,
     saleItems: (json['saleItems'] as List).map((e) => SaleItem.fromJson(e)).toList(),
     description: json['description'] ?? "",
     amountPaid: json['amountPaid'] ?? 0,

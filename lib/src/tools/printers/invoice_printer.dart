@@ -141,6 +141,25 @@ Future<Uint8List> generateTicketPdfFromInvoice(
               ],
             ),
 
+            if (invoice.orderInfo != null)
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Text(
+                    'Pedido: ${invoice.orderInfo!.docNumber}',
+                    style: pw.TextStyle(
+                      fontSize: TicketSettings.contentFontSize(paperSize),
+                    ),
+                  ),
+                  pw.Text(
+                    'Ped: ${DateFormat('dd/MM/yyyy').format(invoice.orderInfo!.createdAt)}',
+                    style: pw.TextStyle(
+                      fontSize: TicketSettings.contentFontSize(paperSize),
+                    ),
+                  ),
+                ],
+              ),
+
             pw.Text(
               paymentType,
               style: pw.TextStyle(
@@ -186,6 +205,14 @@ Future<Uint8List> generateTicketPdfFromInvoice(
                 fontSize: TicketSettings.contentFontSize(paperSize),
               ),
             ),
+
+            if (invoice.orderInfo != null)
+              pw.Text(
+                "Tomado por: ${invoice.orderInfo!.createdBy.name}",
+                style: pw.TextStyle(
+                  fontSize: TicketSettings.contentFontSize(paperSize),
+                ),
+              ),
 
             pw.Divider(color: PdfColors.grey),
 

@@ -13,6 +13,7 @@ export 'common/client_info.dart';
 export 'common/coordinates.dart';
 export 'common/entry_items.dart';
 export 'common/exit_items.dart';
+export 'common/order_info.dart';
 export 'common/product_sale_total.dart';
 export 'common/product_stock_demand.dart';
 export 'common/sale_item_model.dart';
@@ -65,5 +66,3 @@ export 'user_role/user_role_model.dart';
 export 'api_key/api_key_model.dart';
 export 'hold_sale/hold_sale_model.dart';
 export 'app_setting/app_setting_model.dart';
-
-

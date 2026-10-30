@@ -324,6 +324,27 @@ class InvoiceViewerContent extends StatelessWidget {
               ],
             ),
 
+            if (invoice.orderInfo != null) ...[
+              const SizedBox(height: 4),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Pedido No. ${invoice.orderInfo!.docNumber}",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.blueGrey.shade800),
+                  ),
+                  Text(
+                    "${DateTimeTool.formatddMMyy(invoice.orderInfo!.createdAt)} ${DateTimeTool.formatHHmm(invoice.orderInfo!.createdAt)}",
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: Colors.blueGrey.shade700),
+                  ),
+                ],
+              ),
+              Text(
+                "Tomado por: ${invoice.orderInfo!.createdBy.name}",
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: Colors.blueGrey.shade700),
+              ),
+            ],
+
             if (invoice.description.isNotEmpty)
               Text(
                 "Observación: ${invoice.description}",
