@@ -141,6 +141,25 @@ Future<Uint8List> generateTicketPdfFromInvoice(
               ],
             ),
 
+            if (invoice.orderInfo != null)
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Text(
+                    'Pedido: ${invoice.orderInfo!.docNumber}',
+                    style: pw.TextStyle(
+                      fontSize: TicketSettings.contentFontSize(paperSize),
+                    ),
+                  ),
+                  pw.Text(
+                    'Ped: ${DateFormat('dd/MM/yyyy').format(invoice.orderInfo!.createdAt)}',
+                    style: pw.TextStyle(
+                      fontSize: TicketSettings.contentFontSize(paperSize),
+                    ),
+                  ),
+                ],
+              ),
+
             pw.Text(
               paymentType,
               style: pw.TextStyle(

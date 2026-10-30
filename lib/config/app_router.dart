@@ -665,6 +665,7 @@ class AppRouter {
             name: "api_keys",
             builder: (context, state) => const ApiKeysScreen(),
           ),
+
           GoRoute(
             path: "app-settings",
             name: "app-settings",

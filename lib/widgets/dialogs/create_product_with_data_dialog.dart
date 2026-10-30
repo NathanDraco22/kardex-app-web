@@ -33,7 +33,6 @@ Future<ProductInDbInBranch?> showCreateProductWithDataDialog(
     ]);
     if (!context.mounted) return null;
   }
-
   final widget = MultiRepositoryProvider(
     providers: [
       RepositoryProvider.value(value: productRepo),
