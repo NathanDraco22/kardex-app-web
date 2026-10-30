@@ -206,14 +206,6 @@ Future<Uint8List> generateTicketPdfFromInvoice(
               ),
             ),
 
-            if (invoice.orderInfo != null)
-              pw.Text(
-                "Tomado por: ${invoice.orderInfo!.createdBy.name}",
-                style: pw.TextStyle(
-                  fontSize: TicketSettings.contentFontSize(paperSize),
-                ),
-              ),
-
             pw.Divider(color: PdfColors.grey),
 
             pw.Row(
