@@ -153,7 +153,7 @@ class _RootBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (context.isMobile()) {
+    if (context.isMobileOrTablet()) {
       return const CreateTransferScreenMobile();
     }
     return const CreateTransferScreenWeb();

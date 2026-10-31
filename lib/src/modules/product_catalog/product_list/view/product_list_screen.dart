@@ -54,7 +54,7 @@ class _RootScaffold extends StatelessWidget {
       },
       child: Builder(
         builder: (context) {
-          if (context.isMobile()) return const ProductListScreenMobile();
+          if (context.isMobileOrTablet()) return const ProductListScreenMobile();
           return const ProductListScreenWeb();
         },
       ),

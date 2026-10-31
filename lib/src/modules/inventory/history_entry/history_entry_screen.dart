@@ -44,7 +44,7 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (context.isMobile()) {
+    if (context.isMobileOrTablet()) {
       return const HistoryEntryScreenMobile();
     }
 

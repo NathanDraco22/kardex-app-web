@@ -114,7 +114,7 @@ class _ExpirationLogCreationScreenState extends State<ExpirationLogCreationScree
                 children: [
                   SecondaryMenuButton(
                     onPressed: () async {
-                      final isMobile = context.isMobile();
+                      final isMobile = context.isMobileOrTablet();
 
                       if (isMobile) {
                         _selectedProduct = await showProductSearchDelegate(context);

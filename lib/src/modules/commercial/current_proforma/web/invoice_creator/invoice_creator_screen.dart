@@ -564,7 +564,7 @@ class _BodyState extends State<_Body> {
       yield SaleItemRow(
         onEdit: () async {
           CommercialProductResult? commercial;
-          if (context.isMobile()) {
+          if (context.isMobileOrTablet()) {
             commercial = await showCommercialProductModalFromId(
               context,
               productId: saleItem.product.id,
@@ -667,7 +667,7 @@ class _BodyState extends State<_Body> {
           label: const Text("Agregar producto"),
           onPressed: () async {
             CommercialProductResult? commercial;
-            if (context.isMobile()) {
+            if (context.isMobileOrTablet()) {
               commercial = await showCommercialProductSearchDelegate(
                 context,
                 restrictStock: false,

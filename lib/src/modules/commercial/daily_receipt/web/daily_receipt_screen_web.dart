@@ -37,7 +37,7 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) {
     EdgeInsetsGeometry mainPadding = const EdgeInsets.all(8.0);
 
-    if (context.isMobile()) {
+    if (context.isMobileOrTablet()) {
       mainPadding = EdgeInsets.zero;
     }
 

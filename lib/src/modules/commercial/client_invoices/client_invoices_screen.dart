@@ -85,7 +85,7 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isMobile = context.isMobile();
+    final isMobile = context.isMobileOrTablet();
 
     if (isMobile) {
       return ClientInvoicesScreenMobile(
