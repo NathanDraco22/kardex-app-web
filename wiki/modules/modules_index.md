@@ -19,6 +19,7 @@ Este documento ofrece un panorama general y conciso de cada uno de los módulos 
 | **Configuración** | `settings/` | Administración de sucursales (`isCommerce`), usuarios, roles y permisos, llaves de API, periféricos/impresoras y matriz de precios. | [settings.md](./settings.md) |
 | **Navegación y Sesión** | `home/`, `login/`, `splash/`... | Bootstrap inicial, autenticación JWT, menú responsivo comercial vs bodega, conmutador multi-sucursal y atajos de teclado. | [home_and_navigation.md](./home_and_navigation.md) |
 | **Herramientas Avanzadas** | `advanced_tools/` | Estadísticas avanzadas de rotación de productos, días de inventario y proyecciones automáticas de demanda para reabastecimiento. | [advanced_tools.md](./advanced_tools.md) |
+| **Impresión Térmica** | `services/`, `tools/printers/` | Impresión directa en 1 clic para tickets térmicos (Bluetooth/USB) sin drivers externos, fallback al spooler y tramado gráfico. | [sistema_impresion_termica.md](../sistema_impresion_termica.md) |
 
 ---
 

@@ -44,12 +44,14 @@ lib/src/modules/settings/
 - **Propósito:** Configuración de tokens y credenciales para APIs externas de facturación electrónica gubernamental, pasarelas de pago o servicios de mensajería SMS/WhatsApp.
 - **Vistas:** `ApiKeysScreen`.
 
-### 2.4. Integraciones (`integrations`)
+### 2.4. Integraciones y Periféricos (`integrations`)
 - **Propósito:** Configuración de periféricos locales:
-  - Impresoras de tickets térmicos (ancho 58mm / 80mm, USB, Red o Bluetooth).
+  - Impresoras de tickets térmicos (ancho 58mm / 80mm, USB o Bluetooth) con soporte de impresión directa nativa ESC/POS en 1 clic y fallback automático al diálogo del sistema.
+  - Ver guía técnica completa, arquitectura y post-mortems en [Sistema de Impresión Térmica Directa](../sistema_impresion_termica.md).
+  - Diálogo de configuración local interactivo: `LocalPrinterSettingsDialog` (`lib/src/modules/settings/view/local_printer_settings_dialog.dart`), accesible desde el menú de Ajustes en móvil y escritorio para vincular impresoras, calibrar papel, invertir polaridad, tramado halftone y pruebas de impresión.
   - Lectores de códigos de barras (modo emulación teclado o serial).
   - Balanzas electrónicas y cajones portamonedas.
-- **Vistas:** `IntegrationsScreen`.
+- **Vistas:** `IntegrationsScreen`, `LocalPrinterSettingsDialog`.
 
 ### 2.5. Matriz de Precios a Productos (`price_to_product`)
 - **Propósito:** Parametrizar y sincronizar márgenes de ganancia, precios mínimos y precios mayoristas entre diferentes sucursales.

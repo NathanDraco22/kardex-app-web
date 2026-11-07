@@ -60,6 +60,9 @@ dependencies:
   url_launcher: ^6.3.2
   google_fonts: ^8.1.0
   get_it: ^9.2.1
+  flutter_thermal_printer: 2.0.1
+  esc_pos_utils_plus: ^2.0.4
+  permission_handler: ^11.4.0
 
 dev_dependencies:
   flutter_driver:

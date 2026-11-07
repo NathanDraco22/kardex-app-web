@@ -2,13 +2,14 @@ import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/printers/paper_settings.dart';
+import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
 Future<bool> printOrder(OrderInDb order, BranchInDb branch, {PaperSize paperSize = PaperSize.mm80}) async {
   final bytes = await generateTicketPdfFromOrder(order, branch, paperSize: paperSize);
-  return await Printing.layoutPdf(onLayout: (_) => bytes, name: 'pedido_${order.docNumber}.pdf');
+  return await PrintManager.printPdf(bytes, name: 'pedido_${order.docNumber}.pdf', paperSize: paperSize);
 }
 
 Future<bool> shareOrder(OrderInDb order, BranchInDb branch, {PaperSize paperSize = PaperSize.mm80}) async {

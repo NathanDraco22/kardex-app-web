@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:kardex_app_front/src/tools/printers/paper_settings.dart';
+import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 import 'package:kardex_app_front/widgets/cash_counter/cash_counter_models.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:pdf/pdf.dart';
@@ -21,9 +22,10 @@ Future<bool> printCashCounterTicket(
     expectedCash: expectedCash,
     paperSize: paperSize,
   );
-  return await Printing.layoutPdf(
-    onLayout: (_) => bytes,
+  return await PrintManager.printPdf(
+    bytes,
     name: 'arqueo_ticket_${DateFormat('yyyyMMdd').format(record.date)}.pdf',
+    paperSize: paperSize,
   );
 }
 
