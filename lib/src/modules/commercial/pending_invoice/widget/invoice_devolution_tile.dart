@@ -40,14 +40,20 @@ class InvoiceDevolutionTile extends StatelessWidget {
             color: Colors.grey.shade600,
             fontWeight: FontWeight.w500,
           ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(height: 1),
-        Text(
-          NumberFormatter.convertToMoneyLike(amount),
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
-            color: color ?? Colors.grey.shade800,
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: Text(
+            NumberFormatter.convertToMoneyLike(amount),
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
+              color: color ?? Colors.grey.shade800,
+            ),
           ),
         ),
       ],
@@ -235,7 +241,7 @@ class InvoiceDevolutionTile extends StatelessWidget {
 
                 const SizedBox(height: 6),
 
-                // Bloque Bento con Detalles Financieros
+                // Bloque Bento con Detalles Financieros responsivos
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   decoration: BoxDecoration(
@@ -251,19 +257,28 @@ class InvoiceDevolutionTile extends StatelessWidget {
                     ),
                   ),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildSummaryItem("Total", invoice.total),
-                      _buildSummaryItem("Abonado", invoice.amountPaid, color: Colors.teal.shade700),
+                      Expanded(
+                        child: _buildSummaryItem("Total", invoice.total),
+                      ),
+                      Expanded(
+                        child: _buildSummaryItem("Abonado", invoice.amountPaid, color: Colors.teal.shade700),
+                      ),
                       if (targetDevolution.isNotEmpty)
-                        _buildSummaryItem("Devolución", devolutionsTotal, color: Colors.orange.shade800),
+                        Expanded(
+                          child: _buildSummaryItem("Devolución", devolutionsTotal, color: Colors.orange.shade800),
+                        ),
                       if (targetCreditNotes.isNotEmpty)
-                        _buildSummaryItem("Nota Crédito", creditNotesTotal, color: AppThemeTokens.purple),
-                      _buildSummaryItem(
-                        "Saldo Restante",
-                        adjustedTotal,
-                        isBold: true,
-                        color: theme.primaryColor,
+                        Expanded(
+                          child: _buildSummaryItem("Nota Crédito", creditNotesTotal, color: AppThemeTokens.purple),
+                        ),
+                      Expanded(
+                        child: _buildSummaryItem(
+                          "Saldo Restante",
+                          adjustedTotal,
+                          isBold: true,
+                          color: theme.primaryColor,
+                        ),
                       ),
                     ],
                   ),
