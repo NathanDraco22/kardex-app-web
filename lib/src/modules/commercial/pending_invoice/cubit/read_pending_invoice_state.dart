@@ -9,8 +9,17 @@ final class ReadInvoiceLoading extends ReadInvoiceState {}
 final class ReadInvoiceSuccess extends ReadInvoiceState {
   final List<InvoiceInDb> invoices;
   final List<DevolutionInDb> devolutions;
+  final List<CreditNoteInDb> creditNotes;
   final int totalCount;
-  ReadInvoiceSuccess(this.invoices, this.totalCount, {required this.devolutions});
+  final PendingCheckoutSummary? summary;
+
+  ReadInvoiceSuccess(
+    this.invoices,
+    this.totalCount, {
+    required this.devolutions,
+    this.creditNotes = const [],
+    this.summary,
+  });
 }
 
 final class ReadInvoiceError extends ReadInvoiceState {

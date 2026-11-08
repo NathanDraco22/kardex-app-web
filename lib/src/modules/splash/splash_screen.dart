@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/config/app_theme.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
-import 'package:kardex_app_front/src/cubits/app_settings/app_settings_cubit.dart';
+import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
 import 'package:kardex_app_front/src/tools/navigation_tool.dart';
 
 class SplashScreen extends StatelessWidget {

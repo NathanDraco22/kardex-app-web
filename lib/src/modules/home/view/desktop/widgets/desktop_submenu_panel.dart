@@ -5,6 +5,7 @@ import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
 import 'package:kardex_app_front/widgets/gates/orders_gate.dart';
 import 'package:kardex_app_front/widgets/gates/quotations_gate.dart';
 import 'package:kardex_app_front/widgets/gates/role_permission_gate.dart';
+import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 import 'package:kardex_app_front/widgets/dividers/menu_section_divider.dart';
 import 'desktop_submenu_card.dart';
 
@@ -321,46 +322,17 @@ class _DesktopSubmenuPanelState extends State<DesktopSubmenuPanel> {
   }
 
   Widget _buildEmptyState(Color accent) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.search_off_rounded,
-              size: 48,
-              color: Colors.grey.shade400,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              "No se encontraron opciones para \"$_filterQuery\"",
-              style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              "Prueba con otro término de búsqueda.",
-              style: TextStyle(
-                fontSize: 13,
-                color: Colors.grey.shade500,
-              ),
-            ),
-            const SizedBox(height: 14),
-            TextButton.icon(
-              onPressed: () {
-                _searchController.clear();
-                setState(() => _filterQuery = "");
-              },
-              icon: const Icon(Icons.refresh, size: 16),
-              label: const Text("Restablecer búsqueda"),
-            ),
-          ],
-        ),
-      ),
+    return AppEmptyState(
+      icon: Icons.search_off_rounded,
+      title: 'No se encontraron opciones para "$_filterQuery"',
+      subtitle: 'Prueba con otro término o restablece el filtro para ver todas las herramientas disponibles.',
+      accentColor: accent,
+      actionLabel: 'Restablecer búsqueda',
+      actionIcon: Icons.refresh_rounded,
+      onAction: () {
+        _searchController.clear();
+        setState(() => _filterQuery = "");
+      },
     );
   }
 }

@@ -1,4 +1,4 @@
-import 'package:fluentui_system_icons/fluentui_system_icons.dart';
+﻿import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
@@ -216,6 +216,13 @@ List<HomeModuleCategory> getHomeModuleCategories(
           icon: Icons.tag,
           accentColor: Color(0xFF2563EB),
           routeName: "units",
+        ),
+        HomeSubmoduleItem(
+          title: "Escalas de Unidades",
+          subtitle: "Plantillas maestras de conversión y múltiplos",
+          icon: Icons.straighten_rounded,
+          accentColor: Color(0xFF0D9488),
+          routeName: RouteNames.unitScales,
         ),
         HomeSubmoduleItem(
           title: "Categorías de Productos",
@@ -504,6 +511,18 @@ List<HomeModuleCategory> getHomeModuleCategories(
             accentColor: Color(0xFFEA580C),
             routeName: "devolution-history",
             permissions: [CommercialSubModules.createDevolution],
+          ),
+          const HomeSubmoduleItem(
+            section: "Notas de Crédito",
+            title: "Notas de Crédito",
+            subtitle: "Gestión y emisión por devolución o monto",
+            icon: Icons.assignment_return_rounded,
+            accentColor: Color(0xFF7C3AED),
+            routeName: RouteNames.creditNotes,
+            permissions: [
+              CommercialSubModules.createCreditNote,
+              CommercialSubModules.creditNoteHistory,
+            ],
           ),
         ],
       ),

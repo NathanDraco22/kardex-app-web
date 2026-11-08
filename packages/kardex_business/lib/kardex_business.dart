@@ -13,6 +13,7 @@ export 'src/domain/responses/user_status_response.dart';
 export 'src/domain/query_params/adjust_query_params.dart';
 export 'src/domain/query_params/client_query_params.dart';
 export 'src/domain/query_params/client_transaction_query_params.dart';
+export 'src/domain/query_params/credit_note_query_params.dart';
 export 'src/domain/query_params/daily_summary_params.dart';
 export 'src/domain/query_params/devolution_query_params.dart';
 export 'src/domain/query_params/expense_query_params.dart';

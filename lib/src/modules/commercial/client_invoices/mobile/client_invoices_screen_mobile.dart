@@ -10,7 +10,7 @@ import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/sear
 import 'package:kardex_app_front/widgets/dialogs/search_products/quick_commercial_product_search_delegate.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
-import 'package:kardex_app_front/src/cubits/app_settings/app_settings_cubit.dart';
+import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
 
 import '../widgets/product_invoice_card.dart';
 import 'invoice_client_menu_screen.dart';

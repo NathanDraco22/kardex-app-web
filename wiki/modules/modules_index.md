@@ -9,8 +9,10 @@ Este documento ofrece un panorama general y conciso de cada uno de los módulos 
 | Módulo | Carpeta (`lib/src/modules/`) | Rol de Negocio Principal | Documento Detallado |
 | :--- | :--- | :--- | :--- |
 | **Comercial** | `commercial/` | Terminal POS, facturación (nominativa y final), cotizaciones/proformas, recibos de caja, devoluciones y arqueo por usuario. | [commercial.md](./commercial.md) |
+| **Notas de Crédito** | `commercial/credit_notes/` | Sustitución y evolución de devoluciones (por mercancía o monto) con Repositorio Reactivo y amortización en recibos. | [credit_notes.md](./credit_notes.md) |
 | **Inventario** | `inventory/` | Existencias en tiempo real, entradas/salidas (flujo con y sin kárdex), ajustes, transferencias entre sucursales y bitácora de vencimientos. | [inventory.md](./inventory.md) |
-| **Catálogo de Productos** | `product_catalog/` | Catálogo maestro de productos, códigos alternativos (`altCode`), categorías taxonómicas y unidades de medida con factores de conversión. | [product_catalog.md](./product_catalog.md) |
+| **Catálogo de Productos** | `product_catalog/` | Catálogo maestro de productos, códigos alternativos (`altCode`), categorías taxonómicas, unidades de medida y escalas de conversión estandarizadas (Peso, Volumen, Longitud, Tiempo). | [product_catalog.md](./product_catalog.md) |
+| **Escalas de Unidades** | `product_catalog/unit_scales/` | Plantillas de conversión estandarizadas (Peso, Volumen, Longitud, Tiempo y personalizadas) para productos. | [unit_scales.md](./unit_scales.md) |
 | **Cuentas Pendientes** | `pending_accounts/` | Cuentas por cobrar, cartera de deudores, sesiones de crédito y aplicación de abonos a facturas pendientes. | [pending_accounts.md](./pending_accounts.md) |
 | **Finanzas** | `finance/` | Cierre diario y resumen ejecutivo de sucursal, reportes por rangos de fecha, arqueos de operaciones y estados de cuenta de clientes. | [finance.md](./finance.md) |
 | **Gastos** | `expenses/` | Registro de gastos operativos de caja/banco, pagos a proveedores, centros de costos/categorías y reportes analíticos de egresos. | [expenses.md](./expenses.md) |
@@ -31,6 +33,7 @@ Este documento ofrece un panorama general y conciso de cada uno de los módulos 
   - El terminal de venta (`sale_terminal`) soporta ventas en espera temporales persistidas en servidor (`HoldSalesRepository`).
   - Las facturas validan stock comprometido (`promiseStock`) y reducen existencias.
   - La visualización e impresión de facturas y tickets utiliza `InvoicePrinter` y `SingleInvoiceTemplate`.
+  - Las **Notas de Crédito** (`credit_notes`) evolucionan las devoluciones bajo un patrón de **Repositorio Reactivo (`ReactiveRepository`)**, reingresando stock al Kárdex o asignando saldos a favor para amortización en recibos de pago.
 
 ### 2. Inventario (`inventory`)
 - **Enfoque:** Trazabilidad física y contable del almacén.
@@ -45,6 +48,7 @@ Este documento ofrece un panorama general y conciso de cada uno de los módulos 
   - Soporte de código alternativo (`altCode`) para productos que manejan códigos de fábrica y códigos internos propios.
   - Conversión de unidades con `UnitConversionTool` para despachos por fracciones o paquetes.
   - Reconstrucción reactiva de modelos en sucursal con `product_in_branch_factory.dart`.
+  - Escalas de Unidades (`unit_scales`) como plantillas de conversión reutilizables (Peso, Volumen, Longitud, Tiempo) para agilizar la parametrización de productos.
 
 ### 4. Cuentas Pendientes (`pending_accounts`)
 - **Enfoque:** Cobranza y crédito comercial.

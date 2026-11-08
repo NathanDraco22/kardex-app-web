@@ -8,7 +8,7 @@ import 'package:kardex_app_front/src/tools/uploaders/image_uploader.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/product_list/cubit/write_product_cubit.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
-import 'package:kardex_app_front/src/cubits/app_settings/app_settings_cubit.dart';
+import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
 Future<ProductInDbInBranch?> showCreateProductWithDataDialog(

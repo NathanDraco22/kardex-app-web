@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/adjust_entry_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/adjust_exit_viewer.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/credit_note_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/devolution_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/entry_history_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/exit_history_viewer.dart';
@@ -22,11 +23,14 @@ Future<void> showDocumentViewer(BuildContext context, ProductTransactionInDb cur
     case TransactionSubType.devolution:
       showDevolutionViewerDialogFromId(context, currentTransaction.documentId);
       break;
+    case TransactionSubType.creditNote:
+      await showCreditNoteViewerDialogFromId(context, currentTransaction.documentId);
+      break;
     case TransactionSubType.transfer:
       showTransferViewerDialogFromId(context, currentTransaction.documentId);
       break;
     case TransactionSubType.adjustment:
-      if (currentTransaction.type == .exit) {
+      if (currentTransaction.type == TransactionType.exit) {
         showAdjustExitViewerDialogFromId(context, currentTransaction.documentId);
       } else {
         showAdjustEntryViewerDialogFromId(context, currentTransaction.documentId);

@@ -5,7 +5,7 @@ import 'package:kardex_app_front/src/core/app_kardex_config.dart';
 import 'package:kardex_app_front/src/core/session_manager.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
-import 'package:kardex_app_front/src/cubits/app_settings/app_settings_cubit.dart';
+import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
 
 part 'auth_state.dart';
 

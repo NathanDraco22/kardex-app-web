@@ -18,6 +18,7 @@ class RouteNames {
   static const productCategory = 'product-category';
   static const productList = 'product-list';
   static const units = 'units';
+  static const unitScales = 'unit-scales';
 
   static const clientCatalog = 'client-catalog';
   static const clientList = 'client-list';
@@ -48,6 +49,7 @@ class RouteNames {
   static const currentDevolution = 'current-devolution';
   static const clientDevolution = 'client-devolution';
   static const devolutionHistory = 'devolution-history';
+  static const creditNotes = 'credit-notes';
   static const productPriceSetting = 'product-price-setting';
   static const commercialProductMovements = 'commercial-product-movements';
   static const proformaHistory = 'proforma-history';

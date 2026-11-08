@@ -24,6 +24,7 @@ lib/src/modules/commercial/
 ├── invoice_by_product/                  # Auditoría de ventas por producto
 ├── devolutions/ & client_devolution/    # Creación y emisión de notas de devolución
 ├── current_devolutions/ & devolution_history/ # Historial y estado de devoluciones
+├── credit_notes/                        # Gestión y emisión reactiva de notas de crédito
 ├── daily_product_sales/                 # Reporte diario de ventas agrupadas por producto
 ├── daily_product_in_orders/             # Productos comprometidos en pedidos
 ├── pending_invoice/                     # Facturas con saldo pendiente de cobro
@@ -72,12 +73,27 @@ lib/src/modules/commercial/
   - Si la factura original fue al contado, genera un egreso o saldo a favor; si fue a crédito, rebaja la cuenta por cobrar.
   - Plantilla de visualización e impresión: `DevolutionViewer` y `SingleDevolutionTemplate`.
 
-### 2.5. Historiales y Auditorías
+### 2.5. Notas de Crédito (`credit_notes`)
+- **Propósito:** Evolución moderna de las devoluciones con dos modalidades: retorno de mercancía a inventario físico (`devolution`) o concesión de saldos a favor con motivo obligatorio (`amount`).
+- **Arquitectura Reactiva:** Implementa el primer `ReactiveRepository` del frontend, emitiendo notificaciones en vivo hacia `ReadCreditNoteCubit` sin refetch manual.
+- **Flujo Completo:** Ver [Documentación Detallada de Notas de Crédito](./credit_notes.md).
+
+### 2.6. Historiales y Auditorías
 - **`invoice_history` / `receipt_history`:** Pantallas para consultar, reimprimir o filtrar facturas y recibos con `HistoryParams` (rango de fechas, cliente, sucursal, estado).
 - **`invoice_by_product`:** Permite saber con precisión qué facturas incluyeron determinado producto.
 - **`user_operations_results`:** Muestra el desglose de ventas, cobros y anulaciones agrupados por usuario para el cierre de turno y arqueo de caja.
 
 ---
+
+### 2.6. Facturas por Cobrar y Cobranza Compuesta (`pending_invoice` & Composite API)
+- **Propósito:** Permite la gestión y cobro de cuentas pendientes de clientes, integrando automáticamente facturas, devoluciones y notas de crédito disponibles.
+- **Optimización de Red (Composite API):**
+  - Utiliza `CompositeRepository.getClientPendingInvoices(clientId, branchId)` que consulta el endpoint backend `/api/v1/composite/client-pending-invoices`.
+  - Reduce de 3 llamadas HTTP por separado a 1 sola llamada atómica que devuelve facturas, devoluciones, notas de crédito y el `summary` con los balances calculados.
+- **Experiencia Visual (Tile de Notas de Crédito Bento UI):**
+  - Incorpora `CreditNotesSummaryTile` (`lib/src/modules/commercial/pending_invoice/widget/credit_notes_summary_tile.dart`) que se renderiza justo antes de la lista de facturas pendientes.
+  - Presenta un banner interactivo en tonos púrpura con el saldo total a favor del cliente, píldora con el conteo de notas (`AppStatusBadge`), y sección expandible con el desglose individual y botón para abrir el visor `showCreditNoteViewerDialog`.
+  - La barra inferior (`_BottomPendingInvoice`) y el modal de abono rápido calculan el balance neto a pagar deduciendo de forma canónica las notas de crédito y devoluciones.
 
 ## 3. Repositorios y Fuentes de Datos Involucrados
 
@@ -86,6 +102,8 @@ lib/src/modules/commercial/
 | Facturas | `InvoiceDataSource` | `InvoiceRepository` |
 | Recibos | `ReceiptDataSource` | `ReceiptRepository` |
 | Devoluciones | `DevolutionDataSource` | `DevolutionRepository` |
+| Notas de Crédito | `CreditNotesDataSource` | `CreditNotesRepository (ReactiveRepository)` |
+| Composite / Cobranzas | `CompositeDataSource` | `CompositeRepository` |
 | Proformas/Pedidos | `ProformaDataSource` | `ProformaRepository` |
 | Ventas en Espera | `HoldSalesDataSource` | `HoldSalesRepository` |
 | Clientes | `ClientDataSource` | `ClientRepository` |
@@ -102,6 +120,7 @@ lib/src/modules/commercial/
 - `/commercial/receipt-history`: Historial de recibos.
 - `/commercial/devolutions`: Registro de devoluciones.
 - `/commercial/devolution-history`: Historial de devoluciones.
+- `/commercial/credit-notes`: Gestión y emisión de notas de crédito (devolución y monto).
 - `/commercial/user-operations-results`: Arqueo y resultados por usuario.
 
 ---

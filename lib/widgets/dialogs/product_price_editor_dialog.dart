@@ -9,7 +9,7 @@ import 'package:kardex_app_front/src/modules/commercial/product_price_setting/wi
 import 'package:kardex_app_front/widgets/title_label.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
-import 'package:kardex_app_front/src/cubits/app_settings/app_settings_cubit.dart';
+import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
 Future<ProductSaleProfileInDb?> showPriceEditorByProductId(

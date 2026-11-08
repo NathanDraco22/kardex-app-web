@@ -97,21 +97,46 @@ class _HeaderSection extends StatelessWidget {
                   icon: const Icon(Icons.history, size: 18),
                   label: const Text("Historial"),
                 ),
+                OutlinedButton.icon(
+                  onPressed: () {
+                    if (state is! ReadInvoiceSuccess || state.invoices.isEmpty) {
+                      DialogManager.showInfoDialog(
+                        context,
+                        "No hay facturas pendientes para compartir.",
+                      );
+                      return;
+                    }
+                    showPendingInvoicesStatementImageDialog(
+                      context: context,
+                      client: client,
+                      invoices: state.invoices,
+                      devolutions: state.devolutions,
+                      creditNotes: state.creditNotes,
+                    );
+                  },
+                  icon: const Icon(Icons.share_outlined, size: 18),
+                  label: const Text("Compartir"),
+                ),
                 Builder(
                   builder: (context) {
                     int total = 0;
                     int totalDevolutions = 0;
+                    int totalCreditNotes = 0;
                     if (state is ReadInvoiceSuccess) {
-                      total = state.invoices.fold(0, (int previousValue, invoice) {
-                        total += invoice.totalRemaining;
-                        return total;
-                      });
-
-                      totalDevolutions = state.devolutions.fold(0, (int previousValue, devolution) {
-                        totalDevolutions += devolution.total;
-                        return totalDevolutions;
-                      });
+                      if (state.summary != null) {
+                        total = state.summary!.totalInvoices;
+                        totalDevolutions = state.summary!.totalDevolutions;
+                        totalCreditNotes = state.summary!.totalCreditNotes;
+                      } else {
+                        total = state.invoices.fold(0, (sum, inv) => sum + inv.totalRemaining);
+                        totalDevolutions = state.devolutions.fold(0, (sum, d) => sum + d.total);
+                        totalCreditNotes = state.creditNotes.fold(0, (sum, cn) => sum + cn.total);
+                      }
                     }
+
+                    final netPayableCents = (total - totalDevolutions - totalCreditNotes) > 0
+                        ? (total - totalDevolutions - totalCreditNotes)
+                        : 0;
 
                     return ElevatedButton.icon(
                       icon: const Icon(Icons.flash_on),
@@ -121,7 +146,7 @@ class _HeaderSection extends StatelessWidget {
                         final selectedClient = PendingInvoiceMediator.of(context).notifier?.selectedClient;
                         if (selectedClient == null) return;
 
-                        final maxAmountDouble = total / 100;
+                        final maxAmountDouble = netPayableCents / 100;
 
                          final paymentResult = await showFastPaymentModal(
                           context,
@@ -142,6 +167,7 @@ class _HeaderSection extends StatelessWidget {
                           paymentAmountCents: amountCents,
                           invoices: state.invoices,
                           devolutions: state.devolutions,
+                          creditNotes: state.creditNotes,
                           client: selectedClient,
                           branchId: currentBranch.id,
                           currentUserId: currentUser.id,

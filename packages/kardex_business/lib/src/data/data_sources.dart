@@ -1,5 +1,3 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
-
 export 'adjust_entries_data_source.dart';
 export 'adjust_exits_data_source.dart';
 export 'admin_panel_data_source.dart';
@@ -9,6 +7,8 @@ export 'branche_data_source.dart';
 export 'client_data_source.dart';
 export 'client_group_data_source.dart';
 export 'client_transaction_data_source.dart';
+export 'credit_note_data_source.dart';
+export 'composite_data_source.dart';
 export 'daily_summaries_data_source.dart';
 export 'data.dart';
 export 'devolution_data_source.dart';
@@ -43,3 +43,4 @@ export 'unit_data_source.dart';
 export 'user_data_source.dart';
 export 'user_roles_data_source.dart';
 export 'app_settings_data_source.dart';
+export 'unit_scales_data_source.dart';

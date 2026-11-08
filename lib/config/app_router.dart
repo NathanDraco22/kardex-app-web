@@ -38,6 +38,7 @@ import 'package:kardex_app_front/src/modules/commercial/daily_client_invoices/da
 import 'package:kardex_app_front/src/modules/commercial/daily_product_in_orders/daily_product_in_orders_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/daily_product_sales/daily_product_sales_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/daily_receipt/daily_receipt_screen.dart';
+import 'package:kardex_app_front/src/modules/commercial/credit_notes/credit_notes_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/devolution_history/devolution_history_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/invoice_history/invoice_history_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/invoice_by_product/invoice_by_product_screen.dart';
@@ -88,6 +89,7 @@ import 'package:kardex_app_front/src/modules/settings/view/branches/branches_scr
 import 'package:kardex_app_front/src/modules/settings/view/price_to_product/price_to_product_screen.dart';
 import 'package:kardex_app_front/src/modules/settings/view/settings_screen.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/units/units_screen.dart';
+import 'package:kardex_app_front/src/modules/product_catalog/unit_scales/unit_scales_screen.dart';
 import 'package:kardex_app_front/src/modules/settings/view/users/users_screen.dart';
 import 'package:kardex_app_front/src/modules/inactive/inactive_screen.dart';
 import 'package:kardex_app_front/src/modules/splash/splash_screen.dart';
@@ -203,6 +205,11 @@ class AppRouter {
             path: "units",
             name: "units",
             builder: (context, state) => const UnitsScreen(),
+          ),
+          GoRoute(
+            path: "unit-scales",
+            name: "unit-scales",
+            builder: (context, state) => const UnitScalesScreen(),
           ),
         ],
       ),
@@ -376,6 +383,12 @@ class AppRouter {
             path: "devolution-history",
             name: "devolution-history",
             builder: (context, state) => const DevolutionHistoryScreen(),
+          ),
+
+          GoRoute(
+            path: "credit-notes",
+            name: "credit-notes",
+            builder: (context, state) => const CreditNotesScreen(),
           ),
 
           GoRoute(

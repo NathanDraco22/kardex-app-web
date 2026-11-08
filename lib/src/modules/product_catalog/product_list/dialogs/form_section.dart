@@ -33,7 +33,11 @@ class _FormContentState extends State<_FormContent> {
     if (widget.currentProduct != null) {
       tagField = widget.currentProduct!.tags.join(" ");
       if (widget.currentProduct!.image.isNotEmpty) {
-        _currentImageProvider = CachedNetworkImageProvider(widget.currentProduct!.image);
+        _currentImageProvider = CachedNetworkImageProvider(
+          widget.currentProduct!.image,
+          cacheManager: AppImageCacheManager.instance,
+          imageRenderMethodForWeb: ImageRenderMethodForWeb.HtmlImage,
+        );
       }
     }
 

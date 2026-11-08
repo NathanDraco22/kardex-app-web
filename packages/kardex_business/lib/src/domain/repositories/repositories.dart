@@ -1,5 +1,3 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
-
 export 'adjust_entries_repository.dart';
 export 'adjust_exits_repository.dart';
 export 'admin_panel_repository.dart';
@@ -9,6 +7,8 @@ export 'branch_repository.dart';
 export 'client_group_repository.dart';
 export 'client_repository.dart';
 export 'client_transaction_repository.dart';
+export 'credit_notes_repository.dart';
+export 'composite_repository.dart';
 export 'daily_summaries_repository.dart';
 export 'devolution_repository.dart';
 export 'entry_doc_repository.dart';
@@ -40,3 +40,4 @@ export 'unit_repository.dart';
 export 'user_repository.dart';
 export 'user_roles_repository.dart';
 export 'app_settings_repository.dart';
+export 'unit_scales_repository.dart';

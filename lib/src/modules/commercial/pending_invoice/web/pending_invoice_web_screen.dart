@@ -8,8 +8,11 @@ import 'package:kardex_app_front/src/modules/commercial/pending_invoice/cubit/re
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/web/modals/invoice_receipts_history_modal.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/web/receipt_creator/receipt_creator_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/widget/invoice_devolution_tile.dart';
+import 'package:kardex_app_front/src/modules/commercial/pending_invoice/widget/credit_notes_summary_tile.dart';
+import 'package:kardex_app_front/src/modules/commercial/pending_invoice/widget/pending_invoices_statement_image_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/devolution_viewer.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/credit_note_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_acredit_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/receipt_viewer.dart';
 import 'package:kardex_app_front/widgets/map/launch_map_button.dart';
@@ -46,6 +49,8 @@ class _PendingInvoiceWebScreenState extends State<PendingInvoiceWebScreen> {
   Widget build(BuildContext context) {
     final invoiceREpo = context.read<InvoicesRepository>();
     final devolutionRepo = context.read<DevolutionsRepository>();
+    final creditNoteRepo = context.read<CreditNotesRepository>();
+    final compositeRepo = context.read<CompositeRepository>();
     final receiptRepo = context.read<ReceiptsRepository>();
 
     return MultiBlocProvider(
@@ -54,6 +59,8 @@ class _PendingInvoiceWebScreenState extends State<PendingInvoiceWebScreen> {
           create: (context) => ReadPendingInvoiceCubit(
             invoicesRepository: invoiceREpo,
             devolutionsRepository: devolutionRepo,
+            creditNotesRepository: creditNoteRepo,
+            compositeRepository: compositeRepo,
           ),
         ),
         BlocProvider(
@@ -118,7 +125,37 @@ class _RootScaffoldState extends State<_RootScaffold> {
       },
       child: Scaffold(
         floatingActionButton: const _PendingInvoiceFloatingButtons(),
-        appBar: AppBar(title: const Text("Facturas por Cobrar de Cliente")),
+        appBar: AppBar(
+          title: const Text("Facturas por Cobrar de Cliente"),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.share_outlined),
+              tooltip: "Compartir estado de cuenta en imagen",
+              onPressed: () {
+                final state = context.read<ReadPendingInvoiceCubit>().state;
+                final selectedClient =
+                    PendingInvoiceMediator.of(context).notifier?.selectedClient;
+                if (selectedClient == null ||
+                    state is! ReadInvoiceSuccess ||
+                    state.invoices.isEmpty) {
+                  DialogManager.showInfoDialog(
+                    context,
+                    "No hay facturas pendientes para compartir.",
+                  );
+                  return;
+                }
+                showPendingInvoicesStatementImageDialog(
+                  context: context,
+                  client: selectedClient,
+                  invoices: state.invoices,
+                  devolutions: state.devolutions,
+                  creditNotes: state.creditNotes,
+                );
+              },
+            ),
+            const SizedBox(width: 8),
+          ],
+        ),
         body: const _Body(),
         bottomNavigationBar: const _BottomPendingInvoice(),
       ),
@@ -154,6 +191,7 @@ class _PendingInvoiceFloatingButtons extends StatelessWidget {
                     client: viewController.selectedClient!,
                     invoices: viewController.selectedInvoices,
                     devolutions: viewController.selectedDevolutions,
+                    creditNotes: viewController.selectedCreditNotes,
                   ),
                 ),
               ),
@@ -179,38 +217,104 @@ class _BottomPendingInvoice extends StatelessWidget {
         builder: (context) {
           int total = 0;
           int totalDevolutions = 0;
+          int totalCreditNotes = 0;
           if (state is ReadInvoiceSuccess) {
-            total = state.invoices.fold(0, (int previousValue, invoice) {
-              total += invoice.totalRemaining;
-              return total;
-            });
+            if (state.summary != null) {
+              total = state.summary!.totalInvoices;
+              totalDevolutions = state.summary!.totalDevolutions;
+              totalCreditNotes = state.summary!.totalCreditNotes;
+            } else {
+              total = state.invoices.fold(0, (int previousValue, invoice) {
+                total += invoice.totalRemaining;
+                return total;
+              });
 
-            totalDevolutions = state.devolutions.fold(0, (int previousValue, devolution) {
-              totalDevolutions += devolution.total;
-              return totalDevolutions;
-            });
+              totalDevolutions = state.devolutions.fold(0, (int previousValue, devolution) {
+                totalDevolutions += devolution.total;
+                return totalDevolutions;
+              });
+
+              totalCreditNotes = state.creditNotes.fold(0, (int previousValue, cn) {
+                totalCreditNotes += cn.total;
+                return totalCreditNotes;
+              });
+            }
           }
 
+          final netTotal = (total - totalDevolutions - totalCreditNotes) > 0
+              ? (total - totalDevolutions - totalCreditNotes)
+              : 0;
+
           final totalFormatted = NumberFormatter.convertToMoneyLike(total);
+          final netTotalFormatted = NumberFormatter.convertToMoneyLike(netTotal);
+          final hasDiscounts = totalCreditNotes > 0 || totalDevolutions > 0;
 
           return Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
-                "Total: ",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+              if (hasDiscounts) ...[
+                Text(
+                  "Facturas: $totalFormatted",
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey.shade700,
+                  ),
                 ),
-              ),
-              Text(
-                totalFormatted,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+                if (totalCreditNotes > 0) ...[
+                  const SizedBox(width: 16),
+                  Text(
+                    "Notas Crédito: -${NumberFormatter.convertToMoneyLike(totalCreditNotes)}",
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.deepPurple,
+                    ),
+                  ),
+                ],
+                if (totalDevolutions > 0) ...[
+                  const SizedBox(width: 16),
+                  Text(
+                    "Devoluciones: -${NumberFormatter.convertToMoneyLike(totalDevolutions)}",
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.amber.shade900,
+                    ),
+                  ),
+                ],
+                const SizedBox(width: 20),
+                const Text(
+                  "Neto por Cobrar: ",
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                textAlign: TextAlign.start,
-              ),
+                Text(
+                  netTotalFormatted,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blueAccent,
+                  ),
+                ),
+              ] else ...[
+                const Text(
+                  "Total: ",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  totalFormatted,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
               const SizedBox(width: 24),
             ],
           );

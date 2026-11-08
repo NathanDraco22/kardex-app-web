@@ -69,7 +69,7 @@ lib/
 ├── constants/                   # Constantes del sistema
 │   ├── route_names.dart         # Nombres canónicos de rutas
 │   └── shortcut_registry.dart   # Registro global de atajos de teclado
-├── cubits/                      # Cubits globales (AuthCubit, AppModeCubit, AppThemeCubit)
+├── cubits/                      # Cubits globales (AuthCubit, AppModeCubit, AppSettingsCubit, ShortcutsCubit, ToastCubit)
 ├── src/
 │   ├── core/                    # Gestores de borradores y sincronizadores core
 │   ├── data/                    # DataSources (*_data_source.dart)
@@ -115,8 +115,10 @@ Para conocer a detalle la lógica, vistas, cubits y repositorios de cada módulo
 - 🗺️ **[Sistema de Navegación y Arquitectura (sistema_navegacion.md)](./sistema_navegacion.md)** - Guía maestra de navegación: Split Hub (Desktop), Drill-Down (Mobile), permisos de roles, fallback seguro y diferencias entre ramas `main` y `lite`.
 - 📋 **[Índice de Módulos (modules_index.md)](./modules/modules_index.md)** - Resumen ejecutivo de todos los módulos.
 - 🛒 **[Comercial (modules/commercial.md)](./modules/commercial.md)** - Terminal POS, facturas, recibos, proformas y devoluciones.
+- 📋 **[Notas de Crédito (modules/credit_notes.md)](./modules/credit_notes.md)** - Sustitución y evolución de devoluciones (por devolución o monto), patrón de Repositorio Reactivo (`ReactiveRepository`) y amortización en recibos.
 - 📦 **[Inventario (modules/inventory.md)](./modules/inventory.md)** - Stock, entradas/salidas (kárdex y directo), transferencias y ajustes.
-- 🏷️ **[Catálogo de Productos (modules/product_catalog.md)](./modules/product_catalog.md)** - Productos, códigos alternativos, categorías y unidades.
+- 🏷️ **[Catálogo de Productos (modules/product_catalog.md)](./modules/product_catalog.md)** - Productos, códigos alternativos, categorías, unidades de medida y escalas de conversión.
+- ⚖️ **[Escalas de Unidades (modules/unit_scales.md)](./modules/unit_scales.md)** - Plantillas de conversión estandarizadas (Peso, Volumen, Longitud, Tiempo y personalizadas) para agilizar la parametrización de productos.
 - 💳 **[Cuentas Pendientes (modules/pending_accounts.md)](./modules/pending_accounts.md)** - Cuentas por cobrar y pagos de facturas.
 - 📊 **[Finanzas (modules/finance.md)](./modules/finance.md)** - Cierres diarios, arqueos de caja y reportes ejecutivos.
 - 💸 **[Gastos (modules/expenses.md)](./modules/expenses.md)** - Gastos operativos y a proveedores.

@@ -1,6 +1,6 @@
 # Documentación del Módulo: Catálogo de Productos (`product_catalog`)
 
-El módulo **Catálogo de Productos** gestiona el catálogo maestro de artículos, su clasificación taxonómica (categorías), las unidades de medida (y factores de conversión) y las reglas de fijación de precios en `kardex_app_front`.
+El módulo **Catálogo de Productos** gestiona el catálogo maestro de artículos, su clasificación taxonómica (categorías), las unidades de medida, las escalas de conversión estandarizadas y las reglas de fijación de precios en `kardex_app_front`.
 
 ---
 
@@ -19,10 +19,14 @@ lib/src/modules/product_catalog/
 │   ├── cubit/                            # ProductCategoryCubit
 │   ├── dialogs/                          # CreateCategoryDialog
 │   └── view/product_category_screen.dart # Gestión de categorías
-└── units/                                # Unidades de medida y conversiones
-    ├── cubit/                            # UnitsCubit
-    ├── dialog/                           # CreateUnitDialog
-    └── units_screen.dart                 # Gestión de unidades de medida
+├── units/                                # Unidades de medida individuales
+│   ├── cubit/                            # UnitsCubit
+│   ├── dialog/                           # CreateUnitDialog
+│   └── units_screen.dart                 # Gestión de unidades de medida
+└── unit_scales/                          # Escalas y plantillas de conversión
+    ├── cubit/                            # ReadUnitScalesCubit, WriteUnitScaleCubit
+    ├── dialogs/                          # CreateUnitScaleDialog
+    └── unit_scales_screen.dart           # Pantalla de gestión de escalas
 ```
 
 ---
@@ -51,11 +55,26 @@ lib/src/modules/product_catalog/
   - Asignación de iconos o colores identificativos.
 
 ### 2.3. Unidades de Medida (`units`)
-- **Propósito:** Control de unidades físicas (unidad, caja, fardo, kg, litro, metro) y definición de factores de conversión.
+- **Propósito:** Control de unidades físicas (unidad, caja, fardo, kg, litro, metro) y definición de factores de conversión individuales.
 - **Vistas:** `UnitsScreen`.
 - **Cubits:** `UnitsCubit`.
 - **Integración:**
   - Trabaja estrechamente con `UnitConversionTool` (`lib/src/tools/unit_conversion_tool.dart`) para calcular equivalencias al ingresar compras por caja y vender al por menor por unidad.
+
+### 2.4. Escalas de Unidades de Medida (`unit_scales`)
+- **Propósito:** Plantillas reutilizables de conversión para productos que se comercializan bajo diferentes unidades y múltiplos (Peso, Volumen, Longitud, Tiempo y personalizadas). Evita tener que reconfigurar manualmente las unidades extras y factores producto por producto.
+- **Vistas:** `UnitScalesScreen` (diseño responsivo con chips de equivalencias, badges de detalle y mayoreo).
+- **Cubits:**
+  - `ReadUnitScalesCubit`: Carga, filtrado local en tiempo real y refresco de escalas.
+  - `WriteUnitScaleCubit`: Creación (`createNewUnitScale`), edición (`updateUnitScale`) y eliminación (`deleteUnitScale`).
+- **Diálogo Interactivo:**
+  - `showCreateOrEditUnitScaleDialog` (`CreateUnitScaleDialog`): Modal con validación de formularios, configuración de unidad base, adición dinámica de unidades adicionales (`ExtraUnit`) con factor entero multiplicador y selectores de unidad por defecto y mayorista sugeridas.
+- **Escalas Base del Sistema:**
+  - **Peso:** Base `Gramo` (Onza: 28g, Libra: 454g, Kilogramo: 1000g, Quintal: 45400g).
+  - **Volumen:** Base `Mililitro` (Litro: 1000ml, Galón: 3785ml).
+  - **Longitud:** Base `Centímetro` (Metro: 100cm, Yarda: 91cm).
+  - **Tiempo:** Base `Segundo` (Minuto: 60s, Hora: 3600s, Día: 86400s).
+- **Documentación Completa:** Ver [Documentación Detallada de Escalas de Unidades](./unit_scales.md).
 
 ---
 
@@ -66,12 +85,14 @@ lib/src/modules/product_catalog/
 | Productos | `ProductsDataSource` | `ProductsRepository` |
 | Categorías | `ProductCategoriesDataSource` | `ProductCategoriesRepository` |
 | Unidades | `UnitsDataSource` | `UnitsRepository` |
+| Escalas de Unidades | `UnitScalesDataSource` | `UnitScalesRepository` |
 
 ---
 
 ## 4. Rutas en `app_router.dart`
 
-- `/product-catalog`: Menú principal del catálogo.
-- `/product-catalog/products`: Listado global de productos.
-- `/product-catalog/categories`: Catálogo de categorías.
-- `/product-catalog/units`: Unidades de medida.
+- `/product-catalog`: Menú principal del catálogo (`ProductCatalogMenuScreen`).
+- `/product-catalog/product-list`: Listado global de productos (`ProductListScreen`).
+- `/product-catalog/product-category`: Catálogo de categorías (`ProductCategoryScreen`).
+- `/product-catalog/units`: Unidades de medida individuales (`UnitsScreen`).
+- `/product-catalog/unit-scales`: Escalas y plantillas de conversión (`UnitScalesScreen`).

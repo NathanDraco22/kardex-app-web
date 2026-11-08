@@ -63,7 +63,7 @@ lib/src/modules/settings/
 - **Ubicación en Navegación:**
   - Móvil (`SettingsScreen`): Tarjeta `MenuOptionCard` al final del listado, justo después de *Configuración de Impresora Local*.
   - Escritorio (`home_modules_registry.dart`): Submódulo `HomeSubmoduleItem` al final de la categoría `Modules.settings`, después de *Impresora Local*.
-- **Cubit / Estado:** `AppSettingsCubit` y `AppSettingsState` (`lib/src/cubits/app_settings/`), inyectado globalmente en `ProviderContainer` como Singleton en `getIt<AppSettingsCubit>()` y precargado en `SplashScreen`.
+- **Cubit / Estado:** `AppSettingsCubit` y `AppSettingsState` (`lib/cubits/app_settings/`), inyectado globalmente en `ProviderContainer` como Singleton en `getIt<AppSettingsCubit>()` y precargado en `SplashScreen`.
 - **Parámetros Configurados (`AppSettingModel` / `UpdateAppSetting`):**
   - `useDefaultProfitMargin` (bool): Habilitar o no el cálculo automático de margen de ganancia por defecto.
   - `defaultProfitMargin` (double): Porcentaje de margen sugerido (ej. 20.0%).

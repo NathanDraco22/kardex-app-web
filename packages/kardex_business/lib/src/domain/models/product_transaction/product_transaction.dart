@@ -3,7 +3,7 @@ enum TransactionType {
   exit,
 }
 
-enum TransactionSubType { entry, exit, invoice, devolution, transfer, adjustment, loss }
+enum TransactionSubType { entry, exit, invoice, devolution, transfer, adjustment, loss, creditNote }
 
 class BaseProductTransaction {
   final String documentId;
@@ -32,7 +32,10 @@ class BaseProductTransaction {
     documentId: json['documentId'],
     docNumber: json['docNumber'],
     type: TransactionType.values.byName(json['type']),
-    subtype: TransactionSubType.values.byName(json['subtype']),
+    subtype: switch (json['subtype']) {
+      'credit_note' => TransactionSubType.creditNote,
+      _ => TransactionSubType.values.byName(json['subtype']),
+    },
     productId: json['productId'],
     branchId: json['branchId'],
     quantity: json['quantity'],
@@ -44,7 +47,7 @@ class BaseProductTransaction {
     'documentId': documentId,
     'docNumber': docNumber,
     'type': type.name,
-    'subtype': subtype.name,
+    'subtype': subtype == TransactionSubType.creditNote ? 'credit_note' : subtype.name,
     'productId': productId,
     'branchId': branchId,
     'quantity': quantity,
@@ -59,6 +62,7 @@ class ProductTransactionInDb extends BaseProductTransaction {
 
   ProductTransactionInDb({
     required this.id,
+    required this.createdAt,
     required super.documentId,
     required super.docNumber,
     required super.type,
@@ -68,30 +72,30 @@ class ProductTransactionInDb extends BaseProductTransaction {
     required super.quantity,
     required super.averageCost,
     required super.resultStock,
-    required this.createdAt,
   });
 
   factory ProductTransactionInDb.fromJson(Map<String, dynamic> json) => ProductTransactionInDb(
     id: json['id'],
+    createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt']),
     documentId: json['documentId'],
     docNumber: json['docNumber'],
     type: TransactionType.values.byName(json['type']),
-    subtype: TransactionSubType.values.byName(json['subtype']),
+    subtype: switch (json['subtype']) {
+      'credit_note' => TransactionSubType.creditNote,
+      _ => TransactionSubType.values.byName(json['subtype']),
+    },
     productId: json['productId'],
     branchId: json['branchId'],
     quantity: json['quantity'],
     averageCost: json['averageCost'],
     resultStock: json['resultStock'],
-    createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt']),
   );
 
   @override
   Map<String, dynamic> toJson() {
     final data = super.toJson();
-    data.addAll({
-      'id': id,
-      'createdAt': createdAt.millisecondsSinceEpoch,
-    });
+    data['id'] = id;
+    data['createdAt'] = createdAt.millisecondsSinceEpoch;
     return data;
   }
 }
