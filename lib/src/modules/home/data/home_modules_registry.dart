@@ -198,7 +198,7 @@ List<HomeModuleCategory> getHomeModuleCategories(
     const HomeModuleCategory(
       id: HomeModuleId.products,
       title: "Catálogo de Productos",
-      subtitle: "Lista global, categorías y unidades de medida",
+      subtitle: "Lista global, categorías, unidades y escalas de medida",
       icon: FluentIcons.receipt_bag_20_filled,
       accentColor: Color(0xFF7C3AED),
       permissions: [Modules.products],
@@ -212,18 +212,11 @@ List<HomeModuleCategory> getHomeModuleCategories(
           routeName: "product-list",
         ),
         HomeSubmoduleItem(
-          title: "Unidades de Medida",
-          subtitle: "Factores de conversión y unidades de empaque",
-          icon: Icons.tag,
-          accentColor: Color(0xFF2563EB),
-          routeName: "units",
-        ),
-        HomeSubmoduleItem(
-          title: "Escalas de Unidades",
-          subtitle: "Plantillas maestras de conversión y múltiplos",
+          title: "Unidades y Escalas de Medida",
+          subtitle: "Factores de conversión, unidades de empaque y plantillas",
           icon: Icons.straighten_rounded,
           accentColor: Color(0xFF0D9488),
-          routeName: RouteNames.unitScales,
+          routeName: RouteNames.unitsAndScales,
         ),
         HomeSubmoduleItem(
           title: "Categorías de Productos",
@@ -922,100 +915,95 @@ List<HomeModuleCategory> getHomeModuleCategories(
         ),
         const HomeSubmoduleItem(
           title: "Configuraciones del Sistema",
-          subtitle:
-              "Margen de ganancia, vencimientos, órdenes y reglas globales",
+          subtitle: "Margen de ganancia, vencimientos, órdenes y reglas globales",
           icon: Icons.tune_rounded,
           accentColor: Color(0xFF7C3AED),
           routeName: "app-settings",
         ),
-        HomeSubmoduleItem(
-          title: "Reiniciar Inventario a 0",
-          subtitle:
-              "Zona de Peligro: Vacía las existencias físicas de la sucursal activa o seleccionada",
-          icon: Icons.restart_alt_rounded,
-          accentColor: const Color(0xFFDC2626),
-          customAction: (ctx) async {
-            final authCubit = getIt<AuthCubit>();
-            final allBranches = ctx.read<BranchesRepository>().branches;
-            BranchInDb? targetBranch = authCubit.currentBranch;
+        // HomeSubmoduleItem(
+        //   title: "Reiniciar Inventario a 0",
+        //   subtitle: "Zona de Peligro: Vacía las existencias físicas de la sucursal activa o seleccionada",
+        //   icon: Icons.restart_alt_rounded,
+        //   accentColor: const Color(0xFFDC2626),
+        //   customAction: (ctx) async {
+        //     final authCubit = getIt<AuthCubit>();
+        //     final allBranches = ctx.read<BranchesRepository>().branches;
+        //     BranchInDb? targetBranch = authCubit.currentBranch;
 
-            if (targetBranch == null && allBranches.isNotEmpty) {
-              final selected =
-                  await showBranchSelectionDialog(ctx, allBranches);
-              if (selected == null) return;
-              targetBranch = selected;
-            }
+        //     if (targetBranch == null && allBranches.isNotEmpty) {
+        //       final selected = await showBranchSelectionDialog(ctx, allBranches);
+        //       if (selected == null) return;
+        //       targetBranch = selected;
+        //     }
 
-            if (!ctx.mounted) return;
+        //     if (!ctx.mounted) return;
 
-            if (targetBranch == null) {
-              ScaffoldMessenger.of(ctx).showSnackBar(
-                const SnackBar(
-                  content: Text("No hay sucursales disponibles."),
-                  backgroundColor: Colors.redAccent,
-                ),
-              );
-              return;
-            }
+        //     if (targetBranch == null) {
+        //       ScaffoldMessenger.of(ctx).showSnackBar(
+        //         const SnackBar(
+        //           content: Text("No hay sucursales disponibles."),
+        //           backgroundColor: Colors.redAccent,
+        //         ),
+        //       );
+        //       return;
+        //     }
 
-            if (!ctx.mounted) return;
-            final result = await showResetInventoryDangerDialog(
-              ctx,
-              branch: targetBranch,
-            );
-            if (result != null && ctx.mounted) {
-              showDialog<void>(
-                context: ctx,
-                builder: (dCtx) => AlertDialog(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  icon: const Icon(
-                    Icons.check_circle_rounded,
-                    color: Colors.teal,
-                    size: 44,
-                  ),
-                  title: const Text(
-                    "Inventario Reiniciado",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        result.message,
-                        style: const TextStyle(fontSize: 14),
-                      ),
-                      const SizedBox(height: 12),
-                      if (result.docNumber.isNotEmpty)
-                        Text(
-                          "• Comprobante: ${result.docNumber}",
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 13),
-                        ),
-                      Text(
-                        "• Productos ajustados: ${result.adjustedProductsCount}",
-                        style: const TextStyle(fontSize: 13),
-                      ),
-                      Text(
-                        "• Unidades descargadas: ${result.totalQuantityRemoved}",
-                        style: const TextStyle(fontSize: 13),
-                      ),
-                    ],
-                  ),
-                  actions: [
-                    FilledButton(
-                      onPressed: () => Navigator.of(dCtx).pop(),
-                      child: const Text("Entendido"),
-                    ),
-                  ],
-                ),
-              );
-            }
-          },
-        ),
-
+        //     if (!ctx.mounted) return;
+        //     final result = await showResetInventoryDangerDialog(
+        //       ctx,
+        //       branch: targetBranch,
+        //     );
+        //     if (result != null && ctx.mounted) {
+        //       showDialog<void>(
+        //         context: ctx,
+        //         builder: (dCtx) => AlertDialog(
+        //           shape: RoundedRectangleBorder(
+        //             borderRadius: BorderRadius.circular(16),
+        //           ),
+        //           icon: const Icon(
+        //             Icons.check_circle_rounded,
+        //             color: Colors.teal,
+        //             size: 44,
+        //           ),
+        //           title: const Text(
+        //             "Inventario Reiniciado",
+        //             style: TextStyle(fontWeight: FontWeight.bold),
+        //           ),
+        //           content: Column(
+        //             mainAxisSize: MainAxisSize.min,
+        //             crossAxisAlignment: CrossAxisAlignment.start,
+        //             children: [
+        //               Text(
+        //                 result.message,
+        //                 style: const TextStyle(fontSize: 14),
+        //               ),
+        //               const SizedBox(height: 12),
+        //               if (result.docNumber.isNotEmpty)
+        //                 Text(
+        //                   "• Comprobante: ${result.docNumber}",
+        //                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+        //                 ),
+        //               Text(
+        //                 "• Productos ajustados: ${result.adjustedProductsCount}",
+        //                 style: const TextStyle(fontSize: 13),
+        //               ),
+        //               Text(
+        //                 "• Unidades descargadas: ${result.totalQuantityRemoved}",
+        //                 style: const TextStyle(fontSize: 13),
+        //               ),
+        //             ],
+        //           ),
+        //           actions: [
+        //             FilledButton(
+        //               onPressed: () => Navigator.of(dCtx).pop(),
+        //               child: const Text("Entendido"),
+        //             ),
+        //           ],
+        //         ),
+        //       );
+        //     }
+        //   },
+        // ),
       ],
     ),
   ];

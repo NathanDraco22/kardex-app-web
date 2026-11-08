@@ -390,6 +390,8 @@ class _FormContentState extends State<_FormContent> {
                                 fit: FlexFit.tight,
                                 child: QuantityField(
                                   key: ValueKey("${commercialProductResult.selectedUnitIndex}"),
+                                  showTitle: true,
+                                  showButtons: false,
                                   focusNode: focusNode,
                                   initialValue: commercialProductResult.quantity,
                                   conversionFactor: commercialProductResult.conversionFactor,

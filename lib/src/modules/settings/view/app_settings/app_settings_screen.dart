@@ -572,7 +572,11 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                           (authUser.id == 'root' ||
                               authUser.username.toLowerCase() == 'root' ||
                               authUser.role == 'Admin');
-                      if (!context.isDesktop() && !isRootOrAdmin) {
+
+                      if (!isRootOrAdmin) {
+                        return const SizedBox.shrink();
+                      }
+                      if (!context.isDesktop()) {
                         return const SizedBox.shrink();
                       }
 

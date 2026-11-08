@@ -11,6 +11,8 @@ Ubicación: `lib/src/modules/product_catalog/`:
 ```text
 lib/src/modules/product_catalog/
 ├── view/product_catalog_menu_screen.dart # Menú del catálogo de productos
+├── units_and_scales/                     # Pantalla combinada con pestañas
+│   └── units_and_scales_screen.dart      # Unidades + Escalas de Medida
 ├── product_list/                         # Listado maestro de productos (Global)
 │   ├── cubit/                            # ReadProductCubit, WriteProductCubit
 │   ├── dialogs/                          # CreateProductDialog, FormSection
@@ -20,12 +22,14 @@ lib/src/modules/product_catalog/
 │   ├── dialogs/                          # CreateCategoryDialog
 │   └── view/product_category_screen.dart # Gestión de categorías
 ├── units/                                # Unidades de medida individuales
-│   ├── cubit/                            # UnitsCubit
+│   ├── cubit/                            # ReadUnitCubit, WriteUnitCubit
 │   ├── dialog/                           # CreateUnitDialog
+│   ├── panels/                           # UnitsPanel (UI reutilizable)
 │   └── units_screen.dart                 # Gestión de unidades de medida
 └── unit_scales/                          # Escalas y plantillas de conversión
     ├── cubit/                            # ReadUnitScalesCubit, WriteUnitScaleCubit
     ├── dialogs/                          # CreateUnitScaleDialog
+    ├── panels/                           # UnitScalesPanel (UI reutilizable)
     └── unit_scales_screen.dart           # Pantalla de gestión de escalas
 ```
 
@@ -56,14 +60,15 @@ lib/src/modules/product_catalog/
 
 ### 2.3. Unidades de Medida (`units`)
 - **Propósito:** Control de unidades físicas (unidad, caja, fardo, kg, litro, metro) y definición de factores de conversión individuales.
-- **Vistas:** `UnitsScreen`.
-- **Cubits:** `UnitsCubit`.
+- **Vistas:** `UnitsPanel` (UI reutilizable) y `UnitsScreen` (wrapper individual).
+- **Cubits:** `ReadUnitCubit`, `WriteUnitCubit`.
+- **Búsqueda y visualización:** `UnitsPanel` incluye buscador local, tarjetas con iconografía, estado vacío y skeleton loader.
 - **Integración:**
   - Trabaja estrechamente con `UnitConversionTool` (`lib/src/tools/unit_conversion_tool.dart`) para calcular equivalencias al ingresar compras por caja y vender al por menor por unidad.
 
 ### 2.4. Escalas de Unidades de Medida (`unit_scales`)
 - **Propósito:** Plantillas reutilizables de conversión para productos que se comercializan bajo diferentes unidades y múltiplos (Peso, Volumen, Longitud, Tiempo y personalizadas). Evita tener que reconfigurar manualmente las unidades extras y factores producto por producto.
-- **Vistas:** `UnitScalesScreen` (diseño responsivo con chips de equivalencias, badges de detalle y mayoreo).
+- **Vistas:** `UnitScalesPanel` (UI reutilizable) y `UnitScalesScreen` (wrapper individual). Diseño responsivo con chips de equivalencias, badges de detalle y mayoreo.
 - **Cubits:**
   - `ReadUnitScalesCubit`: Carga, filtrado local en tiempo real y refresco de escalas.
   - `WriteUnitScaleCubit`: Creación (`createNewUnitScale`), edición (`updateUnitScale`) y eliminación (`deleteUnitScale`).
@@ -75,6 +80,13 @@ lib/src/modules/product_catalog/
 - **Fijación de Precios y Costos Bidireccionales:**
   - `ProductPriceEditorScreen` / `product_price_editor_dialog.dart`: Sincronización instantánea entre el precio base (ej. Gramos) y el precio comercial (ej. Libras), preselección automática de la unidad preferida (`defaultUnitIndex`) y visualización dinámica de los costos (Promedio, Última Compra, Máximo y Sugerido) para la unidad seleccionada.
 - **Documentación Completa:** Ver [Guía Maestra de Unidades de Medida y Conversiones](./unit_scales.md).
+
+### 2.5. Pantalla Combinada de Unidades y Escalas (`units_and_scales`)
+- **Propósito:** Centralizar la gestión de unidades y escalas en una sola entrada del menú, mejorando la experiencia de navegación.
+- **Vista:** `UnitsAndScalesScreen` (`lib/src/modules/product_catalog/units_and_scales/units_and_scales_screen.dart`).
+- **Pestañas:** `Unidades` (usa `UnitsPanel`) y `Escalas` (usa `UnitScalesPanel`).
+- **Cubits:** Provee los cuatro cubits (`ReadUnitCubit`, `WriteUnitCubit`, `ReadUnitScalesCubit`, `WriteUnitScaleCubit`).
+- **Compatibilidad:** Las rutas heredadas `units` y `unit-scales` redirigen a esta pantalla con la pestaña correspondiente.
 
 ---
 
@@ -94,5 +106,6 @@ lib/src/modules/product_catalog/
 - `/product-catalog`: Menú principal del catálogo (`ProductCatalogMenuScreen`).
 - `/product-catalog/product-list`: Listado global de productos (`ProductListScreen`).
 - `/product-catalog/product-category`: Catálogo de categorías (`ProductCategoryScreen`).
-- `/product-catalog/units`: Unidades de medida individuales (`UnitsScreen`).
-- `/product-catalog/unit-scales`: Escalas y plantillas de conversión (`UnitScalesScreen`).
+- `/product-catalog/units-and-scales`: Pantalla combinada de unidades y escalas (`UnitsAndScalesScreen`). Acepta `?tab=units|scales`.
+- `/product-catalog/units`: Ruta heredada; redirige a `units-and-scales?tab=units`.
+- `/product-catalog/unit-scales`: Ruta heredada; redirige a `units-and-scales?tab=scales`.

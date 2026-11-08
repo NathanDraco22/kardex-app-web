@@ -289,6 +289,8 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                                 fit: FlexFit.tight,
                                 child: QuantityField(
                                   key: ValueKey("${commercialProductResult.selectedUnitIndex}"),
+                                  showTitle: true,
+                                  showButtons: false,
                                   focusNode: focusNode,
                                   initialValue: commercialProductResult.quantity,
                                   conversionFactor: commercialProductResult.conversionFactor,

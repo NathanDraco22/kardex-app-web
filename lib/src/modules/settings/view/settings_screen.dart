@@ -42,11 +42,10 @@ class _Body extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authUser = getIt<AuthCubit>().user;
-    final bool isRootOrAdmin = authUser != null &&
-        (authUser.id == 'root' ||
-            authUser.username.toLowerCase() == 'root' ||
-            authUser.role == 'Admin');
-    final bool showDangerZone = context.isDesktop() || isRootOrAdmin;
+    final bool isRootOrAdmin =
+        authUser != null &&
+        (authUser.id == 'root' || authUser.username.toLowerCase() == 'root' || authUser.role == 'Admin');
+    final bool showDangerZone = context.isDesktop() && isRootOrAdmin;
 
     return Center(
       child: ConstrainedBox(
@@ -117,23 +116,20 @@ class _Body extends StatelessWidget {
                 icon: Icons.tune_rounded,
                 accentColor: Colors.deepPurple.shade600,
                 title: "Configuraciones del Sistema",
-                subtitle:
-                    "Margen de ganancia, vencimientos, órdenes y reglas globales",
+                subtitle: "Margen de ganancia, vencimientos, órdenes y reglas globales",
                 onTap: () => context.pushNamed("app-settings"),
               ),
             ),
             if (showDangerZone) ...[
               const SizedBox(height: 24),
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
                   children: [
-                    Icon(Icons.shield_outlined,
-                        size: 18, color: Colors.red.shade700),
+                    Icon(Icons.shield_outlined, size: 18, color: Colors.red.shade700),
                     const SizedBox(width: 8),
                     Text(
-                      "Zona de Peligro (Solo Desktop / Root)",
+                      "Zona de Peligro",
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
@@ -173,8 +169,7 @@ class _DangerZoneCard extends StatelessWidget {
               border: Border.all(color: const Color(0xFFFCA5A5), width: 1.2),
             ),
             child: ListTile(
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               leading: Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
@@ -212,17 +207,14 @@ class _DangerZoneCard extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
                 onPressed: () async {
                   BranchInDb? target = currentBranch;
                   if (target == null) {
-                    final allBranches =
-                        context.read<BranchesRepository>().branches;
+                    final allBranches = context.read<BranchesRepository>().branches;
                     if (allBranches.isNotEmpty) {
-                      final selected = await showBranchSelectionDialog(
-                          context, allBranches);
+                      final selected = await showBranchSelectionDialog(context, allBranches);
                       if (selected == null) return;
                       target = selected;
                     }
@@ -260,8 +252,7 @@ class _DangerZoneCard extends StatelessWidget {
     );
   }
 
-  void _showResetSuccessDialog(
-      BuildContext context, ResetInventoryResult result) {
+  void _showResetSuccessDialog(BuildContext context, ResetInventoryResult result) {
     showDialog<void>(
       context: context,
       builder: (ctx) {
@@ -292,8 +283,7 @@ class _DangerZoneCard extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 4.0),
                   child: Text(
                     "• Comprobante de Ajuste: ${result.docNumber}",
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 13),
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                   ),
                 ),
               Text(

@@ -19,6 +19,7 @@ class RouteNames {
   static const productList = 'product-list';
   static const units = 'units';
   static const unitScales = 'unit-scales';
+  static const unitsAndScales = 'units-and-scales';
 
   static const clientCatalog = 'client-catalog';
   static const clientList = 'client-list';
@@ -105,7 +106,6 @@ class RouteNames {
   static const imports = 'imports';
   static const apiKeys = 'api_keys';
   static const appSettings = 'app-settings';
-
 
   static const expenses = 'expenses';
   static const operativeExpenses = 'operative-expenses';

@@ -201,10 +201,13 @@ kardex_app_front/
 │   │   │   │   ├── sale_terminal/widgets/terminal_cart_item_tile.dart # Formato displayQuantity en POS
 │   │   │   │   └── client_invoices/..., anon_invoices/...             # QuantityField en formularios
 │   │   │   └── product_catalog/
+│   │   │       ├── units_and_scales/units_and_scales_screen.dart      # Pantalla combinada con pestañas
 │   │   │       ├── unit_scales/                                       # CRUD de Escalas
 │   │   │       │   ├── cubit/ (read_unit_scales, write_unit_scale)
 │   │   │       │   ├── dialogs/create_unit_scale_dialog.dart
+│   │   │       │   ├── panels/unit_scales_panel.dart                  # UI reutilizable
 │   │   │       │   └── unit_scales_screen.dart
+│   │   │       ├── units/panels/units_panel.dart                      # UI reutilizable de unidades
 │   │   │       └── product_list/dialogs/
 │   │   │           ├── create_product_dialog.dart                     # Botón 'Usar Preset'
 │   │   │           └── create_product_with_data_dialog.dart           # Botón 'Usar Preset'

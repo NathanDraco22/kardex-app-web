@@ -47,6 +47,7 @@ class QuantityField extends StatefulWidget {
     this.max,
     this.step = 1.0,
     this.showButtons = false,
+    this.showTitle = false,
     this.unitLabel,
     this.baseUnitName,
     this.title = "Cantidad",
@@ -70,6 +71,7 @@ class QuantityField extends StatefulWidget {
   final double? max;
   final double step;
   final bool showButtons;
+  final bool showTitle;
   final String? unitLabel;
   final String? baseUnitName;
   final String? title;
@@ -166,6 +168,19 @@ class _QuantityFieldState extends State<QuantityField> {
     _updateValue(current - widget.step);
   }
 
+  KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
+    if (event is KeyDownEvent) {
+      if (event.character == '+' || event.logicalKey == LogicalKeyboardKey.numpadAdd) {
+        _increment();
+        return KeyEventResult.handled;
+      } else if (event.character == '-' || event.logicalKey == LogicalKeyboardKey.numpadSubtract) {
+        _decrement();
+        return KeyEventResult.handled;
+      }
+    }
+    return KeyEventResult.ignored;
+  }
+
   @override
   Widget build(BuildContext context) {
     final canUseDecimals = widget.isDecimalSupported;
@@ -230,10 +245,15 @@ class _QuantityFieldState extends State<QuantityField> {
         ],
       );
     } else {
-      content = textField;
+      content = Focus(
+        onKeyEvent: _handleKeyEvent,
+        child: textField,
+      );
     }
 
-    if (widget.title == null && !showEquivalence) {
+    final hasVisibleTitle = widget.showTitle && widget.title != null;
+
+    if (!hasVisibleTitle && !showEquivalence) {
       return content;
     }
 
@@ -241,7 +261,7 @@ class _QuantityFieldState extends State<QuantityField> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (widget.title != null) ...[
+        if (hasVisibleTitle) ...[
           Row(
             mainAxisAlignment: widget.centerTitle
                 ? MainAxisAlignment.center

@@ -262,7 +262,7 @@ List<HomeOption> getHomeOptions(BuildContext context, [BranchInDb? branch]) {
     HomeOption(
       permissions: const [Modules.products],
       title: "Catálogo de Productos",
-      subtitle: "Inventario general, precios y categorías",
+      subtitle: "Inventario, precios, categorías, unidades y escalas",
       accentColor: const Color(0xFF7C3AED),
       icon: FluentIcons.receipt_bag_20_filled,
       onTap: () => context.pushNamed("product-catalog"),

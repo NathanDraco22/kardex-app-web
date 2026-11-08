@@ -88,8 +88,7 @@ import 'package:kardex_app_front/src/modules/product_catalog/view/product_catalo
 import 'package:kardex_app_front/src/modules/settings/view/branches/branches_screen.dart';
 import 'package:kardex_app_front/src/modules/settings/view/price_to_product/price_to_product_screen.dart';
 import 'package:kardex_app_front/src/modules/settings/view/settings_screen.dart';
-import 'package:kardex_app_front/src/modules/product_catalog/units/units_screen.dart';
-import 'package:kardex_app_front/src/modules/product_catalog/unit_scales/unit_scales_screen.dart';
+import 'package:kardex_app_front/src/modules/product_catalog/units_and_scales/units_and_scales_screen.dart';
 import 'package:kardex_app_front/src/modules/settings/view/users/users_screen.dart';
 import 'package:kardex_app_front/src/modules/inactive/inactive_screen.dart';
 import 'package:kardex_app_front/src/modules/splash/splash_screen.dart';
@@ -203,14 +202,22 @@ class AppRouter {
             builder: (context, state) => const ProductListScreen(),
           ),
           GoRoute(
+            path: "units-and-scales",
+            name: "units-and-scales",
+            builder: (context, state) {
+              final tab = state.uri.queryParameters["tab"];
+              return UnitsAndScalesScreen(initialTab: tab == "scales" ? 1 : 0);
+            },
+          ),
+          GoRoute(
             path: "units",
             name: "units",
-            builder: (context, state) => const UnitsScreen(),
+            redirect: (context, state) => "/product-catalog/units-and-scales?tab=units",
           ),
           GoRoute(
             path: "unit-scales",
             name: "unit-scales",
-            builder: (context, state) => const UnitScalesScreen(),
+            redirect: (context, state) => "/product-catalog/units-and-scales?tab=scales",
           ),
         ],
       ),

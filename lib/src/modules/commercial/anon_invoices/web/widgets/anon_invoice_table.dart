@@ -299,7 +299,8 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
                 fit: FlexFit.tight,
                 child: QuantityField(
                   key: ValueKey("${widget.item.product.id}_${widget.item.selectedUnitIndex}"),
-                  showButtons: true,
+                  showButtons: false,
+                  showTitle: false,
                   conversionFactor: widget.item.conversionFactor,
                   initialValue: widget.item.quantity,
                   max: widget.item.product.account.availableStock / widget.item.conversionFactor,
