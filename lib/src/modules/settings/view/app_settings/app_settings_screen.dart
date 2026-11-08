@@ -1,3 +1,7 @@
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/src/tools/extensiones.dart';
+import 'package:kardex_app_front/widgets/dialogs/selectors/branch_selection_dialog.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_business/kardex_business.dart';
@@ -474,6 +478,189 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                     ),
                   ),
                   const SizedBox(height: 32),
+                  Builder(
+                    builder: (context) {
+                      final authUser = getIt<AuthCubit>().user;
+                      final bool isRootOrAdmin = authUser != null &&
+                          (authUser.id == 'root' ||
+                              authUser.username.toLowerCase() == 'root' ||
+                              authUser.role == 'Admin');
+                      if (!context.isDesktop() && !isRootOrAdmin) {
+                        return const SizedBox.shrink();
+                      }
+
+                      final currentBranch = getIt<AuthCubit>().currentBranch;
+                      final branchName = currentBranch?.name ?? "Sin sucursal seleccionada";
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const SizedBox(height: 16),
+                          const Divider(),
+                          const SizedBox(height: 16),
+                          _buildSectionHeader(
+                            icon: Icons.shield_outlined,
+                            title: "Zona de Peligro (Solo Desktop / Root)",
+                            subtitle:
+                                "Acciones irreversibles que impactan el inventario y auditoría",
+                          ),
+                          const SizedBox(height: 12),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFEF2F2),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: const Color(0xFFFCA5A5),
+                                width: 1.2,
+                              ),
+                            ),
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 8),
+                              leading: Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: Colors.red.shade100,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Icon(
+                                  Icons.restart_alt_rounded,
+                                  color: Colors.red.shade800,
+                                  size: 26,
+                                ),
+                              ),
+                              title: const Text(
+                                "Reiniciar Inventario a 0",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                  color: Color(0xFF991B1B),
+                                ),
+                              ),
+                              subtitle: Padding(
+                                padding: const EdgeInsets.only(top: 4.0),
+                                child: Text(
+                                  "Genera un ajuste de salida automático que vacía las existencias físicas de la sucursal ($branchName). Irreversible.",
+                                  style: TextStyle(
+                                    fontSize: 12.5,
+                                    color: Colors.red.shade900.withValues(alpha: 0.85),
+                                  ),
+                                ),
+                              ),
+                              trailing: FilledButton.tonal(
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: Colors.red.shade700,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 12),
+                                ),
+                                onPressed: () async {
+                                  BranchInDb? target = currentBranch;
+                                  if (target == null) {
+                                    final allBranches = context
+                                        .read<BranchesRepository>()
+                                        .branches;
+                                    if (allBranches.isNotEmpty) {
+                                      final selected =
+                                          await showBranchSelectionDialog(
+                                              context, allBranches);
+                                      if (selected == null) return;
+                                      target = selected;
+                                    }
+                                  }
+
+                                  if (target == null) {
+                                    if (!context.mounted) return;
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                            "No hay sucursales disponibles."),
+                                        backgroundColor: Colors.redAccent,
+                                      ),
+                                    );
+                                    return;
+                                  }
+
+                                  if (!context.mounted) return;
+                                  final result =
+                                      await showResetInventoryDangerDialog(
+                                    context,
+                                    branch: target,
+                                  );
+                                  if (result != null && context.mounted) {
+                                    showDialog<void>(
+                                      context: context,
+                                      builder: (dCtx) => AlertDialog(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(16),
+                                        ),
+                                        icon: const Icon(
+                                          Icons.check_circle_rounded,
+                                          color: Colors.teal,
+                                          size: 44,
+                                        ),
+                                        title: const Text(
+                                          "Inventario Reiniciado",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        content: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              result.message,
+                                              style: const TextStyle(
+                                                  fontSize: 14),
+                                            ),
+                                            const SizedBox(height: 12),
+                                            if (result.docNumber.isNotEmpty)
+                                              Text(
+                                                "• Comprobante: ${result.docNumber}",
+                                                style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 13),
+                                              ),
+                                            Text(
+                                              "• Productos ajustados: ${result.adjustedProductsCount}",
+                                              style:
+                                                  const TextStyle(fontSize: 13),
+                                            ),
+                                            Text(
+                                              "• Unidades descargadas: ${result.totalQuantityRemoved}",
+                                              style:
+                                                  const TextStyle(fontSize: 13),
+                                            ),
+                                          ],
+                                        ),
+                                        actions: [
+                                          FilledButton(
+                                            onPressed: () =>
+                                                Navigator.of(dCtx).pop(),
+                                            child: const Text("Entendido"),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }
+                                },
+                                child: const Text(
+                                  "Reiniciar a 0",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+
                 ],
               ),
             ),

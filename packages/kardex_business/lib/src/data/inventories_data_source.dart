@@ -20,4 +20,17 @@ class InventoriesDataSource with HttpService {
     final res = await getQuery(uri, headers: headers);
     return res;
   }
+
+  Future<Map<String, dynamic>> resetBranchInventory(
+    Map<String, dynamic> data,
+  ) async {
+    final uri = HttpTools.generateUri("$_endpoint/reset-stock");
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await postQuery(
+      uri,
+      data,
+      headers: headers,
+    );
+    return res;
+  }
 }

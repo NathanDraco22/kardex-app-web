@@ -66,9 +66,12 @@ class _WebBody extends StatelessWidget {
 
       if (!context.mounted) return;
 
-      final updateBranch = UpdateBranch(
-        imageUrl: uploadedUrl,
-        image: "",
+      final updateBranch = UpdateBranch(
+
+        imageUrl: uploadedUrl,
+
+        image: "",
+
       );
       final branchRepo = context.read<BranchesRepository>();
       await branchRepo.updateBranchById(branch.id, updateBranch);
@@ -253,6 +256,66 @@ class _WebBody extends StatelessWidget {
                                   icon: const Icon(Icons.edit),
                                   tooltip: "Editar sucursal",
                                 ),
+                                  IconButton(
+                                    onPressed: () async {
+                                      final result = await showResetInventoryDangerDialog(
+                                        context,
+                                        branch: branch,
+                                      );
+                                      if (result != null && context.mounted) {
+                                        showDialog<void>(
+                                          context: context,
+                                          builder: (dCtx) => AlertDialog(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(16),
+                                            ),
+                                            icon: const Icon(
+                                              Icons.check_circle_rounded,
+                                              color: Colors.teal,
+                                              size: 44,
+                                            ),
+                                            title: const Text(
+                                              "Inventario Reiniciado",
+                                              style: TextStyle(fontWeight: FontWeight.bold),
+                                            ),
+                                            content: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  result.message,
+                                                  style: const TextStyle(fontSize: 14),
+                                                ),
+                                                const SizedBox(height: 12),
+                                                if (result.docNumber.isNotEmpty)
+                                                  Text(
+                                                    "• Comprobante: ${result.docNumber}",
+                                                    style: const TextStyle(
+                                                        fontWeight: FontWeight.bold, fontSize: 13),
+                                                  ),
+                                                Text(
+                                                  "• Productos ajustados: ${result.adjustedProductsCount}",
+                                                  style: const TextStyle(fontSize: 13),
+                                                ),
+                                                Text(
+                                                  "• Unidades descargadas: ${result.totalQuantityRemoved}",
+                                                  style: const TextStyle(fontSize: 13),
+                                                ),
+                                              ],
+                                            ),
+                                            actions: [
+                                              FilledButton(
+                                                onPressed: () => Navigator.of(dCtx).pop(),
+                                                child: const Text("Entendido"),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    icon: Icon(Icons.restart_alt_rounded, color: Colors.red.shade700),
+                                    tooltip: "Zona de Peligro: Reiniciar inventario a 0 de ${branch.name}",
+                                  ),
                               ],
                             ),
                           );

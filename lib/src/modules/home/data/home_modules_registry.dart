@@ -1,4 +1,4 @@
-﻿import 'package:fluentui_system_icons/fluentui_system_icons.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
@@ -14,6 +14,8 @@ import 'package:kardex_app_front/widgets/dialogs/client_full_details_dialog.dart
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/simple_search_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/search_product_commercial_delegate.dart';
+import 'package:kardex_app_front/widgets/dialogs/selectors/branch_selection_dialog.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 enum HomeModuleId {
@@ -920,6 +922,92 @@ List<HomeModuleCategory> getHomeModuleCategories(
           accentColor: Color(0xFF7C3AED),
           routeName: "app-settings",
         ),
+        HomeSubmoduleItem(
+          title: "Reiniciar Inventario a 0",
+          subtitle:
+              "Zona de Peligro: Vacía las existencias físicas de la sucursal activa o seleccionada",
+          icon: Icons.restart_alt_rounded,
+          accentColor: const Color(0xFFDC2626),
+          customAction: (ctx) async {
+            final authCubit = getIt<AuthCubit>();
+            final allBranches = ctx.read<BranchesRepository>().branches;
+            BranchInDb? targetBranch = authCubit.currentBranch;
+
+            if (targetBranch == null && allBranches.isNotEmpty) {
+              final selected =
+                  await showBranchSelectionDialog(ctx, allBranches);
+              if (selected == null) return;
+              targetBranch = selected;
+            }
+
+            if (targetBranch == null) {
+              ScaffoldMessenger.of(ctx).showSnackBar(
+                const SnackBar(
+                  content: Text("No hay sucursales disponibles."),
+                  backgroundColor: Colors.redAccent,
+                ),
+              );
+              return;
+            }
+
+            if (!ctx.mounted) return;
+            final result = await showResetInventoryDangerDialog(
+              ctx,
+              branch: targetBranch,
+            );
+            if (result != null && ctx.mounted) {
+              showDialog<void>(
+                context: ctx,
+                builder: (dCtx) => AlertDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  icon: const Icon(
+                    Icons.check_circle_rounded,
+                    color: Colors.teal,
+                    size: 44,
+                  ),
+                  title: const Text(
+                    "Inventario Reiniciado",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        result.message,
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                      const SizedBox(height: 12),
+                      if (result.docNumber.isNotEmpty)
+                        Text(
+                          "• Comprobante: ${result.docNumber}",
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 13),
+                        ),
+                      Text(
+                        "• Productos ajustados: ${result.adjustedProductsCount}",
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                      Text(
+                        "• Unidades descargadas: ${result.totalQuantityRemoved}",
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                    ],
+                  ),
+                  actions: [
+                    FilledButton(
+                      onPressed: () => Navigator.of(dCtx).pop(),
+                      child: const Text("Entendido"),
+                    ),
+                  ],
+                ),
+              );
+            }
+          },
+        ),
+
       ],
     ),
   ];
