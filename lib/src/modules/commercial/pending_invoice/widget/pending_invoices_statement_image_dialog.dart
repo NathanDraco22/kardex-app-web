@@ -80,7 +80,7 @@ class _PendingInvoicesStatementImageDialogState
   Future<void> _captureStatementImage() async {
     try {
       // Esperar brevemente para asegurar que fuentes e íconos se hayan pintado
-      await Future.delayed(const Duration(milliseconds: 250));
+      await Future.delayed(const Duration(milliseconds: 280));
       if (!mounted) return;
 
       final boundary = _repaintBoundaryKey.currentContext?.findRenderObject()
@@ -166,18 +166,24 @@ class _PendingInvoicesStatementImageDialogState
               child: Stack(
                 children: [
                   // Widget fuera de vista directa para la captura por RepaintBoundary
+                  // Envuelto en scroll horizontal para que NUNCA sea comprimido por el ancho del teléfono
                   SingleChildScrollView(
-                    child: Center(
+                    scrollDirection: Axis.horizontal,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
                       child: RepaintBoundary(
                         key: _repaintBoundaryKey,
-                        child: _StatementVisualCard(
-                          client: widget.client,
-                          branch: branch,
-                          invoices: widget.invoices,
-                          devolutions: widget.devolutions,
-                          creditNotes: widget.creditNotes,
-                          badgeText: widget.badgeText,
-                          tableTitle: widget.tableTitle,
+                        child: SizedBox(
+                          width: 860,
+                          child: _StatementVisualCard(
+                            client: widget.client,
+                            branch: branch,
+                            invoices: widget.invoices,
+                            devolutions: widget.devolutions,
+                            creditNotes: widget.creditNotes,
+                            badgeText: widget.badgeText,
+                            tableTitle: widget.tableTitle,
+                          ),
                         ),
                       ),
                     ),
@@ -310,9 +316,9 @@ class _StatementVisualCard extends StatelessWidget {
         : 0;
 
     return Container(
-      width: 780,
+      width: 860,
       color: Colors.white,
-      padding: const EdgeInsets.all(28),
+      padding: const EdgeInsets.all(32),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
@@ -329,18 +335,18 @@ class _StatementVisualCard extends StatelessWidget {
                     Text(
                       branch?.name ?? "KARDEX APP",
                       style: const TextStyle(
-                        fontSize: 22,
+                        fontSize: 24,
                         fontWeight: FontWeight.w800,
                         color: Color(0xFF1E293B),
                         letterSpacing: -0.5,
                       ),
                     ),
                     if (branch?.address != null && branch!.address.isNotEmpty) ...[
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 3),
                       Text(
                         branch!.address,
                         style: TextStyle(
-                          fontSize: 12.5,
+                          fontSize: 13,
                           color: Colors.grey.shade600,
                         ),
                       ),
@@ -350,7 +356,7 @@ class _StatementVisualCard extends StatelessWidget {
                       Text(
                         "Tel: ${branch!.phone}",
                         style: TextStyle(
-                          fontSize: 12.5,
+                          fontSize: 13,
                           color: Colors.grey.shade600,
                         ),
                       ),
@@ -362,7 +368,7 @@ class _StatementVisualCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: AppThemeTokens.indigo.withValues(alpha: 0.1),
                       borderRadius: AppThemeTokens.borderRadiusSm,
@@ -374,7 +380,7 @@ class _StatementVisualCard extends StatelessWidget {
                     child: Text(
                       badgeText,
                       style: const TextStyle(
-                        fontSize: 12,
+                        fontSize: 12.5,
                         fontWeight: FontWeight.w800,
                         color: AppThemeTokens.indigo,
                         letterSpacing: 0.5,
@@ -395,13 +401,13 @@ class _StatementVisualCard extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 18),
+          const SizedBox(height: 20),
           const Divider(height: 1, thickness: 1.5, color: Color(0xFFE2E8F0)),
-          const SizedBox(height: 16),
+          const SizedBox(height: 18),
 
           // 2. Ficha de Datos del Cliente (Bento Container)
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
             decoration: BoxDecoration(
               color: const Color(0xFFF8FAFC),
               borderRadius: AppThemeTokens.borderRadiusMd,
@@ -418,26 +424,26 @@ class _StatementVisualCard extends StatelessWidget {
                       Text(
                         "CLIENTE",
                         style: TextStyle(
-                          fontSize: 10.5,
+                          fontSize: 11,
                           fontWeight: FontWeight.bold,
                           color: Colors.grey.shade500,
                           letterSpacing: 0.5,
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 3),
                       Text(
                         client.name,
                         style: const TextStyle(
-                          fontSize: 16,
+                          fontSize: 17,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF0F172A),
                         ),
                       ),
                       if (client.cardId != null && client.cardId!.isNotEmpty) ...[
-                        const SizedBox(height: 2),
+                        const SizedBox(height: 3),
                         Text(
                           "ID / Cédula: ${client.cardId}",
-                          style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
+                          style: TextStyle(fontSize: 12.5, color: Colors.grey.shade700),
                         ),
                       ],
                     ],
@@ -451,22 +457,22 @@ class _StatementVisualCard extends StatelessWidget {
                       Text(
                         "CONTACTO Y DIRECCIÓN",
                         style: TextStyle(
-                          fontSize: 10.5,
+                          fontSize: 11,
                           fontWeight: FontWeight.bold,
                           color: Colors.grey.shade500,
                           letterSpacing: 0.5,
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 3),
                       if (client.phone != null && client.phone!.isNotEmpty)
                         Text(
                           "Tel: ${client.phone}",
-                          style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
+                          style: TextStyle(fontSize: 12.5, color: Colors.grey.shade700),
                         ),
                       if (client.location != null && client.location!.isNotEmpty)
                         Text(
                           client.location!,
-                          style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
+                          style: TextStyle(fontSize: 12.5, color: Colors.grey.shade700),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -477,53 +483,57 @@ class _StatementVisualCard extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 22),
 
           // 3. Tabla de Facturas
           Text(
             "$tableTitle (${invoices.length})",
             style: const TextStyle(
-              fontSize: 12,
+              fontSize: 13,
               fontWeight: FontWeight.w800,
               color: Color(0xFF334155),
               letterSpacing: 0.3,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
 
           Container(
             decoration: BoxDecoration(
-              border: Border.all(color: const Color(0xFFE2E8F0)),
+              border: Border.all(color: const Color(0xFFCBD5E1)),
               borderRadius: AppThemeTokens.borderRadiusSm,
             ),
             clipBehavior: Clip.antiAlias,
             child: Column(
               children: [
-                // Cabecera de la Tabla
+                // Cabecera de la Tabla: Anchos calibrados y sin partición de texto
                 Container(
                   color: const Color(0xFFF1F5F9),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   child: const Row(
                     children: [
                       Expanded(
-                        flex: 3,
+                        flex: 2,
                         child: Text(
                           "Factura",
+                          maxLines: 1,
+                          softWrap: false,
                           style: TextStyle(
-                            fontSize: 11.5,
+                            fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF475569),
+                            color: Color(0xFF334155),
                           ),
                         ),
                       ),
                       Expanded(
-                        flex: 3,
+                        flex: 2,
                         child: Text(
                           "Fecha",
+                          maxLines: 1,
+                          softWrap: false,
                           style: TextStyle(
-                            fontSize: 11.5,
+                            fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF475569),
+                            color: Color(0xFF334155),
                           ),
                         ),
                       ),
@@ -531,11 +541,13 @@ class _StatementVisualCard extends StatelessWidget {
                         flex: 3,
                         child: Text(
                           "Total Factura",
+                          maxLines: 1,
+                          softWrap: false,
                           textAlign: TextAlign.right,
                           style: TextStyle(
-                            fontSize: 11.5,
+                            fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF475569),
+                            color: Color(0xFF334155),
                           ),
                         ),
                       ),
@@ -543,11 +555,13 @@ class _StatementVisualCard extends StatelessWidget {
                         flex: 3,
                         child: Text(
                           "Abonos",
+                          maxLines: 1,
+                          softWrap: false,
                           textAlign: TextAlign.right,
                           style: TextStyle(
-                            fontSize: 11.5,
+                            fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF475569),
+                            color: Color(0xFF334155),
                           ),
                         ),
                       ),
@@ -555,11 +569,13 @@ class _StatementVisualCard extends StatelessWidget {
                         flex: 3,
                         child: Text(
                           "A Favor (NC/Dev)",
+                          maxLines: 1,
+                          softWrap: false,
                           textAlign: TextAlign.right,
                           style: TextStyle(
-                            fontSize: 11.5,
+                            fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF475569),
+                            color: Color(0xFF334155),
                           ),
                         ),
                       ),
@@ -567,9 +583,11 @@ class _StatementVisualCard extends StatelessWidget {
                         flex: 3,
                         child: Text(
                           "Saldo Pendiente",
+                          maxLines: 1,
+                          softWrap: false,
                           textAlign: TextAlign.right,
                           style: TextStyle(
-                            fontSize: 11.5,
+                            fontSize: 12,
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF0F172A),
                           ),
@@ -579,7 +597,7 @@ class _StatementVisualCard extends StatelessWidget {
                   ),
                 ),
 
-                // Filas de Facturas
+                // Filas de Facturas: Espaciosas, sin cortes de líneas y blindadas para números grandes
                 ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
@@ -597,74 +615,103 @@ class _StatementVisualCard extends StatelessWidget {
                     final isEven = index % 2 == 0;
                     return Container(
                       color: isEven ? Colors.white : const Color(0xFFF8FAFC),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
                       child: Row(
                         children: [
                           Expanded(
-                            flex: 3,
+                            flex: 2,
                             child: Text(
                               "#${inv.docNumber}",
+                              maxLines: 1,
+                              softWrap: false,
                               style: const TextStyle(
-                                fontSize: 12,
+                                fontSize: 13,
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xFF0F172A),
                               ),
                             ),
                           ),
                           Expanded(
-                            flex: 3,
+                            flex: 2,
                             child: Text(
                               DateTimeTool.formatddMMyyEs(inv.createdAt),
+                              maxLines: 1,
+                              softWrap: false,
                               style: TextStyle(
-                                fontSize: 11.5,
+                                fontSize: 12,
                                 color: Colors.grey.shade700,
                               ),
                             ),
                           ),
                           Expanded(
                             flex: 3,
-                            child: Text(
-                              NumberFormatter.convertToMoneyLike(inv.total),
-                              textAlign: TextAlign.right,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey.shade800,
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                NumberFormatter.convertToMoneyLike(inv.total),
+                                maxLines: 1,
+                                softWrap: false,
+                                textAlign: TextAlign.right,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey.shade800,
+                                ),
                               ),
                             ),
                           ),
                           Expanded(
                             flex: 3,
-                            child: Text(
-                              NumberFormatter.convertToMoneyLike(inv.amountPaid),
-                              textAlign: TextAlign.right,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Color(0xFF0D9488),
-                                fontWeight: FontWeight.w500,
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                NumberFormatter.convertToMoneyLike(inv.amountPaid),
+                                maxLines: 1,
+                                softWrap: false,
+                                textAlign: TextAlign.right,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: Color(0xFF0D9488),
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ),
                           Expanded(
                             flex: 3,
-                            child: Text(
-                              discounts > 0 ? "-${NumberFormatter.convertToMoneyLike(discounts)}" : "0.00",
-                              textAlign: TextAlign.right,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: discounts > 0 ? const Color(0xFF8B5CF6) : Colors.grey.shade500,
-                                fontWeight: discounts > 0 ? FontWeight.w600 : FontWeight.normal,
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                discounts > 0 ? "-${NumberFormatter.convertToMoneyLike(discounts)}" : "0.00",
+                                maxLines: 1,
+                                softWrap: false,
+                                textAlign: TextAlign.right,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: discounts > 0 ? const Color(0xFF8B5CF6) : Colors.grey.shade500,
+                                  fontWeight: discounts > 0 ? FontWeight.w600 : FontWeight.normal,
+                                ),
                               ),
                             ),
                           ),
                           Expanded(
                             flex: 3,
-                            child: Text(
-                              NumberFormatter.convertToMoneyLike(remaining),
-                              textAlign: TextAlign.right,
-                              style: const TextStyle(
-                                fontSize: 12.5,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF1E40AF),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                NumberFormatter.convertToMoneyLike(remaining),
+                                maxLines: 1,
+                                softWrap: false,
+                                textAlign: TextAlign.right,
+                                style: const TextStyle(
+                                  fontSize: 13.5,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF1E40AF),
+                                ),
                               ),
                             ),
                           ),
@@ -679,9 +726,9 @@ class _StatementVisualCard extends StatelessWidget {
 
           // 4. Sección de Notas de Crédito Activas Generales
           if (creditNotes.isNotEmpty) ...[
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
               decoration: BoxDecoration(
                 color: const Color(0xFFFBF9FE),
                 borderRadius: AppThemeTokens.borderRadiusSm,
@@ -689,13 +736,13 @@ class _StatementVisualCard extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.receipt_long_outlined, size: 16, color: Color(0xFF7C3AED)),
-                  const SizedBox(width: 8),
+                  const Icon(Icons.receipt_long_outlined, size: 18, color: Color(0xFF7C3AED)),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       "El cliente cuenta con ${creditNotes.length} Nota(s) de Crédito a favor por un total de ${NumberFormatter.convertToMoneyLike(totalCreditNotes)}.",
                       style: const TextStyle(
-                        fontSize: 11.5,
+                        fontSize: 12.5,
                         fontWeight: FontWeight.w600,
                         color: Color(0xFF6B21A8),
                       ),
@@ -706,15 +753,15 @@ class _StatementVisualCard extends StatelessWidget {
             ),
           ],
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 22),
 
           // 5. Resumen Financiero Total
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Container(
-                width: 340,
-                padding: const EdgeInsets.all(16),
+                width: 360,
+                padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
                   color: const Color(0xFFF8FAFC),
                   borderRadius: AppThemeTokens.borderRadiusMd,
@@ -735,24 +782,27 @@ class _StatementVisualCard extends StatelessWidget {
                         "-${NumberFormatter.convertToMoneyLike(totalCreditNotes)}",
                         valueColor: const Color(0xFF7C3AED),
                       ),
-                    const Divider(height: 14, thickness: 1, color: Color(0xFFCBD5E1)),
+                    const Divider(height: 16, thickness: 1, color: Color(0xFFCBD5E1)),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text(
                           "NETO A PAGAR:",
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 14.5,
                             fontWeight: FontWeight.w900,
                             color: Color(0xFF0F172A),
                           ),
                         ),
-                        Text(
-                          NumberFormatter.convertToMoneyLike(netTotal),
-                          style: const TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w900,
-                            color: Color(0xFF1D4ED8),
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            NumberFormatter.convertToMoneyLike(netTotal),
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w900,
+                              color: Color(0xFF1D4ED8),
+                            ),
                           ),
                         ),
                       ],
@@ -763,26 +813,31 @@ class _StatementVisualCard extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 26),
           const Divider(height: 1, thickness: 1, color: Color(0xFFE2E8F0)),
           const SizedBox(height: 12),
 
-          // 6. Pie de Página
+          // 6. Pie de Página con Espaciado Adecuado
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                "Kardex App • Comprobante Informativo de Cuentas por Cobrar",
-                style: TextStyle(
-                  fontSize: 11,
-                  color: Colors.grey.shade500,
-                  fontWeight: FontWeight.w500,
+              Flexible(
+                child: Text(
+                  "Kardex App • Comprobante Informativo de Cuentas por Cobrar",
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    color: Colors.grey.shade500,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
+              const SizedBox(width: 16),
               Text(
                 "Página 1 de 1",
                 style: TextStyle(
-                  fontSize: 11,
+                  fontSize: 11.5,
                   color: Colors.grey.shade500,
                 ),
               ),
@@ -795,24 +850,27 @@ class _StatementVisualCard extends StatelessWidget {
 
   Widget _buildTotalRow(String label, String value, {Color? valueColor}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2.5),
+      padding: const EdgeInsets.symmetric(vertical: 3),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             label,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 12.5,
               color: Colors.grey.shade700,
               fontWeight: FontWeight.w500,
             ),
           ),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 12.5,
-              fontWeight: FontWeight.w600,
-              color: valueColor ?? const Color(0xFF1E293B),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: valueColor ?? const Color(0xFF1E293B),
+              ),
             ),
           ),
         ],
