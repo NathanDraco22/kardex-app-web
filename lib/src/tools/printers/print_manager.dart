@@ -134,7 +134,7 @@ class PrintManager with HiveService {
     final isDirect = await getIsDirectPrintEnabled();
     final savedPrinter = await getSavedPrinter();
 
-    if (isDirect && savedPrinter != null) {
+    if (!kIsWeb && isDirect && savedPrinter != null) {
       final autoCut = await getAutoCutEnabled();
       final invertColor = await getInvertColorEnabled();
       final useDithering = await getDitheringEnabled();

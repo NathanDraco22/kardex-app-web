@@ -464,3 +464,10 @@ Esta estructura se ha seguido para módulos como 'Historial de Facturas', 'Histo
 - El equivalente se muestra después del total final en `InvoiceViewerContent` (facturas normales, a crédito y devoluciones), en el ticket térmico de `invoice_printer.dart` y en el PDF A4 de `single_invoice_template.dart`.
 - La línea usa el formato `Total(USD): US$27.31` y solo aparece si la moneda secundaria es distinta a la principal y la tasa es mayor que cero.
 - No se modifica el total, pagos, cuentas por cobrar ni inventario. En facturas a crédito solo se muestra el total facturado, no el saldo restante.
+
+## Historial de Abonos en Imagen (Noviembre 2026)
+- Se agregó la exportación a PNG del historial de abonos desde el diálogo "Ver Recibos" de Facturas por Cobrar de Cliente.
+- Se creó `showInvoiceReceiptsHistoryImageDialog` en `invoice_receipts_history_image_dialog.dart`, con captura mediante `RepaintBoundary` a 2.5x, previsualización con zoom y compartición con `SharePlus`.
+- La imagen incluye membrete de la sucursal, datos del cliente y de la factura, resumen (total factura, total abonos y saldo restante) y tabla de recibos con fecha/hora, método y monto aplicado.
+- `InvoiceReceiptsHistoryModal` ahora conserva los recibos cargados y muestra el botón "Compartir Imagen", deshabilitado mientras carga o cuando no hay recibos.
+- Verificación: `flutter analyze` finalizó sin errores ni advertencias.

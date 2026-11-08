@@ -67,8 +67,10 @@ imports condicionales:
 - **Web** → [`thermal_printer/thermal_printer_service_stub.dart`](../lib/src/services/thermal_printer/thermal_printer_service_stub.dart), una implementación no-op que no importa el paquete.
 
 En web, `PrintManager.printPdf()` cae automáticamente en `Printing.layoutPdf()`,
-que abre el diálogo de impresión del navegador. La entrada "Configuración de
-Impresora Local" muestra un aviso informativo en web.
+que abre el diálogo de impresión del navegador. El diálogo "Configuración de
+Impresora Local" sigue abriéndose en web para elegir el tamaño de papel
+(58/80 mm), pero oculta el switch de impresión directa y todas las opciones de
+hardware (corte, tramado, inversión, búsqueda y prueba de impresora).
 
 ---
 

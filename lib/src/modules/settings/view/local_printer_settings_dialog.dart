@@ -6,19 +6,12 @@ import 'package:kardex_app_front/src/services/thermal_printer/thermal_printer_ty
 import 'package:kardex_app_front/src/services/thermal_printer_service.dart';
 import 'package:kardex_app_front/src/tools/printers/paper_settings.dart';
 import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
-import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 
 Future<void> showLocalPrinterSettingsDialog(BuildContext context) async {
-  if (kIsWeb) {
-    await DialogManager.showInfoDialog(
-      context,
-      "La impresión térmica directa solo está disponible en escritorio y móvil.",
-    );
-    return;
-  }
-
   final currentSize = await PrintManager.getLocalPaperSize();
-  final isDirect = await PrintManager.getIsDirectPrintEnabled();
+  final isDirect = kIsWeb
+      ? false
+      : await PrintManager.getIsDirectPrintEnabled();
   final savedPrinter = await PrintManager.getSavedPrinter();
   final autoCut = await PrintManager.getAutoCutEnabled();
   final invertColor = await PrintManager.getInvertColorEnabled();
@@ -150,11 +143,16 @@ class _LocalPrinterSettingsDialogState extends State<_LocalPrinterSettingsDialog
 
   Future<void> _saveSettings() async {
     await PrintManager.saveLocalPaperSize(_selectedSize);
-    await PrintManager.saveIsDirectPrintEnabled(_isDirectPrint);
-    await PrintManager.saveSavedPrinter(_selectedPrinter);
-    await PrintManager.saveAutoCutEnabled(_autoCut);
-    await PrintManager.saveInvertColorEnabled(_invertColor);
-    await PrintManager.saveDitheringEnabled(_dithering);
+
+    if (kIsWeb) {
+      await PrintManager.saveIsDirectPrintEnabled(false);
+    } else {
+      await PrintManager.saveIsDirectPrintEnabled(_isDirectPrint);
+      await PrintManager.saveSavedPrinter(_selectedPrinter);
+      await PrintManager.saveAutoCutEnabled(_autoCut);
+      await PrintManager.saveInvertColorEnabled(_invertColor);
+      await PrintManager.saveDitheringEnabled(_dithering);
+    }
 
     if (!mounted) return;
     Navigator.of(context).pop();
@@ -210,22 +208,33 @@ class _LocalPrinterSettingsDialogState extends State<_LocalPrinterSettingsDialog
               const Divider(),
               const SizedBox(height: 12),
 
-              // Sección: Modo de Impresión
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: const Text('Impresión Térmica Directa (1 Clic)'),
-                subtitle: const Text(
-                  'Imprime de inmediato por Bluetooth/USB sin abrir el cuadro de diálogo de Android ni usar apps externas.',
+              if (kIsWeb) ...[
+                const SizedBox(height: 8),
+                Text(
+                  'La impresión térmica directa solo está disponible en la app de escritorio o móvil.',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.outline,
+                  ),
                 ),
-                value: _isDirectPrint,
-                onChanged: (value) {
-                  setState(() {
-                    _isDirectPrint = value;
-                  });
-                },
-              ),
+              ],
 
-              if (_isDirectPrint) ...[
+              // Sección: Modo de Impresión
+              if (!kIsWeb)
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('Impresión Térmica Directa (1 Clic)'),
+                  subtitle: const Text(
+                    'Imprime de inmediato por Bluetooth/USB sin abrir el cuadro de diálogo de Android ni usar apps externas.',
+                  ),
+                  value: _isDirectPrint,
+                  onChanged: (value) {
+                    setState(() {
+                      _isDirectPrint = value;
+                    });
+                  },
+                ),
+
+              if (!kIsWeb && _isDirectPrint) ...[
                 const SizedBox(height: 8),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,

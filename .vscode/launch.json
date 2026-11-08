@@ -9,6 +9,7 @@
             "request": "launch",
             "type": "dart",
             "args": [
+                "--wasm",
                 "--dart-define-from-file",
                 "secrets.json",
                 "--web-port=8080"
@@ -20,6 +21,7 @@
             "type": "dart",
             "flutterMode": "profile",
             "args": [
+                "--wasm",
                 "--dart-define-from-file",
                 "secrets.json"
             ]
@@ -30,6 +32,7 @@
             "type": "dart",
             "flutterMode": "release",
             "args": [
+                "--wasm",
                 "--dart-define-from-file",
                 "secrets.json"
             ]
