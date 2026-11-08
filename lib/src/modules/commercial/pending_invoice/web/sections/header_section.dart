@@ -138,10 +138,21 @@ class _HeaderSection extends StatelessWidget {
                         ? (total - totalDevolutions - totalCreditNotes)
                         : 0;
 
+                    final isCreditNotesExceeding = totalCreditNotes > 0 &&
+                        totalCreditNotes > (total - totalDevolutions);
+
                     return ElevatedButton.icon(
                       icon: const Icon(Icons.flash_on),
                       onPressed: () async {
                         if (state is! ReadInvoiceSuccess || state.invoices.isEmpty) return;
+
+                        if (isCreditNotesExceeding) {
+                          await DialogManager.showErrorDialog(
+                            context,
+                            "No es posible realizar abono rápido: Las notas de crédito a favor (${NumberFormatter.convertToMoneyLike(totalCreditNotes)}) superan la deuda neta de las facturas (${NumberFormatter.convertToMoneyLike(total - totalDevolutions)}).\n\nSeleccione facturas adicionales para aplicar el saldo a favor.",
+                          );
+                          return;
+                        }
 
                         final selectedClient = PendingInvoiceMediator.of(context).notifier?.selectedClient;
                         if (selectedClient == null) return;
@@ -176,7 +187,12 @@ class _HeaderSection extends StatelessWidget {
                           bankReference: paymentResult.bankReference,
                         );
 
-                        if (createReceiptPayload == null) return;
+                        if (createReceiptPayload == null) {
+                          if (context.mounted) {
+                            await DialogManager.showErrorDialog(context, summary);
+                          }
+                          return;
+                        }
 
                         if (!context.mounted) return;
                         final confirm = await DialogManager.slideToConfirmActionDialog(
@@ -190,7 +206,9 @@ class _HeaderSection extends StatelessWidget {
                         context.read<WriteReceiptCubit>().createNewReceipt(createReceiptPayload);
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.amber.shade700,
+                        backgroundColor: isCreditNotesExceeding
+                            ? Colors.grey.shade400
+                            : Colors.amber.shade700,
                         foregroundColor: Colors.white,
                       ),
                       label: const Text("Abono"),
@@ -199,6 +217,48 @@ class _HeaderSection extends StatelessWidget {
                 ),
               ],
             ),
+            if (state is ReadInvoiceSuccess) ...[
+              Builder(
+                builder: (context) {
+                  final int totalInvoices = state.summary?.totalInvoices ??
+                      state.invoices.fold<int>(0, (sum, inv) => sum + inv.totalRemaining);
+                  final int totalDevolutions = state.summary?.totalDevolutions ??
+                      state.devolutions.fold<int>(0, (sum, d) => sum + d.total);
+                  final int totalCreditNotes = state.summary?.totalCreditNotes ??
+                      state.creditNotes.fold<int>(0, (sum, cn) => sum + cn.total);
+                  final isExceeding = totalCreditNotes > 0 &&
+                      totalCreditNotes > (totalInvoices - totalDevolutions);
+
+                  if (!isExceeding) return const SizedBox.shrink();
+
+                  return Container(
+                    margin: const EdgeInsets.only(top: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.shade50,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.amber.shade300),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.warning_amber_rounded, size: 18, color: Colors.amber.shade900),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            "Aviso: Las notas de crédito (${NumberFormatter.convertToMoneyLike(totalCreditNotes)}) superan el saldo de las facturas (${NumberFormatter.convertToMoneyLike(totalInvoices - totalDevolutions)}). El abono rápido no puede aplicarse.",
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.amber.shade900,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ],
           ],
         ),
       ),
