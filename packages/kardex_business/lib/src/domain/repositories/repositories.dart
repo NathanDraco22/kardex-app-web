@@ -20,6 +20,7 @@ export 'expense_categories_repository.dart';
 export 'expenses_repository.dart';
 export 'expiration_logs_repository.dart';
 export 'hold_sales_repository.dart';
+export 'imports_repository.dart';
 export 'integrations_repository.dart';
 export 'inventories_repository.dart';
 export 'invoice_repository.dart';

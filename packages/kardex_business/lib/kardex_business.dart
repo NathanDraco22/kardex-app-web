@@ -39,6 +39,7 @@ export 'src/tools/http_tool.dart';
 export 'src/tools/constant.dart';
 export 'src/tools/number_formatter.dart';
 export 'src/tools/unit_conversion_tool.dart';
+export 'src/tools/unit_scale_presets.dart';
 export 'src/tools/datetime_tool.dart';
 export 'src/tools/reactive_repo/reactive_repository.dart';
 export 'src/tools/token_manager.dart';

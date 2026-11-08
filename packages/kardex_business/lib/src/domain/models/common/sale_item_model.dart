@@ -1,3 +1,5 @@
+import 'package:kardex_business/src/tools/unit_conversion_tool.dart';
+
 enum PaymentType {
   cash,
   credit,
@@ -92,6 +94,13 @@ class SaleItem {
     this.conversionFactor = 1,
   });
 
+  double get displayQuantity => conversionFactor <= 1
+      ? quantity.toDouble()
+      : quantity / conversionFactor;
+
+  String get formattedDisplayQuantity =>
+      UnitConversionTool.formatQuantity(displayQuantity);
+
   factory SaleItem.fromJson(Map<String, dynamic> json) => SaleItem(
         product: ProductItem.fromJson(json['product']),
         selectedPrice: json['selectedPrice'],
@@ -120,4 +129,3 @@ class SaleItem {
         'conversionFactor': conversionFactor,
       };
 }
-

@@ -65,6 +65,7 @@ class ProviderContainer extends StatelessWidget {
     final holdSalesDataSource = HoldSalesDataSource();
     final appSettingsDataSource = AppSettingsDataSource();
     final unitScaleDataSource = UnitScalesDataSource();
+    final importsDataSource = ImportsDataSource();
 
     return MultiRepositoryProvider(
       providers: [
@@ -263,6 +264,9 @@ class ProviderContainer extends StatelessWidget {
         ),
         RepositoryProvider(
           create: (context) => AppSettingsRepository(appSettingsDataSource),
+        ),
+        RepositoryProvider(
+          create: (context) => ImportsRepository(importsDataSource),
         ),
       ],
       child: GlobalCubitProvider(

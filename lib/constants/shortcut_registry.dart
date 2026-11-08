@@ -341,5 +341,10 @@ class ShortcutRouteRegistry {
       title: "Integraciones",
       icon: Icons.integration_instructions,
     ),
+    RouteNames.imports: const ShortcutInfo(
+      title: "Importaciones CSV",
+      icon: Icons.upload_file_rounded,
+      color: Color(0xFFEA580C),
+    ),
   };
 }

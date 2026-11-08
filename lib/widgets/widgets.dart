@@ -14,6 +14,7 @@ export 'dialogs/search_products/search_product_dialog.dart';
 export 'dialogs/personal_references_editor_dialog.dart';
 export 'dialogs/personal_references_viewer_dialog.dart';
 export 'dialogs/extra_units_editor_dialog.dart';
+export 'dialogs/unit_scale_preset_selector_dialog.dart';
 export 'empty_scaffold.dart';
 export 'no_item.dart';
 export 'row_widgets/mobile_row.dart';

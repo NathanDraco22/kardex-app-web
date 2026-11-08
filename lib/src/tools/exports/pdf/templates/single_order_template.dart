@@ -253,9 +253,7 @@ class SingleOrderTemplate implements PdfTemplate {
                 pw.Expanded(
                   flex: 1,
                   child: pw.Text(
-                    saleItem.conversionFactor != 1
-                        ? (saleItem.quantity ~/ saleItem.conversionFactor).toString()
-                        : saleItem.quantity.toString(),
+                    saleItem.formattedDisplayQuantity,
                     textAlign: pw.TextAlign.center,
                     style: const pw.TextStyle(fontSize: 12),
                   ),

@@ -17,6 +17,7 @@ class _FormContent extends StatefulWidget {
 
 class _FormContentState extends State<_FormContent> {
   late WordChipTextController controller;
+  late TextEditingController _unitController;
 
   String tagField = "";
 
@@ -28,6 +29,9 @@ class _FormContentState extends State<_FormContent> {
   void initState() {
     super.initState();
     controller = WordChipTextController();
+    _unitController = TextEditingController(
+      text: widget.currentProduct?.unitName ?? (widget.creationMap['unitName'] as String? ?? ''),
+    );
 
     tagField = "";
     if (widget.currentProduct != null) {
@@ -46,6 +50,13 @@ class _FormContentState extends State<_FormContent> {
         controller.text = tagField;
       },
     );
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    _unitController.dispose();
+    super.dispose();
   }
 
   Future<void> _submitForm() async {
@@ -160,6 +171,7 @@ class _FormContentState extends State<_FormContent> {
               unitsMenuEntries: unitsMenuEntries,
               productCaterogriesEntries: productCaterogriesEntries,
               controller: controller,
+              unitController: _unitController,
               imageProvider: _currentImageProvider,
               onImageIntent: _onImageIntent,
             ),
@@ -220,6 +232,7 @@ class _FormContentState extends State<_FormContent> {
               unitsMenuEntries: unitsMenuEntries,
               productCaterogriesEntries: productCaterogriesEntries,
               controller: controller,
+              unitController: _unitController,
               imageProvider: _currentImageProvider,
               onImageIntent: _onImageIntent,
             ),
@@ -236,6 +249,7 @@ class _InnerContent extends StatelessWidget {
     required this.unitsMenuEntries,
     required this.productCaterogriesEntries,
     required this.controller,
+    required this.unitController,
     required this.imageProvider,
     required this.onImageIntent,
   });
@@ -244,6 +258,7 @@ class _InnerContent extends StatelessWidget {
   final Iterable<DropdownMenuEntry<String>> unitsMenuEntries;
   final Iterable<DropdownMenuEntry<String>> productCaterogriesEntries;
   final WordChipTextController controller;
+  final TextEditingController unitController;
   final ImageProvider? imageProvider;
   final void Function(ImageSelectorIntent intent) onImageIntent;
 
@@ -349,6 +364,7 @@ class _InnerContent extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     CustomAutocompleteTextfield<UnitInDb>(
+                      controller: unitController,
                       initValue: currentUnit,
                       onClose: (value) => widget.creationMap['unitName'] = value.name,
                       onFieldSubmitted: (value) {
@@ -450,6 +466,9 @@ class _InnerContent extends StatelessWidget {
           ExtraUnitsSection(
             creationMap: widget.creationMap,
             currentProduct: widget.currentProduct,
+            onPresetApplied: (preset) {
+              unitController.text = preset.baseUnit;
+            },
           ),
 
           const SizedBox(height: 16),

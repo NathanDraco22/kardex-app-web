@@ -268,9 +268,7 @@ Future<Uint8List> generateTicketPdfFromOrder(
                       pw.Expanded(
                         flex: 1,
                         child: pw.Text(
-                          item.conversionFactor != 1
-                              ? (item.quantity ~/ item.conversionFactor).toString()
-                              : item.quantity.toString(),
+                          item.formattedDisplayQuantity,
                           textAlign: pw.TextAlign.center,
                           style: pw.TextStyle(
                             fontSize: TicketSettings.contentFontSize(paperSize),

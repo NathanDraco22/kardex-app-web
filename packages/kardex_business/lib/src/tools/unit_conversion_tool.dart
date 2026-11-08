@@ -15,12 +15,19 @@ class UnitConversionTool {
     return baseQuantity / ensureSafeFactor(conversionFactor);
   }
 
+  static String formatQuantity(num val) {
+    final d = val.toDouble();
+    return d == d.roundToDouble()
+        ? d.toInt().toString()
+        : d.toStringAsFixed(3).replaceFirst(RegExp(r'\.?0+$'), '');
+  }
+
   static String formatDisplayStock(int stock, int conversionFactor) {
     final safeFactor = ensureSafeFactor(conversionFactor);
     final val = stock / safeFactor;
     if (val == val.toInt()) {
       return val.toInt().toString();
-    }
+      }
     return val.toStringAsFixed(2).replaceAll(RegExp(r'\.?0+$'), '');
   }
 

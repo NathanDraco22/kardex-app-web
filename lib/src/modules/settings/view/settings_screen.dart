@@ -85,6 +85,16 @@ class _Body extends StatelessWidget {
               ),
             ),
             ShortcutAddableListTile(
+              routeName: RouteNames.imports,
+              child: MenuOptionCard(
+                icon: Icons.upload_file_rounded,
+                accentColor: Colors.orange.shade700,
+                title: "Importaciones CSV",
+                subtitle: "Carga masiva de inventario, clientes y proveedores",
+                onTap: () => context.pushNamed(RouteNames.imports),
+              ),
+            ),
+            ShortcutAddableListTile(
               routeName: RouteNames.apiKeys,
               child: MenuOptionCard(
                 icon: Icons.key,

@@ -69,12 +69,12 @@ lib/src/modules/product_catalog/
   - `WriteUnitScaleCubit`: Creación (`createNewUnitScale`), edición (`updateUnitScale`) y eliminación (`deleteUnitScale`).
 - **Diálogo Interactivo:**
   - `showCreateOrEditUnitScaleDialog` (`CreateUnitScaleDialog`): Modal con validación de formularios, configuración de unidad base, adición dinámica de unidades adicionales (`ExtraUnit`) con factor entero multiplicador y selectores de unidad por defecto y mayorista sugeridas.
-- **Escalas Base del Sistema:**
-  - **Peso:** Base `Gramo` (Onza: 28g, Libra: 454g, Kilogramo: 1000g, Quintal: 45400g).
-  - **Volumen:** Base `Mililitro` (Litro: 1000ml, Galón: 3785ml).
-  - **Longitud:** Base `Centímetro` (Metro: 100cm, Yarda: 91cm).
-  - **Tiempo:** Base `Segundo` (Minuto: 60s, Hora: 3600s, Día: 86400s).
-- **Documentación Completa:** Ver [Documentación Detallada de Escalas de Unidades](./unit_scales.md).
+- **Sistema de Presets Automáticos:**
+  - `UnitScalePresets`: Plantillas predeterminadas (Peso, Peso Agrícola, Volumen, Empaque, Longitud) cargables en 1 clic desde el modal `UnitScalePresetSelectorDialog`.
+  - Integrado mediante el botón **"Usar Preset"** en los diálogos de alta de producto (`create_product_dialog.dart`, `create_product_with_data_dialog.dart`) y en el editor modal `extra_units_editor_dialog.dart`.
+- **Fijación de Precios y Costos Bidireccionales:**
+  - `ProductPriceEditorScreen` / `product_price_editor_dialog.dart`: Sincronización instantánea entre el precio base (ej. Gramos) y el precio comercial (ej. Libras), preselección automática de la unidad preferida (`defaultUnitIndex`) y visualización dinámica de los costos (Promedio, Última Compra, Máximo y Sugerido) para la unidad seleccionada.
+- **Documentación Completa:** Ver [Guía Maestra de Unidades de Medida y Conversiones](./unit_scales.md).
 
 ---
 

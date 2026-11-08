@@ -432,3 +432,12 @@ Esta estructura se ha seguido para módulos como 'Historial de Facturas', 'Histo
 - Se ajustó el `BlocListener` de `_RootScaffold` para detectar `state.order.status == OrderStatus.cancelled` tras `WriteOrderSuccess`, mostrar "Cotización cancelada con éxito", remover el draft del caché de `ReadProformaCubit` y cerrar la pantalla.
 - Beneficio: las cotizaciones canceladas permanecen en la base y ahora aparecen en el módulo "Buscador de Cotizaciones/Órdenes" (que ya trae todos los estados) con su chip rojo "Cancelado".
 - Verificación: `flutter analyze` sin errores.
+
+## Módulo de Importaciones CSV (Noviembre 2026)
+- Se creó el módulo `lib/src/modules/imports/` con una pantalla de carga masiva accesible desde `Configuraciones → Importaciones CSV` (`/settings/imports`).
+- Se agregó la capa de datos en `packages/kardex_business`: `ImportsDataSource`, `ImportsRepository`, `ImportResult` e `ImportType`, registrados en `provider_container.dart`.
+- La pantalla incluye cuatro tarjetas (inventario inicial, inventario, clientes y proveedores), descarga de plantillas CSV con BOM UTF-8, selección de archivo con `file_picker`, confirmación, overlay de carga y diálogos de resultado/error.
+- Se añadieron plantillas con encabezados alineados al parser del backend y se reutilizó `CsvExportTool` con el nuevo método `saveCsvContent`.
+- Se integró la ruta en `app_router.dart`, `route_names.dart`, `shortcut_registry.dart`, `settings_screen.dart` y el submenú de Configuraciones en `home_modules_registry.dart`.
+- Se documentó el módulo en `wiki/modules/imports.md` y se enlazó desde `modules_index.md` y `project_index.md`.
+- Verificación: `flutter analyze` sin errores en la app y en `packages/kardex_business`.

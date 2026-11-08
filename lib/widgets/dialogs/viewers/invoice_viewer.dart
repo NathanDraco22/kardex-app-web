@@ -434,9 +434,7 @@ class InvoiceViewerContent extends StatelessWidget {
                           ),
                           Expanded(
                             child: Text(
-                              saleItem.conversionFactor != 1
-                                  ? (saleItem.quantity ~/ saleItem.conversionFactor).toString()
-                                  : saleItem.quantity.toString(),
+                              saleItem.formattedDisplayQuantity,
                               textAlign: TextAlign.center,
                             ),
                           ),

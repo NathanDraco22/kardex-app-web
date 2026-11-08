@@ -419,9 +419,7 @@ class _CreditNoteViewer extends StatelessWidget {
                         itemBuilder: (context, index) {
                           final item = creditNote.returnedItems[index];
                           final itemSubtotalFormatted = NumberFormatter.convertToMoneyLike(item.subTotal);
-                          final displayQty = item.conversionFactor != 1
-                              ? (item.quantity ~/ item.conversionFactor).toString()
-                              : item.quantity.toString();
+                          final displayQty = item.formattedDisplayQuantity;
 
                           return Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),

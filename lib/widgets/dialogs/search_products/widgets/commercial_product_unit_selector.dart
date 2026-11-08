@@ -58,6 +58,9 @@ class CommercialProductUnitSelector extends StatelessWidget {
               result.conversionFactor = extra.conversionFactor;
               result.selectedUnitName = extra.name;
             }
+            if (result.conversionFactor <= 1 && result.quantity != result.quantity.roundToDouble()) {
+              result.quantity = result.quantity.roundToDouble();
+            }
             onChanged();
           },
         ),

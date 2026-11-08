@@ -7,6 +7,7 @@ import 'search_debounce.dart';
 class CustomAutocompleteTextfield<T> extends StatefulWidget {
   const CustomAutocompleteTextfield({
     super.key,
+    this.controller,
     this.initValue,
     required this.onSearch,
     required this.suggestionBuilder,
@@ -18,6 +19,7 @@ class CustomAutocompleteTextfield<T> extends StatefulWidget {
     this.onClose,
   });
 
+  final TextEditingController? controller;
   final T? initValue;
 
   final String Function(T value) titleBuilder;
@@ -40,7 +42,8 @@ class CustomAutocompleteTextfield<T> extends StatefulWidget {
 }
 
 class _CustomAutocompleteTextfieldState<T> extends State<CustomAutocompleteTextfield<T>> {
-  final TextEditingController controller = TextEditingController();
+  late final TextEditingController controller;
+  bool _ownsController = false;
 
   T? currentValue;
 
@@ -54,10 +57,16 @@ class _CustomAutocompleteTextfieldState<T> extends State<CustomAutocompleteTextf
   @override
   void initState() {
     super.initState();
+    if (widget.controller != null) {
+      controller = widget.controller!;
+    } else {
+      _ownsController = true;
+      controller = TextEditingController();
+    }
     Future(() {
       getTextFieldSize();
       final initValue = widget.initValue;
-      if (initValue != null) {
+      if (initValue != null && controller.text.isEmpty) {
         controller.text = widget.titleBuilder(initValue);
       }
     });
@@ -65,7 +74,9 @@ class _CustomAutocompleteTextfieldState<T> extends State<CustomAutocompleteTextf
 
   @override
   void dispose() {
-    controller.dispose();
+    if (_ownsController) {
+      controller.dispose();
+    }
     super.dispose();
   }
 

@@ -40,14 +40,18 @@ class CommercialProductResult {
   int _newPrice = 0;
   int selectedPriceLevel = 1;
   Discount? selectedDiscount;
-  int quantity = 0;
+  double quantity = 0.0;
   
   int selectedUnitIndex = 0;
   int conversionFactor = 1;
   String selectedUnitName = '';
 
+  int get baseQuantity => (quantity * conversionFactor).round();
+
+  String get formattedQuantity => UnitConversionTool.formatQuantity(quantity);
+
   int get subTotal {
-    return quantity * _newPrice * conversionFactor;
+    return baseQuantity * _newPrice;
   }
 
   int get newPrice => _newPrice;
@@ -73,7 +77,7 @@ class CommercialProductResult {
     int? newPrice,
     int? selectedPriceLevel,
     Discount? selectedDiscount,
-    int? quantity,
+    double? quantity,
     int? selectedUnitIndex,
     int? conversionFactor,
     String? selectedUnitName,
@@ -105,4 +109,3 @@ class CommercialProductResult {
     return result;
   }
 }
-

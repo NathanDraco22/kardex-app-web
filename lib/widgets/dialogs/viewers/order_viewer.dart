@@ -312,7 +312,7 @@ class OrderViewerContent extends StatelessWidget {
                           ),
                           Expanded(
                             child: Text(
-                              saleItem.quantity.toString(),
+                              saleItem.formattedDisplayQuantity,
                               textAlign: TextAlign.center,
                             ),
                           ),

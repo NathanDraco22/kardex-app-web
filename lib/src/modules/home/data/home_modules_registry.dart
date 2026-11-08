@@ -900,6 +900,13 @@ List<HomeModuleCategory> getHomeModuleCategories(
           routeName: "integrations",
         ),
         const HomeSubmoduleItem(
+          title: "Importaciones CSV",
+          subtitle: "Carga masiva de inventario, clientes y proveedores",
+          icon: Icons.upload_file_rounded,
+          accentColor: Color(0xFFEA580C),
+          routeName: RouteNames.imports,
+        ),
+        const HomeSubmoduleItem(
           title: "Llaves de API (Neptuno)",
           subtitle: "Credenciales de comunicación y sincronización",
           icon: Icons.key,

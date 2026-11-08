@@ -72,11 +72,11 @@ class SaleTerminalViewController extends ChangeNotifier {
 
   bool get hasZeroPriceItems => items.any((item) => item.newPrice <= 0);
 
-  bool get hasItemsWithZeroQuantity => items.any((item) => item.quantity == 0);
+  bool get hasItemsWithZeroQuantity => items.any((item) => item.quantity <= 0);
 
   int get totalItems => items.length;
 
-  int get totalQuantity => items.fold(0, (previousValue, element) => previousValue + element.quantity);
+  int get totalQuantity => items.fold(0, (previousValue, element) => previousValue + element.quantity.round());
 
   int get totalAmount => items.fold(0, (previousValue, element) => previousValue + element.total);
 
@@ -97,9 +97,9 @@ class SaleTerminalViewController extends ChangeNotifier {
     final existingIndex = items.indexWhere((i) => i.product.id == item.product.id);
     if (existingIndex != -1) {
       final existing = items[existingIndex];
-      final maxQuantity = existing.product.account.availableStock ~/ existing.conversionFactor;
-      if (existing.quantity < maxQuantity) {
-        existing.quantity += 1;
+      final maxQuantity = existing.product.account.availableStock / existing.conversionFactor;
+      if (existing.quantity + 1.0 <= maxQuantity) {
+        existing.quantity += 1.0;
         notifyListeners();
       }
       return;
@@ -114,19 +114,19 @@ class SaleTerminalViewController extends ChangeNotifier {
       defaultPriceLevel: selectedPriceLevel,
       preferredUnitType: isWholesale ? 'max' : 'min',
     );
-    result.quantity = 1;
+    result.quantity = 1.0;
 
     final existingIndex = items.indexWhere((i) => i.product.id == product.id);
     if (existingIndex != -1) {
       final existing = items[existingIndex];
-      final maxQuantity = existing.product.account.availableStock ~/ existing.conversionFactor;
-      if (existing.quantity >= maxQuantity) {
+      final maxQuantity = existing.product.account.availableStock / existing.conversionFactor;
+      if (existing.quantity + 1.0 > maxQuantity) {
         DialogManager.showInfoDialog(context, "No hay más stock disponible para este producto");
         requestSearchFocus();
         return false;
       }
     } else {
-      if (product.account.availableStock < (result.quantity * result.conversionFactor)) {
+      if (product.account.availableStock < result.baseQuantity) {
         DialogManager.showInfoDialog(context, "No hay stock disponible para este producto");
         requestSearchFocus();
         return false;
@@ -222,7 +222,7 @@ class SaleTerminalViewController extends ChangeNotifier {
         selectedPrice: commercial.selectedPriceLevel,
         cost: product.account.averageCost,
         price: commercial.newPrice,
-        quantity: commercial.quantity * commercial.conversionFactor,
+        quantity: commercial.baseQuantity,
         discountPercentage: commercial.discountPercent,
         totalDiscount: commercial.totalDiscount,
         subTotal: commercial.subTotal,

@@ -125,6 +125,7 @@ Para conocer a detalle la lógica, vistas, cubits y repositorios de cada módulo
 - 👥 **[Catálogo de Clientes (modules/client_catalog.md)](./modules/client_catalog.md)** - Clientes, límites de crédito y mapa.
 - 🚚 **[Catálogo de Proveedores (modules/suppliers_catalog.md)](./modules/suppliers_catalog.md)** - Abastecedores y condiciones de compra.
 - ⚙️ **[Configuración (modules/settings.md)](./modules/settings.md)** - Sucursales, roles, periféricos, parámetros globales del sistema (`app_settings`) y precios.
+- 📥 **[Importaciones CSV (modules/imports.md)](./modules/imports.md)** - Carga masiva de inventario inicial, inventario, clientes y proveedores con plantillas descargables.
 - 🚀 **[Navegación y Acceso (modules/home_and_navigation.md)](./modules/home_and_navigation.md)** - Login, multi-sucursal y atajos de teclado.
 - 📈 **[Herramientas Avanzadas (modules/advanced_tools.md)](./modules/advanced_tools.md)** - Estadísticas y proyecciones.
 - 🖨️ **[Sistema de Impresión Térmica Directa (sistema_impresion_termica.md)](./sistema_impresion_termica.md)** - Arquitectura de impresión Bluetooth/USB sin drivers externos, rasterización ESC/POS, tramado Floyd-Steinberg y post-mortems de incidencias.

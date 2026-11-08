@@ -95,6 +95,7 @@ import 'package:kardex_app_front/src/modules/inactive/inactive_screen.dart';
 import 'package:kardex_app_front/src/modules/splash/splash_screen.dart';
 import 'package:kardex_app_front/src/modules/suppliers_catalog/view/suppliers_catalog_screen.dart';
 import 'package:kardex_app_front/src/modules/settings/view/integrations/integrations_screen.dart';
+import 'package:kardex_app_front/src/modules/imports/imports_screen.dart';
 import 'package:kardex_app_front/src/modules/expenses/expenses_menu_screen.dart';
 import 'package:kardex_app_front/src/modules/expenses/operative_expenses/view/operative_expenses_screen.dart';
 import 'package:kardex_app_front/src/modules/expenses/supplier_expenses/view/supplier_expenses_view.dart';
@@ -654,6 +655,11 @@ class AppRouter {
             path: "integrations",
             name: "integrations",
             builder: (context, state) => const IntegrationsScreen(),
+          ),
+          GoRoute(
+            path: "imports",
+            name: "imports",
+            builder: (context, state) => const ImportsScreen(),
           ),
           GoRoute(
             path: "api-keys",

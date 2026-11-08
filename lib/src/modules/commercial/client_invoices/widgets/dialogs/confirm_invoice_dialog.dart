@@ -45,7 +45,7 @@ Future<bool> showConfirmationInvoiceDialog(
                         ),
                         Flexible(
                           fit: FlexFit.tight,
-                          child: Text(item.quantity.toString()),
+                          child: Text(item.formattedDisplayQuantity),
                         ),
                         Flexible(
                           fit: FlexFit.tight,
@@ -149,7 +149,7 @@ Future<bool> showConfirmationAnonInvoiceDialog(
                         ),
                         Flexible(
                           fit: FlexFit.tight,
-                          child: Text(item.quantity.toString()),
+                          child: Text(item.formattedDisplayQuantity),
                         ),
                         Flexible(
                           fit: FlexFit.tight,
