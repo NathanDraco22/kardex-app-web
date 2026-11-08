@@ -13,6 +13,8 @@ class AppSettingModel {
   final bool useHoldSales;
   final bool useQuickProductSearch;
   final AppCurrency currency;
+  final AppCurrency secondaryCurrency;
+  final double exchangeRate;
   final int createdAt;
   final int? updatedAt;
 
@@ -29,6 +31,8 @@ class AppSettingModel {
     this.useHoldSales = true,
     this.useQuickProductSearch = false,
     this.currency = AppCurrency.nio,
+    this.secondaryCurrency = AppCurrency.usd,
+    this.exchangeRate = 0.0,
     required this.createdAt,
     this.updatedAt,
   });
@@ -48,6 +52,11 @@ class AppSettingModel {
       useHoldSales: json['useHoldSales'] as bool? ?? true,
       useQuickProductSearch: json['useQuickProductSearch'] as bool? ?? false,
       currency: AppCurrency.fromCode(json['currency'] as String?),
+      secondaryCurrency: AppCurrency.fromCode(
+        json['secondaryCurrency'] as String?,
+        fallback: AppCurrency.usd,
+      ),
+      exchangeRate: (json['exchangeRate'] as num?)?.toDouble() ?? 0.0,
       createdAt: json['createdAt'] as int? ?? 0,
       updatedAt: json['updatedAt'] as int?,
     );
@@ -67,6 +76,8 @@ class AppSettingModel {
       'useHoldSales': useHoldSales,
       'useQuickProductSearch': useQuickProductSearch,
       'currency': currency.code,
+      'secondaryCurrency': secondaryCurrency.code,
+      'exchangeRate': exchangeRate,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };
@@ -85,6 +96,8 @@ class AppSettingModel {
     bool? useHoldSales,
     bool? useQuickProductSearch,
     AppCurrency? currency,
+    AppCurrency? secondaryCurrency,
+    double? exchangeRate,
     int? createdAt,
     int? updatedAt,
   }) {
@@ -104,6 +117,8 @@ class AppSettingModel {
       useQuickProductSearch:
           useQuickProductSearch ?? this.useQuickProductSearch,
       currency: currency ?? this.currency,
+      secondaryCurrency: secondaryCurrency ?? this.secondaryCurrency,
+      exchangeRate: exchangeRate ?? this.exchangeRate,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -122,6 +137,8 @@ class UpdateAppSetting {
   final bool? useHoldSales;
   final bool? useQuickProductSearch;
   final AppCurrency? currency;
+  final AppCurrency? secondaryCurrency;
+  final double? exchangeRate;
 
   const UpdateAppSetting({
     this.useDefaultProfitMargin,
@@ -135,6 +152,8 @@ class UpdateAppSetting {
     this.useHoldSales,
     this.useQuickProductSearch,
     this.currency,
+    this.secondaryCurrency,
+    this.exchangeRate,
   });
 
   Map<String, dynamic> toJson() {
@@ -171,6 +190,12 @@ class UpdateAppSetting {
     }
     if (currency != null) {
       data['currency'] = currency!.code;
+    }
+    if (secondaryCurrency != null) {
+      data['secondaryCurrency'] = secondaryCurrency!.code;
+    }
+    if (exchangeRate != null) {
+      data['exchangeRate'] = exchangeRate;
     }
     return data;
   }

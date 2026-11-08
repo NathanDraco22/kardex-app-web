@@ -449,3 +449,10 @@ Esta estructura se ha seguido para módulos como 'Historial de Facturas', 'Histo
 - Se agregó la sección "Moneda del Sistema" en `AppSettingsScreen` con selector, vista previa y guardado mediante `UpdateAppSetting`.
 - Se reemplazaron los símbolos `C$` quemados en formularios de producto/precio, pagos, clientes, gráficas del panel admin y las cuatro impresoras térmicas. El contador de efectivo conserva sus denominaciones físicas NIO/USD.
 - Verificación: `flutter analyze` y `dart analyze` sin errores; el backend pasó `ruff check` y `ty check`.
+
+## Moneda Secundaria Informativa (Noviembre 2026)
+- Se agregaron `secondaryCurrency` (por defecto `USD`) y `exchangeRate` (por defecto `0.0`) a `app_settings` en frontend y backend. La tasa representa `1 moneda secundaria = X moneda principal` y es solo informativa.
+- La tile "Moneda y tasa de cambio" quedó como primer elemento de `AppSettingsScreen`; muestra la moneda principal, la secundaria y la tasa actual.
+- Al tocar la tile se abre `showCurrencySettingsDialog`, que permite elegir ambas monedas, validar que sean distintas, capturar una tasa positiva de hasta 4 decimales y previsualizar equivalencias.
+- El diálogo guarda únicamente `currency`, `secondaryCurrency` y `exchangeRate` mediante PATCH parcial; el botón inferior conserva el resto de configuraciones.
+- `AppSettingsCubit` expone `secondaryCurrency`, `exchangeRate` y `hasExchangeRate`. No se realizan conversiones de montos ni cambios en precios, tickets, reportes o contador de efectivo.

@@ -78,6 +78,10 @@ lib/src/modules/settings/
   - `currency` (`AppCurrency`): Moneda global del sistema (`NIO`, `USD`, `HNL`, `GTQ`, `CRC`, `COP`, `MXN`, `EUR`; por defecto `NIO`). Solo define el símbolo visual usado por `NumberFormatter` en pantallas, tickets y reportes; no convierte montos existentes.
     - El símbolo se resuelve mediante `NumberFormatter.configureCurrencyResolver`, registrado por `AppSettingsCubit` al construirse. Así, cualquier pantalla, PDF o ticket que use `NumberFormatter` adopta la moneda automáticamente.
     - El contador de efectivo (`cash_counter`) mantiene sus denominaciones físicas de Córdobas y Dólares y no cambia con esta configuración.
+  - `secondaryCurrency` (`AppCurrency`): Moneda secundaria informativa (`USD` por defecto). Se muestra junto a la moneda principal en la tile superior de configuración; no convierte montos ni modifica precios.
+  - `exchangeRate` (double): Tasa informativa donde `1` unidad de la moneda secundaria equivale a `exchangeRate` unidades de la moneda principal. `0.0` significa “sin configurar”. No se usa en cálculos, tickets ni reportes.
+    - La tile “Moneda y tasa de cambio” es el primer elemento de `AppSettingsScreen`. Al tocarla se abre `showCurrencySettingsDialog`, que guarda únicamente `currency`, `secondaryCurrency` y `exchangeRate` mediante un PATCH parcial.
+    - El botón inferior “Guardar Configuraciones” conserva el resto de parámetros y no sobrescribe la moneda ni la tasa.
 
 #### Uso Operativo del Margen de Ganancia Sugerido:
 1. **Editor de Precios de Producto (`ProductPriceEditorScreen`):**

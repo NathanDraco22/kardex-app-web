@@ -17,6 +17,12 @@ class AppSettingsCubit extends Cubit<AppSettingsState> {
 
   AppCurrency get currency => currentSettings?.currency ?? AppCurrency.nio;
 
+  AppCurrency get secondaryCurrency => currentSettings?.secondaryCurrency ?? AppCurrency.usd;
+
+  double get exchangeRate => currentSettings?.exchangeRate ?? 0.0;
+
+  bool get hasExchangeRate => exchangeRate > 0;
+
   bool get useExpirationDates => currentSettings?.useExpirationDates ?? true;
   bool get useOrders => currentSettings?.useOrders ?? true;
   bool get useQuotations => currentSettings?.useQuotations ?? true;

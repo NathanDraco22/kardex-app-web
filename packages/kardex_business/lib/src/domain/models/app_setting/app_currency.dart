@@ -18,11 +18,14 @@ enum AppCurrency {
   final String displayName;
   final String symbol;
 
-  static AppCurrency fromCode(String? code) {
+  static AppCurrency fromCode(
+    String? code, {
+    AppCurrency fallback = AppCurrency.nio,
+  }) {
     final normalized = code?.toUpperCase();
     return AppCurrency.values.firstWhere(
       (currency) => currency.code == normalized,
-      orElse: () => AppCurrency.nio,
+      orElse: () => fallback,
     );
   }
 }

@@ -3,11 +3,13 @@ import 'package:kardex_app_front/widgets/dialogs/selectors/branch_selection_dial
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
 import 'package:kardex_app_front/cubits/app_settings/app_settings_state.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
+import 'currency_settings_dialog.dart';
 
 class AppSettingsScreen extends StatelessWidget {
   const AppSettingsScreen({super.key});
@@ -39,6 +41,8 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
   bool _useHoldSales = true;
   bool _useQuickProductSearch = false;
   AppCurrency _currency = AppCurrency.nio;
+  AppCurrency _secondaryCurrency = AppCurrency.usd;
+  double _exchangeRate = 0.0;
 
   @override
   void initState() {
@@ -73,9 +77,14 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
       _paymentTermController.text = settings.defaultPaymentTermDays.toString();
       _useHoldSales = settings.useHoldSales;
       _useQuickProductSearch = settings.useQuickProductSearch;
-      _currency = settings.currency;
       _initialized = true;
     }
+
+    // La moneda y la tasa se guardan desde su propio diálogo, por lo que
+    // siempre deben reflejar el estado vivo del Cubit.
+    _currency = settings.currency;
+    _secondaryCurrency = settings.secondaryCurrency;
+    _exchangeRate = settings.exchangeRate;
   }
 
   Future<void> _saveSettings() async {
@@ -93,7 +102,6 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
       defaultPaymentTermDays: paymentTerm,
       useHoldSales: _useHoldSales,
       useQuickProductSearch: _useQuickProductSearch,
-      currency: _currency,
     );
 
     final success = await getIt<AppSettingsCubit>().updateSettings(update);
@@ -117,6 +125,118 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
         );
       }
     }
+  }
+
+  Future<void> _openCurrencySettingsDialog() async {
+    final saved = await showCurrencySettingsDialog(
+      context,
+      primaryCurrency: _currency,
+      secondaryCurrency: _secondaryCurrency,
+      exchangeRate: _exchangeRate,
+    );
+
+    if (saved == true && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Moneda y tasa de cambio actualizadas"),
+          backgroundColor: Colors.teal,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
+  String _formatExchangeRate(double rate) {
+    if (rate <= 0) return '—';
+    return NumberFormat('#,##0.####', 'en_US').format(rate);
+  }
+
+  Widget _buildCurrencySummaryTile({required bool isSaving}) {
+    final hasRate = _exchangeRate > 0;
+    final rateLabel = hasRate
+        ? '1 ${_secondaryCurrency.symbol} = ${_currency.symbol}${_formatExchangeRate(_exchangeRate)}'
+        : 'Tasa de cambio sin configurar';
+
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: BorderSide(color: Colors.teal.shade100),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: isSaving ? null : _openCurrencySettingsDialog,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.teal.shade50,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.currency_exchange_rounded,
+                  color: Colors.teal.shade700,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Expanded(
+                          child: Text(
+                            "Moneda y tasa de cambio",
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        Icon(
+                          Icons.edit_outlined,
+                          size: 18,
+                          color: Colors.teal.shade700,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        _CurrencyBadge(currency: _currency),
+                        Icon(
+                          Icons.arrow_forward_rounded,
+                          size: 16,
+                          color: Colors.grey.shade500,
+                        ),
+                        _CurrencyBadge(currency: _secondaryCurrency),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      rateLabel,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: hasRate ? Colors.teal.shade900 : Colors.orange.shade800,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -205,6 +325,8 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                 children: [
+                  _buildCurrencySummaryTile(isSaving: isSaving),
+                  const SizedBox(height: 24),
                   _buildSectionHeader(
                     icon: Icons.trending_up_rounded,
                     title: "Margen de Ganancia Comercial",
@@ -249,7 +371,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                               keyboardType: const TextInputType.numberWithOptions(
                                 decimal: true,
                               ),
-                              inputFormatters: [DecimalTextInputFormatter()],
+                              inputFormatters: [const DecimalTextInputFormatter()],
                               decoration: InputDecoration(
                                 labelText: "Porcentaje de margen por defecto (%)",
                                 hintText: "Ej. 20.0",
@@ -261,96 +383,6 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                               ),
                             ),
                           ],
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  _buildSectionHeader(
-                    icon: Icons.payments_outlined,
-                    title: "Moneda del Sistema",
-                    subtitle: "Símbolo usado en precios, facturas, tickets y reportes",
-                  ),
-                  const SizedBox(height: 8),
-                  Card(
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      side: BorderSide(color: Colors.grey.shade200),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          DropdownButtonFormField<AppCurrency>(
-                            key: ValueKey(_currency),
-                            initialValue: _currency,
-                            isExpanded: true,
-                            decoration: InputDecoration(
-                              labelText: "Moneda",
-                              prefixIcon: const Icon(Icons.currency_exchange_rounded),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              helperText: "Solo cambia el símbolo visual; no convierte montos existentes.",
-                            ),
-                            items: AppCurrency.values
-                                .map(
-                                  (currency) => DropdownMenuItem<AppCurrency>(
-                                    value: currency,
-                                    child: Text(
-                                      "${currency.symbol}  ·  ${currency.displayName}",
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                )
-                                .toList(),
-                            onChanged: isSaving
-                                ? null
-                                : (value) {
-                                    if (value != null) {
-                                      setState(() => _currency = value);
-                                    }
-                                  },
-                          ),
-                          const SizedBox(height: 12),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 12,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.teal.shade50,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: Colors.teal.shade100),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.visibility_outlined,
-                                  size: 18,
-                                  color: Colors.teal.shade800,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  "Vista previa:",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.teal.shade900,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  "${_currency.symbol}1,234.56",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.teal.shade900,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
                         ],
                       ),
                     ),
@@ -748,6 +780,31 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _CurrencyBadge extends StatelessWidget {
+  const _CurrencyBadge({required this.currency});
+
+  final AppCurrency currency;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Text(
+        "${currency.symbol}  ${currency.displayName}",
+        style: const TextStyle(
+          fontSize: 12.5,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
     );
   }
 }
