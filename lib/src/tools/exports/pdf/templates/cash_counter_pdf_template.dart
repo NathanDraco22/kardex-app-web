@@ -1,3 +1,4 @@
+import 'package:kardex_app_front/src/tools/cache/image_bytes_resolver.dart';
 import 'package:intl/intl.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/pdf_template.dart';
 import 'package:kardex_app_front/widgets/cash_counter/cash_counter_models.dart';
@@ -22,6 +23,7 @@ class CashCounterPdfTemplate implements PdfTemplate {
 
   @override
   Future<pw.Document> buildDocument() async {
+    await branch.resolveLogoBytes();
     final doc = pw.Document();
     final f = NumberFormat('#,##0.00', 'en_US');
     final rateF = NumberFormat('#,##0.##', 'en_US');

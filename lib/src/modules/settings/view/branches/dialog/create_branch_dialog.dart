@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/settings/view/branches/cubit/read_branch_cubit.dart';
 import 'package:kardex_app_front/src/modules/settings/view/branches/cubit/write_branch_cubit.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
-import 'package:kardex_app_front/src/tools/loading_dialog.dart';
 import 'package:kardex_app_front/widgets/pick_img_widget.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -24,16 +24,16 @@ Future<BranchInDb?> showCreateBranchPriceDialog(
       builder: (context) {
         return MultiBlocProvider(
           providers: [
-            BlocProvider.value(value: writeCubit),
-            BlocProvider.value(value: readCubit),
-          ],
-          child: CreateProductPriceDialog(
-            branch: branch,
-          ),
-        );
-      },
-    ),
-  );
+          BlocProvider.value(value: writeCubit),
+          BlocProvider.value(value: readCubit),
+        ],
+        child: CreateProductPriceDialog(
+          branch: branch,
+        ),
+      );
+    },
+  ),
+);
 }
 
 class CreateProductPriceDialog extends StatefulWidget {
@@ -66,7 +66,12 @@ class _CreateProductPriceDialogState extends State<CreateProductPriceDialog> {
     final currenBranch = widget.branch;
 
     ImageProvider? currentImageProvider;
-    if (currenBranch?.image != null && currenBranch!.image!.isNotEmpty) {
+    if (currenBranch?.imageUrl != null && currenBranch!.imageUrl!.isNotEmpty) {
+      currentImageProvider = CachedNetworkImageProvider(
+        currenBranch.imageUrl!,
+        cacheManager: AppImageCacheManager.instance,
+      );
+    } else if (currenBranch?.image != null && currenBranch!.image!.isNotEmpty) {
       currentImageProvider = MemoryImage(currenBranch.image!);
     }
     return BlocListener<WriteBranchCubit, WriteBranchState>(

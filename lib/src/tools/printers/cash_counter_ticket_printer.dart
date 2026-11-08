@@ -1,3 +1,4 @@
+import 'package:kardex_app_front/src/tools/cache/image_bytes_resolver.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:kardex_app_front/src/tools/printers/paper_settings.dart';
@@ -69,7 +70,7 @@ Future<Uint8List> generateTicketPdfFromCashCount(
   final dateF = DateFormat('dd/MM/yyyy');
   final timeF = DateFormat('hh:mm a');
 
-  final branchImage = branch.image;
+  final branchImage = await branch.resolveLogoBytes();
   final logoSize = TicketSettings.logoSize(paperSize);
 
   final contentFontSize = TicketSettings.contentFontSize(paperSize);

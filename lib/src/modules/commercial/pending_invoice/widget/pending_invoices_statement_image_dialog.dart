@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/src/tools/cache/image_bytes_resolver.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:share_plus/share_plus.dart';
@@ -66,6 +67,7 @@ class _PendingInvoicesStatementImageDialogState
     extends State<_PendingInvoicesStatementImageDialog> {
   final GlobalKey _repaintBoundaryKey = GlobalKey();
   Uint8List? _capturedImageBytes;
+  Uint8List? _logoBytes;
   bool _isGenerating = true;
   bool _isSharing = false;
 
@@ -79,7 +81,15 @@ class _PendingInvoicesStatementImageDialogState
 
   Future<void> _captureStatementImage() async {
     try {
-      // Esperar brevemente para asegurar que fuentes e íconos se hayan pintado
+      // 1. Resolver asíncronamente los bytes del logo de la sucursal desde imageUrl
+      final authState = getIt<AuthCubit>().state;
+      if (authState is Authenticated) {
+        final branch = authState.branch;
+        _logoBytes = await branch.resolveLogoBytes();
+        if (mounted) setState(() {});
+      }
+
+      // 2. Esperar brevemente para asegurar que fuentes, logo e íconos se hayan pintado
       await Future.delayed(const Duration(milliseconds: 280));
       if (!mounted) return;
 
@@ -178,6 +188,7 @@ class _PendingInvoicesStatementImageDialogState
                           child: _StatementVisualCard(
                             client: widget.client,
                             branch: branch,
+                            logoBytes: _logoBytes,
                             invoices: widget.invoices,
                             devolutions: widget.devolutions,
                             creditNotes: widget.creditNotes,
@@ -290,6 +301,7 @@ class _PendingInvoicesStatementImageDialogState
 class _StatementVisualCard extends StatelessWidget {
   final ClientInDb client;
   final BranchInDb? branch;
+  final Uint8List? logoBytes;
   final List<InvoiceInDb> invoices;
   final List<DevolutionInDb> devolutions;
   final List<CreditNoteInDb> creditNotes;
@@ -299,6 +311,7 @@ class _StatementVisualCard extends StatelessWidget {
   const _StatementVisualCard({
     required this.client,
     required this.branch,
+    this.logoBytes,
     required this.invoices,
     required this.devolutions,
     required this.creditNotes,
@@ -323,47 +336,79 @@ class _StatementVisualCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // 1. Membrete y Encabezado
+          // 1. Membrete y Encabezado con Logo de Sucursal
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
-                      branch?.name ?? "KARDEX APP",
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFF1E293B),
-                        letterSpacing: -0.5,
+                    if (logoBytes != null && logoBytes!.isNotEmpty) ...[
+                      Container(
+                        width: 68,
+                        height: 68,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.04),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: Image.memory(
+                          logoBytes!,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                    ],
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            branch?.name ?? "KARDEX APP",
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF1E293B),
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                          if (branch?.address != null && branch!.address.isNotEmpty) ...[
+                            const SizedBox(height: 3),
+                            Text(
+                              branch!.address,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey.shade600,
+                              ),
+                            ),
+                          ],
+                          if (branch?.phone != null && branch!.phone.isNotEmpty) ...[
+                            const SizedBox(height: 2),
+                            Text(
+                              "Tel: ${branch!.phone}",
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey.shade600,
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                     ),
-                    if (branch?.address != null && branch!.address.isNotEmpty) ...[
-                      const SizedBox(height: 3),
-                      Text(
-                        branch!.address,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey.shade600,
-                        ),
-                      ),
-                    ],
-                    if (branch?.phone != null && branch!.phone.isNotEmpty) ...[
-                      const SizedBox(height: 2),
-                      Text(
-                        "Tel: ${branch!.phone}",
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey.shade600,
-                        ),
-                      ),
-                    ],
                   ],
                 ),
               ),
+              const SizedBox(width: 16),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [

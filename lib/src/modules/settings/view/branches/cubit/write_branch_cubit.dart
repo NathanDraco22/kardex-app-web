@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kardex_business/kardex_business.dart';
-import 'package:kardex_app_front/src/tools/image_tools.dart';
+import 'package:kardex_app_front/src/tools/uploaders/image_uploader.dart';
 
 part 'write_branch_state.dart';
 
@@ -14,8 +14,13 @@ class WriteBranchCubit extends Cubit<WriteBranchState> {
     emit(WriteBranchInProgress());
     try {
       if (image != null) {
-        final base64Image = await xFileToBase64(image);
-        createBranch.image = base64ToBytes(base64Image);
+        final bytes = await image.readAsBytes();
+        final imageUrl = await ImageUploader.uploadImage(
+          bytes: bytes,
+          fileName: "branch_${DateTime.now().millisecondsSinceEpoch}.jpg",
+        );
+        createBranch.imageUrl = imageUrl;
+        createBranch.image = bytes;
       }
 
       final branch = await branchesRepository.createBranch(createBranch);
@@ -30,7 +35,12 @@ class WriteBranchCubit extends Cubit<WriteBranchState> {
     emit(WriteBranchInProgress());
     try {
       if (image != null) {
-        updateBranch.image = await xFileToBase64(image);
+        final bytes = await image.readAsBytes();
+        final imageUrl = await ImageUploader.uploadImage(
+          bytes: bytes,
+          fileName: "branch_${branchId}_${DateTime.now().millisecondsSinceEpoch}.jpg",
+        );
+        updateBranch.imageUrl = imageUrl;
       }
 
       final branch = await branchesRepository.updateBranchById(branchId, updateBranch);

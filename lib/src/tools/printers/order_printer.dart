@@ -1,3 +1,4 @@
+import 'package:kardex_app_front/src/tools/cache/image_bytes_resolver.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:kardex_business/kardex_business.dart';
@@ -31,7 +32,7 @@ Future<Uint8List> generateTicketPdfFromOrder(
     marginAll: TicketSettings.ticketMargin(paperSize) * PdfPageFormat.mm,
   );
 
-  final branchImage = branch.image;
+  final branchImage = await branch.resolveLogoBytes();
 
   String paymentType = order.paymentType.typeLabel;
 

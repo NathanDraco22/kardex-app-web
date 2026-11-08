@@ -1,3 +1,4 @@
+import 'package:kardex_app_front/src/tools/cache/image_bytes_resolver.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/pdf_template.dart';
 import 'package:pdf/pdf.dart';
@@ -14,6 +15,7 @@ class SingleOrderTemplate implements PdfTemplate {
 
   @override
   Future<pw.Document> buildDocument() async {
+    await branch.resolveLogoBytes();
     final doc = pw.Document();
 
     doc.addPage(

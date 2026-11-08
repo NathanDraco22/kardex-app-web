@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:cached_network_image_ce/cached_network_image.dart';
-import 'package:kardex_app_front/src/tools/cache/app_image_cache_manager.dart';
 import 'package:kardex_app_front/src/tools/uploaders/image_uploader.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/product_list/cubit/write_product_cubit.dart';
 
