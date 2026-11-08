@@ -11,7 +11,6 @@ import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 import 'package:kardex_app_front/src/tools/icon_widgets.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/client_full_details_dialog.dart';
-import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/simple_search_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/search_product_commercial_delegate.dart';
 import 'package:kardex_app_front/widgets/dialogs/selectors/branch_selection_dialog.dart';
@@ -939,6 +938,8 @@ List<HomeModuleCategory> getHomeModuleCategories(
               if (selected == null) return;
               targetBranch = selected;
             }
+
+            if (!ctx.mounted) return;
 
             if (targetBranch == null) {
               ScaffoldMessenger.of(ctx).showSnackBar(
