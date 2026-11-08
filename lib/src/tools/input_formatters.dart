@@ -2,9 +2,13 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 class DecimalTextInputFormatter extends TextInputFormatter {
+  final int decimalDigits;
+
+  const DecimalTextInputFormatter({this.decimalDigits = 2});
+
   @override
   TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
-    final regEx = RegExp(r'^\d*\.?\d{0,2}$');
+    final regEx = RegExp('^\\d*\\.?\\d{0,$decimalDigits}\$');
     final String newText = newValue.text;
 
     if (newText.isEmpty) {

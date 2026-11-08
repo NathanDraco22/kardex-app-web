@@ -59,9 +59,7 @@ class _SaleItemRowState extends State<SaleItemRow> {
                   child: Center(
                     child: Builder(
                       builder: (context) {
-                        final displayQty = widget.saleItem.conversionFactor > 1
-                            ? (widget.saleItem.quantity ~/ widget.saleItem.conversionFactor).toString()
-                            : widget.saleItem.quantity.toString();
+                        final displayQty = widget.saleItem.formattedDisplayQuantity;
                         return Text(
                           displayQty,
                           style: const TextStyle(

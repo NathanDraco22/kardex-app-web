@@ -5,6 +5,7 @@ import 'package:hive_ce_flutter/adapters.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:kardex_app_front/config/app_router.dart';
 import 'package:kardex_app_front/config/app_theme.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/app_mode/app_mode_cubit.dart';
 import 'package:kardex_app_front/provider_container.dart';
 
@@ -21,6 +22,7 @@ Future<void> main() async {
 
   await Hive.initFlutter();
   await initializeDateFormatting('es');
+  initServices();
 
   runApp(const MyApp());
 }

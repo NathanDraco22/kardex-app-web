@@ -1,10 +1,15 @@
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/widgets/dialogs/selectors/branch_selection_dialog.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
-import 'package:kardex_app_front/src/cubits/app_settings/app_settings_cubit.dart';
-import 'package:kardex_app_front/src/cubits/app_settings/app_settings_state.dart';
+import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
+import 'package:kardex_app_front/cubits/app_settings/app_settings_state.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
+import 'currency_settings_dialog.dart';
 
 class AppSettingsScreen extends StatelessWidget {
   const AppSettingsScreen({super.key});
@@ -35,6 +40,10 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
   bool _alertMinStock = true;
   bool _useHoldSales = true;
   bool _useQuickProductSearch = false;
+  AppCurrency _currency = AppCurrency.nio;
+  AppCurrency _secondaryCurrency = AppCurrency.usd;
+  double _exchangeRate = 0.0;
+  bool _showInvoiceTotalInSecondaryCurrency = false;
 
   @override
   void initState() {
@@ -69,8 +78,15 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
       _paymentTermController.text = settings.defaultPaymentTermDays.toString();
       _useHoldSales = settings.useHoldSales;
       _useQuickProductSearch = settings.useQuickProductSearch;
+      _showInvoiceTotalInSecondaryCurrency = settings.showInvoiceTotalInSecondaryCurrency;
       _initialized = true;
     }
+
+    // La moneda y la tasa se guardan desde su propio diálogo, por lo que
+    // siempre deben reflejar el estado vivo del Cubit.
+    _currency = settings.currency;
+    _secondaryCurrency = settings.secondaryCurrency;
+    _exchangeRate = settings.exchangeRate;
   }
 
   Future<void> _saveSettings() async {
@@ -88,10 +104,10 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
       defaultPaymentTermDays: paymentTerm,
       useHoldSales: _useHoldSales,
       useQuickProductSearch: _useQuickProductSearch,
+      showInvoiceTotalInSecondaryCurrency: _showInvoiceTotalInSecondaryCurrency,
     );
 
-    final success =
-        await getIt<AppSettingsCubit>().updateSettings(update);
+    final success = await getIt<AppSettingsCubit>().updateSettings(update);
 
     if (mounted) {
       if (success) {
@@ -112,6 +128,187 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
         );
       }
     }
+  }
+
+  Future<void> _openCurrencySettingsDialog() async {
+    final saved = await showCurrencySettingsDialog(
+      context,
+      primaryCurrency: _currency,
+      secondaryCurrency: _secondaryCurrency,
+      exchangeRate: _exchangeRate,
+    );
+
+    if (saved == true && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Moneda y tasa de cambio actualizadas"),
+          backgroundColor: Colors.teal,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
+  String _formatExchangeRate(double rate) {
+    if (rate <= 0) return '—';
+    return NumberFormat('#,##0.####', 'en_US').format(rate);
+  }
+
+  Widget _buildCurrencySummaryTile({required bool isSaving}) {
+    final hasRate = _exchangeRate > 0;
+    final rateLabel = hasRate
+        ? '1 ${_secondaryCurrency.symbol} = ${_currency.symbol}${_formatExchangeRate(_exchangeRate)}'
+        : 'Tasa de cambio sin configurar';
+
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: BorderSide(color: Colors.teal.shade100),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: isSaving ? null : _openCurrencySettingsDialog,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.teal.shade50,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.currency_exchange_rounded,
+                  color: Colors.teal.shade700,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Expanded(
+                          child: Text(
+                            "Moneda y tasa de cambio",
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        Icon(
+                          Icons.edit_outlined,
+                          size: 18,
+                          color: Colors.teal.shade700,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        _CurrencyBadge(currency: _currency),
+                        Icon(
+                          Icons.arrow_forward_rounded,
+                          size: 16,
+                          color: Colors.grey.shade500,
+                        ),
+                        _CurrencyBadge(currency: _secondaryCurrency),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      rateLabel,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: hasRate ? Colors.teal.shade900 : Colors.orange.shade800,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInvoiceSecondaryTotalSwitch({required bool isSaving}) {
+    final hasRate = _exchangeRate > 0;
+    final isEnabled = _showInvoiceTotalInSecondaryCurrency;
+
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: BorderSide(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        children: [
+          SwitchListTile(
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 4,
+            ),
+            secondary: Icon(
+              Icons.receipt_long_rounded,
+              color: Colors.teal.shade700,
+            ),
+            title: Text(
+              "Mostrar total de facturas en moneda secundaria (${_secondaryCurrency.code})",
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            subtitle: Text(
+              "Agrega el equivalente en ${_secondaryCurrency.symbol} después del total final en el visor, PDF y ticket.",
+              style: const TextStyle(
+                fontSize: 13,
+                color: Colors.black54,
+              ),
+            ),
+            value: isEnabled,
+            onChanged: isSaving
+                ? null
+                : (value) {
+                    setState(() {
+                      _showInvoiceTotalInSecondaryCurrency = value;
+                    });
+                  },
+          ),
+          if (isEnabled && !hasRate)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.warning_amber_rounded,
+                    size: 18,
+                    color: Colors.orange.shade800,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      "Configura una tasa de cambio mayor que cero para que el total secundario aparezca en las facturas.",
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        color: Colors.orange.shade900,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -198,14 +395,16 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 800),
               child: ListView(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                 children: [
+                  _buildCurrencySummaryTile(isSaving: isSaving),
+                  const SizedBox(height: 12),
+                  _buildInvoiceSecondaryTotalSwitch(isSaving: isSaving),
+                  const SizedBox(height: 24),
                   _buildSectionHeader(
                     icon: Icons.trending_up_rounded,
                     title: "Margen de Ganancia Comercial",
-                    subtitle:
-                        "Parámetros para cálculo sugerido de precios de venta",
+                    subtitle: "Parámetros para cálculo sugerido de precios de venta",
                   ),
                   const SizedBox(height: 8),
                   Card(
@@ -227,8 +426,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                             ),
                             subtitle: const Text(
                               "Calcula automáticamente el precio de venta a partir del costo promedio al catalogar productos",
-                              style: TextStyle(
-                                  fontSize: 13, color: Colors.black54),
+                              style: TextStyle(fontSize: 13, color: Colors.black54),
                             ),
                             value: _useDefaultProfitMargin,
                             onChanged: isSaving
@@ -244,21 +442,18 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                             TextFormField(
                               controller: _profitMarginController,
                               enabled: !isSaving,
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
+                              keyboardType: const TextInputType.numberWithOptions(
                                 decimal: true,
                               ),
-                              inputFormatters: [DecimalTextInputFormatter()],
+                              inputFormatters: [const DecimalTextInputFormatter()],
                               decoration: InputDecoration(
-                                labelText:
-                                    "Porcentaje de margen por defecto (%)",
+                                labelText: "Porcentaje de margen por defecto (%)",
                                 hintText: "Ej. 20.0",
                                 prefixIcon: const Icon(Icons.percent_rounded),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                helperText:
-                                    "Margen aplicado para calcular el precio de venta sugerido",
+                                helperText: "Margen aplicado para calcular el precio de venta sugerido",
                               ),
                             ),
                           ],
@@ -270,8 +465,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                   _buildSectionHeader(
                     icon: Icons.dashboard_customize_rounded,
                     title: "Módulos y Operaciones",
-                    subtitle:
-                        "Habilita o deshabilita funciones en el sistema",
+                    subtitle: "Habilita o deshabilita funciones en el sistema",
                   ),
                   const SizedBox(height: 8),
                   Card(
@@ -289,14 +483,10 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                           ),
                           subtitle: const Text(
                             "Habilita el seguimiento de lotes y alertas de caducidad en inventario",
-                            style:
-                                TextStyle(fontSize: 13, color: Colors.black54),
+                            style: TextStyle(fontSize: 13, color: Colors.black54),
                           ),
                           value: _useExpirationDates,
-                          onChanged: isSaving
-                              ? null
-                              : (val) =>
-                                  setState(() => _useExpirationDates = val),
+                          onChanged: isSaving ? null : (val) => setState(() => _useExpirationDates = val),
                         ),
                         const Divider(height: 1),
                         SwitchListTile(
@@ -306,13 +496,10 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                           ),
                           subtitle: const Text(
                             "Permite crear, autorizar y facturar órdenes en el área comercial",
-                            style:
-                                TextStyle(fontSize: 13, color: Colors.black54),
+                            style: TextStyle(fontSize: 13, color: Colors.black54),
                           ),
                           value: _useOrders,
-                          onChanged: isSaving
-                              ? null
-                              : (val) => setState(() => _useOrders = val),
+                          onChanged: isSaving ? null : (val) => setState(() => _useOrders = val),
                         ),
                         const Divider(height: 1),
                         SwitchListTile(
@@ -322,13 +509,10 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                           ),
                           subtitle: const Text(
                             "Permite generar presupuestos y proformas sin afectar inventario ni generar cuentas por cobrar",
-                            style:
-                                TextStyle(fontSize: 13, color: Colors.black54),
+                            style: TextStyle(fontSize: 13, color: Colors.black54),
                           ),
                           value: _useQuotations,
-                          onChanged: isSaving
-                              ? null
-                              : (val) => setState(() => _useQuotations = val),
+                          onChanged: isSaving ? null : (val) => setState(() => _useQuotations = val),
                         ),
                         const Divider(height: 1),
                         SwitchListTile(
@@ -339,14 +523,10 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                           ),
                           subtitle: const Text(
                             "Abre el buscador con botones de agregar y quitar cantidad al agregar productos en móvil (facturas, órdenes y cotizaciones)",
-                            style:
-                                TextStyle(fontSize: 13, color: Colors.black54),
+                            style: TextStyle(fontSize: 13, color: Colors.black54),
                           ),
                           value: _useQuickProductSearch,
-                          onChanged: isSaving
-                              ? null
-                              : (val) => setState(
-                                  () => _useQuickProductSearch = val),
+                          onChanged: isSaving ? null : (val) => setState(() => _useQuickProductSearch = val),
                         ),
                         const Divider(height: 1),
                         SwitchListTile(
@@ -356,13 +536,10 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                           ),
                           subtitle: const Text(
                             "Permite pausar carritos en terminal de venta para atender a otros clientes",
-                            style:
-                                TextStyle(fontSize: 13, color: Colors.black54),
+                            style: TextStyle(fontSize: 13, color: Colors.black54),
                           ),
                           value: _useHoldSales,
-                          onChanged: isSaving
-                              ? null
-                              : (val) => setState(() => _useHoldSales = val),
+                          onChanged: isSaving ? null : (val) => setState(() => _useHoldSales = val),
                         ),
                       ],
                     ),
@@ -392,14 +569,10 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                             ),
                             subtitle: const Text(
                               "Permite generar facturas de venta aun si no hay existencias registradas en la sucursal",
-                              style: TextStyle(
-                                  fontSize: 13, color: Colors.black54),
+                              style: TextStyle(fontSize: 13, color: Colors.black54),
                             ),
                             value: _allowNegativeStock,
-                            onChanged: isSaving
-                                ? null
-                                : (val) =>
-                                    setState(() => _allowNegativeStock = val),
+                            onChanged: isSaving ? null : (val) => setState(() => _allowNegativeStock = val),
                           ),
                           const Divider(height: 16),
                           SwitchListTile(
@@ -410,14 +583,10 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                             ),
                             subtitle: const Text(
                               "Resalta en amarillo o rojo los productos que alcancen el límite mínimo",
-                              style: TextStyle(
-                                  fontSize: 13, color: Colors.black54),
+                              style: TextStyle(fontSize: 13, color: Colors.black54),
                             ),
                             value: _alertMinStock,
-                            onChanged: isSaving
-                                ? null
-                                : (val) =>
-                                    setState(() => _alertMinStock = val),
+                            onChanged: isSaving ? null : (val) => setState(() => _alertMinStock = val),
                           ),
                           const Divider(height: 24),
                           TextFormField(
@@ -426,16 +595,13 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                             keyboardType: TextInputType.number,
                             inputFormatters: [IntegerTextInputFormatter()],
                             decoration: InputDecoration(
-                              labelText:
-                                  "Plazo de crédito predeterminado (días)",
+                              labelText: "Plazo de crédito predeterminado (días)",
                               hintText: "Ej. 30",
-                              prefixIcon:
-                                  const Icon(Icons.calendar_month_rounded),
+                              prefixIcon: const Icon(Icons.calendar_month_rounded),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              helperText:
-                                  "Días de gracia asignados automáticamente a facturas de crédito",
+                              helperText: "Días de gracia asignados automáticamente a facturas de crédito",
                             ),
                           ),
                         ],
@@ -463,9 +629,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                             )
                           : const Icon(Icons.save_rounded),
                       label: Text(
-                        isSaving
-                            ? "Guardando..."
-                            : "Guardar Configuraciones",
+                        isSaving ? "Guardando..." : "Guardar Configuraciones",
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -474,6 +638,175 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                     ),
                   ),
                   const SizedBox(height: 32),
+                  Builder(
+                    builder: (context) {
+                      final authUser = getIt<AuthCubit>().user;
+                      final bool isRootOrAdmin =
+                          authUser != null &&
+                          (authUser.id == 'root' ||
+                              authUser.username.toLowerCase() == 'root' ||
+                              authUser.role == 'Admin');
+
+                      if (!isRootOrAdmin) {
+                        return const SizedBox.shrink();
+                      }
+                      if (!context.isDesktop()) {
+                        return const SizedBox.shrink();
+                      }
+
+                      final currentBranch = getIt<AuthCubit>().currentBranch;
+                      final branchName = currentBranch?.name ?? "Sin sucursal seleccionada";
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const SizedBox(height: 16),
+                          const Divider(),
+                          const SizedBox(height: 16),
+                          _buildSectionHeader(
+                            icon: Icons.shield_outlined,
+                            title: "Zona de Peligro (Solo Desktop / Root)",
+                            subtitle: "Acciones irreversibles que impactan el inventario y auditoría",
+                          ),
+                          const SizedBox(height: 12),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFEF2F2),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: const Color(0xFFFCA5A5),
+                                width: 1.2,
+                              ),
+                            ),
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              leading: Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: Colors.red.shade100,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Icon(
+                                  Icons.restart_alt_rounded,
+                                  color: Colors.red.shade800,
+                                  size: 26,
+                                ),
+                              ),
+                              title: const Text(
+                                "Reiniciar Inventario a 0",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                  color: Color(0xFF991B1B),
+                                ),
+                              ),
+                              subtitle: Padding(
+                                padding: const EdgeInsets.only(top: 4.0),
+                                child: Text(
+                                  "Genera un ajuste de salida automático que vacía las existencias físicas de la sucursal ($branchName). Irreversible.",
+                                  style: TextStyle(
+                                    fontSize: 12.5,
+                                    color: Colors.red.shade900.withValues(alpha: 0.85),
+                                  ),
+                                ),
+                              ),
+                              trailing: FilledButton.tonal(
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: Colors.red.shade700,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                ),
+                                onPressed: () async {
+                                  BranchInDb? target = currentBranch;
+                                  if (target == null) {
+                                    final allBranches = context.read<BranchesRepository>().branches;
+                                    if (allBranches.isNotEmpty) {
+                                      final selected = await showBranchSelectionDialog(context, allBranches);
+                                      if (selected == null) return;
+                                      target = selected;
+                                    }
+                                  }
+
+                                  if (target == null) {
+                                    if (!context.mounted) return;
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text("No hay sucursales disponibles."),
+                                        backgroundColor: Colors.redAccent,
+                                      ),
+                                    );
+                                    return;
+                                  }
+
+                                  if (!context.mounted) return;
+                                  final result = await showResetInventoryDangerDialog(
+                                    context,
+                                    branch: target,
+                                  );
+                                  if (result != null && context.mounted) {
+                                    showDialog<void>(
+                                      context: context,
+                                      builder: (dCtx) => AlertDialog(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(16),
+                                        ),
+                                        icon: const Icon(
+                                          Icons.check_circle_rounded,
+                                          color: Colors.teal,
+                                          size: 44,
+                                        ),
+                                        title: const Text(
+                                          "Inventario Reiniciado",
+                                          style: TextStyle(fontWeight: FontWeight.bold),
+                                        ),
+                                        content: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              result.message,
+                                              style: const TextStyle(fontSize: 14),
+                                            ),
+                                            const SizedBox(height: 12),
+                                            if (result.docNumber.isNotEmpty)
+                                              Text(
+                                                "• Comprobante: ${result.docNumber}",
+                                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                                              ),
+                                            Text(
+                                              "• Productos ajustados: ${result.adjustedProductsCount}",
+                                              style: const TextStyle(fontSize: 13),
+                                            ),
+                                            Text(
+                                              "• Unidades descargadas: ${result.totalQuantityRemoved}",
+                                              style: const TextStyle(fontSize: 13),
+                                            ),
+                                          ],
+                                        ),
+                                        actions: [
+                                          FilledButton(
+                                            onPressed: () => Navigator.of(dCtx).pop(),
+                                            child: const Text("Entendido"),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }
+                                },
+                                child: const Text(
+                                  "Reiniciar a 0",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
@@ -493,8 +826,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color:
-                Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(
@@ -526,6 +858,31 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _CurrencyBadge extends StatelessWidget {
+  const _CurrencyBadge({required this.currency});
+
+  final AppCurrency currency;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Text(
+        "${currency.symbol}  ${currency.displayName}",
+        style: const TextStyle(
+          fontSize: 12.5,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
     );
   }
 }

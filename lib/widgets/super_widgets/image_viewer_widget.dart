@@ -1,6 +1,7 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image_ce/cached_network_image.dart';
+import 'package:kardex_app_front/src/tools/cache/app_image_cache_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/image_viewer_dialog.dart';
 
 /// Un widget premium para mostrar la previsualización de una o múltiples imágenes.
@@ -79,6 +80,8 @@ class _ImageViewerWidgetState extends State<ImageViewerWidget> {
                 if (hasImages)
                   CachedNetworkImage(
                     imageUrl: widget.imageUrls.first,
+                    cacheManager: AppImageCacheManager.instance,
+                    imageRenderMethodForWeb: ImageRenderMethodForWeb.HtmlImage,
                     fit: BoxFit.cover,
                     placeholder: (context, url) => const Center(
                       child: CircularProgressIndicator(strokeWidth: 2),

@@ -128,7 +128,29 @@ class _ExtraUnitsEditorDialogState extends State<ExtraUnitsEditorDialog> {
 
     return ShortcutContainer(
       child: AlertDialog(
-        title: const Text('Unidades de Medida Extra'),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text('Unidades de Medida Extra'),
+            FilledButton.tonalIcon(
+              onPressed: () async {
+                final preset = await showUnitScalePresetSelectorDialog(context);
+                if (preset != null) {
+                  setState(() {
+                    extraUnits.clear();
+                    extraUnits.addAll(preset.units);
+                    defaultUnitIndex = preset.defaultUnitIndex;
+                    wholesaleUnitIndex = preset.wholesaleUnitIndex;
+                    _validateDefaultUnitIndex();
+                    _validateWholesaleUnitIndex();
+                  });
+                }
+              },
+              icon: const Icon(Icons.auto_awesome, size: 18),
+              label: const Text("Cargar Preset"),
+            ),
+          ],
+        ),
         content: SizedBox(
           width: 600,
           child: Column(

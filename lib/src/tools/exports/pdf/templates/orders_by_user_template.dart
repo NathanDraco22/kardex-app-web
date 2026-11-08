@@ -27,7 +27,7 @@ class OrdersByUserTemplate implements PdfTemplate {
 
   @override
   Future<pw.Document> buildDocument() async {
-    final doc = pw.Document();
+    final doc = await PdfTheme.newDocument();
 
     doc.addPage(
       pw.MultiPage(
@@ -147,7 +147,8 @@ class OrdersByUserTemplate implements PdfTemplate {
         final rowColor = index.isOdd ? PdfColors.white : PdfColors.grey200;
         final currentOrder = items[index];
 
-        final createdAtFormatted = "${DateTimeTool.formatddMMyy(currentOrder.createdAt)} ${DateTimeTool.formatHHmm(currentOrder.createdAt)}";
+        final createdAtFormatted =
+            "${DateTimeTool.formatddMMyy(currentOrder.createdAt)} ${DateTimeTool.formatHHmm(currentOrder.createdAt)}";
         final clientName = currentOrder.clientInfo.name;
         final totalFormatted = NumberFormatter.convertToMoneyLike(currentOrder.total);
 

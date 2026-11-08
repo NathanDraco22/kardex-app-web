@@ -443,6 +443,23 @@ class _Body extends StatelessWidget {
               ),
             ),
           ),
+          const MenuSectionDivider(title: "Notas de Crédito"),
+          RolePermissionGate(
+            permissions: [
+              CommercialSubModules.createCreditNote,
+              CommercialSubModules.creditNoteHistory,
+            ],
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.creditNotes,
+              child: MenuOptionCard(
+                icon: Icons.assignment_return_rounded,
+                accentColor: Colors.deepPurple.shade600,
+                title: "Notas de Crédito",
+                subtitle: "Gestión de notas de crédito por devolución o monto",
+                onTap: () => context.pushNamed(RouteNames.creditNotes),
+              ),
+            ),
+          ),
         ],
       ),
     );

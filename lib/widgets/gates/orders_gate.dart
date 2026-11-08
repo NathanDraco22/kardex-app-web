@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
-import 'package:kardex_app_front/src/cubits/app_settings/app_settings_cubit.dart';
-import 'package:kardex_app_front/src/cubits/app_settings/app_settings_state.dart';
+import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
+import 'package:kardex_app_front/cubits/app_settings/app_settings_state.dart';
 
 class OrdersGate extends StatelessWidget {
   const OrdersGate({super.key, required this.child});

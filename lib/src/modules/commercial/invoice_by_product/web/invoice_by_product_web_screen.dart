@@ -26,7 +26,7 @@ class _InvoiceByProductWebScreenState extends State<InvoiceByProductWebScreen> {
   Widget build(BuildContext context) {
     EdgeInsets mainPadding = const EdgeInsets.all(4.0);
 
-    if (context.isMobile()) {
+    if (context.isMobileOrTablet()) {
       mainPadding = EdgeInsets.zero;
     }
 

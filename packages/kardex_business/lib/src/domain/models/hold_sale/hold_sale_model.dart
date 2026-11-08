@@ -3,6 +3,7 @@ import 'package:kardex_business/src/domain/models/common/sale_item_model.dart';
 import 'package:kardex_business/src/domain/models/common/user_info.dart';
 import 'package:kardex_business/src/domain/models/product/product_model.dart';
 import 'package:kardex_business/src/domain/models/product_sale_profile/product_sale_profile_model.dart';
+import 'package:kardex_business/src/tools/unit_conversion_tool.dart';
 
 class HoldSaleItem {
   final ProductInDbInBranch product;
@@ -24,6 +25,13 @@ class HoldSaleItem {
     this.selectedUnitName = '',
     this.selectedDiscount,
   });
+
+  double get displayQuantity => conversionFactor <= 1
+      ? quantity.toDouble()
+      : quantity / conversionFactor;
+
+  String get formattedDisplayQuantity =>
+      UnitConversionTool.formatQuantity(displayQuantity);
 
   factory HoldSaleItem.fromJson(Map<String, dynamic> json) {
     return HoldSaleItem(
@@ -171,7 +179,7 @@ class HoldSaleInDb extends BaseHoldSale {
   int get computedTotalAmount {
     if (totalAmount > 0) return totalAmount;
     return items.fold<int>(0, (sum, i) {
-      final subTotal = i.quantity * i.newPrice * i.conversionFactor;
+      final subTotal = (i.displayQuantity * i.newPrice * i.conversionFactor).round();
       final discountPercent = i.selectedDiscount?.percentValue ?? 0;
       final discount = (subTotal * (discountPercent / 100)).round();
       return sum + (subTotal - discount);
@@ -180,7 +188,7 @@ class HoldSaleInDb extends BaseHoldSale {
 
   int get computedTotalQuantity {
     if (totalQuantity > 0) return totalQuantity;
-    return items.fold<int>(0, (sum, i) => sum + i.quantity);
+    return items.fold<int>(0, (sum, i) => sum + i.displayQuantity.round());
   }
 
   factory HoldSaleInDb.fromJson(Map<String, dynamic> json) {

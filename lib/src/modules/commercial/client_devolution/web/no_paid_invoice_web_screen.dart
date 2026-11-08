@@ -34,10 +34,14 @@ class _NoPaidInvoiceWebScreenState extends State<NoPaidInvoiceWebScreen> {
   Widget build(BuildContext context) {
     final invoiceREpo = context.read<InvoicesRepository>();
     final devolutionRepo = context.read<DevolutionsRepository>();
+    final creditNoteRepo = context.read<CreditNotesRepository>();
+    final compositeRepo = context.read<CompositeRepository>();
     return BlocProvider(
       create: (context) => ReadPendingInvoiceCubit(
         invoicesRepository: invoiceREpo,
         devolutionsRepository: devolutionRepo,
+        creditNotesRepository: creditNoteRepo,
+        compositeRepository: compositeRepo,
       ),
       child: NoPaidInvoiceMediator(
         notifier: viewController,

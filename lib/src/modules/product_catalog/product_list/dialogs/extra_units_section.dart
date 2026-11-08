@@ -5,10 +5,12 @@ class ExtraUnitsSection extends StatefulWidget {
     super.key,
     required this.creationMap,
     this.currentProduct,
+    this.onPresetApplied,
   });
 
   final Map creationMap;
   final ProductInDb? currentProduct;
+  final ValueChanged<BaseUnitScale>? onPresetApplied;
 
   @override
   State<ExtraUnitsSection> createState() => _ExtraUnitsSectionState();
@@ -43,6 +45,33 @@ class _ExtraUnitsSectionState extends State<ExtraUnitsSection> {
     widget.creationMap['wholesaleUnitIndex'] = _wholesaleUnitIndex;
   }
 
+  Future<void> _applyPreset() async {
+    final preset = await showUnitScalePresetSelectorDialog(context);
+    if (preset == null) return;
+
+    setState(() {
+      _extraUnits.clear();
+      _extraUnits.addAll(preset.units);
+      _defaultUnitIndex = preset.defaultUnitIndex;
+      _wholesaleUnitIndex = preset.wholesaleUnitIndex;
+      _syncToMap();
+    });
+
+    widget.creationMap['unitName'] = preset.baseUnit;
+    widget.onPresetApplied?.call(preset);
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Preset "${preset.name}" aplicado correctamente'),
+          duration: const Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final String baseUnitName = widget.creationMap['unitName'] as String? ??
@@ -54,8 +83,11 @@ class _ExtraUnitsSectionState extends State<ExtraUnitsSection> {
       children: [
         const Divider(),
         const SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          alignment: WrapAlignment.spaceBetween,
+          crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             OutlinedButton.icon(
               style: OutlinedButton.styleFrom(
@@ -81,7 +113,12 @@ class _ExtraUnitsSectionState extends State<ExtraUnitsSection> {
                 }
               },
               icon: const Icon(Icons.scale),
-              label: Text("Unidades de Medida Extra (${_extraUnits.length})"),
+              label: Text("Unidades Extra (${_extraUnits.length})"),
+            ),
+            FilledButton.tonalIcon(
+              onPressed: _applyPreset,
+              icon: const Icon(Icons.auto_awesome, size: 18),
+              label: const Text("Usar Preset"),
             ),
           ],
         ),

@@ -44,12 +44,14 @@ lib/src/modules/settings/
 - **Propósito:** Configuración de tokens y credenciales para APIs externas de facturación electrónica gubernamental, pasarelas de pago o servicios de mensajería SMS/WhatsApp.
 - **Vistas:** `ApiKeysScreen`.
 
-### 2.4. Integraciones (`integrations`)
+### 2.4. Integraciones y Periféricos (`integrations`)
 - **Propósito:** Configuración de periféricos locales:
-  - Impresoras de tickets térmicos (ancho 58mm / 80mm, USB, Red o Bluetooth).
+  - Impresoras de tickets térmicos (ancho 58mm / 80mm, USB o Bluetooth) con soporte de impresión directa nativa ESC/POS en 1 clic y fallback automático al diálogo del sistema.
+  - Ver guía técnica completa, arquitectura y post-mortems en [Sistema de Impresión Térmica Directa](../sistema_impresion_termica.md).
+  - Diálogo de configuración local interactivo: `LocalPrinterSettingsDialog` (`lib/src/modules/settings/view/local_printer_settings_dialog.dart`), accesible desde el menú de Ajustes en móvil y escritorio para vincular impresoras, calibrar papel, invertir polaridad, tramado halftone y pruebas de impresión.
   - Lectores de códigos de barras (modo emulación teclado o serial).
   - Balanzas electrónicas y cajones portamonedas.
-- **Vistas:** `IntegrationsScreen`.
+- **Vistas:** `IntegrationsScreen`, `LocalPrinterSettingsDialog`.
 
 ### 2.5. Matriz de Precios a Productos (`price_to_product`)
 - **Propósito:** Parametrizar y sincronizar márgenes de ganancia, precios mínimos y precios mayoristas entre diferentes sucursales.
@@ -61,7 +63,7 @@ lib/src/modules/settings/
 - **Ubicación en Navegación:**
   - Móvil (`SettingsScreen`): Tarjeta `MenuOptionCard` al final del listado, justo después de *Configuración de Impresora Local*.
   - Escritorio (`home_modules_registry.dart`): Submódulo `HomeSubmoduleItem` al final de la categoría `Modules.settings`, después de *Impresora Local*.
-- **Cubit / Estado:** `AppSettingsCubit` y `AppSettingsState` (`lib/src/cubits/app_settings/`), inyectado globalmente en `ProviderContainer` como Singleton en `getIt<AppSettingsCubit>()` y precargado en `SplashScreen`.
+- **Cubit / Estado:** `AppSettingsCubit` y `AppSettingsState` (`lib/cubits/app_settings/`), inyectado globalmente en `ProviderContainer` como Singleton en `getIt<AppSettingsCubit>()` y precargado en `SplashScreen`.
 - **Parámetros Configurados (`AppSettingModel` / `UpdateAppSetting`):**
   - `useDefaultProfitMargin` (bool): Habilitar o no el cálculo automático de margen de ganancia por defecto.
   - `defaultProfitMargin` (double): Porcentaje de margen sugerido (ej. 20.0%).
@@ -73,6 +75,18 @@ lib/src/modules/settings/
   - `defaultPaymentTermDays` (int): Días de crédito predeterminados para facturación.
   - `useHoldSales` (bool): Permitir pausar carritos en terminal de venta.
   - `useQuickProductSearch` (bool): Abrir directamente el buscador rápido con botones de agregar y quitar cantidad al agregar productos en móvil (facturas, órdenes y cotizaciones; por defecto: `false`).
+  - `currency` (`AppCurrency`): Moneda global del sistema (`NIO`, `USD`, `HNL`, `GTQ`, `CRC`, `COP`, `MXN`, `EUR`; por defecto `NIO`). Solo define el símbolo visual usado por `NumberFormatter` en pantallas, tickets y reportes; no convierte montos existentes.
+    - El símbolo se resuelve mediante `NumberFormatter.configureCurrencyResolver`, registrado por `AppSettingsCubit` al construirse. Así, cualquier pantalla, PDF o ticket que use `NumberFormatter` adopta la moneda automáticamente.
+    - El contador de efectivo (`cash_counter`) mantiene sus denominaciones físicas de Córdobas y Dólares y no cambia con esta configuración.
+  - `secondaryCurrency` (`AppCurrency`): Moneda secundaria informativa (`USD` por defecto). Se muestra junto a la moneda principal en la tile superior de configuración; no convierte montos ni modifica precios.
+  - `exchangeRate` (double): Tasa informativa donde `1` unidad de la moneda secundaria equivale a `exchangeRate` unidades de la moneda principal. `0.0` significa “sin configurar”. No se usa en cálculos, tickets ni reportes.
+    - La tile “Moneda y tasa de cambio” es el primer elemento de `AppSettingsScreen`. Al tocarla se abre `showCurrencySettingsDialog`, que guarda únicamente `currency`, `secondaryCurrency` y `exchangeRate` mediante un PATCH parcial.
+    - El botón inferior “Guardar Configuraciones” conserva el resto de parámetros y no sobrescribe la moneda ni la tasa.
+  - `showInvoiceTotalInSecondaryCurrency` (bool): Muestra el equivalente del total de facturas en la moneda secundaria (`false` por defecto).
+    - La opción se controla con el switch “Mostrar total de facturas en moneda secundaria (USD)” debajo de la tile de moneda y se guarda con el botón inferior.
+    - El equivalente aparece después del total final en el visor de facturas, el ticket térmico (imprimir/compartir) y el PDF A4.
+    - Solo se muestra si la moneda secundaria es distinta a la principal y la tasa es mayor que cero. No modifica montos, pagos, cuentas por cobrar ni inventario.
+    - La línea usa el formato `Total(USD): US$27.31`.
 
 #### Uso Operativo del Margen de Ganancia Sugerido:
 1. **Editor de Precios de Producto (`ProductPriceEditorScreen`):**

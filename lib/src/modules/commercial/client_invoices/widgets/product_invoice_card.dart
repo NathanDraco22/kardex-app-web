@@ -124,7 +124,7 @@ class ProductInvoiceCard extends StatelessWidget {
                     suffix: ": ",
                   ),
                   Text(
-                    item.quantity.toString(),
+                    item.formattedQuantity,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,

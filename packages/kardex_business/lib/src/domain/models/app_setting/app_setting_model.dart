@@ -1,3 +1,5 @@
+import 'app_currency.dart';
+
 class AppSettingModel {
   final String id;
   final bool useDefaultProfitMargin;
@@ -10,6 +12,10 @@ class AppSettingModel {
   final int defaultPaymentTermDays;
   final bool useHoldSales;
   final bool useQuickProductSearch;
+  final AppCurrency currency;
+  final AppCurrency secondaryCurrency;
+  final double exchangeRate;
+  final bool showInvoiceTotalInSecondaryCurrency;
   final int createdAt;
   final int? updatedAt;
 
@@ -25,6 +31,10 @@ class AppSettingModel {
     this.defaultPaymentTermDays = 30,
     this.useHoldSales = true,
     this.useQuickProductSearch = false,
+    this.currency = AppCurrency.nio,
+    this.secondaryCurrency = AppCurrency.usd,
+    this.exchangeRate = 0.0,
+    this.showInvoiceTotalInSecondaryCurrency = false,
     required this.createdAt,
     this.updatedAt,
   });
@@ -33,7 +43,8 @@ class AppSettingModel {
     return AppSettingModel(
       id: json['id'] as String? ?? 'Default',
       useDefaultProfitMargin: json['useDefaultProfitMargin'] as bool? ?? false,
-      defaultProfitMargin: (json['defaultProfitMargin'] as num?)?.toDouble() ?? 20.0,
+      defaultProfitMargin:
+          (json['defaultProfitMargin'] as num?)?.toDouble() ?? 20.0,
       useExpirationDates: json['useExpirationDates'] as bool? ?? true,
       useOrders: json['useOrders'] as bool? ?? true,
       useQuotations: json['useQuotations'] as bool? ?? true,
@@ -42,6 +53,14 @@ class AppSettingModel {
       defaultPaymentTermDays: json['defaultPaymentTermDays'] as int? ?? 30,
       useHoldSales: json['useHoldSales'] as bool? ?? true,
       useQuickProductSearch: json['useQuickProductSearch'] as bool? ?? false,
+      currency: AppCurrency.fromCode(json['currency'] as String?),
+      secondaryCurrency: AppCurrency.fromCode(
+        json['secondaryCurrency'] as String?,
+        fallback: AppCurrency.usd,
+      ),
+      exchangeRate: (json['exchangeRate'] as num?)?.toDouble() ?? 0.0,
+      showInvoiceTotalInSecondaryCurrency:
+          json['showInvoiceTotalInSecondaryCurrency'] as bool? ?? false,
       createdAt: json['createdAt'] as int? ?? 0,
       updatedAt: json['updatedAt'] as int?,
     );
@@ -60,6 +79,11 @@ class AppSettingModel {
       'defaultPaymentTermDays': defaultPaymentTermDays,
       'useHoldSales': useHoldSales,
       'useQuickProductSearch': useQuickProductSearch,
+      'currency': currency.code,
+      'secondaryCurrency': secondaryCurrency.code,
+      'exchangeRate': exchangeRate,
+      'showInvoiceTotalInSecondaryCurrency':
+          showInvoiceTotalInSecondaryCurrency,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };
@@ -77,6 +101,10 @@ class AppSettingModel {
     int? defaultPaymentTermDays,
     bool? useHoldSales,
     bool? useQuickProductSearch,
+    AppCurrency? currency,
+    AppCurrency? secondaryCurrency,
+    double? exchangeRate,
+    bool? showInvoiceTotalInSecondaryCurrency,
     int? createdAt,
     int? updatedAt,
   }) {
@@ -95,6 +123,12 @@ class AppSettingModel {
       useHoldSales: useHoldSales ?? this.useHoldSales,
       useQuickProductSearch:
           useQuickProductSearch ?? this.useQuickProductSearch,
+      currency: currency ?? this.currency,
+      secondaryCurrency: secondaryCurrency ?? this.secondaryCurrency,
+      exchangeRate: exchangeRate ?? this.exchangeRate,
+      showInvoiceTotalInSecondaryCurrency:
+          showInvoiceTotalInSecondaryCurrency ??
+          this.showInvoiceTotalInSecondaryCurrency,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -112,6 +146,10 @@ class UpdateAppSetting {
   final int? defaultPaymentTermDays;
   final bool? useHoldSales;
   final bool? useQuickProductSearch;
+  final AppCurrency? currency;
+  final AppCurrency? secondaryCurrency;
+  final double? exchangeRate;
+  final bool? showInvoiceTotalInSecondaryCurrency;
 
   const UpdateAppSetting({
     this.useDefaultProfitMargin,
@@ -124,6 +162,10 @@ class UpdateAppSetting {
     this.defaultPaymentTermDays,
     this.useHoldSales,
     this.useQuickProductSearch,
+    this.currency,
+    this.secondaryCurrency,
+    this.exchangeRate,
+    this.showInvoiceTotalInSecondaryCurrency,
   });
 
   Map<String, dynamic> toJson() {
@@ -157,6 +199,19 @@ class UpdateAppSetting {
     }
     if (useQuickProductSearch != null) {
       data['useQuickProductSearch'] = useQuickProductSearch;
+    }
+    if (currency != null) {
+      data['currency'] = currency!.code;
+    }
+    if (secondaryCurrency != null) {
+      data['secondaryCurrency'] = secondaryCurrency!.code;
+    }
+    if (exchangeRate != null) {
+      data['exchangeRate'] = exchangeRate;
+    }
+    if (showInvoiceTotalInSecondaryCurrency != null) {
+      data['showInvoiceTotalInSecondaryCurrency'] =
+          showInvoiceTotalInSecondaryCurrency;
     }
     return data;
   }

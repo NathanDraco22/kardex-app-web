@@ -9,16 +9,20 @@ Este documento ofrece un panorama general y conciso de cada uno de los módulos 
 | Módulo | Carpeta (`lib/src/modules/`) | Rol de Negocio Principal | Documento Detallado |
 | :--- | :--- | :--- | :--- |
 | **Comercial** | `commercial/` | Terminal POS, facturación (nominativa y final), cotizaciones/proformas, recibos de caja, devoluciones y arqueo por usuario. | [commercial.md](./commercial.md) |
+| **Notas de Crédito** | `commercial/credit_notes/` | Sustitución y evolución de devoluciones (por mercancía o monto) con Repositorio Reactivo y amortización en recibos. | [credit_notes.md](./credit_notes.md) |
 | **Inventario** | `inventory/` | Existencias en tiempo real, entradas/salidas (flujo con y sin kárdex), ajustes, transferencias entre sucursales y bitácora de vencimientos. | [inventory.md](./inventory.md) |
-| **Catálogo de Productos** | `product_catalog/` | Catálogo maestro de productos, códigos alternativos (`altCode`), categorías taxonómicas y unidades de medida con factores de conversión. | [product_catalog.md](./product_catalog.md) |
+| **Catálogo de Productos** | `product_catalog/` | Catálogo maestro de productos, códigos alternativos (`altCode`), categorías taxonómicas, unidades de medida y escalas de conversión estandarizadas (Peso, Volumen, Longitud, Tiempo). | [product_catalog.md](./product_catalog.md) |
+| **Escalas de Unidades** | `product_catalog/unit_scales/` | Plantillas de conversión estandarizadas (Peso, Volumen, Longitud, Tiempo y personalizadas) para productos. | [unit_scales.md](./unit_scales.md) |
 | **Cuentas Pendientes** | `pending_accounts/` | Cuentas por cobrar, cartera de deudores, sesiones de crédito y aplicación de abonos a facturas pendientes. | [pending_accounts.md](./pending_accounts.md) |
 | **Finanzas** | `finance/` | Cierre diario y resumen ejecutivo de sucursal, reportes por rangos de fecha, arqueos de operaciones y estados de cuenta de clientes. | [finance.md](./finance.md) |
 | **Gastos** | `expenses/` | Registro de gastos operativos de caja/banco, pagos a proveedores, centros de costos/categorías y reportes analíticos de egresos. | [expenses.md](./expenses.md) |
 | **Catálogo de Clientes** | `client_catalog/` | Directorio de clientes, límites de crédito, grupos comerciales, balances iniciales históricos y mapa geolocalizado de clientes. | [client_catalog.md](./client_catalog.md) |
 | **Catálogo de Proveedores** | `suppliers_catalog/` | Directorio de abastecedores de mercancía, plazos de pago, condiciones crediticias e integración con compras e inventario. | [suppliers_catalog.md](./suppliers_catalog.md) |
 | **Configuración** | `settings/` | Administración de sucursales (`isCommerce`), usuarios, roles y permisos, llaves de API, periféricos/impresoras y matriz de precios. | [settings.md](./settings.md) |
+| **Importaciones CSV** | `imports/` | Carga masiva de inventario inicial, inventario, clientes y proveedores desde archivos CSV con plantillas descargables. | [imports.md](./imports.md) |
 | **Navegación y Sesión** | `home/`, `login/`, `splash/`... | Bootstrap inicial, autenticación JWT, menú responsivo comercial vs bodega, conmutador multi-sucursal y atajos de teclado. | [home_and_navigation.md](./home_and_navigation.md) |
 | **Herramientas Avanzadas** | `advanced_tools/` | Estadísticas avanzadas de rotación de productos, días de inventario y proyecciones automáticas de demanda para reabastecimiento. | [advanced_tools.md](./advanced_tools.md) |
+| **Impresión Térmica** | `services/`, `tools/printers/` | Impresión directa en 1 clic para tickets térmicos (Bluetooth/USB) sin drivers externos, fallback al spooler y tramado gráfico. | [sistema_impresion_termica.md](../sistema_impresion_termica.md) |
 
 ---
 
@@ -30,6 +34,7 @@ Este documento ofrece un panorama general y conciso de cada uno de los módulos 
   - El terminal de venta (`sale_terminal`) soporta ventas en espera temporales persistidas en servidor (`HoldSalesRepository`).
   - Las facturas validan stock comprometido (`promiseStock`) y reducen existencias.
   - La visualización e impresión de facturas y tickets utiliza `InvoicePrinter` y `SingleInvoiceTemplate`.
+  - Las **Notas de Crédito** (`credit_notes`) evolucionan las devoluciones bajo un patrón de **Repositorio Reactivo (`ReactiveRepository`)**, reingresando stock al Kárdex o asignando saldos a favor para amortización en recibos de pago.
 
 ### 2. Inventario (`inventory`)
 - **Enfoque:** Trazabilidad física y contable del almacén.
@@ -44,6 +49,7 @@ Este documento ofrece un panorama general y conciso de cada uno de los módulos 
   - Soporte de código alternativo (`altCode`) para productos que manejan códigos de fábrica y códigos internos propios.
   - Conversión de unidades con `UnitConversionTool` para despachos por fracciones o paquetes.
   - Reconstrucción reactiva de modelos en sucursal con `product_in_branch_factory.dart`.
+  - Escalas de Unidades (`unit_scales`) como plantillas de conversión reutilizables (Peso, Volumen, Longitud, Tiempo) para agilizar la parametrización de productos.
 
 ### 4. Cuentas Pendientes (`pending_accounts`)
 - **Enfoque:** Cobranza y crédito comercial.
@@ -72,7 +78,7 @@ Este documento ofrece un panorama general y conciso de cada uno de los módulos 
 - **Enfoque:** Parametrización y control de acceso.
 - **Puntos Críticos:**
   - La bandera `isCommerce` en sucursales determina si el sistema habilita módulos de venta o si se comporta puramente como centro logístico/bodega.
-  - El submódulo `app_settings` centraliza reglas y banderas globales (margen de ganancia sugerido, fechas de vencimiento, órdenes, cotizaciones, inventario negativo y días de crédito).
+  - El submódulo `app_settings` centraliza reglas y banderas globales (margen de ganancia sugerido, fechas de vencimiento, órdenes, cotizaciones, inventario negativo, días de crédito, moneda global, moneda secundaria, tasa informativa y total de facturas en moneda secundaria).
   - Control de accesos mediante `RolePermissionGate`.
 
 ### 9. Navegación, Sesión y Atajos (`home_and_navigation`)

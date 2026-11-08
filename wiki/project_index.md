@@ -69,7 +69,7 @@ lib/
 ├── constants/                   # Constantes del sistema
 │   ├── route_names.dart         # Nombres canónicos de rutas
 │   └── shortcut_registry.dart   # Registro global de atajos de teclado
-├── cubits/                      # Cubits globales (AuthCubit, AppModeCubit, AppThemeCubit)
+├── cubits/                      # Cubits globales (AuthCubit, AppModeCubit, AppSettingsCubit, ShortcutsCubit, ToastCubit)
 ├── src/
 │   ├── core/                    # Gestores de borradores y sincronizadores core
 │   ├── data/                    # DataSources (*_data_source.dart)
@@ -79,7 +79,7 @@ lib/
 │   │   ├── query_params/        # Parámetros de búsqueda HTTP tipados
 │   │   └── responses/           # Envolturas de respuestas (ListResponse, etc.)
 │   ├── modules/                 # Módulos de funcionalidad y pantallas
-│   ├── services/                # Servicios genéricos (http_service.dart)
+│   ├── services/                # Servicios (http_service.dart, thermal_printer_service.dart)
 │   └── tools/                   # Utilidades (factories, printers, formatters, excel/pdf)
 ├── widgets/                     # Widgets y componentes globales reutilizables
 │   ├── calculator/              # Calculadora flotante y numpad
@@ -115,13 +115,17 @@ Para conocer a detalle la lógica, vistas, cubits y repositorios de cada módulo
 - 🗺️ **[Sistema de Navegación y Arquitectura (sistema_navegacion.md)](./sistema_navegacion.md)** - Guía maestra de navegación: Split Hub (Desktop), Drill-Down (Mobile), permisos de roles, fallback seguro y diferencias entre ramas `main` y `lite`.
 - 📋 **[Índice de Módulos (modules_index.md)](./modules/modules_index.md)** - Resumen ejecutivo de todos los módulos.
 - 🛒 **[Comercial (modules/commercial.md)](./modules/commercial.md)** - Terminal POS, facturas, recibos, proformas y devoluciones.
+- 📋 **[Notas de Crédito (modules/credit_notes.md)](./modules/credit_notes.md)** - Sustitución y evolución de devoluciones (por devolución o monto), patrón de Repositorio Reactivo (`ReactiveRepository`) y amortización en recibos.
 - 📦 **[Inventario (modules/inventory.md)](./modules/inventory.md)** - Stock, entradas/salidas (kárdex y directo), transferencias y ajustes.
-- 🏷️ **[Catálogo de Productos (modules/product_catalog.md)](./modules/product_catalog.md)** - Productos, códigos alternativos, categorías y unidades.
+- 🏷️ **[Catálogo de Productos (modules/product_catalog.md)](./modules/product_catalog.md)** - Productos, códigos alternativos, categorías, unidades de medida y escalas de conversión.
+- ⚖️ **[Escalas de Unidades (modules/unit_scales.md)](./modules/unit_scales.md)** - Plantillas de conversión estandarizadas (Peso, Volumen, Longitud, Tiempo y personalizadas) para agilizar la parametrización de productos.
 - 💳 **[Cuentas Pendientes (modules/pending_accounts.md)](./modules/pending_accounts.md)** - Cuentas por cobrar y pagos de facturas.
 - 📊 **[Finanzas (modules/finance.md)](./modules/finance.md)** - Cierres diarios, arqueos de caja y reportes ejecutivos.
 - 💸 **[Gastos (modules/expenses.md)](./modules/expenses.md)** - Gastos operativos y a proveedores.
 - 👥 **[Catálogo de Clientes (modules/client_catalog.md)](./modules/client_catalog.md)** - Clientes, límites de crédito y mapa.
 - 🚚 **[Catálogo de Proveedores (modules/suppliers_catalog.md)](./modules/suppliers_catalog.md)** - Abastecedores y condiciones de compra.
 - ⚙️ **[Configuración (modules/settings.md)](./modules/settings.md)** - Sucursales, roles, periféricos, parámetros globales del sistema (`app_settings`) y precios.
+- 📥 **[Importaciones CSV (modules/imports.md)](./modules/imports.md)** - Carga masiva de inventario inicial, inventario, clientes y proveedores con plantillas descargables.
 - 🚀 **[Navegación y Acceso (modules/home_and_navigation.md)](./modules/home_and_navigation.md)** - Login, multi-sucursal y atajos de teclado.
 - 📈 **[Herramientas Avanzadas (modules/advanced_tools.md)](./modules/advanced_tools.md)** - Estadísticas y proyecciones.
+- 🖨️ **[Sistema de Impresión Térmica Directa (sistema_impresion_termica.md)](./sistema_impresion_termica.md)** - Arquitectura de impresión Bluetooth/USB sin drivers externos, rasterización ESC/POS, tramado Floyd-Steinberg y post-mortems de incidencias.

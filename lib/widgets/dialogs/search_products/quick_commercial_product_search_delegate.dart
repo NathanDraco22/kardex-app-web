@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/src/tools/tools.dart';
+
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/widgets/display_product_code.dart';
@@ -59,7 +60,7 @@ class _QuickProductSearchDelegateState extends State<QuickProductSearchDelegate>
           defaultPriceLevel: widget.defaultPriceLevel,
           preferredUnitType: widget.preferredUnitType,
         );
-        result.quantity = 1;
+        result.quantity = 1.0;
         _cart[product.id] = result;
       }
     });
@@ -77,20 +78,21 @@ class _QuickProductSearchDelegateState extends State<QuickProductSearchDelegate>
     });
   }
 
-  int _getQuantity(ProductInDbInBranch product) {
-    return _cart[product.id]?.quantity ?? 0;
+  double _getQuantity(ProductInDbInBranch product) {
+    return _cart[product.id]?.quantity ?? 0.0;
   }
 
-  void _setProductQuantity(ProductInDbInBranch product, int newQuantity) {
+  void _setProductQuantity(ProductInDbInBranch product, double newQuantity) {
     setState(() {
       if (newQuantity <= 0) {
         _cart.remove(product.id);
         return;
       }
 
-      int finalQuantity = newQuantity;
-      if (widget.restrictStock && newQuantity * _resolveDisplayFactor(product) > product.account.availableStock) {
-        finalQuantity = (product.account.availableStock / _resolveDisplayFactor(product)).floor();
+      double finalQuantity = newQuantity;
+      final factor = _resolveDisplayFactor(product);
+      if (widget.restrictStock && (newQuantity * factor).round() > product.account.availableStock) {
+        finalQuantity = (product.account.availableStock / factor);
       }
 
       if (!_cart.containsKey(product.id)) {
@@ -117,7 +119,7 @@ class _QuickProductSearchDelegateState extends State<QuickProductSearchDelegate>
 
   @override
   Widget build(BuildContext context) {
-    final cartItemsCount = _cart.values.fold<int>(0, (prev, curr) => prev + curr.quantity);
+    final cartItemsCount = _cart.length;
 
     return Scaffold(
       appBar: AppBar(
@@ -201,8 +203,7 @@ class _QuickProductSearchDelegateState extends State<QuickProductSearchDelegate>
             color: quantity > 0 ? Colors.amber.shade50 : Colors.white,
             onIncrement: canIncrement ? () => _incrementProduct(product) : null,
             onDecrement: quantity > 0 ? () => _decrementProduct(product) : null,
-            onQuantityChanged: (value) {
-              final newQuantity = int.tryParse(value) ?? 0;
+            onQuantityChanged: (newQuantity) {
               _setProductQuantity(product, newQuantity);
             },
           );
@@ -225,10 +226,10 @@ class _ProductInBranchQuickResultRow extends StatefulWidget {
   });
 
   final ProductInDbInBranch product;
-  final int quantity;
+  final double quantity;
   final VoidCallback? onIncrement;
   final VoidCallback? onDecrement;
-  final ValueChanged<String>? onQuantityChanged;
+  final ValueChanged<double>? onQuantityChanged;
   final String preferredUnitType;
   final int defaultPriceLevel;
   final Color? color;
@@ -264,15 +265,18 @@ class _ProductInBranchQuickResultRowState extends State<_ProductInBranchQuickRes
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(text: widget.quantity == 0 ? "" : widget.quantity.toString());
+    _controller = TextEditingController(
+      text: widget.quantity == 0 ? "" : UnitConversionTool.formatQuantity(widget.quantity),
+    );
   }
 
   @override
   void didUpdateWidget(covariant _ProductInBranchQuickResultRow oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.quantity != widget.quantity) {
-      if (int.tryParse(_controller.text) != widget.quantity) {
-        _controller.text = widget.quantity == 0 ? "" : widget.quantity.toString();
+      final currentParsed = double.tryParse(_controller.text.replaceAll(',', '.')) ?? 0.0;
+      if (currentParsed != widget.quantity) {
+        _controller.text = widget.quantity == 0 ? "" : UnitConversionTool.formatQuantity(widget.quantity);
       }
     }
   }
@@ -300,6 +304,7 @@ class _ProductInBranchQuickResultRowState extends State<_ProductInBranchQuickRes
   Widget build(BuildContext context) {
     int value = _displayPrice * _displayConversionFactor;
     String valueToDisplay = NumberFormatter.convertToMoneyLike(value);
+    final canUseDecimals = _displayConversionFactor > 1;
 
     return DecoratedBox(
       decoration: BoxDecoration(color: widget.color),
@@ -412,9 +417,16 @@ class _ProductInBranchQuickResultRowState extends State<_ProductInBranchQuickRes
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
-                      inputFormatters: [IntegerTextInputFormatter()],
-                      keyboardType: TextInputType.number,
-                      onChanged: widget.onQuantityChanged,
+                      inputFormatters: canUseDecimals
+                          ? [DecimalQuantityTextInputFormatter(maxDecimalDigits: 3)]
+                          : [FilteringTextInputFormatter.digitsOnly],
+                      keyboardType: canUseDecimals
+                          ? const TextInputType.numberWithOptions(decimal: true)
+                          : TextInputType.number,
+                      onChanged: (val) {
+                        final parsed = double.tryParse(val.replaceAll(',', '.')) ?? 0.0;
+                        widget.onQuantityChanged?.call(parsed);
+                      },
                     ),
                   ),
                 ),

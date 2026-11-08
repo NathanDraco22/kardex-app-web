@@ -210,9 +210,9 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
                           );
 
                           if (res == null) return;
-                          if (res.quantity == 0) return;
+                          if (res.quantity <= 0) return;
                           if (widget.restrictStock &&
-                              ((res.quantity * res.conversionFactor) > res.product.account.availableStock ||
+                              (res.baseQuantity > res.product.account.availableStock ||
                                   res.product.account.availableStock == 0)) {
                             if (!context.mounted) return;
                             await DialogManager.showErrorDialog(
@@ -258,7 +258,7 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
           );
           if (res == null) return;
           if (widget.restrictStock &&
-              ((res.quantity * res.conversionFactor) > res.product.account.availableStock ||
+              (res.baseQuantity > res.product.account.availableStock ||
                   res.product.account.availableStock == 0)) {
             if (!context.mounted) return;
             await DialogManager.showErrorDialog(
@@ -267,7 +267,7 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
             );
             return;
           }
-          if (res.quantity == 0) return;
+          if (res.quantity <= 0) return;
           controller.updateItem(item, res);
         },
         onEdit: (item) async {
@@ -279,7 +279,7 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
           );
           if (res == null) return;
           if (widget.restrictStock &&
-              ((res.quantity * res.conversionFactor) > res.product.account.availableStock ||
+              (res.baseQuantity > res.product.account.availableStock ||
                   res.product.account.availableStock == 0)) {
             if (!context.mounted) return;
             await DialogManager.showErrorDialog(
@@ -288,7 +288,7 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
             );
             return;
           }
-          if (res.quantity == 0) return;
+          if (res.quantity <= 0) return;
           controller.updateItem(item, res);
         },
       );
@@ -386,7 +386,7 @@ class InvoiceTableRow extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(item.quantity.toString()),
+                  Text(item.formattedQuantity),
                 ],
               ),
             ),

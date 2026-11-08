@@ -5,7 +5,7 @@ import 'package:kardex_app_front/cubits/app_mode/app_mode_cubit.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/cubits/shortcuts/shortcuts_cubit.dart';
 import 'package:kardex_app_front/cubits/toast/toast_cubit.dart';
-import 'package:kardex_app_front/src/cubits/app_settings/app_settings_cubit.dart';
+import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
 
 import 'package:kardex_app_front/src/core/app_config_manager.dart';
 import 'package:kardex_app_front/src/core/app_kardex_config.dart';
@@ -40,6 +40,8 @@ class ProviderContainer extends StatelessWidget {
     final productTransactionDataSource = ProductTransactionsDataSource();
     final expirationLogsDataSource = ExpirationLogsDataSource();
     final devolutionDataSource = DevolutionsDataSource();
+    final creditNotesDataSource = CreditNotesDataSource();
+    final compositeDataSource = CompositeDataSource();
     final invoiceDevolutionDataSource = InvoiceDevolutionsDataSource();
     final clientTransDataSource = ClientTransactionsDataSource();
     final servinStatusDataSource = ServinStatusDataSource();
@@ -62,6 +64,8 @@ class ProviderContainer extends StatelessWidget {
     final expenseCategoriesDataSource = ExpenseCategoriesDataSource();
     final holdSalesDataSource = HoldSalesDataSource();
     final appSettingsDataSource = AppSettingsDataSource();
+    final unitScaleDataSource = UnitScalesDataSource();
+    final importsDataSource = ImportsDataSource();
 
     return MultiRepositoryProvider(
       providers: [
@@ -109,6 +113,10 @@ class ProviderContainer extends StatelessWidget {
 
         RepositoryProvider(
           create: (context) => UnitsRepository(unitDataSource),
+        ),
+
+        RepositoryProvider(
+          create: (context) => UnitScalesRepository(unitScaleDataSource),
         ),
 
         RepositoryProvider(
@@ -173,6 +181,18 @@ class ProviderContainer extends StatelessWidget {
         RepositoryProvider(
           create: (context) => DevolutionsRepository(
             devolutionDataSource,
+          ),
+        ),
+
+        RepositoryProvider(
+          create: (context) => CompositeRepository(
+            compositeDataSource,
+          ),
+        ),
+
+        RepositoryProvider(
+          create: (context) => CreditNotesRepository(
+            creditNotesDataSource,
           ),
         ),
 
@@ -245,6 +265,9 @@ class ProviderContainer extends StatelessWidget {
         ),
         RepositoryProvider(
           create: (context) => AppSettingsRepository(appSettingsDataSource),
+        ),
+        RepositoryProvider(
+          create: (context) => ImportsRepository(importsDataSource),
         ),
       ],
       child: GlobalCubitProvider(

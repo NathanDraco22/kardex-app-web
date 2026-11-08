@@ -21,5 +21,7 @@ enum CommercialSubModules {
   priceSetting,
   createDevolution,
   devolutionHistory,
-  processDevolution;
+  processDevolution,
+  createCreditNote,
+  creditNoteHistory;
 }

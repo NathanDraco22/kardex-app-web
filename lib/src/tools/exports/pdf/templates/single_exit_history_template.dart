@@ -14,7 +14,7 @@ class SingleExitHistoryTemplate implements PdfTemplate {
 
   @override
   Future<pw.Document> buildDocument() async {
-    final doc = pw.Document();
+    final doc = await PdfTheme.newDocument();
 
     doc.addPage(
       pw.MultiPage(
@@ -196,9 +196,15 @@ class SingleExitHistoryTemplate implements PdfTemplate {
                         children: [
                           pw.Text(item.code ?? "", style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey700)),
                           pw.SizedBox(width: 4),
-                          pw.Text(item.brandName ?? "", style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey700)),
+                          pw.Text(
+                            item.brandName ?? "",
+                            style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey700),
+                          ),
                           pw.SizedBox(width: 4),
-                          pw.Text(item.unitName ?? "", style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey700)),
+                          pw.Text(
+                            item.unitName ?? "",
+                            style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey700),
+                          ),
                         ],
                       ),
                     ],

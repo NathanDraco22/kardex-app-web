@@ -564,7 +564,7 @@ class _BodyState extends State<_Body> {
       yield SaleItemRow(
         onEdit: () async {
           CommercialProductResult? commercial;
-          if (context.isMobile()) {
+          if (context.isMobileOrTablet()) {
             commercial = await showCommercialProductModalFromId(
               context,
               productId: saleItem.product.id,
@@ -596,7 +596,7 @@ class _BodyState extends State<_Body> {
             selectedPrice: commercial.selectedPriceLevel,
             cost: commercial.product.account.averageCost,
             price: commercial.newPrice,
-            quantity: commercial.quantity * commercial.conversionFactor,
+            quantity: commercial.baseQuantity,
             discountPercentage: commercial.discountPercent,
             totalDiscount: commercial.totalDiscount,
             subTotal: commercial.subTotal,
@@ -667,7 +667,7 @@ class _BodyState extends State<_Body> {
           label: const Text("Agregar producto"),
           onPressed: () async {
             CommercialProductResult? commercial;
-            if (context.isMobile()) {
+            if (context.isMobileOrTablet()) {
               commercial = await showCommercialProductSearchDelegate(
                 context,
                 restrictStock: false,
@@ -697,7 +697,7 @@ class _BodyState extends State<_Body> {
                 selectedPrice: commercial.selectedPriceLevel,
                 cost: commercial.product.account.averageCost,
                 price: commercial.newPrice,
-                quantity: commercial.quantity * commercial.conversionFactor,
+                quantity: commercial.baseQuantity,
                 discountPercentage: commercial.discountPercent,
                 totalDiscount: commercial.totalDiscount,
                 subTotal: commercial.subTotal,

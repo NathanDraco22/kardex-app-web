@@ -27,7 +27,7 @@ class Custom7DaysBarChart extends StatelessWidget {
               getTooltipColor: (touchedBarGroup) => Colors.blueAccent.withValues(alpha: 0.8),
               getTooltipItem: (group, groupIndex, rod, rodIndex) {
                 return BarTooltipItem(
-                  "C\$ ${rod.toY.toStringAsFixed(2)}",
+                  "${NumberFormatter.currencySymbol} ${rod.toY.toStringAsFixed(2)}",
                   const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                 );
               },

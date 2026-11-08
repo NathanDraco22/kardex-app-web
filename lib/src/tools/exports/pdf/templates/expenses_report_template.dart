@@ -21,7 +21,7 @@ class ExpensesReportTemplate implements PdfTemplate {
 
   @override
   Future<pw.Document> buildDocument() async {
-    final doc = pw.Document();
+    final doc = await PdfTheme.newDocument();
 
     // Lógica de consolidación
     final operativeExpenses = items.where((e) => e.type == ExpenseType.operative).toList();
@@ -240,7 +240,10 @@ class ExpensesReportTemplate implements PdfTemplate {
                 padding: const pw.EdgeInsets.all(4),
                 child: pw.Align(
                   alignment: pw.Alignment.centerRight,
-                  child: pw.Text(NumberFormatter.convertToMoneyLike(entry.value), style: const pw.TextStyle(fontSize: 8)),
+                  child: pw.Text(
+                    NumberFormatter.convertToMoneyLike(entry.value),
+                    style: const pw.TextStyle(fontSize: 8),
+                  ),
                 ),
               ),
             ],

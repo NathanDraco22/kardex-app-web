@@ -200,14 +200,21 @@ class TerminalCartItemTile extends StatelessWidget {
                     ),
                     child: const Icon(Icons.remove, size: 18),
                   ),
-                  SizedBox(
-                    width: 38,
-                    child: Center(
-                      child: Text(
-                        item.quantity.toString(),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                  InkWell(
+                    onTap: onEdit,
+                    borderRadius: BorderRadius.circular(4),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(minWidth: 44),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                        child: Center(
+                          child: Text(
+                            item.formattedQuantity,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
                         ),
                       ),
                     ),

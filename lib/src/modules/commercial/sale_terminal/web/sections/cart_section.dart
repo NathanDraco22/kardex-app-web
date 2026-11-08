@@ -114,22 +114,26 @@ class _CartSectionState extends State<_CartSection> {
                             itemBuilder: (context, index) {
                               final item = viewController.items[index];
                               final color = index.isOdd ? Colors.white : Colors.grey.shade50;
-                              final maxQuantity = item.product.account.availableStock ~/ item.conversionFactor;
+                              final maxQuantity = item.product.account.availableStock / item.conversionFactor;
                               return TerminalCartItemTile(
                                 key: ValueKey(item),
                                 item: item,
                                 backgroundColor: color,
                                 onRemove: () => viewController.removeItem(item),
                                 onEdit: () => _editItem(context, viewController, item),
-                                onQuantityIncrement: item.quantity < maxQuantity
+                                onQuantityIncrement: item.quantity + 1.0 <= maxQuantity
                                     ? () {
-                                        item.quantity++;
+                                        item.quantity += 1.0;
                                         viewController.refresh();
                                       }
                                     : null,
-                                onQuantityDecrement: item.quantity > 0
+                                onQuantityDecrement: item.quantity > 0.0
                                     ? () {
-                                        item.quantity--;
+                                        if (item.quantity > 1.0) {
+                                          item.quantity -= 1.0;
+                                        } else {
+                                          item.quantity = 0.0;
+                                        }
                                         viewController.refresh();
                                       }
                                     : null,
@@ -166,12 +170,12 @@ class _CartSectionState extends State<_CartSection> {
       return;
     }
     if (res.product.account.availableStock == 0 ||
-        res.product.account.availableStock < (res.quantity * res.conversionFactor)) {
+        res.product.account.availableStock < res.baseQuantity) {
       DialogManager.showInfoDialog(context, "No hay stock disponible");
       viewController.requestSearchFocus();
       return;
     }
-    if (res.quantity == 0) {
+    if (res.quantity <= 0) {
       viewController.requestSearchFocus();
       return;
     }

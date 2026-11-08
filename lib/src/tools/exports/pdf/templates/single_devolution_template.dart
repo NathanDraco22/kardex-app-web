@@ -1,3 +1,4 @@
+import 'package:kardex_app_front/src/tools/cache/image_bytes_resolver.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/pdf_template.dart';
 import 'package:pdf/pdf.dart';
@@ -14,7 +15,8 @@ class SingleDevolutionTemplate implements PdfTemplate {
 
   @override
   Future<pw.Document> buildDocument() async {
-    final doc = pw.Document();
+    await branch.resolveLogoBytes();
+    final doc = await PdfTheme.newDocument();
 
     doc.addPage(
       pw.MultiPage(
@@ -193,7 +195,10 @@ class SingleDevolutionTemplate implements PdfTemplate {
             children: [
               pw.Expanded(
                 flex: 4,
-                child: pw.Text("Producto Devuelto", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
+                child: pw.Text(
+                  "Producto Devuelto",
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                ),
               ),
               pw.Expanded(
                 flex: 1,
@@ -247,9 +252,7 @@ class SingleDevolutionTemplate implements PdfTemplate {
                 pw.Expanded(
                   flex: 1,
                   child: pw.Text(
-                    item.conversionFactor != 1
-                        ? (item.quantity ~/ item.conversionFactor).toString()
-                        : item.quantity.toString(),
+                    item.formattedDisplayQuantity,
                     textAlign: pw.TextAlign.center,
                     style: const pw.TextStyle(fontSize: 12),
                   ),

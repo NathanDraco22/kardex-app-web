@@ -8,7 +8,7 @@ import 'package:kardex_app_front/src/tools/uploaders/image_uploader.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/product_list/cubit/write_product_cubit.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
-import 'package:kardex_app_front/src/cubits/app_settings/app_settings_cubit.dart';
+import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
 Future<ProductInDbInBranch?> showCreateProductWithDataDialog(
@@ -135,6 +135,7 @@ class _FormContentState extends State<_FormContent> {
   late TextEditingController _quantityController;
   late TextEditingController _costController;
   late TextEditingController _priceController;
+  late TextEditingController _unitController;
 
   ImageProvider? _currentImageProvider;
   Uint8List? _selectedImageBytes;
@@ -147,6 +148,7 @@ class _FormContentState extends State<_FormContent> {
     _quantityController = TextEditingController(text: "0");
     _costController = TextEditingController(text: "0.00");
     _priceController = TextEditingController(text: "0.00");
+    _unitController = TextEditingController();
   }
 
   @override
@@ -155,6 +157,7 @@ class _FormContentState extends State<_FormContent> {
     _quantityController.dispose();
     _costController.dispose();
     _priceController.dispose();
+    _unitController.dispose();
     super.dispose();
   }
 
@@ -280,6 +283,7 @@ class _FormContentState extends State<_FormContent> {
               unitsMenuEntries: unitsMenuEntries,
               productCategoriesEntries: productCateEntries,
               tagController: _tagController,
+              unitController: _unitController,
               quantityController: _quantityController,
               costController: _costController,
               priceController: _priceController,
@@ -337,6 +341,7 @@ class _FormContentState extends State<_FormContent> {
               unitsMenuEntries: unitsMenuEntries,
               productCategoriesEntries: productCateEntries,
               tagController: _tagController,
+              unitController: _unitController,
               quantityController: _quantityController,
               costController: _costController,
               priceController: _priceController,
@@ -357,6 +362,7 @@ class _InnerContent extends StatelessWidget {
     required this.unitsMenuEntries,
     required this.productCategoriesEntries,
     required this.tagController,
+    required this.unitController,
     required this.quantityController,
     required this.costController,
     required this.priceController,
@@ -369,6 +375,7 @@ class _InnerContent extends StatelessWidget {
   final Iterable<DropdownMenuEntry<String>> unitsMenuEntries;
   final Iterable<DropdownMenuEntry<String>> productCategoriesEntries;
   final _WordChipTextController tagController;
+  final TextEditingController unitController;
   final TextEditingController quantityController;
   final TextEditingController costController;
   final TextEditingController priceController;
@@ -462,6 +469,7 @@ class _InnerContent extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     CustomAutocompleteTextfield<UnitInDb>(
+                      controller: unitController,
                       onClose: (value) => creationMap['unitName'] = value.name,
                       onFieldSubmitted: (value) {
                         FocusScope.of(context).nextFocus();
@@ -548,7 +556,12 @@ class _InnerContent extends StatelessWidget {
             },
           ),
           const SizedBox(height: 16),
-          _ExtraUnitsSection(creationMap: creationMap),
+          _ExtraUnitsSection(
+            creationMap: creationMap,
+            onPresetApplied: (preset) {
+              unitController.text = preset.baseUnit;
+            },
+          ),
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(12),
@@ -596,9 +609,9 @@ class _InnerContent extends StatelessWidget {
                     Flexible(
                       child: TitleTextField(
                         key: const ValueKey("initial_cost"),
-                        title: "Costo Unitario ($defaultCoinSymbol)*",
+                        title: "Costo Unitario (${NumberFormatter.currencySymbol})*",
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                        inputFormatters: [DecimalTextInputFormatter()],
+                        inputFormatters: [const DecimalTextInputFormatter()],
                         controller: costController,
                         validator: (val) {
                           if (val == null || val.trim().isEmpty) return "Requerido";
@@ -612,9 +625,9 @@ class _InnerContent extends StatelessWidget {
                     Flexible(
                       child: TitleTextField(
                         key: const ValueKey("initial_price"),
-                        title: "Precio Venta ($defaultCoinSymbol)*",
+                        title: "Precio Venta (${NumberFormatter.currencySymbol})*",
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                        inputFormatters: [DecimalTextInputFormatter()],
+                        inputFormatters: [const DecimalTextInputFormatter()],
                         controller: priceController,
                         validator: (val) {
                           if (val == null || val.trim().isEmpty) return "Requerido";
@@ -657,7 +670,7 @@ class _InnerContent extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Precio Sugerido (+${profitMargin.toStringAsFixed(profitMargin.truncateToDouble() == profitMargin ? 0 : 1)}%): $defaultCoinSymbol ${suggestedPrice.toStringAsFixed(2)}",
+                                  "Precio Sugerido (+${profitMargin.toStringAsFixed(profitMargin.truncateToDouble() == profitMargin ? 0 : 1)}%): ${NumberFormatter.currencySymbol} ${suggestedPrice.toStringAsFixed(2)}",
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
@@ -665,7 +678,7 @@ class _InnerContent extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  "Calculado sobre costo ($defaultCoinSymbol ${costVal.toStringAsFixed(2)})",
+                                  "Calculado sobre costo (${NumberFormatter.currencySymbol} ${costVal.toStringAsFixed(2)})",
                                   style: TextStyle(fontSize: 11, color: Colors.blue.shade700),
                                 ),
                               ],
@@ -724,9 +737,13 @@ class _InnerContent extends StatelessWidget {
 }
 
 class _ExtraUnitsSection extends StatefulWidget {
-  const _ExtraUnitsSection({required this.creationMap});
+  const _ExtraUnitsSection({
+    required this.creationMap,
+    this.onPresetApplied,
+  });
 
   final Map<String, dynamic> creationMap;
+  final ValueChanged<BaseUnitScale>? onPresetApplied;
 
   @override
   State<_ExtraUnitsSection> createState() => _ExtraUnitsSectionState();
@@ -756,6 +773,33 @@ class _ExtraUnitsSectionState extends State<_ExtraUnitsSection> {
     widget.creationMap['wholesaleUnitIndex'] = _wholesaleUnitIndex;
   }
 
+  Future<void> _applyPreset() async {
+    final preset = await showUnitScalePresetSelectorDialog(context);
+    if (preset == null) return;
+
+    setState(() {
+      _extraUnits.clear();
+      _extraUnits.addAll(preset.units);
+      _defaultUnitIndex = preset.defaultUnitIndex;
+      _wholesaleUnitIndex = preset.wholesaleUnitIndex;
+      _syncToMap();
+    });
+
+    widget.creationMap['unitName'] = preset.baseUnit;
+    widget.onPresetApplied?.call(preset);
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Preset "${preset.name}" aplicado correctamente'),
+          duration: const Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final String baseUnitName = widget.creationMap['unitName'] as String? ?? 'Unidad Base';
@@ -765,8 +809,11 @@ class _ExtraUnitsSectionState extends State<_ExtraUnitsSection> {
       children: [
         const Divider(),
         const SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          alignment: WrapAlignment.spaceBetween,
+          crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             OutlinedButton.icon(
               style: OutlinedButton.styleFrom(
@@ -792,7 +839,12 @@ class _ExtraUnitsSectionState extends State<_ExtraUnitsSection> {
                 }
               },
               icon: const Icon(Icons.scale),
-              label: Text("Unidades de Medida Extra (${_extraUnits.length})"),
+              label: Text("Unidades Extra (${_extraUnits.length})"),
+            ),
+            FilledButton.tonalIcon(
+              onPressed: _applyPreset,
+              icon: const Icon(Icons.auto_awesome, size: 18),
+              label: const Text("Usar Preset"),
             ),
           ],
         ),

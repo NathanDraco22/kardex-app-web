@@ -292,7 +292,7 @@ class _BalanceCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  "C\$ ${(balance / 100).toStringAsFixed(2)}",
+                  NumberFormatter.convertToMoneyLike(balance.toInt()),
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,

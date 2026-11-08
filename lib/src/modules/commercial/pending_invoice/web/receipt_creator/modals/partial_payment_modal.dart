@@ -5,10 +5,12 @@ import 'package:kardex_app_front/src/modules/commercial/pending_invoice/modals/c
 class PartialPaymentResult {
   final Map<String, double> payments;
   final List<DevolutionInDb> usedDevolutions;
+  final List<CreditNoteInDb> usedCreditNotes;
 
   PartialPaymentResult({
     required this.payments,
     required this.usedDevolutions,
+    this.usedCreditNotes = const [],
   });
 }
 
@@ -17,6 +19,7 @@ Future<PartialPaymentResult?> showPartialPaymentModal(
   required ClientInDb client,
   required List<InvoiceInDb> invoices,
   required List<DevolutionInDb> devolutions,
+  List<CreditNoteInDb> creditNotes = const [],
 }) {
   return showDialog<PartialPaymentResult>(
     context: context,
@@ -24,6 +27,7 @@ Future<PartialPaymentResult?> showPartialPaymentModal(
       client: client,
       invoices: invoices,
       devolutions: devolutions,
+      creditNotes: creditNotes,
     ),
   );
 }
@@ -34,11 +38,13 @@ class PartialPaymentModal extends StatefulWidget {
     required this.client,
     required this.invoices,
     required this.devolutions,
+    this.creditNotes = const [],
   });
 
   final ClientInDb client;
   final List<InvoiceInDb> invoices;
   final List<DevolutionInDb> devolutions;
+  final List<CreditNoteInDb> creditNotes;
 
   @override
   State<PartialPaymentModal> createState() => _PartialPaymentModalState();
@@ -71,6 +77,19 @@ class _PartialPaymentModalState extends State<PartialPaymentModal> {
 
   int _getLinkedDevolutionsTotal(String invoiceId) {
     final linked = _getLinkedDevolutions(invoiceId);
+    return linked.fold(0, (sum, item) => sum + item.total);
+  }
+
+  List<CreditNoteInDb> _getLinkedCreditNotes(InvoiceInDb invoice) {
+    return widget.creditNotes.where(
+      (cn) =>
+          cn.invoiceId == invoice.id ||
+          (cn.invoiceDocNumber.isNotEmpty && cn.invoiceDocNumber == invoice.docNumber),
+    ).toList();
+  }
+
+  int _getLinkedCreditNotesTotal(InvoiceInDb invoice) {
+    final linked = _getLinkedCreditNotes(invoice);
     return linked.fold(0, (sum, item) => sum + item.total);
   }
 
@@ -119,6 +138,9 @@ class _PartialPaymentModalState extends State<PartialPaymentModal> {
     final linkedDevolutions = _getLinkedDevolutions(invoice.id);
     final devolutionTotal = _getLinkedDevolutionsTotal(invoice.id);
 
+    final linkedCreditNotes = _getLinkedCreditNotes(invoice);
+    final creditNoteTotal = _getLinkedCreditNotesTotal(invoice);
+
     // Calculate balance: (Total - Paid) in cents
     final balanceCents = invoice.total - invoice.amountPaid;
 
@@ -127,7 +149,7 @@ class _PartialPaymentModalState extends State<PartialPaymentModal> {
     // Input in cents for validation
     final inputCents = (inputAmount * 100).round();
 
-    final totalApplyCents = inputCents + devolutionTotal;
+    final totalApplyCents = inputCents + devolutionTotal + creditNoteTotal;
 
     final isValid = totalApplyCents <= balanceCents;
 
@@ -199,6 +221,52 @@ class _PartialPaymentModalState extends State<PartialPaymentModal> {
                 ),
               ),
             ],
+            if (linkedCreditNotes.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.deepPurple.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(color: Colors.deepPurple.shade200),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Notas de Crédito Vinculadas:",
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.deepPurple),
+                    ),
+                    ...linkedCreditNotes.map(
+                      (cn) => Padding(
+                        padding: const EdgeInsets.only(top: 4.0),
+                        child: Row(
+                          children: [
+                            Text("#${cn.docNumber} (${cn.type.display})"),
+                            const Spacer(),
+                            Text(
+                              "- ${NumberFormatter.convertToMoneyLike(cn.total)}",
+                              style: const TextStyle(color: Colors.deepPurple, fontWeight: FontWeight.w500),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const Divider(),
+                    Row(
+                      children: [
+                        const Text("Total Notas de Crédito:", style: TextStyle(fontWeight: FontWeight.bold)),
+                        const Spacer(),
+                        Text(
+                          "- ${NumberFormatter.convertToMoneyLike(creditNoteTotal)}",
+                          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.deepPurple),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
             const SizedBox(height: 16),
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -251,26 +319,19 @@ class _PartialPaymentModalState extends State<PartialPaymentModal> {
       final balanceCents = invoice.total - invoice.amountPaid;
       final inputCents = ((_inputAmounts[invoice.id] ?? 0.0) * 100).round();
       final devCents = _getLinkedDevolutionsTotal(invoice.id);
-      if (inputCents + devCents > balanceCents) {
+      final cnCents = _getLinkedCreditNotesTotal(invoice);
+      if (inputCents + devCents + cnCents > balanceCents) {
         allValid = false;
         break;
       }
     }
 
-    // Also invalidate if total is 0 (optional, but usually you don't pay 0 unless covering with devolution)
-    // Actually, user might want to apply JUST devolution.
-    // So if cash is 0 but there is a devolution application, it might be valid.
-    // Let's just check bounds.
-
-    // Check if there is ANY application happening (either cash > 0 or linked devolution > 0 for that invoice)
-    // But wait, if they open the modal, maybe they just want to cancel.
-    // We should require at least one positive application to "Confirm".
-
     bool hasAnyApplication = false;
     for (var invoice in widget.invoices) {
       final input = _inputAmounts[invoice.id] ?? 0.0;
       final dev = _getLinkedDevolutionsTotal(invoice.id);
-      if (input > 0 || dev > 0) {
+      final cn = _getLinkedCreditNotesTotal(invoice);
+      if (input > 0 || dev > 0 || cn > 0) {
         hasAnyApplication = true;
         break;
       }
@@ -300,12 +361,23 @@ class _PartialPaymentModalState extends State<PartialPaymentModal> {
             onPressed: (allValid && hasAnyApplication)
                 ? () async {
                     final usedDevolutions = <DevolutionInDb>[];
+                    final usedCreditNotes = <CreditNoteInDb>[];
                     for (var invoice in widget.invoices) {
-                      final linked = _getLinkedDevolutions(invoice.id);
-                      if (linked.isNotEmpty) {
-                        usedDevolutions.addAll(linked);
+                      final linkedDevs = _getLinkedDevolutions(invoice.id);
+                      if (linkedDevs.isNotEmpty) {
+                        usedDevolutions.addAll(linkedDevs);
+                      }
+                      final linkedCns = _getLinkedCreditNotes(invoice);
+                      if (linkedCns.isNotEmpty) {
+                        usedCreditNotes.addAll(linkedCns);
                       }
                     }
+
+                    // Add any amount credit notes
+                    final amountNotes = widget.creditNotes.where(
+                      (cn) => cn.type == CreditNoteType.monto && !usedCreditNotes.contains(cn),
+                    );
+                    usedCreditNotes.addAll(amountNotes);
 
                     final confirm = await showConfirmPartialPayReceipt(
                       context,
@@ -323,6 +395,7 @@ class _PartialPaymentModalState extends State<PartialPaymentModal> {
                       PartialPaymentResult(
                         payments: _inputAmounts,
                         usedDevolutions: usedDevolutions,
+                        usedCreditNotes: usedCreditNotes,
                       ),
                     );
                   }

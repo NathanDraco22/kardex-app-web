@@ -1,3 +1,4 @@
+import 'package:kardex_app_front/src/tools/cache/image_bytes_resolver.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/pdf_template.dart';
 import 'package:pdf/pdf.dart';
@@ -14,7 +15,8 @@ class SingleReceiptTemplate implements PdfTemplate {
 
   @override
   Future<pw.Document> buildDocument() async {
-    final doc = pw.Document();
+    await branch.resolveLogoBytes();
+    final doc = await PdfTheme.newDocument();
 
     doc.addPage(
       pw.MultiPage(
@@ -205,7 +207,10 @@ class SingleReceiptTemplate implements PdfTemplate {
             children: [
               pw.Expanded(
                 flex: 3,
-                child: pw.Text("Número de Factura", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
+                child: pw.Text(
+                  "Número de Factura",
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
+                ),
               ),
               pw.Expanded(
                 flex: 2,
@@ -264,7 +269,10 @@ class SingleReceiptTemplate implements PdfTemplate {
             children: [
               pw.Expanded(
                 flex: 3,
-                child: pw.Text("Número de Devolución", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
+                child: pw.Text(
+                  "Número de Devolución",
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
+                ),
               ),
               pw.Expanded(
                 flex: 2,

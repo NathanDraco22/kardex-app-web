@@ -1,7 +1,9 @@
+import 'package:kardex_app_front/src/tools/cache/image_bytes_resolver.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/printers/paper_settings.dart';
+import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -12,7 +14,7 @@ Future<bool> printDevolution(
   PaperSize paperSize = PaperSize.mm80,
 }) async {
   final bytes = await generateTicketPdfFromDevolution(devolution, branch, paperSize: paperSize);
-  return await Printing.layoutPdf(onLayout: (_) => bytes, name: 'devolucion_${devolution.docNumber}.pdf');
+  return await PrintManager.printPdf(bytes, name: 'devolucion_${devolution.docNumber}.pdf', paperSize: paperSize);
 }
 
 Future<bool> shareDevolution(
@@ -30,7 +32,7 @@ Future<Uint8List> generateTicketPdfFromDevolution(
   PaperSize paperSize = PaperSize.mm80,
 }) async {
   final pdf = pw.Document();
-  final NumberFormat currencyFormat = NumberFormat.currency(symbol: 'C\$');
+  final NumberFormat currencyFormat = NumberFormatter.currencyFormat;
 
   final pageFormat = PdfPageFormat(
     TicketSettings.ticketWidth(paperSize) * PdfPageFormat.mm,
@@ -38,7 +40,7 @@ Future<Uint8List> generateTicketPdfFromDevolution(
     marginAll: TicketSettings.ticketMargin(paperSize) * PdfPageFormat.mm,
   );
 
-  final branchImage = branch.image;
+  final branchImage = await branch.resolveLogoBytes();
 
   final logoSize = TicketSettings.logoSize(paperSize);
 
@@ -49,6 +51,7 @@ Future<Uint8List> generateTicketPdfFromDevolution(
         defaultTextStyle: pw.TextStyle(
           font: await TicketSettings.ticketFont(paperSize),
           fontBold: await TicketSettings.ticketFontBold(paperSize),
+          fontFallback: [await TicketSettings.ticketFallbackFont()],
         ),
       ),
       build: (pw.Context context) {
@@ -236,9 +239,7 @@ Future<Uint8List> generateTicketPdfFromDevolution(
                       pw.Expanded(
                         flex: 1,
                         child: pw.Text(
-                          item.conversionFactor != 1
-                              ? (item.quantity ~/ item.conversionFactor).toString()
-                              : item.quantity.toString(),
+                          item.formattedDisplayQuantity,
                           textAlign: pw.TextAlign.center,
                           style: pw.TextStyle(
                             fontSize: TicketSettings.contentFontSize(paperSize),

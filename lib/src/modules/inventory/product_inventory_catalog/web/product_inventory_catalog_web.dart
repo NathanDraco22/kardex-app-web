@@ -66,7 +66,7 @@ class _Body extends StatelessWidget {
                       child: SecondaryMenuButton(
                         onPressed: () async {
                           ProductInDbInBranch? selectedProduct;
-                          if (!context.isMobile()) {
+                          if (!context.isMobileOrTablet()) {
                             selectedProduct = await showSearchProductInBranchDialog(context);
                           } else {
                             selectedProduct = await showSearchProductInBranchDelegate(context, false);

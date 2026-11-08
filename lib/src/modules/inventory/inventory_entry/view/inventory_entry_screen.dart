@@ -92,7 +92,7 @@ class _RootBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isMobile = context.isMobile();
+    final isMobile = context.isMobileOrTablet();
 
     if (isMobile) return const InventoryEntryMobileScreen();
 

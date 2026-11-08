@@ -2,6 +2,7 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:kardex_business/kardex_business.dart' hide TransactionType, TransactionSubType;
 import 'package:kardex_business/client_transaction.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/credit_note_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/devolution_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/receipt_viewer.dart';
@@ -51,6 +52,9 @@ class MovementMobileRow extends StatelessWidget {
             case TransactionSubType.devolution:
               showDevolutionViewerDialogFromId(context, currentTransaction.documentId);
               break;
+            case TransactionSubType.creditNote:
+              showCreditNoteViewerDialogFromId(context, currentTransaction.documentId);
+              break;
             case TransactionSubType.discount:
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text("Visor de descuentos no disponible")),
@@ -97,7 +101,7 @@ class MovementMobileRow extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          currentTransaction.subtype.value, // Using extension equivalent or name
+                          currentTransaction.subtype.value,
                           style: const TextStyle(
                             fontWeight: FontWeight.w500,
                           ),
@@ -156,6 +160,8 @@ extension _TransactionSubTypeExt on TransactionSubType {
         return "Recibo";
       case TransactionSubType.devolution:
         return "Devolución";
+      case TransactionSubType.creditNote:
+        return "Nota de Crédito";
       case TransactionSubType.discount:
         return "Descuento";
     }

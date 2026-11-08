@@ -16,7 +16,7 @@ class ProductDemandVsStockTemplate implements PdfTemplate {
 
   @override
   Future<pw.Document> buildDocument() async {
-    final doc = pw.Document();
+    final doc = await PdfTheme.newDocument();
 
     doc.addPage(
       pw.MultiPage(
@@ -118,7 +118,7 @@ class ProductDemandVsStockTemplate implements PdfTemplate {
           final item = items[index];
           final totalDemand = item.totalOrdered + item.totalBonification;
           final isOdd = index % 2 != 0;
-          
+
           return pw.Container(
             padding: const pw.EdgeInsets.symmetric(vertical: 4, horizontal: 2),
             color: isOdd ? PdfColors.white : PdfColors.grey100,

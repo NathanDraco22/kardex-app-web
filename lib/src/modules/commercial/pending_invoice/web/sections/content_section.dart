@@ -45,26 +45,43 @@ class _ContentSection extends StatelessWidget {
 
           final invoices = state.invoices;
           final devolutions = state.devolutions;
+          final creditNotes = state.creditNotes;
 
           viewController.devolutions = devolutions;
+          viewController.creditNotes = creditNotes;
 
           if (invoices.isEmpty) {
-            return const Center(
-              child: Text(
-                "No hay facturas pendientes",
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Colors.grey,
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (creditNotes.isNotEmpty)
+                  CreditNotesSummaryTile(creditNotes: creditNotes),
+                const Expanded(
+                  child: Center(
+                    child: Text(
+                      "No hay facturas pendientes",
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+              ],
             );
           }
 
-          return ListView.separated(
-            separatorBuilder: (context, index) => const Divider(height: 2.0, thickness: 2),
-            padding: const EdgeInsets.only(bottom: 40, right: 4, left: 4),
-            itemCount: invoices.length,
-            itemBuilder: (context, index) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (creditNotes.isNotEmpty)
+                CreditNotesSummaryTile(creditNotes: creditNotes),
+              Expanded(
+                child: ListView.separated(
+                  separatorBuilder: (context, index) => const SizedBox(height: 4),
+                  padding: const EdgeInsets.only(bottom: 40, right: 4, left: 4),
+                  itemCount: invoices.length,
+                  itemBuilder: (context, index) {
               final tileColor = index.isOdd ? Colors.white : Colors.grey.shade200;
 
               final currentInvoice = invoices[index];
@@ -73,6 +90,7 @@ class _ContentSection extends StatelessWidget {
                 tileColor: tileColor,
                 invoice: currentInvoice,
                 devolutions: devolutions,
+                creditNotes: creditNotes,
                 isSelected: viewController.isInSelected(currentInvoice),
                 onChanged: (value) {
                   if (value == true) {
@@ -88,6 +106,7 @@ class _ContentSection extends StatelessWidget {
                     context,
                     currentInvoice,
                     devolutions: devolutions,
+                    creditNotes: creditNotes,
                   );
                   if (paymentResult != null && context.mounted) {
                     final amountCents = (paymentResult.amount * 100).round();
@@ -96,13 +115,15 @@ class _ContentSection extends StatelessWidget {
                     if (authState is! Authenticated) throw Exception("User or branch not found");
                     final currentUser = authState.session.user;
                     final currentBranch = authState.branch;
-                    
+
                     final targetDevolutions = devolutions.where((d) => d.originalInvoiceId == currentInvoice.id).toList();
+                    final targetCreditNotes = creditNotes.where((cn) => cn.invoiceId == currentInvoice.id || (cn.invoiceDocNumber.isNotEmpty && cn.invoiceDocNumber == currentInvoice.docNumber)).toList();
 
                     final (createReceipt, errorOrSummary) = FastReceiptLogic.allocateFastPayment(
                       paymentAmountCents: amountCents,
                       invoices: [currentInvoice],
                       devolutions: targetDevolutions,
+                      creditNotes: targetCreditNotes,
                       client: client,
                       branchId: currentBranch.id,
                       currentUserId: currentUser.id,
@@ -112,9 +133,9 @@ class _ContentSection extends StatelessWidget {
                     );
 
                     if (createReceipt != null) {
-                       context.read<WriteReceiptCubit>().createNewReceipt(createReceipt);
+                      context.read<WriteReceiptCubit>().createNewReceipt(createReceipt);
                     } else {
-                       DialogManager.showErrorDialog(context, errorOrSummary);
+                      DialogManager.showErrorDialog(context, errorOrSummary);
                     }
                   }
                 },
@@ -127,8 +148,7 @@ class _ContentSection extends StatelessWidget {
                   showDialog(
                     context: context,
                     builder: (context) {
-                      final devolutions = state.devolutions;
-                      final total = devolutions.fold<int>(
+                      final total = targetDevolution.fold<int>(
                         0,
                         (previousValue, element) => previousValue + element.total,
                       );
@@ -136,13 +156,32 @@ class _ContentSection extends StatelessWidget {
                     },
                   );
                 },
-
+                onViewCreditNotes: () {
+                  final targetCreditNotes = creditNotes
+                      .where(
+                        (cn) =>
+                            cn.invoiceId == currentInvoice.id ||
+                            (cn.invoiceDocNumber.isNotEmpty && cn.invoiceDocNumber == currentInvoice.docNumber),
+                      )
+                      .toList();
+                  if (targetCreditNotes.length == 1) {
+                    showCreditNoteViewerDialog(context, targetCreditNotes.first);
+                  } else if (targetCreditNotes.isNotEmpty) {
+                    showDialog(
+                      context: context,
+                      builder: (context) => _CreditNotesDialog(creditNotes: targetCreditNotes),
+                    );
+                  }
+                },
                 onViewReceipts: () {
                   showInvoiceReceiptsHistoryModal(context, currentInvoice);
                 },
               );
             },
-          );
+          ),
+        ),
+      ],
+    );
         },
       ),
     );
@@ -199,6 +238,61 @@ class _DevolutionDialog extends StatelessWidget {
               ),
               trailing: Text(
                 NumberFormatter.convertToMoneyLike(currentDevolutions.total),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _CreditNotesDialog extends StatelessWidget {
+  const _CreditNotesDialog({required this.creditNotes});
+
+  final List<CreditNoteInDb> creditNotes;
+
+  @override
+  Widget build(BuildContext context) {
+    final total = creditNotes.fold<int>(0, (sum, cn) => sum + cn.total);
+    return AlertDialog(
+      title: const Text("Notas de Crédito"),
+      actions: [
+        Row(
+          spacing: 8,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              "Total",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Text(
+              NumberFormatter.convertToMoneyLike(total),
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      ],
+      content: SizedBox(
+        width: 400,
+        child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: creditNotes.length,
+          itemBuilder: (context, index) {
+            final cn = creditNotes[index];
+            final circleColor = cn.status == CreditNoteStatus.confirmed ? Colors.deepPurple : Colors.grey;
+            return ListTile(
+              leading: Icon(Icons.circle, color: circleColor),
+              tileColor: index.isOdd ? Colors.white : Colors.grey.shade200,
+              title: Text("#${cn.docNumber} (${cn.type.display})"),
+              onTap: () {
+                showCreditNoteViewerDialog(context, cn);
+              },
+              subtitle: Text(
+                DateTimeTool.formatddMMyyEs(cn.createdAt),
+              ),
+              trailing: Text(
+                NumberFormatter.convertToMoneyLike(cn.total),
               ),
             );
           },

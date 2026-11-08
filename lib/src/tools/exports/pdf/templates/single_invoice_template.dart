@@ -1,3 +1,4 @@
+import 'package:kardex_app_front/src/tools/cache/image_bytes_resolver.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/pdf_template.dart';
 import 'package:pdf/pdf.dart';
@@ -14,7 +15,8 @@ class SingleInvoiceTemplate implements PdfTemplate {
 
   @override
   Future<pw.Document> buildDocument() async {
-    final doc = pw.Document();
+    await branch.resolveLogoBytes();
+    final doc = await PdfTheme.newDocument();
 
     doc.addPage(
       pw.MultiPage(
@@ -280,9 +282,7 @@ class SingleInvoiceTemplate implements PdfTemplate {
                 pw.Expanded(
                   flex: 1,
                   child: pw.Text(
-                    saleItem.conversionFactor != 1
-                        ? (saleItem.quantity ~/ saleItem.conversionFactor).toString()
-                        : saleItem.quantity.toString(),
+                    saleItem.formattedDisplayQuantity,
                     textAlign: pw.TextAlign.center,
                     style: const pw.TextStyle(fontSize: 12),
                   ),
@@ -320,6 +320,8 @@ class SingleInvoiceTemplate implements PdfTemplate {
       0,
       (previousValue, element) => previousValue + element.subTotal,
     );
+    final secondaryTotal = NumberFormatter.convertInvoiceTotalToSecondaryMoney(invoice.total);
+    final secondaryCurrency = NumberFormatter.secondaryCurrency;
 
     return pw.Container(
       padding: const pw.EdgeInsets.only(top: 8),
@@ -375,6 +377,34 @@ class SingleInvoiceTemplate implements PdfTemplate {
               ],
             ),
           ),
+          if (secondaryTotal != null && secondaryCurrency != null) ...[
+            pw.SizedBox(height: 4),
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.end,
+              children: [
+                pw.Text(
+                  "Total(${secondaryCurrency.code}):",
+                  style: const pw.TextStyle(
+                    fontWeight: pw.FontWeight.bold,
+                    fontSize: 11,
+                    color: PdfColors.blueGrey700,
+                  ),
+                ),
+                pw.SizedBox(
+                  width: 110,
+                  child: pw.Text(
+                    secondaryTotal,
+                    style: const pw.TextStyle(
+                      fontWeight: pw.FontWeight.bold,
+                      fontSize: 12,
+                      color: PdfColors.blueGrey800,
+                    ),
+                    textAlign: pw.TextAlign.right,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );

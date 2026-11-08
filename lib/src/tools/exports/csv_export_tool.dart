@@ -5,6 +5,54 @@ import 'package:flutter/foundation.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 class CsvExportTool {
+  static Future<String?> saveCsvContent({
+    required String fileName,
+    required String content,
+    bool includeBom = true,
+  }) async {
+    final buffer = StringBuffer();
+
+    if (includeBom) {
+      buffer.write('\uFEFF');
+    }
+
+    buffer.write(content);
+
+    final bytes = utf8.encode(buffer.toString());
+    final uint8List = Uint8List.fromList(bytes);
+    final baseName = fileName.toLowerCase().endsWith(".csv") ? fileName.substring(0, fileName.length - 4) : fileName;
+
+    if (kIsWeb) {
+      return FileSaver.instance.saveFile(
+        name: baseName,
+        bytes: uint8List,
+        fileExtension: "csv",
+        mimeType: MimeType.csv,
+      );
+    }
+
+    try {
+      return await FileSaver.instance.saveAs(
+        name: baseName,
+        bytes: uint8List,
+        fileExtension: "csv",
+        mimeType: MimeType.csv,
+        dialogTitle: "Guardar plantilla CSV",
+      );
+    } catch (error) {
+      debugPrint(
+        "No se pudo abrir el diálogo Guardar como: $error. "
+        "Guardando la plantilla directamente en Descargas.",
+      );
+      return FileSaver.instance.saveFile(
+        name: baseName,
+        bytes: uint8List,
+        fileExtension: "csv",
+        mimeType: MimeType.csv,
+      );
+    }
+  }
+
   static Future<void> exportProductSalesToCSV({
     required List<ProductSalesTotal> products,
     required String fileName,

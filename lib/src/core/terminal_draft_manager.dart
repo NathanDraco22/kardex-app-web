@@ -12,7 +12,7 @@ extension HoldSaleItemToCommercial on HoldSaleItem {
     );
     result.newPrice = newPrice;
     result.selectedPriceLevel = selectedPriceLevel;
-    result.quantity = quantity;
+    result.quantity = displayQuantity;
     result.selectedUnitIndex = selectedUnitIndex;
     result.conversionFactor = conversionFactor;
     result.selectedUnitName = selectedUnitName;
@@ -27,7 +27,7 @@ extension CommercialProductResultToHoldSaleItem on CommercialProductResult {
       product: product,
       newPrice: newPrice,
       selectedPriceLevel: selectedPriceLevel,
-      quantity: quantity,
+      quantity: baseQuantity,
       selectedUnitIndex: selectedUnitIndex,
       conversionFactor: conversionFactor,
       selectedUnitName: selectedUnitName,

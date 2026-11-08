@@ -1,3 +1,4 @@
+import 'package:kardex_app_front/src/tools/cache/image_bytes_resolver.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/pdf_template.dart';
 import 'package:kardex_app_front/widgets/pdf/basic_pdf_table_listview.dart';
@@ -33,7 +34,8 @@ class InvoiceReceiptsHistoryTemplate implements PdfTemplate {
 
   @override
   Future<pw.Document> buildDocument() async {
-    final doc = pw.Document();
+    await branch.resolveLogoBytes();
+    final doc = await PdfTheme.newDocument();
 
     doc.addPage(
       pw.MultiPage(

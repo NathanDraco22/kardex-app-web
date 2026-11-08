@@ -42,6 +42,7 @@ import 'package:kardex_app_front/src/modules/commercial/daily_client_invoices/da
 import 'package:kardex_app_front/src/modules/commercial/daily_product_in_orders/daily_product_in_orders_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/daily_product_sales/daily_product_sales_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/daily_receipt/daily_receipt_screen.dart';
+import 'package:kardex_app_front/src/modules/commercial/credit_notes/credit_notes_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/devolution_history/devolution_history_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/invoice_history/invoice_history_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/invoice_by_product/invoice_by_product_screen.dart';
@@ -84,12 +85,13 @@ import 'package:kardex_app_front/src/modules/product_catalog/view/product_catalo
 import 'package:kardex_app_front/src/modules/settings/view/branches/branches_screen.dart';
 
 import 'package:kardex_app_front/src/modules/settings/view/settings_screen.dart';
-import 'package:kardex_app_front/src/modules/product_catalog/units/units_screen.dart';
+import 'package:kardex_app_front/src/modules/product_catalog/units_and_scales/units_and_scales_screen.dart';
 import 'package:kardex_app_front/src/modules/settings/view/users/users_screen.dart';
 import 'package:kardex_app_front/src/modules/inactive/inactive_screen.dart';
 import 'package:kardex_app_front/src/modules/splash/splash_screen.dart';
 
 import 'package:kardex_app_front/src/modules/settings/view/integrations/integrations_screen.dart';
+import 'package:kardex_app_front/src/modules/imports/imports_screen.dart';
 import 'package:kardex_app_front/src/modules/expenses/expenses_menu_screen.dart';
 import 'package:kardex_app_front/src/modules/expenses/operative_expenses/view/operative_expenses_screen.dart';
 import 'package:kardex_app_front/src/modules/expenses/supplier_expenses/view/supplier_expenses_view.dart';
@@ -197,9 +199,22 @@ class AppRouter {
             builder: (context, state) => const ProductListScreen(),
           ),
           GoRoute(
+            path: "units-and-scales",
+            name: "units-and-scales",
+            builder: (context, state) {
+              final tab = state.uri.queryParameters["tab"];
+              return UnitsAndScalesScreen(initialTab: tab == "scales" ? 1 : 0);
+            },
+          ),
+          GoRoute(
             path: "units",
             name: "units",
-            builder: (context, state) => const UnitsScreen(),
+            redirect: (context, state) => "/product-catalog/units-and-scales?tab=units",
+          ),
+          GoRoute(
+            path: "unit-scales",
+            name: "unit-scales",
+            redirect: (context, state) => "/product-catalog/units-and-scales?tab=scales",
           ),
         ],
       ),
@@ -373,6 +388,12 @@ class AppRouter {
             path: "devolution-history",
             name: "devolution-history",
             builder: (context, state) => const DevolutionHistoryScreen(),
+          ),
+
+          GoRoute(
+            path: "credit-notes",
+            name: "credit-notes",
+            builder: (context, state) => const CreditNotesScreen(),
           ),
 
           GoRoute(
@@ -659,6 +680,11 @@ class AppRouter {
             path: "integrations",
             name: "integrations",
             builder: (context, state) => const IntegrationsScreen(),
+          ),
+          GoRoute(
+            path: "imports",
+            name: "imports",
+            builder: (context, state) => const ImportsScreen(),
           ),
           GoRoute(
             path: "api-keys",

@@ -62,7 +62,7 @@ class AnonInvoiceViewController extends ChangeNotifier {
         selectedPrice: commercial.selectedPriceLevel,
         cost: product.account.averageCost,
         price: commercial.newPrice,
-        quantity: commercial.quantity * commercial.conversionFactor,
+        quantity: commercial.baseQuantity,
         discountPercentage: commercial.discountPercent,
         totalDiscount: commercial.totalDiscount,
         subTotal: commercial.subTotal,

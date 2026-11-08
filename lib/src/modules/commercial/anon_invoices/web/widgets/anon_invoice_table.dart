@@ -7,7 +7,7 @@ import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/commercial_product_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/search_product_commercial_dialog.dart';
-import 'package:kardex_app_front/widgets/incremental_textfield.dart';
+
 
 class AnonInvoiceTable extends StatefulWidget {
   const AnonInvoiceTable({
@@ -89,7 +89,7 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
                           if (!context.mounted) return;
                           if (res == null) return;
                           if (res.product.account.availableStock == 0 ||
-                              res.product.account.availableStock < (res.quantity * res.conversionFactor)) {
+                              res.product.account.availableStock < res.baseQuantity) {
                             DialogManager.showInfoDialog(
                               context,
                               "No hay stock disponible",
@@ -128,7 +128,7 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
           );
           if (res == null) return;
           if (res.product.account.availableStock == 0 ||
-              res.product.account.availableStock < (res.quantity * res.conversionFactor)) {
+              res.product.account.availableStock < res.baseQuantity) {
             if (!context.mounted) return;
             await DialogManager.showErrorDialog(
               context,
@@ -146,7 +146,7 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
           );
           if (res == null) return;
           if (res.product.account.availableStock == 0 ||
-              res.product.account.availableStock < (res.quantity * res.conversionFactor)) {
+              res.product.account.availableStock < res.baseQuantity) {
             if (!context.mounted) return;
             await DialogManager.showErrorDialog(
               context,
@@ -297,10 +297,13 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
               ),
               Flexible(
                 fit: FlexFit.tight,
-                child: IncrementalTextField(
-                  maxValue:
-                      widget.item.product.account.availableStock ~/ widget.item.conversionFactor,
+                child: QuantityField(
+                  key: ValueKey("${widget.item.product.id}_${widget.item.selectedUnitIndex}"),
+                  showButtons: false,
+                  showTitle: false,
+                  conversionFactor: widget.item.conversionFactor,
                   initialValue: widget.item.quantity,
+                  max: widget.item.product.account.availableStock / widget.item.conversionFactor,
                   onChanged: (value) {
                     widget.item.quantity = value;
                     widget.controller.refresh();

@@ -12,6 +12,7 @@ class BaseBranch {
   final String description;
   final bool isCommerce;
   Uint8List? image;
+  String? imageUrl;
   Coordinates? coordinates;
 
   BaseBranch({
@@ -23,6 +24,7 @@ class BaseBranch {
     this.description = "",
     this.isCommerce = true,
     this.image,
+    this.imageUrl,
     this.coordinates,
   });
 
@@ -34,6 +36,7 @@ class BaseBranch {
       email: json['email'] as String,
       phone: json['phone'] as String,
       image: (json['image'] as String?) == null ? null : base64Decode(json['image']),
+      imageUrl: json['imageUrl'] as String?,
       description: json['description'] as String? ?? "",
       isCommerce: json['isCommerce'] as bool? ?? true,
       coordinates: json['coordinates'] != null ? Coordinates.fromJson(json['coordinates']) : null,
@@ -48,6 +51,7 @@ class BaseBranch {
       'email': email,
       'phone': phone,
       'image': image != null ? base64Encode(image!) : "",
+      'imageUrl': imageUrl,
       'description': description,
       'isCommerce': isCommerce,
       'coordinates': coordinates?.toJson(),
@@ -65,6 +69,7 @@ class CreateBranch extends BaseBranch {
     required super.phone,
     super.isCommerce = true,
     super.image,
+    super.imageUrl,
     super.coordinates,
   });
 
@@ -86,6 +91,7 @@ class CreateBranch extends BaseBranch {
       email: json['email'] as String,
       phone: json['phone'] as String,
       image: (json['image'] as String?) == null ? null : base64Decode(json['image']),
+      imageUrl: json['imageUrl'] as String?,
       description: json['description'] as String? ?? "",
       isCommerce: json['isCommerce'] as bool? ?? true,
       coordinates: coordinates,
@@ -101,6 +107,7 @@ class UpdateBranch {
   String? phone;
   String? description;
   String? image;
+  String? imageUrl;
   bool? isCommerce;
   Coordinates? coordinates;
 
@@ -112,6 +119,7 @@ class UpdateBranch {
     this.email,
     this.phone,
     this.image,
+    this.imageUrl,
     this.isCommerce,
     this.coordinates,
   });
@@ -135,6 +143,7 @@ class UpdateBranch {
       email: json['email'] as String?,
       phone: json['phone'] as String?,
       image: json['image'] as String?,
+      imageUrl: json['imageUrl'] as String?,
       isCommerce: json['isCommerce'] as bool?,
       coordinates: coordinates,
     );
@@ -149,6 +158,7 @@ class UpdateBranch {
       'email': email,
       'phone': phone,
       'image': image,
+      'imageUrl': imageUrl,
       'isCommerce': isCommerce,
       'coordinates': coordinates?.toJson(),
     };
@@ -174,6 +184,7 @@ class BranchInDb extends BaseBranch {
     required super.email,
     required super.phone,
     super.image,
+    super.imageUrl,
     super.coordinates,
   });
 
@@ -186,6 +197,7 @@ class BranchInDb extends BaseBranch {
       email: json['email'] as String,
       phone: json['phone'] as String,
       image: (json['image'] as String?) == null ? null : base64Decode(json['image']),
+      imageUrl: json['imageUrl'] as String?,
       coordinates: json['coordinates'] != null ? Coordinates.fromJson(json['coordinates']) : null,
       description: json['description'] as String? ?? "",
       isCommerce: json['isCommerce'] as bool? ?? true,

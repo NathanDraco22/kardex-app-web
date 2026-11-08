@@ -1,14 +1,16 @@
+import 'package:kardex_app_front/src/tools/cache/image_bytes_resolver.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/printers/paper_settings.dart';
+import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
 Future<bool> printInvoice(InvoiceInDb invoice, BranchInDb branch, {PaperSize paperSize = PaperSize.mm80}) async {
   final bytes = await generateTicketPdfFromInvoice(invoice, branch, paperSize: paperSize);
-  return await Printing.layoutPdf(onLayout: (_) => bytes, name: 'factura_${invoice.docNumber}.pdf');
+  return await PrintManager.printPdf(bytes, name: 'factura_${invoice.docNumber}.pdf', paperSize: paperSize);
 }
 
 Future<bool> shareInvoice(InvoiceInDb invoice, BranchInDb branch, {PaperSize paperSize = PaperSize.mm80}) async {
@@ -22,7 +24,7 @@ Future<Uint8List> generateTicketPdfFromInvoice(
   PaperSize paperSize = PaperSize.mm80,
 }) async {
   final pdf = pw.Document();
-  final NumberFormat currencyFormat = NumberFormat.currency(symbol: 'C\$');
+  final NumberFormat currencyFormat = NumberFormatter.currencyFormat;
 
   final pageFormat = PdfPageFormat(
     TicketSettings.ticketWidth(paperSize) * PdfPageFormat.mm,
@@ -30,7 +32,7 @@ Future<Uint8List> generateTicketPdfFromInvoice(
     marginAll: TicketSettings.ticketMargin(paperSize) * PdfPageFormat.mm,
   );
 
-  final branchImage = branch.image;
+  final branchImage = await branch.resolveLogoBytes();
 
   String paymentType = invoice.paymentType == PaymentType.credit ? "CREDITO" : "CONTADO";
 
@@ -44,6 +46,9 @@ Future<Uint8List> generateTicketPdfFromInvoice(
     (element, previousValue) => previousValue.subTotal + element,
   );
 
+  final secondaryTotal = NumberFormatter.convertInvoiceTotalToSecondaryMoney(invoice.total);
+  final secondaryCurrency = NumberFormatter.secondaryCurrency;
+
   final imageSize = TicketSettings.logoSize(paperSize);
   final descriptionFlex = paperSize == PaperSize.mm80 ? 4 : 3;
 
@@ -53,6 +58,7 @@ Future<Uint8List> generateTicketPdfFromInvoice(
         defaultTextStyle: pw.TextStyle(
           font: await TicketSettings.ticketFont(paperSize),
           fontBold: await TicketSettings.ticketFontBold(paperSize),
+          fontFallback: [await TicketSettings.ticketFallbackFont()],
         ),
       ),
       pageFormat: pageFormat,
@@ -290,9 +296,7 @@ Future<Uint8List> generateTicketPdfFromInvoice(
                       pw.Expanded(
                         flex: 1,
                         child: pw.Text(
-                          item.conversionFactor != 1
-                              ? (item.quantity ~/ item.conversionFactor).toString()
-                              : item.quantity.toString(),
+                          item.formattedDisplayQuantity,
                           textAlign: pw.TextAlign.center,
                           style: pw.TextStyle(
                             fontSize: TicketSettings.contentFontSize(paperSize),
@@ -413,6 +417,34 @@ Future<Uint8List> generateTicketPdfFromInvoice(
                 ),
               ],
             ),
+            if (secondaryTotal != null && secondaryCurrency != null)
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.end,
+                children: [
+                  pw.SizedBox(
+                    width: 60,
+                    child: pw.Text(
+                      'Total(${secondaryCurrency.code}): ',
+                      style: pw.TextStyle(
+                        fontWeight: pw.FontWeight.bold,
+                        fontSize: TicketSettings.contentFontSize(paperSize),
+                      ),
+                      textAlign: pw.TextAlign.right,
+                    ),
+                  ),
+                  pw.SizedBox(
+                    width: 60,
+                    child: pw.Text(
+                      secondaryTotal,
+                      style: pw.TextStyle(
+                        fontWeight: pw.FontWeight.bold,
+                        fontSize: TicketSettings.contentFontSize(paperSize),
+                      ),
+                      textAlign: pw.TextAlign.right,
+                    ),
+                  ),
+                ],
+              ),
             pw.SizedBox(height: 5),
             pw.Divider(color: PdfColors.grey),
 

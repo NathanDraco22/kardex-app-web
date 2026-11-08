@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_business/kardex_business.dart';
-import 'package:intl/intl.dart';
 import 'package:kardex_app_front/widgets/map/launch_map_button.dart';
 
 Future<void> showClientDetailsDialog(BuildContext context, ClientInDb client) async {
@@ -17,8 +16,6 @@ class ClientDetailsDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormat = NumberFormat.simpleCurrency(decimalDigits: 2);
-
     return AlertDialog(
       title: Row(
         children: [
@@ -42,7 +39,7 @@ class ClientDetailsDialog extends StatelessWidget {
             const Divider(),
             _DetailItem(
               label: 'Saldo Actual',
-              value: currencyFormat.format(client.balance / 100),
+              value: NumberFormatter.convertToMoneyLike(client.balance),
               valueStyle: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: client.balance > 0 ? Colors.red : Colors.green,
@@ -50,7 +47,7 @@ class ClientDetailsDialog extends StatelessWidget {
             ),
             _DetailItem(
               label: 'Límite de Crédito',
-              value: currencyFormat.format(client.creditLimit / 100),
+              value: NumberFormatter.convertToMoneyLike(client.creditLimit),
             ),
             _DetailItem(
               label: 'Estado de Crédito',

@@ -39,6 +39,8 @@ extension TransactionSubTypeExtension on TransactionSubType {
         return 'Ajuste';
       case TransactionSubType.loss:
         return 'Pérdida';
+      case TransactionSubType.creditNote:
+        return 'Nota de Crédito';
     }
   }
 }

@@ -73,6 +73,30 @@ class AppliedDevolution {
   };
 }
 
+class AppliedCreditNote {
+  final String creditNoteId;
+  final String docNumber;
+  final int amountApplied;
+
+  AppliedCreditNote({
+    required this.creditNoteId,
+    required this.docNumber,
+    required this.amountApplied,
+  });
+
+  factory AppliedCreditNote.fromJson(Map<String, dynamic> json) => AppliedCreditNote(
+    creditNoteId: json['creditNoteId'],
+    docNumber: json['docNumber'] ?? "",
+    amountApplied: json['amountApplied'],
+  );
+
+  Map<String, dynamic> toJson() => {
+    'creditNoteId': creditNoteId,
+    'docNumber': docNumber,
+    'amountApplied': amountApplied,
+  };
+}
+
 class BaseReceipt {
   final String branchId;
   final String clientId;
@@ -80,6 +104,7 @@ class BaseReceipt {
   final String docNumber;
   final List<AppliedInvoice> appliedInvoices;
   final List<AppliedDevolution> appliedDevolutions;
+  final List<AppliedCreditNote> appliedCreditNotes;
   final PaymentMethod paymentMethod;
   final String bankReference;
   final int total;
@@ -92,6 +117,7 @@ class BaseReceipt {
     this.docNumber = "",
     required this.appliedInvoices,
     required this.appliedDevolutions,
+    this.appliedCreditNotes = const [],
     required this.paymentMethod,
     this.bankReference = "",
     required this.total,
@@ -105,6 +131,9 @@ class BaseReceipt {
     docNumber: json['docNumber'] ?? "",
     appliedInvoices: (json['appliedInvoices'] as List).map((e) => AppliedInvoice.fromJson(e)).toList(),
     appliedDevolutions: (json['appliedDevolutions'] as List).map((e) => AppliedDevolution.fromJson(e)).toList(),
+    appliedCreditNotes: json['appliedCreditNotes'] != null
+        ? (json['appliedCreditNotes'] as List).map((e) => AppliedCreditNote.fromJson(e)).toList()
+        : const [],
     paymentMethod: PaymentMethod.values.byName(json['paymentMethod']),
     bankReference: json['bankReference'] ?? "",
     total: json['total'],
@@ -118,6 +147,7 @@ class BaseReceipt {
     'docNumber': docNumber,
     'appliedInvoices': appliedInvoices.map((e) => e.toJson()).toList(),
     'appliedDevolutions': appliedDevolutions.map((e) => e.toJson()).toList(),
+    'appliedCreditNotes': appliedCreditNotes.map((e) => e.toJson()).toList(),
     'paymentMethod': paymentMethod.name,
     'bankReference': bankReference,
     'total': total,
@@ -133,6 +163,7 @@ class CreateReceipt extends BaseReceipt {
     super.docNumber,
     required super.appliedInvoices,
     required super.appliedDevolutions,
+    super.appliedCreditNotes = const [],
     required super.paymentMethod,
     super.bankReference,
     required super.total,
@@ -146,6 +177,9 @@ class CreateReceipt extends BaseReceipt {
     docNumber: json['docNumber'] ?? "",
     appliedInvoices: (json['appliedInvoices'] as List).map((e) => AppliedInvoice.fromJson(e)).toList(),
     appliedDevolutions: (json['appliedDevolutions'] as List).map((e) => AppliedDevolution.fromJson(e)).toList(),
+    appliedCreditNotes: json['appliedCreditNotes'] != null
+        ? (json['appliedCreditNotes'] as List).map((e) => AppliedCreditNote.fromJson(e)).toList()
+        : const [],
     paymentMethod: PaymentMethod.values.byName(json['paymentMethod']),
     bankReference: json['bankReference'] ?? "",
     total: json['total'],
@@ -170,6 +204,7 @@ class ReceiptInDb extends BaseReceipt {
     super.docNumber,
     required super.appliedInvoices,
     required super.appliedDevolutions,
+    super.appliedCreditNotes = const [],
     required super.paymentMethod,
     super.bankReference,
     required super.total,
@@ -186,6 +221,9 @@ class ReceiptInDb extends BaseReceipt {
     docNumber: json['docNumber'] ?? "",
     appliedInvoices: (json['appliedInvoices'] as List).map((e) => AppliedInvoice.fromJson(e)).toList(),
     appliedDevolutions: (json['appliedDevolutions'] as List).map((e) => AppliedDevolution.fromJson(e)).toList(),
+    appliedCreditNotes: json['appliedCreditNotes'] != null
+        ? (json['appliedCreditNotes'] as List).map((e) => AppliedCreditNote.fromJson(e)).toList()
+        : const [],
     paymentMethod: PaymentMethod.values.byName(json['paymentMethod']),
     bankReference: json['bankReference'] ?? "",
     total: json['total'],

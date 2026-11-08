@@ -60,7 +60,7 @@ Future<CommercialProductResult?> showCommercialProductDialogFromId(
       int resolvedUnitIndex = 0;
       String resolvedUnitName = product.unitName;
       int resolvedConversionFactor = 1;
-      int resolvedQuantity = previousSaleItem.quantity;
+      double resolvedQuantity = previousSaleItem.displayQuantity;
 
       if (previousSaleItem.conversionFactor > 1 && product.extraUnits.isNotEmpty) {
         final extraIndex = product.extraUnits.indexWhere(
@@ -70,7 +70,7 @@ Future<CommercialProductResult?> showCommercialProductDialogFromId(
           resolvedUnitIndex = extraIndex + 1;
           resolvedUnitName = product.extraUnits[extraIndex].name;
           resolvedConversionFactor = product.extraUnits[extraIndex].conversionFactor;
-          resolvedQuantity = previousSaleItem.quantity ~/ resolvedConversionFactor;
+          resolvedQuantity = previousSaleItem.displayQuantity;
         }
       }
 
@@ -388,44 +388,44 @@ class _FormContentState extends State<_FormContent> {
                             children: [
                               Flexible(
                                 fit: FlexFit.tight,
+                                child: QuantityField(
+                                  key: ValueKey("${commercialProductResult.selectedUnitIndex}"),
+                                  showTitle: true,
+                                  showButtons: false,
+                                  focusNode: focusNode,
+                                  initialValue: commercialProductResult.quantity,
+                                  conversionFactor: commercialProductResult.conversionFactor,
+                                  unitLabel: commercialProductResult.selectedUnitName,
+                                  baseUnitName: baseUnitName,
+                                  titleTextAlign: TextAlign.center,
+                                  centerTitle: true,
+                                  onEditingComplete: () {
+                                    FocusScope.of(context).requestFocus(acceptFocusNode);
+                                  },
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return "";
+                                    }
 
-                                child: SizedBox(
-                                  height: 90,
-                                  child: TitleTextField(
-                                    focusNode: focusNode,
-                                    textInputAction: TextInputAction.none,
-                                    keyboardType: TextInputType.number,
-                                    onEditingComplete: () {
-                                      // Actions.invoke(acceptFocusNode.context!, const ActivateIntent());
-                                      FocusScope.of(context).requestFocus(acceptFocusNode);
-                                    },
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return "";
-                                      }
+                                    final numberValue = double.tryParse(value.replaceAll(',', '.')) ?? 0.0;
 
-                                      final numberValue = int.tryParse(value) ?? 0;
+                                    if (numberValue <= 0) {
+                                      return "Cantidad invalida";
+                                    }
 
-                                      if (numberValue == 0) {
-                                        return "Cantidad invalida";
-                                      }
+                                    final requestedUnits = (numberValue * commercialProductResult.conversionFactor)
+                                        .round();
+                                    if (widget.restrictStock && requestedUnits > availableStock) {
+                                      return "Supera la existencia ($availableStock $baseUnitName)";
+                                    }
 
-                                      final requestedUnits = numberValue * commercialProductResult.conversionFactor;
-                                      if (widget.restrictStock && requestedUnits > availableStock) {
-                                        return "Supera la existencia ($availableStock $baseUnitName)";
-                                      }
-
-                                      return null;
-                                    },
-                                    titleTextAlign: TextAlign.center,
-                                    initialValue: commercialProductResult.quantity.toString(),
-                                    inputFormatters: [IntegerTextInputFormatter()],
-                                    onChanged: (value) {
-                                      commercialProductResult.quantity = int.tryParse(value) ?? 0;
-                                      setState(() {});
-                                    },
-                                    title: "Cantidad",
-                                  ),
+                                    return null;
+                                  },
+                                  onChanged: (value) {
+                                    commercialProductResult.quantity = value;
+                                    setState(() {});
+                                  },
+                                  title: "Cantidad",
                                 ),
                               ),
 
@@ -441,7 +441,7 @@ class _FormContentState extends State<_FormContent> {
                                     readOnly: commercialProductResult.selectedPriceLevel != 0,
                                     titleTextAlign: TextAlign.center,
                                     initialValue: price.toString(),
-                                    inputFormatters: [DecimalTextInputFormatter()],
+                                    inputFormatters: [const DecimalTextInputFormatter()],
                                     keyboardType: TextInputType.number,
                                     onChanged: (value) {
                                       final rowDecimal = double.tryParse(value) ?? 0.0;
@@ -591,8 +591,9 @@ class _FormContentState extends State<_FormContent> {
                           return;
                         }
 
-                        if (commercialProductResult.quantity == 0) {
+                        if (commercialProductResult.quantity <= 0) {
                           Navigator.pop(context);
+                          return;
                         }
                         Navigator.pop(context, commercialProductResult);
                       },

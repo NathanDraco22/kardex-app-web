@@ -11,6 +11,7 @@ import 'package:kardex_app_front/src/modules/commercial/pending_invoice/modals/c
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/web/receipt_creator/modals/partial_payment_modal.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/receipt_viewer.dart';
+import 'package:kardex_app_front/src/modules/commercial/pending_invoice/widget/pending_invoices_statement_image_dialog.dart';
 
 class CreateReceiptMediator extends InheritedWidget {
   const CreateReceiptMediator({
@@ -19,11 +20,13 @@ class CreateReceiptMediator extends InheritedWidget {
     required this.client,
     required this.invoices,
     required this.devolutions,
+    this.creditNotes = const [],
   });
 
   final ClientInDb client;
   final List<InvoiceInDb> invoices;
   final List<DevolutionInDb> devolutions;
+  final List<CreditNoteInDb> creditNotes;
 
   static CreateReceiptMediator of(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<CreateReceiptMediator>()!;
@@ -41,11 +44,13 @@ class ReceiptCreatorScreen extends StatelessWidget {
     required this.client,
     required this.invoices,
     required this.devolutions,
+    this.creditNotes = const [],
   });
 
   final ClientInDb client;
   final List<InvoiceInDb> invoices;
   final List<DevolutionInDb> devolutions;
+  final List<CreditNoteInDb> creditNotes;
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +59,7 @@ class ReceiptCreatorScreen extends StatelessWidget {
       client: client,
       invoices: invoices,
       devolutions: devolutions,
+      creditNotes: creditNotes,
       child: BlocProvider(
         create: (context) => WriteReceiptCubit(
           receiptsRepository: receiptRepo,
@@ -99,6 +105,27 @@ class _RootScaffold extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text("Crear Recibo de Pago"),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.share_outlined),
+              tooltip: "Compartir liquidación en imagen",
+              onPressed: () {
+                final mediator = CreateReceiptMediator.of(context);
+                showPendingInvoicesStatementImageDialog(
+                  context: context,
+                  client: mediator.client,
+                  invoices: mediator.invoices,
+                  devolutions: mediator.devolutions,
+                  creditNotes: mediator.creditNotes,
+                  title: "Liquidación de Facturas",
+                  badgeText: "LIQUIDACIÓN DE COBRO",
+                  filePrefix: "liquidacion_cobro",
+                  tableTitle: "FACTURAS A LIQUIDAR",
+                );
+              },
+            ),
+            const SizedBox(width: 8),
+          ],
         ),
         body: const _Body(),
         bottomNavigationBar: const _CreateReceiptBottomBar(),
@@ -116,6 +143,8 @@ class _CreateReceiptBottomBar extends StatelessWidget {
     final client = mediator.client;
     final invoices = mediator.invoices;
     final devolutions = mediator.devolutions;
+    final creditNotes = mediator.creditNotes;
+
     final total = invoices.fold(0, (int previousValue, invoice) {
       return previousValue + invoice.totalRemaining;
     });
@@ -123,8 +152,15 @@ class _CreateReceiptBottomBar extends StatelessWidget {
     final devolutionTotal = devolutions.fold(0, (int previousValue, devolution) {
       return previousValue + devolution.total;
     });
-    final totalWithDevolutions = total - devolutionTotal;
-    final totalWithDevolutionsFormatted = NumberFormatter.convertToMoneyLike(totalWithDevolutions);
+
+    final creditNoteTotal = creditNotes.fold(0, (int previousValue, cn) {
+      return previousValue + cn.total;
+    });
+
+    final totalWithDiscounts = total - devolutionTotal - creditNoteTotal;
+    final totalPayable = totalWithDiscounts > 0 ? totalWithDiscounts : 0;
+    final totalPayableFormatted = NumberFormatter.convertToMoneyLike(totalPayable);
+
     return BottomAppBar(
       height: 60,
       child: Center(
@@ -139,11 +175,20 @@ class _CreateReceiptBottomBar extends StatelessWidget {
                   foregroundColor: Colors.white,
                 ),
                 onPressed: () async {
+                  if (creditNoteTotal > 0 && creditNoteTotal > (total - devolutionTotal)) {
+                    await DialogManager.showErrorDialog(
+                      context,
+                      "No es posible abonar: Las notas de crédito (${NumberFormatter.convertToMoneyLike(creditNoteTotal)}) superan la deuda neta de las facturas (${NumberFormatter.convertToMoneyLike(total - devolutionTotal)}).\n\nSeleccione más facturas pendientes para aplicar el saldo.",
+                    );
+                    return;
+                  }
+
                   final result = await showPartialPaymentModal(
                     context,
                     client: client,
                     invoices: invoices,
                     devolutions: devolutions,
+                    creditNotes: creditNotes,
                   );
 
                   if (result == null) return;
@@ -154,7 +199,7 @@ class _CreateReceiptBottomBar extends StatelessWidget {
                   final currentUser = authState.session.user;
                   final currentBranch = authState.branch;
 
-                  // 1. Calculate Applied Invoices (Cash Input + Linked Devolutions)
+                  // 1. Calculate Applied Invoices (Cash Input + Linked Devolutions + Linked Credit Notes)
                   final appliedInvoices = <AppliedInvoice>[];
                   int receiptTotalCents = 0;
 
@@ -164,10 +209,17 @@ class _CreateReceiptBottomBar extends StatelessWidget {
 
                     // Find linked devolutions for this invoice
                     final linkedDevolutions = devolutions.where((d) => d.originalInvoiceId == invoice.id).toList();
-
                     final linkedDevolutionTotal = linkedDevolutions.fold(0, (sum, d) => sum + d.total);
 
-                    final totalAppliedCents = cashInputCents + linkedDevolutionTotal;
+                    // Find linked credit notes for this invoice
+                    final linkedCreditNotes = creditNotes.where(
+                      (cn) =>
+                          cn.invoiceId == invoice.id ||
+                          (cn.invoiceDocNumber.isNotEmpty && cn.invoiceDocNumber == invoice.docNumber),
+                    ).toList();
+                    final linkedCreditNoteTotal = linkedCreditNotes.fold(0, (sum, cn) => sum + cn.total);
+
+                    final totalAppliedCents = cashInputCents + linkedDevolutionTotal + linkedCreditNoteTotal;
 
                     if (totalAppliedCents > 0) {
                       appliedInvoices.add(
@@ -190,9 +242,16 @@ class _CreateReceiptBottomBar extends StatelessWidget {
                     );
                   }).toList();
 
-                  // Confirm before proceeding
+                  // 3. Calculate Applied Credit Notes
+                  final appliedCreditNotes = result.usedCreditNotes.map((cn) {
+                    return AppliedCreditNote(
+                      creditNoteId: cn.id,
+                      docNumber: cn.docNumber,
+                      amountApplied: cn.total,
+                    );
+                  }).toList();
 
-                  // 3. Create Receipt
+                  // 4. Create Receipt
                   final createReceipt = CreateReceipt(
                     branchId: currentBranch.id,
                     clientInfo: ClientInfo(
@@ -207,6 +266,7 @@ class _CreateReceiptBottomBar extends StatelessWidget {
                     clientId: client.id,
                     appliedInvoices: appliedInvoices,
                     appliedDevolutions: appliedDevolutions,
+                    appliedCreditNotes: appliedCreditNotes,
                     paymentMethod: PaymentMethod.cash,
                     total: receiptTotalCents, // Only the cash amount is the receipt total
                     createdBy: UserInfo(
@@ -216,7 +276,6 @@ class _CreateReceiptBottomBar extends StatelessWidget {
                   );
 
                   if (!context.mounted) return;
-                  // Use the same cubit to create the receipt
                   context.read<WriteReceiptCubit>().createNewReceipt(createReceipt);
                 },
                 child: const Text("Abonar"),
@@ -225,13 +284,25 @@ class _CreateReceiptBottomBar extends StatelessWidget {
               const SizedBox(width: 24),
 
               ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: (creditNoteTotal > 0 && creditNoteTotal > (total - devolutionTotal))
+                      ? Colors.grey
+                      : Colors.green,
+                ),
                 onPressed: () async {
+                  if (creditNoteTotal > 0 && creditNoteTotal > (total - devolutionTotal)) {
+                    await DialogManager.showErrorDialog(
+                      context,
+                      "No es posible liquidar: El total de notas de crédito (${NumberFormatter.convertToMoneyLike(creditNoteTotal)}) supera el saldo pendiente de las facturas seleccionadas (${NumberFormatter.convertToMoneyLike(total - devolutionTotal)}).\n\nSeleccione más facturas pendientes para no perder el saldo excedente de las notas.",
+                    );
+                    return;
+                  }
+
                   final res = await showConfirmReceiptModal(
                     context,
                     client,
                     invoices,
-                    totalWithDevolutionsFormatted,
+                    totalPayableFormatted,
                   );
                   if (res != true) return;
 
@@ -248,6 +319,14 @@ class _CreateReceiptBottomBar extends StatelessWidget {
                       devolutionId: devolution.id,
                       docNumber: devolution.docNumber,
                       amountApplied: devolution.total,
+                    );
+                  }).toList();
+
+                  final appliedCreditNotes = creditNotes.map((cn) {
+                    return AppliedCreditNote(
+                      creditNoteId: cn.id,
+                      docNumber: cn.docNumber,
+                      amountApplied: cn.total,
                     );
                   }).toList();
 
@@ -272,8 +351,9 @@ class _CreateReceiptBottomBar extends StatelessWidget {
                     clientId: client.id,
                     appliedInvoices: appliedInvoices,
                     appliedDevolutions: appliedDevolutions,
+                    appliedCreditNotes: appliedCreditNotes,
                     paymentMethod: PaymentMethod.cash,
-                    total: totalWithDevolutions,
+                    total: totalPayable,
                     createdBy: UserInfo(
                       id: currentUser.id,
                       name: currentUser.username,
@@ -302,16 +382,25 @@ class _Body extends StatelessWidget {
     final client = mediator.client;
     final invoices = mediator.invoices;
     final devolutions = mediator.devolutions;
+    final creditNotes = mediator.creditNotes;
+
     final total = invoices.fold(0, (int previousValue, invoice) {
       return previousValue + invoice.totalRemaining;
     });
     final devolutionTotal = devolutions.fold(0, (int previousValue, devolution) {
       return previousValue + devolution.total;
     });
+    final creditNoteTotal = creditNotes.fold(0, (int previousValue, cn) {
+      return previousValue + cn.total;
+    });
+
     final totalFormatted = NumberFormatter.convertToMoneyLike(total);
     final devolutionTotalFormatted = NumberFormatter.convertToMoneyLike(devolutionTotal);
-    final totalWithDevolutions = total - devolutionTotal;
-    final totalWithDevolutionsFormatted = NumberFormatter.convertToMoneyLike(totalWithDevolutions);
+    final creditNoteTotalFormatted = NumberFormatter.convertToMoneyLike(creditNoteTotal);
+    final totalWithDiscounts = total - devolutionTotal - creditNoteTotal;
+    final totalPayable = totalWithDiscounts > 0 ? totalWithDiscounts : 0;
+    final totalPayableFormatted = NumberFormatter.convertToMoneyLike(totalPayable);
+
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 600),
@@ -341,33 +430,60 @@ class _Body extends StatelessWidget {
                         ),
                       ),
 
-                      Row(
+                      Wrap(
                         spacing: 8,
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        alignment: WrapAlignment.center,
                         children: [
                           Text(
                             "Facturas: ${invoices.length}",
-                            style: const TextStyle(
-                              fontSize: 16,
-                            ),
+                            style: const TextStyle(fontSize: 16),
                           ),
-
                           Text(
                             "Devoluciones: ${devolutions.length}",
-                            style: const TextStyle(
-                              fontSize: 16,
-                            ),
+                            style: const TextStyle(fontSize: 16),
                           ),
+                          if (creditNotes.isNotEmpty)
+                            Text(
+                              "Notas de Crédito: ${creditNotes.length}",
+                              style: const TextStyle(fontSize: 16, color: Colors.deepPurple, fontWeight: FontWeight.w600),
+                            ),
                         ],
                       ),
 
                       Text(
-                        "Total a Pagar: $totalWithDevolutionsFormatted",
+                        "Total a Pagar: $totalPayableFormatted",
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
+                      if (creditNoteTotal > 0 && creditNoteTotal > (total - devolutionTotal)) ...[
+                        Container(
+                          margin: const EdgeInsets.only(top: 8),
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.red.shade50,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.red.shade300),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.warning_amber_rounded, color: Colors.red.shade700, size: 20),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  "Las notas de crédito superan el saldo de las facturas. Seleccione más facturas pendientes para poder procesar la liquidación sin perder saldo.",
+                                  style: TextStyle(
+                                    color: Colors.red.shade900,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -378,7 +494,6 @@ class _Body extends StatelessWidget {
               Expanded(
                 child: Card(
                   margin: EdgeInsets.zero,
-
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
@@ -395,9 +510,16 @@ class _Body extends StatelessWidget {
                               const Divider(),
                               const Text("Facturas", style: TextStyle(fontWeight: FontWeight.bold)),
                               ..._buildInvoiceRows(invoices),
-                              const Divider(),
-                              const Text("Devoluciones", style: TextStyle(fontWeight: FontWeight.bold)),
-                              ..._buildDevolutionsRows(devolutions),
+                              if (devolutions.isNotEmpty) ...[
+                                const Divider(),
+                                const Text("Devoluciones", style: TextStyle(fontWeight: FontWeight.bold)),
+                                ..._buildDevolutionsRows(devolutions),
+                              ],
+                              if (creditNotes.isNotEmpty) ...[
+                                const Divider(),
+                                const Text("Notas de Crédito", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.deepPurple)),
+                                ..._buildCreditNotesRows(creditNotes),
+                              ],
                             ],
                           ),
                         ),
@@ -427,29 +549,56 @@ class _Body extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                const Text(
-                                  "Devoluciones: ",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 100,
-                                  child: Text(
-                                    devolutionTotalFormatted,
-                                    style: const TextStyle(
-                                      fontSize: 14,
+                            if (devolutions.isNotEmpty)
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  const Text(
+                                    "Devoluciones: ",
+                                    style: TextStyle(
+                                      fontSize: 16,
                                       fontWeight: FontWeight.w500,
                                     ),
-                                    textAlign: TextAlign.end,
                                   ),
-                                ),
-                              ],
-                            ),
+                                  SizedBox(
+                                    width: 100,
+                                    child: Text(
+                                      "- $devolutionTotalFormatted",
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      textAlign: TextAlign.end,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            if (creditNotes.isNotEmpty)
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  const Text(
+                                    "Notas de Crédito: ",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.deepPurple,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 100,
+                                    child: Text(
+                                      "- $creditNoteTotalFormatted",
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.deepPurple,
+                                      ),
+                                      textAlign: TextAlign.end,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
@@ -463,7 +612,7 @@ class _Body extends StatelessWidget {
                                 SizedBox(
                                   width: 100,
                                   child: Text(
-                                    totalWithDevolutionsFormatted,
+                                    totalPayableFormatted,
                                     style: const TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
@@ -538,6 +687,33 @@ Iterable<Widget> _buildDevolutionsRows(List<DevolutionInDb> devolutions) sync* {
           DateTimeTool.formatddMMyy(
             currentDevolutions.createdAt,
           ),
+        ),
+      ),
+    );
+  }
+}
+
+Iterable<Widget> _buildCreditNotesRows(List<CreditNoteInDb> creditNotes) sync* {
+  for (var i = 0; i < creditNotes.length; i++) {
+    final cn = creditNotes[i];
+    final color = i.isOdd ? Colors.white : Colors.grey.shade200;
+
+    yield Material(
+      color: Colors.transparent,
+      child: ListTile(
+        tileColor: color,
+        title: Row(
+          children: [
+            Text("NC #${cn.docNumber} (${cn.type.display})"),
+            const Spacer(),
+            Text(
+              "- ${NumberFormatter.convertToMoneyLike(cn.total)}",
+              style: const TextStyle(color: Colors.deepPurple, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+        subtitle: Text(
+          DateTimeTool.formatddMMyy(cn.createdAt),
         ),
       ),
     );

@@ -234,7 +234,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
                         ),
 
                         TitleTextField(
-                          title: "Precio de Venta (C\$ )",
+                          title: "Precio de Venta (${NumberFormatter.currencySymbol})",
                           focusNode: priceFocus,
                           keyboardType: TextInputType.number,
                           onChanged: (value) {

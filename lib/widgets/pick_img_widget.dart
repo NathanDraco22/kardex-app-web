@@ -35,11 +35,14 @@ class _PickImgWidgetState extends State<PickImgWidget> {
         source: ImageSource.gallery,
       );
       if (pickedFile != null) {
-        _currentImageProvider = kIsWeb
-            ? NetworkImage(pickedFile.path)
-            : FileImage(
-                File(pickedFile.path),
-              );
+        if (kIsWeb) {
+          final bytes = await pickedFile.readAsBytes();
+          _currentImageProvider = MemoryImage(bytes);
+        } else {
+          _currentImageProvider = FileImage(
+            File(pickedFile.path),
+          );
+        }
         setState(() {});
         widget.onImageSelected(pickedFile);
       }

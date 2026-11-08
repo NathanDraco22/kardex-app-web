@@ -5,13 +5,32 @@ import 'app_settings_state.dart';
 class AppSettingsCubit extends Cubit<AppSettingsState> {
   final AppSettingsRepository appSettingsRepository;
 
-  AppSettingsCubit(this.appSettingsRepository) : super(AppSettingsInitial());
+  AppSettingsCubit(this.appSettingsRepository) : super(AppSettingsInitial()) {
+    NumberFormatter.configureCurrencyResolver(() => currency);
+    NumberFormatter.configureSecondaryCurrencyResolver(
+      () => SecondaryCurrencyConfig(
+        currency: secondaryCurrency,
+        exchangeRate: exchangeRate,
+        showInvoiceTotal: showInvoiceTotalInSecondaryCurrency,
+      ),
+    );
+  }
 
   AppSettingModel? get currentSettings {
     if (state is AppSettingsLoaded) return (state as AppSettingsLoaded).settings;
     if (state is AppSettingsSaving) return (state as AppSettingsSaving).currentSettings;
     return appSettingsRepository.currentAppSettings;
   }
+
+  AppCurrency get currency => currentSettings?.currency ?? AppCurrency.nio;
+
+  AppCurrency get secondaryCurrency => currentSettings?.secondaryCurrency ?? AppCurrency.usd;
+
+  double get exchangeRate => currentSettings?.exchangeRate ?? 0.0;
+
+  bool get showInvoiceTotalInSecondaryCurrency => currentSettings?.showInvoiceTotalInSecondaryCurrency ?? false;
+
+  bool get hasExchangeRate => exchangeRate > 0;
 
   bool get useExpirationDates => currentSettings?.useExpirationDates ?? true;
   bool get useOrders => currentSettings?.useOrders ?? true;
@@ -60,5 +79,12 @@ class AppSettingsCubit extends Cubit<AppSettingsState> {
       emit(AppSettingsError(e.toString(), lastSettings: current));
       return false;
     }
+  }
+
+  @override
+  Future<void> close() async {
+    NumberFormatter.configureCurrencyResolver(null);
+    NumberFormatter.configureSecondaryCurrencyResolver(null);
+    await super.close();
   }
 }

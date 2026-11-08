@@ -250,9 +250,17 @@ class ShortcutRouteRegistry {
       title: "Lista Global de Productos",
       icon: FluentIcons.cube_12_filled,
     ),
+    RouteNames.unitsAndScales: const ShortcutInfo(
+      title: "Unidades y Escalas de Medida",
+      icon: Icons.straighten_rounded,
+    ),
     RouteNames.units: const ShortcutInfo(
-      title: "Unidades de Medida de Productos",
+      title: "Unidades y Escalas de Medida",
       icon: Icons.tag,
+    ),
+    RouteNames.unitScales: const ShortcutInfo(
+      title: "Unidades y Escalas de Medida",
+      icon: Icons.linear_scale_rounded,
     ),
     RouteNames.productCategory: const ShortcutInfo(
       title: "Lista de Categorías de Productos",
@@ -345,6 +353,11 @@ class ShortcutRouteRegistry {
     RouteNames.integrations: const ShortcutInfo(
       title: "Integraciones",
       icon: Icons.integration_instructions,
+    ),
+    RouteNames.imports: const ShortcutInfo(
+      title: "Importaciones CSV",
+      icon: Icons.upload_file_rounded,
+      color: Color(0xFFEA580C),
     ),
   };
 }

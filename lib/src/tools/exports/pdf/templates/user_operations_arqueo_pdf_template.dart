@@ -1,3 +1,4 @@
+import 'package:kardex_app_front/src/tools/cache/image_bytes_resolver.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/pdf_template.dart';
 import 'package:kardex_app_front/widgets/pdf/basic_pdf_table_listview.dart';
@@ -19,7 +20,8 @@ class UserOperationsArqueoPdfTemplate implements PdfTemplate {
 
   @override
   Future<pw.Document> buildDocument() async {
-    final doc = pw.Document();
+    await branch.resolveLogoBytes();
+    final doc = await PdfTheme.newDocument();
 
     final validInvoices = result.detailInvoices.where((e) => e.paymentType != PaymentType.credit).toList();
     final creditInvoices = result.detailInvoices.where((e) => e.paymentType == PaymentType.credit).toList();
@@ -434,7 +436,12 @@ class UserOperationsArqueoPdfTemplate implements PdfTemplate {
             BasicPdfTableCell(content: pw.Text(timeStr, style: const pw.TextStyle(fontSize: 9))),
             BasicPdfTableCell(content: pw.Text("#${inv.docNumber}", style: const pw.TextStyle(fontSize: 9))),
             BasicPdfTableCell(content: pw.Text(inv.clientInfo.name, style: const pw.TextStyle(fontSize: 9))),
-            BasicPdfTableCell(content: pw.Text(inv.paymentType.typeLabel, style: const pw.TextStyle(fontSize: 9, color: PdfColors.orange900))),
+            BasicPdfTableCell(
+              content: pw.Text(
+                inv.paymentType.typeLabel,
+                style: const pw.TextStyle(fontSize: 9, color: PdfColors.orange900),
+              ),
+            ),
             BasicPdfTableCell(
               content: pw.Text(
                 NumberFormatter.convertToMoneyLike(inv.total),

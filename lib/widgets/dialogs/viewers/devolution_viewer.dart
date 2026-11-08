@@ -227,9 +227,7 @@ class _DevolutionViewer extends StatelessWidget {
                                     ),
                                     Expanded(
                                       child: Text(
-                                        item.conversionFactor != 1
-                                            ? (item.quantity ~/ item.conversionFactor).toString()
-                                            : item.quantity.toString(),
+                                        item.formattedDisplayQuantity,
                                       ),
                                     ),
                                     Expanded(

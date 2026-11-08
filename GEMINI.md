@@ -432,3 +432,42 @@ Esta estructura se ha seguido para módulos como 'Historial de Facturas', 'Histo
 - Se ajustó el `BlocListener` de `_RootScaffold` para detectar `state.order.status == OrderStatus.cancelled` tras `WriteOrderSuccess`, mostrar "Cotización cancelada con éxito", remover el draft del caché de `ReadProformaCubit` y cerrar la pantalla.
 - Beneficio: las cotizaciones canceladas permanecen en la base y ahora aparecen en el módulo "Buscador de Cotizaciones/Órdenes" (que ya trae todos los estados) con su chip rojo "Cancelado".
 - Verificación: `flutter analyze` sin errores.
+
+## Módulo de Importaciones CSV (Noviembre 2026)
+- Se creó el módulo `lib/src/modules/imports/` con una pantalla de carga masiva accesible desde `Configuraciones → Importaciones CSV` (`/settings/imports`).
+- Se agregó la capa de datos en `packages/kardex_business`: `ImportsDataSource`, `ImportsRepository`, `ImportResult` e `ImportType`, registrados en `provider_container.dart`.
+- La pantalla incluye cuatro tarjetas (inventario inicial, inventario, clientes y proveedores), descarga de plantillas CSV con BOM UTF-8, selección de archivo con `file_picker`, confirmación, overlay de carga y diálogos de resultado/error.
+- Se añadieron plantillas con encabezados alineados al parser del backend y se reutilizó `CsvExportTool` con el nuevo método `saveCsvContent`.
+- Se integró la ruta en `app_router.dart`, `route_names.dart`, `shortcut_registry.dart`, `settings_screen.dart` y el submenú de Configuraciones en `home_modules_registry.dart`.
+- Se documentó el módulo en `wiki/modules/imports.md` y se enlazó desde `modules_index.md` y `project_index.md`.
+- Verificación: `flutter analyze` sin errores en la app y en `packages/kardex_business`.
+
+## Moneda Global Configurable (Noviembre 2026)
+- Se agregó el campo `currency` a `app_settings` en frontend y backend, con valores ISO `NIO`, `USD`, `HNL`, `GTQ`, `CRC`, `COP`, `MXN` y `EUR`, y `NIO` como valor por defecto retrocompatible.
+- Se creó el enum `AppCurrency` en `packages/kardex_business`, con código ISO, nombre visible y símbolo (`C$`, `US$`, `L`, `Q`, `₡`, `COL$`, `MX$`, `€`).
+- `AppSettingsCubit` expone `currency` y registra un resolver en `NumberFormatter` al construirse; así todas las pantallas, PDFs, CSV y tickets que usan `NumberFormatter` adoptan la moneda automáticamente.
+- Se agregó la sección "Moneda del Sistema" en `AppSettingsScreen` con selector, vista previa y guardado mediante `UpdateAppSetting`.
+- Se reemplazaron los símbolos `C$` quemados en formularios de producto/precio, pagos, clientes, gráficas del panel admin y las cuatro impresoras térmicas. El contador de efectivo conserva sus denominaciones físicas NIO/USD.
+- Verificación: `flutter analyze` y `dart analyze` sin errores; el backend pasó `ruff check` y `ty check`.
+
+## Moneda Secundaria Informativa (Noviembre 2026)
+- Se agregaron `secondaryCurrency` (por defecto `USD`) y `exchangeRate` (por defecto `0.0`) a `app_settings` en frontend y backend. La tasa representa `1 moneda secundaria = X moneda principal` y es solo informativa.
+- La tile "Moneda y tasa de cambio" quedó como primer elemento de `AppSettingsScreen`; muestra la moneda principal, la secundaria y la tasa actual.
+- Al tocar la tile se abre `showCurrencySettingsDialog`, que permite elegir ambas monedas, validar que sean distintas, capturar una tasa positiva de hasta 4 decimales y previsualizar equivalencias.
+- El diálogo guarda únicamente `currency`, `secondaryCurrency` y `exchangeRate` mediante PATCH parcial; el botón inferior conserva el resto de configuraciones.
+- `AppSettingsCubit` expone `secondaryCurrency`, `exchangeRate` y `hasExchangeRate`. No se realizan conversiones de montos ni cambios en precios, tickets, reportes o contador de efectivo.
+
+## Total de Facturas en Moneda Secundaria (Noviembre 2026)
+- Se agregó `showInvoiceTotalInSecondaryCurrency` (`false` por defecto) a `app_settings` en frontend y backend.
+- El switch "Mostrar total de facturas en moneda secundaria (USD)" quedó debajo de la tile de moneda y se guarda con el botón inferior.
+- `NumberFormatter` ahora expone `SecondaryCurrencyConfig`, un resolver secundario y `convertInvoiceTotalToSecondaryMoney`, registrado/limpiado por `AppSettingsCubit`.
+- El equivalente se muestra después del total final en `InvoiceViewerContent` (facturas normales, a crédito y devoluciones), en el ticket térmico de `invoice_printer.dart` y en el PDF A4 de `single_invoice_template.dart`.
+- La línea usa el formato `Total(USD): US$27.31` y solo aparece si la moneda secundaria es distinta a la principal y la tasa es mayor que cero.
+- No se modifica el total, pagos, cuentas por cobrar ni inventario. En facturas a crédito solo se muestra el total facturado, no el saldo restante.
+
+## Historial de Abonos en Imagen (Noviembre 2026)
+- Se agregó la exportación a PNG del historial de abonos desde el diálogo "Ver Recibos" de Facturas por Cobrar de Cliente.
+- Se creó `showInvoiceReceiptsHistoryImageDialog` en `invoice_receipts_history_image_dialog.dart`, con captura mediante `RepaintBoundary` a 2.5x, previsualización con zoom y compartición con `SharePlus`.
+- La imagen incluye membrete de la sucursal, datos del cliente y de la factura, resumen (total factura, total abonos y saldo restante) y tabla de recibos con fecha/hora, método y monto aplicado.
+- `InvoiceReceiptsHistoryModal` ahora conserva los recibos cargados y muestra el botón "Compartir Imagen", deshabilitado mientras carga o cuando no hay recibos.
+- Verificación: `flutter analyze` finalizó sin errores ni advertencias.

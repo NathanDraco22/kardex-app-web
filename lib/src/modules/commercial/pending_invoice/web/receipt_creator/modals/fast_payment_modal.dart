@@ -58,6 +58,7 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
   bool get _canConfirm {
     final inputCents = (_currentInput * 100).round();
     final maxCents = (widget.maxAmountToPay * 100).round();
+    if (maxCents <= 0) return false;
     final isAmountValid = inputCents > 0 && inputCents <= maxCents;
     if (!isAmountValid) return false;
 
@@ -99,6 +100,33 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
                 ),
                 textAlign: TextAlign.center,
               ),
+              if (maxCents <= 0) ...[
+                const SizedBox(height: 10),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.amber.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.amber.shade300),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.warning_amber_rounded, size: 18, color: Colors.amber.shade900),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          "Las notas de crédito cubren o superan el adeudo de facturas. No es posible abonar en efectivo.",
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.amber.shade900,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
               const SizedBox(height: 20),
               SegmentedButton<PaymentMethod>(
                 style: ButtonStyle(
@@ -141,7 +169,7 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
                 controller: _amountController,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 autofocus: true,
-                inputFormatters: [DecimalTextInputFormatter()],
+                inputFormatters: [const DecimalTextInputFormatter()],
                 decoration: InputDecoration(
                   labelText: "Monto a Abonar",
                   border: const OutlineInputBorder(),
