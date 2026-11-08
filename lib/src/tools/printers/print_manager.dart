@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_thermal_printer/utils/printer.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/src/services/thermal_printer/thermal_printer_types.dart';
 import 'package:kardex_app_front/src/services/thermal_printer_service.dart';
 import 'package:kardex_app_front/src/tools/printers/paper_settings.dart';
 import 'package:kardex_business/kardex_business.dart';

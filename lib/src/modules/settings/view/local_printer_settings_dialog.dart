@@ -1,12 +1,22 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:flutter_thermal_printer/utils/printer.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/src/services/thermal_printer/thermal_printer_types.dart';
 import 'package:kardex_app_front/src/services/thermal_printer_service.dart';
 import 'package:kardex_app_front/src/tools/printers/paper_settings.dart';
 import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
+import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 
 Future<void> showLocalPrinterSettingsDialog(BuildContext context) async {
+  if (kIsWeb) {
+    await DialogManager.showInfoDialog(
+      context,
+      "La impresión térmica directa solo está disponible en escritorio y móvil.",
+    );
+    return;
+  }
+
   final currentSize = await PrintManager.getLocalPaperSize();
   final isDirect = await PrintManager.getIsDirectPrintEnabled();
   final savedPrinter = await PrintManager.getSavedPrinter();

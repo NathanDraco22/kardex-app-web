@@ -57,6 +57,19 @@ flowchart TD
 4. **Impresores Específicos:**
    - [`invoice_printer.dart`](../lib/src/tools/printers/invoice_printer.dart), [`order_printer.dart`](../lib/src/tools/printers/order_printer.dart), [`receipt_printer.dart`](../lib/src/tools/printers/receipt_printer.dart), [`devolution_printer.dart`](../lib/src/tools/printers/devolution_printer.dart), [`cash_counter_ticket_printer.dart`](../lib/src/tools/printers/cash_counter_ticket_printer.dart) delegan directamente en `PrintManager.printPdf(...)`.
 
+### Soporte Web (aislamiento de `flutter_thermal_printer`)
+
+La impresión térmica directa no está disponible en navegador. Para evitar que
+`flutter_thermal_printer` rompa el build web, `ThermalPrinterService` usa
+imports condicionales:
+
+- **Nativo (`dart.library.io`)** → [`thermal_printer/thermal_printer_service_io.dart`](../lib/src/services/thermal_printer/thermal_printer_service_io.dart), que usa el paquete real.
+- **Web** → [`thermal_printer/thermal_printer_service_stub.dart`](../lib/src/services/thermal_printer/thermal_printer_service_stub.dart), una implementación no-op que no importa el paquete.
+
+En web, `PrintManager.printPdf()` cae automáticamente en `Printing.layoutPdf()`,
+que abre el diálogo de impresión del navegador. La entrada "Configuración de
+Impresora Local" muestra un aviso informativo en web.
+
 ---
 
 ## 3. Registro de Bugs Críticos, Causas Raíz y Soluciones (*Post-Mortems*)

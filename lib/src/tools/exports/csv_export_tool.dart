@@ -31,12 +31,26 @@ class CsvExportTool {
       );
     }
 
-    return FileSaver.instance.saveAs(
-      name: baseName,
-      bytes: uint8List,
-      fileExtension: "csv",
-      mimeType: MimeType.csv,
-    );
+    try {
+      return await FileSaver.instance.saveAs(
+        name: baseName,
+        bytes: uint8List,
+        fileExtension: "csv",
+        mimeType: MimeType.csv,
+        dialogTitle: "Guardar plantilla CSV",
+      );
+    } catch (error) {
+      debugPrint(
+        "No se pudo abrir el diálogo Guardar como: $error. "
+        "Guardando la plantilla directamente en Descargas.",
+      );
+      return FileSaver.instance.saveFile(
+        name: baseName,
+        bytes: uint8List,
+        fileExtension: "csv",
+        mimeType: MimeType.csv,
+      );
+    }
   }
 
   static Future<void> exportProductSalesToCSV({
