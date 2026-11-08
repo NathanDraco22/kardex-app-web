@@ -46,6 +46,9 @@ Future<Uint8List> generateTicketPdfFromInvoice(
     (element, previousValue) => previousValue.subTotal + element,
   );
 
+  final secondaryTotal = NumberFormatter.convertInvoiceTotalToSecondaryMoney(invoice.total);
+  final secondaryCurrency = NumberFormatter.secondaryCurrency;
+
   final imageSize = TicketSettings.logoSize(paperSize);
   final descriptionFlex = paperSize == PaperSize.mm80 ? 4 : 3;
 
@@ -414,6 +417,34 @@ Future<Uint8List> generateTicketPdfFromInvoice(
                 ),
               ],
             ),
+            if (secondaryTotal != null && secondaryCurrency != null)
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.end,
+                children: [
+                  pw.SizedBox(
+                    width: 60,
+                    child: pw.Text(
+                      'Total(${secondaryCurrency.code}): ',
+                      style: pw.TextStyle(
+                        fontWeight: pw.FontWeight.bold,
+                        fontSize: TicketSettings.contentFontSize(paperSize),
+                      ),
+                      textAlign: pw.TextAlign.right,
+                    ),
+                  ),
+                  pw.SizedBox(
+                    width: 60,
+                    child: pw.Text(
+                      secondaryTotal,
+                      style: pw.TextStyle(
+                        fontWeight: pw.FontWeight.bold,
+                        fontSize: TicketSettings.contentFontSize(paperSize),
+                      ),
+                      textAlign: pw.TextAlign.right,
+                    ),
+                  ),
+                ],
+              ),
             pw.SizedBox(height: 5),
             pw.Divider(color: PdfColors.grey),
 

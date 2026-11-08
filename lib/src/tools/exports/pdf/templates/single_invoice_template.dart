@@ -320,6 +320,8 @@ class SingleInvoiceTemplate implements PdfTemplate {
       0,
       (previousValue, element) => previousValue + element.subTotal,
     );
+    final secondaryTotal = NumberFormatter.convertInvoiceTotalToSecondaryMoney(invoice.total);
+    final secondaryCurrency = NumberFormatter.secondaryCurrency;
 
     return pw.Container(
       padding: const pw.EdgeInsets.only(top: 8),
@@ -375,6 +377,34 @@ class SingleInvoiceTemplate implements PdfTemplate {
               ],
             ),
           ),
+          if (secondaryTotal != null && secondaryCurrency != null) ...[
+            pw.SizedBox(height: 4),
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.end,
+              children: [
+                pw.Text(
+                  "Total(${secondaryCurrency.code}):",
+                  style: const pw.TextStyle(
+                    fontWeight: pw.FontWeight.bold,
+                    fontSize: 11,
+                    color: PdfColors.blueGrey700,
+                  ),
+                ),
+                pw.SizedBox(
+                  width: 110,
+                  child: pw.Text(
+                    secondaryTotal,
+                    style: const pw.TextStyle(
+                      fontWeight: pw.FontWeight.bold,
+                      fontSize: 12,
+                      color: PdfColors.blueGrey800,
+                    ),
+                    textAlign: pw.TextAlign.right,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );

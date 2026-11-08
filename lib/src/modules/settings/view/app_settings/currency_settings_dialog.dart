@@ -87,15 +87,6 @@ class _CurrencySettingsDialogState extends State<_CurrencySettingsDialog> {
     return NumberFormat('#,##0.####', 'en_US').format(rate);
   }
 
-  String _formatMoney(int valueInCents, AppCurrency currency) {
-    final value = double.parse((valueInCents / 100).toStringAsFixed(2));
-    return NumberFormat.currency(
-      locale: 'en_US',
-      symbol: currency.symbol,
-      decimalDigits: 2,
-    ).format(value);
-  }
-
   void _onPrimaryChanged(AppCurrency? value) {
     if (value == null || value == _primaryCurrency) return;
     setState(() {
@@ -375,8 +366,8 @@ class _CurrencySettingsDialogState extends State<_CurrencySettingsDialog> {
           ),
           const SizedBox(height: 8),
           Text(
-            "${_formatMoney(100000, _primaryCurrency)} ≈ "
-            "${_formatMoney(primaryToSecondaryCents, _secondaryCurrency)}",
+            "${NumberFormatter.formatMoney(100000, _primaryCurrency)} ≈ "
+            "${NumberFormatter.formatMoney(primaryToSecondaryCents, _secondaryCurrency)}",
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -385,8 +376,8 @@ class _CurrencySettingsDialogState extends State<_CurrencySettingsDialog> {
           ),
           const SizedBox(height: 4),
           Text(
-            "${_formatMoney(10000, _secondaryCurrency)} ≈ "
-            "${_formatMoney(secondaryToPrimaryCents, _primaryCurrency)}",
+            "${NumberFormatter.formatMoney(10000, _secondaryCurrency)} ≈ "
+            "${NumberFormatter.formatMoney(secondaryToPrimaryCents, _primaryCurrency)}",
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,

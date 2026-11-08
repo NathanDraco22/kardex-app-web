@@ -456,3 +456,11 @@ Esta estructura se ha seguido para módulos como 'Historial de Facturas', 'Histo
 - Al tocar la tile se abre `showCurrencySettingsDialog`, que permite elegir ambas monedas, validar que sean distintas, capturar una tasa positiva de hasta 4 decimales y previsualizar equivalencias.
 - El diálogo guarda únicamente `currency`, `secondaryCurrency` y `exchangeRate` mediante PATCH parcial; el botón inferior conserva el resto de configuraciones.
 - `AppSettingsCubit` expone `secondaryCurrency`, `exchangeRate` y `hasExchangeRate`. No se realizan conversiones de montos ni cambios en precios, tickets, reportes o contador de efectivo.
+
+## Total de Facturas en Moneda Secundaria (Noviembre 2026)
+- Se agregó `showInvoiceTotalInSecondaryCurrency` (`false` por defecto) a `app_settings` en frontend y backend.
+- El switch "Mostrar total de facturas en moneda secundaria (USD)" quedó debajo de la tile de moneda y se guarda con el botón inferior.
+- `NumberFormatter` ahora expone `SecondaryCurrencyConfig`, un resolver secundario y `convertInvoiceTotalToSecondaryMoney`, registrado/limpiado por `AppSettingsCubit`.
+- El equivalente se muestra después del total final en `InvoiceViewerContent` (facturas normales, a crédito y devoluciones), en el ticket térmico de `invoice_printer.dart` y en el PDF A4 de `single_invoice_template.dart`.
+- La línea usa el formato `Total(USD): US$27.31` y solo aparece si la moneda secundaria es distinta a la principal y la tasa es mayor que cero.
+- No se modifica el total, pagos, cuentas por cobrar ni inventario. En facturas a crédito solo se muestra el total facturado, no el saldo restante.

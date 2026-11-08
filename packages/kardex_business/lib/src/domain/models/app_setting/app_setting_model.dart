@@ -15,6 +15,7 @@ class AppSettingModel {
   final AppCurrency currency;
   final AppCurrency secondaryCurrency;
   final double exchangeRate;
+  final bool showInvoiceTotalInSecondaryCurrency;
   final int createdAt;
   final int? updatedAt;
 
@@ -33,6 +34,7 @@ class AppSettingModel {
     this.currency = AppCurrency.nio,
     this.secondaryCurrency = AppCurrency.usd,
     this.exchangeRate = 0.0,
+    this.showInvoiceTotalInSecondaryCurrency = false,
     required this.createdAt,
     this.updatedAt,
   });
@@ -57,6 +59,8 @@ class AppSettingModel {
         fallback: AppCurrency.usd,
       ),
       exchangeRate: (json['exchangeRate'] as num?)?.toDouble() ?? 0.0,
+      showInvoiceTotalInSecondaryCurrency:
+          json['showInvoiceTotalInSecondaryCurrency'] as bool? ?? false,
       createdAt: json['createdAt'] as int? ?? 0,
       updatedAt: json['updatedAt'] as int?,
     );
@@ -78,6 +82,8 @@ class AppSettingModel {
       'currency': currency.code,
       'secondaryCurrency': secondaryCurrency.code,
       'exchangeRate': exchangeRate,
+      'showInvoiceTotalInSecondaryCurrency':
+          showInvoiceTotalInSecondaryCurrency,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };
@@ -98,6 +104,7 @@ class AppSettingModel {
     AppCurrency? currency,
     AppCurrency? secondaryCurrency,
     double? exchangeRate,
+    bool? showInvoiceTotalInSecondaryCurrency,
     int? createdAt,
     int? updatedAt,
   }) {
@@ -119,6 +126,9 @@ class AppSettingModel {
       currency: currency ?? this.currency,
       secondaryCurrency: secondaryCurrency ?? this.secondaryCurrency,
       exchangeRate: exchangeRate ?? this.exchangeRate,
+      showInvoiceTotalInSecondaryCurrency:
+          showInvoiceTotalInSecondaryCurrency ??
+          this.showInvoiceTotalInSecondaryCurrency,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -139,6 +149,7 @@ class UpdateAppSetting {
   final AppCurrency? currency;
   final AppCurrency? secondaryCurrency;
   final double? exchangeRate;
+  final bool? showInvoiceTotalInSecondaryCurrency;
 
   const UpdateAppSetting({
     this.useDefaultProfitMargin,
@@ -154,6 +165,7 @@ class UpdateAppSetting {
     this.currency,
     this.secondaryCurrency,
     this.exchangeRate,
+    this.showInvoiceTotalInSecondaryCurrency,
   });
 
   Map<String, dynamic> toJson() {
@@ -196,6 +208,10 @@ class UpdateAppSetting {
     }
     if (exchangeRate != null) {
       data['exchangeRate'] = exchangeRate;
+    }
+    if (showInvoiceTotalInSecondaryCurrency != null) {
+      data['showInvoiceTotalInSecondaryCurrency'] =
+          showInvoiceTotalInSecondaryCurrency;
     }
     return data;
   }

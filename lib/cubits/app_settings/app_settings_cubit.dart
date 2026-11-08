@@ -7,6 +7,13 @@ class AppSettingsCubit extends Cubit<AppSettingsState> {
 
   AppSettingsCubit(this.appSettingsRepository) : super(AppSettingsInitial()) {
     NumberFormatter.configureCurrencyResolver(() => currency);
+    NumberFormatter.configureSecondaryCurrencyResolver(
+      () => SecondaryCurrencyConfig(
+        currency: secondaryCurrency,
+        exchangeRate: exchangeRate,
+        showInvoiceTotal: showInvoiceTotalInSecondaryCurrency,
+      ),
+    );
   }
 
   AppSettingModel? get currentSettings {
@@ -20,6 +27,8 @@ class AppSettingsCubit extends Cubit<AppSettingsState> {
   AppCurrency get secondaryCurrency => currentSettings?.secondaryCurrency ?? AppCurrency.usd;
 
   double get exchangeRate => currentSettings?.exchangeRate ?? 0.0;
+
+  bool get showInvoiceTotalInSecondaryCurrency => currentSettings?.showInvoiceTotalInSecondaryCurrency ?? false;
 
   bool get hasExchangeRate => exchangeRate > 0;
 
@@ -75,6 +84,7 @@ class AppSettingsCubit extends Cubit<AppSettingsState> {
   @override
   Future<void> close() async {
     NumberFormatter.configureCurrencyResolver(null);
+    NumberFormatter.configureSecondaryCurrencyResolver(null);
     await super.close();
   }
 }

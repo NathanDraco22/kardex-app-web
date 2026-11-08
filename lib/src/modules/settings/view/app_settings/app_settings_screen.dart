@@ -43,6 +43,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
   AppCurrency _currency = AppCurrency.nio;
   AppCurrency _secondaryCurrency = AppCurrency.usd;
   double _exchangeRate = 0.0;
+  bool _showInvoiceTotalInSecondaryCurrency = false;
 
   @override
   void initState() {
@@ -77,6 +78,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
       _paymentTermController.text = settings.defaultPaymentTermDays.toString();
       _useHoldSales = settings.useHoldSales;
       _useQuickProductSearch = settings.useQuickProductSearch;
+      _showInvoiceTotalInSecondaryCurrency = settings.showInvoiceTotalInSecondaryCurrency;
       _initialized = true;
     }
 
@@ -102,6 +104,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
       defaultPaymentTermDays: paymentTerm,
       useHoldSales: _useHoldSales,
       useQuickProductSearch: _useQuickProductSearch,
+      showInvoiceTotalInSecondaryCurrency: _showInvoiceTotalInSecondaryCurrency,
     );
 
     final success = await getIt<AppSettingsCubit>().updateSettings(update);
@@ -239,6 +242,75 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
     );
   }
 
+  Widget _buildInvoiceSecondaryTotalSwitch({required bool isSaving}) {
+    final hasRate = _exchangeRate > 0;
+    final isEnabled = _showInvoiceTotalInSecondaryCurrency;
+
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: BorderSide(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        children: [
+          SwitchListTile(
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 4,
+            ),
+            secondary: Icon(
+              Icons.receipt_long_rounded,
+              color: Colors.teal.shade700,
+            ),
+            title: Text(
+              "Mostrar total de facturas en moneda secundaria (${_secondaryCurrency.code})",
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            subtitle: Text(
+              "Agrega el equivalente en ${_secondaryCurrency.symbol} después del total final en el visor, PDF y ticket.",
+              style: const TextStyle(
+                fontSize: 13,
+                color: Colors.black54,
+              ),
+            ),
+            value: isEnabled,
+            onChanged: isSaving
+                ? null
+                : (value) {
+                    setState(() {
+                      _showInvoiceTotalInSecondaryCurrency = value;
+                    });
+                  },
+          ),
+          if (isEnabled && !hasRate)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.warning_amber_rounded,
+                    size: 18,
+                    color: Colors.orange.shade800,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      "Configura una tasa de cambio mayor que cero para que el total secundario aparezca en las facturas.",
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        color: Colors.orange.shade900,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -326,6 +398,8 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                 children: [
                   _buildCurrencySummaryTile(isSaving: isSaving),
+                  const SizedBox(height: 12),
+                  _buildInvoiceSecondaryTotalSwitch(isSaving: isSaving),
                   const SizedBox(height: 24),
                   _buildSectionHeader(
                     icon: Icons.trending_up_rounded,

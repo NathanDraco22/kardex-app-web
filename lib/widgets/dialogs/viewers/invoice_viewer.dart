@@ -211,6 +211,8 @@ class InvoiceViewerContent extends StatelessWidget {
       0,
       (element, previousValue) => previousValue.subTotal + element,
     );
+    final secondaryTotal = NumberFormatter.convertInvoiceTotalToSecondaryMoney(invoice.total);
+    final secondaryCurrency = NumberFormatter.secondaryCurrency;
     return Column(
       children: [
         const Text(
@@ -462,7 +464,7 @@ class InvoiceViewerContent extends StatelessWidget {
               ),
               const Divider(),
               SizedBox(
-                height: 65,
+                height: secondaryTotal != null ? 92 : 65,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -521,6 +523,34 @@ class InvoiceViewerContent extends StatelessWidget {
                         ],
                       ),
                     ),
+                    if (secondaryTotal != null && secondaryCurrency != null) ...[
+                      const SizedBox(height: 6),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            "Total(${secondaryCurrency.code}):",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              color: Colors.blueGrey.shade700,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 120,
+                            child: Text(
+                              secondaryTotal,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                                color: Colors.blueGrey.shade800,
+                              ),
+                              textAlign: TextAlign.end,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
               ),

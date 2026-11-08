@@ -82,6 +82,11 @@ lib/src/modules/settings/
   - `exchangeRate` (double): Tasa informativa donde `1` unidad de la moneda secundaria equivale a `exchangeRate` unidades de la moneda principal. `0.0` significa “sin configurar”. No se usa en cálculos, tickets ni reportes.
     - La tile “Moneda y tasa de cambio” es el primer elemento de `AppSettingsScreen`. Al tocarla se abre `showCurrencySettingsDialog`, que guarda únicamente `currency`, `secondaryCurrency` y `exchangeRate` mediante un PATCH parcial.
     - El botón inferior “Guardar Configuraciones” conserva el resto de parámetros y no sobrescribe la moneda ni la tasa.
+  - `showInvoiceTotalInSecondaryCurrency` (bool): Muestra el equivalente del total de facturas en la moneda secundaria (`false` por defecto).
+    - La opción se controla con el switch “Mostrar total de facturas en moneda secundaria (USD)” debajo de la tile de moneda y se guarda con el botón inferior.
+    - El equivalente aparece después del total final en el visor de facturas, el ticket térmico (imprimir/compartir) y el PDF A4.
+    - Solo se muestra si la moneda secundaria es distinta a la principal y la tasa es mayor que cero. No modifica montos, pagos, cuentas por cobrar ni inventario.
+    - La línea usa el formato `Total(USD): US$27.31`.
 
 #### Uso Operativo del Margen de Ganancia Sugerido:
 1. **Editor de Precios de Producto (`ProductPriceEditorScreen`):**

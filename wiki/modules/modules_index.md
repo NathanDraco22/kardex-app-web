@@ -78,7 +78,7 @@ Este documento ofrece un panorama general y conciso de cada uno de los módulos 
 - **Enfoque:** Parametrización y control de acceso.
 - **Puntos Críticos:**
   - La bandera `isCommerce` en sucursales determina si el sistema habilita módulos de venta o si se comporta puramente como centro logístico/bodega.
-  - El submódulo `app_settings` centraliza reglas y banderas globales (margen de ganancia sugerido, fechas de vencimiento, órdenes, cotizaciones, inventario negativo, días de crédito, moneda global, moneda secundaria y tasa informativa).
+  - El submódulo `app_settings` centraliza reglas y banderas globales (margen de ganancia sugerido, fechas de vencimiento, órdenes, cotizaciones, inventario negativo, días de crédito, moneda global, moneda secundaria, tasa informativa y total de facturas en moneda secundaria).
   - Control de accesos mediante `RolePermissionGate`.
 
 ### 9. Navegación, Sesión y Atajos (`home_and_navigation`)
