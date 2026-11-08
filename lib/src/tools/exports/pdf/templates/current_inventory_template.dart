@@ -18,7 +18,7 @@ class CurrentInventoryTemplate implements PdfTemplate {
 
   @override
   Future<pw.Document> buildDocument() async {
-    final doc = pw.Document();
+    final doc = await PdfTheme.newDocument();
 
     doc.addPage(
       pw.MultiPage(
@@ -194,7 +194,10 @@ class CurrentInventoryTemplate implements PdfTemplate {
               mainAxisAlignment: pw.MainAxisAlignment.end,
               mainAxisSize: pw.MainAxisSize.min,
               children: [
-                pw.Text("Total en Inventario:", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
+                pw.Text(
+                  "Total en Inventario:",
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                ),
                 pw.SizedBox(
                   width: 110,
                   child: pw.Text(

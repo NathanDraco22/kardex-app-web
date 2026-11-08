@@ -172,7 +172,7 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
 
                     TitleTextField(
                       key: const ValueKey("credit_field"),
-                      title: "Limite de Credito(C\$)*",
+                      title: "Limite de Credito(${NumberFormatter.currencySymbol})*",
                       keyboardType: TextInputType.number,
                       inputFormatters: [IntegerThousandsFormatter()],
                       initialValue: widget.client?.creditLimit.toString(),

@@ -16,7 +16,7 @@ class SingleCreditNoteTemplate implements PdfTemplate {
   @override
   Future<pw.Document> buildDocument() async {
     await branch.resolveLogoBytes();
-    final doc = pw.Document();
+    final doc = await PdfTheme.newDocument();
 
     doc.addPage(
       pw.MultiPage(
@@ -196,7 +196,8 @@ class SingleCreditNoteTemplate implements PdfTemplate {
                       "Estado: ${creditNote.status.display.toUpperCase()}",
                       style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 11),
                     ),
-                    if (creditNote.appliedReceiptDocNumber != null && creditNote.appliedReceiptDocNumber!.isNotEmpty) ...[
+                    if (creditNote.appliedReceiptDocNumber != null &&
+                        creditNote.appliedReceiptDocNumber!.isNotEmpty) ...[
                       pw.SizedBox(height: 2),
                       pw.Text(
                         "Aplicada en Recibo: #${creditNote.appliedReceiptDocNumber}",
@@ -261,7 +262,10 @@ class SingleCreditNoteTemplate implements PdfTemplate {
             children: [
               pw.Expanded(
                 flex: 4,
-                child: pw.Text("Producto Devuelto", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
+                child: pw.Text(
+                  "Producto Devuelto",
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                ),
               ),
               pw.Expanded(
                 flex: 1,

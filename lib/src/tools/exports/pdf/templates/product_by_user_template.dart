@@ -27,7 +27,7 @@ class ProductByUserTemplate implements PdfTemplate {
 
   @override
   Future<pw.Document> buildDocument() async {
-    final doc = pw.Document();
+    final doc = await PdfTheme.newDocument();
 
     doc.addPage(
       pw.MultiPage(
@@ -91,7 +91,10 @@ class ProductByUserTemplate implements PdfTemplate {
             children: [
               pw.Text("Sucursal: $branchName", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold)),
               pw.SizedBox(height: 4),
-              pw.Text("Usuario: ${userInfo?.name ?? 'Todos'}", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+              pw.Text(
+                "Usuario: ${userInfo?.name ?? 'Todos'}",
+                style: const pw.TextStyle(fontWeight: pw.FontWeight.bold),
+              ),
               pw.SizedBox(height: 4),
               pw.Text("Periodo: $dateRangeStr"),
             ],

@@ -1,16 +1,32 @@
 import 'package:intl/intl.dart';
-import 'package:kardex_business/src/tools/constant.dart';
+import 'package:kardex_business/src/domain/models/app_setting/app_currency.dart';
+
+typedef CurrencyResolver = AppCurrency Function();
 
 class NumberFormatter {
+  static CurrencyResolver? _currencyResolver;
+
   static final NumberFormat _instance = NumberFormat.decimalPattern('en_US')
     ..minimumFractionDigits = 2
     ..maximumFractionDigits = 2;
+
+  static void configureCurrencyResolver(CurrencyResolver? resolver) {
+    _currencyResolver = resolver;
+  }
+
+  static AppCurrency get currency =>
+      _currencyResolver?.call() ?? AppCurrency.nio;
+
+  static String get currencySymbol => currency.symbol;
+
+  static NumberFormat get currencyFormat =>
+      NumberFormat.currency(symbol: currencySymbol);
 
   static String convertToMoneyLike(int valueInCents) {
     final valueInCurrency = valueInCents / 100;
     final value = double.parse(valueInCurrency.toStringAsFixed(2));
 
-    return defaultCoinSymbol + _instance.format(value);
+    return currencySymbol + _instance.format(value);
   }
 
   static String decimalPattern(num value) => _instance.format(value);
@@ -39,4 +55,3 @@ class NumberFormatter {
     return val.toStringAsFixed(2).replaceAll(RegExp(r'\.?0+$'), '');
   }
 }
-

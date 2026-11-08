@@ -38,6 +38,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
   bool _alertMinStock = true;
   bool _useHoldSales = true;
   bool _useQuickProductSearch = false;
+  AppCurrency _currency = AppCurrency.nio;
 
   @override
   void initState() {
@@ -72,6 +73,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
       _paymentTermController.text = settings.defaultPaymentTermDays.toString();
       _useHoldSales = settings.useHoldSales;
       _useQuickProductSearch = settings.useQuickProductSearch;
+      _currency = settings.currency;
       _initialized = true;
     }
   }
@@ -91,10 +93,10 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
       defaultPaymentTermDays: paymentTerm,
       useHoldSales: _useHoldSales,
       useQuickProductSearch: _useQuickProductSearch,
+      currency: _currency,
     );
 
-    final success =
-        await getIt<AppSettingsCubit>().updateSettings(update);
+    final success = await getIt<AppSettingsCubit>().updateSettings(update);
 
     if (mounted) {
       if (success) {
@@ -201,14 +203,12 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 800),
               child: ListView(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                 children: [
                   _buildSectionHeader(
                     icon: Icons.trending_up_rounded,
                     title: "Margen de Ganancia Comercial",
-                    subtitle:
-                        "Parámetros para cálculo sugerido de precios de venta",
+                    subtitle: "Parámetros para cálculo sugerido de precios de venta",
                   ),
                   const SizedBox(height: 8),
                   Card(
@@ -230,8 +230,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                             ),
                             subtitle: const Text(
                               "Calcula automáticamente el precio de venta a partir del costo promedio al catalogar productos",
-                              style: TextStyle(
-                                  fontSize: 13, color: Colors.black54),
+                              style: TextStyle(fontSize: 13, color: Colors.black54),
                             ),
                             value: _useDefaultProfitMargin,
                             onChanged: isSaving
@@ -247,21 +246,18 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                             TextFormField(
                               controller: _profitMarginController,
                               enabled: !isSaving,
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
+                              keyboardType: const TextInputType.numberWithOptions(
                                 decimal: true,
                               ),
                               inputFormatters: [DecimalTextInputFormatter()],
                               decoration: InputDecoration(
-                                labelText:
-                                    "Porcentaje de margen por defecto (%)",
+                                labelText: "Porcentaje de margen por defecto (%)",
                                 hintText: "Ej. 20.0",
                                 prefixIcon: const Icon(Icons.percent_rounded),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                helperText:
-                                    "Margen aplicado para calcular el precio de venta sugerido",
+                                helperText: "Margen aplicado para calcular el precio de venta sugerido",
                               ),
                             ),
                           ],
@@ -271,10 +267,99 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                   ),
                   const SizedBox(height: 24),
                   _buildSectionHeader(
+                    icon: Icons.payments_outlined,
+                    title: "Moneda del Sistema",
+                    subtitle: "Símbolo usado en precios, facturas, tickets y reportes",
+                  ),
+                  const SizedBox(height: 8),
+                  Card(
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      side: BorderSide(color: Colors.grey.shade200),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          DropdownButtonFormField<AppCurrency>(
+                            key: ValueKey(_currency),
+                            initialValue: _currency,
+                            isExpanded: true,
+                            decoration: InputDecoration(
+                              labelText: "Moneda",
+                              prefixIcon: const Icon(Icons.currency_exchange_rounded),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              helperText: "Solo cambia el símbolo visual; no convierte montos existentes.",
+                            ),
+                            items: AppCurrency.values
+                                .map(
+                                  (currency) => DropdownMenuItem<AppCurrency>(
+                                    value: currency,
+                                    child: Text(
+                                      "${currency.symbol}  ·  ${currency.displayName}",
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                            onChanged: isSaving
+                                ? null
+                                : (value) {
+                                    if (value != null) {
+                                      setState(() => _currency = value);
+                                    }
+                                  },
+                          ),
+                          const SizedBox(height: 12),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.teal.shade50,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: Colors.teal.shade100),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.visibility_outlined,
+                                  size: 18,
+                                  color: Colors.teal.shade800,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  "Vista previa:",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.teal.shade900,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  "${_currency.symbol}1,234.56",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.teal.shade900,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  _buildSectionHeader(
                     icon: Icons.dashboard_customize_rounded,
                     title: "Módulos y Operaciones",
-                    subtitle:
-                        "Habilita o deshabilita funciones en el sistema",
+                    subtitle: "Habilita o deshabilita funciones en el sistema",
                   ),
                   const SizedBox(height: 8),
                   Card(
@@ -292,14 +377,10 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                           ),
                           subtitle: const Text(
                             "Habilita el seguimiento de lotes y alertas de caducidad en inventario",
-                            style:
-                                TextStyle(fontSize: 13, color: Colors.black54),
+                            style: TextStyle(fontSize: 13, color: Colors.black54),
                           ),
                           value: _useExpirationDates,
-                          onChanged: isSaving
-                              ? null
-                              : (val) =>
-                                  setState(() => _useExpirationDates = val),
+                          onChanged: isSaving ? null : (val) => setState(() => _useExpirationDates = val),
                         ),
                         const Divider(height: 1),
                         SwitchListTile(
@@ -309,13 +390,10 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                           ),
                           subtitle: const Text(
                             "Permite crear, autorizar y facturar órdenes en el área comercial",
-                            style:
-                                TextStyle(fontSize: 13, color: Colors.black54),
+                            style: TextStyle(fontSize: 13, color: Colors.black54),
                           ),
                           value: _useOrders,
-                          onChanged: isSaving
-                              ? null
-                              : (val) => setState(() => _useOrders = val),
+                          onChanged: isSaving ? null : (val) => setState(() => _useOrders = val),
                         ),
                         const Divider(height: 1),
                         SwitchListTile(
@@ -325,13 +403,10 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                           ),
                           subtitle: const Text(
                             "Permite generar presupuestos y proformas sin afectar inventario ni generar cuentas por cobrar",
-                            style:
-                                TextStyle(fontSize: 13, color: Colors.black54),
+                            style: TextStyle(fontSize: 13, color: Colors.black54),
                           ),
                           value: _useQuotations,
-                          onChanged: isSaving
-                              ? null
-                              : (val) => setState(() => _useQuotations = val),
+                          onChanged: isSaving ? null : (val) => setState(() => _useQuotations = val),
                         ),
                         const Divider(height: 1),
                         SwitchListTile(
@@ -342,14 +417,10 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                           ),
                           subtitle: const Text(
                             "Abre el buscador con botones de agregar y quitar cantidad al agregar productos en móvil (facturas, órdenes y cotizaciones)",
-                            style:
-                                TextStyle(fontSize: 13, color: Colors.black54),
+                            style: TextStyle(fontSize: 13, color: Colors.black54),
                           ),
                           value: _useQuickProductSearch,
-                          onChanged: isSaving
-                              ? null
-                              : (val) => setState(
-                                  () => _useQuickProductSearch = val),
+                          onChanged: isSaving ? null : (val) => setState(() => _useQuickProductSearch = val),
                         ),
                         const Divider(height: 1),
                         SwitchListTile(
@@ -359,13 +430,10 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                           ),
                           subtitle: const Text(
                             "Permite pausar carritos en terminal de venta para atender a otros clientes",
-                            style:
-                                TextStyle(fontSize: 13, color: Colors.black54),
+                            style: TextStyle(fontSize: 13, color: Colors.black54),
                           ),
                           value: _useHoldSales,
-                          onChanged: isSaving
-                              ? null
-                              : (val) => setState(() => _useHoldSales = val),
+                          onChanged: isSaving ? null : (val) => setState(() => _useHoldSales = val),
                         ),
                       ],
                     ),
@@ -395,14 +463,10 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                             ),
                             subtitle: const Text(
                               "Permite generar facturas de venta aun si no hay existencias registradas en la sucursal",
-                              style: TextStyle(
-                                  fontSize: 13, color: Colors.black54),
+                              style: TextStyle(fontSize: 13, color: Colors.black54),
                             ),
                             value: _allowNegativeStock,
-                            onChanged: isSaving
-                                ? null
-                                : (val) =>
-                                    setState(() => _allowNegativeStock = val),
+                            onChanged: isSaving ? null : (val) => setState(() => _allowNegativeStock = val),
                           ),
                           const Divider(height: 16),
                           SwitchListTile(
@@ -413,14 +477,10 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                             ),
                             subtitle: const Text(
                               "Resalta en amarillo o rojo los productos que alcancen el límite mínimo",
-                              style: TextStyle(
-                                  fontSize: 13, color: Colors.black54),
+                              style: TextStyle(fontSize: 13, color: Colors.black54),
                             ),
                             value: _alertMinStock,
-                            onChanged: isSaving
-                                ? null
-                                : (val) =>
-                                    setState(() => _alertMinStock = val),
+                            onChanged: isSaving ? null : (val) => setState(() => _alertMinStock = val),
                           ),
                           const Divider(height: 24),
                           TextFormField(
@@ -429,16 +489,13 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                             keyboardType: TextInputType.number,
                             inputFormatters: [IntegerTextInputFormatter()],
                             decoration: InputDecoration(
-                              labelText:
-                                  "Plazo de crédito predeterminado (días)",
+                              labelText: "Plazo de crédito predeterminado (días)",
                               hintText: "Ej. 30",
-                              prefixIcon:
-                                  const Icon(Icons.calendar_month_rounded),
+                              prefixIcon: const Icon(Icons.calendar_month_rounded),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              helperText:
-                                  "Días de gracia asignados automáticamente a facturas de crédito",
+                              helperText: "Días de gracia asignados automáticamente a facturas de crédito",
                             ),
                           ),
                         ],
@@ -466,9 +523,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                             )
                           : const Icon(Icons.save_rounded),
                       label: Text(
-                        isSaving
-                            ? "Guardando..."
-                            : "Guardar Configuraciones",
+                        isSaving ? "Guardando..." : "Guardar Configuraciones",
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -480,7 +535,8 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                   Builder(
                     builder: (context) {
                       final authUser = getIt<AuthCubit>().user;
-                      final bool isRootOrAdmin = authUser != null &&
+                      final bool isRootOrAdmin =
+                          authUser != null &&
                           (authUser.id == 'root' ||
                               authUser.username.toLowerCase() == 'root' ||
                               authUser.role == 'Admin');
@@ -500,8 +556,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                           _buildSectionHeader(
                             icon: Icons.shield_outlined,
                             title: "Zona de Peligro (Solo Desktop / Root)",
-                            subtitle:
-                                "Acciones irreversibles que impactan el inventario y auditoría",
+                            subtitle: "Acciones irreversibles que impactan el inventario y auditoría",
                           ),
                           const SizedBox(height: 12),
                           Container(
@@ -514,8 +569,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                               ),
                             ),
                             child: ListTile(
-                              contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 8),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                               leading: Container(
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
@@ -553,19 +607,14 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 12),
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                                 ),
                                 onPressed: () async {
                                   BranchInDb? target = currentBranch;
                                   if (target == null) {
-                                    final allBranches = context
-                                        .read<BranchesRepository>()
-                                        .branches;
+                                    final allBranches = context.read<BranchesRepository>().branches;
                                     if (allBranches.isNotEmpty) {
-                                      final selected =
-                                          await showBranchSelectionDialog(
-                                              context, allBranches);
+                                      final selected = await showBranchSelectionDialog(context, allBranches);
                                       if (selected == null) return;
                                       target = selected;
                                     }
@@ -575,8 +624,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                                     if (!context.mounted) return;
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
-                                        content: Text(
-                                            "No hay sucursales disponibles."),
+                                        content: Text("No hay sucursales disponibles."),
                                         backgroundColor: Colors.redAccent,
                                       ),
                                     );
@@ -584,8 +632,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                                   }
 
                                   if (!context.mounted) return;
-                                  final result =
-                                      await showResetInventoryDangerDialog(
+                                  final result = await showResetInventoryDangerDialog(
                                     context,
                                     branch: target,
                                   );
@@ -594,8 +641,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                                       context: context,
                                       builder: (dCtx) => AlertDialog(
                                         shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(16),
+                                          borderRadius: BorderRadius.circular(16),
                                         ),
                                         icon: const Icon(
                                           Icons.check_circle_rounded,
@@ -604,43 +650,35 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                                         ),
                                         title: const Text(
                                           "Inventario Reiniciado",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold),
+                                          style: TextStyle(fontWeight: FontWeight.bold),
                                         ),
                                         content: Column(
                                           mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               result.message,
-                                              style: const TextStyle(
-                                                  fontSize: 14),
+                                              style: const TextStyle(fontSize: 14),
                                             ),
                                             const SizedBox(height: 12),
                                             if (result.docNumber.isNotEmpty)
                                               Text(
                                                 "• Comprobante: ${result.docNumber}",
-                                                style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 13),
+                                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                                               ),
                                             Text(
                                               "• Productos ajustados: ${result.adjustedProductsCount}",
-                                              style:
-                                                  const TextStyle(fontSize: 13),
+                                              style: const TextStyle(fontSize: 13),
                                             ),
                                             Text(
                                               "• Unidades descargadas: ${result.totalQuantityRemoved}",
-                                              style:
-                                                  const TextStyle(fontSize: 13),
+                                              style: const TextStyle(fontSize: 13),
                                             ),
                                           ],
                                         ),
                                         actions: [
                                           FilledButton(
-                                            onPressed: () =>
-                                                Navigator.of(dCtx).pop(),
+                                            onPressed: () => Navigator.of(dCtx).pop(),
                                             child: const Text("Entendido"),
                                           ),
                                         ],
@@ -659,7 +697,6 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                       );
                     },
                   ),
-
                 ],
               ),
             ),
@@ -679,8 +716,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color:
-                Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(

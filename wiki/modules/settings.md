@@ -75,6 +75,9 @@ lib/src/modules/settings/
   - `defaultPaymentTermDays` (int): Días de crédito predeterminados para facturación.
   - `useHoldSales` (bool): Permitir pausar carritos en terminal de venta.
   - `useQuickProductSearch` (bool): Abrir directamente el buscador rápido con botones de agregar y quitar cantidad al agregar productos en móvil (facturas, órdenes y cotizaciones; por defecto: `false`).
+  - `currency` (`AppCurrency`): Moneda global del sistema (`NIO`, `USD`, `HNL`, `GTQ`, `CRC`, `COP`, `MXN`, `EUR`; por defecto `NIO`). Solo define el símbolo visual usado por `NumberFormatter` en pantallas, tickets y reportes; no convierte montos existentes.
+    - El símbolo se resuelve mediante `NumberFormatter.configureCurrencyResolver`, registrado por `AppSettingsCubit` al construirse. Así, cualquier pantalla, PDF o ticket que use `NumberFormatter` adopta la moneda automáticamente.
+    - El contador de efectivo (`cash_counter`) mantiene sus denominaciones físicas de Córdobas y Dólares y no cambia con esta configuración.
 
 #### Uso Operativo del Margen de Ganancia Sugerido:
 1. **Editor de Precios de Producto (`ProductPriceEditorScreen`):**

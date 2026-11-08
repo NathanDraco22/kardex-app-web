@@ -24,7 +24,7 @@ Future<Uint8List> generateTicketPdfFromInvoice(
   PaperSize paperSize = PaperSize.mm80,
 }) async {
   final pdf = pw.Document();
-  final NumberFormat currencyFormat = NumberFormat.currency(symbol: 'C\$');
+  final NumberFormat currencyFormat = NumberFormatter.currencyFormat;
 
   final pageFormat = PdfPageFormat(
     TicketSettings.ticketWidth(paperSize) * PdfPageFormat.mm,
@@ -55,6 +55,7 @@ Future<Uint8List> generateTicketPdfFromInvoice(
         defaultTextStyle: pw.TextStyle(
           font: await TicketSettings.ticketFont(paperSize),
           fontBold: await TicketSettings.ticketFontBold(paperSize),
+          fontFallback: [await TicketSettings.ticketFallbackFont()],
         ),
       ),
       pageFormat: pageFormat,

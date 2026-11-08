@@ -35,7 +35,7 @@ class Custom7DaysLineChart extends StatelessWidget {
               getTooltipItems: (List<LineBarSpot> touchedSpots) {
                 return touchedSpots.map((spot) {
                   return LineTooltipItem(
-                    "C\$ ${spot.y.toStringAsFixed(2)}",
+                    "${NumberFormatter.currencySymbol} ${spot.y.toStringAsFixed(2)}",
                     const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                   );
                 }).toList();

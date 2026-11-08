@@ -602,7 +602,7 @@ class _InnerContent extends StatelessWidget {
                     Flexible(
                       child: TitleTextField(
                         key: const ValueKey("initial_cost"),
-                        title: "Costo Unitario ($defaultCoinSymbol)*",
+                        title: "Costo Unitario (${NumberFormatter.currencySymbol})*",
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
                         inputFormatters: [DecimalTextInputFormatter()],
                         controller: costController,
@@ -618,7 +618,7 @@ class _InnerContent extends StatelessWidget {
                     Flexible(
                       child: TitleTextField(
                         key: const ValueKey("initial_price"),
-                        title: "Precio Venta ($defaultCoinSymbol)*",
+                        title: "Precio Venta (${NumberFormatter.currencySymbol})*",
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
                         inputFormatters: [DecimalTextInputFormatter()],
                         controller: priceController,
@@ -663,7 +663,7 @@ class _InnerContent extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Precio Sugerido (+${profitMargin.toStringAsFixed(profitMargin.truncateToDouble() == profitMargin ? 0 : 1)}%): $defaultCoinSymbol ${suggestedPrice.toStringAsFixed(2)}",
+                                  "Precio Sugerido (+${profitMargin.toStringAsFixed(profitMargin.truncateToDouble() == profitMargin ? 0 : 1)}%): ${NumberFormatter.currencySymbol} ${suggestedPrice.toStringAsFixed(2)}",
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
@@ -671,7 +671,7 @@ class _InnerContent extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  "Calculado sobre costo ($defaultCoinSymbol ${costVal.toStringAsFixed(2)})",
+                                  "Calculado sobre costo (${NumberFormatter.currencySymbol} ${costVal.toStringAsFixed(2)})",
                                   style: TextStyle(fontSize: 11, color: Colors.blue.shade700),
                                 ),
                               ],

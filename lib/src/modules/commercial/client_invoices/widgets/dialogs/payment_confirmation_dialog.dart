@@ -149,10 +149,10 @@ class _PaymentDialogState extends State<_PaymentDialog> {
                 ),
                 inputFormatters: [DecimalTextInputFormatter()],
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: "Dinero Recibido",
-                  prefixText: "C\$",
-                  border: OutlineInputBorder(),
+                  prefixText: NumberFormatter.currencySymbol,
+                  border: const OutlineInputBorder(),
                 ),
                 onChanged: (value) {
                   setState(() {

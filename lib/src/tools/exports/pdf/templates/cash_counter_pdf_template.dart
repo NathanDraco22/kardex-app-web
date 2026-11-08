@@ -24,7 +24,7 @@ class CashCounterPdfTemplate implements PdfTemplate {
   @override
   Future<pw.Document> buildDocument() async {
     await branch.resolveLogoBytes();
-    final doc = pw.Document();
+    final doc = await PdfTheme.newDocument();
     final f = NumberFormat('#,##0.00', 'en_US');
     final rateF = NumberFormat('#,##0.##', 'en_US');
     final dateF = DateFormat('dd/MM/yyyy');
@@ -131,12 +131,20 @@ class CashCounterPdfTemplate implements PdfTemplate {
                           children: [
                             pw.Text(
                               "CÓRDOBAS (C\$)",
-                              style: const pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold, color: PdfColors.teal900),
+                              style: const pw.TextStyle(
+                                fontSize: 10,
+                                fontWeight: pw.FontWeight.bold,
+                                color: PdfColors.teal900,
+                              ),
                             ),
                             pw.Spacer(),
                             pw.Text(
                               "Subtotal: C\$ ${f.format(record.totalCordobas)}",
-                              style: const pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold, color: PdfColors.teal900),
+                              style: const pw.TextStyle(
+                                fontSize: 9,
+                                fontWeight: pw.FontWeight.bold,
+                                color: PdfColors.teal900,
+                              ),
                             ),
                           ],
                         ),
@@ -160,12 +168,20 @@ class CashCounterPdfTemplate implements PdfTemplate {
                           children: [
                             pw.Text(
                               "DÓLARES (\$)",
-                              style: const pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold, color: PdfColors.green900),
+                              style: const pw.TextStyle(
+                                fontSize: 10,
+                                fontWeight: pw.FontWeight.bold,
+                                color: PdfColors.green900,
+                              ),
                             ),
                             pw.Spacer(),
                             pw.Text(
                               "Subtotal: \$ ${f.format(record.totalDollars)}",
-                              style: const pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold, color: PdfColors.green900),
+                              style: const pw.TextStyle(
+                                fontSize: 9,
+                                fontWeight: pw.FontWeight.bold,
+                                color: PdfColors.green900,
+                              ),
                             ),
                           ],
                         ),
@@ -231,7 +247,9 @@ class CashCounterPdfTemplate implements PdfTemplate {
   pw.TableRow _buildCordobaRow(DenominationConfig den, NumberFormat f, bool isOdd) {
     final qty = record.getCordobaCount(den.value);
     final subtotal = den.value * qty;
-    final rowBg = qty > 0 ? (isOdd ? PdfColors.teal50 : PdfColors.white) : (isOdd ? PdfColors.grey100 : PdfColors.white);
+    final rowBg = qty > 0
+        ? (isOdd ? PdfColors.teal50 : PdfColors.white)
+        : (isOdd ? PdfColors.grey100 : PdfColors.white);
 
     return pw.TableRow(
       decoration: pw.BoxDecoration(color: rowBg),
@@ -279,7 +297,9 @@ class CashCounterPdfTemplate implements PdfTemplate {
   pw.TableRow _buildDollarRow(DenominationConfig den, NumberFormat f, bool isOdd) {
     final qty = record.getDollarCount(den.value);
     final subtotal = den.value * qty;
-    final rowBg = qty > 0 ? (isOdd ? PdfColors.green50 : PdfColors.white) : (isOdd ? PdfColors.grey100 : PdfColors.white);
+    final rowBg = qty > 0
+        ? (isOdd ? PdfColors.green50 : PdfColors.white)
+        : (isOdd ? PdfColors.grey100 : PdfColors.white);
 
     return pw.TableRow(
       decoration: pw.BoxDecoration(color: rowBg),
@@ -342,18 +362,33 @@ class CashCounterPdfTemplate implements PdfTemplate {
               pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: [
-                  pw.Text("Subtotal Físico Córdobas: C\$ ${f.format(record.totalCordobas)} (${record.totalCordobaPieces} piezas)", style: const pw.TextStyle(fontSize: 9)),
+                  pw.Text(
+                    "Subtotal Físico Córdobas: C\$ ${f.format(record.totalCordobas)} (${record.totalCordobaPieces} piezas)",
+                    style: const pw.TextStyle(fontSize: 9),
+                  ),
                   pw.SizedBox(height: 2),
-                  pw.Text("Subtotal Físico Dólares: \$ ${f.format(record.totalDollars)} (${record.totalDollarPieces} billetes)", style: const pw.TextStyle(fontSize: 9)),
+                  pw.Text(
+                    "Subtotal Físico Dólares: \$ ${f.format(record.totalDollars)} (${record.totalDollarPieces} billetes)",
+                    style: const pw.TextStyle(fontSize: 9),
+                  ),
                   pw.SizedBox(height: 2),
-                  pw.Text("Equivalente USD en Córdobas: C\$ ${f.format(record.totalDollarsInCordobas)}", style: const pw.TextStyle(fontSize: 9)),
+                  pw.Text(
+                    "Equivalente USD en Córdobas: C\$ ${f.format(record.totalDollarsInCordobas)}",
+                    style: const pw.TextStyle(fontSize: 9),
+                  ),
                 ],
               ),
               pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.end,
                 children: [
-                  pw.Text("GRAN TOTAL FÍSICO:", style: const pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold)),
-                  pw.Text("C\$ ${f.format(record.grandTotalCordobas)}", style: const pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColors.teal900)),
+                  pw.Text(
+                    "GRAN TOTAL FÍSICO:",
+                    style: const pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold),
+                  ),
+                  pw.Text(
+                    "C\$ ${f.format(record.grandTotalCordobas)}",
+                    style: const pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColors.teal900),
+                  ),
                 ],
               ),
             ],
@@ -363,8 +398,14 @@ class CashCounterPdfTemplate implements PdfTemplate {
             pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
               children: [
-                pw.Text("Efectivo Esperado en Sistema: C\$ ${f.format(expected)}", style: const pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold)),
-                pw.Text("Resultado: $statusText", style: pw.TextStyle(fontSize: 9.5, fontWeight: pw.FontWeight.bold, color: statusColor)),
+                pw.Text(
+                  "Efectivo Esperado en Sistema: C\$ ${f.format(expected)}",
+                  style: const pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold),
+                ),
+                pw.Text(
+                  "Resultado: $statusText",
+                  style: pw.TextStyle(fontSize: 9.5, fontWeight: pw.FontWeight.bold, color: statusColor),
+                ),
               ],
             ),
           ],

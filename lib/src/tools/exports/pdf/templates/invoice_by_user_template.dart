@@ -25,7 +25,7 @@ class InvoiceByUserTemplate implements PdfTemplate {
 
   @override
   Future<pw.Document> buildDocument() async {
-    final doc = pw.Document();
+    final doc = await PdfTheme.newDocument();
 
     doc.addPage(
       pw.MultiPage(
@@ -87,7 +87,10 @@ class InvoiceByUserTemplate implements PdfTemplate {
           pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              pw.Text("Usuario: ${userInfo?.name ?? 'Todos'}", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+              pw.Text(
+                "Usuario: ${userInfo?.name ?? 'Todos'}",
+                style: const pw.TextStyle(fontWeight: pw.FontWeight.bold),
+              ),
               pw.SizedBox(height: 4),
               pw.Text("Periodo: $dateRangeStr"),
             ],
@@ -148,7 +151,9 @@ class InvoiceByUserTemplate implements PdfTemplate {
           color: rowColor,
           cells: [
             BasicPdfTableCell(content: pw.Text(paidAtFormatted, style: const pw.TextStyle(fontSize: 10))),
-            BasicPdfTableCell(content: pw.Text("#${currentInvoice.docNumber}", style: const pw.TextStyle(fontSize: 10))),
+            BasicPdfTableCell(
+              content: pw.Text("#${currentInvoice.docNumber}", style: const pw.TextStyle(fontSize: 10)),
+            ),
             BasicPdfTableCell(content: pw.Text(clientName, style: const pw.TextStyle(fontSize: 10))),
             BasicPdfTableCell(content: pw.Text(totalPaid, style: const pw.TextStyle(fontSize: 10))),
           ],

@@ -4,6 +4,7 @@ import 'package:pdf/widgets.dart' as pw;
 class TicketSettings {
   static pw.Font? _font;
   static pw.Font? _fontBold;
+  static pw.Font? _fallbackFont;
   static double titleFontSize(PaperSize size) => size == PaperSize.mm58 ? 8.0 : 9.0;
   static double contentFontSize(PaperSize size) => size == PaperSize.mm58 ? 8.0 : 9.0;
   static double ticketWidth(PaperSize size) => size == PaperSize.mm58 ? 50.0 : 72.0;
@@ -23,6 +24,13 @@ class TicketSettings {
       return _fontBold!;
     }
     return null;
+  }
+
+  static Future<pw.Font> ticketFallbackFont() async {
+    _fallbackFont ??= pw.Font.ttf(
+      await rootBundle.load('assets/fonts/NotoSans-Regular.ttf'),
+    );
+    return _fallbackFont!;
   }
 }
 

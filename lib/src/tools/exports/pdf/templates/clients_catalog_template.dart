@@ -14,7 +14,7 @@ class ClientsCatalogTemplate implements PdfTemplate {
 
   @override
   Future<pw.Document> buildDocument() async {
-    final doc = pw.Document();
+    final doc = await PdfTheme.newDocument();
 
     doc.addPage(
       pw.MultiPage(
@@ -107,9 +107,11 @@ class ClientsCatalogTemplate implements PdfTemplate {
         ...List.generate(clients.length, (index) {
           final client = clients[index];
           final isOdd = index % 2 != 0;
-          
+
           final String phoneStr = (client.phone != null && client.phone!.trim().isNotEmpty) ? client.phone! : "--";
-          final String locationStr = (client.location != null && client.location!.trim().isNotEmpty) ? client.location! : "--";
+          final String locationStr = (client.location != null && client.location!.trim().isNotEmpty)
+              ? client.location!
+              : "--";
 
           return pw.Container(
             padding: const pw.EdgeInsets.symmetric(vertical: 4, horizontal: 2),

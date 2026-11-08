@@ -6,7 +6,8 @@ export 'client/client.dart';
 export 'client/client_model.dart';
 export 'client/initial_balance_model.dart';
 export 'client_group/client_group_model.dart';
-export 'client_transaction/client_transaction.dart' hide TransactionSubType, TransactionType;
+export 'client_transaction/client_transaction.dart'
+    hide TransactionSubType, TransactionType;
 export 'common/branches_detail.dart';
 export 'common/change_password.dart';
 export 'common/client_info.dart';
@@ -69,5 +70,6 @@ export 'api_key/api_key_model.dart';
 export 'hold_sale/hold_sale_model.dart';
 export 'imports/import_result.dart';
 export 'imports/import_type.dart';
+export 'app_setting/app_currency.dart';
 export 'app_setting/app_setting_model.dart';
 export 'unit_scale/unit_scale_model.dart';

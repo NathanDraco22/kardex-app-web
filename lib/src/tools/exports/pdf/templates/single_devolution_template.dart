@@ -16,7 +16,7 @@ class SingleDevolutionTemplate implements PdfTemplate {
   @override
   Future<pw.Document> buildDocument() async {
     await branch.resolveLogoBytes();
-    final doc = pw.Document();
+    final doc = await PdfTheme.newDocument();
 
     doc.addPage(
       pw.MultiPage(
@@ -195,7 +195,10 @@ class SingleDevolutionTemplate implements PdfTemplate {
             children: [
               pw.Expanded(
                 flex: 4,
-                child: pw.Text("Producto Devuelto", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
+                child: pw.Text(
+                  "Producto Devuelto",
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                ),
               ),
               pw.Expanded(
                 flex: 1,

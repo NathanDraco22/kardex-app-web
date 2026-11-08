@@ -5,13 +5,17 @@ import 'app_settings_state.dart';
 class AppSettingsCubit extends Cubit<AppSettingsState> {
   final AppSettingsRepository appSettingsRepository;
 
-  AppSettingsCubit(this.appSettingsRepository) : super(AppSettingsInitial());
+  AppSettingsCubit(this.appSettingsRepository) : super(AppSettingsInitial()) {
+    NumberFormatter.configureCurrencyResolver(() => currency);
+  }
 
   AppSettingModel? get currentSettings {
     if (state is AppSettingsLoaded) return (state as AppSettingsLoaded).settings;
     if (state is AppSettingsSaving) return (state as AppSettingsSaving).currentSettings;
     return appSettingsRepository.currentAppSettings;
   }
+
+  AppCurrency get currency => currentSettings?.currency ?? AppCurrency.nio;
 
   bool get useExpirationDates => currentSettings?.useExpirationDates ?? true;
   bool get useOrders => currentSettings?.useOrders ?? true;
@@ -60,5 +64,11 @@ class AppSettingsCubit extends Cubit<AppSettingsState> {
       emit(AppSettingsError(e.toString(), lastSettings: current));
       return false;
     }
+  }
+
+  @override
+  Future<void> close() async {
+    NumberFormatter.configureCurrencyResolver(null);
+    await super.close();
   }
 }

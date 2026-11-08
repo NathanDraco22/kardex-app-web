@@ -441,3 +441,11 @@ Esta estructura se ha seguido para módulos como 'Historial de Facturas', 'Histo
 - Se integró la ruta en `app_router.dart`, `route_names.dart`, `shortcut_registry.dart`, `settings_screen.dart` y el submenú de Configuraciones en `home_modules_registry.dart`.
 - Se documentó el módulo en `wiki/modules/imports.md` y se enlazó desde `modules_index.md` y `project_index.md`.
 - Verificación: `flutter analyze` sin errores en la app y en `packages/kardex_business`.
+
+## Moneda Global Configurable (Noviembre 2026)
+- Se agregó el campo `currency` a `app_settings` en frontend y backend, con valores ISO `NIO`, `USD`, `HNL`, `GTQ`, `CRC`, `COP`, `MXN` y `EUR`, y `NIO` como valor por defecto retrocompatible.
+- Se creó el enum `AppCurrency` en `packages/kardex_business`, con código ISO, nombre visible y símbolo (`C$`, `US$`, `L`, `Q`, `₡`, `COL$`, `MX$`, `€`).
+- `AppSettingsCubit` expone `currency` y registra un resolver en `NumberFormatter` al construirse; así todas las pantallas, PDFs, CSV y tickets que usan `NumberFormatter` adoptan la moneda automáticamente.
+- Se agregó la sección "Moneda del Sistema" en `AppSettingsScreen` con selector, vista previa y guardado mediante `UpdateAppSetting`.
+- Se reemplazaron los símbolos `C$` quemados en formularios de producto/precio, pagos, clientes, gráficas del panel admin y las cuatro impresoras térmicas. El contador de efectivo conserva sus denominaciones físicas NIO/USD.
+- Verificación: `flutter analyze` y `dart analyze` sin errores; el backend pasó `ruff check` y `ty check`.

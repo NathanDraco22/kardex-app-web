@@ -16,7 +16,7 @@ class SingleReceiptTemplate implements PdfTemplate {
   @override
   Future<pw.Document> buildDocument() async {
     await branch.resolveLogoBytes();
-    final doc = pw.Document();
+    final doc = await PdfTheme.newDocument();
 
     doc.addPage(
       pw.MultiPage(
@@ -207,7 +207,10 @@ class SingleReceiptTemplate implements PdfTemplate {
             children: [
               pw.Expanded(
                 flex: 3,
-                child: pw.Text("Número de Factura", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
+                child: pw.Text(
+                  "Número de Factura",
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
+                ),
               ),
               pw.Expanded(
                 flex: 2,
@@ -266,7 +269,10 @@ class SingleReceiptTemplate implements PdfTemplate {
             children: [
               pw.Expanded(
                 flex: 3,
-                child: pw.Text("Número de Devolución", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
+                child: pw.Text(
+                  "Número de Devolución",
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
+                ),
               ),
               pw.Expanded(
                 flex: 2,

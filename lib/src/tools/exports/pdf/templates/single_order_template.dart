@@ -16,7 +16,7 @@ class SingleOrderTemplate implements PdfTemplate {
   @override
   Future<pw.Document> buildDocument() async {
     await branch.resolveLogoBytes();
-    final doc = pw.Document();
+    final doc = await PdfTheme.newDocument();
 
     doc.addPage(
       pw.MultiPage(

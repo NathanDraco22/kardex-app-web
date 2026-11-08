@@ -21,7 +21,7 @@ class UserOperationsArqueoPdfTemplate implements PdfTemplate {
   @override
   Future<pw.Document> buildDocument() async {
     await branch.resolveLogoBytes();
-    final doc = pw.Document();
+    final doc = await PdfTheme.newDocument();
 
     final validInvoices = result.detailInvoices.where((e) => e.paymentType != PaymentType.credit).toList();
     final creditInvoices = result.detailInvoices.where((e) => e.paymentType == PaymentType.credit).toList();
@@ -436,7 +436,12 @@ class UserOperationsArqueoPdfTemplate implements PdfTemplate {
             BasicPdfTableCell(content: pw.Text(timeStr, style: const pw.TextStyle(fontSize: 9))),
             BasicPdfTableCell(content: pw.Text("#${inv.docNumber}", style: const pw.TextStyle(fontSize: 9))),
             BasicPdfTableCell(content: pw.Text(inv.clientInfo.name, style: const pw.TextStyle(fontSize: 9))),
-            BasicPdfTableCell(content: pw.Text(inv.paymentType.typeLabel, style: const pw.TextStyle(fontSize: 9, color: PdfColors.orange900))),
+            BasicPdfTableCell(
+              content: pw.Text(
+                inv.paymentType.typeLabel,
+                style: const pw.TextStyle(fontSize: 9, color: PdfColors.orange900),
+              ),
+            ),
             BasicPdfTableCell(
               content: pw.Text(
                 NumberFormatter.convertToMoneyLike(inv.total),

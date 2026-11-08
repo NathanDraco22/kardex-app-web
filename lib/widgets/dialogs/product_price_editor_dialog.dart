@@ -227,9 +227,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
       final extraDouble = double.tryParse(formattedValue) ?? 0.0;
       final factor = selectedExtraUnit?.conversionFactor ?? 1;
 
-      final baseCents = factor > 0
-          ? ((extraDouble * 100) / factor).round()
-          : (extraDouble * 100).round();
+      final baseCents = factor > 0 ? ((extraDouble * 100) / factor).round() : (extraDouble * 100).round();
       final baseText = _centsToText(baseCents);
 
       switch (level) {
@@ -309,7 +307,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
         Expanded(
           child: TitleTextField(
             key: Key("${keyStr}_extra"),
-            title: "Por ${extraUnit.name} (C\$ ):",
+            title: "Por ${extraUnit.name} (${NumberFormatter.currencySymbol}):",
             focusNode: extraFocusNode,
             keyboardType: TextInputType.number,
             controller: extraController,
@@ -667,7 +665,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
 
                       _buildPriceInput(
                         keyStr: "price1",
-                        title: "Precio de Venta (C\$ )",
+                        title: "Precio de Venta (${NumberFormatter.currencySymbol})",
                         baseFocusNode: priceFocus,
                         baseController: basePrice1Controller,
                         onBaseChanged: (val) => _onBasePriceChanged(1, val),
@@ -682,7 +680,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
 
                       _buildPriceInput(
                         keyStr: "price2",
-                        title: "Precio de Venta 2 (C\$ )",
+                        title: "Precio de Venta 2 (${NumberFormatter.currencySymbol})",
                         baseFocusNode: priceFocus2,
                         baseController: basePrice2Controller,
                         onBaseChanged: (val) => _onBasePriceChanged(2, val),
@@ -697,7 +695,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
 
                       _buildPriceInput(
                         keyStr: "price3",
-                        title: "Precio de Venta 3 (C\$ )",
+                        title: "Precio de Venta 3 (${NumberFormatter.currencySymbol})",
                         baseFocusNode: priceFocus3,
                         baseController: basePrice3Controller,
                         onBaseChanged: (val) => _onBasePriceChanged(3, val),
@@ -712,7 +710,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
 
                       _buildPriceInput(
                         keyStr: "price4",
-                        title: "Precio de Venta 4 (C\$ )",
+                        title: "Precio de Venta 4 (${NumberFormatter.currencySymbol})",
                         baseFocusNode: priceFocus4,
                         baseController: basePrice4Controller,
                         onBaseChanged: (val) => _onBasePriceChanged(4, val),

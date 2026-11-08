@@ -51,6 +51,7 @@ Future<Uint8List> generateTicketPdfFromReceipt(
         defaultTextStyle: pw.TextStyle(
           font: await TicketSettings.ticketFont(paperSize),
           fontBold: await TicketSettings.ticketFontBold(paperSize),
+          fontFallback: [await TicketSettings.ticketFallbackFont()],
         ),
       ),
       build: (pw.Context context) {
