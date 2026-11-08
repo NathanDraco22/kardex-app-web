@@ -361,9 +361,7 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
   void initState() {
     super.initState();
     expirationController = TextEditingController(
-      text: widget.rowModel.expirationDate != null
-          ? DateFormat('MM/yy').format(widget.rowModel.expirationDate!)
-          : '',
+      text: widget.rowModel.expirationDate != null ? DateFormat('MM/yy').format(widget.rowModel.expirationDate!) : '',
     );
     quantityController = TextEditingController(
       text: widget.rowModel.quantity > 0 ? widget.rowModel.quantity.toString() : '',
@@ -544,7 +542,7 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
                       return TextFormField(
                         initialValue: formattedCost,
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                        inputFormatters: [DecimalTextInputFormatter()],
+                        inputFormatters: [const DecimalTextInputFormatter()],
                         textAlign: TextAlign.center,
                         onEditingComplete: () => FocusScope.of(context).nextFocus(),
                         onChanged: (value) {

@@ -169,7 +169,7 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
                 controller: _amountController,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 autofocus: true,
-                inputFormatters: [DecimalTextInputFormatter()],
+                inputFormatters: [const DecimalTextInputFormatter()],
                 decoration: InputDecoration(
                   labelText: "Monto a Abonar",
                   border: const OutlineInputBorder(),

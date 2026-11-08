@@ -11,6 +11,7 @@ import 'package:kardex_app_front/src/modules/imports/tools/import_templates.dart
 import 'package:kardex_app_front/src/modules/imports/widgets/import_option_card.dart';
 import 'package:kardex_app_front/src/tools/exports/csv_export_tool.dart';
 import 'package:kardex_app_front/widgets/gates/role_permission_gate.dart';
+import 'package:kardex_app_front/widgets/gates/root_user_gate.dart';
 import 'package:kardex_app_front/widgets/menu_app_bar.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
@@ -24,21 +25,29 @@ class ImportsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RolePermissionGate(
-      permissions: const [Modules.settings],
+    return RootUserGate(
       fallback: Scaffold(
         appBar: AppBar(title: const Text("Importaciones CSV")),
         body: const Center(
-          child: Text("No tienes permisos para acceder a las importaciones."),
+          child: Text("Solo el usuario root puede acceder a las importaciones."),
         ),
       ),
-      child: BlocProvider(
-        create: (context) => ImportsCubit(
-          importsRepository: context.read<ImportsRepository>(),
-          clientsRepository: context.read<ClientsRepository>(),
-          suppliersRepository: context.read<SuppliersRepository>(),
+      child: RolePermissionGate(
+        permissions: const [Modules.settings],
+        fallback: Scaffold(
+          appBar: AppBar(title: const Text("Importaciones CSV")),
+          body: const Center(
+            child: Text("No tienes permisos para acceder a las importaciones."),
+          ),
         ),
-        child: const _ImportsView(),
+        child: BlocProvider(
+          create: (context) => ImportsCubit(
+            importsRepository: context.read<ImportsRepository>(),
+            clientsRepository: context.read<ClientsRepository>(),
+            suppliersRepository: context.read<SuppliersRepository>(),
+          ),
+          child: const _ImportsView(),
+        ),
       ),
     );
   }

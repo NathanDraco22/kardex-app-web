@@ -5,6 +5,7 @@ import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
 import 'package:kardex_app_front/widgets/gates/orders_gate.dart';
 import 'package:kardex_app_front/widgets/gates/quotations_gate.dart';
 import 'package:kardex_app_front/widgets/gates/role_permission_gate.dart';
+import 'package:kardex_app_front/widgets/gates/root_user_gate.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 import 'package:kardex_app_front/widgets/dividers/menu_section_divider.dart';
 import 'desktop_submenu_card.dart';
@@ -190,6 +191,10 @@ class _DesktopSubmenuPanelState extends State<DesktopSubmenuPanel> {
 
     if (item.isQuotationsOrOrdersGate) {
       card = QuotationsOrOrdersGate(child: card);
+    }
+
+    if (item.isRootGate) {
+      card = RootUserGate(child: card);
     }
 
     if (item.permissions.isNotEmpty) {

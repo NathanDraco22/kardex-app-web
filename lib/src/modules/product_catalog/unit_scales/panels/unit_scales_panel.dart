@@ -46,21 +46,6 @@ class _UnitScalesPanelState extends State<UnitScalesPanel> with AutomaticKeepAli
     }
   }
 
-  void _confirmDelete(UnitScaleInDb scale) async {
-    final confirmed = await DialogManager.slideToConfirmActionDialog(
-      context,
-      "¿Desea eliminar la escala \"${scale.name}\"?",
-    );
-    if (!confirmed) return;
-    if (!mounted) return;
-
-    final cubit = context.read<WriteUnitScaleCubit>();
-    await cubit.deleteUnitScale(scale.id);
-    if (mounted) {
-      context.read<ReadUnitScalesCubit>().refreshUnitScales();
-    }
-  }
-
   IconData _getScaleIcon(String name) {
     final lower = name.toLowerCase();
     if (lower.contains('peso') || lower.contains('masa') || lower.contains('kilo') || lower.contains('gramo')) {
@@ -99,14 +84,6 @@ class _UnitScalesPanelState extends State<UnitScalesPanel> with AutomaticKeepAli
           LoadingDialogManager.showLoadingDialog(context);
         } else {
           LoadingDialogManager.closeLoadingDialog(context);
-        }
-
-        if (state is DeleteUnitScaleSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Escala \"${state.scale.name}\" eliminada correctamente"),
-            ),
-          );
         }
 
         if (state is WriteUnitScaleError) {
@@ -264,7 +241,6 @@ class _UnitScalesPanelState extends State<UnitScalesPanel> with AutomaticKeepAli
                             icon: icon,
                             color: color,
                             onEdit: () => _openEditDialog(scale),
-                            onDelete: () => _confirmDelete(scale),
                           );
                         },
                       );
@@ -343,14 +319,12 @@ class _UnitScaleCard extends StatefulWidget {
   final IconData icon;
   final Color color;
   final VoidCallback onEdit;
-  final VoidCallback onDelete;
 
   const _UnitScaleCard({
     required this.scale,
     required this.icon,
     required this.color,
     required this.onEdit,
-    required this.onDelete,
   });
 
   @override
@@ -420,12 +394,6 @@ class _UnitScaleCardState extends State<_UnitScaleCard> {
                       tooltip: "Editar escala",
                       color: const Color(0xFF64748B),
                       onPressed: widget.onEdit,
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete_outline_rounded, size: 20),
-                      tooltip: "Eliminar escala",
-                      color: AppThemeTokens.danger,
-                      onPressed: widget.onDelete,
                     ),
                   ],
                 ),

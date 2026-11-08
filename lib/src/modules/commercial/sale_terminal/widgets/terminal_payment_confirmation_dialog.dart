@@ -165,7 +165,7 @@ class _TerminalPaymentDialogState extends State<_TerminalPaymentDialog> {
                   fontSize: 18,
                   fontWeight: FontWeight.w500,
                 ),
-                inputFormatters: [DecimalTextInputFormatter()],
+                inputFormatters: [const DecimalTextInputFormatter()],
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   labelText: "Dinero Recibido",

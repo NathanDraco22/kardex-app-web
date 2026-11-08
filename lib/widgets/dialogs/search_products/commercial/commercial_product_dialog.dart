@@ -413,7 +413,8 @@ class _FormContentState extends State<_FormContent> {
                                       return "Cantidad invalida";
                                     }
 
-                                    final requestedUnits = (numberValue * commercialProductResult.conversionFactor).round();
+                                    final requestedUnits = (numberValue * commercialProductResult.conversionFactor)
+                                        .round();
                                     if (widget.restrictStock && requestedUnits > availableStock) {
                                       return "Supera la existencia ($availableStock $baseUnitName)";
                                     }
@@ -440,7 +441,7 @@ class _FormContentState extends State<_FormContent> {
                                     readOnly: commercialProductResult.selectedPriceLevel != 0,
                                     titleTextAlign: TextAlign.center,
                                     initialValue: price.toString(),
-                                    inputFormatters: [DecimalTextInputFormatter()],
+                                    inputFormatters: [const DecimalTextInputFormatter()],
                                     keyboardType: TextInputType.number,
                                     onChanged: (value) {
                                       final rowDecimal = double.tryParse(value) ?? 0.0;

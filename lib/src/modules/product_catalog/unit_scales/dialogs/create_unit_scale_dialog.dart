@@ -403,72 +403,104 @@ class _CreateUnitScaleDialogState extends State<CreateUnitScaleDialog> {
                         ),
                         const SizedBox(height: 8),
 
-                        Row(
-                          children: [
-                            Expanded(
-                              child: DropdownButtonFormField<int>(
-                                decoration: InputDecoration(
-                                  labelText: "Unidad por Defecto (Detalle)",
-                                  filled: true,
-                                  fillColor: const Color(0xFFF8FAFC),
-                                  border: OutlineInputBorder(
-                                    borderRadius: AppThemeTokens.borderRadiusMd,
-                                    borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
-                                  ),
-                                  isDense: true,
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            final defaultDropdown = DropdownButtonFormField<int>(
+                              isExpanded: true,
+                              decoration: InputDecoration(
+                                labelText: "Unidad por Defecto (Detalle)",
+                                filled: true,
+                                fillColor: const Color(0xFFF8FAFC),
+                                border: OutlineInputBorder(
+                                  borderRadius: AppThemeTokens.borderRadiusMd,
+                                  borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
                                 ),
-                                initialValue: _defaultUnitIndex <= _units.length ? _defaultUnitIndex : 0,
-                                items: [
-                                  DropdownMenuItem<int>(
-                                    value: 0,
-                                    child: Text("$baseUnitLabel (Base)"),
+                                isDense: true,
+                              ),
+                              initialValue: _defaultUnitIndex <= _units.length ? _defaultUnitIndex : 0,
+                              items: [
+                                DropdownMenuItem<int>(
+                                  value: 0,
+                                  child: Text(
+                                    "$baseUnitLabel (Base)",
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                  ...List.generate(
-                                    _units.length,
-                                    (i) => DropdownMenuItem<int>(
-                                      value: i + 1,
-                                      child: Text(_units[i].name),
+                                ),
+                                ...List.generate(
+                                  _units.length,
+                                  (i) => DropdownMenuItem<int>(
+                                    value: i + 1,
+                                    child: Text(
+                                      _units[i].name,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
-                                ],
-                                onChanged: (val) {
-                                  if (val != null) setState(() => _defaultUnitIndex = val);
-                                },
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: DropdownButtonFormField<int>(
-                                decoration: InputDecoration(
-                                  labelText: "Unidad Mayorista Sugerida",
-                                  filled: true,
-                                  fillColor: const Color(0xFFF8FAFC),
-                                  border: OutlineInputBorder(
-                                    borderRadius: AppThemeTokens.borderRadiusMd,
-                                    borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
-                                  ),
-                                  isDense: true,
                                 ),
-                                initialValue: _wholesaleUnitIndex <= _units.length ? _wholesaleUnitIndex : 0,
-                                items: [
-                                  DropdownMenuItem<int>(
-                                    value: 0,
-                                    child: Text("Misma que detalle / $baseUnitLabel"),
+                              ],
+                              onChanged: (val) {
+                                if (val != null) setState(() => _defaultUnitIndex = val);
+                              },
+                            );
+
+                            final wholesaleDropdown = DropdownButtonFormField<int>(
+                              isExpanded: true,
+                              decoration: InputDecoration(
+                                labelText: "Unidad Mayorista Sugerida",
+                                filled: true,
+                                fillColor: const Color(0xFFF8FAFC),
+                                border: OutlineInputBorder(
+                                  borderRadius: AppThemeTokens.borderRadiusMd,
+                                  borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                                ),
+                                isDense: true,
+                              ),
+                              initialValue: _wholesaleUnitIndex <= _units.length ? _wholesaleUnitIndex : 0,
+                              items: [
+                                DropdownMenuItem<int>(
+                                  value: 0,
+                                  child: Text(
+                                    "Misma que detalle / $baseUnitLabel",
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                  ...List.generate(
-                                    _units.length,
-                                    (i) => DropdownMenuItem<int>(
-                                      value: i + 1,
-                                      child: Text(_units[i].name),
+                                ),
+                                ...List.generate(
+                                  _units.length,
+                                  (i) => DropdownMenuItem<int>(
+                                    value: i + 1,
+                                    child: Text(
+                                      _units[i].name,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
+                                ),
+                              ],
+                              onChanged: (val) {
+                                if (val != null) setState(() => _wholesaleUnitIndex = val);
+                              },
+                            );
+
+                            if (constraints.maxWidth < 520) {
+                              return Column(
+                                children: [
+                                  defaultDropdown,
+                                  const SizedBox(height: 12),
+                                  wholesaleDropdown,
                                 ],
-                                onChanged: (val) {
-                                  if (val != null) setState(() => _wholesaleUnitIndex = val);
-                                },
-                              ),
-                            ),
-                          ],
+                              );
+                            }
+
+                            return Row(
+                              children: [
+                                Expanded(child: defaultDropdown),
+                                const SizedBox(width: 12),
+                                Expanded(child: wholesaleDropdown),
+                              ],
+                            );
+                          },
                         ),
                       ],
                     ),

@@ -604,7 +604,7 @@ class _InnerContent extends StatelessWidget {
                         key: const ValueKey("initial_cost"),
                         title: "Costo Unitario (${NumberFormatter.currencySymbol})*",
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                        inputFormatters: [DecimalTextInputFormatter()],
+                        inputFormatters: [const DecimalTextInputFormatter()],
                         controller: costController,
                         validator: (val) {
                           if (val == null || val.trim().isEmpty) return "Requerido";
@@ -620,7 +620,7 @@ class _InnerContent extends StatelessWidget {
                         key: const ValueKey("initial_price"),
                         title: "Precio Venta (${NumberFormatter.currencySymbol})*",
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                        inputFormatters: [DecimalTextInputFormatter()],
+                        inputFormatters: [const DecimalTextInputFormatter()],
                         controller: priceController,
                         validator: (val) {
                           if (val == null || val.trim().isEmpty) return "Requerido";

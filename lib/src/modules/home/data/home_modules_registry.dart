@@ -13,7 +13,6 @@ import 'package:kardex_app_front/src/tools/loading_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/client_full_details_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/simple_search_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/search_product_commercial_delegate.dart';
-import 'package:kardex_app_front/widgets/dialogs/selectors/branch_selection_dialog.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
 
@@ -42,6 +41,7 @@ class HomeSubmoduleItem {
   final bool isOrdersGate;
   final bool isQuotationsGate;
   final bool isQuotationsOrOrdersGate;
+  final bool isRootGate;
   final String? section;
 
   const HomeSubmoduleItem({
@@ -56,6 +56,7 @@ class HomeSubmoduleItem {
     this.isOrdersGate = false,
     this.isQuotationsGate = false,
     this.isQuotationsOrOrdersGate = false,
+    this.isRootGate = false,
     this.section,
   });
 }
@@ -898,6 +899,7 @@ List<HomeModuleCategory> getHomeModuleCategories(
           icon: Icons.upload_file_rounded,
           accentColor: Color(0xFFEA580C),
           routeName: RouteNames.imports,
+          isRootGate: true,
         ),
         const HomeSubmoduleItem(
           title: "Llaves de API (Neptuno)",

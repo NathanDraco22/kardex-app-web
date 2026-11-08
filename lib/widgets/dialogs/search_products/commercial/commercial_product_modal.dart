@@ -309,7 +309,8 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                                       return "Cantidad invalida";
                                     }
 
-                                    final requestedUnits = (numberValue * commercialProductResult.conversionFactor).round();
+                                    final requestedUnits = (numberValue * commercialProductResult.conversionFactor)
+                                        .round();
                                     if (widget.restrictStock && requestedUnits > availableStock) {
                                       return "Supera la existencia ($availableStock $baseUnitName)";
                                     }
@@ -339,7 +340,7 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                                     initialValue: price.toString(),
                                     style: const TextStyle(fontWeight: FontWeight.w600),
 
-                                    inputFormatters: [DecimalTextInputFormatter()],
+                                    inputFormatters: [const DecimalTextInputFormatter()],
                                     keyboardType: TextInputType.number,
                                     onChanged: (value) {
                                       final rowDecimal = double.tryParse(value) ?? 0.0;
