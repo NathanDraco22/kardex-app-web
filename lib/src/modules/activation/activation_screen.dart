@@ -6,6 +6,7 @@ import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/activation/cubit/activation_cubit.dart';
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/password_title_textfield.dart';
 import 'package:kardex_app_front/widgets/planet_orbit_logo.dart';
@@ -134,7 +135,7 @@ class _BodyState extends State<_Body> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          ElevatedButton.icon(
+                          PrimaryMenuButton(
                             onPressed: () {
                               context.read<ActivationCubit>().activate(apiKey, buisnessNickname);
                             },

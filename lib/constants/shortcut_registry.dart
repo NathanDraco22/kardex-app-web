@@ -1,5 +1,6 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:kardex_app_front/constants/feature_flags.dart';
 import 'package:kardex_app_front/constants/route_names.dart';
 
 class ShortcutInfo {
@@ -246,15 +247,15 @@ class ShortcutRouteRegistry {
       icon: FluentIcons.cube_12_filled,
     ),
     RouteNames.unitsAndScales: const ShortcutInfo(
-      title: "Unidades y Escalas de Medida",
+      title: FeatureFlags.showUnitScales ? "Unidades y Escalas de Medida" : "Unidades de Medida",
       icon: Icons.straighten_rounded,
     ),
     RouteNames.units: const ShortcutInfo(
-      title: "Unidades y Escalas de Medida",
+      title: FeatureFlags.showUnitScales ? "Unidades y Escalas de Medida" : "Unidades de Medida",
       icon: Icons.tag,
     ),
     RouteNames.unitScales: const ShortcutInfo(
-      title: "Unidades y Escalas de Medida",
+      title: FeatureFlags.showUnitScales ? "Unidades y Escalas de Medida" : "Unidades de Medida",
       icon: Icons.linear_scale_rounded,
     ),
     RouteNames.productCategory: const ShortcutInfo(

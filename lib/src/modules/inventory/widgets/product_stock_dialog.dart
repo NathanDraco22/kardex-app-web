@@ -112,12 +112,24 @@ class _StockList extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      "Stock: ${NumberFormatter.formatDisplayStock(account.currentStock, product.defaultUnitFactor)}",
+                      "Stock: ${NumberFormatter.formatDisplayStock(
+                        account.currentStock,
+                        product.defaultUnitFactor,
+                        selectedUnitName: product.defaultUnitName,
+                        standardUnitName: product.defaultUnitName,
+                        standardUnitFactor: product.defaultUnitFactor,
+                      )}",
                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     if (account.promiseStock > 0)
                       Text(
-                        "Comprometido: ${NumberFormatter.formatDisplayStock(account.promiseStock, product.defaultUnitFactor)}",
+                        "Comprometido: ${NumberFormatter.formatDisplayStock(
+                          account.promiseStock,
+                          product.defaultUnitFactor,
+                          selectedUnitName: product.defaultUnitName,
+                          standardUnitName: product.defaultUnitName,
+                          standardUnitFactor: product.defaultUnitFactor,
+                        )}",
                         style: const TextStyle(fontSize: 12, color: Colors.red),
                       ),
                   ],

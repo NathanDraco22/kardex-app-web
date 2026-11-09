@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_app_front/widgets/custom_slider.dart';
 
 class DialogManager {
@@ -169,9 +170,9 @@ class DialogManager {
                    Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      ElevatedButton(
+                      PrimaryMenuButton(
                         onPressed: () => context.pop(1),
-                        child: Text(saveButtonText),
+                        label: Text(saveButtonText),
                       ),
                       const SizedBox(height: 12),
                       TextButton(
@@ -247,9 +248,9 @@ class DialogManager {
                         child: Text(discardButtonText),
                       ),
                       const SizedBox(width: 8),
-                      ElevatedButton(
+                      PrimaryMenuButton(
                         onPressed: () => context.pop(true),
-                        child: Text(restoreButtonText),
+                        label: Text(restoreButtonText),
                       ),
                     ],
                   ),

@@ -313,8 +313,8 @@ class _CreateProductPriceDialogState extends State<CreateProductPriceDialog> {
                         onPressed: () => context.pop(),
                       ),
 
-                      ElevatedButton(
-                        child: const Text("Guardar"),
+                      PrimaryMenuButton(
+                        label: const Text("Guardar"),
                         onPressed: () async {
                           if (!formKey.currentState!.validate()) return;
 

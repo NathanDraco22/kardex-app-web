@@ -61,7 +61,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                   ),
                 ),
                 const Spacer(),
-                ElevatedButton.icon(
+                PrimaryMenuButton(
                   onPressed: () async {
                     final cubit = context.read<ReadSaleProjectionCubit>();
                     final state = cubit.state;

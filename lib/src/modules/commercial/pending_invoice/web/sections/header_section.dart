@@ -141,7 +141,7 @@ class _HeaderSection extends StatelessWidget {
                     final isCreditNotesExceeding = totalCreditNotes > 0 &&
                         totalCreditNotes > (total - totalDevolutions);
 
-                    return ElevatedButton.icon(
+                    return PrimaryMenuButton(
                       icon: const Icon(Icons.flash_on),
                       onPressed: () async {
                         if (state is! ReadInvoiceSuccess || state.invoices.isEmpty) return;
@@ -205,12 +205,10 @@ class _HeaderSection extends StatelessWidget {
                         if (!context.mounted) return;
                         context.read<WriteReceiptCubit>().createNewReceipt(createReceiptPayload);
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: isCreditNotesExceeding
-                            ? Colors.grey.shade400
-                            : Colors.amber.shade700,
-                        foregroundColor: Colors.white,
-                      ),
+                      backgroundColor: isCreditNotesExceeding
+                          ? Colors.grey.shade400
+                          : Colors.amber.shade700,
+                      foregroundColor: Colors.white,
                       label: const Text("Abono"),
                     );
                   },

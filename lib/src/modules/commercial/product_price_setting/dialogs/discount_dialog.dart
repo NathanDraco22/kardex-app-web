@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/tools/input_formatters.dart';
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
 
 Future<Discount?> showDiscountDialog(BuildContext context, {Discount? discount}) async {
@@ -43,11 +44,11 @@ class _DiscountDialogState extends State<DiscountDialog> {
           child: const Text("Cerrar"),
         ),
         const SizedBox(width: 4),
-        ElevatedButton(
+        PrimaryMenuButton(
           onPressed: () {
             Navigator.pop(context, currentDiscount);
           },
-          child: Builder(
+          label: Builder(
             builder: (context) {
               String title = "Agregar";
 

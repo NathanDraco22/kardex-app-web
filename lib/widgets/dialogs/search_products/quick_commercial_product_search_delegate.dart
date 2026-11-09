@@ -9,6 +9,35 @@ import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_resul
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 
+/// Calcula la cantidad que debe guardarse en el carrito de la búsqueda rápida.
+///
+/// Devuelve `null` cuando el ítem no debe insertarse porque representaría una
+/// cantidad base de cero (por ejemplo, `0.1` con factor 4) o porque no hay
+/// stock disponible y `restrictStock` está activo.
+double? resolveQuickItemQuantity({
+  required double displayQuantity,
+  required int conversionFactor,
+  required bool restrictStock,
+  required int availableStock,
+}) {
+  if (displayQuantity <= 0) return null;
+
+  final factor = conversionFactor > 0 ? conversionFactor : 1;
+  var finalQuantity = displayQuantity;
+
+  if (restrictStock) {
+    if (availableStock <= 0) return null;
+    if ((displayQuantity * factor).round() > availableStock) {
+      finalQuantity = availableStock / factor;
+    }
+  }
+
+  if (finalQuantity <= 0) return null;
+  if ((finalQuantity * factor).round() <= 0) return null;
+
+  return finalQuantity;
+}
+
 Future<List<CommercialProductResult>?> showQuickCommercialProductSearchDelegate(
   BuildContext context, {
   bool restrictStock = true,
@@ -33,11 +62,13 @@ class QuickProductSearchDelegate extends StatefulWidget {
     this.restrictStock = true,
     this.defaultPriceLevel = 1,
     this.preferredUnitType = 'min',
+    this.initialProducts = const [],
   });
 
   final bool restrictStock;
   final int defaultPriceLevel;
   final String preferredUnitType;
+  final List<ProductInDbInBranch> initialProducts;
 
   @override
   State<QuickProductSearchDelegate> createState() => _QuickProductSearchDelegateState();
@@ -46,9 +77,15 @@ class QuickProductSearchDelegate extends StatefulWidget {
 class _QuickProductSearchDelegateState extends State<QuickProductSearchDelegate> {
   bool isSearching = false;
 
-  List<ProductInDbInBranch> products = [];
+  late List<ProductInDbInBranch> products;
 
   final Map<String, CommercialProductResult> _cart = {};
+
+  @override
+  void initState() {
+    super.initState();
+    products = List.of(widget.initialProducts);
+  }
 
   void _incrementProduct(ProductInDbInBranch product) {
     setState(() {
@@ -82,17 +119,19 @@ class _QuickProductSearchDelegateState extends State<QuickProductSearchDelegate>
     return _cart[product.id]?.quantity ?? 0.0;
   }
 
-  void _setProductQuantity(ProductInDbInBranch product, double newQuantity) {
+  double _setProductQuantity(ProductInDbInBranch product, double newQuantity) {
+    final factor = _resolveDisplayFactor(product);
+    final finalQuantity = resolveQuickItemQuantity(
+      displayQuantity: newQuantity,
+      conversionFactor: factor,
+      restrictStock: widget.restrictStock,
+      availableStock: product.account.availableStock,
+    );
+
     setState(() {
-      if (newQuantity <= 0) {
+      if (finalQuantity == null) {
         _cart.remove(product.id);
         return;
-      }
-
-      double finalQuantity = newQuantity;
-      final factor = _resolveDisplayFactor(product);
-      if (widget.restrictStock && (newQuantity * factor).round() > product.account.availableStock) {
-        finalQuantity = (product.account.availableStock / factor);
       }
 
       if (!_cart.containsKey(product.id)) {
@@ -104,6 +143,8 @@ class _QuickProductSearchDelegateState extends State<QuickProductSearchDelegate>
       }
       _cart[product.id]!.quantity = finalQuantity;
     });
+
+    return finalQuantity ?? 0.0;
   }
 
   int _resolveDisplayFactor(ProductInDbInBranch product) {
@@ -191,7 +232,8 @@ class _QuickProductSearchDelegateState extends State<QuickProductSearchDelegate>
           final quantity = _getQuantity(product);
 
           bool canIncrement = true;
-          if (widget.restrictStock && (quantity * _resolveDisplayFactor(product)) >= product.account.availableStock) {
+          if (widget.restrictStock &&
+              ((quantity + 1) * _resolveDisplayFactor(product)) > product.account.availableStock) {
             canIncrement = false;
           }
 
@@ -203,9 +245,7 @@ class _QuickProductSearchDelegateState extends State<QuickProductSearchDelegate>
             color: quantity > 0 ? Colors.amber.shade50 : Colors.white,
             onIncrement: canIncrement ? () => _incrementProduct(product) : null,
             onDecrement: quantity > 0 ? () => _decrementProduct(product) : null,
-            onQuantityChanged: (newQuantity) {
-              _setProductQuantity(product, newQuantity);
-            },
+            onQuantityChanged: (newQuantity) => _setProductQuantity(product, newQuantity),
           );
         },
       ),
@@ -229,7 +269,7 @@ class _ProductInBranchQuickResultRow extends StatefulWidget {
   final double quantity;
   final VoidCallback? onIncrement;
   final VoidCallback? onDecrement;
-  final ValueChanged<double>? onQuantityChanged;
+  final double Function(double)? onQuantityChanged;
   final String preferredUnitType;
   final int defaultPriceLevel;
   final Color? color;
@@ -276,9 +316,17 @@ class _ProductInBranchQuickResultRowState extends State<_ProductInBranchQuickRes
     if (oldWidget.quantity != widget.quantity) {
       final currentParsed = double.tryParse(_controller.text.replaceAll(',', '.')) ?? 0.0;
       if (currentParsed != widget.quantity) {
-        _controller.text = widget.quantity == 0 ? "" : UnitConversionTool.formatQuantity(widget.quantity);
+        _setControllerQuantity(widget.quantity);
       }
     }
+  }
+
+  void _setControllerQuantity(double quantity) {
+    final text = quantity == 0 ? "" : UnitConversionTool.formatQuantity(quantity);
+    _controller.value = TextEditingValue(
+      text: text,
+      selection: TextSelection.collapsed(offset: text.length),
+    );
   }
 
   @override
@@ -305,6 +353,13 @@ class _ProductInBranchQuickResultRowState extends State<_ProductInBranchQuickRes
     int value = _displayPrice * _displayConversionFactor;
     String valueToDisplay = NumberFormatter.convertToMoneyLike(value);
     final canUseDecimals = _displayConversionFactor > 1;
+    final stockDisplay = UnitDisplayFormatter.formatUnitQuantity(
+      baseQuantity: widget.product.account.availableStock,
+      conversionFactor: _displayConversionFactor,
+      selectedUnitName: _displayUnitName,
+      standardUnitName: widget.product.defaultUnitName,
+      standardUnitFactor: widget.product.defaultUnitFactor,
+    );
 
     return DecoratedBox(
       decoration: BoxDecoration(color: widget.color),
@@ -324,34 +379,34 @@ class _ProductInBranchQuickResultRowState extends State<_ProductInBranchQuickRes
                 const SizedBox(width: 8),
                 Expanded(
                   flex: 3,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        DisplayProductCode(product: widget.product),
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Flexible(
-                              child: Text(
-                                widget.product.brandName,
-                                style: const TextStyle(fontSize: 14, color: Colors.grey),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            const Text(
-                              " - ",
-                              style: TextStyle(fontSize: 14, color: Colors.grey),
-                            ),
-                            UnitDisplayer(
-                              unitName: _displayUnitName,
-                              conversionFactor: _displayConversionFactor,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      DisplayProductCode(product: widget.product),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              widget.product.brandName,
                               style: const TextStyle(fontSize: 14, color: Colors.grey),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
+                          ),
+                          const Text(
+                            " - ",
+                            style: TextStyle(fontSize: 14, color: Colors.grey),
+                          ),
+                          UnitDisplayer(
+                            unitName: _displayUnitName,
+                            conversionFactor: _displayConversionFactor,
+                            style: const TextStyle(fontSize: 14, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -368,7 +423,7 @@ class _ProductInBranchQuickResultRowState extends State<_ProductInBranchQuickRes
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        "Stock: ${NumberFormatter.formatDisplayStock(widget.product.account.availableStock, _displayConversionFactor)}",
+                        "Stock: ${stockDisplay.quantityText} ${stockDisplay.unitName}",
                         style: TextStyle(
                           fontSize: 13,
                           color: widget.product.account.availableStock > 0 ? Colors.green.shade700 : Colors.red,
@@ -425,7 +480,10 @@ class _ProductInBranchQuickResultRowState extends State<_ProductInBranchQuickRes
                           : TextInputType.number,
                       onChanged: (val) {
                         final parsed = double.tryParse(val.replaceAll(',', '.')) ?? 0.0;
-                        widget.onQuantityChanged?.call(parsed);
+                        final effectiveQuantity = widget.onQuantityChanged?.call(parsed);
+                        if (effectiveQuantity != null && effectiveQuantity != parsed) {
+                          _setControllerQuantity(effectiveQuantity);
+                        }
                       },
                     ),
                   ),

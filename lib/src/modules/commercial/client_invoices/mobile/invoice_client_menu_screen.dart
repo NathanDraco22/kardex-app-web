@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/view_controller.dart';
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_app_front/widgets/client_selector_card.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
@@ -248,10 +249,17 @@ class _SendButton extends StatelessWidget {
           dialogSubtitle = "¿Desea guardar la cotización?";
         }
 
-        return ElevatedButton.icon(
+        return PrimaryMenuButton(
           onPressed: viewController.selectedClient == null
               ? null
               : () async {
+                  if (viewController.hasItemsWithZeroBaseQuantity) {
+                    DialogManager.showErrorDialog(
+                      context,
+                      "No se puede facturar porque hay productos sin cantidad. Por favor, edita o elimina estos productos.",
+                    );
+                    return;
+                  }
                   if (viewController.hasZeroPriceItems) {
                     DialogManager.showErrorDialog(
                       context,
@@ -306,9 +314,13 @@ class _SendButton extends StatelessWidget {
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          item.quantity.toString(),
+                                          item.formattedDisplayQuantity,
                                         ),
-                                        Text(NumberFormatter.convertFromCentsToUnitsCurrency(item.price).toString()),
+                                        Text(
+                                          NumberFormatter.convertFromCentsToUnitsCurrency(
+                                            item.price * item.conversionFactor,
+                                          ).toString(),
+                                        ),
                                         Text(
                                           NumberFormatter.convertToMoneyLike(
                                             item.totalDiscount,

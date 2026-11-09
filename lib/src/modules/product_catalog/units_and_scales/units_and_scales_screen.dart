@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/constants/feature_flags.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/unit_scales/cubit/read_unit_scales_cubit.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/unit_scales/cubit/write_unit_scale_cubit.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/unit_scales/panels/unit_scales_panel.dart';
@@ -23,8 +24,10 @@ class UnitsAndScalesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const showUnitScales = FeatureFlags.showUnitScales;
+    final resolvedInitialTab = showUnitScales && initialTab == 1 ? 1 : 0;
     final unitsRepository = context.read<UnitsRepository>();
-    final unitScalesRepository = context.read<UnitScalesRepository>();
+    final UnitScalesRepository? unitScalesRepository = showUnitScales ? context.read<UnitScalesRepository>() : null;
 
     return MultiBlocProvider(
       providers: [
@@ -34,49 +37,53 @@ class UnitsAndScalesScreen extends StatelessWidget {
         BlocProvider(
           create: (context) => WriteUnitCubit(unitsRepository),
         ),
-        BlocProvider(
-          create: (context) => ReadUnitScalesCubit(unitScalesRepository)..loadAllUnitScales(),
-        ),
-        BlocProvider(
-          create: (context) => WriteUnitScaleCubit(unitScalesRepository),
-        ),
+        if (showUnitScales) ...[
+          BlocProvider(
+            create: (context) => ReadUnitScalesCubit(unitScalesRepository!)..loadAllUnitScales(),
+          ),
+          BlocProvider(
+            create: (context) => WriteUnitScaleCubit(unitScalesRepository!),
+          ),
+        ],
       ],
       child: DefaultTabController(
-        key: ValueKey(initialTab),
-        length: 2,
-        initialIndex: initialTab == 1 ? 1 : 0,
+        key: ValueKey(resolvedInitialTab),
+        length: showUnitScales ? 2 : 1,
+        initialIndex: resolvedInitialTab,
         child: Scaffold(
           backgroundColor: AppThemeTokens.surfaceLight,
           appBar: AppBar(
             title: const Text(
-              "Unidades y Escalas de Medida",
+              showUnitScales ? "Unidades y Escalas de Medida" : "Unidades de Medida",
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, letterSpacing: -0.2),
             ),
-            bottom: const TabBar(
-              labelColor: Colors.white,
-              unselectedLabelColor: Colors.white70,
-              indicatorColor: Colors.amber,
-              indicatorWeight: 3,
-              tabs: [
-                Tab(
-                  icon: Icon(Icons.tag_rounded),
-                  text: "Unidades",
-                ),
-                Tab(
-                  icon: Icon(Icons.straighten_rounded),
-                  text: "Escalas",
-                ),
-              ],
-            ),
+            bottom: showUnitScales
+                ? const TabBar(
+                    labelColor: Colors.white,
+                    unselectedLabelColor: Colors.white70,
+                    indicatorColor: Colors.amber,
+                    indicatorWeight: 3,
+                    tabs: [
+                      Tab(
+                        icon: Icon(Icons.tag_rounded),
+                        text: "Unidades",
+                      ),
+                      Tab(
+                        icon: Icon(Icons.straighten_rounded),
+                        text: "Escalas",
+                      ),
+                    ],
+                  )
+                : null,
           ),
           body: const SafeArea(
             top: false,
             child: TabBarView(
               children: [
                 UnitsPanel(),
-                UnitScalesPanel(),
+                if (showUnitScales) UnitScalesPanel(),
               ],
             ),
           ),

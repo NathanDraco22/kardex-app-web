@@ -139,9 +139,9 @@ class _RootScaffoldState extends State<_RootScaffold> {
                       child: Center(
                         child: SizedBox(
                           width: 150,
-                          child: ElevatedButton(
+                          child: PrimaryMenuButton(
                             onPressed: _saveProduct,
-                            child: const Text(
+                            label: const Text(
                               "Guardar",
                               style: TextStyle(color: Colors.white),
                             ),

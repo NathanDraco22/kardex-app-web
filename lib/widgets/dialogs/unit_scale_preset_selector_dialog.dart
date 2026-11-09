@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/constants/feature_flags.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 Future<BaseUnitScale?> showUnitScalePresetSelectorDialog(BuildContext context) async {
+  if (!FeatureFlags.showUnitScales) return null;
+
   return await showDialog<BaseUnitScale?>(
     context: context,
     builder: (context) => const UnitScalePresetSelectorDialog(),
@@ -13,12 +16,10 @@ class UnitScalePresetSelectorDialog extends StatefulWidget {
   const UnitScalePresetSelectorDialog({super.key});
 
   @override
-  State<UnitScalePresetSelectorDialog> createState() =>
-      _UnitScalePresetSelectorDialogState();
+  State<UnitScalePresetSelectorDialog> createState() => _UnitScalePresetSelectorDialogState();
 }
 
-class _UnitScalePresetSelectorDialogState
-    extends State<UnitScalePresetSelectorDialog> {
+class _UnitScalePresetSelectorDialogState extends State<UnitScalePresetSelectorDialog> {
   final TextEditingController _searchController = TextEditingController();
   List<BaseUnitScale> _customScales = [];
   bool _isLoading = true;
@@ -61,6 +62,7 @@ class _UnitScalePresetSelectorDialogState
     return UnitScalePresets.standardPresets.where((p) {
       return p.name.toLowerCase().contains(term) ||
           p.baseUnit.toLowerCase().contains(term) ||
+          p.scaleType.label.toLowerCase().contains(term) ||
           p.units.any((u) => u.name.toLowerCase().contains(term));
     }).toList();
   }
@@ -71,6 +73,7 @@ class _UnitScalePresetSelectorDialogState
     return _customScales.where((p) {
       return p.name.toLowerCase().contains(term) ||
           p.baseUnit.toLowerCase().contains(term) ||
+          p.scaleType.label.toLowerCase().contains(term) ||
           p.units.any((u) => u.name.toLowerCase().contains(term));
     }).toList();
   }
@@ -139,7 +142,7 @@ class _UnitScalePresetSelectorDialogState
               TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
-                  hintText: 'Buscar preset (ej. Peso, Litros, Cajas)...',
+                  hintText: 'Buscar escala (ej. Libra, Caja x30, Docena)...',
                   prefixIcon: const Icon(Icons.search, size: 20),
                   suffixIcon: _filter.isNotEmpty
                       ? IconButton(
@@ -168,45 +171,45 @@ class _UnitScalePresetSelectorDialogState
                 child: _isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : (standards.isEmpty && customs.isEmpty)
-                        ? Center(
-                            child: Text(
-                              'No se encontraron presets para "$_filter"',
-                              style: TextStyle(color: Colors.grey.shade600),
+                    ? Center(
+                        child: Text(
+                          'No se encontraron escalas para "$_filter"',
+                          style: TextStyle(color: Colors.grey.shade600),
+                        ),
+                      )
+                    : ListView(
+                        children: [
+                          if (standards.isNotEmpty) ...[
+                            _SectionHeader(
+                              title: 'Presets Rápidos del Sistema',
+                              count: standards.length,
+                              icon: Icons.star_outline,
                             ),
-                          )
-                        : ListView(
-                            children: [
-                              if (standards.isNotEmpty) ...[
-                                _SectionHeader(
-                                  title: 'Presets Rápidos del Sistema',
-                                  count: standards.length,
-                                  icon: Icons.star_outline,
-                                ),
-                                ...standards.map(
-                                  (preset) => _PresetCard(
-                                    preset: preset,
-                                    isCustom: false,
-                                    onSelect: () => Navigator.pop(context, preset),
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                              ],
-                              if (customs.isNotEmpty) ...[
-                                _SectionHeader(
-                                  title: 'Escalas Guardadas del Negocio',
-                                  count: customs.length,
-                                  icon: Icons.bookmark_outline,
-                                ),
-                                ...customs.map(
-                                  (preset) => _PresetCard(
-                                    preset: preset,
-                                    isCustom: true,
-                                    onSelect: () => Navigator.pop(context, preset),
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
+                            ...standards.map(
+                              (preset) => _PresetCard(
+                                preset: preset,
+                                isCustom: false,
+                                onSelect: () => Navigator.pop(context, preset),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                          ],
+                          if (customs.isNotEmpty) ...[
+                            _SectionHeader(
+                              title: 'Escalas Disponibles',
+                              count: customs.length,
+                              icon: Icons.bookmark_outline,
+                            ),
+                            ...customs.map(
+                              (preset) => _PresetCard(
+                                preset: preset,
+                                isCustom: true,
+                                onSelect: () => Navigator.pop(context, preset),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
               ),
             ],
           ),
@@ -294,29 +297,38 @@ class _PresetCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(
+              Text(
+                preset.name,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              ),
+              const SizedBox(height: 6),
+              Wrap(
+                spacing: 6,
+                runSpacing: 4,
                 children: [
-                  Expanded(
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.teal.shade50,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.teal.shade200, width: 0.8),
+                    ),
                     child: Text(
-                      preset.name,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
+                      preset.scaleType.label,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.teal.shade800,
                       ),
                     ),
                   ),
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      color: isCustom
-                          ? Colors.purple.shade50
-                          : Colors.blue.shade50,
+                      color: isCustom ? Colors.purple.shade50 : Colors.blue.shade50,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: isCustom
-                            ? Colors.purple.shade200
-                            : Colors.blue.shade200,
+                        color: isCustom ? Colors.purple.shade200 : Colors.blue.shade200,
                         width: 0.8,
                       ),
                     ),
@@ -325,9 +337,7 @@ class _PresetCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
-                        color: isCustom
-                            ? Colors.purple.shade800
-                            : Colors.blue.shade800,
+                        color: isCustom ? Colors.purple.shade800 : Colors.blue.shade800,
                       ),
                     ),
                   ),
@@ -356,8 +366,7 @@ class _PresetCard extends StatelessWidget {
                 runSpacing: 4,
                 children: preset.units.map((u) {
                   return Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
                       color: Colors.grey.shade100,
                       borderRadius: BorderRadius.circular(6),

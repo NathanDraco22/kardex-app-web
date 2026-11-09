@@ -270,7 +270,7 @@ Future<Uint8List> generateTicketPdfFromCreditNote(
                                 ),
                               ),
                               pw.Text(
-                                item.product.unitName,
+                                item.displayUnitName,
                                 style: pw.TextStyle(
                                   fontSize: TicketSettings.contentFontSize(paperSize) - 1,
                                   color: PdfColors.grey700,
@@ -281,12 +281,26 @@ Future<Uint8List> generateTicketPdfFromCreditNote(
                         ),
                         pw.Expanded(
                           flex: 1,
-                          child: pw.Text(
-                            item.formattedDisplayQuantity,
-                            textAlign: pw.TextAlign.center,
-                            style: pw.TextStyle(
-                              fontSize: TicketSettings.contentFontSize(paperSize),
-                            ),
+                          child: pw.Column(
+                            crossAxisAlignment: pw.CrossAxisAlignment.center,
+                            children: [
+                              pw.Text(
+                                item.formattedDisplayQuantity,
+                                textAlign: pw.TextAlign.center,
+                                style: pw.TextStyle(
+                                  fontSize: TicketSettings.contentFontSize(paperSize),
+                                ),
+                              ),
+                              if (item.bonQuantity > 0)
+                                pw.Text(
+                                  "+ ${item.formattedDisplayBonQuantity} bonif.",
+                                  textAlign: pw.TextAlign.center,
+                                  style: pw.TextStyle(
+                                    fontSize: TicketSettings.contentFontSize(paperSize) - 1,
+                                    color: PdfColors.grey700,
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
                         if (paperSize == PaperSize.mm80)

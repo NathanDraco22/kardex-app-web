@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_app_front/widgets/dialogs/selectors/branch_selection_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
@@ -165,7 +166,7 @@ class _SetInitialBalanceDialogState extends State<SetInitialBalanceDialog> {
                       ),
               ),
               const SizedBox(height: 16),
-              ElevatedButton.icon(
+              PrimaryMenuButton(
                 onPressed: _addBalance,
                 icon: const Icon(Icons.add),
                 label: const Text("Agregar Saldo"),
@@ -178,9 +179,9 @@ class _SetInitialBalanceDialogState extends State<SetInitialBalanceDialog> {
             onPressed: () => context.pop(null),
             child: const Text('Cancelar'),
           ),
-          ElevatedButton(
+          PrimaryMenuButton(
             onPressed: _submit,
-            child: const Text('Guardar Todo'),
+            label: const Text('Guardar Todo'),
           ),
         ],
       ),
@@ -251,7 +252,7 @@ class _SetInitialBalanceDialogState extends State<SetInitialBalanceDialog> {
               onPressed: () => Navigator.pop(context),
               child: const Text("Cancelar"),
             ),
-            ElevatedButton(
+            PrimaryMenuButton(
               onPressed: () {
                 if (formKey.currentState!.validate()) {
                   final doubleValue = double.parse(amountText);
@@ -264,7 +265,7 @@ class _SetInitialBalanceDialogState extends State<SetInitialBalanceDialog> {
                   Navigator.pop(context, newItem);
                 }
               },
-              child: Text(isEditing ? "Guardar Cambios" : "Agregar"),
+              label: Text(isEditing ? "Guardar Cambios" : "Agregar"),
             ),
           ],
         );

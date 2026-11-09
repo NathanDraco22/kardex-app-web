@@ -199,7 +199,7 @@ class _DetailsSegment extends StatelessWidget {
       itemBuilder: (context, index) {
         final item = saleItems[index];
 
-        final totalCost = item.cost * item.quantity;
+        final totalCost = item.cost * (item.quantity + item.bonQuantity);
         final totalPaid = item.total;
         final utility = totalPaid - totalCost;
 
@@ -225,7 +225,8 @@ class _DetailsSegment extends StatelessWidget {
                   ],
                 ),
                 Text(
-                  "Cantidad: ${item.quantity}",
+                  "Cantidad: ${item.formattedDisplayQuantity} ${item.displayUnitName}"
+                  "${item.bonQuantity > 0 ? ' + ${item.formattedDisplayBonQuantity} bonif.' : ''}",
                   style: TextStyle(color: Colors.grey.shade700),
                 ),
                 const Divider(),
@@ -308,7 +309,7 @@ class _TotalsSegment extends StatelessWidget {
     int totalVentas = 0;
 
     for (final item in saleItems) {
-      totalCosto += item.cost * item.quantity;
+      totalCosto += item.cost * (item.quantity + item.bonQuantity);
       totalVentas += item.total;
     }
 

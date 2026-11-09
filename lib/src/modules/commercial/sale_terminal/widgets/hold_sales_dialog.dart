@@ -62,12 +62,25 @@ class _HoldSalesDialogContentState extends State<_HoldSalesDialogContent> {
 
     final lowStockItems = <String>[];
     for (final item in draft.items) {
-      final requiredUnits = item.quantity * item.conversionFactor;
+      final requiredUnits = item.quantity;
       final available = item.product.account.availableStock;
       if (requiredUnits > available) {
-        final unitStr = item.selectedUnitName.isNotEmpty ? item.selectedUnitName : 'unid.';
+        final requiredDisplay = UnitDisplayFormatter.formatUnitQuantity(
+          baseQuantity: requiredUnits,
+          conversionFactor: item.conversionFactor,
+          selectedUnitName: item.selectedUnitName.isNotEmpty ? item.selectedUnitName : 'unid.',
+          standardUnitName: item.product.defaultUnitName,
+          standardUnitFactor: item.product.defaultUnitFactor,
+        );
+        final availableDisplay = UnitDisplayFormatter.formatUnitQuantity(
+          baseQuantity: available,
+          conversionFactor: item.conversionFactor,
+          selectedUnitName: item.selectedUnitName.isNotEmpty ? item.selectedUnitName : 'unid.',
+          standardUnitName: item.product.defaultUnitName,
+          standardUnitFactor: item.product.defaultUnitFactor,
+        );
         lowStockItems.add(
-          "• ${item.product.name}: requiere ${item.quantity} $unitStr (disponible en inventario: $available)",
+          "• ${item.product.name}: requiere ${requiredDisplay.quantityText} ${requiredDisplay.unitName} (disponible en inventario: ${availableDisplay.quantityText} ${availableDisplay.unitName})",
         );
       }
     }

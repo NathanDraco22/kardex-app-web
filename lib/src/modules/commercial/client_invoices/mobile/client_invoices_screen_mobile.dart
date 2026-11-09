@@ -87,7 +87,7 @@ class _RootScaffold extends StatelessWidget {
               );
               if (items == null || items.isEmpty) return;
               for (final item in items) {
-                if (item.quantity == 0) continue;
+                if (item.baseQuantity <= 0) continue;
                 viewController.addItem(item);
               }
               return;
@@ -100,7 +100,7 @@ class _RootScaffold extends StatelessWidget {
               restrictStock: isRestrictStock,
             );
             if (res == null) return;
-            if (isRestrictStock && (res.quantity * res.conversionFactor) > res.product.account.availableStock) {
+            if (isRestrictStock && res.baseQuantity > res.product.account.availableStock) {
               if (!context.mounted) return;
               await DialogManager.showErrorDialog(
                 context,
@@ -108,7 +108,7 @@ class _RootScaffold extends StatelessWidget {
               );
               return;
             }
-            if (res.quantity == 0) return;
+            if (res.baseQuantity <= 0) return;
 
             viewController.addItem(res);
           },
@@ -326,8 +326,7 @@ class _Body extends StatelessWidget {
                             restrictStock: isRestrictStock,
                           );
                           if (res == null) return;
-                          if (isRestrictStock &&
-                              (res.quantity * res.conversionFactor) > res.product.account.availableStock) {
+                          if (isRestrictStock && res.baseQuantity > res.product.account.availableStock) {
                             if (!context.mounted) return;
                             await DialogManager.showErrorDialog(
                               context,
@@ -335,7 +334,7 @@ class _Body extends StatelessWidget {
                             );
                             return;
                           }
-                          if (res.quantity == 0) return;
+                          if (res.baseQuantity <= 0) return;
                           viewController.updateItem(
                             currentCommercial,
                             res,
@@ -350,8 +349,7 @@ class _Body extends StatelessWidget {
                             restrictStock: isRestrictStock,
                           );
                           if (res == null) return;
-                          if (isRestrictStock &&
-                              (res.quantity * res.conversionFactor) > res.product.account.availableStock) {
+                          if (isRestrictStock && res.baseQuantity > res.product.account.availableStock) {
                             if (!context.mounted) return;
                             await DialogManager.showErrorDialog(
                               context,
@@ -359,7 +357,7 @@ class _Body extends StatelessWidget {
                             );
                             return;
                           }
-                          if (res.quantity == 0) return;
+                          if (res.baseQuantity <= 0) return;
                           viewController.updateItem(
                             currentCommercial,
                             res,

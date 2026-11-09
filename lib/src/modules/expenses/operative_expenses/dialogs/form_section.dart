@@ -227,9 +227,9 @@ class _FormContentState extends State<_FormContent> {
                       onPressed: () => context.pop(),
                       child: const Text("Cancelar"),
                     ),
-                    ElevatedButton(
+                    PrimaryMenuButton(
                       onPressed: submitAction,
-                      child: Text("$wordPrefix Gasto"),
+                      label: Text("$wordPrefix Gasto"),
                     ),
                   ],
                 ),
@@ -271,9 +271,9 @@ class _FormContentState extends State<_FormContent> {
               onPressed: () => context.pop(),
               child: const Text("Cancelar"),
             ),
-            ElevatedButton(
+            PrimaryMenuButton(
               onPressed: submitAction,
-              child: Text("$wordPrefix Gasto"),
+              label: Text("$wordPrefix Gasto"),
             ),
           ],
         ),

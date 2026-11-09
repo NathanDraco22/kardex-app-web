@@ -1,5 +1,6 @@
 import 'package:intl/intl.dart';
 import 'package:kardex_business/src/domain/models/app_setting/app_currency.dart';
+import 'package:kardex_business/src/tools/unit_display_formatter.dart';
 
 typedef CurrencyResolver = AppCurrency Function();
 
@@ -90,12 +91,19 @@ class NumberFormatter {
     return _instance.format(value);
   }
 
-  static String formatDisplayStock(int stock, int factor) {
-    final safeFactor = factor < 1 ? 1 : factor;
-    final val = stock / safeFactor;
-    if (val == val.toInt()) {
-      return val.toInt().toString();
-    }
-    return val.toStringAsFixed(2).replaceAll(RegExp(r'\.?0+$'), '');
+  static String formatDisplayStock(
+    int stock,
+    int factor, {
+    String? selectedUnitName,
+    String? standardUnitName,
+    int? standardUnitFactor,
+  }) {
+    return UnitDisplayFormatter.formatUnitQuantity(
+      baseQuantity: stock,
+      conversionFactor: factor,
+      selectedUnitName: selectedUnitName,
+      standardUnitName: standardUnitName,
+      standardUnitFactor: standardUnitFactor,
+    ).quantityText;
   }
 }

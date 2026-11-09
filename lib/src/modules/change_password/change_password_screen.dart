@@ -7,6 +7,7 @@ import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/change_password/cubit/change_password_cubit.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/password_title_textfield.dart';
 
@@ -135,7 +136,7 @@ class _BodyState extends State<_Body> {
 
                     const SizedBox(height: 8),
 
-                    ElevatedButton(
+                    PrimaryMenuButton(
                       onPressed: () {
                         if (!formKey.currentState!.validate()) return;
                         context.read<ChangePasswordCubit>().changePassword(
@@ -146,7 +147,7 @@ class _BodyState extends State<_Body> {
                           ),
                         );
                       },
-                      child: const Text("Cambiar Contraseña"),
+                      label: const Text("Cambiar Contraseña"),
                     ),
                   ],
                 ),

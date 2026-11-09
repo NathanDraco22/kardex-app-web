@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kardex_app_front/widgets/buttons/elevated_ctrl_button.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/widgets/elements/quantity_unit_rules.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/tools/input_formatter/input_formatter.dart';
@@ -118,13 +119,49 @@ class _TransferProductTableState extends State<TransferProductTable> {
   Future<void> _handleChangeUnit(TransferProductRow row) async {
     final unit = await showInventoryUnitPicker(context, row.product);
     if (unit == null) return;
+    if (!mounted) return;
+
+    final oldFactor = UnitConversionTool.ensureSafeFactor(row.conversionFactor);
+    final newFactor = UnitConversionTool.ensureSafeFactor(unit.conversionFactor);
+    final previousQuantity = row.quantity;
+    final baseQuantity = previousQuantity * oldFactor;
+    final isNewUnitSuperior = QuantityUnitRules.isSuperiorUnit(
+      selectedUnitIndex: unit.unitIndex,
+      defaultUnitIndex: row.product.defaultUnitIndex,
+    );
+    final convertedQuantity = QuantityUnitRules.convertOnUnitChange(
+      displayQuantity: previousQuantity,
+      oldFactor: oldFactor,
+      newFactor: newFactor,
+      newUnitIsSuperior: isNewUnitSuperior,
+      // La fila guarda enteros en la unidad mostrada.
+      requireIntegerDisplay: true,
+    );
+    final newQuantity = convertedQuantity?.round();
+    final averageCost = row.product.account.averageCost;
+    final oldCost = row.unitaryCost > 0 ? row.unitaryCost : averageCost * oldFactor;
+    final shouldClearQuantity = newQuantity == null;
+
     setState(() {
+      row.quantity = newQuantity ?? 0;
       row.selectedUnitIndex = unit.unitIndex;
       row.conversionFactor = unit.conversionFactor;
       row.selectedUnitName = unit.unitName;
-      row.unitaryCost = (row.product.account.averageCost * unit.conversionFactor).round();
+      row.unitaryCost = UnitConversionTool.convertUnitCost(oldCost, oldFactor, newFactor);
     });
     _tableController?.refresh();
+
+    if (shouldClearQuantity) {
+      final displayQuantity = UnitConversionTool.formatQuantity(baseQuantity / newFactor);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "$baseQuantity ${row.product.unitName} = $displayQuantity ${unit.unitName}",
+          ),
+          duration: const Duration(seconds: 4),
+        ),
+      );
+    }
   }
 
   @override
@@ -344,10 +381,12 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
 
   late final TextEditingController quantityController;
   late final TextEditingController expirationController;
+  int _lastUnitIndex = 0;
 
   @override
   void initState() {
     super.initState();
+    _lastUnitIndex = widget.rowModel.selectedUnitIndex;
     quantityController = TextEditingController(
       text: widget.rowModel.quantity > 0 ? widget.rowModel.quantity.toString() : "",
     );
@@ -361,6 +400,15 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
           expirationFocus.requestFocus();
         },
       );
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant EntryRow oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (_lastUnitIndex != widget.rowModel.selectedUnitIndex) {
+      _lastUnitIndex = widget.rowModel.selectedUnitIndex;
+      quantityController.text = widget.rowModel.quantity > 0 ? widget.rowModel.quantity.toString() : "";
     }
   }
 

@@ -1,4 +1,5 @@
 import 'package:kardex_business/src/domain/models/common/user_info.dart';
+import 'package:kardex_business/src/tools/unit_display_formatter.dart';
 
 class ExitItem {
   final String productId;
@@ -9,6 +10,8 @@ class ExitItem {
   final int? cost;
   final int quantity;
   final int conversionFactor;
+  final String? standardUnitName;
+  final int? standardUnitFactor;
 
   ExitItem({
     required this.productId,
@@ -19,7 +22,22 @@ class ExitItem {
     this.cost,
     required this.quantity,
     this.conversionFactor = 1,
+    this.standardUnitName,
+    this.standardUnitFactor,
   }) : assert(quantity < 0, 'La cantidad en una salida debe ser negativa.');
+
+  UnitDisplayValue get displayQuantity =>
+      UnitDisplayFormatter.formatUnitQuantity(
+        baseQuantity: quantity.abs(),
+        conversionFactor: conversionFactor,
+        selectedUnitName: unitName,
+        standardUnitName: standardUnitName,
+        standardUnitFactor: standardUnitFactor,
+      );
+
+  String get formattedDisplayQuantity => displayQuantity.quantityText;
+
+  String get displayUnitName => displayQuantity.unitName;
 
   factory ExitItem.fromJson(Map<String, dynamic> json) {
     return ExitItem(
@@ -31,11 +49,13 @@ class ExitItem {
       cost: json['cost'] as int?,
       quantity: json['quantity'] as int,
       conversionFactor: json['conversionFactor'] as int? ?? 1,
+      standardUnitName: json['standardUnitName'] as String?,
+      standardUnitFactor: json['standardUnitFactor'] as int?,
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
+    final data = <String, dynamic>{
       'productId': productId,
       'productName': productName,
       'code': code,
@@ -45,6 +65,13 @@ class ExitItem {
       'quantity': quantity,
       'conversionFactor': conversionFactor,
     };
+    if (standardUnitName != null) {
+      data['standardUnitName'] = standardUnitName;
+    }
+    if (standardUnitFactor != null) {
+      data['standardUnitFactor'] = standardUnitFactor;
+    }
+    return data;
   }
 }
 
@@ -74,7 +101,9 @@ class BaseExitDoc {
       docDate: DateTime.fromMillisecondsSinceEpoch(json['docDate'] as int),
       branchId: json['branchId'] as String,
       description: json['description'] as String? ?? "",
-      items: (json['items'] as List<dynamic>).map((item) => ExitItem.fromJson(item as Map<String, dynamic>)).toList(),
+      items: (json['items'] as List<dynamic>)
+          .map((item) => ExitItem.fromJson(item as Map<String, dynamic>))
+          .toList(),
       createdBy: UserInfo.fromJson(json['createdBy']),
     );
   }
@@ -110,7 +139,9 @@ class CreateExitDoc extends BaseExitDoc {
       docDate: DateTime.fromMillisecondsSinceEpoch(json['docDate'] as int),
       branchId: json['branchId'] as String,
       description: json['description'] as String? ?? "",
-      items: (json['items'] as List<dynamic>).map((item) => ExitItem.fromJson(item as Map<String, dynamic>)).toList(),
+      items: (json['items'] as List<dynamic>)
+          .map((item) => ExitItem.fromJson(item as Map<String, dynamic>))
+          .toList(),
       createdBy: UserInfo.fromJson(json['createdBy']),
     );
   }
@@ -140,7 +171,9 @@ class ExitDocInDb extends BaseExitDoc {
       docDate: DateTime.fromMillisecondsSinceEpoch(json['docDate'] as int),
       branchId: json['branchId'] as String,
       description: json['description'] as String? ?? "",
-      items: (json['items'] as List<dynamic>).map((item) => ExitItem.fromJson(item as Map<String, dynamic>)).toList(),
+      items: (json['items'] as List<dynamic>)
+          .map((item) => ExitItem.fromJson(item as Map<String, dynamic>))
+          .toList(),
       createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
       createdBy: UserInfo.fromJson(json['createdBy']),
     );
@@ -149,10 +182,7 @@ class ExitDocInDb extends BaseExitDoc {
   @override
   Map<String, dynamic> toJson() {
     final data = super.toJson();
-    data.addAll({
-      'id': id,
-      'createdAt': createdAt.millisecondsSinceEpoch,
-    });
+    data.addAll({'id': id, 'createdAt': createdAt.millisecondsSinceEpoch});
     return data;
   }
 }

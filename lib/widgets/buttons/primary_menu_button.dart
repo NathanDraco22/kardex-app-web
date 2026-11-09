@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 
 /// Botón primario diseñado para barras de menú, filtros y encabezados.
 ///
-/// Aplica un borde suavemente redondeado (`BorderRadius.circular(12)`),
-/// elimina márgenes residuales táctiles con [MaterialTapTargetSize.shrinkWrap]
-/// y utiliza un relleno compacto para alinearse con otros controles.
+/// Por defecto usa el color primario del tema con texto `onPrimary`. Aplica un
+/// borde suavemente redondeado (`BorderRadius.circular(12)`), elimina márgenes
+/// residuales táctiles con [MaterialTapTargetSize.shrinkWrap] y utiliza un
+/// relleno compacto para alinearse con otros controles.
 class PrimaryMenuButton extends StatelessWidget {
   const PrimaryMenuButton({
     super.key,
@@ -16,6 +17,7 @@ class PrimaryMenuButton extends StatelessWidget {
     this.padding,
     this.tooltip,
     this.focusNode,
+    this.autofocus = false,
   });
 
   /// Acción a ejecutar al pulsar el botón. Si es `null`, el botón queda inactivo.
@@ -42,11 +44,16 @@ class PrimaryMenuButton extends StatelessWidget {
   /// Nodo de foco opcional.
   final FocusNode? focusNode;
 
+  /// Si el botón debe recibir el foco automáticamente. Por defecto `false`.
+  final bool autofocus;
+
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     final effectiveStyle = FilledButton.styleFrom(
-      backgroundColor: backgroundColor,
-      foregroundColor: foregroundColor,
+      backgroundColor: backgroundColor ?? colorScheme.primary,
+      foregroundColor: foregroundColor ?? colorScheme.onPrimary,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       visualDensity: VisualDensity.compact,
       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -57,6 +64,7 @@ class PrimaryMenuButton extends StatelessWidget {
     if (icon != null) {
       button = FilledButton.icon(
         focusNode: focusNode,
+        autofocus: autofocus,
         onPressed: onPressed,
         icon: icon!,
         label: label,
@@ -65,6 +73,7 @@ class PrimaryMenuButton extends StatelessWidget {
     } else {
       button = FilledButton(
         focusNode: focusNode,
+        autofocus: autofocus,
         onPressed: onPressed,
         style: effectiveStyle,
         child: label,

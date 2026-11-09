@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 
 /// Muestra un modal inferior básico con título, contenido y botones de acción.
 Future<bool?> showBasicBottomModal(
@@ -100,13 +101,11 @@ class BasicBottomModal extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: acceptColor ?? Theme.of(context).primaryColor,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
+                child: PrimaryMenuButton(
+                  backgroundColor: acceptColor,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
                   onPressed: () => context.pop(true),
-                  child: Text(
+                  label: Text(
                     acceptText,
                     style: const TextStyle(color: Colors.white),
                   ),

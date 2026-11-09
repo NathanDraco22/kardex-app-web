@@ -45,9 +45,26 @@ class _ExtraUnitsSectionState extends State<ExtraUnitsSection> {
     widget.creationMap['wholesaleUnitIndex'] = _wholesaleUnitIndex;
   }
 
+  Future<bool> _confirmBaseUnitChange(String currentBaseUnit, String newBaseUnit) {
+    return DialogManager.confirmActionDialog(
+      context,
+      'Se cambiará la unidad base del producto de "$currentBaseUnit" a "$newBaseUnit". '
+      'El stock existente no se convierte automáticamente.',
+    );
+  }
+
   Future<void> _applyPreset() async {
     final preset = await showUnitScalePresetSelectorDialog(context);
     if (preset == null) return;
+    if (!mounted) return;
+
+    final currentBaseUnit = widget.creationMap['unitName'] as String? ?? widget.currentProduct?.unitName ?? '';
+    if (currentBaseUnit.isNotEmpty && currentBaseUnit != preset.baseUnit) {
+      final confirmed = await _confirmBaseUnitChange(currentBaseUnit, preset.baseUnit);
+      if (!confirmed) return;
+    }
+
+    if (!mounted) return;
 
     setState(() {
       _extraUnits.clear();
@@ -74,9 +91,7 @@ class _ExtraUnitsSectionState extends State<ExtraUnitsSection> {
 
   @override
   Widget build(BuildContext context) {
-    final String baseUnitName = widget.creationMap['unitName'] as String? ??
-        widget.currentProduct?.unitName ??
-        'Unidad Base';
+    final String baseUnitName = widget.creationMap['unitName'] as String? ?? widget.currentProduct?.unitName ?? '';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -103,23 +118,44 @@ class _ExtraUnitsSectionState extends State<ExtraUnitsSection> {
                 );
 
                 if (result != null) {
+                  if (!mounted) return;
+
+                  final resultBaseUnit = result.baseUnitName.trim();
+                  final effectiveBaseUnit = resultBaseUnit.isEmpty ? baseUnitName : resultBaseUnit;
+
                   setState(() {
                     _extraUnits.clear();
                     _extraUnits.addAll(result.extraUnits);
                     _defaultUnitIndex = result.defaultUnitIndex;
                     _wholesaleUnitIndex = result.wholesaleUnitIndex;
+                    if (effectiveBaseUnit.isNotEmpty) {
+                      widget.creationMap['unitName'] = effectiveBaseUnit;
+                    }
                     _syncToMap();
                   });
+
+                  if (effectiveBaseUnit.isNotEmpty) {
+                    widget.onPresetApplied?.call(
+                      BaseUnitScale(
+                        name: 'Preset aplicado',
+                        baseUnit: effectiveBaseUnit,
+                        units: result.extraUnits,
+                        defaultUnitIndex: result.defaultUnitIndex,
+                        wholesaleUnitIndex: result.wholesaleUnitIndex,
+                      ),
+                    );
+                  }
                 }
               },
               icon: const Icon(Icons.scale),
               label: Text("Unidades Extra (${_extraUnits.length})"),
             ),
-            FilledButton.tonalIcon(
-              onPressed: _applyPreset,
-              icon: const Icon(Icons.auto_awesome, size: 18),
-              label: const Text("Usar Preset"),
-            ),
+            if (FeatureFlags.showUnitScales)
+              FilledButton.tonalIcon(
+                onPressed: _applyPreset,
+                icon: const Icon(Icons.auto_awesome, size: 18),
+                label: const Text("Usar Preset"),
+              ),
           ],
         ),
       ],

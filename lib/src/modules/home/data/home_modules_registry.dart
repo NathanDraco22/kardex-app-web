@@ -2,6 +2,7 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/constants/feature_flags.dart';
 import 'package:kardex_app_front/constants/route_names.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/modules/inventory/adjust_exit/adjust_exit_screen.dart';
@@ -199,7 +200,9 @@ List<HomeModuleCategory> getHomeModuleCategories(
     const HomeModuleCategory(
       id: HomeModuleId.products,
       title: "Catálogo de Productos",
-      subtitle: "Lista global, categorías, unidades y escalas de medida",
+      subtitle: FeatureFlags.showUnitScales
+          ? "Lista global, categorías, unidades y escalas de medida"
+          : "Lista global, categorías y unidades de medida",
       icon: FluentIcons.receipt_bag_20_filled,
       accentColor: Color(0xFF7C3AED),
       permissions: [Modules.products],
@@ -213,8 +216,10 @@ List<HomeModuleCategory> getHomeModuleCategories(
           routeName: "product-list",
         ),
         HomeSubmoduleItem(
-          title: "Unidades y Escalas de Medida",
-          subtitle: "Factores de conversión, unidades de empaque y plantillas",
+          title: FeatureFlags.showUnitScales ? "Unidades y Escalas de Medida" : "Unidades de Medida",
+          subtitle: FeatureFlags.showUnitScales
+              ? "Factores de conversión, unidades de empaque y plantillas"
+              : "Unidades base y unidades de empaque",
           icon: Icons.straighten_rounded,
           accentColor: Color(0xFF0D9488),
           routeName: RouteNames.unitsAndScales,

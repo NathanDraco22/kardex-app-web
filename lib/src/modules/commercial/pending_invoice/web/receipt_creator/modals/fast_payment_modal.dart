@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 
 class FastPaymentResult {
   final double amount;
@@ -228,7 +229,7 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
                     child: const Text("Cancelar"),
                   ),
                   const SizedBox(width: 16),
-                  ElevatedButton(
+                  PrimaryMenuButton(
                     onPressed: _canConfirm
                         ? () {
                             Navigator.pop(
@@ -241,11 +242,7 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
                             );
                           }
                         : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue.shade700,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: const Text("Aplicar Abono"),
+                    label: const Text("Aplicar Abono"),
                   ),
                 ],
               ),

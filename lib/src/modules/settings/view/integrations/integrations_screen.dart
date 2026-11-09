@@ -6,6 +6,7 @@ import 'package:kardex_app_front/src/modules/settings/view/integrations/cubit/re
 import 'package:kardex_app_front/src/modules/settings/view/integrations/cubit/write_integration_cubit.dart';
 import 'package:kardex_app_front/src/modules/settings/view/integrations/dialog/edit_integration_dialog.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 
 class IntegrationsScreen extends StatelessWidget {
   const IntegrationsScreen({super.key});
@@ -170,7 +171,7 @@ class _TestButton extends StatelessWidget {
       builder: (context, setState) {
         return SizedBox(
           width: 120,
-          child: ElevatedButton(
+          child: PrimaryMenuButton(
             onPressed: () async {
               if (isLoading) return;
               setState(() {
@@ -189,7 +190,7 @@ class _TestButton extends StatelessWidget {
                 isLoading = false;
               });
             },
-            child: isLoading ? const LinearProgressIndicator() : const Text("Enviar Prueba"),
+            label: isLoading ? const LinearProgressIndicator() : const Text("Enviar Prueba"),
           ),
         );
       },

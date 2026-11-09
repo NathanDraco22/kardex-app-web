@@ -8,6 +8,7 @@ import 'package:kardex_app_front/widgets/date_picker_button.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/cubits/product_stats/estimate_product_stats_cubit.dart';
 import 'package:kardex_app_front/src/modules/advanced_tools/product_stats/cubits/read_product_stats_cubit.dart';
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_app_front/widgets/dialogs/selectors/branch_selection_dialog.dart';
 
 part 'sections/header_section.dart';

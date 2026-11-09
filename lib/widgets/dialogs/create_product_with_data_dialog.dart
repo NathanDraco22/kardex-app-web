@@ -7,6 +7,7 @@ import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/tools/uploaders/image_uploader.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/product_list/cubit/write_product_cubit.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/constants/feature_flags.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
@@ -155,6 +156,7 @@ class _FormContentState extends State<_FormContent> {
   }
 
   Future<void> _submitForm() async {
+    widget.creationMap['unitName'] = _unitController.text.trim();
     if (!widget.formKey.currentState!.validate()) return;
 
     final writeCubit = context.read<WriteProductCubit>();
@@ -291,9 +293,9 @@ class _FormContentState extends State<_FormContent> {
               children: [
                 SizedBox(
                   height: 40,
-                  child: ElevatedButton(
+                  child: PrimaryMenuButton(
                     onPressed: _submitForm,
-                    child: const Text("Crear Producto"),
+                    label: const Text("Crear Producto"),
                   ),
                 ),
                 SizedBox(
@@ -323,9 +325,9 @@ class _FormContentState extends State<_FormContent> {
                 onPressed: () => context.pop(),
                 child: const Text("Cancelar"),
               ),
-              ElevatedButton(
+              PrimaryMenuButton(
                 onPressed: _submitForm,
-                child: const Text("Crear Producto"),
+                label: const Text("Crear Producto"),
               ),
             ],
             content: _InnerContent(
@@ -463,14 +465,18 @@ class _InnerContent extends StatelessWidget {
                     const SizedBox(height: 6),
                     CustomAutocompleteTextfield<UnitInDb>(
                       controller: unitController,
+                      allowFreeText: true,
+                      onChanged: (value) => creationMap['unitName'] = value.trim(),
                       onClose: (value) => creationMap['unitName'] = value.name,
                       onFieldSubmitted: (value) {
                         FocusScope.of(context).nextFocus();
                       },
                       validator: (value) {
-                        if (value == null || value.isEmpty) {
+                        final text = unitController.text.trim();
+                        if (text.isEmpty) {
                           return "Campo requerido";
                         }
+                        creationMap['unitName'] = text;
                         return null;
                       },
                       onSearch: (value) {
@@ -553,6 +559,7 @@ class _InnerContent extends StatelessWidget {
             creationMap: creationMap,
             onPresetApplied: (preset) {
               unitController.text = preset.baseUnit;
+              creationMap['unitName'] = preset.baseUnit;
             },
           ),
           const SizedBox(height: 16),
@@ -766,9 +773,26 @@ class _ExtraUnitsSectionState extends State<_ExtraUnitsSection> {
     widget.creationMap['wholesaleUnitIndex'] = _wholesaleUnitIndex;
   }
 
+  Future<bool> _confirmBaseUnitChange(String currentBaseUnit, String newBaseUnit) {
+    return DialogManager.confirmActionDialog(
+      context,
+      'Se cambiará la unidad base del producto de "$currentBaseUnit" a "$newBaseUnit". '
+      'El stock existente no se convierte automáticamente.',
+    );
+  }
+
   Future<void> _applyPreset() async {
     final preset = await showUnitScalePresetSelectorDialog(context);
     if (preset == null) return;
+    if (!mounted) return;
+
+    final currentBaseUnit = widget.creationMap['unitName'] as String? ?? '';
+    if (currentBaseUnit.isNotEmpty && currentBaseUnit != preset.baseUnit) {
+      final confirmed = await _confirmBaseUnitChange(currentBaseUnit, preset.baseUnit);
+      if (!confirmed) return;
+    }
+
+    if (!mounted) return;
 
     setState(() {
       _extraUnits.clear();
@@ -795,8 +819,6 @@ class _ExtraUnitsSectionState extends State<_ExtraUnitsSection> {
 
   @override
   Widget build(BuildContext context) {
-    final String baseUnitName = widget.creationMap['unitName'] as String? ?? 'Unidad Base';
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -813,32 +835,54 @@ class _ExtraUnitsSectionState extends State<_ExtraUnitsSection> {
                 foregroundColor: Theme.of(context).colorScheme.primary,
               ),
               onPressed: () async {
+                final currentBaseUnit = widget.creationMap['unitName'] as String? ?? '';
                 final result = await showProductExtraUnitsEditor(
                   context,
                   initialExtraUnits: _extraUnits,
                   initialDefaultUnitIndex: _defaultUnitIndex,
                   initialWholesaleUnitIndex: _wholesaleUnitIndex,
-                  baseUnitName: baseUnitName,
+                  baseUnitName: currentBaseUnit,
                 );
 
                 if (result != null) {
+                  if (!mounted) return;
+
+                  final resultBaseUnit = result.baseUnitName.trim();
+                  final effectiveBaseUnit = resultBaseUnit.isEmpty ? currentBaseUnit : resultBaseUnit;
+
                   setState(() {
                     _extraUnits.clear();
                     _extraUnits.addAll(result.extraUnits);
                     _defaultUnitIndex = result.defaultUnitIndex;
                     _wholesaleUnitIndex = result.wholesaleUnitIndex;
+                    if (effectiveBaseUnit.isNotEmpty) {
+                      widget.creationMap['unitName'] = effectiveBaseUnit;
+                    }
                     _syncToMap();
                   });
+
+                  if (effectiveBaseUnit.isNotEmpty) {
+                    widget.onPresetApplied?.call(
+                      BaseUnitScale(
+                        name: 'Preset aplicado',
+                        baseUnit: effectiveBaseUnit,
+                        units: result.extraUnits,
+                        defaultUnitIndex: result.defaultUnitIndex,
+                        wholesaleUnitIndex: result.wholesaleUnitIndex,
+                      ),
+                    );
+                  }
                 }
               },
               icon: const Icon(Icons.scale),
               label: Text("Unidades Extra (${_extraUnits.length})"),
             ),
-            FilledButton.tonalIcon(
-              onPressed: _applyPreset,
-              icon: const Icon(Icons.auto_awesome, size: 18),
-              label: const Text("Usar Preset"),
-            ),
+            if (FeatureFlags.showUnitScales)
+              FilledButton.tonalIcon(
+                onPressed: _applyPreset,
+                icon: const Icon(Icons.auto_awesome, size: 18),
+                label: const Text("Usar Preset"),
+              ),
           ],
         ),
       ],

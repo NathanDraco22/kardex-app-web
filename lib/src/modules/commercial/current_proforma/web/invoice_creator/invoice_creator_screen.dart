@@ -10,6 +10,7 @@ import 'package:kardex_app_front/src/modules/commercial/current_orders/modals/co
 import 'package:kardex_app_front/src/modules/commercial/current_proforma/cubit/read_proforma_cubit.dart';
 import 'package:kardex_app_front/src/tools/printers/order_printer.dart';
 import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_order_template.dart';
@@ -415,14 +416,20 @@ class _BodyState extends State<_Body> {
                                     segments: [
                                       const ButtonSegment<PaymentType>(
                                         value: PaymentType.cash,
-                                        label: Text("CONTADO", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                                        label: Text(
+                                          "CONTADO",
+                                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                        ),
                                         icon: Icon(Icons.payments_outlined, size: 16),
                                       ),
                                       ButtonSegment<PaymentType>(
                                         value: PaymentType.credit,
                                         enabled: !isSaleClient,
                                         tooltip: isSaleClient ? "Cliente Ocasional no puede tener crédito" : null,
-                                        label: const Text("CRÉDITO", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                                        label: const Text(
+                                          "CRÉDITO",
+                                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                        ),
                                         icon: const Icon(Icons.credit_score_outlined, size: 16),
                                       ),
                                     ],
@@ -597,11 +604,17 @@ class _BodyState extends State<_Body> {
             cost: commercial.product.account.averageCost,
             price: commercial.newPrice,
             quantity: commercial.baseQuantity,
+            bonQuantity: saleItem.bonQuantity,
             discountPercentage: commercial.discountPercent,
             totalDiscount: commercial.totalDiscount,
             subTotal: commercial.subTotal,
             total: commercial.total,
             conversionFactor: commercial.conversionFactor,
+            selectedUnitName: commercial.selectedUnitName.isNotEmpty
+                ? commercial.selectedUnitName
+                : commercial.product.unitName,
+            standardUnitName: commercial.product.defaultUnitName,
+            standardUnitFactor: commercial.product.defaultUnitFactor,
           );
 
           List<SaleItem> newItems = List.from(saleItems);
@@ -612,7 +625,7 @@ class _BodyState extends State<_Body> {
 
           for (var item in newItems) {
             newTotal += item.total;
-            newTotalCost += (item.cost * item.quantity);
+            newTotalCost += (item.cost * (item.quantity + item.bonQuantity));
           }
 
           final updateOrder = UpdateOrder(
@@ -640,7 +653,7 @@ class _BodyState extends State<_Body> {
 
           for (var item in newItems) {
             newTotal += item.total;
-            newTotalCost += (item.cost * item.quantity);
+            newTotalCost += (item.cost * (item.quantity + item.bonQuantity));
           }
 
           final updateOrder = UpdateOrder(
@@ -662,7 +675,7 @@ class _BodyState extends State<_Body> {
     yield const Divider();
     yield Row(
       children: [
-        ElevatedButton.icon(
+        PrimaryMenuButton(
           icon: const Icon(Icons.add),
           label: const Text("Agregar producto"),
           onPressed: () async {
@@ -698,11 +711,17 @@ class _BodyState extends State<_Body> {
                 cost: commercial.product.account.averageCost,
                 price: commercial.newPrice,
                 quantity: commercial.baseQuantity,
+                bonQuantity: 0,
                 discountPercentage: commercial.discountPercent,
                 totalDiscount: commercial.totalDiscount,
                 subTotal: commercial.subTotal,
                 total: commercial.total,
                 conversionFactor: commercial.conversionFactor,
+                selectedUnitName: commercial.selectedUnitName.isNotEmpty
+                    ? commercial.selectedUnitName
+                    : commercial.product.unitName,
+                standardUnitName: commercial.product.defaultUnitName,
+                standardUnitFactor: commercial.product.defaultUnitFactor,
               ),
             );
 
@@ -711,7 +730,7 @@ class _BodyState extends State<_Body> {
 
             for (var item in newItems) {
               newTotal += item.total;
-              newTotalCost += (item.cost * item.quantity);
+              newTotalCost += (item.cost * (item.quantity + item.bonQuantity));
             }
 
             final updateOrder = UpdateOrder(

@@ -94,7 +94,7 @@ class _CreateSupplierDialogState extends State<CreateSupplierDialog> {
                   },
                   child: const Text("Cancelar"),
                 ),
-                ElevatedButton(
+                PrimaryMenuButton(
                   onPressed: () {
                     if (!formKey.currentState!.validate()) return;
 
@@ -106,7 +106,7 @@ class _CreateSupplierDialogState extends State<CreateSupplierDialog> {
                       writeCubit.updateSupplier(widget.supplier!.id, updateSupplier);
                     }
                   },
-                  child: Text("$wordPrefix Proveedor"),
+                  label: Text("$wordPrefix Proveedor"),
                 ),
               ],
               content: SizedBox(

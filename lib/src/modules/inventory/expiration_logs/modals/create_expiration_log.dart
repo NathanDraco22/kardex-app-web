@@ -73,7 +73,7 @@ class _ExpirationLogCreationScreenState extends State<ExpirationLogCreationScree
         title: const Text("Nueva Bitácora de Vencimiento"),
 
         actions: [
-          ElevatedButton.icon(
+          PrimaryMenuButton(
             icon: const Icon(Icons.save),
             label: const Text('Guardar'),
             onPressed: () async {

@@ -428,16 +428,27 @@ class InvoiceViewerContent extends StatelessWidget {
                                 ),
                                 Text(saleItem.product.name),
                                 Text(
-                                  "${saleItem.product.unitName}${saleItem.conversionFactor > 1 ? ' (${saleItem.conversionFactor % 1 == 0 ? saleItem.conversionFactor.toInt() : saleItem.conversionFactor})' : ''}",
+                                  "${saleItem.displayUnitName}${saleItem.displayUnitFactor > 1 ? ' (${saleItem.displayUnitFactor % 1 == 0 ? saleItem.displayUnitFactor.toInt() : saleItem.displayUnitFactor})' : ''}",
                                   style: const TextStyle(color: Colors.grey, fontSize: 12),
                                 ),
                               ],
                             ),
                           ),
                           Expanded(
-                            child: Text(
-                              saleItem.formattedDisplayQuantity,
-                              textAlign: TextAlign.center,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  saleItem.formattedDisplayQuantity,
+                                  textAlign: TextAlign.center,
+                                ),
+                                if (saleItem.bonQuantity > 0)
+                                  Text(
+                                    "+ ${saleItem.formattedDisplayBonQuantity} bonif.",
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(color: Colors.grey, fontSize: 11),
+                                  ),
+                              ],
                             ),
                           ),
                           Expanded(

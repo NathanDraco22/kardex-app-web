@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
+import 'package:kardex_app_front/widgets/elements/quantity_unit_rules.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 class CommercialProductUnitSelector extends StatelessWidget {
   const CommercialProductUnitSelector({
@@ -49,17 +51,52 @@ class CommercialProductUnitSelector extends StatelessWidget {
           items: items,
           onChanged: (value) {
             if (value == null) return;
-            result.selectedUnitIndex = value;
+            if (value < 0 || value > product.extraUnits.length) return;
+
+            final oldFactor = UnitConversionTool.ensureSafeFactor(result.conversionFactor);
+            final int newFactor;
+            final String newUnitName;
             if (value == 0) {
-              result.conversionFactor = 1;
-              result.selectedUnitName = product.unitName;
+              newFactor = 1;
+              newUnitName = product.unitName;
             } else {
               final extra = product.extraUnits[value - 1];
-              result.conversionFactor = extra.conversionFactor;
-              result.selectedUnitName = extra.name;
+              newFactor = UnitConversionTool.ensureSafeFactor(extra.conversionFactor);
+              newUnitName = extra.name;
             }
-            if (result.conversionFactor <= 1 && result.quantity != result.quantity.roundToDouble()) {
-              result.quantity = result.quantity.roundToDouble();
+
+            final isNewUnitSuperior = QuantityUnitRules.isSuperiorUnit(
+              selectedUnitIndex: value,
+              defaultUnitIndex: product.defaultUnitIndex,
+            );
+            final previousQuantity = result.quantity;
+            final convertedQuantity = QuantityUnitRules.convertOnUnitChange(
+              displayQuantity: previousQuantity,
+              oldFactor: oldFactor,
+              newFactor: newFactor,
+              newUnitIsSuperior: isNewUnitSuperior,
+            );
+
+            result.quantity = convertedQuantity ?? 0;
+            result.selectedUnitIndex = value;
+            result.conversionFactor = newFactor;
+            result.selectedUnitName = newUnitName;
+
+            if (convertedQuantity == null) {
+              final baseQuantity = (previousQuantity * oldFactor).round();
+              final equivalence = UnitConversionTool.formatQuantity(
+                baseQuantity / newFactor,
+                maxDecimals: 6,
+              );
+              ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+                SnackBar(
+                  content: Text(
+                    "No se pudo convertir exactamente a $newUnitName. "
+                    "Cantidad reiniciada a 0 ($baseQuantity ${product.unitName} = $equivalence $newUnitName).",
+                  ),
+                  duration: const Duration(seconds: 4),
+                ),
+              );
             }
             onChanged();
           },

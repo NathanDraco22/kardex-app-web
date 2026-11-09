@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/constants/feature_flags.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/product_demand_vs_stock/product_demand_vs_stock_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/daily_operations_results/daily_operations_results_screen.dart';
@@ -204,6 +205,12 @@ class AppRouter {
           GoRoute(
             path: "units-and-scales",
             name: "units-and-scales",
+            redirect: (context, state) {
+              if (!FeatureFlags.showUnitScales && state.uri.queryParameters["tab"] == "scales") {
+                return "/product-catalog/units-and-scales?tab=units";
+              }
+              return null;
+            },
             builder: (context, state) {
               final tab = state.uri.queryParameters["tab"];
               return UnitsAndScalesScreen(initialTab: tab == "scales" ? 1 : 0);
@@ -217,7 +224,10 @@ class AppRouter {
           GoRoute(
             path: "unit-scales",
             name: "unit-scales",
-            redirect: (context, state) => "/product-catalog/units-and-scales?tab=scales",
+            redirect: (context, state) {
+              const tab = FeatureFlags.showUnitScales ? "scales" : "units";
+              return "/product-catalog/units-and-scales?tab=$tab";
+            },
           ),
         ],
       ),

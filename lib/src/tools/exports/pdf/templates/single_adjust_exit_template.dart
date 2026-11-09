@@ -53,7 +53,7 @@ class SingleAdjustExitTemplate implements PdfTemplate {
     final createdTime = DateTimeTool.formatHHmm(DateTime.fromMillisecondsSinceEpoch(createdAtMs));
 
     final total = adjustExit.items.fold<int>(0, (prev, item) {
-      return prev + (item.cost * item.quantity);
+      return prev + (item.cost * item.quantity.abs());
     });
 
     return pw.Column(
@@ -198,7 +198,7 @@ class SingleAdjustExitTemplate implements PdfTemplate {
                           ),
                           pw.SizedBox(width: 4),
                           pw.Text(
-                            item.unitName ?? "",
+                            item.displayUnitName,
                             style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey700),
                           ),
                         ],
@@ -209,7 +209,7 @@ class SingleAdjustExitTemplate implements PdfTemplate {
                 pw.Expanded(
                   flex: 1,
                   child: pw.Text(
-                    item.quantity.toString(),
+                    item.formattedDisplayQuantity,
                     textAlign: pw.TextAlign.center,
                     style: const pw.TextStyle(fontSize: 10),
                   ),
@@ -217,7 +217,7 @@ class SingleAdjustExitTemplate implements PdfTemplate {
                 pw.Expanded(
                   flex: 2,
                   child: pw.Text(
-                    NumberFormatter.convertToMoneyLike(item.cost),
+                    NumberFormatter.convertToMoneyLike(item.cost * item.conversionFactor),
                     textAlign: pw.TextAlign.center,
                     style: const pw.TextStyle(fontSize: 10),
                   ),
@@ -225,7 +225,7 @@ class SingleAdjustExitTemplate implements PdfTemplate {
                 pw.Expanded(
                   flex: 2,
                   child: pw.Text(
-                    NumberFormatter.convertToMoneyLike(item.cost * item.quantity),
+                    NumberFormatter.convertToMoneyLike(item.cost * item.quantity.abs()),
                     textAlign: pw.TextAlign.center,
                     style: const pw.TextStyle(fontSize: 10),
                   ),
@@ -240,7 +240,7 @@ class SingleAdjustExitTemplate implements PdfTemplate {
 
   pw.Widget _buildTotals() {
     final total = adjustExit.items.fold<int>(0, (prev, item) {
-      return prev + (item.cost * item.quantity);
+      return prev + (item.cost * item.quantity.abs());
     });
 
     return pw.Container(

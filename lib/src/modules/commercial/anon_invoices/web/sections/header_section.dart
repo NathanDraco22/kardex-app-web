@@ -153,8 +153,24 @@ Future<void> saveAnonInvoiceAction(
   }
 
   for (var item in viewController.items) {
-    if (item.quantity == 0) {
-      await DialogManager.showInfoDialog(context, "${item.product.name} sin cantidad");
+    final displayUnit = item.selectedUnitName.isNotEmpty ? item.selectedUnitName : item.product.unitName;
+    final displayQuantity = item.formattedQuantity;
+
+    if (item.baseQuantity <= 0) {
+      await DialogManager.showInfoDialog(
+        context,
+        "${item.product.name} sin cantidad ($displayQuantity $displayUnit = 0 ${item.product.unitName})",
+      );
+      return;
+    }
+
+    if (item.baseQuantity > item.product.account.availableStock) {
+      await DialogManager.showErrorDialog(
+        context,
+        "${item.product.name}: la cantidad $displayQuantity $displayUnit equivale a "
+        "${item.baseQuantity} ${item.product.unitName} y supera la existencia de "
+        "${item.product.account.availableStock} ${item.product.unitName}",
+      );
       return;
     }
   }

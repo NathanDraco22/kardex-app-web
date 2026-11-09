@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/units/cubit/read_unit_cubit.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/units/dialog/create_unit_dialog.dart';
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 import 'package:kardex_business/kardex_business.dart';
 
@@ -259,15 +260,9 @@ class _UnitsToolbar extends StatelessWidget {
       onChanged: onSearchChanged,
     );
 
-    final addButton = ElevatedButton.icon(
+    final addButton = PrimaryMenuButton(
       onPressed: onCreateUnit,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppThemeTokens.indigo,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        shape: RoundedRectangleBorder(borderRadius: AppThemeTokens.borderRadiusMd),
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       icon: const Icon(Icons.add_rounded, size: 18),
       label: const Text(
         'Agregar Unidad',

@@ -4,6 +4,7 @@ import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/tools/input_formatter/input_formatter.dart';
 import 'package:kardex_app_front/widgets/calculator/calculator_field.dart';
+import 'package:kardex_app_front/widgets/elements/quantity_unit_rules.dart';
 import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/widgets/dialogs/inventory_unit_picker.dart';
@@ -101,14 +102,51 @@ class _Content extends StatelessWidget {
         onChangeUnit: () async {
           final unit = await showInventoryUnitPicker(context, currentRowCardModel.product);
           if (unit == null) return;
-          currentRowCardModel.selectedUnitIndex = unit.unitIndex;
-          currentRowCardModel.conversionFactor = unit.conversionFactor;
-          currentRowCardModel.selectedUnitName = unit.unitName;
+          if (!context.mounted) return;
+
+          final oldFactor = UnitConversionTool.ensureSafeFactor(currentRowCardModel.conversionFactor);
+          final newFactor = UnitConversionTool.ensureSafeFactor(unit.conversionFactor);
+          final previousQuantity = currentRowCardModel.quantity;
+          final baseQuantity = previousQuantity * oldFactor;
+          final isNewUnitSuperior = QuantityUnitRules.isSuperiorUnit(
+            selectedUnitIndex: unit.unitIndex,
+            defaultUnitIndex: currentRowCardModel.product.defaultUnitIndex,
+          );
+          final convertedQuantity = QuantityUnitRules.convertOnUnitChange(
+            displayQuantity: previousQuantity,
+            oldFactor: oldFactor,
+            newFactor: newFactor,
+            newUnitIsSuperior: isNewUnitSuperior,
+            // La fila guarda enteros en la unidad mostrada.
+            requireIntegerDisplay: true,
+          );
+          final newQuantity = convertedQuantity?.round();
           final averageCost = currentRowCardModel.product is ProductInDbInBranch
               ? (currentRowCardModel.product as ProductInDbInBranch).account.averageCost
               : 0;
-          currentRowCardModel.unitaryCost = (averageCost * unit.conversionFactor).round();
+          final oldCost = currentRowCardModel.unitaryCost > 0
+              ? currentRowCardModel.unitaryCost
+              : averageCost * oldFactor;
+          final shouldClearQuantity = newQuantity == null;
+
+          currentRowCardModel.quantity = newQuantity ?? 0;
+          currentRowCardModel.selectedUnitIndex = unit.unitIndex;
+          currentRowCardModel.conversionFactor = unit.conversionFactor;
+          currentRowCardModel.selectedUnitName = unit.unitName;
+          currentRowCardModel.unitaryCost = UnitConversionTool.convertUnitCost(oldCost, oldFactor, newFactor);
           controller.refresh();
+
+          if (shouldClearQuantity) {
+            final displayQuantity = UnitConversionTool.formatQuantity(baseQuantity / newFactor);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  "$baseQuantity ${currentRowCardModel.product.unitName} = $displayQuantity ${unit.unitName}",
+                ),
+                duration: const Duration(seconds: 4),
+              ),
+            );
+          }
         },
       );
     }
@@ -141,6 +179,7 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
   final parentFocus = FocusNode();
   late final TextEditingController expirationController;
   late final TextEditingController quantityController;
+  int _lastUnitIndex = 0;
 
   @override
   bool get wantKeepAlive => true;
@@ -148,6 +187,7 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
   @override
   void initState() {
     super.initState();
+    _lastUnitIndex = widget.rowCardModel.selectedUnitIndex;
     expirationController = TextEditingController(
       text: widget.rowCardModel.expirationDate != null
           ? DateFormat('MM/yy').format(widget.rowCardModel.expirationDate!)
@@ -166,6 +206,15 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
           focusNode.requestFocus();
         }
       });
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant EntryRowCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (_lastUnitIndex != widget.rowCardModel.selectedUnitIndex) {
+      _lastUnitIndex = widget.rowCardModel.selectedUnitIndex;
+      quantityController.text = widget.rowCardModel.quantity > 0 ? widget.rowCardModel.quantity.toString() : '';
     }
   }
 

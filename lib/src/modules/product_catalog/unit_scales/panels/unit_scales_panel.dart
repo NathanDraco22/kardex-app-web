@@ -4,6 +4,7 @@ import 'package:kardex_app_front/src/modules/product_catalog/unit_scales/cubit/r
 import 'package:kardex_app_front/src/modules/product_catalog/unit_scales/cubit/write_unit_scale_cubit.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/unit_scales/dialogs/create_unit_scale_dialog.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_business/kardex_business.dart';
@@ -46,33 +47,36 @@ class _UnitScalesPanelState extends State<UnitScalesPanel> with AutomaticKeepAli
     }
   }
 
-  IconData _getScaleIcon(String name) {
-    final lower = name.toLowerCase();
-    if (lower.contains('peso') || lower.contains('masa') || lower.contains('kilo') || lower.contains('gramo')) {
-      return Icons.scale_rounded;
+  IconData _getScaleIcon(UnitScaleType type) {
+    switch (type) {
+      case UnitScaleType.weight:
+        return Icons.scale_rounded;
+      case UnitScaleType.volume:
+        return Icons.water_drop_rounded;
+      case UnitScaleType.length:
+        return Icons.straighten_rounded;
+      case UnitScaleType.pack:
+      case UnitScaleType.fractionPack:
+        return Icons.inventory_2_rounded;
+      case UnitScaleType.custom:
+        return Icons.linear_scale_rounded;
     }
-    if (lower.contains('volumen') ||
-        lower.contains('litro') ||
-        lower.contains('líquido') ||
-        lower.contains('liquido')) {
-      return Icons.water_drop_rounded;
-    }
-    if (lower.contains('longitud') || lower.contains('metro') || lower.contains('distancia')) {
-      return Icons.straighten_rounded;
-    }
-    if (lower.contains('tiempo') || lower.contains('hora') || lower.contains('minuto')) {
-      return Icons.access_time_filled_rounded;
-    }
-    return Icons.linear_scale_rounded;
   }
 
-  Color _getScaleColor(String name) {
-    final lower = name.toLowerCase();
-    if (lower.contains('peso')) return AppThemeTokens.teal;
-    if (lower.contains('volumen')) return AppThemeTokens.info;
-    if (lower.contains('longitud')) return AppThemeTokens.purple;
-    if (lower.contains('tiempo')) return AppThemeTokens.warning;
-    return AppThemeTokens.indigo;
+  Color _getScaleColor(UnitScaleType type) {
+    switch (type) {
+      case UnitScaleType.weight:
+        return AppThemeTokens.teal;
+      case UnitScaleType.volume:
+        return AppThemeTokens.info;
+      case UnitScaleType.length:
+        return AppThemeTokens.purple;
+      case UnitScaleType.pack:
+      case UnitScaleType.fractionPack:
+        return AppThemeTokens.warning;
+      case UnitScaleType.custom:
+        return AppThemeTokens.indigo;
+    }
   }
 
   @override
@@ -233,8 +237,8 @@ class _UnitScalesPanelState extends State<UnitScalesPanel> with AutomaticKeepAli
                         separatorBuilder: (_, _) => const SizedBox(height: 10),
                         itemBuilder: (context, index) {
                           final scale = scales[index];
-                          final icon = _getScaleIcon(scale.name);
-                          final color = _getScaleColor(scale.name);
+                          final icon = _getScaleIcon(scale.scaleType);
+                          final color = _getScaleColor(scale.scaleType);
 
                           return _UnitScaleCard(
                             scale: scale,
@@ -273,15 +277,9 @@ class _ScalesHeader extends StatelessWidget {
       ),
     );
 
-    final button = ElevatedButton.icon(
+    final button = PrimaryMenuButton(
       onPressed: onCreateScale,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppThemeTokens.indigo,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        shape: RoundedRectangleBorder(borderRadius: AppThemeTokens.borderRadiusMd),
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       icon: const Icon(Icons.add_rounded, size: 18),
       label: const Text(
         'Nueva Escala',
@@ -404,6 +402,10 @@ class _UnitScaleCardState extends State<_UnitScaleCard> {
                   spacing: 6,
                   runSpacing: 4,
                   children: [
+                    AppStatusBadge.purple(
+                      label: scale.scaleType.label,
+                      icon: Icons.category_outlined,
+                    ),
                     AppStatusBadge.indigo(
                       label: "Base: ${scale.baseUnit}",
                       icon: Icons.straighten_rounded,

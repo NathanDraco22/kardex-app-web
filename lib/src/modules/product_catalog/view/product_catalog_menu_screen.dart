@@ -1,6 +1,7 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/constants/feature_flags.dart';
 import 'package:kardex_app_front/constants/route_names.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
@@ -53,8 +54,10 @@ class _Body extends StatelessWidget {
             child: MenuOptionCard(
               icon: Icons.straighten_rounded,
               accentColor: Colors.teal.shade700,
-              title: "Unidades y Escalas de Medida",
-              subtitle: "Factores de conversión, unidades de empaque y plantillas",
+              title: FeatureFlags.showUnitScales ? "Unidades y Escalas de Medida" : "Unidades de Medida",
+              subtitle: FeatureFlags.showUnitScales
+                  ? "Factores de conversión, unidades de empaque y plantillas"
+                  : "Unidades base y unidades de empaque",
               onTap: () => context.pushNamed(RouteNames.unitsAndScales),
             ),
           ),

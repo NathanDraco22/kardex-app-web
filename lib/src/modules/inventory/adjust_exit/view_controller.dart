@@ -75,6 +75,8 @@ class AdjustExitViewController extends ChangeNotifier {
         brandName: e.product.brandName,
         code: e.product.code,
         unitName: UnitConversionTool.resolveUnitName(e.selectedUnitName, e.product.unitName),
+        standardUnitName: e.product.defaultUnitName,
+        standardUnitFactor: e.product.defaultUnitFactor,
       );
     }).toList();
 

@@ -1,3 +1,5 @@
+import 'package:kardex_business/src/tools/unit_display_formatter.dart';
+
 class EntryItem {
   final String productId;
   final String productName;
@@ -7,6 +9,8 @@ class EntryItem {
   final int cost;
   final int quantity;
   final int conversionFactor;
+  final String? standardUnitName;
+  final int? standardUnitFactor;
   final int? expirationDate;
 
   EntryItem({
@@ -15,11 +19,26 @@ class EntryItem {
     required this.cost,
     required this.quantity,
     this.conversionFactor = 1,
+    this.standardUnitName,
+    this.standardUnitFactor,
     this.expirationDate,
     this.code,
     this.brandName,
     this.unitName,
   });
+
+  UnitDisplayValue get displayQuantity =>
+      UnitDisplayFormatter.formatUnitQuantity(
+        baseQuantity: quantity,
+        conversionFactor: conversionFactor,
+        selectedUnitName: unitName,
+        standardUnitName: standardUnitName,
+        standardUnitFactor: standardUnitFactor,
+      );
+
+  String get formattedDisplayQuantity => displayQuantity.quantityText;
+
+  String get displayUnitName => displayQuantity.unitName;
 
   factory EntryItem.fromJson(Map<String, dynamic> json) {
     return EntryItem(
@@ -31,12 +50,14 @@ class EntryItem {
       cost: json['cost'] as int,
       quantity: json['quantity'] as int,
       conversionFactor: json['conversionFactor'] as int? ?? 1,
+      standardUnitName: json['standardUnitName'] as String?,
+      standardUnitFactor: json['standardUnitFactor'] as int?,
       expirationDate: json['expirationDate'] as int?,
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
+    final data = <String, dynamic>{
       'productId': productId,
       'productName': productName,
       'cost': cost,
@@ -47,5 +68,12 @@ class EntryItem {
       'brandName': brandName,
       'unitName': unitName,
     };
+    if (standardUnitName != null) {
+      data['standardUnitName'] = standardUnitName;
+    }
+    if (standardUnitFactor != null) {
+      data['standardUnitFactor'] = standardUnitFactor;
+    }
+    return data;
   }
 }

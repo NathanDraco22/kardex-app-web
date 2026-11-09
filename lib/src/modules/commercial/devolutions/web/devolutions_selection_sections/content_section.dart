@@ -43,12 +43,12 @@ class _ContentSection extends StatelessWidget {
                       Expanded(flex: 3, child: Text(item.product.brandName)),
                       Expanded(
                         flex: 1,
-                        child: Text(item.quantity.toString(), textAlign: TextAlign.center),
+                        child: Text(item.formattedDisplayQuantity, textAlign: TextAlign.center),
                       ),
                       Expanded(
                         flex: 2,
                         child: Text(
-                          NumberFormatter.convertToMoneyLike(item.price),
+                          NumberFormatter.convertToMoneyLike(item.price * item.conversionFactor),
                           textAlign: TextAlign.right,
                         ),
                       ),

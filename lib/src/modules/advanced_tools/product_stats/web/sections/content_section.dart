@@ -31,11 +31,11 @@ class _ContentSectionState extends State<_ContentSection> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text("Error: ${state.message}"),
-                ElevatedButton(
+                PrimaryMenuButton(
                   onPressed: () {
                     context.read<ReadProductStatsCubit>().getAllWithInfo();
                   },
-                  child: const Text("Reintentar"),
+                  label: const Text("Reintentar"),
                 ),
               ],
             ),

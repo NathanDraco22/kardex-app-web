@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -10,6 +12,8 @@ import 'package:kardex_app_front/widgets/dialogs/selectors/client_selection_dial
 import 'package:kardex_app_front/widgets/dialogs/viewers/credit_note_viewer.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
+
+import '../credit_note_policy.dart';
 
 Future<CreditNoteInDb?> showCreateCreditNoteDialog(BuildContext context) async {
   final writeCubit = context.read<WriteCreditNoteCubit>();
@@ -59,7 +63,13 @@ class _CreateCreditNoteDialogState extends State<_CreateCreditNoteDialog> {
   final _invoiceSearchController = TextEditingController();
   bool _isSearchingInvoice = false;
   InvoiceInDb? _searchedInvoice;
-  final Map<String, int> _returnedQuantities = {}; // product.id -> quantity
+  // index de línea -> cantidad en unidad comercial (display)
+  final Map<int, double> _returnedQuantities = {};
+  // index de línea -> cantidad base ya devuelta en notas previas
+  final Map<int, int> _previouslyReturnedBase = {};
+  int _invoiceSearchGeneration = 0;
+  bool _isLoadingPreviousCreditNotes = false;
+  String _idempotencyKey = generateCreditNoteIdempotencyKey();
 
   // Campos por Monto
   ClientInDb? _selectedClient;
@@ -89,17 +99,25 @@ class _CreateCreditNoteDialogState extends State<_CreateCreditNoteDialog> {
       if (!mounted) return;
 
       setState(() {
+        if (_searchedInvoice?.id != invoice.id) {
+          _idempotencyKey = generateCreditNoteIdempotencyKey();
+        }
         _searchedInvoice = invoice;
+        _invoiceSearchGeneration++;
+        _previouslyReturnedBase.clear();
         _returnedQuantities.clear();
-        for (final item in invoice.saleItems) {
-          _returnedQuantities[item.product.id] = 0;
+        for (var index = 0; index < invoice.saleItems.length; index++) {
+          _returnedQuantities[index] = 0.0;
         }
       });
+
+      await _loadPreviousCreditNotes(invoice);
     } catch (e) {
       if (mounted) {
         DialogManager.showErrorDialog(context, "No se encontró la factura \"$docNumber\"");
         setState(() {
           _searchedInvoice = null;
+          _previouslyReturnedBase.clear();
           _returnedQuantities.clear();
         });
       }
@@ -112,21 +130,115 @@ class _CreateCreditNoteDialogState extends State<_CreateCreditNoteDialog> {
     }
   }
 
+  Future<void> _loadPreviousCreditNotes(InvoiceInDb invoice) async {
+    setState(() => _isLoadingPreviousCreditNotes = true);
+
+    try {
+      final notes = await context.read<CreditNotesRepository>().getCreditNotesByInvoiceId(invoice.id);
+
+      if (!mounted || _searchedInvoice?.id != invoice.id) return;
+
+      final previous = <int, int>{};
+      final legacyItems = <SaleItem>[];
+
+      for (final note in notes) {
+        if (note.status == CreditNoteStatus.cancelled) continue;
+        for (final item in note.returnedItems) {
+          final index = item.invoiceItemIndex;
+          if (index != null && index >= 0 && index < invoice.saleItems.length) {
+            previous[index] = (previous[index] ?? 0) + item.quantity.abs();
+          } else {
+            legacyItems.add(item);
+          }
+        }
+      }
+
+      // Fallback para notas antiguas sin invoiceItemIndex: se imputan solo
+      // cuando hay una única línea con el mismo producto y conversionFactor.
+      for (final item in legacyItems) {
+        final matches = <int>[];
+        for (var index = 0; index < invoice.saleItems.length; index++) {
+          final line = invoice.saleItems[index];
+          final sameProduct = line.product.id == item.product.id;
+          final sameFactor =
+              UnitConversionTool.ensureSafeFactor(line.conversionFactor) ==
+              UnitConversionTool.ensureSafeFactor(item.conversionFactor);
+          if (sameProduct && sameFactor) matches.add(index);
+        }
+        if (matches.length == 1) {
+          final index = matches.single;
+          previous[index] = (previous[index] ?? 0) + item.quantity.abs();
+        }
+        // Si hay ambigüedad se ignora; el backend sigue validando por índice.
+      }
+
+      setState(() {
+        _previouslyReturnedBase
+          ..clear()
+          ..addAll(previous);
+        _returnedQuantities.clear();
+        for (var index = 0; index < invoice.saleItems.length; index++) {
+          _returnedQuantities[index] = 0.0;
+        }
+        _invoiceSearchGeneration++;
+      });
+    } catch (_) {
+      if (mounted) {
+        DialogManager.showErrorDialog(
+          context,
+          "No se pudieron cargar las devoluciones previas de la factura. "
+          "El servidor validará el tope al emitir la nota.",
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoadingPreviousCreditNotes = false);
+      }
+    }
+  }
+
+  int _previouslyReturnedFor(int index) => _previouslyReturnedBase[index] ?? 0;
+
+  /// Tope de devolución expresado en unidad comercial, descontando el
+  /// acumulado de notas de crédito previas de la misma línea.
+  double _maxDisplayQuantity(SaleItem item, int index) {
+    final remaining = math.max(0, item.quantity - _previouslyReturnedFor(index));
+    return remaining / UnitConversionTool.ensureSafeFactor(item.conversionFactor);
+  }
+
+  CreditNoteLineResult _calculateLine(
+    SaleItem item,
+    int index,
+    double displayQuantity,
+  ) {
+    return calculateCreditNoteLine(
+      displayQuantity: displayQuantity,
+      conversionFactor: item.conversionFactor,
+      invoiceQuantity: item.quantity,
+      invoiceSubTotal: item.subTotal,
+      invoiceTotal: item.total,
+      previouslyReturnedBase: _previouslyReturnedFor(index),
+    );
+  }
+
   int get _calculatedDevolutionTotal {
     if (_searchedInvoice == null) return 0;
+    final items = _searchedInvoice!.saleItems;
     int total = 0;
-    for (final item in _searchedInvoice!.saleItems) {
-      final qty = _returnedQuantities[item.product.id] ?? 0;
-      total += qty * item.price;
+    for (var index = 0; index < items.length; index++) {
+      final result = _calculateLine(items[index], index, _returnedQuantities[index] ?? 0);
+      if (result is CreditNoteLineAmounts) total += result.total;
     }
     return total;
   }
 
   int get _calculatedDevolutionItemsCount {
     if (_searchedInvoice == null) return 0;
+    final items = _searchedInvoice!.saleItems;
     int count = 0;
-    for (final qty in _returnedQuantities.values) {
-      count += qty;
+    for (var index = 0; index < items.length; index++) {
+      final result = _calculateLine(items[index], index, _returnedQuantities[index] ?? 0);
+      if (result is CreditNoteLineAmounts) count++;
     }
     return count;
   }
@@ -155,29 +267,60 @@ class _CreateCreditNoteDialogState extends State<_CreateCreditNoteDialog> {
       }
 
       final itemsToReturn = <SaleItem>[];
-      for (final item in _searchedInvoice!.saleItems) {
-        final qty = _returnedQuantities[item.product.id] ?? 0;
-        if (qty > 0) {
-          itemsToReturn.add(
-            SaleItem(
-              product: item.product,
-              selectedPrice: item.selectedPrice,
-              quantity: qty,
-              cost: item.cost,
-              price: item.price,
-              subTotal: qty * item.price,
-              total: qty * item.price,
-            ),
+      final invoiceItems = _searchedInvoice!.saleItems;
+      for (var index = 0; index < invoiceItems.length; index++) {
+        final item = invoiceItems[index];
+        final displayQuantity = _returnedQuantities[index] ?? 0;
+        if (displayQuantity <= 0) continue;
+
+        final result = _calculateLine(item, index, displayQuantity);
+        if (result is CreditNoteLineInvalid) {
+          DialogManager.showErrorDialog(
+            context,
+            "${item.product.name}: ${result.message}",
           );
+          return;
         }
+        if (result is! CreditNoteLineAmounts) continue;
+
+        itemsToReturn.add(
+          SaleItem(
+            product: item.product,
+            selectedPrice: item.selectedPrice,
+            quantity: result.quantity,
+            bonQuantity: 0,
+            cost: item.cost,
+            price: item.price,
+            subTotal: result.subTotal,
+            discountPercentage: item.discountPercentage,
+            totalDiscount: result.totalDiscount,
+            total: result.total,
+            conversionFactor: UnitConversionTool.ensureSafeFactor(item.conversionFactor),
+            selectedUnitName: item.selectedUnitName,
+            standardUnitName: item.standardUnitName,
+            standardUnitFactor: item.standardUnitFactor,
+            invoiceItemIndex: index,
+          ),
+        );
       }
 
       if (itemsToReturn.isEmpty) {
-        DialogManager.showErrorDialog(context, "Debes seleccionar al menos un producto a devolver con cantidad mayor a 0");
+        DialogManager.showErrorDialog(
+          context,
+          "Debes seleccionar al menos un producto a devolver con cantidad mayor a 0",
+        );
         return;
       }
 
-      final total = _calculatedDevolutionTotal;
+      final total = itemsToReturn.fold<int>(0, (sum, item) => sum + item.total);
+      if (total <= 0) {
+        DialogManager.showErrorDialog(
+          context,
+          "El total de la nota de crédito debe ser mayor a 0",
+        );
+        return;
+      }
+
       final createDoc = CreateCreditNote(
         branchId: currentBranch.id,
         clientId: _searchedInvoice!.clientId,
@@ -190,12 +333,16 @@ class _CreateCreditNoteDialogState extends State<_CreateCreditNoteDialog> {
         description: reason,
         status: CreditNoteStatus.confirmed,
         createdBy: UserInfo(id: currentUser.id, name: currentUser.username),
+        idempotencyKey: _idempotencyKey,
       );
 
       final created = await context.read<WriteCreditNoteCubit>().create(createDoc);
       if (created != null && mounted) {
         context.pop(created);
         showCreditNoteViewerDialog(context, created);
+      } else if (mounted) {
+        // El backend pudo rechazar el tope acumulado: recargamos lo devuelto.
+        await _loadPreviousCreditNotes(_searchedInvoice!);
       }
     } else {
       // Tipo Monto
@@ -231,6 +378,7 @@ class _CreateCreditNoteDialogState extends State<_CreateCreditNoteDialog> {
         description: reason,
         status: CreditNoteStatus.confirmed,
         createdBy: UserInfo(id: currentUser.id, name: currentUser.username),
+        idempotencyKey: _idempotencyKey,
       );
 
       final created = await context.read<WriteCreditNoteCubit>().create(createDoc);
@@ -268,9 +416,7 @@ class _CreateCreditNoteDialogState extends State<_CreateCreditNoteDialog> {
                 subtitle: isDevolution
                     ? "Devolución de mercancía e ingreso al inventario"
                     : "Ajuste directo de saldo / bonificación al cliente",
-                icon: isDevolution
-                    ? Icons.assignment_return_rounded
-                    : Icons.monetization_on_rounded,
+                icon: isDevolution ? Icons.assignment_return_rounded : Icons.monetization_on_rounded,
                 accentColor: themeColor,
                 trailingBadge: isDevolution
                     ? AppStatusBadge.indigo(label: "Devolución")
@@ -304,7 +450,12 @@ class _CreateCreditNoteDialogState extends State<_CreateCreditNoteDialog> {
                                     icon: Icons.assignment_return_rounded,
                                     isSelected: isDevolution,
                                     accentColor: AppThemeTokens.indigo,
-                                    onTap: () => setState(() => _selectedType = CreditNoteType.devolution),
+                                    onTap: () => setState(() {
+                                      if (_selectedType != CreditNoteType.devolution) {
+                                        _idempotencyKey = generateCreditNoteIdempotencyKey();
+                                      }
+                                      _selectedType = CreditNoteType.devolution;
+                                    }),
                                   ),
                                 ),
                                 const SizedBox(width: 4),
@@ -314,7 +465,12 @@ class _CreateCreditNoteDialogState extends State<_CreateCreditNoteDialog> {
                                     icon: Icons.attach_money_rounded,
                                     isSelected: !isDevolution,
                                     accentColor: AppThemeTokens.teal,
-                                    onTap: () => setState(() => _selectedType = CreditNoteType.amount),
+                                    onTap: () => setState(() {
+                                      if (_selectedType != CreditNoteType.amount) {
+                                        _idempotencyKey = generateCreditNoteIdempotencyKey();
+                                      }
+                                      _selectedType = CreditNoteType.amount;
+                                    }),
                                   ),
                                 ),
                               ],
@@ -356,17 +512,9 @@ class _CreateCreditNoteDialogState extends State<_CreateCreditNoteDialog> {
                                 const SizedBox(width: 10),
                                 SizedBox(
                                   height: 48,
-                                  child: ElevatedButton.icon(
+                                  child: PrimaryMenuButton(
                                     onPressed: _isSearchingInvoice ? null : _searchInvoice,
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: AppThemeTokens.indigo,
-                                      foregroundColor: Colors.white,
-                                      elevation: 0,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: AppThemeTokens.borderRadiusMd,
-                                      ),
-                                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                                    ),
+                                    padding: const EdgeInsets.symmetric(horizontal: 16),
                                     icon: _isSearchingInvoice
                                         ? const SizedBox(
                                             width: 16,
@@ -449,6 +597,12 @@ class _CreateCreditNoteDialogState extends State<_CreateCreditNoteDialog> {
                               ),
                               const SizedBox(height: 8),
 
+                              if (_isLoadingPreviousCreditNotes)
+                                const Padding(
+                                  padding: EdgeInsets.only(bottom: 8),
+                                  child: LinearProgressIndicator(minHeight: 2),
+                                ),
+
                               Container(
                                 decoration: BoxDecoration(
                                   color: Colors.white,
@@ -462,7 +616,25 @@ class _CreateCreditNoteDialogState extends State<_CreateCreditNoteDialog> {
                                   separatorBuilder: (_, _) => const Divider(height: 1, color: Color(0xFFF1F5F9)),
                                   itemBuilder: (context, index) {
                                     final item = _searchedInvoice!.saleItems[index];
-                                    final currentQty = _returnedQuantities[item.product.id] ?? 0;
+                                    final currentQty = _returnedQuantities[index] ?? 0.0;
+                                    final factor = UnitConversionTool.ensureSafeFactor(
+                                      item.conversionFactor,
+                                    );
+                                    final isBaseUnit = factor <= 1;
+                                    final previousBase = _previouslyReturnedFor(index);
+                                    final maxDisplayQuantity = _maxDisplayQuantity(item, index);
+                                    final isFullyReturned = maxDisplayQuantity <= 0;
+                                    final displayPrice = item.price * factor;
+                                    final details = StringBuffer(
+                                      "Facturados: ${item.formattedDisplayQuantity} ${item.product.unitName}"
+                                      " | Precio: ${NumberFormatter.convertToMoneyLike(displayPrice)} / ${item.product.unitName}",
+                                    );
+                                    if (previousBase > 0) {
+                                      details.write(
+                                        " | Devuelto: ${UnitConversionTool.formatQuantity(previousBase / factor)}"
+                                        " | Disponible: ${UnitConversionTool.formatQuantity(maxDisplayQuantity)}",
+                                      );
+                                    }
                                     return Padding(
                                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                                       child: Row(
@@ -481,55 +653,63 @@ class _CreateCreditNoteDialogState extends State<_CreateCreditNoteDialog> {
                                                 ),
                                                 const SizedBox(height: 2),
                                                 Text(
-                                                  "Facturados: ${item.quantity} | Precio unitario: ${NumberFormatter.convertToMoneyLike(item.price)}",
-                                                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                                                  details.toString(),
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: isFullyReturned
+                                                        ? AppThemeTokens.indigo
+                                                        : Colors.grey.shade600,
+                                                  ),
                                                 ),
                                               ],
                                             ),
                                           ),
-                                          Container(
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xFFF8FAFC),
-                                              borderRadius: AppThemeTokens.borderRadiusSm,
-                                              border: Border.all(color: const Color(0xFFE2E8F0)),
-                                            ),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                IconButton(
-                                                  icon: const Icon(Icons.remove_rounded, size: 18),
-                                                  splashRadius: 18,
-                                                  onPressed: currentQty > 0
-                                                      ? () {
-                                                          setState(() {
-                                                            _returnedQuantities[item.product.id] = currentQty - 1;
-                                                          });
-                                                        }
-                                                      : null,
+                                          const SizedBox(width: 12),
+                                          SizedBox(
+                                            width: 132,
+                                            child: QuantityField(
+                                              key: ValueKey(
+                                                "${_invoiceSearchGeneration}_${_searchedInvoice!.id}_$index",
+                                              ),
+                                              initialValue: currentQty,
+                                              conversionFactor: item.conversionFactor,
+                                              allowDecimals: !isBaseUnit,
+                                              step: isBaseUnit ? 1 : null,
+                                              max: maxDisplayQuantity,
+                                              baseUnitName: item.product.unitName,
+                                              readOnly: isFullyReturned,
+                                              unitLabel: item.product.unitName,
+                                              showTitle: false,
+                                              showButtons: false,
+                                              decoration: InputDecoration(
+                                                isDense: true,
+                                                filled: true,
+                                                fillColor: const Color(0xFFF8FAFC),
+                                                contentPadding: const EdgeInsets.symmetric(
+                                                  horizontal: 10,
+                                                  vertical: 10,
                                                 ),
-                                                Container(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                                                  child: Text(
-                                                    "$currentQty",
-                                                    style: const TextStyle(
-                                                      fontWeight: FontWeight.w700,
-                                                      fontSize: 14.5,
-                                                      color: Color(0xFF0F172A),
-                                                    ),
+                                                border: OutlineInputBorder(
+                                                  borderRadius: AppThemeTokens.borderRadiusSm,
+                                                  borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                                                ),
+                                                enabledBorder: OutlineInputBorder(
+                                                  borderRadius: AppThemeTokens.borderRadiusSm,
+                                                  borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                                                ),
+                                                focusedBorder: OutlineInputBorder(
+                                                  borderRadius: AppThemeTokens.borderRadiusSm,
+                                                  borderSide: const BorderSide(
+                                                    color: AppThemeTokens.indigo,
+                                                    width: 1.5,
                                                   ),
                                                 ),
-                                                IconButton(
-                                                  icon: const Icon(Icons.add_rounded, size: 18),
-                                                  splashRadius: 18,
-                                                  onPressed: currentQty < item.quantity
-                                                      ? () {
-                                                          setState(() {
-                                                            _returnedQuantities[item.product.id] = currentQty + 1;
-                                                          });
-                                                        }
-                                                      : null,
-                                                ),
-                                              ],
+                                              ),
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  _returnedQuantities[index] = value;
+                                                });
+                                              },
                                             ),
                                           ),
                                         ],
@@ -734,16 +914,10 @@ class _CreateCreditNoteDialogState extends State<_CreateCreditNoteDialog> {
                           // --- BOTÓN EMITIR ---
                           SizedBox(
                             height: 48,
-                            child: ElevatedButton.icon(
+                            child: PrimaryMenuButton(
                               onPressed: _submit,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: themeColor,
-                                foregroundColor: Colors.white,
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: AppThemeTokens.borderRadiusMd,
-                                ),
-                              ),
+                              backgroundColor: themeColor,
+                              foregroundColor: Colors.white,
                               icon: const Icon(Icons.check_circle_rounded, size: 20),
                               label: const Text(
                                 "Emitir Nota de Crédito",

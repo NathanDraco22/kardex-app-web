@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 
 import 'cubit/api_keys_cubit.dart';
 
@@ -428,7 +429,7 @@ class _CreateApiKeyDialogState extends State<_CreateApiKeyDialog> {
           onPressed: () => Navigator.of(context).pop(),
           child: const Text("Cancelar"),
         ),
-        ElevatedButton(
+        PrimaryMenuButton(
           onPressed: () {
             final name = _nameController.text.trim();
             if (name.isEmpty) {
@@ -440,7 +441,7 @@ class _CreateApiKeyDialogState extends State<_CreateApiKeyDialog> {
             Navigator.of(context).pop();
             widget.onSave(name, _selectedServiceType);
           },
-          child: const Text("Generar Llave"),
+          label: const Text("Generar Llave"),
         ),
       ],
     );

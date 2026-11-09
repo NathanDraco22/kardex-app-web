@@ -9,6 +9,7 @@ import 'package:kardex_app_front/cubits/app_mode/app_mode_cubit.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
 import 'package:kardex_app_front/src/tools/navigation_tool.dart';
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/password_title_textfield.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
@@ -189,11 +190,11 @@ class _BodyState extends State<_Body> {
                       ),
 
                       const SizedBox(height: 16),
-                      ElevatedButton(
+                      PrimaryMenuButton(
                         onPressed: () {
                           getIt<AuthCubit>().login(userId, password);
                         },
-                        child: const Text("Iniciar Sesión"),
+                        label: const Text("Iniciar Sesión"),
                       ),
                     ],
                   ),

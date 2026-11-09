@@ -65,7 +65,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                       endDate = value.add(const Duration(days: 1));
                     },
                   ),
-                  ElevatedButton.icon(
+                  PrimaryMenuButton(
                     onPressed: () async {
                       if (startDate == null || endDate == null) {
                         ScaffoldMessenger.of(context).showSnackBar(

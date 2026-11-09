@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/role_tools.dart';
+import 'package:kardex_app_front/widgets/buttons/secondary_menu_button.dart';
 import 'package:kardex_app_front/widgets/title_label.dart';
 
 Future<void> showProductInBranchInfoDialog(
@@ -143,21 +144,27 @@ class ProductInBranchInfoDialog extends StatelessWidget {
                     Expanded(
                       child: TitleLabel(
                         title: "Promedio",
-                        bigTitle: NumberFormatter.convertFromCentsToUnitsCurrency(product.account.averageCost * product.defaultUnitFactor),
+                        bigTitle: NumberFormatter.convertFromCentsToUnitsCurrency(
+                          product.account.averageCost * product.defaultUnitFactor,
+                        ),
                         crossAxisAlignment: CrossAxisAlignment.center,
                       ),
                     ),
                     Expanded(
                       child: TitleLabel(
                         title: "Último",
-                        bigTitle: NumberFormatter.convertFromCentsToUnitsCurrency(product.account.lastCost * product.defaultUnitFactor),
+                        bigTitle: NumberFormatter.convertFromCentsToUnitsCurrency(
+                          product.account.lastCost * product.defaultUnitFactor,
+                        ),
                         crossAxisAlignment: CrossAxisAlignment.center,
                       ),
                     ),
                     Expanded(
                       child: TitleLabel(
                         title: "Mayor",
-                        bigTitle: NumberFormatter.convertFromCentsToUnitsCurrency(product.account.maximumCost * product.defaultUnitFactor),
+                        bigTitle: NumberFormatter.convertFromCentsToUnitsCurrency(
+                          product.account.maximumCost * product.defaultUnitFactor,
+                        ),
                         crossAxisAlignment: CrossAxisAlignment.center,
                       ),
                     ),
@@ -173,16 +180,22 @@ class ProductInBranchInfoDialog extends StatelessWidget {
               const SizedBox(height: 8),
               TitleLabel(
                 title: "Existencia Disponible",
-                bigTitle: NumberFormatter.formatDisplayStock(product.account.availableStock, product.defaultUnitFactor),
+                bigTitle: NumberFormatter.formatDisplayStock(
+                  product.account.availableStock,
+                  product.defaultUnitFactor,
+                  selectedUnitName: product.defaultUnitName,
+                  standardUnitName: product.defaultUnitName,
+                  standardUnitFactor: product.defaultUnitFactor,
+                ),
                 crossAxisAlignment: CrossAxisAlignment.center,
               ),
 
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
+                child: SecondaryMenuButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text("Cerrar"),
+                  label: const Text("Cerrar"),
                 ),
               ),
             ],

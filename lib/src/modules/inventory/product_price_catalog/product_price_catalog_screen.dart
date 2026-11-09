@@ -6,6 +6,7 @@ import 'package:kardex_app_front/src/cubits/read_product_in_branch/read_product_
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/inventory/product_price_catalog/web/product_catalog_web.dart';
 import 'package:kardex_app_front/src/modules/inventory/product_price_catalog/cubits/export_price_list_cubit.dart';
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 class ProductPriceCatalogScreen extends StatelessWidget {
   const ProductPriceCatalogScreen({super.key});
@@ -76,7 +77,7 @@ class _RootScaffold extends StatelessWidget {
                                 ),
                               );
                             }
-                            return ElevatedButton.icon(
+                            return PrimaryMenuButton(
                               onPressed: () {
                                 context.read<ExportPriceListCubit>().exportExcel(branchName: getIt<AuthCubit>().currentBranchName, branchId: getIt<AuthCubit>().currentBranchId);
                               },

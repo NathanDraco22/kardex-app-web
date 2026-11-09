@@ -8,7 +8,6 @@ import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/comm
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/search_product_commercial_dialog.dart';
 
-
 class AnonInvoiceTable extends StatefulWidget {
   const AnonInvoiceTable({
     super.key,
@@ -88,8 +87,10 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
                           );
                           if (!context.mounted) return;
                           if (res == null) return;
-                          if (res.product.account.availableStock == 0 ||
-                              res.product.account.availableStock < res.baseQuantity) {
+                          // La venta directa agrega la fila sin cantidad para
+                          // capturarla luego en la tabla.
+                          if (res.product.account.availableStock <= 0 ||
+                              res.baseQuantity > res.product.account.availableStock) {
                             DialogManager.showInfoDialog(
                               context,
                               "No hay stock disponible",
@@ -127,8 +128,9 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
             isDirectSale: true,
           );
           if (res == null) return;
-          if (res.product.account.availableStock == 0 ||
-              res.product.account.availableStock < res.baseQuantity) {
+          // La venta directa agrega la fila sin cantidad para capturarla
+          // luego en la tabla.
+          if (res.product.account.availableStock <= 0 || res.baseQuantity > res.product.account.availableStock) {
             if (!context.mounted) return;
             await DialogManager.showErrorDialog(
               context,
@@ -145,8 +147,15 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
             commercialProductResult: item,
           );
           if (res == null) return;
-          if (res.product.account.availableStock == 0 ||
-              res.product.account.availableStock < res.baseQuantity) {
+          if (res.baseQuantity <= 0) {
+            if (!context.mounted) return;
+            await DialogManager.showErrorDialog(
+              context,
+              "La cantidad debe ser mayor a 0",
+            );
+            return;
+          }
+          if (res.baseQuantity > res.product.account.availableStock) {
             if (!context.mounted) return;
             await DialogManager.showErrorDialog(
               context,
@@ -193,6 +202,10 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
     super.build(context);
 
     final product = widget.item.product;
+    final isSuperiorUnit = widget.item.selectedUnitIndex > product.defaultUnitIndex;
+    final maxDisplayQuantity = isSuperiorUnit
+        ? (product.account.availableStock / widget.item.conversionFactor).floorToDouble()
+        : product.account.availableStock / widget.item.conversionFactor;
 
     final price = NumberFormatter.convertToMoneyLike(
       widget.item.newPrice * widget.item.conversionFactor,
@@ -302,8 +315,11 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
                   showButtons: false,
                   showTitle: false,
                   conversionFactor: widget.item.conversionFactor,
+                  allowDecimals: widget.item.selectedUnitIndex > 0 && !isSuperiorUnit,
+                  step: isSuperiorUnit ? 1 : null,
+                  baseUnitName: product.unitName,
                   initialValue: widget.item.quantity,
-                  max: widget.item.product.account.availableStock / widget.item.conversionFactor,
+                  max: maxDisplayQuantity,
                   onChanged: (value) {
                     widget.item.quantity = value;
                     widget.controller.refresh();

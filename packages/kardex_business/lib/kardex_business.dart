@@ -29,7 +29,6 @@ export 'src/domain/query_params/transaction_query_params.dart';
 export 'src/domain/query_params/transfer_query_params.dart';
 export 'src/domain/query_params/hold_sale_filter_params.dart';
 
-
 export 'src/services/http_service.dart';
 export 'src/services/dio_http_service.dart';
 export 'src/services/hive_service.dart';
@@ -39,6 +38,7 @@ export 'src/tools/http_tool.dart';
 export 'src/tools/constant.dart';
 export 'src/tools/number_formatter.dart';
 export 'src/tools/unit_conversion_tool.dart';
+export 'src/tools/unit_display_formatter.dart';
 export 'src/tools/unit_scale_presets.dart';
 export 'src/tools/datetime_tool.dart';
 export 'src/tools/reactive_repo/reactive_repository.dart';

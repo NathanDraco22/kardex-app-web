@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/cubits/expense_category_cubit/write_expense_categories_cubit.dart';
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
@@ -78,7 +79,7 @@ class _CreateExpenseCategoryDialogState extends State<CreateExpenseCategoryDialo
                   },
                   child: const Text("Cancelar"),
                 ),
-                ElevatedButton(
+                PrimaryMenuButton(
                   onPressed: () async {
                     if (!formKey.currentState!.validate()) return;
                     if (currentCategory == null) {
@@ -104,7 +105,7 @@ class _CreateExpenseCategoryDialogState extends State<CreateExpenseCategoryDialo
                       );
                     }
                   },
-                  child: Text(prefixTitle),
+                  label: Text(prefixTitle),
                 ),
               ],
               content: SizedBox(

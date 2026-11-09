@@ -198,6 +198,13 @@ class MenuActions extends StatelessWidget {
               label: saveButtonTitle,
               onPressed: canSave
                   ? () async {
+                      if (viewController.hasItemsWithZeroBaseQuantity) {
+                        DialogManager.showErrorDialog(
+                          context,
+                          "No se puede facturar porque hay productos sin cantidad. Por favor, edita o elimina estos productos.",
+                        );
+                        return;
+                      }
                       if (viewController.hasZeroPriceItems) {
                         DialogManager.showErrorDialog(
                           context,

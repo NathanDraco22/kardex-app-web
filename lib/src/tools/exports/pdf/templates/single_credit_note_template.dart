@@ -310,7 +310,7 @@ class SingleCreditNoteTemplate implements PdfTemplate {
                       pw.Text(item.product.name, style: const pw.TextStyle(fontSize: 12)),
                       pw.SizedBox(height: 2),
                       pw.Text(
-                        item.product.unitName,
+                        item.displayUnitName,
                         style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey600),
                       ),
                     ],
@@ -318,10 +318,21 @@ class SingleCreditNoteTemplate implements PdfTemplate {
                 ),
                 pw.Expanded(
                   flex: 1,
-                  child: pw.Text(
-                    item.formattedDisplayQuantity,
-                    textAlign: pw.TextAlign.center,
-                    style: const pw.TextStyle(fontSize: 12),
+                  child: pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.center,
+                    children: [
+                      pw.Text(
+                        item.formattedDisplayQuantity,
+                        textAlign: pw.TextAlign.center,
+                        style: const pw.TextStyle(fontSize: 12),
+                      ),
+                      if (item.bonQuantity > 0)
+                        pw.Text(
+                          "+ ${item.formattedDisplayBonQuantity} bonif.",
+                          textAlign: pw.TextAlign.center,
+                          style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey600),
+                        ),
+                    ],
                   ),
                 ),
                 pw.Expanded(

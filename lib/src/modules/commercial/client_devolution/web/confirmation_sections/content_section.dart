@@ -6,7 +6,7 @@ class _ContentSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final totalDevolution = items.fold<int>(0, (sum, item) => sum + (item.price * item.quantity));
+    final totalDevolution = items.fold<int>(0, (sum, item) => sum + item.total);
     final totalFormatted = NumberFormatter.convertToMoneyLike(totalDevolution);
 
     return Card(
@@ -24,13 +24,12 @@ class _ContentSection extends StatelessWidget {
               separatorBuilder: (context, index) => const Divider(height: 1),
               itemBuilder: (context, index) {
                 final item = items[index];
-                final subtotal = item.price * item.quantity;
-                final priceFormatted = NumberFormatter.convertToMoneyLike(item.price);
-                final subtotalFormatted = NumberFormatter.convertToMoneyLike(subtotal);
+                final priceFormatted = NumberFormatter.convertToMoneyLike(item.price * item.conversionFactor);
+                final subtotalFormatted = NumberFormatter.convertToMoneyLike(item.total);
 
                 return ListTile(
                   title: Text(item.product.name),
-                  subtitle: Text('Cantidad: ${item.quantity} x $priceFormatted'),
+                  subtitle: Text('Cantidad: ${item.formattedDisplayQuantity} x $priceFormatted'),
                   trailing: Text(subtotalFormatted),
                 );
               },

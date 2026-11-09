@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/units/cubit/write_unit_cubit.dart';
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
@@ -66,14 +67,14 @@ class _CreateUnitDialogState extends State<CreateUnitDialog> {
                   },
                   child: const Text("Cancelar"),
                 ),
-                ElevatedButton(
+                PrimaryMenuButton(
                   onPressed: () {
                     if (formKey.currentState!.validate()) {
                       final newUnit = CreateUnit.fromJson(creationMap);
                       context.read<WriteUnitCubit>().createNewUnit(newUnit);
                     }
                   },
-                  child: const Text("Agregar Unidad"),
+                  label: const Text("Agregar Unidad"),
                 ),
               ],
               content: Column(

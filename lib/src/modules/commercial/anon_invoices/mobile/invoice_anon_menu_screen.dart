@@ -6,6 +6,7 @@ import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/cubits/write_invoice_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/widgets/dialogs/payment_confirmation_dialog.dart';
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
 import 'package:kardex_app_front/widgets/text_field_date_selector.dart';
@@ -222,7 +223,7 @@ class _SendButton extends StatelessWidget {
     return ListenableBuilder(
       listenable: viewController,
       builder: (context, _) {
-        return ElevatedButton.icon(
+        return PrimaryMenuButton(
           onPressed: () async {
             final totalCost = widget.saleItems.fold<int>(
               0,

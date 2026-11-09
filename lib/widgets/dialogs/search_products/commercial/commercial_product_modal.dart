@@ -193,8 +193,15 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
     final factor = commercialProductResult.conversionFactor;
     final unitName = commercialProductResult.selectedUnitName;
     final baseUnitName = widget.product.unitName;
-    final stockStr = NumberFormatter.formatDisplayStock(availableStock, factor);
-    final displayStock = "$stockStr $unitName";
+    final isSuperiorUnit = commercialProductResult.selectedUnitIndex > product.defaultUnitIndex;
+    final stockDisplay = UnitDisplayFormatter.formatUnitQuantity(
+      baseQuantity: availableStock,
+      conversionFactor: factor,
+      selectedUnitName: unitName,
+      standardUnitName: product.defaultUnitName,
+      standardUnitFactor: product.defaultUnitFactor,
+    );
+    final displayStock = "${stockDisplay.quantityText} ${stockDisplay.unitName}";
 
     return Form(
       key: formKey,
@@ -294,6 +301,8 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                                   focusNode: focusNode,
                                   initialValue: commercialProductResult.quantity,
                                   conversionFactor: commercialProductResult.conversionFactor,
+                                  allowDecimals: commercialProductResult.selectedUnitIndex > 0 && !isSuperiorUnit,
+                                  step: isSuperiorUnit ? 1 : null,
                                   unitLabel: commercialProductResult.selectedUnitName,
                                   baseUnitName: baseUnitName,
                                   titleTextAlign: TextAlign.center,
@@ -311,6 +320,9 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
 
                                     final requestedUnits = (numberValue * commercialProductResult.conversionFactor)
                                         .round();
+                                    if (requestedUnits <= 0) {
+                                      return "Cantidad invalida";
+                                    }
                                     if (widget.restrictStock && requestedUnits > availableStock) {
                                       return "Supera la existencia ($availableStock $baseUnitName)";
                                     }
@@ -470,7 +482,7 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                         "Cancelar",
                       ),
                     ),
-                    ElevatedButton(
+                    PrimaryMenuButton(
                       onPressed: () {
                         if (commercialProductResult.newPrice == 0) {
                           DialogManager.showErrorDialog(context, "El producto no tiene precio de venta");
@@ -483,13 +495,13 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                           return;
                         }
 
-                        if (commercialProductResult.quantity <= 0) {
-                          Navigator.pop(context);
+                        if (commercialProductResult.baseQuantity <= 0) {
+                          DialogManager.showErrorDialog(context, "La cantidad debe ser mayor a 0");
                           return;
                         }
                         Navigator.pop(context, commercialProductResult);
                       },
-                      child: const Text(
+                      label: const Text(
                         "Aceptar",
                       ),
                     ),

@@ -243,10 +243,16 @@ class _Body extends StatelessWidget {
                             itemCount: returnedItems.length,
                             itemBuilder: (context, index) {
                               final item = returnedItems[index];
+                              final unitPrice = NumberFormatter.convertToMoneyLike(
+                                item.price * item.conversionFactor,
+                              );
+                              final brandName = item.product.brandName;
                               return ListTile(
-                                leading: Text("${item.quantity} x"),
+                                leading: Text("${item.formattedDisplayQuantity} x"),
                                 title: Text(item.product.name),
-                                subtitle: Text(item.product.brandName),
+                                subtitle: Text(
+                                  brandName.isEmpty ? "$unitPrice c/u" : "$brandName • $unitPrice c/u",
+                                ),
                                 trailing: Text(NumberFormatter.convertToMoneyLike(item.total)),
                               );
                             },

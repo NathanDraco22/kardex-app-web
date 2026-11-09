@@ -42,7 +42,7 @@ class _MobileBody extends StatelessWidget {
                 const Spacer(),
                 SizedBox(
                   height: 40,
-                  child: ElevatedButton.icon(
+                  child: PrimaryMenuButton(
                     onPressed: () async {
                       await showCreateExpenseDialog(context);
                     },

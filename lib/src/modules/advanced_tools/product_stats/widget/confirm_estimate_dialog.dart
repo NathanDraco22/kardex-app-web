@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 Future<bool> showConfirmEstimateDialog(
@@ -84,9 +85,9 @@ class _ConfirmEstimateDialogState extends State<ConfirmEstimateDialog> {
           onPressed: () => Navigator.pop(context, false),
           child: const Text("Cancelar"),
         ),
-        ElevatedButton(
+        PrimaryMenuButton(
           onPressed: _secondsRemaining == 0 ? () => Navigator.pop(context, true) : null,
-          child: Text(
+          label: Text(
             _secondsRemaining > 0 ? "Confirmar ($_secondsRemaining)" : "Confirmar",
           ),
         ),
