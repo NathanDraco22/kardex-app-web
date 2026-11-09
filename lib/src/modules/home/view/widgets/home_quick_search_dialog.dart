@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/core/access_manager.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/client_invoices_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/web/pending_invoice_web_screen.dart';
+import 'package:kardex_app_front/src/modules/commercial/proforma/proforma_screen.dart';
 import 'package:kardex_app_front/widgets/dialogs/client_quick_actions_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/search_product_commercial_delegate.dart';
 import 'package:kardex_app_front/widgets/dialogs/selectors/client_selection_dialog.dart';
@@ -22,9 +24,16 @@ bool canShowClientQuickSearch(BuildContext context) {
   final isCommerce = getIt<AuthCubit>().currentBranch?.isCommerce ?? true;
   if (!isCommerce) return false;
 
-  return _hasAccess(context, CommercialSubModules.createInvoice) ||
-      _hasAccess(context, Modules.pendingInvoices) ||
-      _hasAccess(context, CommercialSubModules.pendingInvoices);
+  final canCreateInvoice = _hasAccess(context, CommercialSubModules.createInvoice);
+  final canSeePendingInvoices =
+      _hasAccess(context, Modules.pendingInvoices) || _hasAccess(context, CommercialSubModules.pendingInvoices);
+  final canCreateOrder = _hasAccess(context, CommercialSubModules.createOrder);
+  final settings = getIt<AppSettingsCubit>();
+  final settingsAvailable = settings.currentSettings != null;
+
+  return canCreateInvoice ||
+      canSeePendingInvoices ||
+      (canCreateOrder && settingsAvailable && (settings.useQuotations || settings.useOrders));
 }
 
 bool canShowProductQuickSearch(BuildContext context) {
@@ -61,10 +70,16 @@ Future<void> showHomeQuickSearchDialog(BuildContext context) async {
   final client = await showClientSelectionDialog(context);
   if (client == null || !context.mounted) return;
 
+  final canCreateOrder = _hasAccess(context, CommercialSubModules.createOrder);
+  final settings = getIt<AppSettingsCubit>();
+  final settingsAvailable = settings.currentSettings != null;
+
   final action = await showClientQuickActionsDialog(
     context,
     client: client,
     showInvoiceAction: _hasAccess(context, CommercialSubModules.createInvoice),
+    showQuoteAction: canCreateOrder && settingsAvailable && settings.useQuotations,
+    showOrderAction: canCreateOrder && settingsAvailable && settings.useOrders,
     showPendingInvoicesAction:
         _hasAccess(context, Modules.pendingInvoices) || _hasAccess(context, CommercialSubModules.pendingInvoices),
   );
@@ -75,6 +90,27 @@ Future<void> showHomeQuickSearchDialog(BuildContext context) async {
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => ClientInvoiceScreen(initialClient: client),
+      ),
+    );
+    return;
+  }
+
+  if (action == ClientQuickAction.quote) {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ProformaScreen(initialClient: client),
+      ),
+    );
+    return;
+  }
+
+  if (action == ClientQuickAction.order) {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ClientInvoiceScreen(
+          isOrder: true,
+          initialClient: client,
+        ),
       ),
     );
     return;
@@ -122,7 +158,7 @@ class _HomeQuickSearchDialog extends StatelessWidget {
                 icon: Icons.person_search_rounded,
                 color: Colors.blue.shade700,
                 title: "Buscar cliente",
-                subtitle: "Facturar o consultar facturas pendientes",
+                subtitle: "Facturar, cotizar, ordenar o consultar saldos",
                 onTap: () => Navigator.pop(context, _QuickSearchOption.client),
               ),
             if (canSearchClient && canSearchProduct) const SizedBox(height: 12),

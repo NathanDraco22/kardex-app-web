@@ -2,6 +2,7 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/cubits/shortcuts/shortcuts_cubit.dart';
 import 'package:kardex_app_front/cubits/toast/toast_cubit.dart';
@@ -81,6 +82,7 @@ class _RootScaffold extends StatelessWidget {
         }
 
         final user = authState.session.user;
+        context.watch<AppSettingsCubit>();
 
         final hasShortcuts = context.watch<ShortcutsCubit>().state.shortcuts.isNotEmpty;
         final showShortcutsFab = hasShortcuts && !context.isDesktop();

@@ -68,7 +68,11 @@ class _RootScaffold extends StatelessWidget {
           LoadingDialogManager.closeLoadingDialog(context);
           final cubit = context.read<WriteInvoiceCubit>();
           String message = "Factura guardada con éxito";
-          if (cubit.isOrder) message = "Orden de compra enviada con éxito";
+          if (cubit.documentType == CommercialDocumentType.quote) {
+            message = "Cotización guardada con éxito";
+          } else if (cubit.isOrder) {
+            message = "Orden de compra enviada con éxito";
+          }
           await DialogManager.showInfoDialog(context, message);
           if (!context.mounted) return;
           if (state.createdInvoice != null) {

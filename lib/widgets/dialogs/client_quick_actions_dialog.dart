@@ -3,6 +3,8 @@ import 'package:kardex_business/kardex_business.dart';
 
 enum ClientQuickAction {
   invoice,
+  quote,
+  order,
   pendingInvoices,
 }
 
@@ -10,6 +12,8 @@ Future<ClientQuickAction?> showClientQuickActionsDialog(
   BuildContext context, {
   required ClientInDb client,
   bool showInvoiceAction = true,
+  bool showQuoteAction = true,
+  bool showOrderAction = true,
   bool showPendingInvoicesAction = true,
 }) {
   return showDialog<ClientQuickAction>(
@@ -17,6 +21,8 @@ Future<ClientQuickAction?> showClientQuickActionsDialog(
     builder: (context) => ClientQuickActionsDialog(
       client: client,
       showInvoiceAction: showInvoiceAction,
+      showQuoteAction: showQuoteAction,
+      showOrderAction: showOrderAction,
       showPendingInvoicesAction: showPendingInvoicesAction,
     ),
   );
@@ -27,11 +33,15 @@ class ClientQuickActionsDialog extends StatelessWidget {
     super.key,
     required this.client,
     this.showInvoiceAction = true,
+    this.showQuoteAction = true,
+    this.showOrderAction = true,
     this.showPendingInvoicesAction = true,
   });
 
   final ClientInDb client;
   final bool showInvoiceAction;
+  final bool showQuoteAction;
+  final bool showOrderAction;
   final bool showPendingInvoicesAction;
 
   @override
@@ -121,6 +131,8 @@ class ClientQuickActionsDialog extends StatelessWidget {
             ),
             _ClientActions(
               showInvoiceAction: showInvoiceAction,
+              showQuoteAction: showQuoteAction,
+              showOrderAction: showOrderAction,
               showPendingInvoicesAction: showPendingInvoicesAction,
             ),
           ],
@@ -324,35 +336,58 @@ class _InfoLine extends StatelessWidget {
 class _ClientActions extends StatelessWidget {
   const _ClientActions({
     required this.showInvoiceAction,
+    required this.showQuoteAction,
+    required this.showOrderAction,
     required this.showPendingInvoicesAction,
   });
 
   final bool showInvoiceAction;
+  final bool showQuoteAction;
+  final bool showOrderAction;
   final bool showPendingInvoicesAction;
 
   @override
   Widget build(BuildContext context) {
-    if (!showInvoiceAction && !showPendingInvoicesAction) {
-      return const SizedBox.shrink();
-    }
+    final actions = <Widget>[
+      if (showInvoiceAction)
+        FilledButton.icon(
+          style: FilledButton.styleFrom(
+            minimumSize: const Size.fromHeight(48),
+          ),
+          onPressed: () => Navigator.pop(context, ClientQuickAction.invoice),
+          icon: const Icon(Icons.receipt_long_outlined),
+          label: const Text("Facturar"),
+        ),
+      if (showQuoteAction)
+        OutlinedButton.icon(
+          style: OutlinedButton.styleFrom(
+            minimumSize: const Size.fromHeight(48),
+          ),
+          onPressed: () => Navigator.pop(context, ClientQuickAction.quote),
+          icon: const Icon(Icons.request_quote_outlined),
+          label: const Text("Cotización"),
+        ),
+      if (showOrderAction)
+        OutlinedButton.icon(
+          style: OutlinedButton.styleFrom(
+            minimumSize: const Size.fromHeight(48),
+          ),
+          onPressed: () => Navigator.pop(context, ClientQuickAction.order),
+          icon: const Icon(Icons.shopping_cart_outlined),
+          label: const Text("Orden de compra"),
+        ),
+      if (showPendingInvoicesAction)
+        OutlinedButton.icon(
+          style: OutlinedButton.styleFrom(
+            minimumSize: const Size.fromHeight(48),
+          ),
+          onPressed: () => Navigator.pop(context, ClientQuickAction.pendingInvoices),
+          icon: const Icon(Icons.account_balance_wallet_outlined),
+          label: const Text("Facturas pendientes"),
+        ),
+    ];
 
-    final invoiceButton = FilledButton.icon(
-      style: FilledButton.styleFrom(
-        minimumSize: const Size.fromHeight(48),
-      ),
-      onPressed: () => Navigator.pop(context, ClientQuickAction.invoice),
-      icon: const Icon(Icons.receipt_long_outlined),
-      label: const Text("Facturar"),
-    );
-
-    final pendingButton = OutlinedButton.icon(
-      style: OutlinedButton.styleFrom(
-        minimumSize: const Size.fromHeight(48),
-      ),
-      onPressed: () => Navigator.pop(context, ClientQuickAction.pendingInvoices),
-      icon: const Icon(Icons.account_balance_wallet_outlined),
-      label: const Text("Facturas pendientes"),
-    );
+    if (actions.isEmpty) return const SizedBox.shrink();
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -363,29 +398,28 @@ class _ClientActions extends StatelessWidget {
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          if (!showInvoiceAction) {
-            return SizedBox(width: double.infinity, child: pendingButton);
-          }
-          if (!showPendingInvoicesAction) {
-            return SizedBox(width: double.infinity, child: invoiceButton);
+          if (actions.length == 1) {
+            return SizedBox(width: double.infinity, child: actions.first);
           }
 
           if (constraints.maxWidth < 420) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                invoiceButton,
-                const SizedBox(height: 8),
-                pendingButton,
+                for (int i = 0; i < actions.length; i++) ...[
+                  if (i > 0) const SizedBox(height: 8),
+                  actions[i],
+                ],
               ],
             );
           }
 
-          return Row(
+          final itemWidth = (constraints.maxWidth - 12) / 2;
+          return Wrap(
+            spacing: 12,
+            runSpacing: 8,
             children: [
-              Expanded(child: invoiceButton),
-              const SizedBox(width: 12),
-              Expanded(child: pendingButton),
+              for (final action in actions) SizedBox(width: itemWidth, child: action),
             ],
           );
         },
