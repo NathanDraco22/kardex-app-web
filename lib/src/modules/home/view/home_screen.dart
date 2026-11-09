@@ -17,6 +17,7 @@ import 'widgets/home_desktop_card.dart';
 import 'widgets/home_end_drawer.dart';
 import 'widgets/home_quick_search_dialog.dart';
 import '../data/home_modules_registry.dart';
+import 'desktop/widgets/desktop_initial_panel.dart';
 import 'desktop/widgets/desktop_module_sidebar.dart';
 import 'desktop/widgets/desktop_submenu_panel.dart';
 
@@ -82,6 +83,7 @@ class _RootScaffold extends StatelessWidget {
         final user = authState.session.user;
 
         final hasShortcuts = context.watch<ShortcutsCubit>().state.shortcuts.isNotEmpty;
+        final showShortcutsFab = hasShortcuts && !context.isDesktop();
 
         return BlocListener<ToastCubit, ToastState>(
           listener: (context, state) {
@@ -96,14 +98,14 @@ class _RootScaffold extends StatelessWidget {
             );
           },
           child: Scaffold(
-            floatingActionButton: hasShortcuts
+            floatingActionButton: showShortcutsFab
                 ? FloatingActionButton(
                     heroTag: null,
                     onPressed: () => context.pushNamed(RouteNames.shortcuts),
                     child: const Icon(FluentIcons.bookmark_multiple_24_filled),
                   )
                 : null,
-            floatingActionButtonLocation: hasShortcuts
+            floatingActionButtonLocation: showShortcutsFab
                 ? (MediaQuery.sizeOf(context).width < maxPhoneScreenWidth
                       ? FloatingActionButtonLocation.endFloat
                       : FloatingActionButtonLocation.centerTop)

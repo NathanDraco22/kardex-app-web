@@ -89,9 +89,10 @@ class HomeModuleCategory {
 List<HomeModuleCategory> getHomeModuleCategories(
   BuildContext context, [
   BranchInDb? branch,
+  bool includeCommerceOnly = false,
 ]) {
   final currentBranch = branch ?? getIt<AuthCubit>().currentBranch;
-  final isCommerce = currentBranch?.isCommerce ?? true;
+  final isCommerce = includeCommerceOnly || (currentBranch?.isCommerce ?? true);
 
   final categories = <HomeModuleCategory>[
     HomeModuleCategory(

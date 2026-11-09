@@ -3,8 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kardex_app_front/constants/shortcut_registry.dart';
+import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
 import 'package:kardex_app_front/cubits/shortcuts/shortcuts_cubit.dart';
+import 'package:kardex_app_front/src/modules/home/data/home_shortcut_resolver.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
 
@@ -36,10 +37,10 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<AppSettingsCubit>();
+
     return BlocBuilder<ShortcutsCubit, ShortcutsState>(
-      buildWhen: (prev, curr) =>
-          prev.isLoading != curr.isLoading ||
-          !listEquals(prev.routes, curr.routes),
+      buildWhen: (prev, curr) => prev.isLoading != curr.isLoading || !listEquals(prev.routes, curr.routes),
       builder: (context, state) {
         if (state.isLoading) {
           return const Center(child: CircularProgressIndicator());
@@ -76,6 +77,8 @@ class _Body extends StatelessWidget {
           );
         }
 
+        final resolver = HomeShortcutResolver.build(context);
+
         return Center(
           child: ReorderableListView(
             padding: const EdgeInsets.only(top: 8, bottom: 24),
@@ -92,6 +95,7 @@ class _Body extends StatelessWidget {
                   key: ValueKey(state.shortcuts[i].routeName),
                   shortcut: state.shortcuts[i],
                   index: i,
+                  resolver: resolver,
                 ),
             ],
           ),
@@ -104,19 +108,21 @@ class _Body extends StatelessWidget {
 class _ShortcutTile extends StatelessWidget {
   final Shortcut shortcut;
   final int index;
+  final HomeShortcutResolver resolver;
 
   const _ShortcutTile({
     super.key,
     required this.shortcut,
     required this.index,
+    required this.resolver,
   });
 
   @override
   Widget build(BuildContext context) {
-    final info = ShortcutRouteRegistry.routes[shortcut.routeName];
-    final title = info?.title ?? shortcut.routeName;
-    final icon = info?.icon ?? Icons.link;
-    final color = info?.color;
+    final isAccessible = resolver.canAccess(shortcut.routeName);
+    final title = resolver.titleFor(shortcut.routeName);
+    final icon = resolver.iconFor(shortcut.routeName);
+    final color = resolver.colorFor(shortcut.routeName);
 
     return GestureDetector(
       onLongPress: () async {
@@ -144,16 +150,33 @@ class _ShortcutTile extends StatelessWidget {
           context.read<ShortcutsCubit>().removeShortcut(shortcut.routeName);
         }
       },
-      child: MenuOptionCard(
-        title: title,
-        icon: icon,
-        accentColor: color ?? Colors.indigo.shade400,
-        onTap: () => context.pushNamed(shortcut.routeName),
-        trailing: ReorderableDragStartListener(
-          index: index,
-          child: const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 4),
-            child: Icon(Icons.drag_handle, size: 26, color: Colors.grey),
+      child: Opacity(
+        opacity: isAccessible ? 1 : 0.55,
+        child: MenuOptionCard(
+          title: title,
+          icon: icon,
+          accentColor: color ?? Colors.indigo.shade400,
+          onTap: isAccessible ? () => context.pushNamed(shortcut.routeName) : null,
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (!isAccessible)
+                const Padding(
+                  padding: EdgeInsets.only(right: 6),
+                  child: Icon(
+                    Icons.lock_outline_rounded,
+                    size: 18,
+                    color: Colors.grey,
+                  ),
+                ),
+              ReorderableDragStartListener(
+                index: index,
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 4),
+                  child: Icon(Icons.drag_handle, size: 26, color: Colors.grey),
+                ),
+              ),
+            ],
           ),
         ),
       ),

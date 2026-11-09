@@ -20,6 +20,11 @@ class ShortcutRouteRegistry {
 
   static final Map<String, ShortcutInfo> routes = {
     // --- Comercio ---
+    RouteNames.saleTerminal: const ShortcutInfo(
+      title: "Terminal de Venta (POS)",
+      icon: FluentIcons.cart_24_filled,
+      color: Color(0xFF009688),
+    ),
     RouteNames.globalStockSearch: const ShortcutInfo(
       title: "Consulta de Existencias Globales",
       icon: Icons.search,
@@ -50,6 +55,11 @@ class ShortcutRouteRegistry {
       title: "Facturación a Clientes",
       icon: FluentIcons.person_money_20_filled,
       color: Color(0xFF43A047),
+    ),
+    RouteNames.clientInvoiceWholesale: const ShortcutInfo(
+      title: "Facturación a Clientes (Mayorista)",
+      icon: FluentIcons.person_money_20_filled,
+      color: Color(0xFF1E88E5),
     ),
     RouteNames.expirationLogs: const ShortcutInfo(
       title: "Bitácora de Vencimientos",
@@ -101,6 +111,11 @@ class ShortcutRouteRegistry {
       icon: FluentIcons.document_text_24_filled,
       color: Color(0xFF1E88E5),
     ),
+    RouteNames.proformaWholesale: const ShortcutInfo(
+      title: "Crear Cotización (Mayorista)",
+      icon: FluentIcons.document_text_24_filled,
+      color: Color(0xFF1565C0),
+    ),
     RouteNames.currentOrders: const ShortcutInfo(
       title: "Órdenes de Compra",
       icon: FluentIcons.receipt_bag_24_filled,
@@ -115,6 +130,11 @@ class ShortcutRouteRegistry {
       title: "Crear Orden de Compra",
       icon: FluentIcons.receipt_add_24_filled,
       color: Color(0xFF29B6F6),
+    ),
+    RouteNames.saleOrderWholesale: const ShortcutInfo(
+      title: "Crear Orden de Compra (Mayorista)",
+      icon: FluentIcons.receipt_add_24_filled,
+      color: Color(0xFF1565C0),
     ),
     RouteNames.receiptHistory: const ShortcutInfo(
       title: "Historial de Recibos",
@@ -135,6 +155,11 @@ class ShortcutRouteRegistry {
       title: "Historial de Devoluciones",
       icon: Icons.content_paste_search_rounded,
       color: Color(0xFFFB8C00),
+    ),
+    RouteNames.creditNotes: const ShortcutInfo(
+      title: "Notas de Crédito",
+      icon: Icons.assignment_return_rounded,
+      color: Color(0xFF9C27B0),
     ),
     RouteNames.userOperationsResults: const ShortcutInfo(
       title: "Arqueo y Resultados por Usuario",
@@ -215,6 +240,11 @@ class ShortcutRouteRegistry {
       icon: Icons.analytics_outlined,
       color: Color(0xFFFF9800),
     ),
+    RouteNames.rangeFinanceReport: const ShortcutInfo(
+      title: "Reporte de Finanzas por Rango",
+      icon: Icons.date_range_outlined,
+      color: Color(0xFF2196F3),
+    ),
     RouteNames.clientAccounts: const ShortcutInfo(
       title: "Estado de cuenta de Clientes",
       icon: FluentIcons.notepad_person_24_filled,
@@ -279,6 +309,13 @@ class ShortcutRouteRegistry {
     RouteNames.clientGroups: const ShortcutInfo(
       title: "Grupos de Clientes",
       icon: Icons.group_work_rounded,
+    ),
+
+    // --- Catálogo de Proveedores ---
+    RouteNames.suppliersCatalog: const ShortcutInfo(
+      title: "Lista de Proveedores",
+      icon: FluentIcons.building_multiple_20_filled,
+      color: Color(0xFF009688),
     ),
 
     // --- Gastos ---
@@ -354,6 +391,16 @@ class ShortcutRouteRegistry {
       title: "Importaciones CSV",
       icon: Icons.upload_file_rounded,
       color: Color(0xFFEA580C),
+    ),
+    RouteNames.apiKeys: const ShortcutInfo(
+      title: "Llaves de API",
+      icon: Icons.key,
+      color: Color(0xFFFFB300),
+    ),
+    RouteNames.appSettings: const ShortcutInfo(
+      title: "Configuración General",
+      icon: Icons.tune_rounded,
+      color: Color(0xFF3F51B5),
     ),
   };
 }
