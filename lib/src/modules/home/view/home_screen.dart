@@ -15,6 +15,7 @@ import 'package:toastification/toastification.dart';
 import 'package:kardex_app_front/constants/route_names.dart';
 import 'widgets/home_desktop_card.dart';
 import 'widgets/home_end_drawer.dart';
+import 'widgets/home_quick_search_dialog.dart';
 import '../data/home_modules_registry.dart';
 import 'desktop/widgets/desktop_module_sidebar.dart';
 import 'desktop/widgets/desktop_submenu_panel.dart';
@@ -111,6 +112,12 @@ class _RootScaffold extends StatelessWidget {
             appBar: AppBar(
               title: const Text("Neptuno App"),
               actions: [
+                if (context.isMobileOrTablet() && canShowHomeQuickSearch(context))
+                  IconButton(
+                    tooltip: "Búsqueda rápida",
+                    onPressed: () => showHomeQuickSearchDialog(context),
+                    icon: const Icon(Icons.search),
+                  ),
                 const AvatarButton(),
                 const SizedBox(width: 12),
               ],
