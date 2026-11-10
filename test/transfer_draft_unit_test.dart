@@ -3,7 +3,7 @@ import 'package:kardex_app_front/src/core/transfer_draft_manager.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 void main() {
-  const baseUnitName = 'Cuarto de Libra';
+  const baseUnitName = '1/4 Libra';
   const defaultExtras = [
     TransferDraftUnitOption(name: 'Libra', factor: 4),
     TransferDraftUnitOption(name: 'Arroba (25 lb)', factor: 100),
@@ -100,7 +100,7 @@ void main() {
         savedUnitIndex: 1,
         savedFactor: 4,
         savedUnitName: 'Libra',
-        savedBaseUnitName: 'Cuarto de Libra',
+        savedBaseUnitName: '1/4 Libra',
         productBaseUnitName: 'Unidad',
         productExtraUnits: const [
           TransferDraftUnitOption(name: 'Libra', factor: 4),
@@ -122,7 +122,7 @@ void main() {
         savedQuantity: 8,
         savedUnitIndex: 0,
         savedFactor: 1,
-        savedUnitName: 'Cuarto de Libra',
+        savedUnitName: '1/4 Libra',
         savedBaseUnitName: null,
         productBaseUnitName: 'Unidad',
         productDefaultUnitIndex: 0,

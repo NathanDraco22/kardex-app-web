@@ -484,7 +484,6 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
 
                             if (widget.rowModel.selectedUnitIndex > 0) {
                               color = Colors.blue.shade300;
-                              label = "$label(${widget.rowModel.conversionFactor})";
                             }
 
                             return Text(
@@ -618,11 +617,11 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
                   if (widget.rowModel.conversionFactor > 1) ...[
                     const SizedBox(height: 2),
                     Text(
-                      "(${NumberFormatter.convertToMoneyLike((widget.rowModel.unitaryCost / widget.rowModel.conversionFactor).round())})",
+                      "Base: ${NumberFormatter.convertToMoneyLike((widget.rowModel.unitaryCost / widget.rowModel.conversionFactor).round())}",
                       style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.blue.shade300,
-                        fontStyle: FontStyle.italic,
+                        fontSize: 12,
+                        color: Colors.blue.shade700,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],

@@ -334,57 +334,44 @@ class _FormContentState extends State<_FormContent> {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Builder(
-                                  builder: (context) {
-                                    Color? stockColor;
+                          Builder(
+                            builder: (context) {
+                              Color? stockColor;
 
-                                    if (commercialProductResult.selectedUnitIndex != 0) {
-                                      stockColor = Colors.blue;
-                                    }
+                              if (commercialProductResult.selectedUnitIndex != 0) {
+                                stockColor = Colors.blue;
+                              }
 
-                                    if (availableStock <= 0) {
-                                      stockColor = Colors.red;
-                                    }
+                              if (availableStock <= 0) {
+                                stockColor = Colors.red;
+                              }
 
-                                    return TitleLabel(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      title: "Existencia",
-                                      bigTitle: displayStock,
-                                      bigTitleColor: stockColor,
-                                    );
-                                  },
-                                ),
-                              ),
-                              Expanded(
-                                child: Visibility(
-                                  visible: isUserAdmin,
-                                  child: Row(
-                                    mainAxisAlignment: .spaceEvenly,
-                                    children: [
-                                      TitleLabel(
-                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                        title: "Costo",
-                                        bigTitle: NumberFormatter.convertFromCentsToUnitsCurrency(
-                                          widget.product.account.averageCost * factor,
-                                        ),
-                                      ),
-                                      TitleLabel(
-                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                        title: "Ult. C",
-                                        bigTitle: NumberFormatter.convertFromCentsToUnitsCurrency(
-                                          widget.product.account.lastCost * factor,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              const Expanded(child: SizedBox.shrink()),
-                            ],
+                              return TitleLabel(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                title: "Existencia",
+                                bigTitle: displayStock,
+                                bigTitleColor: stockColor,
+                              );
+                            },
                           ),
+                          if (isUserAdmin) ...[
+                            const SizedBox(height: 8),
+                            UnitCostComparison(
+                              items: [
+                                UnitCostItem(
+                                  label: "Costo",
+                                  baseCostInCents: widget.product.account.averageCost,
+                                ),
+                                UnitCostItem(
+                                  label: "Última Compra",
+                                  baseCostInCents: widget.product.account.lastCost,
+                                ),
+                              ],
+                              baseUnitName: baseUnitName,
+                              selectedUnitName: unitName,
+                              selectedUnitFactor: factor,
+                            ),
+                          ],
                           const Divider(
                             height: 24,
                           ),
@@ -404,8 +391,8 @@ class _FormContentState extends State<_FormContent> {
                                   conversionFactor: commercialProductResult.conversionFactor,
                                   allowDecimals: commercialProductResult.selectedUnitIndex > 0 && !isSuperiorUnit,
                                   step: isSuperiorUnit ? 1 : null,
-                                  unitLabel: commercialProductResult.selectedUnitName,
-                                  baseUnitName: baseUnitName,
+                                  equivalenceUnitName: product.defaultUnitName,
+                                  equivalenceFactor: product.defaultUnitFactor,
                                   titleTextAlign: TextAlign.center,
                                   centerTitle: true,
                                   onEditingComplete: () {

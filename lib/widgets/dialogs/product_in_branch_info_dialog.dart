@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/role_tools.dart';
 import 'package:kardex_app_front/widgets/buttons/secondary_menu_button.dart';
+import 'package:kardex_app_front/widgets/elements/unit_cost_comparison.dart';
 import 'package:kardex_app_front/widgets/title_label.dart';
 
 Future<void> showProductInBranchInfoDialog(
@@ -139,36 +140,24 @@ class ProductInBranchInfoDialog extends StatelessWidget {
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
                 const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TitleLabel(
-                        title: "Promedio",
-                        bigTitle: NumberFormatter.convertFromCentsToUnitsCurrency(
-                          product.account.averageCost * product.defaultUnitFactor,
-                        ),
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                      ),
+                UnitCostComparison(
+                  items: [
+                    UnitCostItem(
+                      label: "Promedio",
+                      baseCostInCents: product.account.averageCost,
                     ),
-                    Expanded(
-                      child: TitleLabel(
-                        title: "Último",
-                        bigTitle: NumberFormatter.convertFromCentsToUnitsCurrency(
-                          product.account.lastCost * product.defaultUnitFactor,
-                        ),
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                      ),
+                    UnitCostItem(
+                      label: "Último",
+                      baseCostInCents: product.account.lastCost,
                     ),
-                    Expanded(
-                      child: TitleLabel(
-                        title: "Mayor",
-                        bigTitle: NumberFormatter.convertFromCentsToUnitsCurrency(
-                          product.account.maximumCost * product.defaultUnitFactor,
-                        ),
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                      ),
+                    UnitCostItem(
+                      label: "Mayor",
+                      baseCostInCents: product.account.maximumCost,
                     ),
                   ],
+                  baseUnitName: product.unitName,
+                  selectedUnitName: product.defaultUnitName,
+                  selectedUnitFactor: product.defaultUnitFactor,
                 ),
               ],
 

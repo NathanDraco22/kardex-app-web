@@ -39,7 +39,7 @@ class CustomAutocompleteTextfield<T> extends StatefulWidget {
 
   /// Permite conservar el texto escrito cuando el usuario cierra la lista de
   /// sugerencias sin seleccionar una opción. Útil para unidades de medida
-  /// libres que no están en el catálogo (ej. "Cuarto de Libra").
+  /// libres que no están en el catálogo (ej. "1/4 Libra").
   final bool allowFreeText;
 
   final void Function(String)? onFieldSubmitted;

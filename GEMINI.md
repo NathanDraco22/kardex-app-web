@@ -501,3 +501,12 @@ Esta estructura se ha seguido para módulos como 'Historial de Facturas', 'Histo
 - **Verificación:** `flutter analyze` limpio, `flutter test` **83/83**, `ruff`/`ty` OK, `pytest` **14/14** y `git diff --check` OK.
 - **Limitaciones residuales:** las tablas/list views de inventario y transferencia guardan cantidad display `int` y no admiten fracciones en unidad estándar; con `defaultUnitIndex = 0` la regla considera “superiores” a todas las unidades extra; no se ejecutó hot reload ni prueba manual de UI.
 - **Commit:** no se realizó.
+
+## Ajustes de Unidades, Etiquetas y Costos (Noviembre 2026)
+- **Nombres:** las fracciones base pasan de `Cuarto de ...`/`Media ...` a `1/4 ...`/`1/2 ...` en semillas y presets: `1/4 Libra`, `1/4 Litro`, `1/4 Metro`, `1/4 Caja xN`, `1/2 Caja xN`, `1/4 Docena`, `1/2 Docena`.
+- **Etiquetas:** `UnitDisplayer`, filas de entradas/transferencias, selector de unidad, visores e historiales dejan de mostrar el factor crudo (`(400)`, `(x4)`); queda el nombre de la unidad y el resaltado azul.
+- **Equivalencia:** `QuantityField` muestra equivalencia en la unidad estándar solo para unidades superiores (`1 Quintal → = 100 Libra`, `1 Arroba → = 25 Libra`); en la unidad estándar no muestra equivalencia.
+- **Costos:** nuevo widget `UnitCostComparison` con la fila base primero (negrita/fondo suave) y la unidad seleccionada en azul. Aplicado en `product_price_editor_dialog.dart`, `inventory_unit_picker.dart`, `commercial_product_dialog.dart`, `commercial_product_modal.dart` y `product_in_branch_info_dialog.dart`. En las tablas compactas de entradas/transferencias el costo base se etiqueta `Base: ...` con mayor contraste.
+- **Sin cambios de cálculo:** cantidades, costos y dinero siguen en `int`; solo cambia la presentación.
+- **Mobile:** el selector “Calcular para la unidad” usa `isExpanded`/ellipsis y se apila verticalmente cuando el ancho es menor a `500`; `TitleTextField` usa `Wrap` para que los títulos largos (“Por 1/2 Caja x30 (15 u)…”) no desborden. `QuantityField` ya no repite la unidad en el título ni como sufijo; la unidad se muestra en el selector, fila o detalle.
+- **Verificación:** `flutter analyze` limpio; `flutter test` **91/91**; hot reload en app Windows sin errores de runtime; sin commit.

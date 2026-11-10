@@ -153,9 +153,7 @@ class _Body extends StatelessWidget {
                                           children: [
                                             Text(item.brandName),
                                             Text(
-                                              displayFactor > 1
-                                                  ? "${item.displayUnitName} ($displayFactor)"
-                                                  : item.displayUnitName,
+                                              item.displayUnitName,
                                               style: TextStyle(
                                                 color: displayFactor > 1 ? Colors.blue.shade300 : null,
                                                 fontSize: 12,

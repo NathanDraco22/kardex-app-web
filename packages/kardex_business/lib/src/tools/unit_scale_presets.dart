@@ -40,10 +40,10 @@ class UnitScalePresets {
       return BaseUnitScale(
         name: '$label - Fracción',
         scaleType: UnitScaleType.fractionPack,
-        baseUnit: 'Cuarto de $label (${unitsPerPack ~/ 4} u)',
+        baseUnit: '1/4 $label (${unitsPerPack ~/ 4} u)',
         units: [
           ExtraUnit(
-            name: 'Media $label (${unitsPerPack ~/ 2} u)',
+            name: '1/2 $label (${unitsPerPack ~/ 2} u)',
             conversionFactor: 2,
           ),
           ExtraUnit(name: '$label ($unitsPerPack u)', conversionFactor: 4),
@@ -57,7 +57,7 @@ class UnitScalePresets {
       return BaseUnitScale(
         name: '$label - Fracción',
         scaleType: UnitScaleType.fractionPack,
-        baseUnit: 'Media $label (${unitsPerPack ~/ 2} u)',
+        baseUnit: '1/2 $label (${unitsPerPack ~/ 2} u)',
         units: [
           ExtraUnit(name: '$label ($unitsPerPack u)', conversionFactor: 2),
         ],
@@ -84,7 +84,7 @@ class UnitScalePresets {
     final units = <ExtraUnit>[
       if (unitsPerPack % 2 == 0 && halfFactor > 1)
         ExtraUnit(
-          name: 'Media $label ($halfFactor u)',
+          name: '1/2 $label ($halfFactor u)',
           conversionFactor: halfFactor,
         ),
       ExtraUnit(

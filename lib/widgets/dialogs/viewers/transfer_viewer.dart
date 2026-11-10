@@ -202,7 +202,6 @@ class TransferViewerContent extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final item = transfer.items[index];
                     final display = item.displayQuantity;
-                    final displayFactor = item.displayUnitFactor;
                     final rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
                     return Container(
                       padding: const EdgeInsets.all(4),
@@ -216,7 +215,7 @@ class TransferViewerContent extends StatelessWidget {
                               children: [
                                 Text(item.name),
                                 Text(
-                                  displayFactor > 1 ? "${item.displayUnitName} ($displayFactor)" : item.displayUnitName,
+                                  item.displayUnitName,
                                   style: const TextStyle(fontSize: 12, color: Colors.grey),
                                 ),
                               ],

@@ -55,15 +55,16 @@ class TitleTextField extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          mainAxisAlignment: centerTitle ? MainAxisAlignment.center : MainAxisAlignment.start,
+        Wrap(
+          alignment: centerTitle ? WrapAlignment.center : WrapAlignment.start,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 4,
           children: [
             Text(
               title,
               textAlign: titleTextAlign,
             ),
-            if (tooltip != null) ...[
-              const SizedBox(width: 4),
+            if (tooltip != null)
               Tooltip(
                 message: tooltip,
                 child: Icon(
@@ -72,7 +73,6 @@ class TitleTextField extends StatelessWidget {
                   color: Theme.of(context).colorScheme.primary,
                 ),
               ),
-            ],
           ],
         ),
         TextFormField(

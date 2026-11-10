@@ -64,8 +64,8 @@ class QuantityField extends StatefulWidget {
     this.step,
     this.showButtons = false,
     this.showTitle = false,
-    this.unitLabel,
-    this.baseUnitName,
+    this.equivalenceUnitName,
+    this.equivalenceFactor,
     this.title = "Cantidad",
     this.centerTitle = false,
     this.titleTextAlign,
@@ -88,8 +88,8 @@ class QuantityField extends StatefulWidget {
   final double? step;
   final bool showButtons;
   final bool showTitle;
-  final String? unitLabel;
-  final String? baseUnitName;
+  final String? equivalenceUnitName;
+  final int? equivalenceFactor;
   final String? title;
   final bool centerTitle;
   final TextAlign? titleTextAlign;
@@ -343,9 +343,15 @@ class _QuantityFieldState extends State<QuantityField> {
     final currentVal = _parseCurrentValue();
     final canDecrement = _stepValue(currentVal, -1) >= widget.min - _comparisonTolerance;
     final canIncrement = widget.max == null || _stepValue(currentVal, 1) <= widget.max! + _comparisonTolerance;
-    final showEquivalence =
-        canUseDecimals && widget.baseUnitName != null && widget.baseUnitName!.isNotEmpty && currentVal > 0;
     final baseQty = (currentVal * widget.conversionFactor).round();
+    final equivalenceFactor = widget.equivalenceFactor ?? 0;
+    final showEquivalence =
+        widget.equivalenceUnitName != null &&
+        widget.equivalenceUnitName!.trim().isNotEmpty &&
+        equivalenceFactor > 0 &&
+        widget.conversionFactor > equivalenceFactor &&
+        currentVal > 0;
+    final equivalenceQty = showEquivalence ? baseQty / equivalenceFactor : 0.0;
 
     final textField = TextFormField(
       readOnly: widget.readOnly,
@@ -357,7 +363,6 @@ class _QuantityFieldState extends State<QuantityField> {
       inputFormatters: inputFormatters,
       style: widget.style ?? const TextStyle(fontWeight: FontWeight.w600),
       decoration: (widget.decoration ?? const InputDecoration()).copyWith(
-        suffixText: widget.unitLabel,
         isDense: true,
         errorText: _stepError,
       ),
@@ -424,21 +429,16 @@ class _QuantityFieldState extends State<QuantityField> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (hasVisibleTitle) ...[
-          Row(
-            mainAxisAlignment: widget.centerTitle ? MainAxisAlignment.center : MainAxisAlignment.start,
+          Wrap(
+            alignment: widget.centerTitle ? WrapAlignment.center : WrapAlignment.start,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 4,
             children: [
               Text(
                 widget.title!,
                 textAlign: widget.titleTextAlign,
                 style: const TextStyle(fontWeight: FontWeight.w500),
               ),
-              if (widget.unitLabel != null) ...[
-                const SizedBox(width: 4),
-                Text(
-                  "(${widget.unitLabel})",
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                ),
-              ],
             ],
           ),
           const SizedBox(height: 6),
@@ -447,7 +447,8 @@ class _QuantityFieldState extends State<QuantityField> {
         if (showEquivalence) ...[
           const SizedBox(height: 2),
           Text(
-            "= $baseQty ${widget.baseUnitName}",
+            "= ${UnitConversionTool.formatQuantity(equivalenceQty, maxDecimals: 6)} "
+            "${widget.equivalenceUnitName}",
             textAlign: widget.titleTextAlign ?? TextAlign.center,
             style: TextStyle(
               fontSize: 12,

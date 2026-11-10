@@ -219,7 +219,7 @@ class _DevolutionViewer extends StatelessWidget {
                                         children: [
                                           Text(item.product.name),
                                           Text(
-                                            "${item.displayUnitName}${item.displayUnitFactor > 1 ? ' (${item.displayUnitFactor % 1 == 0 ? item.displayUnitFactor.toInt() : item.displayUnitFactor})' : ''}",
+                                            item.displayUnitName,
                                             style: const TextStyle(color: Colors.grey, fontSize: 12),
                                           ),
                                         ],

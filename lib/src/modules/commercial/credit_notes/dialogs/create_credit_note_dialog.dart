@@ -621,13 +621,16 @@ class _CreateCreditNoteDialogState extends State<_CreateCreditNoteDialog> {
                                       item.conversionFactor,
                                     );
                                     final isBaseUnit = factor <= 1;
+                                    final standardFactor = item.standardUnitFactor;
+                                    final isSuperiorUnit = standardFactor != null && factor > standardFactor;
+                                    final allowsFractions = !isBaseUnit && !isSuperiorUnit;
                                     final previousBase = _previouslyReturnedFor(index);
                                     final maxDisplayQuantity = _maxDisplayQuantity(item, index);
                                     final isFullyReturned = maxDisplayQuantity <= 0;
                                     final displayPrice = item.price * factor;
                                     final details = StringBuffer(
-                                      "Facturados: ${item.formattedDisplayQuantity} ${item.product.unitName}"
-                                      " | Precio: ${NumberFormatter.convertToMoneyLike(displayPrice)} / ${item.product.unitName}",
+                                      "Facturados: ${item.formattedDisplayQuantity} ${item.displayUnitName}"
+                                      " | Precio: ${NumberFormatter.convertToMoneyLike(displayPrice)} / ${item.displayUnitName}",
                                     );
                                     if (previousBase > 0) {
                                       details.write(
@@ -673,12 +676,12 @@ class _CreateCreditNoteDialogState extends State<_CreateCreditNoteDialog> {
                                               ),
                                               initialValue: currentQty,
                                               conversionFactor: item.conversionFactor,
-                                              allowDecimals: !isBaseUnit,
-                                              step: isBaseUnit ? 1 : null,
+                                              allowDecimals: allowsFractions,
+                                              step: allowsFractions ? null : 1,
                                               max: maxDisplayQuantity,
-                                              baseUnitName: item.product.unitName,
+                                              equivalenceUnitName: item.standardUnitName ?? item.product.unitName,
+                                              equivalenceFactor: item.standardUnitFactor ?? item.conversionFactor,
                                               readOnly: isFullyReturned,
-                                              unitLabel: item.product.unitName,
                                               showTitle: false,
                                               showButtons: false,
                                               decoration: InputDecoration(

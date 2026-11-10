@@ -326,7 +326,6 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
 
                             if (rowCard.selectedUnitIndex > 0) {
                               color = Colors.blue.shade300;
-                              label = "$label(${rowCard.conversionFactor})";
                             }
 
                             return Text(
@@ -446,11 +445,11 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
                                     ),
                                     if (rowCard.conversionFactor > 1) ...[
                                       Text(
-                                        "(${NumberFormatter.convertToMoneyLike((rowCard.unitaryCost / rowCard.conversionFactor).round())})",
+                                        "Base: ${NumberFormatter.convertToMoneyLike((rowCard.unitaryCost / rowCard.conversionFactor).round())}",
                                         style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.blue.shade300,
-                                          fontStyle: FontStyle.italic,
+                                          fontSize: 12,
+                                          color: Colors.blue.shade700,
+                                          fontWeight: FontWeight.w600,
                                         ),
                                       ),
                                     ],
@@ -480,11 +479,11 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
                                 ),
                                 if (rowCard.conversionFactor > 1) ...[
                                   Text(
-                                    "(${NumberFormatter.convertFromCentsToUnitsCurrency((rowCard.unitaryCost / rowCard.conversionFactor).round())})",
+                                    "Base: ${NumberFormatter.convertFromCentsToUnitsCurrency((rowCard.unitaryCost / rowCard.conversionFactor).round())}",
                                     style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.blue.shade300,
-                                      fontStyle: FontStyle.italic,
+                                      fontSize: 12,
+                                      color: Colors.blue.shade700,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                 ],

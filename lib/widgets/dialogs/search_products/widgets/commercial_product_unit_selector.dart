@@ -27,7 +27,7 @@ class CommercialProductUnitSelector extends StatelessWidget {
         final extra = product.extraUnits[index];
         return DropdownMenuItem<int>(
           value: index + 1,
-          child: Text('${extra.name} (x${extra.conversionFactor})'),
+          child: Text(extra.name),
         );
       }),
     ];
@@ -82,22 +82,6 @@ class CommercialProductUnitSelector extends StatelessWidget {
             result.conversionFactor = newFactor;
             result.selectedUnitName = newUnitName;
 
-            if (convertedQuantity == null) {
-              final baseQuantity = (previousQuantity * oldFactor).round();
-              final equivalence = UnitConversionTool.formatQuantity(
-                baseQuantity / newFactor,
-                maxDecimals: 6,
-              );
-              ScaffoldMessenger.maybeOf(context)?.showSnackBar(
-                SnackBar(
-                  content: Text(
-                    "No se pudo convertir exactamente a $newUnitName. "
-                    "Cantidad reiniciada a 0 ($baseQuantity ${product.unitName} = $equivalence $newUnitName).",
-                  ),
-                  duration: const Duration(seconds: 4),
-                ),
-              );
-            }
             onChanged();
           },
         ),
