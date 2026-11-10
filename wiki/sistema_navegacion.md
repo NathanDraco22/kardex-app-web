@@ -208,6 +208,9 @@ flowchart TD
 
 ## 6. Matriz de Diferencias entre Ramas: `main` vs. `lite`
 
+> [!NOTE]
+> Esta sección resume el **qué** cambia técnicamente entre ramas. Para el **por qué** —el problema que originó `lite`, el flujo simplificado de producto/stock/precio y las reglas de producto detrás de estas diferencias— consulta [ramas_main_vs_lite.md](./ramas_main_vs_lite.md).
+
 | Característica | Rama `main` (Estándar) | Rama `lite` (Ligera) |
 | :--- | :--- | :--- |
 | **Módulos Raíz en Home / Sidebar** | 10 módulos disponibles | 8 módulos disponibles |

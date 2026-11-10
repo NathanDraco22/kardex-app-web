@@ -113,6 +113,7 @@ lib/
 Para conocer a detalle la lógica, vistas, cubits y repositorios de cada módulo funcional, consulta:
 
 - 🗺️ **[Sistema de Navegación y Arquitectura (sistema_navegacion.md)](./sistema_navegacion.md)** - Guía maestra de navegación: Split Hub (Desktop), Drill-Down (Mobile), permisos de roles, fallback seguro y diferencias entre ramas `main` y `lite`.
+- 🧭 **[Ediciones main vs lite (ramas_main_vs_lite.md)](./ramas_main_vs_lite.md)** - Contexto de negocio: por qué existe `lite`, el flujo simplificado de producto/stock/precio y por qué no incluye movimientos de kárdex.
 - 📋 **[Índice de Módulos (modules_index.md)](./modules/modules_index.md)** - Resumen ejecutivo de todos los módulos.
 - 🛒 **[Comercial (modules/commercial.md)](./modules/commercial.md)** - Terminal POS, facturas, recibos, proformas y devoluciones.
 - 📋 **[Notas de Crédito (modules/credit_notes.md)](./modules/credit_notes.md)** - Sustitución y evolución de devoluciones (por devolución o monto), patrón de Repositorio Reactivo (`ReactiveRepository`) y amortización en recibos.
