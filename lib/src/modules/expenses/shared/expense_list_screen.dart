@@ -6,9 +6,7 @@ import 'package:kardex_app_front/src/modules/expenses/shared/expense_list_config
 import 'package:kardex_app_front/src/modules/expenses/shared/expense_metrics.dart';
 import 'package:kardex_app_front/src/modules/expenses/shared/expense_status_ui.dart';
 import 'package:kardex_app_front/src/modules/expenses/shared/widgets/expense_filter_panel.dart';
-import 'package:kardex_app_front/src/modules/expenses/shared/widgets/expense_kpi_strip.dart';
 import 'package:kardex_app_front/src/modules/expenses/shared/widgets/expense_list_tile.dart';
-import 'package:kardex_app_front/src/modules/expenses/shared/widgets/expense_page_header.dart';
 import 'package:kardex_app_front/src/modules/expenses/shared/widgets/expense_table_header.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 import 'package:kardex_business/kardex_business.dart';
@@ -57,14 +55,50 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
         foregroundColor: const Color(0xFF0F172A),
         elevation: 0,
         scrolledUnderElevation: 0,
-        title: const Text(
-          'Gastos',
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w700,
-            letterSpacing: -0.2,
+        title: Tooltip(
+          message: widget.config.subtitle,
+          child: Text(
+            widget.config.title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              letterSpacing: -0.2,
+            ),
           ),
         ),
+        actions: [
+          BlocBuilder<ReadExpenseCubit, ReadExpenseState>(
+            builder: (context, state) {
+              final isRefreshing = state is ReadExpenseSearching;
+              return IconButton(
+                tooltip: 'Actualizar',
+                onPressed: isRefreshing ? null : () => context.read<ReadExpenseCubit>().refresh(),
+                icon: isRefreshing
+                    ? SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: widget.config.accentColor,
+                        ),
+                      )
+                    : const Icon(Icons.refresh_rounded, size: 21),
+              );
+            },
+          ),
+          IconButton(
+            tooltip: widget.config.createButtonLabel,
+            onPressed: _createExpense,
+            icon: Icon(
+              Icons.add_rounded,
+              size: 23,
+              color: widget.config.accentColor,
+            ),
+          ),
+          const SizedBox(width: 4),
+        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
           child: Container(height: 1, color: AppThemeTokens.borderLight),
@@ -94,31 +128,12 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
                         physics: const AlwaysScrollableScrollPhysics(),
                         slivers: [
                           SliverPadding(
-                            padding: EdgeInsets.fromLTRB(horizontalPadding, 20, horizontalPadding, 0),
-                            sliver: SliverToBoxAdapter(
-                              child: ExpensePageHeader(
-                                config: widget.config,
-                                isRefreshing: state is ReadExpenseSearching,
-                                onRefresh: () => context.read<ReadExpenseCubit>().refresh(),
-                                onCreate: _createExpense,
-                              ),
-                            ),
-                          ),
-                          SliverPadding(
-                            padding: EdgeInsets.fromLTRB(horizontalPadding, 16, horizontalPadding, 0),
-                            sliver: SliverToBoxAdapter(
-                              child: ExpenseKpiStrip(
-                                metrics: metrics,
-                                accentColor: widget.config.accentColor,
-                                totalLoaded: successState?.totalLoaded ?? 0,
-                              ),
-                            ),
-                          ),
-                          SliverPadding(
-                            padding: EdgeInsets.fromLTRB(horizontalPadding, 16, horizontalPadding, 0),
+                            padding: EdgeInsets.fromLTRB(horizontalPadding, 12, horizontalPadding, 0),
                             sliver: SliverToBoxAdapter(
                               child: ExpenseFilterPanel(
                                 config: widget.config,
+                                metrics: metrics,
+                                totalLoaded: successState?.totalLoaded ?? 0,
                                 searchController: _searchController,
                                 searchQuery: _searchQuery,
                                 onSearchChanged: _onSearchChanged,

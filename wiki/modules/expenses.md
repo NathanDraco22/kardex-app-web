@@ -53,7 +53,6 @@ lib/src/modules/expenses/
 │       ├── expense_form_widgets.dart
 │       ├── expense_kpi_strip.dart
 │       ├── expense_list_tile.dart            # Fila desktop + tarjeta móvil
-│       ├── expense_page_header.dart
 │       └── expense_table_header.dart
 ├── operative_expenses/
 │   ├── dialogs/create_expense_dialog.dart
@@ -122,7 +121,7 @@ API FastAPI
 | `shared/expense_actions.dart` | Reglas de permisos, acciones de fila y confirmaciones. Centraliza `edit`, `markAsPaid`, `delete` y el snackbar del módulo. |
 | `shared/expense_form_utils.dart` | `parseExpenseAmountCents`, `formatExpenseAmountInput`, `resolveExpenseStatus`, `resolveExpirationDate` y `buildExpensePayload`. |
 | `shared/expense_list_config.dart` | Contrato que adapta la lista compartida a cada tipo: título, subtítulo, icono, color, tipo, etiqueta del concepto, textos de búsqueda/vacío, callbacks y soporte de filtros. |
-| `shared/expense_list_screen.dart` | Orquesta header, KPIs, filtros, tabla/cards, skeletons, errores, estado vacío y paginación. No conoce los formularios; los recibe por configuración. |
+| `shared/expense_list_screen.dart` | Orquesta la tarjeta de totales/filtros, tabla/cards, skeletons, errores, estado vacío y paginación. No conoce los formularios; los recibe por configuración. |
 | `shared/expense_metrics.dart` | `ExpenseMetrics.fromExpenses(...)` calcula total, pagado, pendiente, vencido y sus conteos sobre los registros visibles. |
 | `shared/expense_status_ui.dart` | Etiqueta, icono y variante de color por estado; badge de vencido; badge de actividad (`Nuevo`/`Actualizado`); función `isExpenseOverdue`. |
 
@@ -130,9 +129,8 @@ API FastAPI
 
 | Widget | Uso |
 | :--- | :--- |
-| `ExpensePageHeader` | Cabecera con icono tintado, título, subtítulo, refresco y botón de creación. |
-| `ExpenseKpiStrip` | Cuatro tarjetas: Total registrado, Pagado, Pendiente y Vencidos. Incluye la nota de alcance “sobre N registros visibles de M cargados”. |
-| `ExpenseFilterPanel` | Búsqueda, pills de estado, filtro de categoría/proveedor, fechas separadas de registro (inicio/fin) y limpieza de filtros. |
+| `ExpenseKpiStrip` | Barra compacta con Total, Pagado, Pendiente y Vencidos. En desktop va en una fila y en móvil en grilla 2×2. Incluye la nota de alcance “sobre N registros visibles de M cargados”. |
+| `ExpenseFilterPanel` | Tarjeta única con la barra de totales, dropdown de estado, filtro de categoría/proveedor, fechas separadas de registro (inicio/fin) y buscador al final. |
 | `ExpenseDateRangeFields` | Par de campos “Fecha Inicio” y “Fecha Fin” con calendarios individuales, soporte de extremos opcionales y limpieza por campo. Se usa en las listas y en el reporte. |
 | `ExpenseTableHeader` / `ExpenseTableRow` | Tabla desktop: Concepto, Documento, Registro, Vencimiento, Estado, Monto y acciones. |
 | `ExpenseCardTile` | Tarjeta equivalente para móvil/tablet, con metadatos, badges y menú de acciones. |
@@ -180,10 +178,11 @@ Ambas listas reutilizan `ExpenseListScreen` y solo cambian su `ExpenseListConfig
 
 #### Elementos de la interfaz
 
-- AppBar simple “Gastos” y fondo `AppThemeTokens.surfaceLight`.
-- Header con título, subtítulo, refresco y botón de creación.
-- Franja de KPIs.
-- Panel de búsqueda y filtros.
+- AppBar con el título específico (“Gastos Operativos” / “Gastos de Proveedores”), refresco y “Nuevo Gasto” como acciones compactas.
+- Tarjeta única de totales y filtros, con estilo compacto similar al módulo “Buscar facturas por producto”.
+- Barra de totales en formato resumido (Total, Pagado, Pendiente, Vencidos).
+- Dropdown de estado: Todos, Pendientes, Pagados y Vencidos.
+- Fechas separadas de registro (inicio/fin) y buscador al final de la tarjeta.
 - Barra de progreso fina durante `ReadExpenseSearching`.
 - Tabla en desktop (`>= 900 px`) y tarjetas en móvil/tablet.
 - Skeletons de 6 filas o 4 tarjetas durante la carga inicial.
@@ -205,7 +204,7 @@ Ambas listas reutilizan `ExpenseListScreen` y solo cambian su `ExpenseListConfig
 
 Al cambiar un filtro se resetea el `offset` a 0 y se conserva el `type` del listado. Los filtros locales se aplican sobre los registros ya cargados; por eso “Pendientes” y “Vencidos” pueden requerir cargar más páginas para mostrar todos los resultados del período.
 
-#### KPIs de lista
+#### Totales de lista
 
 `ExpenseMetrics.fromExpenses` calcula sobre los registros **visibles** (después de filtros locales y sin eliminados):
 
@@ -214,7 +213,7 @@ Al cambiar un filtro se resetea el `offset` a 0 y se conserva el `type` del list
 - **Pendiente:** `draft`, `open` y `partiallyPaid`.
 - **Vencidos:** con `expirationDate` ya pasada y estado distinto de `paid`/`cancelled`.
 
-Los KPIs **no son totales globales del backend**. La propia franja indica cuántos registros visibles se están considerando sobre el total cargado.
+Los totales **no son globales del backend**. La barra compacta indica cuántos registros visibles se están considerando sobre el total cargado.
 
 #### Acciones de fila
 
@@ -531,7 +530,7 @@ Resultados registrados:
 | Archivo | Cobertura principal |
 | :--- | :--- |
 | `test/expense_metrics_test.dart` | Cálculo de métricas, estados, vencidos y montos. |
-| `test/expense_shared_layout_test.dart` | Layout responsive de header, KPIs, filtros, tabla, tarjetas, estados vacíos y paginación. |
+| `test/expense_shared_layout_test.dart` | Layout responsive de la tarjeta de totales/filtros, tabla, tarjetas, estados vacíos y paginación. |
 | `test/expense_reports_test.dart` | Presets de período, agregación, consolidado, CSV, `loadAll`, KPIs y paginación local del detalle. |
 | `test/expense_categories_test.dart` | Grid, tarjetas, badges, búsqueda, refresh con error y diálogo responsive. |
 | `test/expense_forms_test.dart` | Parser de montos, estado/vencimiento, payload de edición y formularios responsive. |

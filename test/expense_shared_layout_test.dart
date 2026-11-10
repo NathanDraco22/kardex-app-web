@@ -9,7 +9,6 @@ import 'package:kardex_app_front/src/modules/expenses/shared/expense_metrics.dar
 import 'package:kardex_app_front/src/modules/expenses/shared/widgets/expense_filter_panel.dart';
 import 'package:kardex_app_front/src/modules/expenses/shared/widgets/expense_kpi_strip.dart';
 import 'package:kardex_app_front/src/modules/expenses/shared/widgets/expense_list_tile.dart';
-import 'package:kardex_app_front/src/modules/expenses/shared/widgets/expense_page_header.dart';
 import 'package:kardex_app_front/src/modules/expenses/shared/widgets/expense_table_header.dart';
 import 'package:kardex_business/kardex_business.dart';
 
@@ -38,20 +37,10 @@ void main() {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    ExpensePageHeader(
-                      config: _config,
-                      onRefresh: () {},
-                      onCreate: () {},
-                    ),
-                    const SizedBox(height: 16),
-                    ExpenseKpiStrip(
-                      metrics: metrics,
-                      accentColor: _accent,
-                      totalLoaded: 1,
-                    ),
-                    const SizedBox(height: 16),
                     ExpenseFilterPanel(
                       config: _config,
+                      metrics: metrics,
+                      totalLoaded: 1,
                       searchController: searchController,
                       searchQuery: '',
                       onSearchChanged: (_) {},
@@ -132,7 +121,10 @@ void main() {
 
       expect(tester.takeException(), isNull);
       expect(
-        find.descendant(of: find.byType(AppBar), matching: find.text('Gastos')),
+        find.descendant(
+          of: find.byType(AppBar),
+          matching: find.text('Gastos Operativos'),
+        ),
         findsOneWidget,
       );
     });
@@ -179,8 +171,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Pendientes'));
-    await tester.pumpAndSettle();
+    await _selectStatus(tester, 'Pendientes');
 
     expect(cubit.requestedStatus, isNull);
     expect(cubit.applyFiltersCalls, 1);
@@ -208,11 +199,58 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Pendientes'));
-    await tester.pumpAndSettle();
+    await _selectStatus(tester, 'Pendientes');
 
     expect(cubit.requestedStatus, isNull);
     expect(find.text('Parcial'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('el dropdown de estado envía Pagados al servidor', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(1280, 1000));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    final cubit = _FakeReadExpenseCubit([
+      _expense(id: 'paid', status: ExpenseStatus.paid),
+    ]);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: BlocProvider<ReadExpenseCubit>.value(
+          value: cubit,
+          child: const ExpenseListScreen(config: _config),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await _selectStatus(tester, 'Pagados');
+
+    expect(cubit.requestedStatus, ExpenseStatus.paid.name);
+    expect(cubit.applyFiltersCalls, 1);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('el buscador queda debajo de los filtros', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(1280, 1000));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    final cubit = _FakeReadExpenseCubit([_expense()]);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: BlocProvider<ReadExpenseCubit>.value(
+          value: cubit,
+          child: const ExpenseListScreen(config: _config),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final statusTop = tester.getTopLeft(find.byKey(const Key('expense_status_dropdown'))).dy;
+    final searchTop = tester.getTopLeft(find.byType(TextField)).dy;
+
+    expect(searchTop, greaterThan(statusTop));
     expect(tester.takeException(), isNull);
   });
 
@@ -454,6 +492,8 @@ void main() {
             padding: const EdgeInsets.all(16),
             child: ExpenseFilterPanel(
               config: _config,
+              metrics: ExpenseMetrics.fromExpenses(const []),
+              totalLoaded: 0,
               searchController: controller,
               searchQuery: '',
               onSearchChanged: (_) {},
@@ -504,6 +544,8 @@ void main() {
             padding: const EdgeInsets.all(16),
             child: ExpenseFilterPanel(
               config: _config,
+              metrics: ExpenseMetrics.fromExpenses(const []),
+              totalLoaded: 0,
               searchController: controller,
               searchQuery: '',
               onSearchChanged: (_) {},
@@ -562,6 +604,13 @@ void main() {
       },
     );
   }
+}
+
+Future<void> _selectStatus(WidgetTester tester, String label) async {
+  await tester.tap(find.byKey(const Key('expense_status_dropdown')));
+  await tester.pumpAndSettle();
+  await tester.tap(find.text(label).last);
+  await tester.pumpAndSettle();
 }
 
 int _requestedOffset(_FakeExpensesRepository repository) {

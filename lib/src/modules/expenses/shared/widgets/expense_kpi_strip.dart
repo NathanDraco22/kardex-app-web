@@ -3,7 +3,11 @@ import 'package:kardex_app_front/src/modules/expenses/shared/expense_metrics.dar
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 
-/// Franja de 4 tarjetas KPI con los montos principales de la lista de gastos.
+/// Barra compacta con los montos principales de la lista de gastos.
+///
+/// Sustituye a las tarjetas KPI grandes para que el header y los filtros
+/// ocupen poco espacio vertical. En desktop se muestra en una fila y en
+/// móvil/tablet en una grilla de dos columnas.
 class ExpenseKpiStrip extends StatelessWidget {
   const ExpenseKpiStrip({
     super.key,
@@ -20,68 +24,80 @@ class ExpenseKpiStrip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final items = <_MetricData>[
+      _MetricData(
+        label: 'Total',
+        amount: metrics.total,
+        count: metrics.count,
+        icon: Icons.account_balance_wallet_rounded,
+        color: accentColor,
+      ),
+      _MetricData(
+        label: 'Pagado',
+        amount: metrics.paid,
+        count: metrics.paidCount,
+        icon: Icons.check_circle_outline_rounded,
+        color: AppThemeTokens.success,
+      ),
+      _MetricData(
+        label: 'Pendiente',
+        amount: metrics.pending,
+        count: metrics.pendingCount,
+        icon: Icons.schedule_rounded,
+        color: AppThemeTokens.warning,
+      ),
+      _MetricData(
+        label: 'Vencidos',
+        amount: metrics.overdueAmount,
+        count: metrics.overdueCount,
+        icon: Icons.warning_amber_rounded,
+        color: AppThemeTokens.danger,
+      ),
+    ];
+
     return LayoutBuilder(
       builder: (context, constraints) {
-        final width = constraints.maxWidth;
-        final columns = width >= 1040
-            ? 4
-            : width >= 600
-            ? 2
-            : 1;
-        const spacing = 12.0;
-        final cardWidth = columns == 1 ? width : (width - spacing * (columns - 1)) / columns;
-
-        final cards = [
-          _KpiCard(
-            label: 'Total registrado',
-            amount: metrics.total,
-            caption: _plural(metrics.count, 'registro', 'registros'),
-            icon: Icons.account_balance_wallet_rounded,
-            color: accentColor,
-          ),
-          _KpiCard(
-            label: 'Pagado',
-            amount: metrics.paid,
-            caption: _plural(metrics.paidCount, 'pagado', 'pagados'),
-            icon: Icons.check_circle_outline_rounded,
-            color: AppThemeTokens.success,
-          ),
-          _KpiCard(
-            label: 'Pendiente',
-            amount: metrics.pending,
-            caption: _plural(metrics.pendingCount, 'pendiente', 'pendientes'),
-            icon: Icons.schedule_rounded,
-            color: AppThemeTokens.warning,
-          ),
-          _KpiCard(
-            label: 'Vencidos',
-            amount: metrics.overdueAmount,
-            caption: _plural(metrics.overdueCount, 'vencido', 'vencidos'),
-            icon: Icons.warning_amber_rounded,
-            color: AppThemeTokens.danger,
-          ),
-        ];
+        final isWide = constraints.maxWidth >= 760;
+        final metricsWidget = isWide
+            ? Row(
+                children: [
+                  for (var index = 0; index < items.length; index++) ...[
+                    if (index > 0) const _MetricDivider(),
+                    Expanded(child: _CompactMetric(data: items[index])),
+                  ],
+                ],
+              )
+            : Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(child: _CompactMetric(data: items[0])),
+                      const SizedBox(width: 12),
+                      Expanded(child: _CompactMetric(data: items[1])),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(child: _CompactMetric(data: items[2])),
+                      const SizedBox(width: 12),
+                      Expanded(child: _CompactMetric(data: items[3])),
+                    ],
+                  ),
+                ],
+              );
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Wrap(
-              spacing: spacing,
-              runSpacing: spacing,
-              children: [
-                for (final card in cards)
-                  SizedBox(
-                    width: cardWidth,
-                    child: card,
-                  ),
-              ],
-            ),
+            metricsWidget,
             if (totalLoaded > 0) ...[
-              const SizedBox(height: 6),
+              const SizedBox(height: 5),
               Text(
                 'Montos sobre ${metrics.count} registros visibles de $totalLoaded cargados.',
+                textAlign: TextAlign.right,
                 style: const TextStyle(
-                  fontSize: 11,
+                  fontSize: 10,
                   color: Color(0xFF94A3B8),
                 ),
               ),
@@ -91,88 +107,97 @@ class ExpenseKpiStrip extends StatelessWidget {
       },
     );
   }
-
-  String _plural(int value, String singular, String plural) {
-    return '$value ${value == 1 ? singular : plural}';
-  }
 }
 
-class _KpiCard extends StatelessWidget {
-  const _KpiCard({
+class _MetricData {
+  const _MetricData({
     required this.label,
     required this.amount,
-    required this.caption,
+    required this.count,
     required this.icon,
     required this.color,
   });
 
   final String label;
   final int amount;
-  final String caption;
+  final int count;
   final IconData icon;
   final Color color;
+}
+
+class _CompactMetric extends StatelessWidget {
+  const _CompactMetric({required this.data});
+
+  final _MetricData data;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 26,
+          height: 26,
+          decoration: BoxDecoration(
+            color: data.color.withValues(alpha: 0.10),
+            borderRadius: AppThemeTokens.borderRadiusSm,
+          ),
+          child: Icon(data.icon, size: 14, color: data.color),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                data.label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF64748B),
+                ),
+              ),
+              Text(
+                NumberFormatter.convertToMoneyLike(data.amount),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF0F172A),
+                  letterSpacing: -0.3,
+                  height: 1.1,
+                ),
+              ),
+              Text(
+                '${data.count} ${data.count == 1 ? 'registro' : 'registros'}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 9.5,
+                  color: Color(0xFF94A3B8),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _MetricDivider extends StatelessWidget {
+  const _MetricDivider();
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: AppThemeTokens.borderRadiusLg,
-        border: Border.all(color: AppThemeTokens.borderLight),
-        boxShadow: AppThemeTokens.subtleCardShadow(),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 34,
-                height: 34,
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.12),
-                  borderRadius: AppThemeTokens.borderRadiusSm,
-                  border: Border.all(color: color.withValues(alpha: 0.22)),
-                ),
-                child: Icon(icon, color: color, size: 18),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF64748B),
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            NumberFormatter.convertToMoneyLike(amount),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w800,
-              color: Color(0xFF0F172A),
-              letterSpacing: -0.5,
-              height: 1.15,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            caption,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 11.5,
-              color: Color(0xFF94A3B8),
-            ),
-          ),
-        ],
-      ),
+      width: 1,
+      height: 32,
+      margin: const EdgeInsets.symmetric(horizontal: 10),
+      color: AppThemeTokens.borderLight,
     );
   }
 }
