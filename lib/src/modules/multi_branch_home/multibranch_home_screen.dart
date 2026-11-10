@@ -1,13 +1,12 @@
-import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
-import 'package:kardex_app_front/src/tools/cache/app_image_cache_manager.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
+import 'package:kardex_app_front/widgets/dialogs/selectors/branch_selection_dialog.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 class MultibranchHomeScreen extends StatelessWidget {
@@ -27,15 +26,6 @@ class _MultibranchBody extends StatefulWidget {
 }
 
 class _MultibranchBodyState extends State<_MultibranchBody> {
-  final ScrollController _scrollController = ScrollController();
-  final GlobalKey _branchesKey = GlobalKey();
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AuthCubit, AuthState>(
@@ -95,7 +85,6 @@ class _MultibranchBodyState extends State<_MultibranchBody> {
               final isWide = constraints.maxWidth >= 900;
 
               return SingleChildScrollView(
-                controller: _scrollController,
                 padding: EdgeInsets.symmetric(
                   horizontal: isWide ? 32 : 20,
                   vertical: 24,
@@ -128,13 +117,10 @@ class _MultibranchBodyState extends State<_MultibranchBody> {
                           onBranches: () => _openBranches(branches),
                         ),
                         const SizedBox(height: 28),
-                        Container(
-                          key: _branchesKey,
-                          child: _BranchesSection(
-                            branches: branches,
-                            currentBranchId: authState.branch.id,
-                            onSelect: _selectBranch,
-                          ),
+                        _BranchesSection(
+                          branches: branches,
+                          currentBranchId: authState.branch.id,
+                          onSelect: _selectBranch,
                         ),
                         const SizedBox(height: 24),
                       ],
@@ -149,7 +135,7 @@ class _MultibranchBodyState extends State<_MultibranchBody> {
     );
   }
 
-  void _openBranches(List<BranchInDb> branches) {
+  Future<void> _openBranches(List<BranchInDb> branches) async {
     if (branches.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -160,19 +146,14 @@ class _MultibranchBodyState extends State<_MultibranchBody> {
       return;
     }
 
-    if (branches.length == 1) {
-      _selectBranch(branches.first);
-      return;
-    }
-
-    final target = _branchesKey.currentContext;
-    if (target == null) return;
-
-    Scrollable.ensureVisible(
-      target,
-      duration: const Duration(milliseconds: 380),
-      curve: Curves.easeOutCubic,
+    final selected = await showBranchSelectionDialog(
+      context,
+      branches,
+      currentBranchId: getIt<AuthCubit>().currentBranchId,
     );
+
+    if (selected == null || !mounted) return;
+    _selectBranch(selected);
   }
 
   void _selectBranch(BranchInDb branch) {
@@ -1026,7 +1007,7 @@ class _BranchCardState extends State<_BranchCard> {
                 ),
                 child: Row(
                   children: [
-                    _BranchAvatar(branch: branch),
+                    BranchAvatar(branch: branch),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
@@ -1083,82 +1064,6 @@ class _BranchCardState extends State<_BranchCard> {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _BranchAvatar extends StatelessWidget {
-  const _BranchAvatar({required this.branch});
-
-  final BranchInDb branch;
-
-  @override
-  Widget build(BuildContext context) {
-    final hasRemoteImage = branch.imageUrl != null && branch.imageUrl!.trim().isNotEmpty;
-    final hasLocalImage = branch.image != null && branch.image!.isNotEmpty;
-    final accent = branch.isCommerce ? const Color(0xFFD97706) : const Color(0xFF475569);
-
-    Widget image;
-    if (hasRemoteImage) {
-      image = CachedNetworkImage(
-        imageUrl: branch.imageUrl!.trim(),
-        cacheManager: AppImageCacheManager.instance,
-        fit: BoxFit.cover,
-        placeholder: (context, url) => _BranchAvatarPlaceholder(
-          isCommerce: branch.isCommerce,
-          color: accent,
-        ),
-        errorBuilder: (context, error, stackTrace) => _BranchAvatarPlaceholder(
-          isCommerce: branch.isCommerce,
-          color: accent,
-        ),
-      );
-    } else if (hasLocalImage) {
-      image = Image.memory(
-        branch.image!,
-        fit: BoxFit.cover,
-        gaplessPlayback: true,
-      );
-    } else {
-      image = _BranchAvatarPlaceholder(
-        isCommerce: branch.isCommerce,
-        color: accent,
-      );
-    }
-
-    return Container(
-      width: 48,
-      height: 48,
-      decoration: BoxDecoration(
-        color: accent.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: accent.withValues(alpha: 0.14)),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(13),
-        child: image,
-      ),
-    );
-  }
-}
-
-class _BranchAvatarPlaceholder extends StatelessWidget {
-  const _BranchAvatarPlaceholder({
-    required this.isCommerce,
-    required this.color,
-  });
-
-  final bool isCommerce;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Icon(
-        isCommerce ? Icons.storefront_rounded : Icons.warehouse_rounded,
-        color: color,
-        size: 22,
       ),
     );
   }

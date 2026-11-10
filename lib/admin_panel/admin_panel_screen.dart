@@ -221,6 +221,7 @@ class _Body extends StatelessWidget {
                       final res = await showBranchSelectionDialog(
                         context,
                         branches,
+                        currentBranchId: getIt<AuthCubit>().currentBranchId,
                       );
 
                       if (res == null) return;

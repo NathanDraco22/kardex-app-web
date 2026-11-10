@@ -85,7 +85,11 @@ class HomeEndDrawer extends StatelessWidget {
                   final filteredBranches = branches.where((element) {
                     return element.id != getIt<AuthCubit>().currentBranchId;
                   }).toList();
-                  final res = await showBranchSelectionDialog(context, filteredBranches);
+                  final res = await showBranchSelectionDialog(
+                    context,
+                    filteredBranches,
+                    currentBranchId: getIt<AuthCubit>().currentBranchId,
+                  );
                   if (res == null) return;
                   if (!context.mounted) return;
                   getIt<AuthCubit>().changeBranch(res.id);
