@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/constants/feature_flags.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/product_demand_vs_stock/product_demand_vs_stock_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/user_operations_results/user_operations_results_screen.dart';
@@ -198,23 +199,26 @@ class AppRouter {
             name: "product-list",
             builder: (context, state) => const ProductListScreen(),
           ),
+          // Rutas heredadas: en Lite, Unidades y Escalas vive dentro de Inventario.
           GoRoute(
             path: "units-and-scales",
-            name: "units-and-scales",
-            builder: (context, state) {
+            redirect: (context, state) {
               final tab = state.uri.queryParameters["tab"];
-              return UnitsAndScalesScreen(initialTab: tab == "scales" ? 1 : 0);
+              return tab == null ? "/inventory/units-and-scales" : "/inventory/units-and-scales?tab=$tab";
             },
           ),
           GoRoute(
             path: "units",
             name: "units",
-            redirect: (context, state) => "/product-catalog/units-and-scales?tab=units",
+            redirect: (context, state) => "/inventory/units-and-scales?tab=units",
           ),
           GoRoute(
             path: "unit-scales",
             name: "unit-scales",
-            redirect: (context, state) => "/product-catalog/units-and-scales?tab=scales",
+            redirect: (context, state) {
+              const tab = FeatureFlags.showUnitScales ? "scales" : "units";
+              return "/inventory/units-and-scales?tab=$tab";
+            },
           ),
         ],
       ),
@@ -493,6 +497,20 @@ class AppRouter {
         name: 'inventory',
         builder: (context, state) => const InventoryMenuScreen(),
         routes: [
+          GoRoute(
+            path: "units-and-scales",
+            name: "units-and-scales",
+            redirect: (context, state) {
+              if (!FeatureFlags.showUnitScales && state.uri.queryParameters["tab"] == "scales") {
+                return "/inventory/units-and-scales?tab=units";
+              }
+              return null;
+            },
+            builder: (context, state) {
+              final tab = state.uri.queryParameters["tab"];
+              return UnitsAndScalesScreen(initialTab: tab == "scales" ? 1 : 0);
+            },
+          ),
           GoRoute(
             path: "current-inventory",
             name: "current-inventory",

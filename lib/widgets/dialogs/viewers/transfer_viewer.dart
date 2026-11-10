@@ -201,6 +201,8 @@ class TransferViewerContent extends StatelessWidget {
                   itemCount: transfer.items.length,
                   itemBuilder: (context, index) {
                     final item = transfer.items[index];
+                    final display = item.displayQuantity;
+                    final displayFactor = item.displayUnitFactor;
                     final rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
                     return Container(
                       padding: const EdgeInsets.all(4),
@@ -214,9 +216,7 @@ class TransferViewerContent extends StatelessWidget {
                               children: [
                                 Text(item.name),
                                 Text(
-                                  item.conversionFactor > 1
-                                      ? "${item.unitName} (${item.conversionFactor.toInt()})"
-                                      : item.unitName,
+                                  displayFactor > 1 ? "${item.displayUnitName} ($displayFactor)" : item.displayUnitName,
                                   style: const TextStyle(fontSize: 12, color: Colors.grey),
                                 ),
                               ],
@@ -224,12 +224,12 @@ class TransferViewerContent extends StatelessWidget {
                           ),
                           Expanded(
                             child: Text(
-                              NumberFormatter.formatDisplayStock(item.quantity, item.conversionFactor),
+                              display.quantityText,
                             ),
                           ),
                           Expanded(
                             child: Text(
-                              NumberFormatter.convertToMoneyLike(item.cost * item.conversionFactor),
+                              NumberFormatter.convertToMoneyLike(item.displayUnitCost),
                             ),
                           ),
                           Expanded(

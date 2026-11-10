@@ -219,15 +219,25 @@ class _DevolutionViewer extends StatelessWidget {
                                         children: [
                                           Text(item.product.name),
                                           Text(
-                                            "${item.product.unitName}${item.conversionFactor > 1 ? ' (${item.conversionFactor % 1 == 0 ? item.conversionFactor.toInt() : item.conversionFactor})' : ''}",
+                                            "${item.displayUnitName}${item.displayUnitFactor > 1 ? ' (${item.displayUnitFactor % 1 == 0 ? item.displayUnitFactor.toInt() : item.displayUnitFactor})' : ''}",
                                             style: const TextStyle(color: Colors.grey, fontSize: 12),
                                           ),
                                         ],
                                       ),
                                     ),
                                     Expanded(
-                                      child: Text(
-                                        item.formattedDisplayQuantity,
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            item.formattedDisplayQuantity,
+                                          ),
+                                          if (item.bonQuantity > 0)
+                                            Text(
+                                              "+ ${item.formattedDisplayBonQuantity} bonif.",
+                                              style: const TextStyle(color: Colors.grey, fontSize: 12),
+                                            ),
+                                        ],
                                       ),
                                     ),
                                     Expanded(

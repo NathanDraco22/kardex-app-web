@@ -10,6 +10,7 @@ import 'package:kardex_app_front/src/modules/commercial/pending_invoice/web/rece
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/widget/invoice_devolution_tile.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/widget/credit_notes_summary_tile.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/widget/pending_invoices_statement_image_dialog.dart';
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/devolution_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/credit_note_viewer.dart';
@@ -133,11 +134,8 @@ class _RootScaffoldState extends State<_RootScaffold> {
               tooltip: "Compartir estado de cuenta en imagen",
               onPressed: () {
                 final state = context.read<ReadPendingInvoiceCubit>().state;
-                final selectedClient =
-                    PendingInvoiceMediator.of(context).notifier?.selectedClient;
-                if (selectedClient == null ||
-                    state is! ReadInvoiceSuccess ||
-                    state.invoices.isEmpty) {
+                final selectedClient = PendingInvoiceMediator.of(context).notifier?.selectedClient;
+                if (selectedClient == null || state is! ReadInvoiceSuccess || state.invoices.isEmpty) {
                   DialogManager.showInfoDialog(
                     context,
                     "No hay facturas pendientes para compartir.",
@@ -431,15 +429,22 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
       child: Padding(
-        padding: EdgeInsets.all(4.0),
+        padding: const EdgeInsets.all(4.0),
         child: Column(
           spacing: 8,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _HeaderSection(),
-            Expanded(
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.sizeOf(context).height * 0.45,
+              ),
+              child: const SingleChildScrollView(
+                child: _HeaderSection(),
+              ),
+            ),
+            const Expanded(
               child: _ContentSection(),
             ),
           ],

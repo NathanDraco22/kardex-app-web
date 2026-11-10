@@ -68,7 +68,7 @@ Todos los componentes de navegación están estandarizados en `lib/widgets/` y e
   - Divisor de secciones con título en mayúsculas tenues (`11.5 dp`, `FontWeight.w700`, `letterSpacing: 0.9`, `Colors.grey.shade600`) y línea divisoria horizontal.
   - Parámetro `isFirst` para ajustar el margen superior en la primera sección de una lista.
 - **`TertiaryMenuButton` (`lib/widgets/buttons/tertiary_menu_button.dart`):**
-  - Botón plano de texto/icono sin borde para `AppBar` o barras oscuras (fondo `#072a3c`).
+  - Botón tonal con fondo indigo suave (12 % de opacidad) y texto/icono indigo; en `AppBar` o barras oscuras conserva el texto blanco si se pasa `foregroundColor`.
   - Esquinas redondeadas (12 dp), densidad compacta y sin el margen invisible de 48 dp de Flutter (`MaterialTapTargetSize.shrinkWrap`).
 
 ---
@@ -219,7 +219,7 @@ flowchart TD
 | **Inventario: Ajustes y Mermas** | Rutas activas (`adjust-entry`, `history-adjust-entry`, mermas) | Omitidas por completo (rutas no registradas en router) |
 | **Comercio: Total de Opciones** | 28 opciones | 27 opciones (se omite `commercial-product-movements`) |
 | **Condición de Pago Dinámica** | `SegmentedButton` en cotizaciones / órdenes borrador (`CONTADO`/`CRÉDITO`) | Idéntico (portado) |
-| **Botones en AppBars Oscuros** | `TertiaryMenuButton` plano | Idéntico (portado) |
+| **Botones en AppBars Oscuros** | `TertiaryMenuButton` tonal | Idéntico (portado) |
 
 ---
 

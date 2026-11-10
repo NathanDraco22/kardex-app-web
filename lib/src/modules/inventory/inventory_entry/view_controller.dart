@@ -93,6 +93,8 @@ class InventoryEntryViewController extends ChangeNotifier {
         code: e.product.code,
         brandName: e.product.brandName,
         unitName: UnitConversionTool.resolveUnitName(e.selectedUnitName, e.product.unitName),
+        standardUnitName: e.product.defaultUnitName,
+        standardUnitFactor: e.product.defaultUnitFactor,
         expirationDate: e.expirationDate?.millisecondsSinceEpoch,
       );
     }).toList();

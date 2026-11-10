@@ -36,6 +36,12 @@ class _SearchFieldDebouncedState extends State<SearchFieldDebounced> {
   Timer? _debounceTime;
 
   @override
+  void dispose() {
+    _debounceTime?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return TextField(
       focusNode: widget.focusNode,

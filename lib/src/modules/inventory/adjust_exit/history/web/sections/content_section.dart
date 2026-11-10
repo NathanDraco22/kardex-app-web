@@ -79,7 +79,10 @@ class _ContentSection extends StatelessWidget {
 
                       // Calculate total since DB doesn't store it
                       // Using fold<int> since AdjustExitItem has int cost and quantity
-                      final totalVal = exit.items.fold<int>(0, (prev, item) => prev + (item.cost * item.quantity));
+                      final totalVal = exit.items.fold<int>(
+                        0,
+                        (prev, item) => prev + (item.cost * item.quantity.abs()),
+                      );
                       final total = NumberFormatter.convertToMoneyLike(totalVal);
 
                       return BasicTableRow(

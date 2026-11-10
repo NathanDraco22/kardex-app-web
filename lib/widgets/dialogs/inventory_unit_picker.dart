@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 class UnitPickerResult {
@@ -265,7 +266,7 @@ class _InventoryUnitPickerDialogState extends State<_InventoryUnitPickerDialog> 
           onPressed: () => Navigator.pop(context, null),
           child: const Text("Cancelar"),
         ),
-        ElevatedButton(
+        PrimaryMenuButton(
           autofocus: widget.unitOptions.length == 1,
           onPressed: () {
             Navigator.pop(
@@ -277,7 +278,7 @@ class _InventoryUnitPickerDialogState extends State<_InventoryUnitPickerDialog> 
               ),
             );
           },
-          child: const Text("Agregar"),
+          label: const Text("Agregar"),
         ),
       ],
     );

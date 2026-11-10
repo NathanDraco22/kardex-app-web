@@ -60,6 +60,7 @@ class _FormContentState extends State<_FormContent> {
   }
 
   Future<void> _submitForm() async {
+    widget.creationMap['unitName'] = _unitController.text.trim();
     if (!widget.formKey.currentState!.validate()) return;
 
     final writeCubit = context.read<WriteProductCubit>();
@@ -185,9 +186,9 @@ class _FormContentState extends State<_FormContent> {
               children: [
                 SizedBox(
                   height: 40,
-                  child: ElevatedButton(
+                  child: PrimaryMenuButton(
                     onPressed: _submitForm,
-                    child: Text("$wordPrefix Producto"),
+                    label: Text("$wordPrefix Producto"),
                   ),
                 ),
 
@@ -222,9 +223,9 @@ class _FormContentState extends State<_FormContent> {
                 },
                 child: const Text("Cancelar"),
               ),
-              ElevatedButton(
+              PrimaryMenuButton(
                 onPressed: _submitForm,
-                child: Text("$wordPrefix Producto"),
+                label: Text("$wordPrefix Producto"),
               ),
             ],
             content: _InnerContent(
@@ -366,14 +367,18 @@ class _InnerContent extends StatelessWidget {
                     CustomAutocompleteTextfield<UnitInDb>(
                       controller: unitController,
                       initValue: currentUnit,
+                      allowFreeText: true,
+                      onChanged: (value) => widget.creationMap['unitName'] = value,
                       onClose: (value) => widget.creationMap['unitName'] = value.name,
                       onFieldSubmitted: (value) {
                         FocusScope.of(context).nextFocus();
                       },
                       validator: (value) {
-                        if (value == null || value.isEmpty) {
+                        final text = unitController.text.trim();
+                        if (text.isEmpty) {
                           return "Campo requerido";
                         }
+                        widget.creationMap['unitName'] = text;
                         return null;
                       },
                       onSearch: (value) {
@@ -468,6 +473,7 @@ class _InnerContent extends StatelessWidget {
             currentProduct: widget.currentProduct,
             onPresetApplied: (preset) {
               unitController.text = preset.baseUnit;
+              widget.creationMap['unitName'] = preset.baseUnit;
             },
           ),
 

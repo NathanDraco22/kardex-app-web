@@ -132,7 +132,12 @@ class _ContentSection extends StatelessWidget {
                       );
 
                       final dateStr = DateTimeTool.formatddMMyy(entryHistory.docDate);
-                      final costStr = NumberFormatter.convertFromCentsToUnitsCurrency(entryItem.cost);
+                      final unitLabel = entryItem.unitName == null || entryItem.unitName!.isEmpty
+                          ? ''
+                          : "${entryItem.unitName}${entryItem.conversionFactor > 1 ? ' (${entryItem.conversionFactor})' : ''}";
+                      final costStr = NumberFormatter.convertFromCentsToUnitsCurrency(
+                        entryItem.cost * entryItem.conversionFactor,
+                      );
 
                       return Material(
                         color: Colors.transparent,
@@ -161,7 +166,7 @@ class _ContentSection extends StatelessWidget {
                                 ),
                                 Expanded(
                                   child: Text(
-                                    costStr,
+                                    unitLabel.isEmpty ? costStr : "$costStr / $unitLabel",
                                     style: const TextStyle(fontWeight: FontWeight.w500),
                                     textAlign: TextAlign.end,
                                   ),

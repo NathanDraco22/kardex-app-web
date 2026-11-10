@@ -7,6 +7,7 @@ import 'package:kardex_app_front/src/cubits/expenses/write_expenses_cubit.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_app_front/widgets/date_picker_button.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';

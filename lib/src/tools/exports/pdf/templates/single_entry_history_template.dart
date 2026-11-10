@@ -202,7 +202,7 @@ class SingleEntryHistoryTemplate implements PdfTemplate {
                           ),
                           pw.SizedBox(width: 4),
                           pw.Text(
-                            item.unitName ?? "",
+                            item.displayUnitName,
                             style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey700),
                           ),
                         ],
@@ -213,7 +213,7 @@ class SingleEntryHistoryTemplate implements PdfTemplate {
                 pw.Expanded(
                   flex: 1,
                   child: pw.Text(
-                    item.quantity.toString(),
+                    item.formattedDisplayQuantity,
                     textAlign: pw.TextAlign.center,
                     style: const pw.TextStyle(fontSize: 10),
                   ),
@@ -221,7 +221,7 @@ class SingleEntryHistoryTemplate implements PdfTemplate {
                 pw.Expanded(
                   flex: 2,
                   child: pw.Text(
-                    NumberFormatter.convertToMoneyLike(item.cost),
+                    NumberFormatter.convertToMoneyLike(item.cost * item.conversionFactor),
                     textAlign: pw.TextAlign.center,
                     style: const pw.TextStyle(fontSize: 10),
                   ),
@@ -229,7 +229,7 @@ class SingleEntryHistoryTemplate implements PdfTemplate {
                 pw.Expanded(
                   flex: 2,
                   child: pw.Text(
-                    NumberFormatter.convertToMoneyLike(item.cost * item.quantity),
+                    NumberFormatter.convertToMoneyLike(item.cost * item.quantity.abs()),
                     textAlign: pw.TextAlign.center,
                     style: const pw.TextStyle(fontSize: 10),
                   ),

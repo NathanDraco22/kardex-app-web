@@ -253,8 +253,15 @@ class _FormContentState extends State<_FormContent> {
     final factor = commercialProductResult.conversionFactor;
     final unitName = commercialProductResult.selectedUnitName;
     final baseUnitName = widget.product.unitName;
-    final stockStr = NumberFormatter.formatDisplayStock(availableStock, factor);
-    final displayStock = "$stockStr $unitName";
+    final isSuperiorUnit = commercialProductResult.selectedUnitIndex > product.defaultUnitIndex;
+    final stockDisplay = UnitDisplayFormatter.formatUnitQuantity(
+      baseQuantity: availableStock,
+      conversionFactor: factor,
+      selectedUnitName: unitName,
+      standardUnitName: product.defaultUnitName,
+      standardUnitFactor: product.defaultUnitFactor,
+    );
+    final displayStock = "${stockDisplay.quantityText} ${stockDisplay.unitName}";
 
     return Form(
       key: formKey,
@@ -395,6 +402,8 @@ class _FormContentState extends State<_FormContent> {
                                   focusNode: focusNode,
                                   initialValue: commercialProductResult.quantity,
                                   conversionFactor: commercialProductResult.conversionFactor,
+                                  allowDecimals: commercialProductResult.selectedUnitIndex > 0 && !isSuperiorUnit,
+                                  step: isSuperiorUnit ? 1 : null,
                                   unitLabel: commercialProductResult.selectedUnitName,
                                   baseUnitName: baseUnitName,
                                   titleTextAlign: TextAlign.center,
@@ -415,6 +424,9 @@ class _FormContentState extends State<_FormContent> {
 
                                     final requestedUnits = (numberValue * commercialProductResult.conversionFactor)
                                         .round();
+                                    if (requestedUnits <= 0) {
+                                      return "Cantidad invalida";
+                                    }
                                     if (widget.restrictStock && requestedUnits > availableStock) {
                                       return "Supera la existencia ($availableStock $baseUnitName)";
                                     }
@@ -591,8 +603,8 @@ class _FormContentState extends State<_FormContent> {
                           return;
                         }
 
-                        if (commercialProductResult.quantity <= 0) {
-                          Navigator.pop(context);
+                        if (commercialProductResult.baseQuantity <= 0) {
+                          DialogManager.showErrorDialog(context, "La cantidad debe ser mayor a 0");
                           return;
                         }
                         Navigator.pop(context, commercialProductResult);

@@ -123,7 +123,7 @@ class _PersonalReferencesEditorDialogState extends State<PersonalReferencesEdito
                     ),
             ),
             const SizedBox(height: 16),
-            ElevatedButton.icon(
+            PrimaryMenuButton(
               onPressed: _addReference,
               icon: const Icon(Icons.add),
               label: const Text("Añadir Referencia"),
@@ -136,9 +136,9 @@ class _PersonalReferencesEditorDialogState extends State<PersonalReferencesEdito
           onPressed: () => context.pop(null), // Changed to return null on cancel
           child: const Text('Cancelar'),
         ),
-        ElevatedButton(
+        PrimaryMenuButton(
           onPressed: () => context.pop(references),
-          child: const Text('Guardar'),
+          label: const Text('Guardar'),
         ),
       ],
     );
@@ -238,14 +238,14 @@ class _PersonalReferencesEditorDialogState extends State<PersonalReferencesEdito
               onPressed: () => Navigator.pop(context),
               child: const Text("Cancelar"),
             ),
-            ElevatedButton(
+            PrimaryMenuButton(
               onPressed: () {
                 if (formKey.currentState!.validate()) {
                   final newRef = PersonalReference.fromJson(map);
                   Navigator.pop(context, newRef);
                 }
               },
-              child: Text(isEditing ? "Guardar Cambios" : "Agregar"),
+              label: Text(isEditing ? "Guardar Cambios" : "Agregar"),
             ),
           ],
         );

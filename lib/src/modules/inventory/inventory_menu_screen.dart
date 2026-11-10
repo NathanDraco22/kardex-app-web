@@ -2,6 +2,7 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/constants/feature_flags.dart';
 import 'package:kardex_app_front/constants/route_names.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
@@ -57,13 +58,15 @@ class _Body extends StatelessWidget {
             ),
           ),
           ShortcutAddableListTile(
-            routeName: RouteNames.units,
+            routeName: RouteNames.unitsAndScales,
             child: MenuOptionCard(
-              icon: Icons.tag,
-              accentColor: Colors.blue.shade600,
-              title: "Unidades de Medida de Productos",
-              subtitle: "Factores de conversión y unidades de empaque",
-              onTap: () => context.pushNamed("units"),
+              icon: Icons.straighten_rounded,
+              accentColor: Colors.teal.shade700,
+              title: FeatureFlags.showUnitScales ? "Unidades y Escalas de Medida" : "Unidades de Medida",
+              subtitle: FeatureFlags.showUnitScales
+                  ? "Factores de conversión, unidades de empaque y plantillas"
+                  : "Unidades base y unidades de empaque",
+              onTap: () => context.pushNamed(RouteNames.unitsAndScales),
             ),
           ),
           ShortcutAddableListTile(

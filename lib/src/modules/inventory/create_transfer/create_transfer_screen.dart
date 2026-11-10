@@ -45,6 +45,11 @@ class _CreateTransferScreenState extends State<CreateTransferScreen> {
       if (reanudar == true) {
         final draft = await draftManager.getDraft(branchId);
         if (draft != null && mounted) {
+          if (draft.needsUnitReview) {
+            await _showUnitReviewDialog(draft);
+            if (!mounted) return;
+          }
+
           setState(() {
             notifier = CreateTransferNotifier(
               initialRows: draft.rows,
@@ -60,6 +65,48 @@ class _CreateTransferScreenState extends State<CreateTransferScreen> {
       debugPrint("Error loading transfer draft: $e");
       debugPrint(stack.toString());
     }
+  }
+
+  Future<void> _showUnitReviewDialog(TransferDraft draft) async {
+    final details = draft.reviews
+        .map((review) {
+          final quantity = '${review.quantity} ${review.unitName}';
+          final base = '= ${review.baseQuantity} ${review.baseUnitName}';
+          final cost = NumberFormatter.convertToMoneyLike(review.unitaryCost);
+          return '• ${review.productName}: $quantity ($base), costo $cost c/u.\n'
+              '  ${review.reason}';
+        })
+        .join('\n\n');
+
+    await showDialog<void>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          icon: Icon(
+            Icons.warning_amber_rounded,
+            color: Colors.orange.shade700,
+          ),
+          title: const Text("Revisa las unidades del borrador"),
+          content: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 520),
+            child: SingleChildScrollView(
+              child: Text(
+                "Se restauró la transferencia con los siguientes valores reconstruidos. "
+                "Puedes continuar, pero verifica la cantidad, la unidad y el costo antes de guardar."
+                "${details.isEmpty ? '' : '\n\n$details'}",
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              autofocus: true,
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text("Entendido, continuar"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> _handleExit(BuildContext context) async {

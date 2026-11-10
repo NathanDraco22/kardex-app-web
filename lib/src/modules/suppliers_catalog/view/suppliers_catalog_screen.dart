@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/suppliers_catalog/cubit/supplier_read_cubit.dart';
 import 'package:kardex_app_front/src/modules/suppliers_catalog/cubit/supplier_write_cubit.dart';
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_app_front/widgets/no_item.dart';
 import 'package:kardex_app_front/widgets/row_widgets/mobile_row.dart';
 import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';

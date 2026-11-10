@@ -17,10 +17,12 @@ class ClientInvoiceScreen extends StatefulWidget {
     super.key,
     this.isOrder = false,
     this.isWholesale = false,
+    this.initialClient,
   });
 
   final bool isOrder;
   final bool isWholesale;
+  final ClientInDb? initialClient;
 
   @override
   State<ClientInvoiceScreen> createState() => _ClientInvoiceScreenState();
@@ -33,6 +35,10 @@ class _ClientInvoiceScreenState extends State<ClientInvoiceScreen> {
   void initState() {
     super.initState();
     viewController = ClientInvoiceViewController(isWholesale: widget.isWholesale);
+    final initialClient = widget.initialClient;
+    if (initialClient != null) {
+      viewController.selectedClient = initialClient;
+    }
   }
 
   @override

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'ctrl_key_tip.dart';
+import 'primary_menu_button.dart';
 
 class ElevatedCtrlButton extends StatelessWidget {
   const ElevatedCtrlButton({
@@ -24,7 +25,7 @@ class ElevatedCtrlButton extends StatelessWidget {
       key: ValueKey(onPressed),
       hotKey: hotKey,
       onShortcut: onPressed ?? () {},
-      child: ElevatedButton.icon(
+      child: PrimaryMenuButton(
         focusNode: focusNode,
         onPressed: onPressed,
         icon: Icon(icon),

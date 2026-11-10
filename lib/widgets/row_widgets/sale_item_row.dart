@@ -66,7 +66,7 @@ class _SaleItemRowState extends State<SaleItemRow> {
                             fontWeight: FontWeight.w500,
                           ),
                         );
-                      }
+                      },
                     ),
                   ),
                 ),
@@ -108,8 +108,8 @@ class _SaleItemRowState extends State<SaleItemRow> {
                           Flexible(
                             fit: FlexFit.tight,
                             child: UnitDisplayer(
-                              unitName: widget.saleItem.product.unitName,
-                              conversionFactor: widget.saleItem.conversionFactor,
+                              unitName: widget.saleItem.displayUnitName,
+                              conversionFactor: widget.saleItem.displayUnitFactor,
                             ),
                           ),
                         ],

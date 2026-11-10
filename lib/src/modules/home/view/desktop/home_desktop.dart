@@ -18,51 +18,41 @@ class _HomeDesktopBodyState extends State<_HomeDesktopBody> {
 
   @override
   Widget build(BuildContext context) {
-    final allCategories = getHomeModuleCategories(context, widget.currentBranch);
-    final allowedCategories = allCategories.where((cat) {
+    final allowedCategories = getHomeModuleCategories(context, widget.currentBranch).where((cat) {
       return cat.permissions.any(
         (p) => AccessManager().hasCurrentAccess(context, p.name),
       );
     }).toList();
 
-    if (allowedCategories.isEmpty) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.all(32),
-          child: Text(
-            "No tienes permisos asignados para acceder a los módulos de esta sucursal.",
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.black54,
-            ),
-          ),
-        ),
-      );
-    }
-
-    final activeId = _selectedModuleId != null &&
-            allowedCategories.any((c) => c.id == _selectedModuleId)
-        ? _selectedModuleId!
-        : allowedCategories.first.id;
-
-    final selectedCategory = allowedCategories.firstWhere(
-      (c) => c.id == activeId,
-      orElse: () => allowedCategories.first,
-    );
+    final selectedCategory = _selectedModuleId == null
+        ? null
+        : allowedCategories.firstWhereOrNull(
+            (category) => category.id == _selectedModuleId,
+          );
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         DesktopModuleSidebar(
           categories: allowedCategories,
-          selectedModuleId: activeId,
+          selectedModuleId: selectedCategory?.id,
           onSelect: (id) => setState(() => _selectedModuleId = id),
           currentBranch: widget.currentBranch,
         ),
         Expanded(
-          child: DesktopSubmenuPanel(
-            category: selectedCategory,
-          ),
+          child: selectedCategory == null
+              ? DesktopInitialPanel(
+                  firstName: widget.firstName,
+                  currentBranch: widget.currentBranch,
+                  onExploreModules: allowedCategories.isEmpty
+                      ? null
+                      : () => setState(
+                          () => _selectedModuleId = allowedCategories.first.id,
+                        ),
+                )
+              : DesktopSubmenuPanel(
+                  category: selectedCategory,
+                ),
         ),
       ],
     );

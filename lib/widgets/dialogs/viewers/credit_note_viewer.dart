@@ -202,9 +202,7 @@ class _CreditNoteViewer extends StatelessWidget {
                                   border: Border.all(color: themeColor.withValues(alpha: 0.25)),
                                 ),
                                 child: Icon(
-                                  isDevolution
-                                      ? Icons.assignment_return_rounded
-                                      : Icons.monetization_on_rounded,
+                                  isDevolution ? Icons.assignment_return_rounded : Icons.monetization_on_rounded,
                                   color: themeColor,
                                   size: 24,
                                 ),
@@ -438,10 +436,10 @@ class _CreditNoteViewer extends StatelessWidget {
                                           color: Color(0xFF1E293B),
                                         ),
                                       ),
-                                      if (item.product.unitName.isNotEmpty) ...[
+                                      if (item.displayUnitName.isNotEmpty) ...[
                                         const SizedBox(height: 2),
                                         Text(
-                                          item.product.unitName,
+                                          item.displayUnitName,
                                           style: TextStyle(
                                             fontSize: 11.5,
                                             color: Colors.grey.shade600,
@@ -453,14 +451,28 @@ class _CreditNoteViewer extends StatelessWidget {
                                 ),
                                 Expanded(
                                   flex: 2,
-                                  child: Text(
-                                    displayQty,
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 13,
-                                      color: Color(0xFF334155),
-                                    ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        displayQty,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 13,
+                                          color: Color(0xFF334155),
+                                        ),
+                                      ),
+                                      if (item.bonQuantity > 0)
+                                        Text(
+                                          "+ ${item.formattedDisplayBonQuantity} bonif.",
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: Colors.grey.shade600,
+                                          ),
+                                        ),
+                                    ],
                                   ),
                                 ),
                                 Expanded(

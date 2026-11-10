@@ -79,9 +79,10 @@ class _HeaderSection extends StatelessWidget {
                 const SizedBox(height: 16),
               ],
             ),
-            Row(
-              spacing: 4,
-              mainAxisAlignment: MainAxisAlignment.start,
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 if (client.coordinates != null) ...[
                   LaunchMapButton(
@@ -138,10 +139,10 @@ class _HeaderSection extends StatelessWidget {
                         ? (total - totalDevolutions - totalCreditNotes)
                         : 0;
 
-                    final isCreditNotesExceeding = totalCreditNotes > 0 &&
-                        totalCreditNotes > (total - totalDevolutions);
+                    final isCreditNotesExceeding =
+                        totalCreditNotes > 0 && totalCreditNotes > (total - totalDevolutions);
 
-                    return ElevatedButton.icon(
+                    return PrimaryMenuButton(
                       icon: const Icon(Icons.flash_on),
                       onPressed: () async {
                         if (state is! ReadInvoiceSuccess || state.invoices.isEmpty) return;
@@ -159,7 +160,7 @@ class _HeaderSection extends StatelessWidget {
 
                         final maxAmountDouble = netPayableCents / 100;
 
-                         final paymentResult = await showFastPaymentModal(
+                        final paymentResult = await showFastPaymentModal(
                           context,
                           maxAmountToPay: maxAmountDouble,
                           clientName: selectedClient.name,
@@ -205,12 +206,8 @@ class _HeaderSection extends StatelessWidget {
                         if (!context.mounted) return;
                         context.read<WriteReceiptCubit>().createNewReceipt(createReceiptPayload);
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: isCreditNotesExceeding
-                            ? Colors.grey.shade400
-                            : Colors.amber.shade700,
-                        foregroundColor: Colors.white,
-                      ),
+                      backgroundColor: isCreditNotesExceeding ? Colors.grey.shade400 : Colors.amber.shade700,
+                      foregroundColor: Colors.white,
                       label: const Text("Abono"),
                     );
                   },
@@ -220,14 +217,14 @@ class _HeaderSection extends StatelessWidget {
             if (state is ReadInvoiceSuccess) ...[
               Builder(
                 builder: (context) {
-                  final int totalInvoices = state.summary?.totalInvoices ??
+                  final int totalInvoices =
+                      state.summary?.totalInvoices ??
                       state.invoices.fold<int>(0, (sum, inv) => sum + inv.totalRemaining);
-                  final int totalDevolutions = state.summary?.totalDevolutions ??
-                      state.devolutions.fold<int>(0, (sum, d) => sum + d.total);
-                  final int totalCreditNotes = state.summary?.totalCreditNotes ??
-                      state.creditNotes.fold<int>(0, (sum, cn) => sum + cn.total);
-                  final isExceeding = totalCreditNotes > 0 &&
-                      totalCreditNotes > (totalInvoices - totalDevolutions);
+                  final int totalDevolutions =
+                      state.summary?.totalDevolutions ?? state.devolutions.fold<int>(0, (sum, d) => sum + d.total);
+                  final int totalCreditNotes =
+                      state.summary?.totalCreditNotes ?? state.creditNotes.fold<int>(0, (sum, cn) => sum + cn.total);
+                  final isExceeding = totalCreditNotes > 0 && totalCreditNotes > (totalInvoices - totalDevolutions);
 
                   if (!isExceeding) return const SizedBox.shrink();
 

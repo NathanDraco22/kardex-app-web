@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:croppy/croppy.dart';
 import 'package:image/image.dart' as img;
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 
 /// Clase base sellada que representa la intención del usuario al salir del diálogo.
 sealed class ImageSelectorIntent {}
@@ -284,14 +285,11 @@ class _ImageSelectorDialogState extends State<ImageSelectorDialog> {
 
               // Botones de acción intermedia (Agregar, Cambiar, Eliminar)
               if (!hasImage)
-                ElevatedButton.icon(
+                PrimaryMenuButton(
                   onPressed: _pickAndCropImage,
                   icon: const Icon(Icons.add_a_photo_outlined, size: 18),
                   label: const Text("Agregar Imagen"),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 )
               else
                 Row(
@@ -331,16 +329,13 @@ class _ImageSelectorDialogState extends State<ImageSelectorDialog> {
                     child: const Text("Cancelar"),
                   ),
                   const SizedBox(width: 8),
-                  ElevatedButton(
+                  PrimaryMenuButton(
                     onPressed: _confirmAndPop,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _hasChanges
-                          ? theme.colorScheme.primary
-                          : theme.colorScheme.primary.withValues(alpha: 0.6),
-                      foregroundColor: theme.colorScheme.onPrimary,
-                      elevation: _hasChanges ? 2 : 0,
-                    ),
-                    child: const Text("Aceptar"),
+                    backgroundColor: _hasChanges
+                        ? theme.colorScheme.primary
+                        : theme.colorScheme.primary.withValues(alpha: 0.6),
+                    foregroundColor: theme.colorScheme.onPrimary,
+                    label: const Text("Aceptar"),
                   ),
                 ],
               ),

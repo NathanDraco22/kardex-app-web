@@ -5,6 +5,7 @@ import 'package:flutter/rendering.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/tools/cache/image_bytes_resolver.dart';
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:share_plus/share_plus.dart';
@@ -270,7 +271,7 @@ class _PendingInvoicesStatementImageDialogState
                     ),
                   ),
                   const Spacer(),
-                  ElevatedButton.icon(
+                  PrimaryMenuButton(
                     onPressed: _isGenerating || _isSharing ? null : _shareImage,
                     icon: _isSharing
                         ? const SizedBox(
@@ -280,12 +281,7 @@ class _PendingInvoicesStatementImageDialogState
                           )
                         : const Icon(Icons.share_rounded, size: 18),
                     label: const Text("Compartir"),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppThemeTokens.indigo,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: AppThemeTokens.borderRadiusSm),
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   ),
                 ],
               ),

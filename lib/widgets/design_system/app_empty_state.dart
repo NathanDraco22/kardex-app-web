@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'app_theme_tokens.dart';
+import '../buttons/primary_menu_button.dart';
 
 /// Estado vacío expresivo y moderno estilo SaaS con burbuja cromática y llamada a la acción (CTA).
 class AppEmptyState extends StatelessWidget {
@@ -81,17 +81,11 @@ class AppEmptyState extends StatelessWidget {
             ],
             if (actionLabel != null && onAction != null) ...[
               const SizedBox(height: 20),
-              ElevatedButton.icon(
+              PrimaryMenuButton(
                 onPressed: onAction,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: effectiveColor,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: AppThemeTokens.borderRadiusMd,
-                  ),
-                ),
+                backgroundColor: effectiveColor,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 icon: Icon(actionIcon ?? Icons.add, size: 18),
                 label: Text(
                   actionLabel!,

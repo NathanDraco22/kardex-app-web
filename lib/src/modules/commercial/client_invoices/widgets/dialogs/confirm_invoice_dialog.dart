@@ -50,7 +50,7 @@ Future<bool> showConfirmationInvoiceDialog(
                         Flexible(
                           fit: FlexFit.tight,
                           child: Text(
-                            NumberFormatter.convertFromCentsToUnitsCurrency(item.price),
+                            NumberFormatter.convertFromCentsToUnitsCurrency(item.price * item.conversionFactor),
                           ),
                         ),
 
@@ -154,7 +154,7 @@ Future<bool> showConfirmationAnonInvoiceDialog(
                         Flexible(
                           fit: FlexFit.tight,
                           child: Text(
-                            NumberFormatter.convertToMoneyLike(item.price),
+                            NumberFormatter.convertToMoneyLike(item.price * item.conversionFactor),
                           ),
                         ),
 

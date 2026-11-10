@@ -92,6 +92,8 @@ class InventoryExitViewController extends ChangeNotifier {
         unitName: UnitConversionTool.resolveUnitName(e.selectedUnitName, e.product.unitName),
         code: e.product.code,
         conversionFactor: e.conversionFactor,
+        standardUnitName: e.product.defaultUnitName,
+        standardUnitFactor: e.product.defaultUnitFactor,
       );
     }).toList();
 

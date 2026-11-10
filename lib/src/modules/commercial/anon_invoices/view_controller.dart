@@ -55,9 +55,7 @@ class AnonInvoiceViewController extends ChangeNotifier {
       return SaleItem(
         product: ProductItem.fromJson({
           ...product.toJson(),
-          'unitName': commercial.selectedUnitName.isNotEmpty
-              ? commercial.selectedUnitName
-              : product.unitName,
+          'unitName': commercial.selectedUnitName.isNotEmpty ? commercial.selectedUnitName : product.unitName,
         }),
         selectedPrice: commercial.selectedPriceLevel,
         cost: product.account.averageCost,
@@ -68,6 +66,9 @@ class AnonInvoiceViewController extends ChangeNotifier {
         subTotal: commercial.subTotal,
         total: commercial.total,
         conversionFactor: commercial.conversionFactor,
+        selectedUnitName: commercial.selectedUnitName.isNotEmpty ? commercial.selectedUnitName : product.unitName,
+        standardUnitName: product.defaultUnitName,
+        standardUnitFactor: product.defaultUnitFactor,
       );
     }).toList();
 

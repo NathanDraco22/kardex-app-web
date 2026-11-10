@@ -37,7 +37,12 @@ class _TabletProductsSectionState extends State<_TabletProductsSection> {
       preferredUnitType: viewController.isWholesale ? 'max' : 'min',
     );
     result.quantity = 1;
-    if (product.account.availableStock < (result.quantity * result.conversionFactor)) {
+    if (result.baseQuantity <= 0) {
+      DialogManager.showInfoDialog(context, "La cantidad debe ser mayor a 0");
+      viewController.requestSearchFocus();
+      return;
+    }
+    if (result.baseQuantity > product.account.availableStock) {
       DialogManager.showInfoDialog(context, "No hay stock disponible");
       viewController.requestSearchFocus();
       return;
@@ -58,13 +63,13 @@ class _TabletProductsSectionState extends State<_TabletProductsSection> {
       viewController.requestSearchFocus();
       return;
     }
-    if (res.product.account.availableStock == 0 ||
-        res.product.account.availableStock < (res.quantity * res.conversionFactor)) {
-      DialogManager.showInfoDialog(context, "No hay stock disponible");
+    if (res.baseQuantity <= 0) {
+      DialogManager.showInfoDialog(context, "La cantidad debe ser mayor a 0");
       viewController.requestSearchFocus();
       return;
     }
-    if (res.quantity == 0) {
+    if (res.baseQuantity > res.product.account.availableStock) {
+      DialogManager.showInfoDialog(context, "No hay stock disponible");
       viewController.requestSearchFocus();
       return;
     }
@@ -105,24 +110,22 @@ class _TabletProductsSectionState extends State<_TabletProductsSection> {
     SaleTerminalViewController viewController,
   ) {
     return switch (state) {
-      ReadTerminalProductInitial() || ReadTerminalProductLoading() =>
-        const Center(child: CircularProgressIndicator()),
+      ReadTerminalProductInitial() || ReadTerminalProductLoading() => const Center(child: CircularProgressIndicator()),
       ReadTerminalProductError(:final message) => Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(message),
-              const SizedBox(height: 8),
-              ElevatedButton.icon(
-                onPressed: () => context.read<ReadTerminalProductCubit>().loadProducts(),
-                icon: const Icon(Icons.refresh),
-                label: const Text("Reintentar"),
-              ),
-            ],
-          ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(message),
+            const SizedBox(height: 8),
+            PrimaryMenuButton(
+              onPressed: () => context.read<ReadTerminalProductCubit>().loadProducts(),
+              icon: const Icon(Icons.refresh),
+              label: const Text("Reintentar"),
+            ),
+          ],
         ),
-      ReadTerminalProductSuccess(:final products) =>
-        _buildProductGrid(context, products, viewController),
+      ),
+      ReadTerminalProductSuccess(:final products) => _buildProductGrid(context, products, viewController),
     };
   }
 

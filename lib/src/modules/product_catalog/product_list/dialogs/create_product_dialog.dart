@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/constants/feature_flags.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:kardex_app_front/src/tools/uploaders/image_uploader.dart';
@@ -15,7 +16,6 @@ import '../cubit/read_product_cubit.dart';
 part 'form_section.dart';
 part 'widgets.dart';
 part 'extra_units_section.dart';
-
 
 Future<ProductInDb?> showCreateProductDialog(
   BuildContext context, {

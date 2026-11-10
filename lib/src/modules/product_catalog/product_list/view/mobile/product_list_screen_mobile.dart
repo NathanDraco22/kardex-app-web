@@ -55,7 +55,7 @@ class _MobileBody extends StatelessWidget {
                 const Spacer(),
                 SizedBox(
                   height: 40,
-                  child: ElevatedButton.icon(
+                  child: PrimaryMenuButton(
                     onPressed: () async {
                       final res = await showCreateProductDialog(context);
                       if (res == null) return;

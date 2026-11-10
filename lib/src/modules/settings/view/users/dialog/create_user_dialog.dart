@@ -232,7 +232,7 @@ class _CreateUserDialogState extends State<CreateUserDialog> {
             },
             child: const Text("Cancelar"),
           ),
-          ElevatedButton(
+          PrimaryMenuButton(
             onPressed: () {
               if (!formKey.currentState!.validate()) return;
               if (selectedRole == null) return;
@@ -250,7 +250,7 @@ class _CreateUserDialogState extends State<CreateUserDialog> {
 
               writeCubit.createNewUser(createUser);
             },
-            child: const Text("Crear Usuario"),
+            label: const Text("Crear Usuario"),
           ),
         ],
       ),

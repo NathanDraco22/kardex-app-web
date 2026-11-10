@@ -1,4 +1,5 @@
 import 'package:kardex_business/src/domain/models/common/user_info.dart';
+import 'package:kardex_business/src/tools/unit_display_formatter.dart';
 
 class ExitItem {
   final String productId;
@@ -9,6 +10,8 @@ class ExitItem {
   final int? cost;
   final int quantity;
   final int conversionFactor;
+  final String? standardUnitName;
+  final int? standardUnitFactor;
 
   ExitItem({
     required this.productId,
@@ -19,7 +22,22 @@ class ExitItem {
     this.cost,
     required this.quantity,
     this.conversionFactor = 1,
+    this.standardUnitName,
+    this.standardUnitFactor,
   });
+
+  UnitDisplayValue get displayQuantity =>
+      UnitDisplayFormatter.formatUnitQuantity(
+        baseQuantity: quantity.abs(),
+        conversionFactor: conversionFactor,
+        selectedUnitName: unitName,
+        standardUnitName: standardUnitName,
+        standardUnitFactor: standardUnitFactor,
+      );
+
+  String get formattedDisplayQuantity => displayQuantity.quantityText;
+
+  String get displayUnitName => displayQuantity.unitName;
 
   factory ExitItem.fromJson(Map<String, dynamic> json) {
     return ExitItem(
@@ -31,11 +49,13 @@ class ExitItem {
       cost: json['cost'] as int?,
       quantity: json['quantity'] as int,
       conversionFactor: json['conversionFactor'] as int? ?? 1,
+      standardUnitName: json['standardUnitName'] as String?,
+      standardUnitFactor: json['standardUnitFactor'] as int?,
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
+    final data = <String, dynamic>{
       'productId': productId,
       'productName': productName,
       'code': code,
@@ -45,6 +65,13 @@ class ExitItem {
       'quantity': quantity,
       'conversionFactor': conversionFactor,
     };
+    if (standardUnitName != null) {
+      data['standardUnitName'] = standardUnitName;
+    }
+    if (standardUnitFactor != null) {
+      data['standardUnitFactor'] = standardUnitFactor;
+    }
+    return data;
   }
 }
 
@@ -54,9 +81,7 @@ class Client {
   Client({required this.name});
 
   factory Client.fromJson(Map<String, dynamic> json) {
-    return Client(
-      name: json['name'] as String,
-    );
+    return Client(name: json['name'] as String);
   }
 
   Map<String, dynamic> toJson() {
@@ -90,7 +115,10 @@ class ExitHistoryInDb {
   });
 
   int get total {
-    return items.fold(0, (sum, item) => sum + ((item.cost ?? 0) * item.quantity.abs()));
+    return items.fold(
+      0,
+      (sum, item) => sum + ((item.cost ?? 0) * item.quantity.abs()),
+    );
   }
 
   factory ExitHistoryInDb.fromJson(Map<String, dynamic> json) {
@@ -101,7 +129,9 @@ class ExitHistoryInDb {
       docDate: DateTime.fromMillisecondsSinceEpoch(json['docDate'] as int),
       branchId: json['branchId'] as String,
       description: json['description'] as String,
-      items: (json['items'] as List<dynamic>).map((item) => ExitItem.fromJson(item as Map<String, dynamic>)).toList(),
+      items: (json['items'] as List<dynamic>)
+          .map((item) => ExitItem.fromJson(item as Map<String, dynamic>))
+          .toList(),
       id: json['id'] as String,
       createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
       createdBy: UserInfo.fromJson(json['createdBy'] as Map<String, dynamic>),

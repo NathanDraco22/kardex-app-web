@@ -15,8 +15,10 @@ class CustomAutocompleteTextfield<T> extends StatefulWidget {
     this.hintText,
     this.validator,
     this.readOnly = false,
+    this.allowFreeText = false,
     this.onFieldSubmitted,
     this.onClose,
+    this.onChanged,
   });
 
   final TextEditingController? controller;
@@ -35,7 +37,13 @@ class CustomAutocompleteTextfield<T> extends StatefulWidget {
 
   final bool readOnly;
 
+  /// Permite conservar el texto escrito cuando el usuario cierra la lista de
+  /// sugerencias sin seleccionar una opción. Útil para unidades de medida
+  /// libres que no están en el catálogo (ej. "Cuarto de Libra").
+  final bool allowFreeText;
+
   final void Function(String)? onFieldSubmitted;
+  final ValueChanged<String>? onChanged;
 
   @override
   State<CustomAutocompleteTextfield<T>> createState() => _CustomAutocompleteTextfieldState<T>();
@@ -44,6 +52,11 @@ class CustomAutocompleteTextfield<T> extends StatefulWidget {
 class _CustomAutocompleteTextfieldState<T> extends State<CustomAutocompleteTextfield<T>> {
   late final TextEditingController controller;
   bool _ownsController = false;
+
+  /// Evita que el `onChanged` del campo exterior procese el texto mientras el
+  /// popup de sugerencias está abierto. El popup comparte el controlador, así
+  /// que el texto final se propaga recién al cerrarlo.
+  bool _dialogOpen = false;
 
   T? currentValue;
 
@@ -92,7 +105,11 @@ class _CustomAutocompleteTextfieldState<T> extends State<CustomAutocompleteTextf
       onFieldSubmitted: widget.onFieldSubmitted,
       decoration: InputDecoration(hintText: widget.hintText),
       onChanged: (value) async {
+        // El popup comparte el controlador: no se notifica cada carácter aquí,
+        // porque el texto completo se propaga al cerrar el popup.
+        if (_dialogOpen) return;
         await displaySuggestions(context);
+        if (!mounted) return;
         mainTextFieldFocus.requestFocus();
       },
       onTap: () async {
@@ -103,39 +120,58 @@ class _CustomAutocompleteTextfieldState<T> extends State<CustomAutocompleteTextf
   }
 
   Future<void> displaySuggestions(BuildContext context) async {
+    if (_dialogOpen) return;
     getTextFieldSize();
-    final res = await showDialog(
-      context: context,
-      builder: (context) {
-        return Stack(
-          children: [
-            TweenAnimationBuilder(
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.decelerate,
-              tween: SizeTween(begin: textFieldSize, end: textFieldSize * 6),
-              builder: (context, value, child) {
-                return Positioned(
-                  top: globalPosOffset.dy,
-                  left: globalPosOffset.dx,
-                  width: textFieldSize.width,
-                  height: value?.height ?? 0,
-                  child: _InnerSearchTextField<T>(
-                    widget.onSearch,
-                    widget.suggestionBuilder,
-                    controller,
-                  ),
-                );
-              },
-            ),
-          ],
-        );
-      },
-    );
+    _dialogOpen = true;
+
+    T? res;
+    try {
+      res = await showDialog<T>(
+        context: context,
+        builder: (context) {
+          return Stack(
+            children: [
+              TweenAnimationBuilder(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.decelerate,
+                tween: SizeTween(begin: textFieldSize, end: textFieldSize * 6),
+                builder: (context, value, child) {
+                  return Positioned(
+                    top: globalPosOffset.dy,
+                    left: globalPosOffset.dx,
+                    width: textFieldSize.width,
+                    height: value?.height ?? 0,
+                    child: _InnerSearchTextField<T>(
+                      widget.onSearch,
+                      widget.suggestionBuilder,
+                      controller,
+                    ),
+                  );
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } finally {
+      _dialogOpen = false;
+    }
+
+    if (!mounted) return;
 
     if (res == null) {
-      controller.text = "";
+      if (widget.allowFreeText) {
+        final text = controller.text.trim();
+        if (currentValue != null && text != widget.titleBuilder(currentValue as T)) {
+          currentValue = null;
+        }
+        widget.onChanged?.call(text);
+        return;
+      }
       if (currentValue != null) {
         controller.text = widget.titleBuilder(currentValue as T);
+      } else {
+        controller.text = "";
       }
       return;
     }

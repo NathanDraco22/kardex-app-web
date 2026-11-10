@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_app_front/widgets/map/map_nic_widget.dart';
 import 'package:kardex_app_front/widgets/map/marker_point.dart';
 import 'package:latlong2/latlong.dart';
@@ -150,11 +151,9 @@ class _MapBottomModalState extends State<MapBottomModal> {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: widget.acceptColor ?? Theme.of(context).primaryColor,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
+                  child: PrimaryMenuButton(
+                    backgroundColor: widget.acceptColor,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                     onPressed: () {
                       context.pop(
                         Coordinates(
@@ -163,7 +162,7 @@ class _MapBottomModalState extends State<MapBottomModal> {
                         ),
                       );
                     },
-                    child: Text(
+                    label: Text(
                       widget.acceptText,
                       style: const TextStyle(color: Colors.white),
                     ),

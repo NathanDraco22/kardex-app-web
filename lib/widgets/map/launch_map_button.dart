@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LaunchMapButton extends StatelessWidget {
@@ -28,7 +29,7 @@ class LaunchMapButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton.icon(
+    return PrimaryMenuButton(
       onPressed: _launchMap,
       icon: const Icon(Icons.location_on_outlined),
       label: Text(label),

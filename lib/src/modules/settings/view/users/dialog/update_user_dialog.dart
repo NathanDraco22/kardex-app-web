@@ -233,7 +233,7 @@ class _UpdateUserDialogState extends State<UpdateUserDialog> {
             },
             child: const Text("Cancelar"),
           ),
-          ElevatedButton(
+          PrimaryMenuButton(
             onPressed: () {
               if (!formKey.currentState!.validate()) return;
 
@@ -246,7 +246,7 @@ class _UpdateUserDialogState extends State<UpdateUserDialog> {
 
               writeCubit.updateUser(widget.user.id, updateUser);
             },
-            child: const Text("Actualizar Usuario"),
+            label: const Text("Actualizar Usuario"),
           ),
         ],
       ),

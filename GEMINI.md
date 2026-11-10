@@ -471,3 +471,33 @@ Esta estructura se ha seguido para módulos como 'Historial de Facturas', 'Histo
 - La imagen incluye membrete de la sucursal, datos del cliente y de la factura, resumen (total factura, total abonos y saldo restante) y tabla de recibos con fecha/hora, método y monto aplicado.
 - `InvoiceReceiptsHistoryModal` ahora conserva los recibos cargados y muestra el botón "Compartir Imagen", deshabilitado mientras carga o cuando no hay recibos.
 - Verificación: `flutter analyze` finalizó sin errores ni advertencias.
+
+## Escalas de Unidades con Fracciones Comerciales (Noviembre 2026)
+- Se documentó en `wiki/modules/unit_scales.md` el modelo de micro-escalas: la unidad base es la fracción comercial mínima, no la unidad física mínima.
+- Se agregó `UnitScaleType` (`weight`, `volume`, `length`, `pack`, `fractionPack`, `custom`) a `BaseUnitScale`, `CreateUnitScale`, `UpdateUnitScale` y `UnitScaleInDb`.
+- Las escalas por defecto viven en el backend (`create_default_unit_scales.py`); el frontend ya no mantiene presets estándar duplicados.
+- `fractionPack`: si el empaque tiene N unidades y N%4==0 usa cuarto de empaque; si N%2==0 usa media parte; si es impar no aplica.
+- `pack`: base `Unidad`, permite venta por unidad; sus precios de caja se redondean contra N.
+- Se reactivó `SHOW_UNIT_SCALES=true` y se agregó el generador de empaques en el editor de escalas.
+- Se corrigió C7: el preset del editor de unidades extra devuelve y actualiza la unidad base del producto.
+- `QuantityField` ahora deriva el paso de los botones/teclas como `1 / conversionFactor` (una unidad base).
+- Se creó el reporte de revisión independiente en `Hallazgos/reporte-cambios-unidades-facturacion-inventario.md`.
+- Verificación: `flutter analyze` sin issues y 26 pruebas aprobadas.
+
+## Decisiones P0 de Unidades, Notas de Crédito y Devoluciones (Noviembre 2026)
+- Se cerró el alcance **P0 = C3 + C7**. Las **bonificaciones** quedan diferidas por decisión de negocio (la app aún no las muestra/explota visualmente) y las **devoluciones directas** quedan deprecadas, reemplazadas por notas de crédito.
+- **C3:** solo notas de crédito; líneas identificadas por `invoiceItemIndex`; tope acumulado por línea/factura; devolución parcial permitida; rechazo de cantidades no múltiplas del `conversionFactor`; `floor` en cantidad y dinero; el backend recalcula `amount`; `idempotencyKey`; sin lock por factura (riesgo residual aceptado).
+- **C7:** la unidad libre guarda el texto visible completo; `validator` desde el controlador; sincronización al guardar; el placeholder `Unidad Base` no se persiste; confirmación única.
+- **P1** (`QuantityField`, display, búsqueda rápida y transferencias) quedó implementado en la fase posterior (ver entrada siguiente); la revalidación de stock al cobrar no se cambió. **P2** (semillas, PATCH null, precio 0, etiquetas, N=2/4, `showButtons`) queda pendiente.
+- **Producción:** la maneja el usuario; no se agrega migración ni guard de producción.
+- Sesión de solo documentación: no se modificó código ni tests.
+
+## P1 de Unidades: QuantityField, Display, Búsqueda Rápida y Transferencias (Noviembre 2026)
+- **P1-A1 `QuantityField`:** regla global de múltiplos derivada de `1/conversionFactor`, error inline, operación en base entera (factor 30: 30 clics llegan a `1`), `readOnly` ignora botones/teclas, precisión dinámica (`0.25`, `0.0025`) y captura por teclado en los flujos de producción.
+- **P1-A2 Display:** `UnitDisplayFormatter` usa la unidad superior solo si la cantidad es entera; si no, muestra la unidad estándar (ej. `1.5 Quintal → 150 Libra`). Metadata `selectedUnitName`, `standardUnitName`, `standardUnitFactor` en `SaleItem`; `standardUnitName`/`standardUnitFactor` en `EntryItem`, `ExitItem` y `AdjustExitItem`. Aplicado a visores, impresoras, PDFs y stock.
+- **P1-A3 Búsqueda rápida:** no inserta ítems con cantidad base `0`; stock `0` con `restrictStock` activo no inserta; sin `restrictStock` permite cantidad positiva y el backend decide.
+- **P1-A4 Transferencias:** borradores `v3` con metadata; `v2` reconvierte cantidad con el factor guardado y costo `averageCost × factor`; `v1` o base cambiada infiere `defaultUnitIndex`, marca `needsUnitReview` y permite continuar con advertencia.
+- **Stock:** la política no cambió; el frontend mantiene sus bloqueos y el backend decide con `LET_NEGATIVE`/LITE. Solo se corrigió la búsqueda rápida con base `0`.
+- **Verificación:** `flutter analyze` limpio, `flutter test` **83/83**, `ruff`/`ty` OK, `pytest` **14/14** y `git diff --check` OK.
+- **Limitaciones residuales:** las tablas/list views de inventario y transferencia guardan cantidad display `int` y no admiten fracciones en unidad estándar; con `defaultUnitIndex = 0` la regla considera “superiores” a todas las unidades extra; no se ejecutó hot reload ni prueba manual de UI.
+- **Commit:** no se realizó.

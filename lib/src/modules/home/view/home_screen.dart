@@ -2,6 +2,7 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/cubits/shortcuts/shortcuts_cubit.dart';
 import 'package:kardex_app_front/cubits/toast/toast_cubit.dart';
@@ -15,7 +16,9 @@ import 'package:toastification/toastification.dart';
 import 'package:kardex_app_front/constants/route_names.dart';
 import 'widgets/home_desktop_card.dart';
 import 'widgets/home_end_drawer.dart';
+import 'widgets/home_quick_search_dialog.dart';
 import '../data/home_modules_registry.dart';
+import 'desktop/widgets/desktop_initial_panel.dart';
 import 'desktop/widgets/desktop_module_sidebar.dart';
 import 'desktop/widgets/desktop_submenu_panel.dart';
 
@@ -79,8 +82,10 @@ class _RootScaffold extends StatelessWidget {
         }
 
         final user = authState.session.user;
+        context.watch<AppSettingsCubit>();
 
         final hasShortcuts = context.watch<ShortcutsCubit>().state.shortcuts.isNotEmpty;
+        final showShortcutsFab = hasShortcuts && !context.isDesktop();
 
         return BlocListener<ToastCubit, ToastState>(
           listener: (context, state) {
@@ -95,14 +100,14 @@ class _RootScaffold extends StatelessWidget {
             );
           },
           child: Scaffold(
-            floatingActionButton: hasShortcuts
+            floatingActionButton: showShortcutsFab
                 ? FloatingActionButton(
                     heroTag: null,
                     onPressed: () => context.pushNamed(RouteNames.shortcuts),
                     child: const Icon(FluentIcons.bookmark_multiple_24_filled),
                   )
                 : null,
-            floatingActionButtonLocation: hasShortcuts
+            floatingActionButtonLocation: showShortcutsFab
                 ? (MediaQuery.sizeOf(context).width < maxPhoneScreenWidth
                       ? FloatingActionButtonLocation.endFloat
                       : FloatingActionButtonLocation.centerTop)
@@ -111,6 +116,12 @@ class _RootScaffold extends StatelessWidget {
             appBar: AppBar(
               title: const Text("Neptuno App"),
               actions: [
+                if (context.isMobileOrTablet() && canShowHomeQuickSearch(context))
+                  IconButton(
+                    tooltip: "Búsqueda rápida",
+                    onPressed: () => showHomeQuickSearchDialog(context),
+                    icon: const Icon(Icons.search),
+                  ),
                 const AvatarButton(),
                 const SizedBox(width: 12),
               ],

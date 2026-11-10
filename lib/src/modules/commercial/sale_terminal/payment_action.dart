@@ -8,7 +8,7 @@ Future<void> startTerminalPayment(BuildContext context) async {
   final viewController = context.read<WriteTerminalInvoiceCubit>().viewController;
   if (viewController.items.isEmpty) return;
 
-  if (viewController.hasItemsWithZeroQuantity) {
+  if (viewController.hasItemsWithZeroBaseQuantity) {
     await DialogManager.showInfoDialog(
       context,
       "Hay productos sin cantidad. Revisa la venta antes de cobrar.",

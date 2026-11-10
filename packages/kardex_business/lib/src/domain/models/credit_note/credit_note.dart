@@ -54,6 +54,7 @@ class BaseCreditNote {
   final String? appliedReceiptId;
   final String? appliedReceiptDocNumber;
   final DateTime? appliedAt;
+  final String? idempotencyKey;
 
   int get total => amount;
   String get invoiceId => originalInvoiceId;
@@ -75,6 +76,7 @@ class BaseCreditNote {
     this.appliedReceiptId,
     this.appliedReceiptDocNumber,
     this.appliedAt,
+    this.idempotencyKey,
   });
 
   factory BaseCreditNote.fromJson(Map<String, dynamic> json) => BaseCreditNote(
@@ -86,7 +88,9 @@ class BaseCreditNote {
     originalInvoiceId: json['originalInvoiceId'] ?? "",
     originalInvoiceDocNumber: json['originalInvoiceDocNumber'] ?? "",
     returnedItems: json['returnedItems'] != null
-        ? (json['returnedItems'] as List).map((e) => SaleItem.fromJson(e)).toList()
+        ? (json['returnedItems'] as List)
+              .map((e) => SaleItem.fromJson(e))
+              .toList()
         : const [],
     amount: json['amount'],
     description: json['description'] ?? "",
@@ -94,26 +98,35 @@ class BaseCreditNote {
     createdBy: UserInfo.fromJson(json['createdBy']),
     appliedReceiptId: json['appliedReceiptId'],
     appliedReceiptDocNumber: json['appliedReceiptDocNumber'],
-    appliedAt: json['appliedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['appliedAt']) : null,
+    appliedAt: json['appliedAt'] != null
+        ? DateTime.fromMillisecondsSinceEpoch(json['appliedAt'])
+        : null,
+    idempotencyKey: json['idempotencyKey'],
   );
 
-  Map<String, dynamic> toJson() => {
-    'branchId': branchId,
-    'clientId': clientId,
-    'clientInfo': clientInfo.toJson(),
-    'type': type.name,
-    'docNumber': docNumber,
-    'originalInvoiceId': originalInvoiceId,
-    'originalInvoiceDocNumber': originalInvoiceDocNumber,
-    'returnedItems': returnedItems.map((e) => e.toJson()).toList(),
-    'amount': amount,
-    'description': description,
-    'status': status.name,
-    'createdBy': createdBy.toJson(),
-    'appliedReceiptId': appliedReceiptId,
-    'appliedReceiptDocNumber': appliedReceiptDocNumber,
-    'appliedAt': appliedAt?.millisecondsSinceEpoch,
-  };
+  Map<String, dynamic> toJson() {
+    final data = <String, dynamic>{
+      'branchId': branchId,
+      'clientId': clientId,
+      'clientInfo': clientInfo.toJson(),
+      'type': type.name,
+      'docNumber': docNumber,
+      'originalInvoiceId': originalInvoiceId,
+      'originalInvoiceDocNumber': originalInvoiceDocNumber,
+      'returnedItems': returnedItems.map((e) => e.toJson()).toList(),
+      'amount': amount,
+      'description': description,
+      'status': status.name,
+      'createdBy': createdBy.toJson(),
+      'appliedReceiptId': appliedReceiptId,
+      'appliedReceiptDocNumber': appliedReceiptDocNumber,
+      'appliedAt': appliedAt?.millisecondsSinceEpoch,
+    };
+    if (idempotencyKey != null) {
+      data['idempotencyKey'] = idempotencyKey;
+    }
+    return data;
+  }
 }
 
 class CreateCreditNote extends BaseCreditNote {
@@ -130,24 +143,29 @@ class CreateCreditNote extends BaseCreditNote {
     super.description = "",
     super.status = CreditNoteStatus.confirmed,
     required super.createdBy,
+    super.idempotencyKey,
   });
 
-  factory CreateCreditNote.fromJson(Map<String, dynamic> json) => CreateCreditNote(
-    branchId: json['branchId'],
-    clientId: json['clientId'],
-    clientInfo: ClientInfo.fromJson(json['clientInfo']),
-    type: CreditNoteType.values.byName(json['type']),
-    docNumber: json['docNumber'] ?? "",
-    originalInvoiceId: json['originalInvoiceId'] ?? "",
-    originalInvoiceDocNumber: json['originalInvoiceDocNumber'] ?? "",
-    returnedItems: json['returnedItems'] != null
-        ? (json['returnedItems'] as List).map((e) => SaleItem.fromJson(e)).toList()
-        : const [],
-    amount: json['amount'],
-    description: json['description'] ?? "",
-    status: CreditNoteStatus.values.byName(json['status']),
-    createdBy: UserInfo.fromJson(json['createdBy']),
-  );
+  factory CreateCreditNote.fromJson(Map<String, dynamic> json) =>
+      CreateCreditNote(
+        branchId: json['branchId'],
+        clientId: json['clientId'],
+        clientInfo: ClientInfo.fromJson(json['clientInfo']),
+        type: CreditNoteType.values.byName(json['type']),
+        docNumber: json['docNumber'] ?? "",
+        originalInvoiceId: json['originalInvoiceId'] ?? "",
+        originalInvoiceDocNumber: json['originalInvoiceDocNumber'] ?? "",
+        returnedItems: json['returnedItems'] != null
+            ? (json['returnedItems'] as List)
+                  .map((e) => SaleItem.fromJson(e))
+                  .toList()
+            : const [],
+        amount: json['amount'],
+        description: json['description'] ?? "",
+        status: CreditNoteStatus.values.byName(json['status']),
+        createdBy: UserInfo.fromJson(json['createdBy']),
+        idempotencyKey: json['idempotencyKey'],
+      );
 }
 
 class UpdateCreditNote {
@@ -197,6 +215,7 @@ class CreditNoteInDb extends BaseCreditNote {
     super.appliedReceiptId,
     super.appliedReceiptDocNumber,
     super.appliedAt,
+    super.idempotencyKey,
     required this.createdAt,
     this.updatedAt,
   });
@@ -211,7 +230,9 @@ class CreditNoteInDb extends BaseCreditNote {
     originalInvoiceId: json['originalInvoiceId'] ?? "",
     originalInvoiceDocNumber: json['originalInvoiceDocNumber'] ?? "",
     returnedItems: json['returnedItems'] != null
-        ? (json['returnedItems'] as List).map((e) => SaleItem.fromJson(e)).toList()
+        ? (json['returnedItems'] as List)
+              .map((e) => SaleItem.fromJson(e))
+              .toList()
         : const [],
     amount: json['amount'],
     description: json['description'] ?? "",
@@ -219,9 +240,14 @@ class CreditNoteInDb extends BaseCreditNote {
     createdBy: UserInfo.fromJson(json['createdBy']),
     appliedReceiptId: json['appliedReceiptId'],
     appliedReceiptDocNumber: json['appliedReceiptDocNumber'],
-    appliedAt: json['appliedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['appliedAt']) : null,
+    appliedAt: json['appliedAt'] != null
+        ? DateTime.fromMillisecondsSinceEpoch(json['appliedAt'])
+        : null,
+    idempotencyKey: json['idempotencyKey'],
     createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt']),
-    updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt']) : null,
+    updatedAt: json['updatedAt'] != null
+        ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt'])
+        : null,
   );
 
   @override

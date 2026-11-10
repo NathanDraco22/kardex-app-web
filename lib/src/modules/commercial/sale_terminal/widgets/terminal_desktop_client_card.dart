@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/view_controller.dart';
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_app_front/widgets/dialogs/client_full_details_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/selectors/client_selection_dialog.dart';
 
@@ -153,14 +154,8 @@ class TerminalDesktopClientCard extends StatelessWidget {
                 },
               ),
             ] else ...[
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue.shade600,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  elevation: 0,
-                ),
+              PrimaryMenuButton(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 onPressed: () async {
                   final selected = await showClientSelectionDialog(context);
                   if (selected != null) {

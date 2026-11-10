@@ -37,7 +37,12 @@ class _ProductsSectionState extends State<_ProductsSection> {
       preferredUnitType: viewController.isWholesale ? 'max' : 'min',
     );
     result.quantity = 1;
-    if (product.account.availableStock < (result.quantity * result.conversionFactor)) {
+    if (result.baseQuantity <= 0) {
+      DialogManager.showInfoDialog(context, "La cantidad debe ser mayor a 0");
+      viewController.requestSearchFocus();
+      return;
+    }
+    if (result.baseQuantity > product.account.availableStock) {
       DialogManager.showInfoDialog(context, "No hay stock disponible");
       viewController.requestSearchFocus();
       return;
@@ -58,13 +63,13 @@ class _ProductsSectionState extends State<_ProductsSection> {
       viewController.requestSearchFocus();
       return;
     }
-    if (res.product.account.availableStock == 0 ||
-        res.product.account.availableStock < (res.quantity * res.conversionFactor)) {
-      DialogManager.showInfoDialog(context, "No hay stock disponible");
+    if (res.baseQuantity <= 0) {
+      DialogManager.showInfoDialog(context, "La cantidad debe ser mayor a 0");
       viewController.requestSearchFocus();
       return;
     }
-    if (res.quantity == 0) {
+    if (res.baseQuantity > res.product.account.availableStock) {
+      DialogManager.showInfoDialog(context, "No hay stock disponible");
       viewController.requestSearchFocus();
       return;
     }
@@ -112,7 +117,7 @@ class _ProductsSectionState extends State<_ProductsSection> {
           children: [
             Text(message),
             const SizedBox(height: 8),
-            ElevatedButton.icon(
+            PrimaryMenuButton(
               onPressed: () => context.read<ReadTerminalProductCubit>().loadProducts(),
               icon: const Icon(Icons.refresh),
               label: const Text("Reintentar"),

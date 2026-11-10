@@ -12,6 +12,7 @@ import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
 
+import '../widgets/invoice_client_bar.dart';
 import '../widgets/product_invoice_card.dart';
 import 'invoice_client_menu_screen.dart';
 import 'package:kardex_business/kardex_business.dart';
@@ -37,7 +38,23 @@ class _ClientInvoicesScreenMobileState extends State<ClientInvoicesScreenMobile>
   void didChangeDependencies() {
     super.didChangeDependencies();
     viewController = context.read<WriteInvoiceCubit>().viewController;
-    viewController.updatePricesOnClientChange = false;
+    viewController.updatePricesOnClientChange = true;
+    viewController.onPricesChanged = _onPricesChanged;
+  }
+
+  void _onPricesChanged() {
+    if (!mounted) return;
+    ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+      const SnackBar(
+        content: Text("Precios actualizados según el nivel del cliente."),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    viewController.onPricesChanged = null;
+    super.dispose();
   }
 
   @override
@@ -87,7 +104,7 @@ class _RootScaffold extends StatelessWidget {
               );
               if (items == null || items.isEmpty) return;
               for (final item in items) {
-                if (item.quantity == 0) continue;
+                if (item.baseQuantity <= 0) continue;
                 viewController.addItem(item);
               }
               return;
@@ -100,7 +117,7 @@ class _RootScaffold extends StatelessWidget {
               restrictStock: isRestrictStock,
             );
             if (res == null) return;
-            if (isRestrictStock && (res.quantity * res.conversionFactor) > res.product.account.availableStock) {
+            if (isRestrictStock && res.baseQuantity > res.product.account.availableStock) {
               if (!context.mounted) return;
               await DialogManager.showErrorDialog(
                 context,
@@ -108,7 +125,7 @@ class _RootScaffold extends StatelessWidget {
               );
               return;
             }
-            if (res.quantity == 0) return;
+            if (res.baseQuantity <= 0) return;
 
             viewController.addItem(res);
           },
@@ -291,6 +308,7 @@ class _Body extends StatelessWidget {
               ),
             ),
           ),
+          InvoiceClientBar(viewController: viewController),
           Expanded(
             child: Card(
               child: ListenableBuilder(
@@ -326,8 +344,7 @@ class _Body extends StatelessWidget {
                             restrictStock: isRestrictStock,
                           );
                           if (res == null) return;
-                          if (isRestrictStock &&
-                              (res.quantity * res.conversionFactor) > res.product.account.availableStock) {
+                          if (isRestrictStock && res.baseQuantity > res.product.account.availableStock) {
                             if (!context.mounted) return;
                             await DialogManager.showErrorDialog(
                               context,
@@ -335,7 +352,7 @@ class _Body extends StatelessWidget {
                             );
                             return;
                           }
-                          if (res.quantity == 0) return;
+                          if (res.baseQuantity <= 0) return;
                           viewController.updateItem(
                             currentCommercial,
                             res,
@@ -350,8 +367,7 @@ class _Body extends StatelessWidget {
                             restrictStock: isRestrictStock,
                           );
                           if (res == null) return;
-                          if (isRestrictStock &&
-                              (res.quantity * res.conversionFactor) > res.product.account.availableStock) {
+                          if (isRestrictStock && res.baseQuantity > res.product.account.availableStock) {
                             if (!context.mounted) return;
                             await DialogManager.showErrorDialog(
                               context,
@@ -359,7 +375,7 @@ class _Body extends StatelessWidget {
                             );
                             return;
                           }
-                          if (res.quantity == 0) return;
+                          if (res.baseQuantity <= 0) return;
                           viewController.updateItem(
                             currentCommercial,
                             res,

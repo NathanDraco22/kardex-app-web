@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/unit_scales/cubit/write_unit_scale_cubit.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
+import 'package:kardex_app_front/widgets/buttons/secondary_menu_button.dart';
+import 'package:kardex_app_front/widgets/buttons/tertiary_menu_button.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
@@ -46,12 +50,17 @@ class _CreateUnitScaleDialogState extends State<CreateUnitScaleDialog> {
   final formKey = GlobalKey<FormState>();
   late final TextEditingController _nameController;
   late final TextEditingController _baseUnitController;
+  late final TextEditingController _packNameController;
+  late final TextEditingController _packUnitsController;
 
   late List<ExtraUnit> _units;
   late int _defaultUnitIndex;
   late int _wholesaleUnitIndex;
+  late UnitScaleType _scaleType;
 
   bool get isEditing => widget.scaleToEdit != null;
+
+  bool get _showPackGenerator => _scaleType == UnitScaleType.fractionPack || _scaleType == UnitScaleType.pack;
 
   @override
   void initState() {
@@ -59,9 +68,12 @@ class _CreateUnitScaleDialogState extends State<CreateUnitScaleDialog> {
     final edit = widget.scaleToEdit;
     _nameController = TextEditingController(text: edit?.name ?? '');
     _baseUnitController = TextEditingController(text: edit?.baseUnit ?? '');
+    _packNameController = TextEditingController(text: 'Caja');
+    _packUnitsController = TextEditingController();
     _units = List<ExtraUnit>.from(edit?.units ?? []);
     _defaultUnitIndex = edit?.defaultUnitIndex ?? 0;
     _wholesaleUnitIndex = edit?.wholesaleUnitIndex ?? 0;
+    _scaleType = edit?.scaleType ?? UnitScaleType.custom;
     _validateIndexes();
   }
 
@@ -69,12 +81,175 @@ class _CreateUnitScaleDialogState extends State<CreateUnitScaleDialog> {
   void dispose() {
     _nameController.dispose();
     _baseUnitController.dispose();
+    _packNameController.dispose();
+    _packUnitsController.dispose();
     super.dispose();
   }
 
   void _validateIndexes() {
-    if (_defaultUnitIndex > _units.length) _defaultUnitIndex = 0;
-    if (_wholesaleUnitIndex > _units.length) _wholesaleUnitIndex = 0;
+    if (_defaultUnitIndex < 0 || _defaultUnitIndex > _units.length) {
+      _defaultUnitIndex = 0;
+    }
+    if (_wholesaleUnitIndex < 0 || _wholesaleUnitIndex > _units.length) {
+      _wholesaleUnitIndex = 0;
+    }
+  }
+
+  Future<void> _generateUnits() async {
+    final unitsPerPack = int.tryParse(_packUnitsController.text.trim());
+    if (unitsPerPack == null) {
+      await DialogManager.showErrorDialog(
+        context,
+        'Ingresa un número entero de unidades por empaque.',
+      );
+      return;
+    }
+
+    final generated = _scaleType == UnitScaleType.fractionPack
+        ? UnitScalePresets.buildFractionPack(
+            packName: _packNameController.text,
+            unitsPerPack: unitsPerPack,
+          )
+        : UnitScalePresets.buildPack(
+            packName: _packNameController.text,
+            unitsPerPack: unitsPerPack,
+          );
+
+    if (generated == null) {
+      final message = _scaleType == UnitScaleType.fractionPack
+          ? 'No se puede generar la escala: el empaque debe tener un número par de '
+                'unidades mayor a 1. Para empaques impares usa una escala de empaque '
+                'con venta por unidad.'
+          : 'No se puede generar la escala: el número de unidades por empaque debe '
+                'ser mayor a 1.';
+      await DialogManager.showErrorDialog(context, message);
+      return;
+    }
+
+    setState(() {
+      if (_nameController.text.trim().isEmpty) {
+        _nameController.text = generated.name;
+      }
+      _baseUnitController.text = generated.baseUnit;
+      _units = List<ExtraUnit>.from(generated.units);
+      _defaultUnitIndex = generated.defaultUnitIndex;
+      _wholesaleUnitIndex = generated.wholesaleUnitIndex;
+      _validateIndexes();
+    });
+  }
+
+  Widget _buildPackGeneratorCard() {
+    final isFraction = _scaleType == UnitScaleType.fractionPack;
+
+    InputDecoration fieldDecoration(String hint) => InputDecoration(
+      hintText: hint,
+      filled: true,
+      fillColor: Colors.white,
+      border: OutlineInputBorder(
+        borderRadius: AppThemeTokens.borderRadiusMd,
+        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: AppThemeTokens.borderRadiusMd,
+        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: AppThemeTokens.borderRadiusMd,
+        borderSide: const BorderSide(color: AppThemeTokens.indigo, width: 1.5),
+      ),
+    );
+
+    final packNameField = TitleTextField(
+      controller: _packNameController,
+      title: "Nombre del Empaque",
+      decoration: fieldDecoration("Ej. Caja, Blíster, Docena"),
+      textCapitalization: TextCapitalization.words,
+    );
+
+    final unitsField = TitleTextField(
+      controller: _packUnitsController,
+      title: "Unidades por Empaque",
+      decoration: fieldDecoration("Ej. 12"),
+      keyboardType: TextInputType.number,
+      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+    );
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppThemeTokens.indigo.withValues(alpha: 0.04),
+        borderRadius: AppThemeTokens.borderRadiusMd,
+        border: Border.all(color: AppThemeTokens.indigo.withValues(alpha: 0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Row(
+            children: [
+              Icon(
+                Icons.inventory_2_outlined,
+                size: 18,
+                color: AppThemeTokens.indigo,
+              ),
+              SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  "Generador de Empaque",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                    color: Color(0xFF0F172A),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            isFraction
+                ? "Calcula la base (cuarto o media parte) y las unidades del empaque."
+                : "Calcula la base Unidad y las unidades del empaque.",
+            style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+          ),
+          const SizedBox(height: 12),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth < 420) {
+                return Column(
+                  children: [
+                    packNameField,
+                    const SizedBox(height: 12),
+                    unitsField,
+                  ],
+                );
+              }
+
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: packNameField),
+                  const SizedBox(width: 12),
+                  Expanded(child: unitsField),
+                ],
+              );
+            },
+          ),
+          const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.centerRight,
+            child: PrimaryMenuButton(
+              onPressed: _generateUnits,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              icon: const Icon(Icons.auto_awesome, size: 17),
+              label: const Text(
+                "Generar Unidades",
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _addExtraUnit() async {
@@ -128,9 +303,32 @@ class _CreateUnitScaleDialogState extends State<CreateUnitScaleDialog> {
     final name = _nameController.text.trim();
     final baseUnit = _baseUnitController.text.trim();
 
-    final title = isEditing
-        ? "¿Desea actualizar la escala $name?"
-        : "¿Desea registrar la escala $name?";
+    final baseUnitKey = baseUnit.toLowerCase();
+    final unitNames = <String>{};
+    for (final unit in _units) {
+      final unitKey = unit.name.trim().toLowerCase();
+      if (unitKey.isEmpty || unitKey == baseUnitKey || !unitNames.add(unitKey)) {
+        await DialogManager.showErrorDialog(
+          context,
+          'Los nombres de las unidades no pueden estar vacíos, repetirse entre sí '
+          'ni coincidir con la unidad base.',
+        );
+        return;
+      }
+    }
+
+    if (_defaultUnitIndex < 0 ||
+        _defaultUnitIndex > _units.length ||
+        _wholesaleUnitIndex < 0 ||
+        _wholesaleUnitIndex > _units.length) {
+      await DialogManager.showErrorDialog(
+        context,
+        'La unidad por defecto o mayorista seleccionada no es válida.',
+      );
+      return;
+    }
+
+    final title = isEditing ? "¿Desea actualizar la escala $name?" : "¿Desea registrar la escala $name?";
 
     final confirmed = await DialogManager.slideToConfirmActionDialog(context, title);
     if (!confirmed) return;
@@ -141,6 +339,7 @@ class _CreateUnitScaleDialogState extends State<CreateUnitScaleDialog> {
     if (isEditing) {
       final update = UpdateUnitScale(
         name: name,
+        scaleType: _scaleType,
         baseUnit: baseUnit,
         units: _units,
         defaultUnitIndex: _defaultUnitIndex,
@@ -150,6 +349,7 @@ class _CreateUnitScaleDialogState extends State<CreateUnitScaleDialog> {
     } else {
       final create = CreateUnitScale(
         name: name,
+        scaleType: _scaleType,
         baseUnit: baseUnit,
         units: _units,
         defaultUnitIndex: _defaultUnitIndex,
@@ -161,8 +361,7 @@ class _CreateUnitScaleDialogState extends State<CreateUnitScaleDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final baseUnitLabel =
-        _baseUnitController.text.trim().isEmpty ? 'Unidad Base' : _baseUnitController.text.trim();
+    final baseUnitLabel = _baseUnitController.text.trim().isEmpty ? 'Unidad Base' : _baseUnitController.text.trim();
 
     return BlocListener<WriteUnitScaleCubit, WriteUnitScaleState>(
       listener: (context, state) {
@@ -276,6 +475,66 @@ class _CreateUnitScaleDialogState extends State<CreateUnitScaleDialog> {
                             ),
                           ],
                         ),
+                        const SizedBox(height: 14),
+
+                        DropdownButtonFormField<UnitScaleType>(
+                          key: const ValueKey("scale_type"),
+                          initialValue: _scaleType,
+                          isExpanded: true,
+                          decoration: InputDecoration(
+                            labelText: "Tipo de Escala*",
+                            filled: true,
+                            fillColor: const Color(0xFFF8FAFC),
+                            border: OutlineInputBorder(
+                              borderRadius: AppThemeTokens.borderRadiusMd,
+                              borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                            ),
+                            isDense: true,
+                          ),
+                          items: UnitScaleType.values.map((type) {
+                            return DropdownMenuItem<UnitScaleType>(
+                              value: type,
+                              child: Text(type.label),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            if (value != null) setState(() => _scaleType = value);
+                          },
+                        ),
+
+                        if (isEditing) ...[
+                          const SizedBox(height: 12),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: Colors.amber.shade50,
+                              borderRadius: AppThemeTokens.borderRadiusSm,
+                              border: Border.all(color: Colors.amber.shade200),
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  Icons.info_outline_rounded,
+                                  size: 17,
+                                  color: Colors.amber.shade800,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    "Los productos existentes conservan su copia; los cambios no se propagan automáticamente.",
+                                    style: TextStyle(fontSize: 12, color: Colors.amber.shade900),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+
+                        if (_showPackGenerator) ...[
+                          const SizedBox(height: 14),
+                          _buildPackGeneratorCard(),
+                        ],
                         const SizedBox(height: 18),
 
                         Row(
@@ -289,17 +548,13 @@ class _CreateUnitScaleDialogState extends State<CreateUnitScaleDialog> {
                                 color: Color(0xFF0F172A),
                               ),
                             ),
-                            ElevatedButton.icon(
+                            TertiaryMenuButton(
                               onPressed: _addExtraUnit,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppThemeTokens.indigo.withValues(alpha: 0.12),
-                                foregroundColor: AppThemeTokens.indigo,
-                                elevation: 0,
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                                shape: RoundedRectangleBorder(borderRadius: AppThemeTokens.borderRadiusSm),
-                              ),
                               icon: const Icon(Icons.add_rounded, size: 17),
-                              label: const Text("Agregar Unidad", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                              label: const Text(
+                                "Agregar Unidad",
+                                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                              ),
                             ),
                           ],
                         ),
@@ -406,6 +661,9 @@ class _CreateUnitScaleDialogState extends State<CreateUnitScaleDialog> {
                         LayoutBuilder(
                           builder: (context, constraints) {
                             final defaultDropdown = DropdownButtonFormField<int>(
+                              key: ValueKey(
+                                'default_unit_index_${_defaultUnitIndex}_${_units.length}',
+                              ),
                               isExpanded: true,
                               decoration: InputDecoration(
                                 labelText: "Unidad por Defecto (Detalle)",
@@ -445,6 +703,9 @@ class _CreateUnitScaleDialogState extends State<CreateUnitScaleDialog> {
                             );
 
                             final wholesaleDropdown = DropdownButtonFormField<int>(
+                              key: ValueKey(
+                                'wholesale_unit_index_${_wholesaleUnitIndex}_${_units.length}',
+                              ),
                               isExpanded: true,
                               decoration: InputDecoration(
                                 labelText: "Unidad Mayorista Sugerida",
@@ -518,25 +779,16 @@ class _CreateUnitScaleDialogState extends State<CreateUnitScaleDialog> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    OutlinedButton(
+                    SecondaryMenuButton(
                       onPressed: () => context.pop(),
-                      style: OutlinedButton.styleFrom(
-                        shape: RoundedRectangleBorder(borderRadius: AppThemeTokens.borderRadiusMd),
-                        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                      ),
-                      child: const Text("Cancelar"),
+                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                      label: const Text("Cancelar"),
                     ),
                     const SizedBox(width: 12),
-                    ElevatedButton(
+                    PrimaryMenuButton(
                       onPressed: _submit,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppThemeTokens.indigo,
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: AppThemeTokens.borderRadiusMd),
-                        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
-                      ),
-                      child: Text(
+                      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+                      label: Text(
                         isEditing ? "Guardar Cambios" : "Crear Escala",
                         style: const TextStyle(fontWeight: FontWeight.w700),
                       ),
@@ -561,8 +813,7 @@ class _CreateUnitScaleDialogState extends State<CreateUnitScaleDialog> {
     final factorCtrl = TextEditingController(
       text: unitToEdit != null ? unitToEdit.conversionFactor.toString() : '',
     );
-    final baseLabel =
-        _baseUnitController.text.trim().isEmpty ? 'unidad base' : _baseUnitController.text.trim();
+    final baseLabel = _baseUnitController.text.trim().isEmpty ? 'unidad base' : _baseUnitController.text.trim();
 
     return await showDialog<ExtraUnit?>(
       context: context,
@@ -649,15 +900,12 @@ class _CreateUnitScaleDialogState extends State<CreateUnitScaleDialog> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          OutlinedButton(
+                          SecondaryMenuButton(
                             onPressed: () => Navigator.pop(ctx),
-                            style: OutlinedButton.styleFrom(
-                              shape: RoundedRectangleBorder(borderRadius: AppThemeTokens.borderRadiusMd),
-                            ),
-                            child: const Text("Cancelar"),
+                            label: const Text("Cancelar"),
                           ),
                           const SizedBox(width: 10),
-                          ElevatedButton(
+                          PrimaryMenuButton(
                             onPressed: () {
                               if (!form.currentState!.validate()) return;
                               final unit = ExtraUnit(
@@ -666,13 +914,7 @@ class _CreateUnitScaleDialogState extends State<CreateUnitScaleDialog> {
                               );
                               Navigator.pop(ctx, unit);
                             },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppThemeTokens.indigo,
-                              foregroundColor: Colors.white,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(borderRadius: AppThemeTokens.borderRadiusMd),
-                            ),
-                            child: Text(isEdit ? "Guardar" : "Agregar"),
+                            label: Text(isEdit ? "Guardar" : "Agregar"),
                           ),
                         ],
                       ),

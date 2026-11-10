@@ -84,7 +84,13 @@ class _ContentSection extends StatelessWidget {
             ),
             BasicTableCell(
               content: Text(
-                NumberFormatter.formatDisplayStock(inventory.currentStock, product.defaultUnitFactor),
+                NumberFormatter.formatDisplayStock(
+                  inventory.currentStock,
+                  product.defaultUnitFactor,
+                  selectedUnitName: product.defaultUnitName,
+                  standardUnitName: product.defaultUnitName,
+                  standardUnitFactor: product.defaultUnitFactor,
+                ),
                 textAlign: TextAlign.center,
               ),
             ),

@@ -91,6 +91,7 @@ lib/src/modules/inventory/
 ## 4. Rutas en `app_router.dart`
 
 - `/inventory`: Menú principal de inventario.
+- `/inventory/units-and-scales`: Pantalla combinada de Unidades y Escalas de Medida (`UnitsAndScalesScreen`). Acepta `?tab=units|scales`. En Lite es la ubicación principal de esta funcionalidad.
 - `/inventory/current`: Inventario actual y existencias.
 - `/inventory/entry`: Registro de entradas.
 - `/inventory/exit`: Registro de salidas.

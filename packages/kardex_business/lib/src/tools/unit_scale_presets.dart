@@ -6,58 +6,100 @@ import '../domain/models/unit_scale/unit_scale_model.dart';
 class UnitScalePresets {
   const UnitScalePresets._();
 
-  static const List<BaseUnitScale> standardPresets = [
-    BaseUnitScale(
-      name: 'Peso (Libras / Kilogramos)',
-      baseUnit: 'Gramos',
-      units: [
-        ExtraUnit(name: 'Libra', conversionFactor: 454),
-        ExtraUnit(name: 'Kilogramo', conversionFactor: 1000),
-      ],
-      defaultUnitIndex: 1, // Libra
-      wholesaleUnitIndex: 2, // Kilogramo
-    ),
-    BaseUnitScale(
-      name: 'Peso Agrícola (Libras / Arrobas / Quintales)',
-      baseUnit: 'Gramos',
-      units: [
-        ExtraUnit(name: 'Libra', conversionFactor: 454),
-        ExtraUnit(name: 'Arroba (25 lb)', conversionFactor: 11350),
-        ExtraUnit(name: 'Quintal (100 lb)', conversionFactor: 45400),
-      ],
-      defaultUnitIndex: 1, // Libra
-      wholesaleUnitIndex: 3, // Quintal
-    ),
-    BaseUnitScale(
-      name: 'Volumen y Líquidos (Litros / Galones)',
-      baseUnit: 'Mililitros',
-      units: [
-        ExtraUnit(name: 'Litro', conversionFactor: 1000),
-        ExtraUnit(name: 'Galón', conversionFactor: 3785),
-      ],
-      defaultUnitIndex: 1, // Litro
-      wholesaleUnitIndex: 2, // Galón
-    ),
-    BaseUnitScale(
-      name: 'Empaques y Cajas (Docenas / Cajas x24)',
-      baseUnit: 'Unidades',
-      units: [
-        ExtraUnit(name: 'Media Docena', conversionFactor: 6),
-        ExtraUnit(name: 'Docena', conversionFactor: 12),
-        ExtraUnit(name: 'Caja x24', conversionFactor: 24),
-      ],
-      defaultUnitIndex: 0, // Unidades
-      wholesaleUnitIndex: 3, // Caja x24
-    ),
-    BaseUnitScale(
-      name: 'Longitud y Telas (Metros / Yardas)',
-      baseUnit: 'Centímetros',
-      units: [
-        ExtraUnit(name: 'Yarda', conversionFactor: 91),
-        ExtraUnit(name: 'Metro', conversionFactor: 100),
-      ],
-      defaultUnitIndex: 2, // Metro
-      wholesaleUnitIndex: 2, // Metro
-    ),
-  ];
+  /// Las escalas por defecto viven en el backend
+  /// (`create_default_unit_scales.py`) y se exponen por
+  /// `GET /api/v1/unit-scales`. El frontend no mantiene una lista duplicada
+  /// de presets estándar; el selector consume las escalas del repositorio.
+  static const List<BaseUnitScale> standardPresets = <BaseUnitScale>[];
+
+  static String _packName(String packName) {
+    final trimmed = packName.trim();
+    return trimmed.isEmpty ? 'Caja' : trimmed;
+  }
+
+  static String _packLabel(String packName, int unitsPerPack) {
+    final pack = _packName(packName);
+    if (pack.toLowerCase() == 'docena') return 'Docena';
+    return '$pack x$unitsPerPack';
+  }
+
+  /// Genera una escala de empaque fraccionado para [unitsPerPack] unidades.
+  ///
+  /// Si el tamaño es múltiplo de 4, la base es el cuarto de empaque (factor 4);
+  /// si solo es par, la base es la media parte (factor 2). Los empaques
+  /// impares no tienen fracción exacta y devuelven `null`.
+  static BaseUnitScale? buildFractionPack({
+    required String packName,
+    required int unitsPerPack,
+  }) {
+    if (unitsPerPack <= 1) return null;
+
+    final label = _packLabel(packName, unitsPerPack);
+
+    if (unitsPerPack % 4 == 0) {
+      return BaseUnitScale(
+        name: '$label - Fracción',
+        scaleType: UnitScaleType.fractionPack,
+        baseUnit: 'Cuarto de $label (${unitsPerPack ~/ 4} u)',
+        units: [
+          ExtraUnit(
+            name: 'Media $label (${unitsPerPack ~/ 2} u)',
+            conversionFactor: 2,
+          ),
+          ExtraUnit(name: '$label ($unitsPerPack u)', conversionFactor: 4),
+        ],
+        defaultUnitIndex: 2,
+        wholesaleUnitIndex: 2,
+      );
+    }
+
+    if (unitsPerPack % 2 == 0) {
+      return BaseUnitScale(
+        name: '$label - Fracción',
+        scaleType: UnitScaleType.fractionPack,
+        baseUnit: 'Media $label (${unitsPerPack ~/ 2} u)',
+        units: [
+          ExtraUnit(name: '$label ($unitsPerPack u)', conversionFactor: 2),
+        ],
+        defaultUnitIndex: 1,
+        wholesaleUnitIndex: 1,
+      );
+    }
+
+    return null;
+  }
+
+  /// Genera una escala de empaque con venta por unidad.
+  ///
+  /// La base es `Unidad`; si el empaque es par se agrega la media parte y
+  /// siempre se agrega el empaque completo con factor [unitsPerPack].
+  static BaseUnitScale? buildPack({
+    required String packName,
+    required int unitsPerPack,
+  }) {
+    if (unitsPerPack <= 1) return null;
+
+    final label = _packLabel(packName, unitsPerPack);
+    final halfFactor = unitsPerPack ~/ 2;
+    final units = <ExtraUnit>[
+      if (unitsPerPack % 2 == 0 && halfFactor > 1)
+        ExtraUnit(
+          name: 'Media $label ($halfFactor u)',
+          conversionFactor: halfFactor,
+        ),
+      ExtraUnit(
+        name: '$label ($unitsPerPack u)',
+        conversionFactor: unitsPerPack,
+      ),
+    ];
+
+    return BaseUnitScale(
+      name: '$label - Unidad',
+      scaleType: UnitScaleType.pack,
+      baseUnit: 'Unidad',
+      units: units,
+      defaultUnitIndex: units.length,
+      wholesaleUnitIndex: units.length,
+    );
+  }
 }

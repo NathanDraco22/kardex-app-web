@@ -91,7 +91,7 @@ class _RootScaffold extends StatelessWidget {
                                 ),
                               );
                             }
-                            return ElevatedButton.icon(
+                            return PrimaryMenuButton(
                               onPressed: () {
                                 context.read<ExportPriceListCubit>().exportExcel(
                                   branchName: getIt<AuthCubit>().currentBranchName,

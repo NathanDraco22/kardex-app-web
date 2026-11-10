@@ -14,9 +14,11 @@ class ProformaScreen extends StatefulWidget {
   const ProformaScreen({
     super.key,
     this.isWholesale = false,
+    this.initialClient,
   });
 
   final bool isWholesale;
+  final ClientInDb? initialClient;
 
   @override
   State<ProformaScreen> createState() => _ProformaScreenState();
@@ -29,6 +31,10 @@ class _ProformaScreenState extends State<ProformaScreen> {
   void initState() {
     super.initState();
     viewController = ClientInvoiceViewController(isWholesale: widget.isWholesale);
+    final initialClient = widget.initialClient;
+    if (initialClient != null) {
+      viewController.selectedClient = initialClient;
+    }
   }
 
   @override

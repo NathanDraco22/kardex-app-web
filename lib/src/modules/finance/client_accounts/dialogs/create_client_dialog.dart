@@ -95,7 +95,7 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
                   },
                   child: const Text("Cancelar"),
                 ),
-                ElevatedButton(
+                PrimaryMenuButton(
                   onPressed: () {
                     if (!formKey.currentState!.validate()) return;
 
@@ -107,7 +107,7 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
                       writeCubit.updateClient(widget.client!.id, updateClient);
                     }
                   },
-                  child: Text("$wordPrefix Cliente"),
+                  label: Text("$wordPrefix Cliente"),
                 ),
               ],
               content: SizedBox(

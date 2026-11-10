@@ -135,9 +135,9 @@ class _ContentSection extends StatelessWidget {
 
                       final String qtyText;
                       if (saleItem.bonQuantity > 0) {
-                        qtyText = "${saleItem.quantity} + ${saleItem.bonQuantity}";
+                        qtyText = "${saleItem.formattedDisplayQuantity} + ${saleItem.formattedDisplayBonQuantity}";
                       } else {
-                        qtyText = "${saleItem.quantity}";
+                        qtyText = saleItem.formattedDisplayQuantity;
                       }
 
                       return BasicTableRow(

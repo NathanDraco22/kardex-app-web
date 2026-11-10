@@ -49,16 +49,6 @@ class _Body extends StatelessWidget {
             ),
           ),
           ShortcutAddableListTile(
-            routeName: RouteNames.unitsAndScales,
-            child: MenuOptionCard(
-              icon: Icons.straighten_rounded,
-              accentColor: Colors.teal.shade700,
-              title: "Unidades y Escalas de Medida",
-              subtitle: "Factores de conversión, unidades de empaque y plantillas",
-              onTap: () => context.pushNamed(RouteNames.unitsAndScales),
-            ),
-          ),
-          ShortcutAddableListTile(
             routeName: RouteNames.productCategory,
             child: MenuOptionCard(
               icon: Icons.category_rounded,

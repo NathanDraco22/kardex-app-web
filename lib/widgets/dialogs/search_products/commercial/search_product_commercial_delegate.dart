@@ -206,6 +206,9 @@ class _ProductInBranchResultRow extends StatelessWidget {
                                   NumberFormatter.formatDisplayStock(
                                     product.account.availableStock,
                                     product.defaultUnitFactor,
+                                    selectedUnitName: product.defaultUnitName,
+                                    standardUnitName: product.defaultUnitName,
+                                    standardUnitFactor: product.defaultUnitFactor,
                                   ),
                                   style: TextStyle(
                                     fontSize: 15,

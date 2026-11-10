@@ -67,7 +67,7 @@ lib/src/modules/product_catalog/
   - Trabaja estrechamente con `UnitConversionTool` (`lib/src/tools/unit_conversion_tool.dart`) para calcular equivalencias al ingresar compras por caja y vender al por menor por unidad.
 
 ### 2.4. Escalas de Unidades de Medida (`unit_scales`)
-- **Propósito:** Plantillas reutilizables de conversión para productos que se comercializan bajo diferentes unidades y múltiplos (Peso, Volumen, Longitud, Tiempo y personalizadas). Evita tener que reconfigurar manualmente las unidades extras y factores producto por producto.
+- **Propósito:** Plantillas reutilizables de conversión para productos que se comercializan bajo diferentes unidades y múltiplos. El `scaleType` de la escala define la fracción mínima: `weight`/`volume`/`length` usan cuartos, `fractionPack` usa media/cuarto de empaque y `pack` usa la unidad. Evita reconfigurar manualmente las unidades extras y factores producto por producto.
 - **Vistas:** `UnitScalesPanel` (UI reutilizable) y `UnitScalesScreen` (wrapper individual). Diseño responsivo con chips de equivalencias, badges de detalle y mayoreo.
 - **Cubits:**
   - `ReadUnitScalesCubit`: Carga, filtrado local en tiempo real y refresco de escalas.
@@ -75,10 +75,11 @@ lib/src/modules/product_catalog/
 - **Diálogo Interactivo:**
   - `showCreateOrEditUnitScaleDialog` (`CreateUnitScaleDialog`): Modal con validación de formularios, configuración de unidad base, adición dinámica de unidades adicionales (`ExtraUnit`) con factor entero multiplicador y selectores de unidad por defecto y mayorista sugeridas.
 - **Sistema de Presets Automáticos:**
-  - `UnitScalePresets`: Plantillas predeterminadas (Peso, Peso Agrícola, Volumen, Empaque, Longitud) cargables en 1 clic desde el modal `UnitScalePresetSelectorDialog`.
-  - Integrado mediante el botón **"Usar Preset"** en los diálogos de alta de producto (`create_product_dialog.dart`, `create_product_with_data_dialog.dart`) y en el editor modal `extra_units_editor_dialog.dart`.
+  - Las escalas por defecto viven en el backend (`create_default_unit_scales.py`) y se consumen vía `UnitScalePresetSelectorDialog`; el frontend no mantiene una lista estándar duplicada. Las escalas personalizadas creadas por el usuario también aparecen en el selector.
+  - Integrado mediante el botón **"Usar Preset"** en los diálogos de alta de producto (`create_product_dialog.dart`, `create_product_with_data_dialog.dart`) y en el editor modal `extra_units_editor_dialog.dart` (C7: el preset debe actualizar también la unidad base).
+  - El editor de escalas incluye `scaleType` y un generador para `fractionPack`/`pack` (“Caja x30” → media caja/caja).
 - **Fijación de Precios y Costos Bidireccionales:**
-  - `ProductPriceEditorScreen` / `product_price_editor_dialog.dart`: Sincronización instantánea entre el precio base (ej. Gramos) y el precio comercial (ej. Libras), preselección automática de la unidad preferida (`defaultUnitIndex`) y visualización dinámica de los costos (Promedio, Última Compra, Máximo y Sugerido) para la unidad seleccionada.
+  - `ProductPriceEditorScreen` / `product_price_editor_dialog.dart`: Sincronización instantánea entre el precio base (ej. Cuarto de Libra) y el precio comercial (ej. Libra), preselección automática de la unidad preferida (`defaultUnitIndex`) y visualización dinámica de los costos (Promedio, Última Compra, Máximo y Sugerido) para la unidad seleccionada.
 - **Documentación Completa:** Ver [Guía Maestra de Unidades de Medida y Conversiones](./unit_scales.md).
 
 ### 2.5. Pantalla Combinada de Unidades y Escalas (`units_and_scales`)
@@ -86,7 +87,8 @@ lib/src/modules/product_catalog/
 - **Vista:** `UnitsAndScalesScreen` (`lib/src/modules/product_catalog/units_and_scales/units_and_scales_screen.dart`).
 - **Pestañas:** `Unidades` (usa `UnitsPanel`) y `Escalas` (usa `UnitScalesPanel`).
 - **Cubits:** Provee los cuatro cubits (`ReadUnitCubit`, `WriteUnitCubit`, `ReadUnitScalesCubit`, `WriteUnitScaleCubit`).
-- **Compatibilidad:** Las rutas heredadas `units` y `unit-scales` redirigen a esta pantalla con la pestaña correspondiente.
+- **Ubicación en Lite:** La entrada de menú y la ruta viven dentro de **Inventario** (`/inventory/units-and-scales`); el catálogo de productos ya no muestra esta opción.
+- **Compatibilidad:** Las rutas heredadas `units`, `unit-scales` y `/product-catalog/units-and-scales` redirigen a esta pantalla con la pestaña correspondiente.
 
 ---
 
@@ -106,6 +108,7 @@ lib/src/modules/product_catalog/
 - `/product-catalog`: Menú principal del catálogo (`ProductCatalogMenuScreen`).
 - `/product-catalog/product-list`: Listado global de productos (`ProductListScreen`).
 - `/product-catalog/product-category`: Catálogo de categorías (`ProductCategoryScreen`).
-- `/product-catalog/units-and-scales`: Pantalla combinada de unidades y escalas (`UnitsAndScalesScreen`). Acepta `?tab=units|scales`.
-- `/product-catalog/units`: Ruta heredada; redirige a `units-and-scales?tab=units`.
-- `/product-catalog/unit-scales`: Ruta heredada; redirige a `units-and-scales?tab=scales`.
+- `/inventory/units-and-scales`: Pantalla combinada de unidades y escalas (`UnitsAndScalesScreen`). Acepta `?tab=units|scales`. En Lite es la ubicación principal.
+- `/product-catalog/units-and-scales`: Ruta heredada; redirige a `/inventory/units-and-scales` conservando el parámetro `tab`.
+- `/product-catalog/units`: Ruta heredada; redirige a `/inventory/units-and-scales?tab=units`.
+- `/product-catalog/unit-scales`: Ruta heredada; redirige a `/inventory/units-and-scales?tab=scales`.

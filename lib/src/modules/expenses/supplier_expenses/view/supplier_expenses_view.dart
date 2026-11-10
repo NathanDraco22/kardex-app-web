@@ -4,6 +4,7 @@ import 'package:kardex_app_front/src/cubits/expenses/read_expenses_cubit.dart';
 import 'package:kardex_app_front/src/cubits/expenses/write_expenses_cubit.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_app_front/widgets/no_item.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/supplier_expense_viewer.dart';

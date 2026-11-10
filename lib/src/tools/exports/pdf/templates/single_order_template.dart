@@ -244,7 +244,7 @@ class SingleOrderTemplate implements PdfTemplate {
                       pw.Text(saleItem.product.name, style: const pw.TextStyle(fontSize: 12)),
                       pw.SizedBox(height: 2),
                       pw.Text(
-                        saleItem.product.unitName,
+                        saleItem.displayUnitName,
                         style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey600),
                       ),
                     ],
@@ -252,10 +252,21 @@ class SingleOrderTemplate implements PdfTemplate {
                 ),
                 pw.Expanded(
                   flex: 1,
-                  child: pw.Text(
-                    saleItem.formattedDisplayQuantity,
-                    textAlign: pw.TextAlign.center,
-                    style: const pw.TextStyle(fontSize: 12),
+                  child: pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.center,
+                    children: [
+                      pw.Text(
+                        saleItem.formattedDisplayQuantity,
+                        textAlign: pw.TextAlign.center,
+                        style: const pw.TextStyle(fontSize: 12),
+                      ),
+                      if (saleItem.bonQuantity > 0)
+                        pw.Text(
+                          "+ ${saleItem.formattedDisplayBonQuantity} bonif.",
+                          textAlign: pw.TextAlign.center,
+                          style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey600),
+                        ),
+                    ],
                   ),
                 ),
                 pw.Expanded(

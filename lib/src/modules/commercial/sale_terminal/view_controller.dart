@@ -72,7 +72,7 @@ class SaleTerminalViewController extends ChangeNotifier {
 
   bool get hasZeroPriceItems => items.any((item) => item.newPrice <= 0);
 
-  bool get hasItemsWithZeroQuantity => items.any((item) => item.quantity <= 0);
+  bool get hasItemsWithZeroBaseQuantity => items.any((item) => item.baseQuantity <= 0);
 
   int get totalItems => items.length;
 
@@ -80,8 +80,7 @@ class SaleTerminalViewController extends ChangeNotifier {
 
   int get totalAmount => items.fold(0, (previousValue, element) => previousValue + element.total);
 
-  int get totalDiscount =>
-      items.fold(0, (previousValue, element) => previousValue + element.totalDiscount);
+  int get totalDiscount => items.fold(0, (previousValue, element) => previousValue + element.totalDiscount);
 
   void addItem(CommercialProductResult item) {
     final existingIndex = items.indexWhere((i) => i.product.id == item.product.id);
@@ -215,9 +214,7 @@ class SaleTerminalViewController extends ChangeNotifier {
       return SaleItem(
         product: ProductItem.fromJson({
           ...product.toJson(),
-          'unitName': commercial.selectedUnitName.isNotEmpty
-              ? commercial.selectedUnitName
-              : product.unitName,
+          'unitName': commercial.selectedUnitName.isNotEmpty ? commercial.selectedUnitName : product.unitName,
         }),
         selectedPrice: commercial.selectedPriceLevel,
         cost: product.account.averageCost,
@@ -228,6 +225,9 @@ class SaleTerminalViewController extends ChangeNotifier {
         subTotal: commercial.subTotal,
         total: commercial.total,
         conversionFactor: commercial.conversionFactor,
+        selectedUnitName: commercial.selectedUnitName.isNotEmpty ? commercial.selectedUnitName : product.unitName,
+        standardUnitName: product.defaultUnitName,
+        standardUnitFactor: product.defaultUnitFactor,
       );
     }).toList();
 

@@ -23,7 +23,7 @@ class TerminalPayButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final hasItems = viewController.items.isNotEmpty;
     final hasZeroPrice = viewController.hasZeroPriceItems;
-    final hasZeroQuantity = viewController.hasItemsWithZeroQuantity;
+    final hasZeroQuantity = viewController.hasItemsWithZeroBaseQuantity;
     final enabled = hasItems && !hasZeroPrice && !hasZeroQuantity;
 
     String? disabledMessage;

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/settings/view/price_to_product/cubit/write_product_price_cubit.dart';
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
@@ -66,7 +67,7 @@ class _CreateProductPriceDialogState extends State<CreateProductPriceDialog> {
                   },
                   child: const Text("Cancelar"),
                 ),
-                ElevatedButton(
+                PrimaryMenuButton(
                   onPressed: () async {
                     if (!formKey.currentState!.validate()) return;
 
@@ -80,7 +81,7 @@ class _CreateProductPriceDialogState extends State<CreateProductPriceDialog> {
                     if (!context.mounted) return;
                     context.read<WriteProductPriceCubit>().createNewProductPrice(newProductPrice);
                   },
-                  child: const Text("Agregar Precio de Producto"),
+                  label: const Text("Agregar Precio de Producto"),
                 ),
               ],
               content: Column(

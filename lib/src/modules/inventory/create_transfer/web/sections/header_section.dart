@@ -195,11 +195,18 @@ Future<void> saveTransfer(BuildContext context) async {
   final productTableController = mediatorRead.productTableController;
 
   final items = productTableController.rows.map((e) {
+    final selectedUnitName = UnitConversionTool.resolveUnitName(
+      e.selectedUnitName,
+      e.product.unitName,
+    );
     return TransferItem(
       id: e.product.id,
       name: e.product.name,
       code: e.product.code,
-      unitName: UnitConversionTool.resolveUnitName(e.selectedUnitName, e.product.unitName),
+      unitName: selectedUnitName,
+      selectedUnitName: selectedUnitName,
+      standardUnitName: e.product.defaultUnitName,
+      standardUnitFactor: e.product.defaultUnitFactor,
       brandName: e.product.brandName,
       quantity: UnitConversionTool.toBaseQuantity(e.quantity, e.conversionFactor),
       cost: UnitConversionTool.toBaseCost(e.unitaryCost, e.conversionFactor),

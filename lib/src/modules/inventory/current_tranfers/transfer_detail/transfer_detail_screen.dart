@@ -125,6 +125,7 @@ class _Body extends StatelessWidget {
                             ],
                             rowBuilder: (context, index) {
                               final item = transfer.items[index];
+                              final displayFactor = item.displayUnitFactor;
                               final rowColor = index.isEven ? Colors.grey.shade200 : Colors.white;
 
                               String expirationTag = "--";
@@ -151,23 +152,15 @@ class _Body extends StatelessWidget {
                                           spacing: 8,
                                           children: [
                                             Text(item.brandName),
-                                            Builder(
-                                              builder: (context) {
-                                                String label = item.unitName;
-                                                Color? color;
-                                                if (item.conversionFactor > 1) {
-                                                  color = Colors.blue.shade300;
-                                                  label = "$label(${item.conversionFactor})";
-                                                }
-                                                return Text(
-                                                  label,
-                                                  style: TextStyle(
-                                                    color: color,
-                                                    fontSize: 12,
-                                                    fontWeight: item.conversionFactor > 1 ? FontWeight.bold : FontWeight.normal,
-                                                  ),
-                                                );
-                                              },
+                                            Text(
+                                              displayFactor > 1
+                                                  ? "${item.displayUnitName} ($displayFactor)"
+                                                  : item.displayUnitName,
+                                              style: TextStyle(
+                                                color: displayFactor > 1 ? Colors.blue.shade300 : null,
+                                                fontSize: 12,
+                                                fontWeight: displayFactor > 1 ? FontWeight.bold : FontWeight.normal,
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -182,7 +175,7 @@ class _Body extends StatelessWidget {
                                   ),
                                   BasicTableCell(
                                     content: Text(
-                                      NumberFormatter.formatDisplayStock(item.quantity, item.conversionFactor),
+                                      item.formattedDisplayQuantity,
                                       style: const TextStyle(
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -190,7 +183,7 @@ class _Body extends StatelessWidget {
                                   ),
                                   BasicTableCell(
                                     content: Text(
-                                      NumberFormatter.convertToMoneyLike(item.cost * item.conversionFactor),
+                                      NumberFormatter.convertToMoneyLike(item.displayUnitCost),
                                       style: const TextStyle(
                                         fontWeight: FontWeight.w500,
                                       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/modals/confirm_receipt_modal.dart';
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 
 class PartialPaymentResult {
   final Map<String, double> payments;
@@ -351,13 +352,8 @@ class _PartialPaymentModalState extends State<PartialPaymentModal> {
       ),
       child: Row(
         children: [
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 16,
-              ),
-            ),
+          PrimaryMenuButton(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             onPressed: (allValid && hasAnyApplication)
                 ? () async {
                     final usedDevolutions = <DevolutionInDb>[];
@@ -400,7 +396,7 @@ class _PartialPaymentModalState extends State<PartialPaymentModal> {
                     );
                   }
                 : null,
-            child: const Text("Confirmar Abonos"),
+            label: const Text("Confirmar Abonos"),
           ),
 
           const Spacer(),

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
-/// Botón terciario de estilo plano/texto diseñado para barras de menú, barras de herramientas
-/// y encabezados como [AppBar] o contenedores con fondo sólido oscuro o claro.
+import '../design_system/app_theme_tokens.dart';
+
+/// Botón terciario de estilo tonal (fondo indigo suave) con texto/icono del color
+/// primario del tema, diseñado para barras de menú, barras de herramientas y
+/// encabezados como [AppBar] o contenedores con fondo sólido oscuro o claro.
 ///
 /// Comparte la misma silueta de esquinas redondeadas (`BorderRadius.circular(12)`),
 /// altura y densidad que [PrimaryMenuButton] y [SecondaryMenuButton], eliminando
@@ -29,11 +32,10 @@ class TertiaryMenuButton extends StatelessWidget {
   /// Icono opcional que acompaña a la etiqueta (generalmente [Icon]).
   final Widget? icon;
 
-  /// Color de fondo opcional (por defecto transparente).
+  /// Color de fondo opcional. Si se omite, usa indigo con 12 % de opacidad.
   final Color? backgroundColor;
 
-  /// Color de texto e icono personalizado.
-  /// Si se omite, toma el color del tema o del contexto (p. ej. [AppBarTheme.foregroundColor] o [ColorScheme.primary]).
+  /// Color de texto e icono personalizado. Si se omite, usa `colorScheme.primary`.
   final Color? foregroundColor;
 
   /// Relleno interno del botón. Por defecto `symmetric(horizontal: 14, vertical: 10)`.
@@ -47,9 +49,14 @@ class TertiaryMenuButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final backgroundSeed = backgroundColor ?? AppThemeTokens.indigo;
+    final foregroundSeed = foregroundColor ?? Theme.of(context).colorScheme.primary;
+
     final effectiveStyle = TextButton.styleFrom(
-      backgroundColor: backgroundColor,
-      foregroundColor: foregroundColor,
+      backgroundColor: backgroundColor ?? backgroundSeed.withValues(alpha: 0.12),
+      foregroundColor: foregroundSeed,
+      disabledBackgroundColor: backgroundSeed.withValues(alpha: 0.06),
+      disabledForegroundColor: foregroundSeed.withValues(alpha: 0.38),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       visualDensity: VisualDensity.compact,
       tapTargetSize: MaterialTapTargetSize.shrinkWrap,

@@ -8,6 +8,7 @@ import 'package:kardex_app_front/widgets/gates/role_permission_gate.dart';
 import 'package:kardex_app_front/widgets/gates/root_user_gate.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 import 'package:kardex_app_front/widgets/dividers/menu_section_divider.dart';
+import 'package:kardex_app_front/widgets/shortcut_addable_list_tile.dart';
 import 'desktop_submenu_card.dart';
 
 class DesktopSubmenuPanel extends StatefulWidget {
@@ -177,6 +178,13 @@ class _DesktopSubmenuPanelState extends State<DesktopSubmenuPanel> {
       },
     );
 
+    if (item.routeName != null) {
+      card = ShortcutAddableListTile(
+        routeName: item.routeName!,
+        child: card,
+      );
+    }
+
     if (item.isExpirationGate) {
       card = ExpirationDateGate(child: card);
     }
@@ -235,13 +243,17 @@ class _DesktopSubmenuPanelState extends State<DesktopSubmenuPanel> {
               children: [
                 Row(
                   children: [
-                    Text(
-                      category.title,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                        letterSpacing: -0.4,
+                    Flexible(
+                      child: Text(
+                        category.title,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                          letterSpacing: -0.4,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -269,6 +281,8 @@ class _DesktopSubmenuPanelState extends State<DesktopSubmenuPanel> {
                     fontSize: 13,
                     color: Colors.grey.shade600,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),

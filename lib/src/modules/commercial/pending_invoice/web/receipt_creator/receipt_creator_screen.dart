@@ -9,6 +9,7 @@ import 'package:kardex_app_front/src/modules/commercial/pending_invoice/cubit/re
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/cubit/write_receipt_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/modals/confirm_receipt_modal.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/web/receipt_creator/modals/partial_payment_modal.dart';
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/receipt_viewer.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/widget/pending_invoices_statement_image_dialog.dart';
@@ -169,11 +170,7 @@ class _CreateReceiptBottomBar extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue.shade700,
-                  foregroundColor: Colors.white,
-                ),
+              PrimaryMenuButton(
                 onPressed: () async {
                   if (creditNoteTotal > 0 && creditNoteTotal > (total - devolutionTotal)) {
                     await DialogManager.showErrorDialog(
@@ -278,7 +275,7 @@ class _CreateReceiptBottomBar extends StatelessWidget {
                   if (!context.mounted) return;
                   context.read<WriteReceiptCubit>().createNewReceipt(createReceipt);
                 },
-                child: const Text("Abonar"),
+                label: const Text("Abonar"),
               ),
 
               const SizedBox(width: 24),

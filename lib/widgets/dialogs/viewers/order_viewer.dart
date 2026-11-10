@@ -311,15 +311,28 @@ class OrderViewerContent extends StatelessWidget {
                             ),
                           ),
                           Expanded(
-                            child: Text(
-                              saleItem.formattedDisplayQuantity,
-                              textAlign: TextAlign.center,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  saleItem.formattedDisplayQuantity,
+                                  textAlign: TextAlign.center,
+                                ),
+                                if (saleItem.bonQuantity > 0)
+                                  Text(
+                                    "+ ${saleItem.formattedDisplayBonQuantity} bonif.",
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(color: Colors.grey, fontSize: 11),
+                                  ),
+                              ],
                             ),
                           ),
                           Expanded(
                             flex: 2,
                             child: Text(
-                              NumberFormatter.convertFromCentsToDouble(saleItem.price).toString(),
+                              NumberFormatter.convertFromCentsToDouble(
+                                saleItem.price * saleItem.conversionFactor,
+                              ).toString(),
                               textAlign: TextAlign.center,
                             ),
                           ),

@@ -51,6 +51,8 @@ class ClientInvoiceViewController extends ChangeNotifier {
 
   bool get hasZeroPriceItems => items.any((item) => item.newPrice <= 0);
 
+  bool get hasItemsWithZeroBaseQuantity => items.any((item) => item.baseQuantity <= 0);
+
   DateTime get selectedDate => _selectedDate ?? DateTime.now();
   set selectedDate(DateTime value) {
     _selectedDate = value;
@@ -108,9 +110,7 @@ class ClientInvoiceViewController extends ChangeNotifier {
       return SaleItem(
         product: ProductItem.fromJson({
           ...product.toJson(),
-          'unitName': commercial.selectedUnitName.isNotEmpty
-              ? commercial.selectedUnitName
-              : product.unitName,
+          'unitName': commercial.selectedUnitName.isNotEmpty ? commercial.selectedUnitName : product.unitName,
         }),
         selectedPrice: commercial.selectedPriceLevel,
         cost: product.account.averageCost,
@@ -121,6 +121,9 @@ class ClientInvoiceViewController extends ChangeNotifier {
         subTotal: commercial.subTotal,
         total: commercial.total,
         conversionFactor: commercial.conversionFactor,
+        selectedUnitName: commercial.selectedUnitName.isNotEmpty ? commercial.selectedUnitName : product.unitName,
+        standardUnitName: product.defaultUnitName,
+        standardUnitFactor: product.defaultUnitFactor,
       );
     }).toList();
 

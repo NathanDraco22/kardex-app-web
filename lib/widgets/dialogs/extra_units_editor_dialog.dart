@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/constants/feature_flags.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
 class ExtraUnitsEditorResult {
   final List<ExtraUnit> extraUnits;
   final int defaultUnitIndex;
   final int wholesaleUnitIndex;
+  final String baseUnitName;
 
   ExtraUnitsEditorResult({
     required this.extraUnits,
     required this.defaultUnitIndex,
     required this.wholesaleUnitIndex,
+    required this.baseUnitName,
   });
 }
 
@@ -57,6 +60,7 @@ class _ExtraUnitsEditorDialogState extends State<ExtraUnitsEditorDialog> {
   late List<ExtraUnit> extraUnits;
   late int defaultUnitIndex;
   late int wholesaleUnitIndex;
+  late String _baseUnitName;
 
   @override
   void initState() {
@@ -64,6 +68,7 @@ class _ExtraUnitsEditorDialogState extends State<ExtraUnitsEditorDialog> {
     extraUnits = List.from(widget.initialExtraUnits);
     defaultUnitIndex = widget.initialDefaultUnitIndex;
     wholesaleUnitIndex = widget.initialWholesaleUnitIndex;
+    _baseUnitName = widget.baseUnitName.trim();
     _validateDefaultUnitIndex();
     _validateWholesaleUnitIndex();
   }
@@ -123,7 +128,7 @@ class _ExtraUnitsEditorDialogState extends State<ExtraUnitsEditorDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final String baseUnitName = widget.baseUnitName.isEmpty ? 'Unidad Base' : widget.baseUnitName;
+    final String baseUnitName = _baseUnitName.isEmpty ? 'Unidad Base' : _baseUnitName;
     final defaultUnitNameText = defaultUnitIndex == 0 ? baseUnitName : extraUnits[defaultUnitIndex - 1].name;
 
     return ShortcutContainer(
@@ -132,23 +137,36 @@ class _ExtraUnitsEditorDialogState extends State<ExtraUnitsEditorDialog> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text('Unidades de Medida Extra'),
-            FilledButton.tonalIcon(
-              onPressed: () async {
-                final preset = await showUnitScalePresetSelectorDialog(context);
-                if (preset != null) {
+            if (FeatureFlags.showUnitScales)
+              FilledButton.tonalIcon(
+                onPressed: () async {
+                  final preset = await showUnitScalePresetSelectorDialog(context);
+                  if (preset == null) return;
+                  if (!context.mounted) return;
+
+                  if (preset.baseUnit.isNotEmpty && _baseUnitName.isNotEmpty && preset.baseUnit != _baseUnitName) {
+                    final confirmed = await DialogManager.confirmActionDialog(
+                      context,
+                      'Se cambiará la unidad base de "$_baseUnitName" a "${preset.baseUnit}". '
+                      'Los productos existentes conservan su copia de la escala anterior.',
+                    );
+                    if (!confirmed) return;
+                  }
+
+                  if (!mounted) return;
                   setState(() {
                     extraUnits.clear();
                     extraUnits.addAll(preset.units);
                     defaultUnitIndex = preset.defaultUnitIndex;
                     wholesaleUnitIndex = preset.wholesaleUnitIndex;
+                    _baseUnitName = preset.baseUnit;
                     _validateDefaultUnitIndex();
                     _validateWholesaleUnitIndex();
                   });
-                }
-              },
-              icon: const Icon(Icons.auto_awesome, size: 18),
-              label: const Text("Cargar Preset"),
-            ),
+                },
+                icon: const Icon(Icons.auto_awesome, size: 18),
+                label: const Text("Cargar Preset"),
+              ),
           ],
         ),
         content: SizedBox(
@@ -285,7 +303,7 @@ class _ExtraUnitsEditorDialogState extends State<ExtraUnitsEditorDialog> {
               Builder(
                 builder: (context) {
                   // RegisShortcutNotification(onAdd: () => _addExtraUnit()).dispatch(context);
-                  return ElevatedButton.icon(
+                  return PrimaryMenuButton(
                     autofocus: true,
                     onPressed: _addExtraUnit,
                     icon: const Icon(Icons.add),
@@ -301,15 +319,16 @@ class _ExtraUnitsEditorDialogState extends State<ExtraUnitsEditorDialog> {
             onPressed: () => context.pop(null),
             child: const Text('Cancelar'),
           ),
-          ElevatedButton(
+          PrimaryMenuButton(
             onPressed: () => context.pop(
               ExtraUnitsEditorResult(
                 extraUnits: extraUnits,
                 defaultUnitIndex: defaultUnitIndex,
                 wholesaleUnitIndex: wholesaleUnitIndex,
+                baseUnitName: _baseUnitName.trim(),
               ),
             ),
-            child: const Text('Guardar'),
+            label: const Text('Guardar'),
           ),
         ],
       ),
@@ -387,9 +406,9 @@ class _ExtraUnitsEditorDialogState extends State<ExtraUnitsEditorDialog> {
               onPressed: () => Navigator.pop(context),
               child: const Text("Cancelar"),
             ),
-            ElevatedButton(
+            PrimaryMenuButton(
               onPressed: addAction,
-              child: Text(isEditing ? "Guardar Cambios" : "Agregar"),
+              label: Text(isEditing ? "Guardar Cambios" : "Agregar"),
             ),
           ],
         );

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/cubits/expense_category_cubit/read_expense_categories_cubit.dart';
 import 'package:kardex_app_front/src/cubits/expense_category_cubit/write_expense_categories_cubit.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 
 import '../dialogs/create_expense_category_dialog.dart';
 import '../widgets/expense_category_table.dart';
