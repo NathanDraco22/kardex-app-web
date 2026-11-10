@@ -52,9 +52,11 @@ Al tocar un producto del catálogo se abre el **"Editor de Inventario y Precios"
 
 - **Agregar al inventario**: cantidad, costo unitario y, si aplica, fecha de vencimiento.
 - **Restar al inventario**: cantidad a descontar.
-- **Precios de venta** (principal y alternativos) con guardado directo.
-- **Editar Producto**: acceso al formulario maestro para corregir datos.
-- Indicadores de costo promedio, existencia y alerta si el precio queda por debajo del costo.
+- **Precios de venta (1 a 4 niveles)**, con precio equivalente por unidad extra (caja, docena, etc.) y guardado directo.
+- **Margen automático por unidad** cuando `AppSettings.useDefaultProfitMargin` está activo.
+- **Comparativa de costos** (promedio, última compra y máximo) en unidad base y en la unidad seleccionada.
+- **Editar Producto**: acceso al formulario maestro para corregir datos, incluidas las unidades y escalas.
+- Indicadores de existencia y alerta si el precio queda por debajo del costo.
 
 Este editor es la pieza que reemplaza, para el día a día, la combinación de "documento de entrada + catálogo de precios" de `main`.
 
