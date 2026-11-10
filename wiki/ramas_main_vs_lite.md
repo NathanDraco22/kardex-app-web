@@ -137,12 +137,20 @@ Lo que `lite` **no** incluye: Movimientos de un Producto (kárdex), Ajustes y Me
 
 ## 8. Reglas para desarrollo y mantenimiento
 
+> [!IMPORTANT]
+> Todo cambio en `main` debe evaluarse para `lite` antes de cerrar la tarea. Si aplica, definir si entra como código compartido (vía `main → lite`) o como implementación lite-only. No asumir que llegará solo.
+
 1. **`lite` no es un feature flag de `main`.** Son dos modelos operativos. No asumas que una mejora de `main` aplica igual en `lite`.
 2. **No habilitar `product-movements` en `lite` sin implementar kárdex.** La pantalla quedaría vacía porque no hay asientos que leer.
 3. **No portar el editor directo de stock a `main` sin evaluar el kárdex.** En `main`, el flujo formal y la auditoría son parte del valor del producto.
 4. **Mantener los documentos en `lite`.** Aunque sean directos, siguen siendo el respaldo operativo del cliente.
 5. **Revisar ambas ramas ante cualquier cambio de navegación.** La matriz técnica y las reglas están en [sistema_navegacion.md](./sistema_navegacion.md#7-guía-práctica-para-desarrolladores), sección 7.3.
 6. **Actualizar este documento si cambia el flujo de producto/stock/precio.** La documentación debe explicar la intención, no solo la pantalla.
+7. **Evaluar todo cambio de `main` para `lite`.** Antes de dar por terminado un cambio en `main`, revisar si aplica a la operación lite y documentar la decisión:
+   - **Compartido:** entra por `main` y se baja con `git merge main` a `lite`.
+   - **Lite-only:** se implementa en `lite`.
+   - **No aplica:** se deja constancia del motivo.
+   No asumir que el cambio llegará a `lite` solo por existir en `main`.
 
 ---
 
