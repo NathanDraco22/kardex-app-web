@@ -102,7 +102,7 @@ lib/src/modules/settings/
 #### Uso Operativo del Margen de Ganancia Sugerido:
 1. **Editor de Precios de Producto (`ProductPriceEditorScreen`):**
    - Si `useDefaultProfitMargin` está encendido y el producto cuenta con costo registrado (`averageCost` o `lastCost`), se renderiza una tarjeta destacada con el porcentaje configurado y el precio sugerido calculado ($\text{Costo} \times [1 + \frac{\text{Margen}}{100}]$).
-   - Al pulsar el botón **"Usar Precio Sugerido"**, se carga inmediatamente dicho valor en el Precio de Venta principal (`currentSalePrice` y su campo de texto).
+   - Al pulsar el botón **"Usar Precio Sugerido"**, `SuggestedPriceCard` aplica el valor al primer nivel mediante `PriceLevelSyncController.applySuggestedBasePrice`, actualizando el precio base y su equivalente por unidad extra.
 2. **Creación Rápida de Producto con Datos (`CreateProductWithDataDialog`):**
    - Al tipear el costo unitario en el formulario, un `AnimatedBuilder` calcula en tiempo real el precio de venta sugerido y despliega el botón **"Usar Precio Sugerido"** para transferirlo directamente al campo `priceController`.
 
