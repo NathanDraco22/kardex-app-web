@@ -173,6 +173,7 @@ class _ContentSection extends StatelessWidget {
                           : Colors.red.shade900,
                       textAlign: TextAlign.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
+                      showBase: false,
                     ),
                     const SizedBox(height: 12),
 

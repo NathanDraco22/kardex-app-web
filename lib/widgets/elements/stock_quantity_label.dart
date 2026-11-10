@@ -14,6 +14,7 @@ class StockQuantityLabel extends StatelessWidget {
     this.color,
     this.textAlign = TextAlign.start,
     this.crossAxisAlignment = CrossAxisAlignment.start,
+    this.showBase = true,
   });
 
   final int baseStock;
@@ -25,6 +26,9 @@ class StockQuantityLabel extends StatelessWidget {
   final Color? color;
   final TextAlign textAlign;
   final CrossAxisAlignment crossAxisAlignment;
+
+  /// Si es `false`, solo muestra la cantidad en la unidad de venta.
+  final bool showBase;
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +53,7 @@ class StockQuantityLabel extends StatelessWidget {
             color: color,
           ),
         ),
-        if (hasConversion) ...[
+        if (hasConversion && showBase) ...[
           const SizedBox(height: 2),
           Text(
             "Base: $baseStock $baseUnitName",

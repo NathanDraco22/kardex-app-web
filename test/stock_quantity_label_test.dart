@@ -58,4 +58,23 @@ void main() {
     expect(find.text('60 Libra'), findsOneWidget);
     expect(find.textContaining('Base:'), findsNothing);
   });
+
+  testWidgets('puede ocultar la equivalencia en unidad base', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: StockQuantityLabel(
+            baseStock: 60,
+            baseUnitName: 'Unidad',
+            displayUnitName: 'Caja x30',
+            displayUnitFactor: 30,
+            showBase: false,
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('2 Caja x30'), findsOneWidget);
+    expect(find.textContaining('Base:'), findsNothing);
+  });
 }
