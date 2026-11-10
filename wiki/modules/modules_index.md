@@ -15,7 +15,7 @@ Este documento ofrece un panorama general y conciso de cada uno de los módulos 
 | **Escalas de Unidades** | `product_catalog/unit_scales/` | Plantillas de conversión estandarizadas (Peso, Volumen, Longitud, Tiempo y personalizadas) para productos. | [unit_scales.md](./unit_scales.md) |
 | **Cuentas Pendientes** | `pending_accounts/` | Cuentas por cobrar, cartera de deudores, sesiones de crédito y aplicación de abonos a facturas pendientes. | [pending_accounts.md](./pending_accounts.md) |
 | **Finanzas** | `finance/` | Cierre diario y resumen ejecutivo de sucursal, reportes por rangos de fecha, arqueos de operaciones y estados de cuenta de clientes. | [finance.md](./finance.md) |
-| **Gastos** | `expenses/` | Registro de gastos operativos de caja/banco, pagos a proveedores, centros de costos/categorías y reportes analíticos de egresos. | [expenses.md](./expenses.md) |
+| **Gastos** | `expenses/` | Hub de egresos con listas operativas/proveedor, formularios adaptativos, visores de solo lectura, categorías y reporte por período con KPIs, consolidado y exportación CSV/PDF. | [expenses.md](./expenses.md) |
 | **Catálogo de Clientes** | `client_catalog/` | Directorio de clientes, límites de crédito, grupos comerciales, balances iniciales históricos y mapa geolocalizado de clientes. | [client_catalog.md](./client_catalog.md) |
 | **Catálogo de Proveedores** | `suppliers_catalog/` | Directorio de abastecedores de mercancía, plazos de pago, condiciones crediticias e integración con compras e inventario. | [suppliers_catalog.md](./suppliers_catalog.md) |
 | **Configuración** | `settings/` | Administración de sucursales (`isCommerce`), usuarios, roles y permisos, llaves de API, periféricos/impresoras y matriz de precios. | [settings.md](./settings.md) |
@@ -66,7 +66,9 @@ Este documento ofrece un panorama general y conciso de cada uno de los módulos 
 ### 6. Gastos (`expenses`)
 - **Enfoque:** Control de egresos no relacionados a compra directa de inventario.
 - **Puntos Críticos:**
-  - Clasificación por categorías contables para monitorear el gasto operativo de cada sucursal.
+  - Hub único con listas compartidas responsive (tabla/cards), KPIs, filtros y paginación; editar/eliminar sujetos a la regla de 4 horas y “Marcar como pagado” solo si el gasto está pendiente.
+  - Formularios adaptativos (diálogo desktop y pantalla completa móvil), visor de solo lectura, categorías con búsqueda y reporte por período con detalle/consolidado y exportación CSV/PDF.
+  - La fecha del reporte y sus columnas/exportaciones usan `createdAt` (“Registro”); `date` queda como fecha del documento.
 
 ### 7. Clientes y Proveedores (`client_catalog` & `suppliers_catalog`)
 - **Enfoque:** Directorios de contrapartes comerciales.

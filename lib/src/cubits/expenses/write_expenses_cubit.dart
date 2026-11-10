@@ -19,29 +19,39 @@ class WriteExpenseCubit extends Cubit<WriteExpenseState> {
     }
   }
 
-  Future<void> update(String expenseId, UpdateExpense expense) async {
+  Future<bool> update(String expenseId, UpdateExpense expense) async {
     emit(WritingExpense());
     try {
       final updated = await expensesRepository.updateExpenseById(expenseId, expense);
-      if (updated != null) {
-        emit(ExpenseUpdated(updated));
-        emit(WriteExpenseInitial());
+      if (updated == null) {
+        emit(WriteExpenseError('No se pudo actualizar el gasto.'));
+        return false;
       }
+
+      emit(ExpenseUpdated(updated));
+      emit(WriteExpenseInitial());
+      return true;
     } catch (error) {
       emit(WriteExpenseError(error.toString()));
+      return false;
     }
   }
 
-  Future<void> delete(String expenseId) async {
+  Future<bool> delete(String expenseId) async {
     emit(WritingExpense());
     try {
       final deleted = await expensesRepository.deleteExpenseById(expenseId);
-      if (deleted != null) {
-        emit(ExpenseDeleted(deleted));
-        emit(WriteExpenseInitial());
+      if (deleted == null) {
+        emit(WriteExpenseError('No se pudo eliminar el gasto.'));
+        return false;
       }
+
+      emit(ExpenseDeleted(deleted));
+      emit(WriteExpenseInitial());
+      return true;
     } catch (error) {
       emit(WriteExpenseError(error.toString()));
+      return false;
     }
   }
 }

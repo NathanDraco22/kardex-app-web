@@ -12,6 +12,7 @@ class ExpenseCategoryDropdown extends StatelessWidget {
     this.categories,
     this.showAllOption = false,
     this.isRequired = false,
+    this.decoration,
   });
 
   final String? value;
@@ -21,6 +22,7 @@ class ExpenseCategoryDropdown extends StatelessWidget {
   final List<ExpenseCategoryInDb>? categories;
   final bool showAllOption;
   final bool isRequired;
+  final InputDecoration? decoration;
 
   @override
   Widget build(BuildContext context) {
@@ -28,15 +30,13 @@ class ExpenseCategoryDropdown extends StatelessWidget {
     final allCategories = categories ?? context.read<ExpenseCategoriesRepository>().expenseCategories;
 
     // Filtrar únicamente categorías activas y no eliminadas
-    final filteredCategories = allCategories
-        .where((c) => c.isActive && !c.isDeleted)
-        .toList();
+    final filteredCategories = allCategories.where((c) => c.isActive && !c.isDeleted).toList();
 
     // Si el valor actual no está en la lista filtrada pero no es nulo/vacío, lo agregamos para evitar que Dropdown aborte
     final hasValue = value != null && value!.isNotEmpty;
     final valueExistsInFiltered = filteredCategories.any((c) => c.name == value);
-    
-    // Si el valor actual existe en la lista general de categorías (pero desactivada o eliminada), 
+
+    // Si el valor actual existe en la lista general de categorías (pero desactivada o eliminada),
     // lo agregamos temporalmente para no causar error visual de selección.
     List<ExpenseCategoryInDb> finalCategories = [...filteredCategories];
     if (hasValue && !valueExistsInFiltered) {
@@ -58,11 +58,16 @@ class ExpenseCategoryDropdown extends StatelessWidget {
 
     return DropdownButtonFormField<String?>(
       initialValue: value == "" ? null : value,
-      decoration: InputDecoration(
-        border: const OutlineInputBorder(),
-        label: Text(isRequired ? "$label*" : label),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      ),
+      // Las variantes con decoración personalizada (formularios) ocupan todo
+      // el ancho disponible para evitar desbordes con nombres largos.
+      isExpanded: decoration != null,
+      decoration:
+          decoration ??
+          InputDecoration(
+            border: const OutlineInputBorder(),
+            label: Text(isRequired ? "$label*" : label),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          ),
       items: [
         if (showAllOption)
           const DropdownMenuItem<String?>(
