@@ -50,8 +50,8 @@ El sistema crea el producto y su información de inventario/precio para la sucur
 
 Al tocar un producto del catálogo se abre el **"Editor de Inventario y Precios"**, que reúne:
 
-- **Agregar al inventario**: cantidad, costo unitario y, si aplica, fecha de vencimiento.
-- **Restar al inventario**: cantidad a descontar.
+- **Agregar al inventario**: cantidad y costo unitario en la unidad de venta por defecto (con selector de unidad y conversión a base), y fecha de vencimiento si aplica.
+- **Restar al inventario**: cantidad en la unidad de venta por defecto, con conversión a base y validación contra la existencia.
 - **Precios de venta (1 a 4 niveles)**, con precio equivalente por unidad extra (caja, docena, etc.) y guardado directo.
 - **Margen automático por unidad** cuando `AppSettings.useDefaultProfitMargin` está activo.
 - **Comparativa de costos** (promedio, última compra y máximo) en unidad base y en la unidad seleccionada.
