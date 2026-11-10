@@ -5,6 +5,9 @@ Bienvenido a la documentación arquitectónica y técnica de **Kardex App Front*
 > [!IMPORTANT]
 > **Lectura Obligatoria:** Cualquier desarrollador o agente de Inteligencia Artificial que trabaje en esta aplicación **DEBE leer este documento y [modules_index.md](./modules/modules_index.md) antes de realizar cualquier acción, análisis o modificación de código**.
 
+> [!IMPORTANT]
+> **Regla de ediciones `main` / `lite`:** todo cambio realizado en `main` debe evaluarse explícitamente para `lite` antes de darse por terminado. Consulta el flujo y las reglas en [ramas_main_vs_lite.md](./ramas_main_vs_lite.md#8-reglas-para-desarrollo-y-mantenimiento).
+
 ---
 
 ## 1. Visión General del Proyecto
