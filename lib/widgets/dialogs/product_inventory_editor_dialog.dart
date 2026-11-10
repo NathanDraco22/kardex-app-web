@@ -393,6 +393,8 @@ class _RootScaffoldState extends State<_RootScaffold> {
 
                                         final res = await showSubstractProductInventoryDialog(
                                           context,
+                                          product: currentProduct,
+                                          allowNegativeStock: getIt<AppSettingsCubit>().allowNegativeStock,
                                         );
 
                                         if (res == null) return;
@@ -426,7 +428,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
 
                                   final res = await showAddProductInventoryDialog(
                                     context,
-                                    currentAverageCost: currentProduct.account.averageCost,
+                                    product: currentProduct,
                                   );
 
                                   if (res == null) return;
