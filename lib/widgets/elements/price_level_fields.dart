@@ -84,8 +84,8 @@ class PriceLevelsSection extends StatelessWidget {
   final PriceLevelSyncController controller;
   final VoidCallback onChanged;
 
-  /// Títulos por nivel. Si se omite, se generan como "Precio de Venta",
-  /// "Precio de Venta 2", etc. usando el símbolo de moneda configurado.
+  /// Títulos por nivel. Si se omite, se generan como "Precio Venta 1",
+  /// "Precio Venta 2", etc. usando el símbolo de moneda configurado.
   final List<String>? titles;
 
   final double spacing;
@@ -126,7 +126,6 @@ class PriceLevelsSection extends StatelessWidget {
       return titles![index];
     }
 
-    final suffix = index == 0 ? '' : ' ${index + 1}';
-    return 'Precio de Venta$suffix (${NumberFormatter.currencySymbol})';
+    return 'Precio Venta ${index + 1} (${NumberFormatter.currencySymbol})';
   }
 }
