@@ -58,7 +58,7 @@ lib/src/modules/
   - Hero con el logo corporativo (`companyLogoUrl` de `app_settings`), nombre de la empresa, bienvenida al usuario y estado de la sesión.
   - Tarjetas principales para entrar al **Panel Administrativo** o a **Sucursales**.
   - Sección “Tus sucursales” con tarjetas que muestran logo/imagen, nombre, dirección y badge Comercio/Almacén. Un clic selecciona la sucursal y navega al home.
-  - Si solo existe una sucursal, la tarjeta “Sucursales” entra directamente; si existen varias, hace scroll a la lista.
+  - La tarjeta “Sucursales” abre siempre el diálogo `BranchSelectionDialog`, incluso si solo existe una sucursal. El diálogo resalta la sucursal actual y comparte el avatar `BranchAvatar` con las tarjetas de la sección “Tus sucursales”.
   - Chip de usuario y cierre de sesión con confirmación.
 - **Efecto:** Actualiza el estado global de la sucursal activa en `AppModeCubit` y recarga las cachés locales de inventario y precios.
 

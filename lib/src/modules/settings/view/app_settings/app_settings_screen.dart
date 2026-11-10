@@ -970,7 +970,11 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                                   if (target == null) {
                                     final allBranches = context.read<BranchesRepository>().branches;
                                     if (allBranches.isNotEmpty) {
-                                      final selected = await showBranchSelectionDialog(context, allBranches);
+                                      final selected = await showBranchSelectionDialog(
+                                        context,
+                                        allBranches,
+                                        currentBranchId: getIt<AuthCubit>().currentBranchId,
+                                      );
                                       if (selected == null) return;
                                       target = selected;
                                     }
