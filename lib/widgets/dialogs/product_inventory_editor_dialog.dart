@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/src/modules/commercial/product_price_setting/cubit/write_product_sale_profile_cubit.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
-import 'package:kardex_app_front/widgets/title_label.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
 import 'package:kardex_app_front/src/cubits/write_product_account/write_product_account_cubit.dart';
@@ -335,22 +334,15 @@ class _RootScaffoldState extends State<_RootScaffold> {
                         const SizedBox(
                           height: 16,
                         ),
-                        SizedBox(
-                          height: 50,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                child: TitleLabel(
-                                  title: "Existencia",
-                                  bigTitle: currentProduct.account.currentStock.toString(),
-                                  bigTitleColor: currentProduct.account.currentStock > 0
-                                      ? Colors.green.shade900
-                                      : Colors.red.shade900,
-                                ),
-                              ),
-                            ],
-                          ),
+                        StockQuantityLabel(
+                          title: "Existencia",
+                          baseStock: currentProduct.account.currentStock,
+                          baseUnitName: currentProduct.unitName,
+                          displayUnitName: currentProduct.defaultUnitName,
+                          displayUnitFactor: currentProduct.defaultUnitFactor,
+                          color: currentProduct.account.currentStock > 0
+                              ? Colors.green.shade900
+                              : Colors.red.shade900,
                         ),
                         const SizedBox(height: 8),
                         UnitCostComparison(

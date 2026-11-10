@@ -91,8 +91,6 @@ class _ContentSection extends StatelessWidget {
             currentProduct.account.averageCost,
           );
 
-          final stock = currentProduct.account.currentStock.toString();
-
           final price = NumberFormatter.convertToMoneyLike(
             currentProduct.saleProfile.salePrice,
           );
@@ -165,13 +163,16 @@ class _ContentSection extends StatelessWidget {
               BasicTableCell(
                 content: Column(
                   children: [
-                    Text(
-                      stock,
+                    StockQuantityLabel(
+                      baseStock: currentProduct.account.currentStock,
+                      baseUnitName: currentProduct.unitName,
+                      displayUnitName: currentProduct.defaultUnitName,
+                      displayUnitFactor: currentProduct.defaultUnitFactor,
+                      color: currentProduct.account.currentStock > 0
+                          ? Colors.green.shade900
+                          : Colors.red.shade900,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: currentProduct.account.currentStock > 0 ? Colors.green.shade900 : Colors.red.shade900,
-                      ),
+                      crossAxisAlignment: CrossAxisAlignment.center,
                     ),
                     const SizedBox(height: 12),
 
