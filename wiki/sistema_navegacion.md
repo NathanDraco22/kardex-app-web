@@ -274,3 +274,5 @@ HomeSubmoduleItem(
 Cualquier cambio que se realice en la navegación debe considerar las particularidades de `lite`:
 - **Si agregas un módulo a `main`:** Evalúa si aplica a `lite` o si debe omitirse.
 - **Si modificas `inventory_menu_screen.dart` en `main`:** Recuerda que en `lite` este archivo contiene la sección de *Catálogo de Productos* y carece de *Ajustes y Mermas*.
+
+> **Regla general:** todo cambio en `main` debe evaluarse para `lite` antes de cerrarse. Consulta [ramas_main_vs_lite.md](./ramas_main_vs_lite.md#8-reglas-para-desarrollo-y-mantenimiento).
