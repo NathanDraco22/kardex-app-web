@@ -72,193 +72,49 @@ class _RootScaffold extends StatefulWidget {
 }
 
 class _RootScaffoldState extends State<_RootScaffold> {
-  late int currentSalePrice;
-  late int currentSalePrice2;
-  late int currentSalePrice3;
-  late int currentSalePrice4;
+  late final PriceLevelSyncController priceController;
   late List<Discount> currentDiscounts;
-  ExtraUnit? selectedExtraUnit;
 
-  late final TextEditingController basePrice1Controller;
-  late final TextEditingController basePrice2Controller;
-  late final TextEditingController basePrice3Controller;
-  late final TextEditingController basePrice4Controller;
-
-  late final TextEditingController extraPrice1Controller;
-  late final TextEditingController extraPrice2Controller;
-  late final TextEditingController extraPrice3Controller;
-  late final TextEditingController extraPrice4Controller;
-
-  final FocusNode priceFocus = FocusNode();
-  final FocusNode priceFocus2 = FocusNode();
-  final FocusNode priceFocus3 = FocusNode();
-  final FocusNode priceFocus4 = FocusNode();
-
-  final FocusNode extraPriceFocus = FocusNode();
-  final FocusNode extraPriceFocus2 = FocusNode();
-  final FocusNode extraPriceFocus3 = FocusNode();
-  final FocusNode extraPriceFocus4 = FocusNode();
-
-  bool _isSyncing = false;
   bool hasLowerPrices = false;
-
-  String _centsToText(int cents) => (cents / 100).toStringAsFixed(2);
 
   @override
   void initState() {
     super.initState();
-    currentSalePrice = widget.product.saleProfile.salePrice;
-    currentSalePrice2 = widget.product.saleProfile.salePrice2;
-    currentSalePrice3 = widget.product.saleProfile.salePrice3;
-    currentSalePrice4 = widget.product.saleProfile.salePrice4;
-    currentDiscounts = [...widget.product.saleProfile.discounts];
+    final saleProfile = widget.product.saleProfile;
 
-    if (widget.product.extraUnits.isNotEmpty) {
-      if (widget.product.defaultUnitIndex > 0 &&
-          widget.product.defaultUnitIndex - 1 < widget.product.extraUnits.length) {
-        selectedExtraUnit = widget.product.extraUnits[widget.product.defaultUnitIndex - 1];
-      } else if (widget.product.wholesaleUnitIndex > 0 &&
-          widget.product.wholesaleUnitIndex - 1 < widget.product.extraUnits.length) {
-        selectedExtraUnit = widget.product.extraUnits[widget.product.wholesaleUnitIndex - 1];
-      } else {
-        selectedExtraUnit = widget.product.extraUnits.first;
-      }
-    }
-
-    final factor = selectedExtraUnit?.conversionFactor ?? 1;
-
-    basePrice1Controller = TextEditingController(text: _centsToText(currentSalePrice));
-    basePrice2Controller = TextEditingController(text: _centsToText(currentSalePrice2));
-    basePrice3Controller = TextEditingController(text: _centsToText(currentSalePrice3));
-    basePrice4Controller = TextEditingController(text: _centsToText(currentSalePrice4));
-
-    extraPrice1Controller = TextEditingController(text: _centsToText(currentSalePrice * factor));
-    extraPrice2Controller = TextEditingController(text: _centsToText(currentSalePrice2 * factor));
-    extraPrice3Controller = TextEditingController(text: _centsToText(currentSalePrice3 * factor));
-    extraPrice4Controller = TextEditingController(text: _centsToText(currentSalePrice4 * factor));
+    priceController = PriceLevelSyncController(
+      initialPrices: [
+        saleProfile.salePrice,
+        saleProfile.salePrice2,
+        saleProfile.salePrice3,
+        saleProfile.salePrice4,
+      ],
+      extraUnits: widget.product.extraUnits,
+      defaultUnitIndex: widget.product.defaultUnitIndex,
+      wholesaleUnitIndex: widget.product.wholesaleUnitIndex,
+    );
+    currentDiscounts = [...saleProfile.discounts];
 
     Future(
       () {
-        priceFocus.requestFocus();
+        priceController.baseFocusNodes.first.requestFocus();
       },
     );
   }
 
   @override
   void dispose() {
-    basePrice1Controller.dispose();
-    basePrice2Controller.dispose();
-    basePrice3Controller.dispose();
-    basePrice4Controller.dispose();
-
-    extraPrice1Controller.dispose();
-    extraPrice2Controller.dispose();
-    extraPrice3Controller.dispose();
-    extraPrice4Controller.dispose();
-
-    priceFocus.dispose();
-    priceFocus2.dispose();
-    priceFocus3.dispose();
-    priceFocus4.dispose();
-
-    extraPriceFocus.dispose();
-    extraPriceFocus2.dispose();
-    extraPriceFocus3.dispose();
-    extraPriceFocus4.dispose();
-
+    priceController.dispose();
     super.dispose();
   }
 
-  void _updateAllExtraControllers() {
-    final factor = selectedExtraUnit?.conversionFactor ?? 1;
-    _isSyncing = true;
-    try {
-      extraPrice1Controller.text = _centsToText(currentSalePrice * factor);
-      extraPrice2Controller.text = _centsToText(currentSalePrice2 * factor);
-      extraPrice3Controller.text = _centsToText(currentSalePrice3 * factor);
-      extraPrice4Controller.text = _centsToText(currentSalePrice4 * factor);
-    } finally {
-      _isSyncing = false;
-    }
-  }
-
-  void _onBasePriceChanged(int level, String value) {
-    if (_isSyncing) return;
-    _isSyncing = true;
-    try {
-      final formattedValue = value.replaceAll(",", "");
-      final valDouble = double.tryParse(formattedValue) ?? 0.0;
-      final cents = (valDouble * 100).round();
-
-      final factor = selectedExtraUnit?.conversionFactor ?? 1;
-      final extraCents = cents * factor;
-      final extraText = _centsToText(extraCents);
-
-      switch (level) {
-        case 1:
-          currentSalePrice = cents;
-          extraPrice1Controller.text = extraText;
-          break;
-        case 2:
-          currentSalePrice2 = cents;
-          extraPrice2Controller.text = extraText;
-          break;
-        case 3:
-          currentSalePrice3 = cents;
-          extraPrice3Controller.text = extraText;
-          break;
-        case 4:
-          currentSalePrice4 = cents;
-          extraPrice4Controller.text = extraText;
-          break;
-      }
-      setState(() {});
-    } finally {
-      _isSyncing = false;
-    }
-  }
-
-  void _onExtraPriceChanged(int level, String value) {
-    if (_isSyncing) return;
-    _isSyncing = true;
-    try {
-      final formattedValue = value.replaceAll(",", "");
-      final extraDouble = double.tryParse(formattedValue) ?? 0.0;
-      final factor = selectedExtraUnit?.conversionFactor ?? 1;
-
-      final baseCents = factor > 0 ? ((extraDouble * 100) / factor).round() : (extraDouble * 100).round();
-      final baseText = _centsToText(baseCents);
-
-      switch (level) {
-        case 1:
-          currentSalePrice = baseCents;
-          basePrice1Controller.text = baseText;
-          break;
-        case 2:
-          currentSalePrice2 = baseCents;
-          basePrice2Controller.text = baseText;
-          break;
-        case 3:
-          currentSalePrice3 = baseCents;
-          basePrice3Controller.text = baseText;
-          break;
-        case 4:
-          currentSalePrice4 = baseCents;
-          basePrice4Controller.text = baseText;
-          break;
-      }
-      setState(() {});
-    } finally {
-      _isSyncing = false;
-    }
-  }
-
   void _saveProduct() {
+    final prices = priceController.prices;
     final updatedDto = UpdateProductSaleProfile(
-      salePrice: currentSalePrice,
-      salePrice2: currentSalePrice2,
-      salePrice3: currentSalePrice3,
-      salePrice4: currentSalePrice4,
+      salePrice: prices[0],
+      salePrice2: prices[1],
+      salePrice3: prices[2],
+      salePrice4: prices[3],
       discounts: currentDiscounts,
     );
     final branchId = getIt<AuthCubit>().currentBranchId;
@@ -269,64 +125,15 @@ class _RootScaffoldState extends State<_RootScaffold> {
     );
   }
 
-  Widget _buildPriceInput({
-    required String keyStr,
-    required String title,
-    required FocusNode baseFocusNode,
-    required TextEditingController baseController,
-    required ValueChanged<String> onBaseChanged,
-    FocusNode? extraFocusNode,
-    TextEditingController? extraController,
-    ValueChanged<String>? onExtraChanged,
-  }) {
-    final baseInputField = TitleTextField(
-      key: Key(keyStr),
-      title: title,
-      focusNode: baseFocusNode,
-      keyboardType: TextInputType.number,
-      controller: baseController,
-      onChanged: onBaseChanged,
-      textInputAction: TextInputAction.next,
-      inputFormatters: [DoubleThousandsFormatter()],
-    );
-
-    if (widget.product.extraUnits.isEmpty || selectedExtraUnit == null || extraController == null) {
-      return baseInputField;
-    }
-
-    final extraUnit = selectedExtraUnit!;
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: baseInputField,
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: TitleTextField(
-            key: Key("${keyStr}_extra"),
-            title: "Por ${extraUnit.name} (${NumberFormatter.currencySymbol}):",
-            focusNode: extraFocusNode,
-            keyboardType: TextInputType.number,
-            controller: extraController,
-            onChanged: onExtraChanged,
-            textInputAction: TextInputAction.next,
-            inputFormatters: [DoubleThousandsFormatter()],
-          ),
-        ),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    final currentPrices = priceController.prices;
     hasLowerPrices =
         [
-          currentSalePrice,
-          if (currentSalePrice2 > 0) currentSalePrice2,
-          if (currentSalePrice3 > 0) currentSalePrice3,
-          if (currentSalePrice4 > 0) currentSalePrice4,
+          currentPrices[0],
+          if (currentPrices[1] > 0) currentPrices[1],
+          if (currentPrices[2] > 0) currentPrices[2],
+          if (currentPrices[3] > 0) currentPrices[3],
         ].any(
           (price) => price < widget.product.account.averageCost,
         );
@@ -455,8 +262,8 @@ class _RootScaffoldState extends State<_RootScaffold> {
                           ),
                         ],
                         baseUnitName: widget.product.unitName,
-                        selectedUnitName: selectedExtraUnit?.name ?? widget.product.unitName,
-                        selectedUnitFactor: selectedExtraUnit?.conversionFactor ?? 1,
+                        selectedUnitName: priceController.selectedUnit?.name ?? widget.product.unitName,
+                        selectedUnitFactor: priceController.factor,
                       ),
 
                       const SizedBox(
@@ -486,79 +293,16 @@ class _RootScaffoldState extends State<_RootScaffold> {
                         ),
                       ),
 
-                      if (widget.product.extraUnits.isNotEmpty && selectedExtraUnit != null) ...[
+                      if (priceController.hasExtraUnit) ...[
                         const SizedBox(height: 12),
-                        LayoutBuilder(
-                          builder: (context, constraints) {
-                            final baseInfo = Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  "Precio Base para:",
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.grey,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  widget.product.unitName,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black87,
-                                  ),
-                                ),
-                              ],
-                            );
-
-                            final unitDropdown = DropdownButtonFormField<ExtraUnit>(
-                              isExpanded: true,
-                              decoration: const InputDecoration(
-                                labelText: 'Calcular para la unidad:',
-                                border: OutlineInputBorder(),
-                                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                              ),
-                              initialValue: selectedExtraUnit,
-                              items: widget.product.extraUnits.map((extra) {
-                                return DropdownMenuItem<ExtraUnit>(
-                                  value: extra,
-                                  child: Text(
-                                    extra.name,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                );
-                              }).toList(),
-                              onChanged: (value) {
-                                if (value != null) {
-                                  setState(() {
-                                    selectedExtraUnit = value;
-                                    _updateAllExtraControllers();
-                                  });
-                                }
-                              },
-                            );
-
-                            if (constraints.maxWidth < 500) {
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  baseInfo,
-                                  const SizedBox(height: 12),
-                                  unitDropdown,
-                                ],
-                              );
-                            }
-
-                            return Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Expanded(flex: 3, child: baseInfo),
-                                const SizedBox(width: 16),
-                                Expanded(flex: 2, child: unitDropdown),
-                              ],
-                            );
+                        PriceUnitSelector(
+                          baseUnitName: widget.product.unitName,
+                          extraUnits: priceController.extraUnits,
+                          selectedUnit: priceController.selectedUnit,
+                          onChanged: (unit) {
+                            setState(() {
+                              priceController.selectUnit(unit);
+                            });
                           },
                         ),
                       ],
@@ -569,134 +313,28 @@ class _RootScaffoldState extends State<_RootScaffold> {
                           if (!appSettings.useDefaultProfitMargin) {
                             return const SizedBox.shrink();
                           }
-                          final profitMargin = appSettings.defaultProfitMargin;
                           final costInCents = widget.product.account.averageCost > 0
                               ? widget.product.account.averageCost
                               : widget.product.account.lastCost;
-                          if (costInCents <= 0) {
-                            return const SizedBox.shrink();
-                          }
-                          final suggestedPriceInCents = (costInCents * (1 + profitMargin / 100)).round();
-                          final suggestedDouble = NumberFormatter.convertFromCentsToDouble(suggestedPriceInCents);
 
-                          final factor = selectedExtraUnit?.conversionFactor ?? 1;
-                          final hasExtra = selectedExtraUnit != null && factor > 1;
-                          final extraSuggestedCents = suggestedPriceInCents * factor;
-                          final extraCostInCents = costInCents * factor;
-
-                          return Container(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                            decoration: BoxDecoration(
-                              color: Colors.blue.shade50,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: Colors.blue.shade200),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(Icons.auto_awesome, size: 20, color: Colors.blue.shade700),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        hasExtra
-                                            ? "Precio Sugerido (+${profitMargin.toStringAsFixed(profitMargin.truncateToDouble() == profitMargin ? 0 : 1)}%): ${NumberFormatter.convertToMoneyLike(extraSuggestedCents)} por ${selectedExtraUnit!.name}"
-                                            : "Precio Sugerido (+${profitMargin.toStringAsFixed(profitMargin.truncateToDouble() == profitMargin ? 0 : 1)}%): ${NumberFormatter.convertToMoneyLike(suggestedPriceInCents)}",
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.blue.shade900,
-                                        ),
-                                      ),
-                                      Text(
-                                        hasExtra
-                                            ? "Costo base: ${NumberFormatter.convertToMoneyLike(costInCents)} (${widget.product.unitName}) · Equivale a ${NumberFormatter.convertToMoneyLike(extraCostInCents)} por ${selectedExtraUnit!.name}"
-                                            : "Costo base: ${NumberFormatter.convertToMoneyLike(costInCents)}",
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.blue.shade800,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                FilledButton.tonal(
-                                  style: FilledButton.styleFrom(
-                                    visualDensity: VisualDensity.compact,
-                                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                                    textStyle: const TextStyle(color: Colors.white),
-                                  ),
-                                  onPressed: () {
-                                    currentSalePrice = suggestedPriceInCents;
-                                    basePrice1Controller.text = suggestedDouble.toString();
-                                    extraPrice1Controller.text = _centsToText(extraSuggestedCents);
-                                    setState(() {});
-                                  },
-                                  child: const Text("Usar Precio Sugerido", style: TextStyle(color: Colors.white)),
-                                ),
-                              ],
-                            ),
+                          return SuggestedPriceCard(
+                            costInCents: costInCents,
+                            profitMargin: appSettings.defaultProfitMargin,
+                            baseUnitName: widget.product.unitName,
+                            selectedUnitName: priceController.selectedUnit?.name,
+                            selectedUnitFactor: priceController.factor,
+                            onApplySuggested: (baseCents) {
+                              setState(() {
+                                priceController.applySuggestedBasePrice(baseCents);
+                              });
+                            },
                           );
                         },
                       ),
 
-                      _buildPriceInput(
-                        keyStr: "price1",
-                        title: "Precio de Venta (${NumberFormatter.currencySymbol})",
-                        baseFocusNode: priceFocus,
-                        baseController: basePrice1Controller,
-                        onBaseChanged: (val) => _onBasePriceChanged(1, val),
-                        extraFocusNode: extraPriceFocus,
-                        extraController: extraPrice1Controller,
-                        onExtraChanged: (val) => _onExtraPriceChanged(1, val),
-                      ),
-
-                      const SizedBox(
-                        height: 12,
-                      ),
-
-                      _buildPriceInput(
-                        keyStr: "price2",
-                        title: "Precio de Venta 2 (${NumberFormatter.currencySymbol})",
-                        baseFocusNode: priceFocus2,
-                        baseController: basePrice2Controller,
-                        onBaseChanged: (val) => _onBasePriceChanged(2, val),
-                        extraFocusNode: extraPriceFocus2,
-                        extraController: extraPrice2Controller,
-                        onExtraChanged: (val) => _onExtraPriceChanged(2, val),
-                      ),
-
-                      const SizedBox(
-                        height: 12,
-                      ),
-
-                      _buildPriceInput(
-                        keyStr: "price3",
-                        title: "Precio de Venta 3 (${NumberFormatter.currencySymbol})",
-                        baseFocusNode: priceFocus3,
-                        baseController: basePrice3Controller,
-                        onBaseChanged: (val) => _onBasePriceChanged(3, val),
-                        extraFocusNode: extraPriceFocus3,
-                        extraController: extraPrice3Controller,
-                        onExtraChanged: (val) => _onExtraPriceChanged(3, val),
-                      ),
-
-                      const SizedBox(
-                        height: 12,
-                      ),
-
-                      _buildPriceInput(
-                        keyStr: "price4",
-                        title: "Precio de Venta 4 (${NumberFormatter.currencySymbol})",
-                        baseFocusNode: priceFocus4,
-                        baseController: basePrice4Controller,
-                        onBaseChanged: (val) => _onBasePriceChanged(4, val),
-                        extraFocusNode: extraPriceFocus4,
-                        extraController: extraPrice4Controller,
-                        onExtraChanged: (val) => _onExtraPriceChanged(4, val),
+                      PriceLevelsSection(
+                        controller: priceController,
+                        onChanged: () => setState(() {}),
                       ),
 
                       const Divider(),
