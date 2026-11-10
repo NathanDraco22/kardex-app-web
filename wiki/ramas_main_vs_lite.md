@@ -56,7 +56,7 @@ Al tocar un producto del catálogo se abre el **"Editor de Inventario y Precios"
 - **Margen automático por unidad** cuando `AppSettings.useDefaultProfitMargin` está activo.
 - **Comparativa de costos** (promedio, última compra y máximo) en unidad base y en la unidad seleccionada.
 - **Editar Producto**: acceso al formulario maestro para corregir datos, incluidas las unidades y escalas.
-- Indicadores de existencia y alerta si el precio queda por debajo del costo.
+- Indicadores de existencia en la unidad de venta por defecto, con equivalencia en unidad base, y alerta si el precio queda por debajo del costo.
 
 Este editor es la pieza que reemplaza, para el día a día, la combinación de "documento de entrada + catálogo de precios" de `main`.
 
