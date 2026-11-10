@@ -66,3 +66,39 @@ DateTimeRange rangeFor(ExpenseReportPeriod period, {DateTime? now}) {
       return DateTimeRange(start: today, end: today);
   }
 }
+
+/// Ajusta el inicio de un rango manteniendo el fin si sigue siendo válido.
+///
+/// Si el nuevo inicio queda después del fin actual, el fin se mueve al mismo
+/// día para no dejar un rango invertido.
+DateTimeRange rangeWithStart(DateTimeRange current, DateTime start) {
+  final normalizedStart = DateTime(start.year, start.month, start.day);
+  final normalizedEnd = DateTime(
+    current.end.year,
+    current.end.month,
+    current.end.day,
+  );
+
+  return DateTimeRange(
+    start: normalizedStart,
+    end: normalizedStart.isAfter(normalizedEnd) ? normalizedStart : normalizedEnd,
+  );
+}
+
+/// Ajusta el fin de un rango manteniendo el inicio si sigue siendo válido.
+///
+/// Si el nuevo fin queda antes del inicio actual, el inicio se mueve al mismo
+/// día para no dejar un rango invertido.
+DateTimeRange rangeWithEnd(DateTimeRange current, DateTime end) {
+  final normalizedStart = DateTime(
+    current.start.year,
+    current.start.month,
+    current.start.day,
+  );
+  final normalizedEnd = DateTime(end.year, end.month, end.day);
+
+  return DateTimeRange(
+    start: normalizedEnd.isBefore(normalizedStart) ? normalizedEnd : normalizedStart,
+    end: normalizedEnd,
+  );
+}

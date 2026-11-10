@@ -3,12 +3,13 @@
 - **Contexto:** rediseño completo del módulo de Gastos (Fases 1–3) en la rama `feat/expenses-redesign`.
 - **Commits:** `32d93f6c` (base compartida y listas), `c4ddfad9` (reporte y categorías), `9c340903` (formularios, visores y hub).
 - **Fase 1:** se creó `expenses/shared/` con configuración de lista, orquestador responsive, métricas, badges, acciones, filtros, KPIs y tabla/tarjetas; se eliminaron las vistas Web/Móvil duplicadas de gastos operativos y de proveedores.
-- **Fase 2:** se rediseñaron el reporte (presets de período, KPIs, detalle paginado 100, consolidado con dona/ranking, exportación CSV/PDF) y el catálogo de categorías (grid responsive, búsqueda, badges, diálogo moderno).
+- **Fase 2:** se rediseñaron el reporte (dos campos Fecha Inicio/Fin con presets como atajos, KPIs, detalle paginado 100, consolidado con dona/ranking, exportación CSV/PDF) y el catálogo de categorías (grid responsive, búsqueda, badges, diálogo moderno).
 - **Fase 3:** formularios adaptativos (diálogo desktop con `AppDialogHeader`, pantalla completa móvil), parser robusto de montos, preservación de estado/vencimiento, visor compartido de solo lectura y hub renovado.
 - **Listas:** `ExpenseListScreen` reutiliza `ExpenseListConfig` para operativos y proveedores; incluye header, KPIs, filtros, tabla desktop/tarjetas móvil, skeletons, empty/error, paginación y acciones editar/eliminar con regla de 4 horas; “Marcar como pagado” se habilita solo si el gasto está pendiente.
 - **Paginación:** `ReadExpenseCubit.loadMore` deriva el offset de `_serverCountedIds`, usa generaciones de petición/mutación y `loadMoreError`; `loadAll` carga hasta 20 páginas para el reporte.
 - **Formularios:** el N° Documento es read-only en edición; `dateId` se genera como `YYYY-MM-DD`; se conservan estado y vencimiento originales si el usuario no cambia el crédito.
 - **Fechas:** listas y reporte filtran/muestran `createdAt` como “Registro”; `date` queda como fecha del documento. CSV/PDF también usan `createdAt` y la etiqueta “Registro”.
+- **Ajuste posterior (filtro del reporte):** se restauraron dos campos separados “Fecha Inicio” y “Fecha Fin” con calendarios individuales; los presets siguen como atajos que rellenan ambos campos y el reporte se recarga al editar una fecha. Se retiró el `showDateRangePicker` combinado y el pill “Personalizado”.
 - **Reporte:** máximo 2,000 registros cargados (20 × 100); si queda `hasMore`, la vista avisa y la exportación solo incluye los cargados.
 - **Verificación:** `flutter analyze` sin issues; `flutter test` completo con **199 tests passed**; `dart analyze packages/kardex_business` sin issues; **96 tests específicos de Gastos**.
 - **Limitación backend (categorías):** `description` e `isActive` no están en el modelo base de Pydantic (`expense_category_model.py` solo declara `name`; no declara `description` ni `isActive`); el frontend los incluye en su modelo/payload, pero el servidor los descarta y la UI usa fallback.

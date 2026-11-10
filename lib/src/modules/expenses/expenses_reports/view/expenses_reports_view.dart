@@ -80,35 +80,27 @@ class _ExpensesReportScaffoldState extends State<_ExpensesReportScaffold> {
   }
 
   Future<void> _onPeriodSelected(ExpenseReportPeriod period) async {
-    if (period == ExpenseReportPeriod.custom) {
-      final now = DateTime.now();
-      final picked = await showDateRangePicker(
-        context: context,
-        firstDate: DateTime(now.year - 5),
-        lastDate: DateTime(now.year, now.month, now.day),
-        initialDateRange: _range,
-        helpText: 'Seleccionar período',
-        saveText: 'Aplicar',
-        cancelText: 'Cancelar',
-      );
-      if (picked == null || !mounted) return;
-
-      setState(() {
-        _period = ExpenseReportPeriod.custom;
-        // El rango se conserva date-only para que el selector pueda reabrirse
-        // sin chocar con `lastDate`; _queryParams aplica start/end of day.
-        _range = DateTimeRange(
-          start: picked.start.startOfDay(),
-          end: picked.end.startOfDay(),
-        );
-      });
-      await _reload();
-      return;
-    }
+    if (period == ExpenseReportPeriod.custom) return;
 
     setState(() {
       _period = period;
       _range = rangeFor(period);
+    });
+    await _reload();
+  }
+
+  Future<void> _onStartDateChanged(DateTime start) async {
+    setState(() {
+      _period = ExpenseReportPeriod.custom;
+      _range = rangeWithStart(_range, start);
+    });
+    await _reload();
+  }
+
+  Future<void> _onEndDateChanged(DateTime end) async {
+    setState(() {
+      _period = ExpenseReportPeriod.custom;
+      _range = rangeWithEnd(_range, end);
     });
     await _reload();
   }
@@ -220,8 +212,11 @@ class _ExpensesReportScaffoldState extends State<_ExpensesReportScaffold> {
                             sliver: SliverToBoxAdapter(
                               child: ExpenseReportFilters(
                                 period: _period,
-                                range: _range,
+                                startDate: _range.start,
+                                endDate: _range.end,
                                 onPeriodSelected: _onPeriodSelected,
+                                onStartDateChanged: _onStartDateChanged,
+                                onEndDateChanged: _onEndDateChanged,
                                 onClear: _clearPeriod,
                                 onExport: items.isEmpty || isRefreshing ? null : () => _export(items),
                                 isRefreshing: isRefreshing,

@@ -336,9 +336,9 @@ Refresco robusto:
 | Últimos 7 días | Hoy y los 6 días previos. |
 | Este mes | Del día 1 del mes actual a hoy. |
 | Mes anterior | Mes calendario anterior completo. |
-| Personalizado | `showDateRangePicker` con máximo hasta hoy; el rango se guarda date-only y la consulta aplica inicio/fin de día. |
+| Fecha Inicio / Fecha Fin | Dos selectores de fecha separados. Los presets los rellenan como atajos y el usuario puede ajustar cada extremo manualmente. |
 
-La tarjeta de filtros rotula explícitamente **“Fecha de registro”**. El filtro y la columna “Registro” usan `createdAt`, no `date`.
+La tarjeta de filtros muestra **“Fecha Inicio”** y **“Fecha Fin”** como campos separados. Al cambiar cualquiera de los dos, el reporte se recarga automáticamente y no queda ningún preset resaltado. Los presets siguen disponibles como atajos que rellenan ambos campos. El filtro y la columna “Registro” usan `createdAt`, no `date`.
 
 #### Carga y límites
 
@@ -466,7 +466,7 @@ La UI se reconstruye y refleja el cambio
 Reglas:
 
 - Las listas filtran por rango de fechas y muestran la columna “Registro” con `createdAt`.
-- El reporte rotula el filtro como “Fecha de registro” y usa `createdAt` tanto en la pantalla como en CSV/PDF.
+- El reporte usa los campos “Fecha Inicio” y “Fecha Fin” y `createdAt` tanto en la pantalla como en CSV/PDF.
 - `date` sigue siendo la fecha del documento y se conserva para el formulario, el visor y la compatibilidad de datos; no es la fecha del reporte.
 - La exportación CSV/PDF usa los registros cargados del período y la etiqueta “Registro”, no `date`.
 

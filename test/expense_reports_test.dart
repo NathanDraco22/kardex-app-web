@@ -75,6 +75,102 @@ void main() {
     });
   });
 
+  group('rangos con fechas separadas', () {
+    test('mover el inicio después del fin ajusta el fin al mismo día', () {
+      final result = rangeWithStart(
+        DateTimeRange(
+          start: DateTime(2026, 11, 1),
+          end: DateTime(2026, 11, 5),
+        ),
+        DateTime(2026, 11, 10, 18),
+      );
+
+      expect(result.start, DateTime(2026, 11, 10));
+      expect(result.end, DateTime(2026, 11, 10));
+    });
+
+    test('mover el inicio antes del fin conserva el fin', () {
+      final result = rangeWithStart(
+        DateTimeRange(
+          start: DateTime(2026, 11, 5),
+          end: DateTime(2026, 11, 10),
+        ),
+        DateTime(2026, 11, 1, 9),
+      );
+
+      expect(result.start, DateTime(2026, 11, 1));
+      expect(result.end, DateTime(2026, 11, 10));
+    });
+
+    test('mover el fin antes del inicio ajusta el inicio al mismo día', () {
+      final result = rangeWithEnd(
+        DateTimeRange(
+          start: DateTime(2026, 11, 5),
+          end: DateTime(2026, 11, 10),
+        ),
+        DateTime(2026, 11, 1, 18),
+      );
+
+      expect(result.start, DateTime(2026, 11, 1));
+      expect(result.end, DateTime(2026, 11, 1));
+    });
+
+    test('mover el fin después del inicio conserva el inicio', () {
+      final result = rangeWithEnd(
+        DateTimeRange(
+          start: DateTime(2026, 11, 5),
+          end: DateTime(2026, 11, 10),
+        ),
+        DateTime(2026, 11, 15, 9),
+      );
+
+      expect(result.start, DateTime(2026, 11, 5));
+      expect(result.end, DateTime(2026, 11, 15));
+    });
+  });
+
+  group('filtros del reporte', () {
+    testWidgets('muestra dos campos de fecha y oculta Personalizado', (
+      tester,
+    ) async {
+      await tester.binding.setSurfaceSize(const Size(1280, 1000));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      ExpenseReportPeriod? selectedPeriod;
+      final range = rangeFor(
+        ExpenseReportPeriod.last7Days,
+        now: DateTime(2026, 11, 10),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: ExpenseReportFilters(
+              period: ExpenseReportPeriod.last7Days,
+              startDate: range.start,
+              endDate: range.end,
+              onPeriodSelected: (period) => selectedPeriod = period,
+              onStartDateChanged: (_) {},
+              onEndDateChanged: (_) {},
+              onClear: () {},
+              onExport: () {},
+              isRefreshing: false,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Fecha Inicio'), findsOneWidget);
+      expect(find.text('Fecha Fin'), findsOneWidget);
+      expect(find.text('Personalizado'), findsNothing);
+
+      await tester.tap(find.text('Ayer'));
+      expect(selectedPeriod, ExpenseReportPeriod.yesterday);
+      expect(tester.takeException(), isNull);
+    });
+  });
+
   group('agregación del reporte', () {
     test('consolida operativos por categoría con porcentajes', () {
       final items = [
@@ -386,8 +482,15 @@ void main() {
                     const SizedBox(height: 16),
                     ExpenseReportFilters(
                       period: ExpenseReportPeriod.last7Days,
-                      range: rangeFor(ExpenseReportPeriod.last7Days),
+                      startDate: rangeFor(
+                        ExpenseReportPeriod.last7Days,
+                      ).start,
+                      endDate: rangeFor(
+                        ExpenseReportPeriod.last7Days,
+                      ).end,
                       onPeriodSelected: (_) {},
+                      onStartDateChanged: (_) {},
+                      onEndDateChanged: (_) {},
                       onClear: () {},
                       onExport: () {},
                       isRefreshing: false,
