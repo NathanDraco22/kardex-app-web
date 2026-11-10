@@ -44,7 +44,7 @@ lib/src/modules/finance/
 - **Integración con Usuarios:** Soporta filtrado por `userId` para ver el balance individual de cada cajero/vendedor.
 
 ### 2.4. Reporte Financiero por Rango (`range_finance_report`)
-- **Propósito:** Generación de balances consolidados entre dos fechas arbitrarias (`startDate`, `endDate`), con exportación a PDF y Excel.
+- **Propósito:** Generación de balances consolidados entre dos fechas arbitrarias (`startDate`, `endDate`), incluyendo ventas, flujo de caja, créditos, abonos y gastos/egresos con desglose por tipo. Exportación a PDF y Excel.
 - **Vistas:** `RangeFinanceReportScreen`.
 - **Cubits:** `RangeFinanceReportCubit`.
 

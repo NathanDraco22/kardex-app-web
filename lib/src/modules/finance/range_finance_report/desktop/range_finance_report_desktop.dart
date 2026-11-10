@@ -61,13 +61,17 @@ class RangeFinanceReportDesktop extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(width: 20),
-                              // Columna Derecha: Flujo de Caja y Abonos Recibidos
+                              // Columna Derecha: Flujo de Caja, Gastos y Abonos Recibidos
                               Expanded(
                                 flex: 5,
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     BranchCashFlowTotalsCard(result: result),
+                                    if (result.expenses != null) ...[
+                                      const SizedBox(height: 20),
+                                      BranchExpensesTotalsCard(result: result),
+                                    ],
                                     const SizedBox(height: 20),
                                     BranchReceiptsTotalsCard(result: result),
                                   ],

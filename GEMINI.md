@@ -526,3 +526,9 @@ Esta estructura se ha seguido para módulos como 'Historial de Facturas', 'Histo
 - **Accesos:** los seis `ListTile` con `Divider` se reemplazaron por `AppActionTile` en una grilla de dos columnas en pantallas anchas y una columna en móvil.
 - **Navegación:** “Ir a sucursal” conserva `BranchSelectionDialog` con la sucursal actual resaltada.
 - **Verificación:** `flutter analyze` sin issues y `flutter test` 93/93.
+
+## Gastos en Reporte Financiero por Rango (Noviembre 2026)
+- **Backend:** `TotalsResult.expenses` opcional; agregado por `date`, `branchId`, `isDeleted=False`, `isActive=True` y opcional `createdBy.id`; `paid` por `status == "paid"` y `pending = total - paid`; incluye cancelados; índice `(branchId, date)`.
+- **Frontend:** `ExpenseTotals`/`ExpenseTypeTotal` en `kardex_business`; `TotalsResult.expenses` nullable y tolerante a backend viejo, tipos desconocidos y `byType` ausente; tarjeta `BranchExpensesTotalsCard` en desktop/tablet/móvil, oculta si el backend no envía el campo.
+- **Verificación:** `ruff`/`ty` OK; `flutter analyze` limpio; test `totals_result_expenses_test.dart` 4/4.
+- **Sin commit.**

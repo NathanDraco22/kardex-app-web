@@ -40,6 +40,10 @@ class RangeFinanceReportMobile extends StatelessWidget {
                       BranchSalesTotalsCard(result: result),
                       const SizedBox(height: 16),
                       BranchCashFlowTotalsCard(result: result),
+                      if (result.expenses != null) ...[
+                        const SizedBox(height: 16),
+                        BranchExpensesTotalsCard(result: result),
+                      ],
                       const SizedBox(height: 16),
                       BranchCreditControlCard(result: result),
                       const SizedBox(height: 16),

@@ -6,8 +6,7 @@ export 'client/client.dart';
 export 'client/client_model.dart';
 export 'client/initial_balance_model.dart';
 export 'client_group/client_group_model.dart';
-export 'client_transaction/client_transaction.dart'
-    hide TransactionSubType, TransactionType;
+export 'client_transaction/client_transaction.dart' hide TransactionSubType, TransactionType;
 export 'common/branches_detail.dart';
 export 'common/change_password.dart';
 export 'common/client_info.dart';
@@ -55,6 +54,7 @@ export 'product_stat/product_stat_in_db.dart';
 export 'product_transaction/product_transaction.dart';
 export 'receipt/receipt_model.dart';
 export 'receipt/receipt_total.dart';
+export 'reports/expense_totals.dart';
 export 'reports/totals_result.dart';
 export 'servin/servin.dart';
 export 'shortcut/shortcut_model.dart';
