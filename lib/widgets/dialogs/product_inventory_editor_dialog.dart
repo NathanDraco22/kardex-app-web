@@ -72,16 +72,8 @@ class _RootScaffold extends StatefulWidget {
 class _RootScaffoldState extends State<_RootScaffold> {
   late ProductInDbInBranch currentProduct;
 
-  late int currentSalePrice;
-  late int currentSalePrice2;
-  late int currentSalePrice3;
+  late final PriceLevelSyncController priceController;
   late List<Discount> currentDiscounts;
-
-  late final TextEditingController price1Controller;
-
-  FocusNode priceFocus = FocusNode();
-  FocusNode priceFocus2 = FocusNode();
-  FocusNode priceFocus3 = FocusNode();
 
   bool hasLowerPrices = false;
   bool stockWasModified = false;
@@ -91,33 +83,41 @@ class _RootScaffoldState extends State<_RootScaffold> {
   void initState() {
     super.initState();
     currentProduct = widget.initialProduct;
-    currentSalePrice = currentProduct.saleProfile.salePrice;
-    currentSalePrice2 = currentProduct.saleProfile.salePrice2;
-    currentSalePrice3 = currentProduct.saleProfile.salePrice3;
-    currentDiscounts = [...currentProduct.saleProfile.discounts];
-    price1Controller = TextEditingController(
-      text: NumberFormatter.convertFromCentsToDouble(
-        widget.initialProduct.saleProfile.salePrice,
-      ).toString(),
+    final saleProfile = currentProduct.saleProfile;
+
+    priceController = PriceLevelSyncController(
+      initialPrices: [
+        saleProfile.salePrice,
+        saleProfile.salePrice2,
+        saleProfile.salePrice3,
+        saleProfile.salePrice4,
+      ],
+      extraUnits: currentProduct.extraUnits,
+      defaultUnitIndex: currentProduct.defaultUnitIndex,
+      wholesaleUnitIndex: currentProduct.wholesaleUnitIndex,
     );
+    currentDiscounts = [...saleProfile.discounts];
+
     Future(
       () {
-        priceFocus.requestFocus();
+        priceController.baseFocusNodes.first.requestFocus();
       },
     );
   }
 
   @override
   void dispose() {
-    price1Controller.dispose();
+    priceController.dispose();
     super.dispose();
   }
 
   void _saveProduct() {
+    final prices = priceController.prices;
     final updatedDto = UpdateProductSaleProfile(
-      salePrice: currentSalePrice,
-      salePrice2: currentSalePrice2,
-      salePrice3: currentSalePrice3,
+      salePrice: prices[0],
+      salePrice2: prices[1],
+      salePrice3: prices[2],
+      salePrice4: prices[3],
       discounts: currentDiscounts,
     );
 
@@ -139,11 +139,13 @@ class _RootScaffoldState extends State<_RootScaffold> {
 
     final isAdmin = currentAuthState.session.isAdmin;
 
+    final currentPrices = priceController.prices;
     hasLowerPrices =
         [
-          currentSalePrice,
-          if (currentSalePrice2 > 0) currentSalePrice2,
-          if (currentSalePrice3 > 0) currentSalePrice3,
+          currentPrices[0],
+          if (currentPrices[1] > 0) currentPrices[1],
+          if (currentPrices[2] > 0) currentPrices[2],
+          if (currentPrices[3] > 0) currentPrices[3],
         ].any(
           (price) => price < currentProduct.account.averageCost,
         );
@@ -246,6 +248,11 @@ class _RootScaffoldState extends State<_RootScaffold> {
 
                       setState(() {
                         currentProduct = currentProduct.updateWithProduct(updatedProduct);
+                        priceController.updateExtraUnits(
+                          currentProduct.extraUnits,
+                          defaultUnitIndex: currentProduct.defaultUnitIndex,
+                          wholesaleUnitIndex: currentProduct.wholesaleUnitIndex,
+                        );
                         productWasModified = true;
                       });
                     },
@@ -335,15 +342,6 @@ class _RootScaffoldState extends State<_RootScaffold> {
                             children: [
                               Expanded(
                                 child: TitleLabel(
-                                  title: "Costo",
-                                  bigTitle: NumberFormatter.convertToMoneyLike(
-                                    currentProduct.account.averageCost,
-                                  ),
-                                ),
-                              ),
-                              const VerticalDivider(width: 40),
-                              Expanded(
-                                child: TitleLabel(
                                   title: "Existencia",
                                   bigTitle: currentProduct.account.currentStock.toString(),
                                   bigTitleColor: currentProduct.account.currentStock > 0
@@ -354,9 +352,27 @@ class _RootScaffoldState extends State<_RootScaffold> {
                             ],
                           ),
                         ),
-                        const SizedBox(
-                          height: 16,
+                        const SizedBox(height: 8),
+                        UnitCostComparison(
+                          items: [
+                            UnitCostItem(
+                              label: "Costo",
+                              baseCostInCents: currentProduct.account.averageCost,
+                            ),
+                            UnitCostItem(
+                              label: "Última Compra",
+                              baseCostInCents: currentProduct.account.lastCost,
+                            ),
+                            UnitCostItem(
+                              label: "Costo Máximo",
+                              baseCostInCents: currentProduct.account.maximumCost,
+                            ),
+                          ],
+                          baseUnitName: currentProduct.unitName,
+                          selectedUnitName: priceController.selectedUnit?.name ?? currentProduct.unitName,
+                          selectedUnitFactor: priceController.factor,
                         ),
+                        const SizedBox(height: 16),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -460,146 +476,47 @@ class _RootScaffoldState extends State<_RootScaffold> {
                           height: 12,
                         ),
 
+                        if (priceController.hasExtraUnit) ...[
+                          PriceUnitSelector(
+                            baseUnitName: currentProduct.unitName,
+                            extraUnits: priceController.extraUnits,
+                            selectedUnit: priceController.selectedUnit,
+                            onChanged: (unit) {
+                              setState(() {
+                                priceController.selectUnit(unit);
+                              });
+                            },
+                          ),
+                        ],
+
                         Builder(
                           builder: (context) {
                             final appSettings = getIt<AppSettingsCubit>();
                             if (!appSettings.useDefaultProfitMargin) {
                               return const SizedBox.shrink();
                             }
-                            final profitMargin = appSettings.defaultProfitMargin;
                             final costInCents = currentProduct.account.averageCost > 0
                                 ? currentProduct.account.averageCost
                                 : currentProduct.account.lastCost;
-                            if (costInCents <= 0) {
-                              return const SizedBox.shrink();
-                            }
-                            final suggestedPriceInCents = (costInCents * (1 + profitMargin / 100)).round();
-                            final suggestedDouble = NumberFormatter.convertFromCentsToDouble(suggestedPriceInCents);
 
-                            return Container(
-                              margin: const EdgeInsets.only(bottom: 12),
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                              decoration: BoxDecoration(
-                                color: Colors.blue.shade50,
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: Colors.blue.shade200),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(Icons.auto_awesome, size: 20, color: Colors.blue.shade700),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "Precio Sugerido (+${profitMargin.toStringAsFixed(profitMargin.truncateToDouble() == profitMargin ? 0 : 1)}%): ${NumberFormatter.convertToMoneyLike(suggestedPriceInCents)}",
-                                          style: TextStyle(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.blue.shade900,
-                                          ),
-                                        ),
-                                        Text(
-                                          "Calculado sobre costo (${NumberFormatter.convertToMoneyLike(costInCents)})",
-                                          style: TextStyle(fontSize: 11, color: Colors.blue.shade700),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  FilledButton.tonal(
-                                    style: FilledButton.styleFrom(
-                                      visualDensity: VisualDensity.compact,
-                                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                                      textStyle: const TextStyle(color: Colors.white),
-                                    ),
-                                    onPressed: () {
-                                      currentSalePrice = suggestedPriceInCents;
-                                      price1Controller.text = suggestedDouble.toString();
-                                      setState(() {});
-                                    },
-                                    child: const Text("Usar Precio Sugerido", style: TextStyle(color: Colors.white)),
-                                  ),
-                                ],
-                              ),
+                            return SuggestedPriceCard(
+                              costInCents: costInCents,
+                              profitMargin: appSettings.defaultProfitMargin,
+                              baseUnitName: currentProduct.unitName,
+                              selectedUnitName: priceController.selectedUnit?.name,
+                              selectedUnitFactor: priceController.factor,
+                              onApplySuggested: (baseCents) {
+                                setState(() {
+                                  priceController.applySuggestedBasePrice(baseCents);
+                                });
+                              },
                             );
                           },
                         ),
 
-                        TitleTextField(
-                          key: const Key("price1"),
-                          title: "Precio de Venta (C\$ )",
-                          focusNode: priceFocus,
-                          keyboardType: TextInputType.number,
-                          controller: price1Controller,
-                          onChanged: (value) {
-                            if (value.isEmpty) {
-                              currentSalePrice = 0;
-                              setState(() {});
-                              return;
-                            }
-                            final formattedValue = value.replaceAll(",", "");
-                            final cents = ((double.tryParse(formattedValue) ?? 0) * 100).round();
-                            currentSalePrice = cents;
-                            setState(() {});
-                          },
-                          inputFormatters: [DoubleThousandsFormatter()],
-                        ),
-
-                        const SizedBox(
-                          height: 12,
-                        ),
-
-                        TitleTextField(
-                          key: const Key("price2"),
-                          title: "Precio de Venta 2 (C\$ )",
-                          focusNode: priceFocus2,
-                          keyboardType: TextInputType.number,
-                          onChanged: (value) {
-                            if (value.isEmpty) {
-                              currentSalePrice2 = 0;
-                              setState(() {});
-                              return;
-                            }
-                            final formattedValue = value.replaceAll(",", "");
-                            final cents = ((double.tryParse(formattedValue) ?? 0) * 100).round();
-                            currentSalePrice2 = cents;
-                            setState(() {});
-                          },
-
-                          initialValue: NumberFormatter.convertFromCentsToDouble(
-                            currentProduct.saleProfile.salePrice2,
-                          ).toString(),
-
-                          inputFormatters: [DoubleThousandsFormatter()],
-                        ),
-
-                        const SizedBox(
-                          height: 12,
-                        ),
-
-                        TitleTextField(
-                          key: const Key("price3"),
-                          title: "Precio de Venta 3 (C\$ )",
-                          focusNode: priceFocus3,
-                          keyboardType: TextInputType.number,
-                          onChanged: (value) {
-                            if (value.isEmpty) {
-                              currentSalePrice3 = 0;
-                              setState(() {});
-                              return;
-                            }
-                            final formattedValue = value.replaceAll(",", "");
-                            final cents = ((double.tryParse(formattedValue) ?? 0) * 100).round();
-                            currentSalePrice3 = cents;
-                            setState(() {});
-                          },
-
-                          initialValue: NumberFormatter.convertFromCentsToDouble(
-                            currentProduct.saleProfile.salePrice3,
-                          ).toString(),
-
-                          inputFormatters: [DoubleThousandsFormatter()],
+                        PriceLevelsSection(
+                          controller: priceController,
+                          onChanged: () => setState(() {}),
                         ),
                       ],
                     ),
