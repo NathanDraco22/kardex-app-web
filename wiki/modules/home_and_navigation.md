@@ -62,7 +62,13 @@ lib/src/modules/
   - Chip de usuario y cierre de sesión con confirmación.
 - **Efecto:** Actualiza el estado global de la sucursal activa en `AppModeCubit` y recarga las cachés locales de inventario y precios.
 
-### 2.5. Atajos de Teclado (`shortcuts`)
+### 2.5. Panel Administrativo (`admin_panel`)
+- **Propósito:** Tablero ejecutivo con las ventas del día anterior, el acumulado de los últimos 7 días y accesos rápidos a reportes, existencias globales, cambio de sucursal, catálogos y configuración.
+- **Diseño:** Fondo `AppThemeTokens.surfaceLight`, hero de bienvenida con avatar y sucursal activa, tarjetas de métricas y gráfica de tendencia con estilo suave (sin gradientes).
+- **Componente reutilizable:** Los accesos usan `AppActionTile` (`lib/widgets/design_system/app_action_tile.dart`), un tile con icono tintado, título, subtítulo, hover sutil y chevron. Sustituye la repetición de `ListTile` + `Divider`.
+- **Navegación:** “Ir a sucursal” reutiliza `BranchSelectionDialog` y resalta la sucursal actual.
+
+### 2.6. Atajos de Teclado (`shortcuts`)
 - **Propósito:** Mostrar al usuario el mapa de atajos globales configurados para agilizar la operación diaria sin ratón.
 - **Vistas:** `ShortcutsMenuScreen`.
 - **Atajos Globales Destacados:**

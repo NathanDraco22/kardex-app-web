@@ -519,3 +519,10 @@ Esta estructura se ha seguido para módulos como 'Historial de Facturas', 'Histo
 - **Multibranch:** rediseño completo con hero corporativo, tarjetas de Panel Administrativo/Sucursales, listado de sucursales con imagen, badges Comercio/Almacén y acceso directo, chip de usuario y cierre de sesión.
 - **Verificación:** `flutter analyze` limpio, `dart analyze` del paquete limpio, test de serialización aprobado; `ruff check` y `ty check` OK en el servidor.
 - **Sin commit.**
+
+## Rediseño del Panel Administrativo y Tile Reutilizable (Noviembre 2026)
+- **Nuevo componente:** `AppActionTile` en `lib/widgets/design_system/app_action_tile.dart`, exportado desde `design_system.dart`. Fondo blanco, borde `borderLight`, icono tintado, subtítulo, hover sutil y chevron animado.
+- **Panel:** fondo `surfaceLight`, hero de bienvenida con avatar y sucursal activa, tarjetas de “Ventas de ayer” y “Últimos 7 días”, y gráfica de tendencia suavizada con puntos y área teal.
+- **Accesos:** los seis `ListTile` con `Divider` se reemplazaron por `AppActionTile` en una grilla de dos columnas en pantallas anchas y una columna en móvil.
+- **Navegación:** “Ir a sucursal” conserva `BranchSelectionDialog` con la sucursal actual resaltada.
+- **Verificación:** `flutter analyze` sin issues y `flutter test` 93/93.
