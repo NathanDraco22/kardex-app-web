@@ -11,6 +11,7 @@ import 'package:kardex_app_front/src/core/access_manager.dart';
 import 'package:kardex_app_front/src/tools/extensiones.dart';
 import 'package:kardex_business/kardex_business.dart';
 
+import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 import 'package:kardex_app_front/widgets/gates/role_permission_gate.dart';
 import 'package:toastification/toastification.dart';
 import 'package:kardex_app_front/constants/route_names.dart';
@@ -82,7 +83,8 @@ class _RootScaffold extends StatelessWidget {
         }
 
         final user = authState.session.user;
-        context.watch<AppSettingsCubit>();
+        final appSettings = context.watch<AppSettingsCubit>();
+        final businessName = authState.servin.name.trim().isNotEmpty ? authState.servin.name.trim() : "Neptuno App";
 
         final hasShortcuts = context.watch<ShortcutsCubit>().state.shortcuts.isNotEmpty;
         final showShortcutsFab = hasShortcuts && !context.isDesktop();
@@ -114,7 +116,23 @@ class _RootScaffold extends StatelessWidget {
                 : null,
             endDrawer: HomeEndDrawer(user: user),
             appBar: AppBar(
-              title: const Text("Neptuno App"),
+              title: CompanyLogo(
+                imageUrl: appSettings.companyLogoUrl,
+                height: 30,
+                width: 120,
+                fit: BoxFit.contain,
+                alignment: Alignment.centerLeft,
+                fallback: Text(
+                  businessName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                placeholder: Text(
+                  businessName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
               actions: [
                 if (context.isMobileOrTablet() && canShowHomeQuickSearch(context))
                   IconButton(

@@ -1,3 +1,6 @@
+import 'dart:typed_data';
+
+import 'package:image_picker/image_picker.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/widgets/dialogs/selectors/branch_selection_dialog.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
@@ -9,6 +12,7 @@ import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
 import 'package:kardex_app_front/cubits/app_settings/app_settings_state.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_app_front/src/tools/uploaders/image_uploader.dart';
 import 'currency_settings_dialog.dart';
 
 class AppSettingsScreen extends StatelessWidget {
@@ -31,7 +35,12 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
   late final TextEditingController _profitMarginController;
   late final TextEditingController _paymentTermController;
 
+  final ImagePicker _imagePicker = ImagePicker();
+
   bool _initialized = false;
+  String? _companyLogoUrl;
+  Uint8List? _pendingCompanyLogoBytes;
+  bool _isSavingCompanyLogo = false;
   bool _useDefaultProfitMargin = false;
   bool _useExpirationDates = true;
   bool _useOrders = true;
@@ -87,6 +96,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
     _currency = settings.currency;
     _secondaryCurrency = settings.secondaryCurrency;
     _exchangeRate = settings.exchangeRate;
+    _companyLogoUrl = settings.companyLogoUrl;
   }
 
   Future<void> _saveSettings() async {
@@ -146,6 +156,104 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
           behavior: SnackBarBehavior.floating,
         ),
       );
+    }
+  }
+
+  void _showSettingsSnackBar(String message, {bool isError = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? Colors.redAccent : Colors.teal,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  Future<void> _pickCompanyLogo() async {
+    try {
+      final picked = await _imagePicker.pickImage(source: ImageSource.gallery);
+      if (picked == null || !mounted) return;
+
+      final fileName = picked.name.isNotEmpty ? picked.name : picked.path;
+      final dotIndex = fileName.lastIndexOf('.');
+      final extension = dotIndex >= 0 ? fileName.substring(dotIndex + 1).toLowerCase() : '';
+      final isPng = extension == 'png';
+      final isJpeg = extension == 'jpg' || extension == 'jpeg';
+
+      if (!isPng && !isJpeg) {
+        _showSettingsSnackBar(
+          "Formato no soportado. Usa una imagen JPG o PNG.",
+          isError: true,
+        );
+        return;
+      }
+
+      final bytes = await picked.readAsBytes();
+      if (!mounted) return;
+
+      setState(() {
+        _pendingCompanyLogoBytes = bytes;
+        _isSavingCompanyLogo = true;
+      });
+
+      final uploadFileName = 'company_logo_${DateTime.now().millisecondsSinceEpoch}.${isPng ? 'png' : 'jpg'}';
+      final url = await ImageUploader.uploadImage(
+        bytes: bytes,
+        fileName: uploadFileName,
+        mediaType: isPng ? 'image/png' : 'image/jpeg',
+      );
+
+      final success = await getIt<AppSettingsCubit>().updateSettings(
+        UpdateAppSetting(companyLogoUrl: url),
+      );
+
+      if (mounted && success) {
+        _showSettingsSnackBar("Logo de la empresa actualizado");
+      }
+    } catch (_) {
+      if (mounted) {
+        _showSettingsSnackBar(
+          "No se pudo subir la imagen. Inténtalo de nuevo.",
+          isError: true,
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _pendingCompanyLogoBytes = null;
+          _isSavingCompanyLogo = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _removeCompanyLogo() async {
+    final confirmed = await DialogManager.confirmActionDialog(
+      context,
+      "¿Quitar el logo de la empresa?",
+    );
+    if (confirmed != true || !mounted) return;
+
+    setState(() => _isSavingCompanyLogo = true);
+
+    try {
+      final success = await getIt<AppSettingsCubit>().updateSettings(
+        const UpdateAppSetting(companyLogoUrl: ""),
+      );
+      if (mounted && success) {
+        _showSettingsSnackBar("Logo de la empresa eliminado");
+      }
+    } catch (_) {
+      if (mounted) {
+        _showSettingsSnackBar(
+          "No se pudo quitar el logo. Inténtalo de nuevo.",
+          isError: true,
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSavingCompanyLogo = false);
+      }
     }
   }
 
@@ -311,6 +419,136 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
     );
   }
 
+  Widget _buildCompanyLogoCard({required bool isSaving}) {
+    final hasLogo = (_companyLogoUrl ?? '').trim().isNotEmpty || _pendingCompanyLogoBytes != null;
+    final isBusy = _isSavingCompanyLogo;
+    final isDisabled = isSaving || isBusy;
+
+    final preview = Stack(
+      alignment: Alignment.center,
+      children: [
+        Container(
+          width: 140,
+          height: 120,
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: Colors.grey.shade200),
+          ),
+          child: CompanyLogo(
+            imageUrl: _companyLogoUrl,
+            localBytes: _pendingCompanyLogoBytes,
+            fit: BoxFit.contain,
+            borderRadius: BorderRadius.circular(10),
+            fallback: Center(
+              child: Icon(
+                Icons.business_rounded,
+                size: 42,
+                color: Colors.grey.shade400,
+              ),
+            ),
+            placeholder: const Center(
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          ),
+        ),
+        if (isBusy)
+          Container(
+            width: 140,
+            height: 120,
+            decoration: BoxDecoration(
+              color: Colors.black45,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: const Center(
+              child: CircularProgressIndicator(
+                color: Colors.white,
+                strokeWidth: 2.5,
+              ),
+            ),
+          ),
+      ],
+    );
+
+    final actions = Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        FilledButton.tonalIcon(
+          onPressed: isDisabled ? null : _pickCompanyLogo,
+          icon: Icon(
+            hasLogo ? Icons.swap_horiz_rounded : Icons.upload_rounded,
+            size: 18,
+          ),
+          label: Text(hasLogo ? "Cambiar imagen" : "Subir imagen"),
+        ),
+        if (hasLogo)
+          TextButton.icon(
+            onPressed: isDisabled ? null : _removeCompanyLogo,
+            icon: const Icon(Icons.delete_outline_rounded, size: 18),
+            label: const Text("Quitar"),
+            style: TextButton.styleFrom(foregroundColor: Colors.red.shade700),
+          ),
+      ],
+    );
+
+    final info = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Logo de la empresa",
+          style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          "Se mostrará en el inicio y en el selector de sucursales. Es solo estético: no se usa en facturas, tickets ni reportes.",
+          style: TextStyle(
+            fontSize: 13,
+            height: 1.35,
+            color: Colors.grey.shade600,
+          ),
+        ),
+        const SizedBox(height: 12),
+        actions,
+      ],
+    );
+
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: BorderSide(color: Colors.grey.shade200),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final isNarrow = constraints.maxWidth < 560;
+            if (isNarrow) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  preview,
+                  const SizedBox(height: 14),
+                  info,
+                ],
+              );
+            }
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                preview,
+                const SizedBox(width: 18),
+                Expanded(child: info),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -389,7 +627,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
             _syncWithSettings(state.settings);
           }
 
-          final isSaving = state is AppSettingsSaving;
+          final isSaving = state is AppSettingsSaving || _isSavingCompanyLogo;
 
           return Center(
             child: ConstrainedBox(
@@ -397,6 +635,14 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                 children: [
+                  _buildSectionHeader(
+                    icon: Icons.business_rounded,
+                    title: "Identidad de la empresa",
+                    subtitle: "Imagen corporativa para el inicio y el selector de sucursales",
+                  ),
+                  const SizedBox(height: 8),
+                  _buildCompanyLogoCard(isSaving: isSaving),
+                  const SizedBox(height: 24),
                   _buildCurrencySummaryTile(isSaving: isSaving),
                   const SizedBox(height: 12),
                   _buildInvoiceSecondaryTotalSwitch(isSaving: isSaving),
