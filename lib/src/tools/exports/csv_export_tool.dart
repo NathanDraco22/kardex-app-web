@@ -99,49 +99,8 @@ class CsvExportTool {
   }) async {
     if (expenses.isEmpty) return;
 
-    final StringBuffer buffer = StringBuffer();
-
-    // Agregar BOM UTF-8 para compatibilidad con Excel
-    buffer.write('\uFEFF');
-
-    buffer.writeln("Tipo,N° Documento,Concepto,Fecha,Estado,Monto");
-
-    for (final expense in expenses) {
-      final isOperative = expense.type == ExpenseType.operative;
-      final typeStr = isOperative ? "Operativo" : "Proveedor";
-      final concept = isOperative ? expense.category : expense.supplierName;
-      final safeConcept = concept.replaceAll('"', '""');
-      final dateStr = DateTimeTool.formatddMMyyEs(
-        DateTime.fromMillisecondsSinceEpoch(expense.date),
-      );
-
-      String statusStr = "";
-      switch (expense.status) {
-        case ExpenseStatus.draft:
-          statusStr = "Borrador";
-          break;
-        case ExpenseStatus.open:
-          statusStr = "Pendiente";
-          break;
-        case ExpenseStatus.paid:
-          statusStr = "Pagado";
-          break;
-        case ExpenseStatus.partiallyPaid:
-          statusStr = "Parcial";
-          break;
-        case ExpenseStatus.cancelled:
-          statusStr = "Cancelado";
-          break;
-      }
-
-      final formattedAmount = NumberFormatter.convertToMoneyLike(expense.amount);
-
-      buffer.writeln(
-        '"$typeStr","${expense.docNumber}","$safeConcept","$dateStr","$statusStr","$formattedAmount"',
-      );
-    }
-
-    final bytes = utf8.encode(buffer.toString());
+    // BOM UTF-8 para compatibilidad con Excel.
+    final bytes = utf8.encode('\uFEFF${buildExpensesCsv(expenses)}');
     final uint8List = Uint8List.fromList(bytes);
 
     if (kIsWeb) {
@@ -159,5 +118,67 @@ class CsvExportTool {
         mimeType: MimeType.csv,
       );
     }
+  }
+}
+
+/// Construye el contenido CSV del reporte de gastos sin acceder a FileSaver.
+///
+/// Usa la fecha de registro (`createdAt`) y el mismo criterio de tipo/concepto
+/// que el reporte visual.
+String buildExpensesCsv(List<ExpenseInDb> expenses) {
+  final buffer = StringBuffer()..writeln("Tipo,N° Documento,Concepto,Registro,Estado,Monto");
+
+  for (final expense in expenses) {
+    final typeStr = _expenseTypeLabel(expense.type);
+    final concept = _expenseConcept(expense);
+    final safeConcept = concept.replaceAll('"', '""');
+    final dateStr = DateTimeTool.formatddMMyyEs(expense.createdAt);
+    final statusStr = _expenseStatusLabel(expense.status);
+    final formattedAmount = NumberFormatter.convertToMoneyLike(expense.amount);
+
+    buffer.writeln(
+      '"$typeStr","${expense.docNumber}","$safeConcept","$dateStr","$statusStr","$formattedAmount"',
+    );
+  }
+
+  return buffer.toString();
+}
+
+String _expenseTypeLabel(ExpenseType type) {
+  switch (type) {
+    case ExpenseType.operative:
+      return 'Operativo';
+    case ExpenseType.supplier:
+      return 'Proveedor';
+    case ExpenseType.tax:
+      return 'Impuesto';
+  }
+}
+
+String _expenseConcept(ExpenseInDb expense) {
+  switch (expense.type) {
+    case ExpenseType.operative:
+      return expense.category;
+    case ExpenseType.supplier:
+      return expense.supplierName;
+    case ExpenseType.tax:
+      final category = expense.category.trim();
+      if (category.isNotEmpty) return category;
+      return expense.description?.trim() ?? '';
+  }
+}
+
+String _expenseStatusLabel(ExpenseStatus status) {
+  switch (status) {
+    case ExpenseStatus.draft:
+      return 'Borrador';
+    case ExpenseStatus.open:
+      return 'Pendiente';
+    case ExpenseStatus.paid:
+      return 'Pagado';
+    case ExpenseStatus.partiallyPaid:
+      return 'Parcial';
+    case ExpenseStatus.cancelled:
+      return 'Cancelado';
   }
 }

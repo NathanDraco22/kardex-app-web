@@ -88,6 +88,37 @@ class ReadExpenseCubit extends Cubit<ReadExpenseState> {
   /// Recarga manteniendo los filtros activos, siempre desde la primera página.
   Future<void> refresh() => getAll(_copyQueryParams(queryParams)..offset = 0);
 
+  /// Carga el período actual completo (hasta [maxPages] páginas).
+  ///
+  /// Reutiliza [getAll] para la primera página y [loadMore] para las
+  /// siguientes, sin alterar la semántica de ninguna de las dos. Se detiene al
+  /// agotar [ReadExpenseSuccess.hasMore], ante un error de carga o al alcanzar
+  /// [maxPages]. Si el período supera el límite, el estado conserva
+  /// `hasMore == true` para que la vista pueda avisarlo.
+  Future<void> loadAll({int maxPages = 20}) async {
+    final pagesLimit = maxPages < 1 ? 1 : maxPages;
+
+    await getAll(_copyQueryParams(queryParams)..offset = 0);
+    if (isClosed) return;
+
+    var loadedPages = 1;
+    while (loadedPages < pagesLimit) {
+      final currentState = state;
+      if (currentState is! ReadExpenseSuccess) return;
+      if (!currentState.hasMore || currentState.isLoadingMore) return;
+
+      await loadMore();
+      if (isClosed) return;
+
+      final nextState = state;
+      if (nextState is! ReadExpenseSuccess) return;
+      if (nextState is ReadExpenseSearching) return;
+      if (nextState.loadMoreError != null) return;
+
+      loadedPages++;
+    }
+  }
+
   /// Aplica filtros de servidor conservando el tipo de gasto y la paginación.
   Future<void> applyFilters({
     String? status,
