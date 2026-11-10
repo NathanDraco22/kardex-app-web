@@ -203,68 +203,8 @@ class _PageBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            AppThemeTokens.surfaceLight,
-            AppThemeTokens.indigo.withValues(alpha: 0.06),
-            AppThemeTokens.teal.withValues(alpha: 0.04),
-          ],
-        ),
-      ),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          Positioned(
-            top: -140,
-            right: -90,
-            child: _Glow(
-              color: AppThemeTokens.indigo.withValues(alpha: 0.11),
-              size: 340,
-            ),
-          ),
-          Positioned(
-            bottom: -170,
-            left: -130,
-            child: _Glow(
-              color: AppThemeTokens.teal.withValues(alpha: 0.08),
-              size: 400,
-            ),
-          ),
-          child,
-        ],
-      ),
-    );
-  }
-}
-
-class _Glow extends StatelessWidget {
-  const _Glow({
-    required this.color,
-    required this.size,
-  });
-
-  final Color color;
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    return IgnorePointer(
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: RadialGradient(
-            colors: [
-              color,
-              color.withValues(alpha: 0),
-            ],
-          ),
-        ),
-      ),
+      color: AppThemeTokens.surfaceLight,
+      child: child,
     );
   }
 }
@@ -390,9 +330,9 @@ class _TopBar extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.75),
+              color: Colors.white,
               borderRadius: AppThemeTokens.borderRadiusFull,
-              border: Border.all(color: Colors.white),
+              border: Border.all(color: AppThemeTokens.borderLight),
             ),
             child: const Row(
               mainAxisSize: MainAxisSize.min,
@@ -424,7 +364,7 @@ class _TopBar extends StatelessWidget {
           style: IconButton.styleFrom(
             backgroundColor: Colors.white,
             foregroundColor: Colors.red.shade700,
-            side: BorderSide(color: Colors.grey.shade200),
+            side: const BorderSide(color: AppThemeTokens.borderLight),
           ),
         ),
       ],
@@ -446,7 +386,7 @@ class _UserChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: AppThemeTokens.borderRadiusFull,
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: AppThemeTokens.borderLight),
         boxShadow: AppThemeTokens.subtleCardShadow(),
       ),
       child: Row(
@@ -454,7 +394,7 @@ class _UserChip extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 16,
-            backgroundColor: AppThemeTokens.indigo.withValues(alpha: 0.12),
+            backgroundColor: AppThemeTokens.indigo.withValues(alpha: 0.08),
             child: Text(
               initial,
               style: const TextStyle(
@@ -528,12 +468,8 @@ class _HeroCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: AppThemeTokens.indigo.withValues(alpha: 0.16),
-        ),
-        boxShadow: AppThemeTokens.subtleCardShadow(
-          accent: AppThemeTokens.indigo,
-        ),
+        border: Border.all(color: AppThemeTokens.borderLight),
+        boxShadow: AppThemeTokens.subtleCardShadow(),
       ),
       child: CompanyLogo(
         imageUrl: companyLogoUrl,
@@ -542,7 +478,7 @@ class _HeroCard extends StatelessWidget {
           child: Icon(
             Icons.business_rounded,
             size: isWide ? 58 : 46,
-            color: AppThemeTokens.indigo,
+            color: AppThemeTokens.neutral,
           ),
         ),
         placeholder: const Center(
@@ -563,7 +499,7 @@ class _HeroCard extends StatelessWidget {
             fontSize: 11.5,
             fontWeight: FontWeight.w800,
             letterSpacing: 1.4,
-            color: AppThemeTokens.indigo,
+            color: AppThemeTokens.neutral,
           ),
         ),
         const SizedBox(height: 8),
@@ -611,19 +547,10 @@ class _HeroCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(isWide ? 28 : 20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Colors.white,
-            AppThemeTokens.indigo.withValues(alpha: 0.04),
-          ],
-        ),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(26),
-        border: Border.all(color: Colors.white),
-        boxShadow: AppThemeTokens.subtleCardShadow(
-          accent: AppThemeTokens.indigo,
-        ),
+        border: Border.all(color: AppThemeTokens.borderLight),
+        boxShadow: AppThemeTokens.subtleCardShadow(),
       ),
       child: isWide
           ? Row(
@@ -662,9 +589,9 @@ class _InfoChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.10),
+        color: Colors.grey.shade50,
         borderRadius: AppThemeTokens.borderRadiusFull,
-        border: Border.all(color: color.withValues(alpha: 0.22)),
+        border: Border.all(color: AppThemeTokens.borderLight),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -786,22 +713,13 @@ class _WorkspaceActionCardState extends State<_WorkspaceActionCard> {
           duration: const Duration(milliseconds: 180),
           curve: Curves.easeOutCubic,
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                accent.withValues(alpha: _isHovered ? 0.16 : 0.10),
-                Colors.white,
-              ],
-            ),
+            color: Colors.white,
             borderRadius: BorderRadius.circular(22),
             border: Border.all(
-              color: accent.withValues(alpha: _isHovered ? 0.42 : 0.22),
-              width: _isHovered ? 1.3 : 1.0,
+              color: _isHovered ? accent.withValues(alpha: 0.30) : AppThemeTokens.borderLight,
+              width: _isHovered ? 1.2 : 1.0,
             ),
-            boxShadow: _isHovered
-                ? AppThemeTokens.hoverCardShadow(accent: accent)
-                : AppThemeTokens.subtleCardShadow(accent: accent),
+            boxShadow: _isHovered ? AppThemeTokens.hoverCardShadow(accent: accent) : AppThemeTokens.subtleCardShadow(),
           ),
           child: Material(
             color: Colors.transparent,
@@ -810,8 +728,8 @@ class _WorkspaceActionCardState extends State<_WorkspaceActionCard> {
             child: InkWell(
               onTap: widget.onTap,
               borderRadius: BorderRadius.circular(22),
-              splashColor: accent.withValues(alpha: 0.10),
-              highlightColor: accent.withValues(alpha: 0.05),
+              splashColor: accent.withValues(alpha: 0.08),
+              highlightColor: accent.withValues(alpha: 0.04),
               child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: Row(
@@ -822,12 +740,12 @@ class _WorkspaceActionCardState extends State<_WorkspaceActionCard> {
                       height: 58,
                       decoration: BoxDecoration(
                         color: accent.withValues(
-                          alpha: _isHovered ? 0.20 : 0.12,
+                          alpha: _isHovered ? 0.14 : 0.08,
                         ),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
                           color: accent.withValues(
-                            alpha: _isHovered ? 0.38 : 0.20,
+                            alpha: _isHovered ? 0.28 : 0.14,
                           ),
                         ),
                       ),
@@ -868,8 +786,11 @@ class _WorkspaceActionCardState extends State<_WorkspaceActionCard> {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: accent.withValues(alpha: 0.10),
+                              color: Colors.grey.shade50,
                               borderRadius: AppThemeTokens.borderRadiusFull,
+                              border: Border.all(
+                                color: AppThemeTokens.borderLight,
+                              ),
                             ),
                             child: Text(
                               widget.badge,
@@ -939,7 +860,7 @@ class _BranchesSection extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: AppThemeTokens.indigo.withValues(alpha: 0.10),
+                color: Colors.grey.shade100,
                 borderRadius: AppThemeTokens.borderRadiusFull,
               ),
               child: Text(
@@ -947,7 +868,7 @@ class _BranchesSection extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 11.5,
                   fontWeight: FontWeight.w800,
-                  color: AppThemeTokens.indigo,
+                  color: AppThemeTokens.neutral,
                 ),
               ),
             ),
@@ -1063,9 +984,9 @@ class _BranchCardState extends State<_BranchCard> {
     final branch = widget.branch;
     final accent = branch.isCommerce ? const Color(0xFFD97706) : const Color(0xFF475569);
     final borderColor = widget.isCurrent
-        ? AppThemeTokens.teal.withValues(alpha: 0.55)
+        ? AppThemeTokens.teal.withValues(alpha: 0.35)
         : _isHovered
-        ? accent.withValues(alpha: 0.42)
+        ? accent.withValues(alpha: 0.30)
         : AppThemeTokens.borderLight;
 
     return MouseRegion(
@@ -1087,9 +1008,7 @@ class _BranchCardState extends State<_BranchCard> {
               color: borderColor,
               width: widget.isCurrent ? 1.4 : 1.0,
             ),
-            boxShadow: _isHovered
-                ? AppThemeTokens.hoverCardShadow(accent: accent)
-                : AppThemeTokens.subtleCardShadow(accent: accent),
+            boxShadow: _isHovered ? AppThemeTokens.hoverCardShadow(accent: accent) : AppThemeTokens.subtleCardShadow(),
           ),
           child: Material(
             color: Colors.transparent,
@@ -1098,8 +1017,8 @@ class _BranchCardState extends State<_BranchCard> {
             child: InkWell(
               onTap: widget.onTap,
               borderRadius: BorderRadius.circular(18),
-              splashColor: accent.withValues(alpha: 0.10),
-              highlightColor: accent.withValues(alpha: 0.05),
+              splashColor: accent.withValues(alpha: 0.08),
+              highlightColor: accent.withValues(alpha: 0.04),
               child: Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 14,
@@ -1212,9 +1131,9 @@ class _BranchAvatar extends StatelessWidget {
       width: 48,
       height: 48,
       decoration: BoxDecoration(
-        color: accent.withValues(alpha: 0.10),
+        color: accent.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: accent.withValues(alpha: 0.20)),
+        border: Border.all(color: accent.withValues(alpha: 0.14)),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(13),
@@ -1259,8 +1178,9 @@ class _BranchTypeChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.10),
+        color: Colors.grey.shade50,
         borderRadius: AppThemeTokens.borderRadiusFull,
+        border: Border.all(color: AppThemeTokens.borderLight),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -1293,7 +1213,7 @@ class _CurrentBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
       decoration: BoxDecoration(
-        color: AppThemeTokens.teal.withValues(alpha: 0.12),
+        color: Colors.grey.shade100,
         borderRadius: AppThemeTokens.borderRadiusFull,
       ),
       child: const Row(
