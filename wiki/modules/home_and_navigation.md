@@ -54,6 +54,12 @@ lib/src/modules/
 ### 2.4. Conmutador Multi-Sucursal (`multi_branch_home`)
 - **Propósito:** Permitir a usuarios con permisos en varias sucursales alternar rápidamente entre ellas con un solo clic sin tener que cerrar sesión.
 - **Vistas:** `MultibranchHomeScreen`.
+- **Diseño actual:**
+  - Hero con el logo corporativo (`companyLogoUrl` de `app_settings`), nombre de la empresa, bienvenida al usuario y estado de la sesión.
+  - Tarjetas principales para entrar al **Panel Administrativo** o a **Sucursales**.
+  - Sección “Tus sucursales” con tarjetas que muestran logo/imagen, nombre, dirección y badge Comercio/Almacén. Un clic selecciona la sucursal y navega al home.
+  - Si solo existe una sucursal, la tarjeta “Sucursales” entra directamente; si existen varias, hace scroll a la lista.
+  - Chip de usuario y cierre de sesión con confirmación.
 - **Efecto:** Actualiza el estado global de la sucursal activa en `AppModeCubit` y recarga las cachés locales de inventario y precios.
 
 ### 2.5. Atajos de Teclado (`shortcuts`)

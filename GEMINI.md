@@ -510,3 +510,12 @@ Esta estructura se ha seguido para módulos como 'Historial de Facturas', 'Histo
 - **Sin cambios de cálculo:** cantidades, costos y dinero siguen en `int`; solo cambia la presentación.
 - **Mobile:** el selector “Calcular para la unidad” usa `isExpanded`/ellipsis y se apila verticalmente cuando el ancho es menor a `500`; `TitleTextField` usa `Wrap` para que los títulos largos (“Por 1/2 Caja x30 (15 u)…”) no desborden. `QuantityField` ya no repite la unidad en el título ni como sufijo; la unidad se muestra en el selector, fila o detalle.
 - **Verificación:** `flutter analyze` limpio; `flutter test` **91/91**; hot reload en app Windows sin errores de runtime; sin commit.
+
+## Logo Corporativo en App Settings (Noviembre 2026)
+- **Objetivo:** agregar una imagen corporativa global (`companyLogoUrl`) en `app_settings`, editable desde Configuración del Sistema y usada solo como elemento estético en el home y el selector de sucursales.
+- **Backend:** `BaseAppSetting` y `UpdateAppSetting` aceptan `companyLogoUrl: str | None`; no requiere migración y el PATCH parcial existente refresca `AppSettingsTool`.
+- **Frontend:** `AppSettingModel`/`UpdateAppSetting` y `AppSettingsCubit` exponen el logo; `AppSettingsScreen` permite subir/cambiar/quitar JPG o PNG con `ImageUploader` y guarda la URL de inmediato. Nuevo widget `CompanyLogo` con caché persistente y fallback.
+- **Home / Admin:** el AppBar del home muestra el logo (o el nombre de la empresa como fallback) y el del Panel Administrativo lo muestra junto al título.
+- **Multibranch:** rediseño completo con hero corporativo, tarjetas de Panel Administrativo/Sucursales, listado de sucursales con imagen, badges Comercio/Almacén y acceso directo, chip de usuario y cierre de sesión.
+- **Verificación:** `flutter analyze` limpio, `dart analyze` del paquete limpio, test de serialización aprobado; `ruff check` y `ty check` OK en el servidor.
+- **Sin commit.**

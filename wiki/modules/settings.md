@@ -87,6 +87,17 @@ lib/src/modules/settings/
     - El equivalente aparece después del total final en el visor de facturas, el ticket térmico (imprimir/compartir) y el PDF A4.
     - Solo se muestra si la moneda secundaria es distinta a la principal y la tasa es mayor que cero. No modifica montos, pagos, cuentas por cobrar ni inventario.
     - La línea usa el formato `Total(USD): US$27.31`.
+  - `companyLogoUrl` (`String?`): URL pública de la imagen corporativa global de la empresa. Es un parámetro **solo estético**; no se usa en facturas, tickets, reportes ni cálculos.
+
+#### Identidad de la Empresa (`companyLogoUrl`):
+- La sección **“Identidad de la empresa”** es el primer bloque de `AppSettingsScreen`.
+- Permite **subir, cambiar o quitar** una imagen JPG/PNG desde la galería. La imagen conserva su proporción original y la transparencia del PNG.
+- Al seleccionar una imagen, se sube mediante `ImageUploader` al almacenamiento de imágenes y se guarda la URL con un `PATCH` parcial inmediato de `companyLogoUrl`; no requiere pulsar “Guardar Configuraciones”.
+- El logo se muestra en:
+  - El `AppBar` del `HomeScreen` (si no existe, se usa el nombre de la empresa como fallback).
+  - El `AppBar` del `AdminPanelScreen`.
+  - El hero de `MultibranchHomeScreen`.
+- La resolución de la imagen en la UI usa `CompanyLogo` (`lib/widgets/design_system/company_logo.dart`), que prioriza bytes locales para la previsualización y usa `CachedNetworkImage` + `AppImageCacheManager` para la URL remota.
 
 #### Uso Operativo del Margen de Ganancia Sugerido:
 1. **Editor de Precios de Producto (`ProductPriceEditorScreen`):**

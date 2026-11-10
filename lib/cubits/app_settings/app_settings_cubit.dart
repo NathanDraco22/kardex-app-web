@@ -30,6 +30,10 @@ class AppSettingsCubit extends Cubit<AppSettingsState> {
 
   bool get showInvoiceTotalInSecondaryCurrency => currentSettings?.showInvoiceTotalInSecondaryCurrency ?? false;
 
+  String? get companyLogoUrl => currentSettings?.companyLogoUrl;
+
+  bool get hasCompanyLogo => (companyLogoUrl ?? '').trim().isNotEmpty;
+
   bool get hasExchangeRate => exchangeRate > 0;
 
   bool get useExpirationDates => currentSettings?.useExpirationDates ?? true;

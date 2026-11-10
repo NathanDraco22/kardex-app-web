@@ -5,7 +5,9 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/admin_panel/widgets/custom_7_charts.dart';
 import 'package:kardex_app_front/admin_panel/widgets/panel_drawer.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/selectors/branch_selection_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/global_stock_search_modal.dart';
@@ -47,10 +49,30 @@ class _RootScaffold extends StatelessWidget {
       );
     }
     final user = authState.session.user;
+    final appSettings = context.watch<AppSettingsCubit>();
     return Scaffold(
       endDrawer: PanelEndDrawer(user: user),
       appBar: AppBar(
-        title: const Text("Panel Administrativo"),
+        title: Row(
+          children: [
+            if (appSettings.hasCompanyLogo) ...[
+              CompanyLogo(
+                imageUrl: appSettings.companyLogoUrl,
+                height: 26,
+                width: 90,
+                fit: BoxFit.contain,
+                alignment: Alignment.centerLeft,
+              ),
+              const SizedBox(width: 10),
+            ],
+            const Expanded(
+              child: Text(
+                "Panel Administrativo",
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
         actions: const [
           AvatarButton(),
           SizedBox(width: 12),
@@ -204,7 +226,7 @@ class _Body extends StatelessWidget {
                       if (res == null) return;
 
                       if (!context.mounted) return;
-                       getIt<AuthCubit>().changeBranch(res.id);
+                      getIt<AuthCubit>().changeBranch(res.id);
                       context.go("/home");
                     },
                   ),

@@ -16,6 +16,7 @@ class AppSettingModel {
   final AppCurrency secondaryCurrency;
   final double exchangeRate;
   final bool showInvoiceTotalInSecondaryCurrency;
+  final String? companyLogoUrl;
   final int createdAt;
   final int? updatedAt;
 
@@ -35,6 +36,7 @@ class AppSettingModel {
     this.secondaryCurrency = AppCurrency.usd,
     this.exchangeRate = 0.0,
     this.showInvoiceTotalInSecondaryCurrency = false,
+    this.companyLogoUrl,
     required this.createdAt,
     this.updatedAt,
   });
@@ -61,6 +63,7 @@ class AppSettingModel {
       exchangeRate: (json['exchangeRate'] as num?)?.toDouble() ?? 0.0,
       showInvoiceTotalInSecondaryCurrency:
           json['showInvoiceTotalInSecondaryCurrency'] as bool? ?? false,
+      companyLogoUrl: json['companyLogoUrl'] as String?,
       createdAt: json['createdAt'] as int? ?? 0,
       updatedAt: json['updatedAt'] as int?,
     );
@@ -84,6 +87,7 @@ class AppSettingModel {
       'exchangeRate': exchangeRate,
       'showInvoiceTotalInSecondaryCurrency':
           showInvoiceTotalInSecondaryCurrency,
+      'companyLogoUrl': companyLogoUrl,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };
@@ -105,6 +109,7 @@ class AppSettingModel {
     AppCurrency? secondaryCurrency,
     double? exchangeRate,
     bool? showInvoiceTotalInSecondaryCurrency,
+    String? companyLogoUrl,
     int? createdAt,
     int? updatedAt,
   }) {
@@ -129,6 +134,7 @@ class AppSettingModel {
       showInvoiceTotalInSecondaryCurrency:
           showInvoiceTotalInSecondaryCurrency ??
           this.showInvoiceTotalInSecondaryCurrency,
+      companyLogoUrl: companyLogoUrl ?? this.companyLogoUrl,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -150,6 +156,7 @@ class UpdateAppSetting {
   final AppCurrency? secondaryCurrency;
   final double? exchangeRate;
   final bool? showInvoiceTotalInSecondaryCurrency;
+  final String? companyLogoUrl;
 
   const UpdateAppSetting({
     this.useDefaultProfitMargin,
@@ -166,6 +173,7 @@ class UpdateAppSetting {
     this.secondaryCurrency,
     this.exchangeRate,
     this.showInvoiceTotalInSecondaryCurrency,
+    this.companyLogoUrl,
   });
 
   Map<String, dynamic> toJson() {
@@ -212,6 +220,9 @@ class UpdateAppSetting {
     if (showInvoiceTotalInSecondaryCurrency != null) {
       data['showInvoiceTotalInSecondaryCurrency'] =
           showInvoiceTotalInSecondaryCurrency;
+    }
+    if (companyLogoUrl != null) {
+      data['companyLogoUrl'] = companyLogoUrl;
     }
     return data;
   }
