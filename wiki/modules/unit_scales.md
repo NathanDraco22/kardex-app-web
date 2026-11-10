@@ -11,7 +11,7 @@ La decisión central de esta versión es:
 
 Ejemplos:
 
-- Peso/Volumen/Longitud → la base es el **cuarto** (`Cuarto de Libra`, `Cuarto de Litro`, `Cuarto de Metro`).
+- Peso/Volumen/Longitud → la base es el **cuarto** (`1/4 Libra`, `1/4 Litro`, `1/4 Metro`).
 - Empaque fraccionado (`fractionPack`) → la base es **media o cuarta parte del empaque**, según el tamaño.
 - Empaque con venta por unidad (`pack`) → la base es la **unidad** y las cajas/docenas son extras.
 - Personalizada (`custom`) → el usuario define la base y los factores.
@@ -29,9 +29,9 @@ Esto elimina la necesidad de una propiedad `fractionType` o de un enum de fracci
 - La **unidad base** es indivisible en inventario.
 - La **unidad comercial** es la que ve el cajero; se obtiene con `conversionFactor` respecto a la base.
 - La **fracción mínima de venta** queda codificada por la base:
-  - Base `Cuarto de Libra` → se vende en múltiplos de `0.25 Libra`.
-  - Base `Media Caja x30` → se vende en múltiplos de `0.5 Caja x30`.
-  - Base `Cuarto de Caja x12` → se vende en múltiplos de `0.25 Caja x12`.
+  - Base `1/4 Libra` → se vende en múltiplos de `0.25 Libra`.
+  - Base `1/2 Caja x30` → se vende en múltiplos de `0.5 Caja x30`.
+  - Base `1/4 Caja x12` → se vende en múltiplos de `0.25 Caja x12`.
   - Base `Unidad` → se vende en unidades enteras.
 - El **paso de los botones `+`/`-` y del teclado** es siempre una unidad base: `1 / conversionFactor` de la unidad seleccionada.
 
@@ -54,9 +54,9 @@ enum UnitScaleType {
 
 | `scaleType` | Unidad base | ¿Venta por unidad? | Uso típico |
 | :--- | :--- | :---: | :--- |
-| `weight` | `Cuarto de Libra` | No | Arroz, queso, carne, granos |
-| `volume` | `Cuarto de Litro` (250 ml) | No | Líquidos a granel |
-| `length` | `Cuarto de Metro` (25 cm) | No | Telas, cabos, rollos |
+| `weight` | `1/4 Libra` | No | Arroz, queso, carne, granos |
+| `volume` | `1/4 Litro` (250 ml) | No | Líquidos a granel |
+| `length` | `1/4 Metro` (25 cm) | No | Telas, cabos, rollos |
 | `pack` | `Unidad` (1) | **Sí** | Medicamentos que se venden por unidad y por caja |
 | `fractionPack` | Media/cuarto de empaque | No | Distribuidoras que venden media caja/cuarto de caja |
 | `custom` | La que defina el usuario | Según factores | Casos especiales |
@@ -71,9 +71,9 @@ La base es siempre el cuarto de la unidad principal. Las unidades extra son los 
 
 | Escala | Base | Extras | Default | Mayorista |
 | :--- | :--- | :--- | :--- | :--- |
-| **Libra** (`weight`) | `Cuarto de Libra` (4 oz) | `Libra` ×4, `Arroba 25 lb` ×100, `Quintal 100 lb` ×400 | Libra | Arroba o Quintal |
-| **Litro** (`volume`) | `Cuarto de Litro` (250 ml) | `Litro` ×4, `Bidón 5 L` ×20, `Bidón 20 L` ×80 | Litro | Bidón 20 L |
-| **Metro** (`length`) | `Cuarto de Metro` (25 cm) | `Metro` ×4, `Rollo 50 m` ×200, `Rollo 100 m` ×400 | Metro | Rollo 100 m |
+| **Libra** (`weight`) | `1/4 Libra` (4 oz) | `Libra` ×4, `Arroba 25 lb` ×100, `Quintal 100 lb` ×400 | Libra | Arroba o Quintal |
+| **Litro** (`volume`) | `1/4 Litro` (250 ml) | `Litro` ×4, `Bidón 5 L` ×20, `Bidón 20 L` ×80 | Litro | Bidón 20 L |
+| **Metro** (`length`) | `1/4 Metro` (25 cm) | `Metro` ×4, `Rollo 50 m` ×200, `Rollo 100 m` ×400 | Metro | Rollo 100 m |
 
 No se incluyen `Media Libra`, `Medio Litro` ni `Medio Metro` como unidades extra: `0.5` de la unidad principal ya es una cantidad válida.
 
@@ -91,19 +91,19 @@ Para un empaque de `N` unidades:
 
 | Preset | Base | Extras | Default |
 | :--- | :--- | :--- | :--- |
-| **Caja x10** | `Media Caja x10 (5 u)` | `Caja x10 (10 u)` ×2 | Caja x10 |
-| **Caja x12** | `Cuarto de Caja x12 (3 u)` | `Media Caja x12 (6 u)` ×2; `Caja x12 (12 u)` ×4 | Caja x12 |
-| **Caja x20** | `Cuarto de Caja x20 (5 u)` | `Media Caja x20 (10 u)` ×2; `Caja x20 (20 u)` ×4 | Caja x20 |
-| **Caja x24** | `Cuarto de Caja x24 (6 u)` | `Media Caja x24 (12 u)` ×2; `Caja x24 (24 u)` ×4 | Caja x24 |
-| **Caja x30** | `Media Caja x30 (15 u)` | `Caja x30 (30 u)` ×2 | Caja x30 |
-| **Caja x50** | `Media Caja x50 (25 u)` | `Caja x50 (50 u)` ×2 | Caja x50 |
-| **Caja x60** | `Cuarto de Caja x60 (15 u)` | `Media Caja x60 (30 u)` ×2; `Caja x60 (60 u)` ×4 | Caja x60 |
-| **Caja x100** | `Cuarto de Caja x100 (25 u)` | `Media Caja x100 (50 u)` ×2; `Caja x100 (100 u)` ×4 | Caja x100 |
-| **Docena** | `Cuarto de Docena (3 u)` | `Media Docena (6 u)` ×2; `Docena (12 u)` ×4 | Docena |
+| **Caja x10** | `1/2 Caja x10 (5 u)` | `Caja x10 (10 u)` ×2 | Caja x10 |
+| **Caja x12** | `1/4 Caja x12 (3 u)` | `1/2 Caja x12 (6 u)` ×2; `Caja x12 (12 u)` ×4 | Caja x12 |
+| **Caja x20** | `1/4 Caja x20 (5 u)` | `1/2 Caja x20 (10 u)` ×2; `Caja x20 (20 u)` ×4 | Caja x20 |
+| **Caja x24** | `1/4 Caja x24 (6 u)` | `1/2 Caja x24 (12 u)` ×2; `Caja x24 (24 u)` ×4 | Caja x24 |
+| **Caja x30** | `1/2 Caja x30 (15 u)` | `Caja x30 (30 u)` ×2 | Caja x30 |
+| **Caja x50** | `1/2 Caja x50 (25 u)` | `Caja x50 (50 u)` ×2 | Caja x50 |
+| **Caja x60** | `1/4 Caja x60 (15 u)` | `1/2 Caja x60 (30 u)` ×2; `Caja x60 (60 u)` ×4 | Caja x60 |
+| **Caja x100** | `1/4 Caja x100 (25 u)` | `1/2 Caja x100 (50 u)` ×2; `Caja x100 (100 u)` ×4 | Caja x100 |
+| **Docena** | `1/4 Docena (3 u)` | `1/2 Docena (6 u)` ×2; `Docena (12 u)` ×4 | Docena |
 
 `Caja x12` y `Docena` son numéricamente equivalentes; se puede usar una sola plantilla o dos nombres según el negocio.
 
-El nombre de la unidad base siempre incluye el tamaño del empaque y las unidades: `Cuarto de Caja x12 (3 u)`. Así el inventario y los reportes no quedan ambiguos.
+El nombre de la unidad base siempre incluye el tamaño del empaque y las unidades: `1/4 Caja x12 (3 u)`. Así el inventario y los reportes no quedan ambiguos.
 
 ---
 
@@ -167,7 +167,7 @@ El producto **no** guarda `scaleType`. Guarda su foto de la escala:
 
 ```dart
 class BaseProduct {
-  final String unitName;            // unidad base (ej. "Cuarto de Libra")
+  final String unitName;            // unidad base (ej. "1/4 Libra")
   final List<ExtraUnit> extraUnits; // unidades comerciales mayores
   final int defaultUnitIndex;       // 0 = base; 1..N = extraUnits
   final int wholesaleUnitIndex;     // 0 = usar default
@@ -197,7 +197,7 @@ class BaseUnitScale {
 - El frontend **no mantiene** una lista duplicada de presets estándar. `UnitScalePresets.standardPresets` queda vacío; el selector consume las escalas del repositorio.
 - Las escalas viejas (`Peso` con gramos, `Volumen` con mililitros, `Longitud` con centímetros, `Tiempo`) se eliminan de las semillas y se limpian de la base de datos de desarrollo. No hay producción con esas escalas.
 - `create_unit_scale_if_absent` no actualiza escalas existentes; para los defaults nuevos se usan nombres nuevos y una limpieza explícita de los nombres viejos.
-- El campo “Unidad de Medida” del formulario de producto usa `allowFreeText` para conservar la unidad base del preset (`Cuarto de Libra`, `Media Caja x30`, etc.) aunque no esté en el catálogo de unidades. El producto guarda `unitName` como texto libre; la unidad comercial se resuelve con `defaultUnitIndex`.
+- El campo “Unidad de Medida” del formulario de producto usa `allowFreeText` para conservar la unidad base del preset (`1/4 Libra`, `1/2 Caja x30`, etc.) aunque no esté en el catálogo de unidades. El producto guarda `unitName` como texto libre; la unidad comercial se resuelve con `defaultUnitIndex`.
 
 ---
 
@@ -243,19 +243,19 @@ Sin esto, el bug real es que puede guardarse `unitName = "C"`: el primer caráct
 
 ## 10. `QuantityField`: paso por unidad mínima
 
-`QuantityField` calcula el paso como:
+Para unidades **estándar** y de **base**, `QuantityField` usa el paso mínimo:
 
 ```dart
 step = 1 / conversionFactor
 ```
 
-Eso equivale a una unidad base de la escala:
+Para unidades **superiores**, los flujos de producción fuerzan `step = 1` y `allowDecimals = false`:
 
 | Escala | Unidad seleccionada | Factor | Paso |
 | :--- | :--- | ---: | ---: |
 | Libra | Libra | 4 | `0.25 Libra` |
-| Libra | Arroba | 100 | `0.01 Arroba` |
-| Libra | Quintal | 400 | `0.0025 Quintal` |
+| Libra | Arroba | 100 | `1 Arroba` (solo entero) |
+| Libra | Quintal | 400 | `1 Quintal` (solo entero) |
 | Litro | Litro | 4 | `0.25 Litro` |
 | Metro | Metro | 4 | `0.25 Metro` |
 | `fractionPack` x30 | Caja x30 | 2 | `0.5 Caja` |
@@ -264,7 +264,7 @@ Eso equivale a una unidad base de la escala:
 | `pack` x30 | Caja x30 | 30 | `1/30 Caja` (= 1 u) |
 
 - Los botones `+`/`-` y las teclas `+`/`-` usan el mismo paso.
-- El campo muestra la equivalencia en unidad base (`= 1 u`, `= 1 Cuarto de Libra`).
+- El campo muestra la equivalencia en la unidad estándar solo cuando la unidad seleccionada es superior (`1 Quintal → = 100 Libra`, `1 Arroba → = 25 Libra`). En la unidad estándar no muestra equivalencia; en la base tampoco.
 - Para pasos con más de 3 decimales, el formateo debe conservar la precisión suficiente para que la cantidad base siga siendo exacta.
 - El paso no es global `1.0`; se deriva del factor de la unidad seleccionada.
 
@@ -281,11 +281,19 @@ Eso equivale a una unidad base de la escala:
 
 La validación de notas de crédito comparte la misma regla: rechaza cantidades no múltiplas y base `0` en lugar de omitir la línea en silencio.
 
+### 10.2. Etiquetas, equivalencia y costos
+
+- Las etiquetas de unidad muestran solo el nombre (`Quintal (100 lb)`, `Libra`, `1/4 Caja x12 (3 u)`), no el factor crudo a la base. El resaltado azul indica que la unidad no es la base.
+- `QuantityField` muestra equivalencia en la **unidad estándar** solo cuando la unidad seleccionada es superior: `1 Quintal → = 100 Libra`, `1 Arroba → = 25 Libra`. Para la unidad estándar no muestra equivalencia.
+- El campo de cantidad no repite el nombre de la unidad en el título ni como sufijo. La unidad se muestra en el selector, la fila o el detalle de la línea; así se evita la duplicación y el overflow en mobile.
+- `UnitCostComparison` presenta los costos con la fila **Base** primero (negrita y fondo suave) y la unidad seleccionada después (azul). Se usa en configuración de precios, selector de unidad, diálogos comerciales e información de producto. En las tablas compactas de entradas/transferencias, el costo base se etiqueta `Base: ...`.
+- No se modifica ningún cálculo: solo presentación de valores que ya existen.
+
 ---
 
 ## 11. Precios y edición
 
-- El editor de precios mantiene la edición bidireccional entre precio base y precio comercial.
+- El editor de precios mantiene la edición bidireccional entre precio base y precio comercial y muestra los costos con `UnitCostComparison` (base primero).
 - La unidad comercial por defecto es `defaultUnitIndex` (Libra, Litro, Metro, Caja).
 - Para factores `2`/`4` los precios en córdobas enteros son exactos; los `.50`/`.25`/`.99` pueden redondear. Mostrar el precio comercial real luego del redondeo cuando sea relevante.
 - C1 no queda eliminado para `pack` ni para factores personalizados; la wiki lo documenta como limitación.
@@ -358,17 +366,17 @@ Las devoluciones directas no se tocan en esta fase: se consideran **deprecadas**
 
 ## 15. Pruebas manuales sugeridas
 
-1. Crear un producto con escala `Libra`: la base debe ser `Cuarto de Libra`, la unidad por defecto `Libra` y el `+` debe sumar `0.25`.
+1. Crear un producto con escala `Libra`: la base debe ser `1/4 Libra`, la unidad por defecto `Libra` y el `+` debe sumar `0.25`.
 2. Vender `0.25`, `0.5`, `0.75` y `1` Libra; verificar que la cantidad base sea `1`, `2`, `3`, `4`.
 3. Cambiar a `Arroba` y verificar que `+` sume `0.01 Arroba` (= 0.25 lb).
-4. Crear una escala `fractionPack` para Caja x30: base `Media Caja x30 (15 u)`, extra `Caja x30 (30 u)`, `+` suma `0.5 Caja`.
-5. Crear una escala `fractionPack` para Caja x12: base `Cuarto de Caja x12 (3 u)`, `+` suma `0.25 Caja`.
+4. Crear una escala `fractionPack` para Caja x30: base `1/2 Caja x30 (15 u)`, extra `Caja x30 (30 u)`, `+` suma `0.5 Caja`.
+5. Crear una escala `fractionPack` para Caja x12: base `1/4 Caja x12 (3 u)`, `+` suma `0.25 Caja`.
 6. Crear una escala `pack` para Caja x30: base `Unidad`, `+` suma `1 u`; al cambiar a Caja, `+` suma `1/30 Caja` y muestra `= 1 u`.
 7. Aplicar un preset desde el editor de unidades extra (C7): la unidad base del formulario debe cambiar.
 8. Verificar que las escalas viejas de gramos/mililitros/centímetros ya no aparezcan.
 9. Verificar que el selector de presets muestre las escalas del backend y las creadas por el usuario.
 10. Verificar precios: `C$18.00` exacto, `C$18.50` en factor 4 con +2 ¢/unidad; documentar el resultado.
-11. Escribir una unidad libre (“Cuarto de Libra”), cerrar el popup y guardar; verificar que `unitName` sea exactamente el texto visible y no `"C"`.
+11. Escribir una unidad libre (“1/4 Libra”), cerrar el popup y guardar; verificar que `unitName` sea exactamente el texto visible y no `"C"`.
 
 ---
 
@@ -380,7 +388,7 @@ Las devoluciones directas no se tocan en esta fase: se consideran **deprecadas**
 
 | Nivel | Definición | Admite fracciones | Ejemplos |
 | :--- | :--- | :---: | :--- |
-| **Base** | Fracción comercial mínima; factor `1`; se guarda como `int` | No; es la unidad indivisible | `Cuarto de Libra`, `Media Caja x30`, `Unidad` |
+| **Base** | Fracción comercial mínima; factor `1`; se guarda como `int` | No; es la unidad indivisible | `1/4 Libra`, `1/2 Caja x30`, `Unidad` |
 | **Estándar** | Unidad comercial principal de la escala; `product.defaultUnitIndex` | **Sí** | `Libra`, `Litro`, `Metro`, `Caja xN` |
 | **Superior** | Unidad extra con factor mayor al estándar | **Solo enteros** | `Arroba`, `Quintal`, `Bidón`, `Rollo` |
 
@@ -397,7 +405,7 @@ nuevaCantidad = baseQuantity / factorNuevo
 
 - Si la unidad nueva es **superior**, solo se convierte cuando `nuevaCantidad` es un entero exacto: `25 Libra → 1 Arroba`, `100 Libra → 1 Quintal`.
 - Si la unidad nueva es **superior** y la conversión no es exacta, la cantidad se **reinicia a `0`**: `0.5 Libra → 0`, `4 Libra → 0` al pasar a Arroba.
-- Si la unidad nueva es la **estándar** o la **base**, se admite la fracción resultante (`1 Libra → 4 Cuarto de Libra` al pasar a la base; `1 Cuarto de Libra → 0.25 Libra` al pasar a la estándar).
+- Si la unidad nueva es la **estándar** o la **base**, se admite la fracción resultante (`1 Libra → 4 1/4 Libra` al pasar a la base; `1 1/4 Libra → 0.25 Libra` al pasar a la estándar).
 - No se muestra una fracción de una unidad superior ni se redondea silenciosamente a la unidad más cercana.
 - **Nota:** la semilla estándar define `Arroba = 25 lb`; `4 Libra` no equivale a `1 Arroba`. El caso `4 Libra → 1 Arroba` solo sería válido con una escala personalizada que defina `Arroba = 4 Libra`.
 
@@ -461,7 +469,7 @@ Formato actual:
       "selectedUnitIndex": 2,
       "conversionFactor": 4,
       "selectedUnitName": "Caja x12",
-      "baseUnitName": "Cuarto de Caja x12 (3 u)",
+      "baseUnitName": "1/4 Caja x12 (3 u)",
       "standardUnitName": "Caja x12",
       "standardUnitFactor": 4
     }

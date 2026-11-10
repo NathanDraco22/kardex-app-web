@@ -159,6 +159,51 @@ void main() {
     expect(changes, isEmpty);
   });
 
+  testWidgets('la unidad superior muestra equivalencia en unidad estándar', (
+    tester,
+  ) async {
+    final controller = TextEditingController(text: '1');
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: QuantityField(
+            conversionFactor: 400,
+            equivalenceUnitName: 'Libra',
+            equivalenceFactor: 4,
+            controller: controller,
+            onChanged: (_) {},
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('= 100 Libra'), findsOneWidget);
+    expect(find.textContaining('1/4'), findsNothing);
+  });
+
+  testWidgets('la unidad estándar no muestra equivalencia', (tester) async {
+    final controller = TextEditingController(text: '1');
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: QuantityField(
+            conversionFactor: 4,
+            equivalenceUnitName: 'Libra',
+            equivalenceFactor: 4,
+            controller: controller,
+            onChanged: (_) {},
+          ),
+        ),
+      ),
+    );
+
+    expect(find.textContaining('= '), findsNothing);
+  });
+
   testWidgets('el Form detecta la cantidad fuera de grilla', (tester) async {
     final controller = TextEditingController();
     addTearDown(controller.dispose);

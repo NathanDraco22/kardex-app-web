@@ -76,11 +76,11 @@ void main() {
     await pumpField(tester);
 
     await openPopup(tester);
-    await typeInPopup(tester, 'Cuarto de Libra');
+    await typeInPopup(tester, '1/4 Libra');
     await closePopup(tester);
 
-    expect(controller.text, 'Cuarto de Libra');
-    expect(changes, ['Cuarto de Libra']);
+    expect(controller.text, '1/4 Libra');
+    expect(changes, ['1/4 Libra']);
     expect(closed, isEmpty);
   });
 
@@ -94,18 +94,18 @@ void main() {
     expect(find.byType(SearchFieldDebounced), findsOneWidget);
     expect(changes, isEmpty);
 
-    await typeInPopup(tester, 'Cuarto de Libra');
+    await typeInPopup(tester, '1/4 Libra');
     await closePopup(tester);
 
-    expect(controller.text, 'Cuarto de Libra');
-    expect(changes, ['Cuarto de Libra']);
+    expect(controller.text, '1/4 Libra');
+    expect(changes, ['1/4 Libra']);
   });
 
   testWidgets('sin allowFreeText el cierre sin selección limpia el texto', (tester) async {
     await pumpField(tester, allowFreeText: false);
 
     await openPopup(tester);
-    await typeInPopup(tester, 'Cuarto de Libra');
+    await typeInPopup(tester, '1/4 Libra');
     await closePopup(tester);
 
     expect(controller.text, isEmpty);
@@ -127,11 +127,11 @@ void main() {
     changes.clear();
 
     await openPopup(tester);
-    await typeInPopup(tester, 'Cuarto de Libra');
+    await typeInPopup(tester, '1/4 Libra');
     await closePopup(tester);
 
-    expect(controller.text, 'Cuarto de Libra');
-    expect(changes, ['Cuarto de Libra']);
+    expect(controller.text, '1/4 Libra');
+    expect(changes, ['1/4 Libra']);
     expect(closed, ['Libra']);
   });
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
+import 'package:kardex_app_front/widgets/elements/unit_cost_comparison.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 class UnitPickerResult {
@@ -161,7 +162,7 @@ class _InventoryUnitPickerDialogState extends State<_InventoryUnitPickerDialog> 
                   final opt = widget.unitOptions[index];
                   final isFocused = _focusNodes[index].hasFocus;
                   final isSelected = selectedOption == opt;
-                  final label = opt.factor == 1 ? opt.name : '${opt.name} (x${opt.factor})';
+                  final label = opt.name;
 
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 4),
@@ -224,39 +225,27 @@ class _InventoryUnitPickerDialogState extends State<_InventoryUnitPickerDialog> 
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Colors.grey.shade300),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildCostRow(
-                      "Costo Promedio:",
-                      account.averageCost * selectedOption.factor,
+                child: UnitCostComparison(
+                  items: [
+                    UnitCostItem(
+                      label: "Costo Promedio",
+                      baseCostInCents: account.averageCost,
                     ),
-                    const SizedBox(height: 6),
-                    _buildCostRow(
-                      "Última Compra:",
-                      account.lastCost * selectedOption.factor,
+                    UnitCostItem(
+                      label: "Última Compra",
+                      baseCostInCents: account.lastCost,
                     ),
-                    const SizedBox(height: 6),
-                    _buildCostRow(
-                      "Costo Máximo:",
-                      account.maximumCost * selectedOption.factor,
+                    UnitCostItem(
+                      label: "Costo Máximo",
+                      baseCostInCents: account.maximumCost,
                     ),
                   ],
+                  baseUnitName: widget.product.unitName,
+                  selectedUnitName: selectedOption.name,
+                  selectedUnitFactor: selectedOption.factor,
+                  layout: UnitCostComparisonLayout.vertical,
                 ),
               ),
-              if (selectedOption.factor > 1) ...[
-                const SizedBox(height: 8),
-                Center(
-                  child: Text(
-                    "Costo promedio base (${widget.product.unitName}): ${NumberFormatter.convertToMoneyLike(account.averageCost)}",
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontStyle: FontStyle.italic,
-                      color: Colors.black54,
-                    ),
-                  ),
-                ),
-              ],
             ],
           ],
         ),
@@ -279,22 +268,6 @@ class _InventoryUnitPickerDialogState extends State<_InventoryUnitPickerDialog> 
             );
           },
           label: const Text("Agregar"),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCostRow(String label, int cents) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(fontSize: 13, color: Colors.black54),
-        ),
-        Text(
-          NumberFormatter.convertToMoneyLike(cents),
-          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.blue),
         ),
       ],
     );

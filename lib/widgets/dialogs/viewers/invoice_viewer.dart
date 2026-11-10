@@ -428,7 +428,7 @@ class InvoiceViewerContent extends StatelessWidget {
                                 ),
                                 Text(saleItem.product.name),
                                 Text(
-                                  "${saleItem.displayUnitName}${saleItem.displayUnitFactor > 1 ? ' (${saleItem.displayUnitFactor % 1 == 0 ? saleItem.displayUnitFactor.toInt() : saleItem.displayUnitFactor})' : ''}",
+                                  saleItem.displayUnitName,
                                   style: const TextStyle(color: Colors.grey, fontSize: 12),
                                 ),
                               ],

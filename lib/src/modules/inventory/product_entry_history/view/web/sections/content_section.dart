@@ -132,9 +132,7 @@ class _ContentSection extends StatelessWidget {
                       );
 
                       final dateStr = DateTimeTool.formatddMMyy(entryHistory.docDate);
-                      final unitLabel = entryItem.unitName == null || entryItem.unitName!.isEmpty
-                          ? ''
-                          : "${entryItem.unitName}${entryItem.conversionFactor > 1 ? ' (${entryItem.conversionFactor})' : ''}";
+                      final unitLabel = entryItem.unitName ?? '';
                       final costStr = NumberFormatter.convertFromCentsToUnitsCurrency(
                         entryItem.cost * entryItem.conversionFactor,
                       );

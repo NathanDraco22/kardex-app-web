@@ -317,7 +317,8 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
                   conversionFactor: widget.item.conversionFactor,
                   allowDecimals: widget.item.selectedUnitIndex > 0 && !isSuperiorUnit,
                   step: isSuperiorUnit ? 1 : null,
-                  baseUnitName: product.unitName,
+                  equivalenceUnitName: product.defaultUnitName,
+                  equivalenceFactor: product.defaultUnitFactor,
                   initialValue: widget.item.quantity,
                   max: maxDisplayQuantity,
                   onChanged: (value) {

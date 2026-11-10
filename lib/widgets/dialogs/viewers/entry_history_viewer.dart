@@ -282,7 +282,7 @@ class _EntryHistoryViewer extends StatelessWidget {
                                                 item.brandName ?? "",
                                               ),
                                               Text(
-                                                "${item.displayUnitName}${item.conversionFactor > 1 ? ' (${item.conversionFactor % 1 == 0 ? item.conversionFactor.toInt() : item.conversionFactor})' : ''}",
+                                                item.displayUnitName,
                                               ),
                                             ],
                                           ),

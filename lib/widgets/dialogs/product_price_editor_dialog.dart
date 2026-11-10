@@ -6,7 +6,6 @@ import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/commercial/product_price_setting/cubit/write_product_sale_profile_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/product_price_setting/dialogs/discount_dialog.dart';
 import 'package:kardex_app_front/src/modules/commercial/product_price_setting/widgets/discount_tile.dart';
-import 'package:kardex_app_front/widgets/title_label.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
@@ -440,64 +439,24 @@ class _RootScaffoldState extends State<_RootScaffold> {
                         height: 8,
                       ),
 
-                      Builder(
-                        builder: (context) {
-                          final factor = selectedExtraUnit?.conversionFactor ?? 1;
-                          final hasExtra = selectedExtraUnit != null && factor > 1;
-                          final unitLabel = hasExtra ? selectedExtraUnit!.name : widget.product.unitName;
-
-                          Widget buildCostItem(String label, int baseCostInCents) {
-                            if (!hasExtra) {
-                              return TitleLabel(
-                                title: label,
-                                bigTitle: NumberFormatter.convertToMoneyLike(baseCostInCents),
-                              );
-                            }
-                            final extraCostInCents = baseCostInCents * factor;
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  "$label ($unitLabel)",
-                                  style: const TextStyle(fontSize: 11, color: Colors.black54),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(height: 1),
-                                Text(
-                                  NumberFormatter.convertToMoneyLike(extraCostInCents),
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                  ),
-                                ),
-                                Text(
-                                  "Base: ${NumberFormatter.convertToMoneyLike(baseCostInCents)}",
-                                  style: const TextStyle(fontSize: 10, color: Colors.grey),
-                                ),
-                              ],
-                            );
-                          }
-
-                          return SizedBox(
-                            height: hasExtra ? 54 : 40,
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: buildCostItem("Costo", widget.product.account.averageCost),
-                                ),
-                                const VerticalDivider(),
-                                Expanded(
-                                  child: buildCostItem("Ultima Compra", widget.product.account.lastCost),
-                                ),
-                                const VerticalDivider(),
-                                Expanded(
-                                  child: buildCostItem("Costo Maximo", widget.product.account.maximumCost),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
+                      UnitCostComparison(
+                        items: [
+                          UnitCostItem(
+                            label: "Costo",
+                            baseCostInCents: widget.product.account.averageCost,
+                          ),
+                          UnitCostItem(
+                            label: "Última Compra",
+                            baseCostInCents: widget.product.account.lastCost,
+                          ),
+                          UnitCostItem(
+                            label: "Costo Máximo",
+                            baseCostInCents: widget.product.account.maximumCost,
+                          ),
+                        ],
+                        baseUnitName: widget.product.unitName,
+                        selectedUnitName: selectedExtraUnit?.name ?? widget.product.unitName,
+                        selectedUnitFactor: selectedExtraUnit?.conversionFactor ?? 1,
                       ),
 
                       const SizedBox(
@@ -529,61 +488,78 @@ class _RootScaffoldState extends State<_RootScaffold> {
 
                       if (widget.product.extraUnits.isNotEmpty && selectedExtraUnit != null) ...[
                         const SizedBox(height: 12),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              flex: 3,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    "Precio Base para:",
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: Colors.grey,
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            final baseInfo = Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "Precio Base para:",
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.w500,
                                   ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    widget.product.unitName,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              flex: 2,
-                              child: DropdownButtonFormField<ExtraUnit>(
-                                decoration: const InputDecoration(
-                                  labelText: 'Calcular para la unidad:',
-                                  border: OutlineInputBorder(),
-                                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                 ),
-                                initialValue: selectedExtraUnit,
-                                items: widget.product.extraUnits.map((extra) {
-                                  return DropdownMenuItem<ExtraUnit>(
-                                    value: extra,
-                                    child: Text('${extra.name} (x${extra.conversionFactor})'),
-                                  );
-                                }).toList(),
-                                onChanged: (value) {
-                                  if (value != null) {
-                                    setState(() {
-                                      selectedExtraUnit = value;
-                                      _updateAllExtraControllers();
-                                    });
-                                  }
-                                },
+                                const SizedBox(height: 4),
+                                Text(
+                                  widget.product.unitName,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                              ],
+                            );
+
+                            final unitDropdown = DropdownButtonFormField<ExtraUnit>(
+                              isExpanded: true,
+                              decoration: const InputDecoration(
+                                labelText: 'Calcular para la unidad:',
+                                border: OutlineInputBorder(),
+                                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                               ),
-                            ),
-                          ],
+                              initialValue: selectedExtraUnit,
+                              items: widget.product.extraUnits.map((extra) {
+                                return DropdownMenuItem<ExtraUnit>(
+                                  value: extra,
+                                  child: Text(
+                                    extra.name,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                if (value != null) {
+                                  setState(() {
+                                    selectedExtraUnit = value;
+                                    _updateAllExtraControllers();
+                                  });
+                                }
+                              },
+                            );
+
+                            if (constraints.maxWidth < 500) {
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  baseInfo,
+                                  const SizedBox(height: 12),
+                                  unitDropdown,
+                                ],
+                              );
+                            }
+
+                            return Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Expanded(flex: 3, child: baseInfo),
+                                const SizedBox(width: 16),
+                                Expanded(flex: 2, child: unitDropdown),
+                              ],
+                            );
+                          },
                         ),
                       ],
 
@@ -636,9 +612,13 @@ class _RootScaffoldState extends State<_RootScaffold> {
                                       ),
                                       Text(
                                         hasExtra
-                                            ? "Calculado sobre costo: ${NumberFormatter.convertToMoneyLike(extraCostInCents)} (${NumberFormatter.convertToMoneyLike(costInCents)} por ${widget.product.unitName})"
-                                            : "Calculado sobre costo (${NumberFormatter.convertToMoneyLike(costInCents)})",
-                                        style: TextStyle(fontSize: 11, color: Colors.blue.shade700),
+                                            ? "Costo base: ${NumberFormatter.convertToMoneyLike(costInCents)} (${widget.product.unitName}) · Equivale a ${NumberFormatter.convertToMoneyLike(extraCostInCents)} por ${selectedExtraUnit!.name}"
+                                            : "Costo base: ${NumberFormatter.convertToMoneyLike(costInCents)}",
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.blue.shade800,
+                                        ),
                                       ),
                                     ],
                                   ),

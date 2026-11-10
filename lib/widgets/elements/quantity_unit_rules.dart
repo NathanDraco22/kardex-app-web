@@ -36,7 +36,8 @@ class QuantityUnitRules {
   ///   factor (las unidades superiores solo aceptan enteros);
   /// - [requireIntegerDisplay] y el resultado tiene fracción.
   ///
-  /// El llamador debe reiniciar la cantidad a 0 y mostrar la equivalencia.
+  /// El llamador debe reiniciar la cantidad a 0. Puede informar la equivalencia
+  /// si el flujo lo requiere.
   static double? convertOnUnitChange({
     required num displayQuantity,
     required int oldFactor,
