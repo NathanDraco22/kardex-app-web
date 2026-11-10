@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_app_front/src/modules/expenses/expenses_reports/expense_report_period.dart';
-import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_app_front/src/modules/expenses/shared/widgets/expense_date_range_fields.dart';
 import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_app_front/widgets/buttons/secondary_menu_button.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
@@ -32,38 +32,11 @@ class ExpenseReportFilters extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dateFields = LayoutBuilder(
-      builder: (context, constraints) {
-        final startField = _ReportDateField(
-          label: 'Fecha Inicio',
-          value: startDate,
-          onTap: () => _pickStartDate(context),
-        );
-        final endField = _ReportDateField(
-          label: 'Fecha Fin',
-          value: endDate,
-          onTap: () => _pickEndDate(context),
-        );
-
-        if (constraints.maxWidth < 460) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              startField,
-              const SizedBox(height: 10),
-              endField,
-            ],
-          );
-        }
-
-        return Row(
-          children: [
-            Expanded(child: startField),
-            const SizedBox(width: 10),
-            Expanded(child: endField),
-          ],
-        );
-      },
+    final dateFields = ExpenseDateRangeFields(
+      startDate: startDate,
+      endDate: endDate,
+      onStartDateChanged: onStartDateChanged,
+      onEndDateChanged: onEndDateChanged,
     );
 
     final actions = Wrap(
@@ -197,111 +170,6 @@ class ExpenseReportFilters extends StatelessWidget {
             ],
           ),
         ],
-      ),
-    );
-  }
-
-  Future<void> _pickStartDate(BuildContext context) async {
-    final now = DateTime.now();
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: startDate,
-      firstDate: DateTime(now.year - 5),
-      lastDate: DateTime(now.year, now.month, now.day),
-      helpText: 'Fecha Inicio',
-    );
-    if (picked == null || !context.mounted) return;
-    onStartDateChanged(picked);
-  }
-
-  Future<void> _pickEndDate(BuildContext context) async {
-    final now = DateTime.now();
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: endDate,
-      firstDate: startDate,
-      lastDate: DateTime(now.year, now.month, now.day),
-      helpText: 'Fecha Fin',
-    );
-    if (picked == null || !context.mounted) return;
-    onEndDateChanged(picked);
-  }
-}
-
-class _ReportDateField extends StatelessWidget {
-  const _ReportDateField({
-    required this.label,
-    required this.value,
-    required this.onTap,
-  });
-
-  final String label;
-  final DateTime value;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final border = OutlineInputBorder(
-      borderRadius: AppThemeTokens.borderRadiusMd,
-      borderSide: const BorderSide(color: AppThemeTokens.borderLight),
-    );
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: AppThemeTokens.borderRadiusMd,
-      child: InputDecorator(
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: const TextStyle(fontSize: 13, color: Color(0xFF64748B)),
-          floatingLabelStyle: const TextStyle(
-            fontSize: 12.5,
-            fontWeight: FontWeight.w600,
-            color: AppThemeTokens.indigo,
-          ),
-          filled: true,
-          fillColor: const Color(0xFFF8FAFC),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 10,
-          ),
-          border: border,
-          enabledBorder: border,
-          focusedBorder: OutlineInputBorder(
-            borderRadius: AppThemeTokens.borderRadiusMd,
-            borderSide: const BorderSide(
-              color: AppThemeTokens.indigo,
-              width: 1.5,
-            ),
-          ),
-        ),
-        child: Row(
-          children: [
-            const Icon(
-              Icons.calendar_today_rounded,
-              size: 16,
-              color: AppThemeTokens.indigo,
-            ),
-            const SizedBox(width: 7),
-            Expanded(
-              child: Text(
-                DateTimeTool.formatddMMyyEs(value),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 13.5,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFF1E293B),
-                  letterSpacing: -0.1,
-                ),
-              ),
-            ),
-            const Icon(
-              Icons.expand_more_rounded,
-              size: 18,
-              color: Color(0xFF94A3B8),
-            ),
-          ],
-        ),
       ),
     );
   }

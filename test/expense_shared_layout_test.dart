@@ -62,8 +62,12 @@ void main() {
                       categories: const [],
                       selectedSupplier: null,
                       onSupplierChanged: (_) {},
-                      dateRange: null,
-                      onDateRangeChanged: (_) {},
+                      startDate: null,
+                      endDate: null,
+                      onStartDateChanged: (_) {},
+                      onEndDateChanged: (_) {},
+                      onClearStartDate: () {},
+                      onClearEndDate: () {},
                       hasActiveFilters: false,
                       onClearFilters: () {},
                     ),
@@ -435,6 +439,129 @@ void main() {
 
     expect(find.textContaining('Montos sobre'), findsNothing);
   });
+
+  testWidgets('el filtro de categorías no desborda con nombres largos', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(768, 1200));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    final controller = TextEditingController();
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: ExpenseFilterPanel(
+              config: _config,
+              searchController: controller,
+              searchQuery: '',
+              onSearchChanged: (_) {},
+              selectedStatus: ExpenseStatusFilter.all,
+              onStatusChanged: (_) {},
+              selectedCategory: null,
+              onCategoryChanged: (_) {},
+              categories: [
+                ExpenseCategoryInDb(
+                  id: 'cat-long',
+                  name: 'Mantenimiento de infraestructura y equipos tecnológicos',
+                  createdAt: DateTime(2026, 1, 1),
+                  isActive: true,
+                  isDeleted: false,
+                ),
+              ],
+              selectedSupplier: null,
+              onSupplierChanged: (_) {},
+              startDate: null,
+              endDate: null,
+              onStartDateChanged: (_) {},
+              onEndDateChanged: (_) {},
+              onClearStartDate: () {},
+              onClearEndDate: () {},
+              hasActiveFilters: false,
+              onClearFilters: () {},
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('el panel de listas muestra Fecha Inicio y Fecha Fin', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(1280, 1000));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    final controller = TextEditingController();
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: ExpenseFilterPanel(
+              config: _config,
+              searchController: controller,
+              searchQuery: '',
+              onSearchChanged: (_) {},
+              selectedStatus: ExpenseStatusFilter.all,
+              onStatusChanged: (_) {},
+              selectedCategory: null,
+              onCategoryChanged: (_) {},
+              categories: const [],
+              selectedSupplier: null,
+              onSupplierChanged: (_) {},
+              startDate: null,
+              endDate: null,
+              onStartDateChanged: (_) {},
+              onEndDateChanged: (_) {},
+              onClearStartDate: () {},
+              onClearEndDate: () {},
+              hasActiveFilters: false,
+              onClearFilters: () {},
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Fecha de registro'), findsOneWidget);
+    expect(find.text('Fecha Inicio'), findsOneWidget);
+    expect(find.text('Fecha Fin'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  for (final size in [const Size(360, 640), const Size(1280, 520)]) {
+    testWidgets(
+      'el estado vacío no desborda en ${size.width.toInt()}x${size.height.toInt()}',
+      (tester) async {
+        await tester.binding.setSurfaceSize(size);
+        addTearDown(() => tester.binding.setSurfaceSize(null));
+
+        final cubit = _FakeReadExpenseCubit(const [], hasMore: true);
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: BlocProvider<ReadExpenseCubit>.value(
+              value: cubit,
+              child: const ExpenseListScreen(config: _config),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.drag(find.byType(CustomScrollView), const Offset(0, -2000));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Cargar más registros'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
 }
 
 int _requestedOffset(_FakeExpensesRepository repository) {

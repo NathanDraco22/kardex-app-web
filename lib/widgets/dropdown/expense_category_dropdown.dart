@@ -58,9 +58,17 @@ class ExpenseCategoryDropdown extends StatelessWidget {
 
     return DropdownButtonFormField<String?>(
       initialValue: value == "" ? null : value,
-      // Las variantes con decoración personalizada (formularios) ocupan todo
-      // el ancho disponible para evitar desbordes con nombres largos.
-      isExpanded: decoration != null,
+      // Ocupa todo el ancho disponible para que un nombre largo no fuerce al
+      // botón a crecer más allá de su celda en los filtros.
+      isExpanded: true,
+      selectedItemBuilder: (context) {
+        return [
+          if (showAllOption) const _EllipsizedDropdownLabel("Todos"),
+          ...finalCategories.map(
+            (c) => _EllipsizedDropdownLabel(c.name),
+          ),
+        ];
+      },
       decoration:
           decoration ??
           InputDecoration(
@@ -83,6 +91,25 @@ class ExpenseCategoryDropdown extends StatelessWidget {
       ],
       onChanged: onChanged,
       validator: validator,
+    );
+  }
+}
+
+/// Texto de una línea para el valor seleccionado del dropdown.
+///
+/// El menú desplegable conserva los nombres completos; solo el valor visible
+/// dentro del campo se recorta para no desbordar.
+class _EllipsizedDropdownLabel extends StatelessWidget {
+  const _EllipsizedDropdownLabel(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
     );
   }
 }

@@ -132,7 +132,8 @@ API FastAPI
 | :--- | :--- |
 | `ExpensePageHeader` | Cabecera con icono tintado, título, subtítulo, refresco y botón de creación. |
 | `ExpenseKpiStrip` | Cuatro tarjetas: Total registrado, Pagado, Pendiente y Vencidos. Incluye la nota de alcance “sobre N registros visibles de M cargados”. |
-| `ExpenseFilterPanel` | Búsqueda, pills de estado, filtro de categoría/proveedor, rango de fechas y limpieza de filtros. |
+| `ExpenseFilterPanel` | Búsqueda, pills de estado, filtro de categoría/proveedor, fechas separadas de registro (inicio/fin) y limpieza de filtros. |
+| `ExpenseDateRangeFields` | Par de campos “Fecha Inicio” y “Fecha Fin” con calendarios individuales, soporte de extremos opcionales y limpieza por campo. Se usa en las listas y en el reporte. |
 | `ExpenseTableHeader` / `ExpenseTableRow` | Tabla desktop: Concepto, Documento, Registro, Vencimiento, Estado, Monto y acciones. |
 | `ExpenseCardTile` | Tarjeta equivalente para móvil/tablet, con metadatos, badges y menú de acciones. |
 | `ExpenseFormSection`, `ExpenseFormColumns`, `ExpenseAmountField`, `ExpenseDateField`, `ExpenseCreditSwitch`, `expenseFormFieldDecoration` | Base visual y campos reutilizables de los formularios. |
@@ -200,7 +201,7 @@ Ambas listas reutilizan `ExpenseListScreen` y solo cambian su `ExpenseListConfig
 | Estado `Vencidos` | Local | Usa `isExpenseOverdue`; no se envía al backend. |
 | Categoría | Servidor + local | Solo en gastos operativos. |
 | Proveedor | Servidor + local | Solo en gastos de proveedores. |
-| Rango de fechas | Servidor + local | Se aplica sobre `createdAt`, con inicio/fin de día. |
+| Fecha Inicio / Fecha Fin (registro) | Servidor + local | Se aplica sobre `createdAt`, con inicio/fin de día. Cada extremo es opcional y se ajustan entre sí si quedan invertidos. |
 
 Al cambiar un filtro se resetea el `offset` a 0 y se conserva el `type` del listado. Los filtros locales se aplican sobre los registros ya cargados; por eso “Pendientes” y “Vencidos” pueden requerir cargar más páginas para mostrar todos los resultados del período.
 
@@ -465,7 +466,7 @@ La UI se reconstruye y refleja el cambio
 
 Reglas:
 
-- Las listas filtran por rango de fechas y muestran la columna “Registro” con `createdAt`.
+- Las listas filtran por fecha de registro con los campos separados “Fecha Inicio” y “Fecha Fin” y muestran la columna “Registro” con `createdAt`.
 - El reporte usa los campos “Fecha Inicio” y “Fecha Fin” y `createdAt` tanto en la pantalla como en CSV/PDF.
 - `date` sigue siendo la fecha del documento y se conserva para el formulario, el visor y la compatibilidad de datos; no es la fecha del reporte.
 - La exportación CSV/PDF usa los registros cargados del período y la etiqueta “Registro”, no `date`.

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_app_front/src/modules/expenses/shared/expense_list_config.dart';
+import 'package:kardex_app_front/src/modules/expenses/shared/widgets/expense_date_range_fields.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 import 'package:kardex_app_front/widgets/dialogs/selectors/supplier_selection_dialog.dart';
 import 'package:kardex_app_front/widgets/dropdown/expense_category_dropdown.dart';
@@ -48,8 +49,12 @@ class ExpenseFilterPanel extends StatelessWidget {
     required this.categories,
     required this.selectedSupplier,
     required this.onSupplierChanged,
-    required this.dateRange,
-    required this.onDateRangeChanged,
+    required this.startDate,
+    required this.endDate,
+    required this.onStartDateChanged,
+    required this.onEndDateChanged,
+    required this.onClearStartDate,
+    required this.onClearEndDate,
     required this.hasActiveFilters,
     required this.onClearFilters,
   });
@@ -65,8 +70,12 @@ class ExpenseFilterPanel extends StatelessWidget {
   final List<ExpenseCategoryInDb> categories;
   final SupplierInDb? selectedSupplier;
   final ValueChanged<SupplierInDb?> onSupplierChanged;
-  final DateTimeRange? dateRange;
-  final ValueChanged<DateTimeRange?> onDateRangeChanged;
+  final DateTime? startDate;
+  final DateTime? endDate;
+  final ValueChanged<DateTime> onStartDateChanged;
+  final ValueChanged<DateTime> onEndDateChanged;
+  final VoidCallback? onClearStartDate;
+  final VoidCallback? onClearEndDate;
   final bool hasActiveFilters;
   final VoidCallback onClearFilters;
 
@@ -147,7 +156,6 @@ class ExpenseFilterPanel extends StatelessWidget {
                     onChanged: onCategoryChanged,
                   ),
                 if (config.supportsSupplierFilter) _buildSupplierFilter(context),
-                _buildDateRangeFilter(context),
               ];
 
               final clearButton = TextButton.icon(
@@ -191,6 +199,36 @@ class ExpenseFilterPanel extends StatelessWidget {
                 ],
               );
             },
+          ),
+          const SizedBox(height: 14),
+          const Row(
+            children: [
+              Icon(
+                Icons.event_note_rounded,
+                size: 15,
+                color: Color(0xFF64748B),
+              ),
+              SizedBox(width: 6),
+              Text(
+                'Fecha de registro',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF475569),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          ExpenseDateRangeFields(
+            startDate: startDate,
+            endDate: endDate,
+            onStartDateChanged: onStartDateChanged,
+            onEndDateChanged: onEndDateChanged,
+            onClearStart: onClearStartDate,
+            onClearEnd: onClearEndDate,
+            accentColor: config.accentColor,
+            breakpoint: 420,
           ),
         ],
       ),
@@ -250,64 +288,6 @@ class ExpenseFilterPanel extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Widget _buildDateRangeFilter(BuildContext context) {
-    return InkWell(
-      onTap: () async {
-        final now = DateTime.now();
-        final picked = await showDateRangePicker(
-          context: context,
-          firstDate: DateTime(now.year - 5),
-          lastDate: now,
-          initialDateRange: dateRange,
-          helpText: 'Fecha de registro',
-          saveText: 'Aplicar',
-        );
-        if (picked == null || !context.mounted) return;
-        onDateRangeChanged(picked);
-      },
-      borderRadius: AppThemeTokens.borderRadiusMd,
-      child: InputDecorator(
-        decoration: _filterDecoration('Fecha de registro'),
-        isEmpty: dateRange == null,
-        child: Row(
-          children: [
-            const Icon(Icons.date_range_rounded, size: 16, color: Color(0xFF94A3B8)),
-            const SizedBox(width: 6),
-            Expanded(
-              child: Text(
-                _dateRangeLabel,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 13.5,
-                  fontWeight: dateRange == null ? FontWeight.w400 : FontWeight.w600,
-                  color: dateRange == null ? const Color(0xFF64748B) : const Color(0xFF0F172A),
-                ),
-              ),
-            ),
-            if (dateRange == null)
-              const Icon(Icons.expand_more_rounded, size: 18, color: Color(0xFF94A3B8))
-            else
-              IconButton(
-                tooltip: 'Quitar fecha de registro',
-                onPressed: () => onDateRangeChanged(null),
-                icon: const Icon(Icons.close_rounded, size: 15, color: Color(0xFF64748B)),
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints.tightFor(width: 44, height: 44),
-                splashRadius: 20,
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  String get _dateRangeLabel {
-    final range = dateRange;
-    if (range == null) return 'Todas las fechas';
-    return '${DateTimeTool.formatddMMyyEs(range.start)} - ${DateTimeTool.formatddMMyyEs(range.end)}';
   }
 
   InputDecoration _filterDecoration(String label) {

@@ -39,7 +39,8 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
   ExpenseStatusFilter _statusFilter = ExpenseStatusFilter.all;
   String? _selectedCategory;
   SupplierInDb? _selectedSupplier;
-  DateTimeRange? _dateRange;
+  DateTime? _startDate;
+  DateTime? _endDate;
 
   @override
   void dispose() {
@@ -128,8 +129,12 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
                                 categories: context.read<ReadExpenseCubit>().expenseCategories,
                                 selectedSupplier: _selectedSupplier,
                                 onSupplierChanged: _onSupplierChanged,
-                                dateRange: _dateRange,
-                                onDateRangeChanged: _onDateRangeChanged,
+                                startDate: _startDate,
+                                endDate: _endDate,
+                                onStartDateChanged: _onStartDateChanged,
+                                onEndDateChanged: _onEndDateChanged,
+                                onClearStartDate: _onClearStartDate,
+                                onClearEndDate: _onClearEndDate,
                                 hasActiveFilters: _hasActiveFilters,
                                 onClearFilters: _clearFilters,
                               ),
@@ -195,17 +200,19 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
 
     if (state is ReadExpenseError) {
       return [
-        SliverFillRemaining(
-          hasScrollBody: false,
-          child: AppEmptyState(
-            icon: Icons.error_outline_rounded,
-            title: 'No se pudieron cargar los gastos',
-            subtitle: state.message,
-            accentColor: AppThemeTokens.danger,
-            actionLabel: 'Reintentar',
-            actionIcon: Icons.refresh_rounded,
-            onAction: () => context.read<ReadExpenseCubit>().refresh(),
-          ),
+        _buildExpandedSliver(
+          horizontalPadding: horizontalPadding,
+          children: [
+            AppEmptyState(
+              icon: Icons.error_outline_rounded,
+              title: 'No se pudieron cargar los gastos',
+              subtitle: state.message,
+              accentColor: AppThemeTokens.danger,
+              actionLabel: 'Reintentar',
+              actionIcon: Icons.refresh_rounded,
+              onAction: () => context.read<ReadExpenseCubit>().refresh(),
+            ),
+          ],
         ),
       ];
     }
@@ -218,32 +225,29 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
       final showLoadMore = successState != null && (hasMore || isLoadingMore || loadMoreError != null);
 
       return [
-        SliverFillRemaining(
-          hasScrollBody: false,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              AppEmptyState(
-                icon: hasActiveFilters ? Icons.search_off_rounded : widget.config.icon,
-                title: hasActiveFilters ? 'Sin resultados' : widget.config.emptyTitle,
-                subtitle: hasActiveFilters
-                    ? 'No hay gastos que coincidan con los filtros seleccionados.'
-                    : widget.config.emptySubtitle,
-                accentColor: widget.config.accentColor,
-                actionLabel: hasActiveFilters ? 'Limpiar filtros' : widget.config.createButtonLabel,
-                actionIcon: hasActiveFilters ? Icons.filter_alt_off_rounded : Icons.add_rounded,
-                onAction: hasActiveFilters ? _clearFilters : _createExpense,
-              ),
-              if (showLoadMore)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8, bottom: 32),
-                  child: _buildLoadMoreSection(
-                    isLoadingMore: isLoadingMore,
-                    error: loadMoreError,
-                  ),
+        _buildExpandedSliver(
+          horizontalPadding: horizontalPadding,
+          children: [
+            AppEmptyState(
+              icon: hasActiveFilters ? Icons.search_off_rounded : widget.config.icon,
+              title: hasActiveFilters ? 'Sin resultados' : widget.config.emptyTitle,
+              subtitle: hasActiveFilters
+                  ? 'No hay gastos que coincidan con los filtros seleccionados.'
+                  : widget.config.emptySubtitle,
+              accentColor: widget.config.accentColor,
+              actionLabel: hasActiveFilters ? 'Limpiar filtros' : widget.config.createButtonLabel,
+              actionIcon: hasActiveFilters ? Icons.filter_alt_off_rounded : Icons.add_rounded,
+              onAction: hasActiveFilters ? _clearFilters : _createExpense,
+            ),
+            if (showLoadMore)
+              Padding(
+                padding: const EdgeInsets.only(top: 8, bottom: 32),
+                child: _buildLoadMoreSection(
+                  isLoadingMore: isLoadingMore,
+                  error: loadMoreError,
                 ),
-            ],
-          ),
+              ),
+          ],
         ),
       ];
     }
@@ -337,6 +341,42 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
     return slivers;
   }
 
+  /// Sliver de altura natural para estados vacíos/error.
+  ///
+  /// `SliverFillRemaining(hasScrollBody: false)` impone una altura fija que
+  /// desborda en ventanas bajas cuando el estado vacío incluye acciones
+  /// adicionales. Este sliver ocupa el espacio restante cuando sobra, pero
+  /// permite que el contenido crezca y lo desplaza el scroll principal.
+  Widget _buildExpandedSliver({
+    required double horizontalPadding,
+    required List<Widget> children,
+  }) {
+    return SliverLayoutBuilder(
+      builder: (context, constraints) {
+        return SliverToBoxAdapter(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: constraints.remainingPaintExtent,
+            ),
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(
+                horizontalPadding,
+                16,
+                horizontalPadding,
+                32,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: children,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   List<ExpenseInDb> _visibleItems(ReadExpenseSuccess state) {
     final deletedIds = state.deletedItems.map((expense) => expense.id).toSet();
     final query = _searchQuery.trim().toLowerCase();
@@ -363,12 +403,13 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
           if (_selectedCategory != null && expense.category != _selectedCategory) return false;
           if (_selectedSupplier != null && expense.supplierId != _selectedSupplier!.id) return false;
 
-          final range = _dateRange;
-          if (range != null) {
-            if (expense.createdAt.isBefore(range.start.startOfDay()) ||
-                expense.createdAt.isAfter(range.end.endOfDay())) {
-              return false;
-            }
+          final startDate = _startDate;
+          if (startDate != null && expense.createdAt.isBefore(startDate.startOfDay())) {
+            return false;
+          }
+          final endDate = _endDate;
+          if (endDate != null && expense.createdAt.isAfter(endDate.endOfDay())) {
+            return false;
           }
 
           if (query.isNotEmpty) {
@@ -391,7 +432,8 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
     return _statusFilter != ExpenseStatusFilter.all ||
         _selectedCategory != null ||
         _selectedSupplier != null ||
-        _dateRange != null ||
+        _startDate != null ||
+        _endDate != null ||
         _searchQuery.trim().isNotEmpty;
   }
 
@@ -414,20 +456,47 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
     _applyFilters();
   }
 
-  void _onDateRangeChanged(DateTimeRange? value) {
-    setState(() => _dateRange = value);
+  void _onStartDateChanged(DateTime value) {
+    final normalized = DateTime(value.year, value.month, value.day);
+    setState(() {
+      _startDate = normalized;
+      final end = _endDate;
+      if (end != null && end.isBefore(normalized)) {
+        _endDate = normalized;
+      }
+    });
+    _applyFilters();
+  }
+
+  void _onEndDateChanged(DateTime value) {
+    final normalized = DateTime(value.year, value.month, value.day);
+    setState(() {
+      _endDate = normalized;
+      final start = _startDate;
+      if (start != null && start.isAfter(normalized)) {
+        _startDate = normalized;
+      }
+    });
+    _applyFilters();
+  }
+
+  void _onClearStartDate() {
+    setState(() => _startDate = null);
+    _applyFilters();
+  }
+
+  void _onClearEndDate() {
+    setState(() => _endDate = null);
     _applyFilters();
   }
 
   void _applyFilters() {
-    final range = _dateRange;
-
     context.read<ReadExpenseCubit>().applyFilters(
       status: _statusFilter.apiStatus,
       category: widget.config.supportsCategoryFilter ? _selectedCategory : null,
       supplierId: widget.config.supportsSupplierFilter ? _selectedSupplier?.id : null,
-      startDate: range?.start.startOfDay().millisecondsSinceEpoch,
-      endDate: range?.end.endOfDay().millisecondsSinceEpoch,
+      startDate: _startDate?.startOfDay().millisecondsSinceEpoch,
+      endDate: _endDate?.endOfDay().millisecondsSinceEpoch,
     );
   }
 
@@ -438,7 +507,8 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
       _statusFilter = ExpenseStatusFilter.all;
       _selectedCategory = null;
       _selectedSupplier = null;
-      _dateRange = null;
+      _startDate = null;
+      _endDate = null;
     });
     context.read<ReadExpenseCubit>().clearFilters();
   }
