@@ -29,6 +29,8 @@ void main() {
 
     expect(find.byKey(const Key('price1')), findsOneWidget);
     expect(find.byKey(const Key('price1_extra')), findsOneWidget);
+    expect(find.text('Precio Venta 1 (C\$)'), findsOneWidget);
+    expect(find.text('Precio Venta 2 (C\$)'), findsOneWidget);
     expect(find.text('Por Caja (C\$):'), findsNWidgets(2));
     expect(controller.extraControllers[0].text, '120.00');
 
@@ -69,6 +71,8 @@ void main() {
 
     expect(find.byKey(const Key('price1')), findsOneWidget);
     expect(find.byKey(const Key('price4')), findsOneWidget);
+    expect(find.text('Precio Venta 1 (C\$)'), findsOneWidget);
+    expect(find.text('Precio Venta 4 (C\$)'), findsOneWidget);
     expect(find.byKey(const Key('price1_extra')), findsNothing);
 
     controller.dispose();

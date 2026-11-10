@@ -281,7 +281,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
                                   color: Colors.amber.shade700,
                                 ),
                                 title: Text(
-                                  "Precio de Venta menor al costo",
+                                  "Precio Venta menor al costo",
                                   style: TextStyle(
                                     color: Colors.amber.shade700,
                                   ),
