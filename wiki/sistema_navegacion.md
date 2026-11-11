@@ -48,7 +48,7 @@ Todos los componentes de navegación están estandarizados en `lib/widgets/` y e
   - Lista de módulos con iconos temáticos redondeados, títulos legibles y distintivo de estado activo (borde de 1 dp y fondo con opacidad del color temático).
   - Contador de módulos en la cabecera.
 - **`DesktopSubmenuPanel` (`lib/.../desktop/widgets/desktop_submenu_panel.dart`):**
-  - Panel derecho con fondo neutro suave (`#F8FAFC`).
+  - Panel derecho que hereda el fondo índigo suave del tema (`Colors.indigo.shade50`).
   - Cabecera con icono grande (48x48 dp), título del módulo, subtítulo explicativo y distintivo de conteo.
   - Buscador reactivo en tiempo real integrado en la cabecera con botón para limpiar búsqueda.
   - Contenedor ergonómico centrado con ancho máximo de 960 dp (`ConstrainedBox(maxWidth: 960)`).

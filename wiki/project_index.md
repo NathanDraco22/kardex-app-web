@@ -115,6 +115,7 @@ lib/
 
 Para conocer a detalle la lógica, vistas, cubits y repositorios de cada módulo funcional, consulta:
 
+- 🎨 **[Identidad Visual y Guía de Estilos (diseno_e_identidad_visual.md)](./diseno_e_identidad_visual.md)** - Reglas arquitectónicas de fondos (`Colors.indigo.shade50`), contraste con tarjetas Bento blancas, AppBar corporativo (`#072A3C`) y erradicación de fondos blancos planos.
 - 🗺️ **[Sistema de Navegación y Arquitectura (sistema_navegacion.md)](./sistema_navegacion.md)** - Guía maestra de navegación: Split Hub (Desktop), Drill-Down (Mobile), permisos de roles, fallback seguro y diferencias entre ramas `main` y `lite`.
 - 🧭 **[Ediciones main vs lite (ramas_main_vs_lite.md)](./ramas_main_vs_lite.md)** - Contexto de negocio: por qué existe `lite`, el flujo simplificado de producto/stock/precio y por qué no incluye movimientos de kárdex.
 - 📋 **[Índice de Módulos (modules_index.md)](./modules/modules_index.md)** - Resumen ejecutivo de todos los módulos.
