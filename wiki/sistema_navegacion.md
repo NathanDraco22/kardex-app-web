@@ -219,7 +219,7 @@ flowchart TD
 | **Inventario: Secciones** | 5 secciones: Consultas, Entradas/Salidas, Traslados, Precios, Ajustes/Mermas | 4 secciones: Catálogo, Consultas, Entradas/Salidas, Traslados |
 | **Inventario: Catálogo** | Usa `product-price-catalog` (`RouteNames.productPriceCatalog`) | Usa `product-inventory-catalog` (`RouteNames.productInventoryCatalog`) con edición directa |
 | **Inventario: Kárdex por Movimiento** | Opción activa `product-movements` | Deshabilitada (`product-movements` comentado) |
-| **Inventario: Ajustes y Mermas** | Rutas activas (`adjust-entry`, `history-adjust-entry`, mermas) | Omitidas por completo (rutas no registradas en router) |
+| **Inventario: Ajustes y Mermas** | Rutas activas (`adjust-entry`, `history-adjust-entry`, mermas, `adjustment-requests` y sus subrutas) | Omitidas por completo (rutas no registradas en router) |
 | **Comercio: Total de Opciones** | 28 opciones | 27 opciones (se omite `commercial-product-movements`) |
 | **Condición de Pago Dinámica** | `SegmentedButton` en cotizaciones / órdenes borrador (`CONTADO`/`CRÉDITO`) | Idéntico (portado) |
 | **Botones en AppBars Oscuros** | `TertiaryMenuButton` tonal | Idéntico (portado) |

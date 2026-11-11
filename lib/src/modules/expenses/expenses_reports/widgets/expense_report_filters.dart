@@ -5,7 +5,7 @@ import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_app_front/widgets/buttons/secondary_menu_button.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 
-/// Tarjeta de filtros del reporte: fechas separadas, atajos y acciones.
+/// Barra de filtros compacta del reporte: fechas estilo cotizaciones, atajos inline y acciones.
 class ExpenseReportFilters extends StatelessWidget {
   const ExpenseReportFilters({
     super.key,
@@ -37,99 +37,69 @@ class ExpenseReportFilters extends StatelessWidget {
       endDate: endDate,
       onStartDateChanged: onStartDateChanged,
       onEndDateChanged: onEndDateChanged,
+      breakpoint: 280,
     );
 
-    final actions = Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      crossAxisAlignment: WrapCrossAlignment.center,
+    final actions = Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         SecondaryMenuButton(
           onPressed: onClear,
-          icon: const Icon(Icons.restart_alt_rounded, size: 17),
+          icon: const Icon(Icons.restart_alt_rounded, size: 15),
           label: const Text(
             'Limpiar',
-            style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600),
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 11),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         ),
+        const SizedBox(width: 8),
         Tooltip(
           message: isRefreshing
               ? 'Espera a que termine la carga del período'
               : onExport == null
-              ? 'No hay datos para exportar en este período'
-              : 'Exportar reporte',
+                  ? 'No hay datos para exportar en este período'
+                  : 'Exportar reporte',
           child: PrimaryMenuButton(
             onPressed: onExport,
-            icon: const Icon(Icons.download_rounded, size: 18),
+            icon: const Icon(Icons.download_rounded, size: 16),
             label: const Text(
               'Exportar',
-              style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700),
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 11),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           ),
         ),
+        if (isRefreshing) ...[
+          const SizedBox(width: 8),
+          const SizedBox(
+            width: 14,
+            height: 14,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+        ],
       ],
     );
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: AppThemeTokens.borderRadiusLg,
+        borderRadius: AppThemeTokens.borderRadiusMd,
         border: Border.all(color: AppThemeTokens.borderLight),
         boxShadow: AppThemeTokens.subtleCardShadow(),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 34,
-                height: 34,
-                decoration: BoxDecoration(
-                  color: AppThemeTokens.indigo.withValues(alpha: 0.10),
-                  borderRadius: AppThemeTokens.borderRadiusSm,
-                  border: Border.all(
-                    color: AppThemeTokens.indigo.withValues(alpha: 0.20),
-                  ),
-                ),
-                child: const Icon(
-                  Icons.calendar_month_rounded,
-                  size: 18,
-                  color: AppThemeTokens.indigo,
-                ),
-              ),
-              const SizedBox(width: 10),
-              const Expanded(
-                child: Text(
-                  'Período del reporte',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF0F172A),
-                    letterSpacing: -0.2,
-                  ),
-                ),
-              ),
-              if (isRefreshing)
-                const SizedBox(
-                  width: 15,
-                  height: 15,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-            ],
-          ),
-          const SizedBox(height: 14),
           LayoutBuilder(
             builder: (context, constraints) {
-              if (constraints.maxWidth >= 900) {
+              if (constraints.maxWidth >= 720) {
                 return Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Expanded(flex: 3, child: dateFields),
-                    const SizedBox(width: 16),
+                    Expanded(child: dateFields),
+                    const SizedBox(width: 12),
                     actions,
                   ],
                 );
@@ -137,36 +107,47 @@ class ExpenseReportFilters extends StatelessWidget {
 
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   dateFields,
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
                   Align(alignment: Alignment.centerRight, child: actions),
                 ],
               );
             },
           ),
-          const SizedBox(height: 14),
-          const Text(
-            'ATAJOS RÁPIDOS',
-            style: TextStyle(
-              fontSize: 10.5,
-              fontWeight: FontWeight.w800,
-              color: Color(0xFF64748B),
-              letterSpacing: 0.6,
-            ),
-          ),
-          const SizedBox(height: 7),
-          Wrap(
-            spacing: 7,
-            runSpacing: 7,
+          const SizedBox(height: 8),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              for (final option in ExpenseReportPeriod.values)
-                if (option != ExpenseReportPeriod.custom)
-                  _PeriodPill(
-                    label: option.label,
-                    isSelected: period == option,
-                    onTap: () => onPeriodSelected(option),
+              const Text(
+                'Atajos:',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF64748B),
+                  letterSpacing: 0.2,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      for (final option in ExpenseReportPeriod.values)
+                        if (option != ExpenseReportPeriod.custom) ...[
+                          _PeriodPill(
+                            label: option.label,
+                            isSelected: period == option,
+                            onTap: () => onPeriodSelected(option),
+                          ),
+                          const SizedBox(width: 6),
+                        ],
+                    ],
                   ),
+                ),
+              ),
             ],
           ),
         ],
@@ -193,21 +174,21 @@ class _PeriodPill extends StatelessWidget {
       borderRadius: AppThemeTokens.borderRadiusFull,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 140),
-        constraints: const BoxConstraints(minHeight: 44),
+        height: 28,
         alignment: Alignment.center,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-          color: isSelected ? AppThemeTokens.indigo.withValues(alpha: 0.12) : Colors.white,
+          color: isSelected ? AppThemeTokens.indigo.withValues(alpha: 0.12) : const Color(0xFFF8FAFC),
           borderRadius: AppThemeTokens.borderRadiusFull,
           border: Border.all(
-            color: isSelected ? AppThemeTokens.indigo.withValues(alpha: 0.45) : const Color(0xFFCBD5E1),
+            color: isSelected ? AppThemeTokens.indigo.withValues(alpha: 0.45) : AppThemeTokens.borderLight,
             width: 0.9,
           ),
         ),
         child: Text(
           label,
           style: TextStyle(
-            fontSize: 12,
+            fontSize: 11.5,
             fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
             color: isSelected ? AppThemeTokens.indigo : const Color(0xFF475569),
           ),

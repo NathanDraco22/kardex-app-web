@@ -49,23 +49,13 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppThemeTokens.surfaceLight,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF0F172A),
-        elevation: 0,
-        scrolledUnderElevation: 0,
         title: Tooltip(
           message: widget.config.subtitle,
           child: Text(
             widget.config.title,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              letterSpacing: -0.2,
-            ),
           ),
         ),
         actions: [
@@ -76,12 +66,12 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
                 tooltip: 'Actualizar',
                 onPressed: isRefreshing ? null : () => context.read<ReadExpenseCubit>().refresh(),
                 icon: isRefreshing
-                    ? SizedBox(
+                    ? const SizedBox(
                         width: 18,
                         height: 18,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: widget.config.accentColor,
+                          color: Colors.white,
                         ),
                       )
                     : const Icon(Icons.refresh_rounded, size: 21),
@@ -91,18 +81,13 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
           IconButton(
             tooltip: widget.config.createButtonLabel,
             onPressed: _createExpense,
-            icon: Icon(
+            icon: const Icon(
               Icons.add_rounded,
-              size: 23,
-              color: widget.config.accentColor,
+              size: 24,
             ),
           ),
           const SizedBox(width: 4),
         ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Container(height: 1, color: AppThemeTokens.borderLight),
-        ),
       ),
       body: SafeArea(
         top: false,

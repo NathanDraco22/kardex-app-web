@@ -1,5 +1,6 @@
 export 'adjust_entry/adjust_entry_model.dart';
 export 'adjust_exit/adjust_exit_model.dart';
+export 'adjustment_request/adjustment_request_model.dart';
 export 'branch/branch.dart';
 export 'branch/branch_model.dart';
 export 'client/client.dart';

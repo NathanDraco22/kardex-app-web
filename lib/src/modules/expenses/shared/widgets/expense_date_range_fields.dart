@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 
-/// Par de campos de fecha independientes para filtrar por un rango.
+/// Par de campos de fecha independientes y compactos para filtrar por un rango.
 ///
-/// Se usa tanto en el reporte de gastos como en el panel de filtros de las
-/// listas para que ambos compartan la misma apariencia y el mismo
-/// comportamiento de los calendarios.
+/// Inspirado en el estilo de DatePickerListTile y DatePickerButton utilizados
+/// en el Buscador de Cotizaciones y reportes de la app, pero optimizado para
+/// caber en una toolbar horizontal delgada (36-40px de alto).
 class ExpenseDateRangeFields extends StatelessWidget {
   const ExpenseDateRangeFields({
     super.key,
@@ -19,7 +19,7 @@ class ExpenseDateRangeFields extends StatelessWidget {
     this.accentColor = AppThemeTokens.indigo,
     this.startLabel = 'Fecha Inicio',
     this.endLabel = 'Fecha Fin',
-    this.breakpoint = 460,
+    this.breakpoint = 420,
   });
 
   final DateTime? startDate;
@@ -44,14 +44,14 @@ class ExpenseDateRangeFields extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final startField = _ExpenseDateRangeField(
+        final startField = _ExpenseCompactDatePicker(
           label: startLabel,
           value: startDate,
           accentColor: accentColor,
           onTap: () => _pickStartDate(context),
           onClear: onClearStart,
         );
-        final endField = _ExpenseDateRangeField(
+        final endField = _ExpenseCompactDatePicker(
           label: endLabel,
           value: endDate,
           accentColor: accentColor,
@@ -62,9 +62,10 @@ class ExpenseDateRangeFields extends StatelessWidget {
         if (constraints.maxWidth < breakpoint) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
             children: [
               startField,
-              const SizedBox(height: 10),
+              const SizedBox(height: 6),
               endField,
             ],
           );
@@ -73,7 +74,7 @@ class ExpenseDateRangeFields extends StatelessWidget {
         return Row(
           children: [
             Expanded(child: startField),
-            const SizedBox(width: 10),
+            const SizedBox(width: 8),
             Expanded(child: endField),
           ],
         );
@@ -124,8 +125,9 @@ class ExpenseDateRangeFields extends StatelessWidget {
   }
 }
 
-class _ExpenseDateRangeField extends StatelessWidget {
-  const _ExpenseDateRangeField({
+/// Selector de fecha compacto estilo DatePickerListTile/DatePickerButton
+class _ExpenseCompactDatePicker extends StatelessWidget {
+  const _ExpenseCompactDatePicker({
     required this.label,
     required this.value,
     required this.accentColor,
@@ -141,73 +143,92 @@ class _ExpenseDateRangeField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final border = OutlineInputBorder(
-      borderRadius: AppThemeTokens.borderRadiusMd,
-      borderSide: const BorderSide(color: AppThemeTokens.borderLight),
-    );
+    String text = 'Todas';
+    if (value != null) {
+      final today = _today();
+      if (value!.year == today.year && value!.month == today.month && value!.day == today.day) {
+        text = 'Hoy';
+      } else {
+        text = DateTimeTool.formatddMMyy(value!);
+      }
+    }
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: AppThemeTokens.borderRadiusMd,
-      child: InputDecorator(
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: const TextStyle(fontSize: 13, color: Color(0xFF64748B)),
-          floatingLabelStyle: TextStyle(
-            fontSize: 12.5,
-            fontWeight: FontWeight.w600,
-            color: accentColor,
-          ),
-          filled: true,
-          fillColor: const Color(0xFFF8FAFC),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 10,
-          ),
-          border: border,
-          enabledBorder: border,
-          focusedBorder: OutlineInputBorder(
-            borderRadius: AppThemeTokens.borderRadiusMd,
-            borderSide: BorderSide(color: accentColor, width: 1.5),
-          ),
-        ),
-        child: Row(
-          children: [
-            Icon(Icons.calendar_today_rounded, size: 16, color: accentColor),
-            const SizedBox(width: 7),
-            Expanded(
-              child: Text(
-                value == null ? 'Todas' : DateTimeTool.formatddMMyyEs(value!),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 13.5,
-                  fontWeight: value == null ? FontWeight.w500 : FontWeight.w700,
-                  color: value == null ? const Color(0xFF64748B) : const Color(0xFF1E293B),
-                  letterSpacing: -0.1,
-                ),
-              ),
+    final hasValue = value != null;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: AppThemeTokens.borderRadiusSm,
+        child: Container(
+          height: 38,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF8FAFC),
+            borderRadius: AppThemeTokens.borderRadiusSm,
+            border: Border.all(
+              color: hasValue ? accentColor.withValues(alpha: 0.4) : AppThemeTokens.borderLight,
+              width: 1,
             ),
-            if (value != null && onClear != null)
-              IconButton(
-                tooltip: 'Limpiar $label',
-                onPressed: onClear,
-                icon: const Icon(
-                  Icons.close_rounded,
-                  size: 15,
-                  color: Color(0xFF64748B),
-                ),
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints.tightFor(width: 40, height: 40),
-                splashRadius: 20,
-              )
-            else
-              const Icon(
-                Icons.expand_more_rounded,
-                size: 18,
-                color: Color(0xFF94A3B8),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.calendar_today_rounded,
+                size: 14,
+                color: hasValue ? accentColor : const Color(0xFF64748B),
               ),
-          ],
+              const SizedBox(width: 6),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF64748B),
+                        height: 1.0,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      text,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: hasValue ? FontWeight.w700 : FontWeight.w500,
+                        color: hasValue ? const Color(0xFF0F172A) : const Color(0xFF94A3B8),
+                        height: 1.0,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (hasValue && onClear != null)
+                IconButton(
+                  tooltip: 'Limpiar $label',
+                  icon: const Icon(Icons.close_rounded, size: 14),
+                  color: const Color(0xFF64748B),
+                  onPressed: onClear,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints.tightFor(width: 22, height: 22),
+                  splashRadius: 12,
+                )
+              else
+                const Icon(
+                  Icons.arrow_drop_down_rounded,
+                  size: 16,
+                  color: Color(0xFF94A3B8),
+                ),
+            ],
+          ),
         ),
       ),
     );

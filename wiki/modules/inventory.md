@@ -15,6 +15,7 @@ lib/src/modules/inventory/
 ├── inventory_entry/                     # Entrada formal de mercancía por compra o recepción
 ├── inventory_exit/                      # Salida formal de mercancía por consumo o despacho
 ├── adjust_entry/ & adjust_exit/         # Ajustes de inventario (sobrantes y faltantes)
+├── adjustment_request/                  # Solicitudes de ajuste con flujo de aprobación
 ├── history_entry/ & history_exit/       # Historial de entradas y salidas registradas
 ├── create_transfer/                     # Creación y emisión de traslados entre sucursales
 ├── current_tranfers/                    # Recepción y confirmación de traslados en tránsito
@@ -60,6 +61,23 @@ lib/src/modules/inventory/
 - **Cubits:** `AdjustEntryCubit`, `AdjustExitCubit`.
 - **Regla de Negocio:** Permite especificar motivo del ajuste (auditoría, rotura, merma, corrección de sistema) y actualiza el saldo contable.
 
+### 2.4.1. Solicitudes de Ajuste (`adjustment_request`)
+
+- **Propósito:** Registrar un conteo físico y someterlo a aprobación antes de afectar existencias.
+- **Flujo:**
+  1. El usuario crea una solicitud **Pendiente** con los productos, la existencia del sistema, el conteo real, la diferencia y el costo.
+  2. Otro usuario con acceso a Inventario la **Aprueba**; el servidor aplica la diferencia original guardada.
+  3. Si hay sobrantes y faltantes en la misma solicitud, se generan **dos documentos**: un Ajuste de Entrada y un Ajuste de Salida, dentro de la misma transacción Mongo.
+  4. Si se **Cancela**, no se toca el inventario.
+- **Reglas:**
+  - El creador no puede aprobar su propia solicitud.
+  - Solo las solicitudes pendientes se pueden editar, cancelar o eliminar lógicamente.
+  - El backend vuelve a tomar la foto real del `ProductAccount` al crear/editar; no confía en la existencia enviada por el cliente.
+  - La aprobación aplica la diferencia registrada, aunque el stock actual haya cambiado. Si una salida ya no tiene stock suficiente, el servidor rechaza la aprobación.
+- **Vistas:** `AdjustmentRequestListScreen`, `AdjustmentRequestFormScreen`, `AdjustmentRequestDetailScreen`.
+- **Cubits:** `ReadAdjustmentRequestsCubit`, `WriteAdjustmentRequestCubit`, `ReadAdjustmentRequestDetailCubit`.
+- **Repositorio:** `AdjustmentRequestsRepository` (reactivo: notifica altas/cambios/bajas al `ReadCubit`).
+
 ### 2.5. Transferencias entre Sucursales (`create_transfer` & `current_tranfers`)
 - **Propósito:** Despacho y recepción controlada de mercadería entre distintas bodegas o puntos de venta.
 - **Vistas:**
@@ -84,6 +102,7 @@ lib/src/modules/inventory/
 | Salidas | `ExitDocsDataSource` | `ExitDocsRepository` |
 | Transferencias | `TransfersDataSource` | `TransfersRepository` |
 | Ajustes | `AdjustDocsDataSource` | `AdjustDocsRepository` |
+| Solicitudes de Ajuste | `AdjustmentRequestsDataSource` | `AdjustmentRequestsRepository` |
 | Lotes / Vencimientos | `ExpirationLogsDataSource` | `ExpirationLogsRepository` |
 
 ---
@@ -98,4 +117,8 @@ lib/src/modules/inventory/
 - `/inventory/current-transfers`: Consultar transferencias activas.
 - `/inventory/expiration-logs`: Bitácora de fechas de caducidad.
 - `/inventory/adjust-entry` & `/inventory/adjust-exit`: Ajustes de inventario.
+- `/inventory/adjustment-requests`: Lista de solicitudes de ajuste.
+- `/inventory/adjustment-requests/create`: Nueva solicitud de ajuste.
+- `/inventory/adjustment-requests/:requestId`: Detalle de la solicitud.
+- `/inventory/adjustment-requests/:requestId/edit`: Edición de una solicitud pendiente.
 - `/inventory/history-entry` & `/inventory/history-exit`: Historiales de movimientos.

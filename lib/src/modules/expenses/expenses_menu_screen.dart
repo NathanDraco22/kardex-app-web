@@ -23,7 +23,6 @@ class _RootScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      backgroundColor: Color(0xFFF8FAFC),
       appBar: MenuAppBar(title: 'Gastos'),
       body: ExpensesHubBody(),
     );

@@ -243,6 +243,16 @@ class _Body extends StatelessWidget {
               ),
             ),
           ),
+          ShortcutAddableListTile(
+            routeName: RouteNames.adjustmentRequests,
+            child: MenuOptionCard(
+              icon: Icons.fact_check_outlined,
+              accentColor: Colors.indigo,
+              title: "Solicitudes de Ajuste",
+              subtitle: "Conteo físico con flujo de aprobación",
+              onTap: () => context.pushNamed("adjustment-requests"),
+            ),
+          ),
         ],
       ),
     );

@@ -20,10 +20,6 @@ enum ExpenseStatusFilter {
   final String label;
 
   /// Valor de estado aceptado por [ExpenseQueryParams.status].
-  ///
-  /// El backend solo acepta un estado por petición. "Pendientes" agrupa
-  /// borradores, abiertos y pagos parciales, por lo que se resuelve con el
-  /// filtro local de la lista en lugar de enviar `status` al servidor.
   String? get apiStatus {
     switch (this) {
       case ExpenseStatusFilter.all:
@@ -36,7 +32,7 @@ enum ExpenseStatusFilter {
   }
 }
 
-/// Tarjeta compacta con totales, filtros y búsqueda de la lista de gastos.
+/// Toolbar compacta con totales, filtros y búsqueda de la lista de gastos.
 class ExpenseFilterPanel extends StatelessWidget {
   const ExpenseFilterPanel({
     super.key,
@@ -88,81 +84,70 @@ class ExpenseFilterPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: AppThemeTokens.borderRadiusLg,
+        borderRadius: AppThemeTokens.borderRadiusMd,
         border: Border.all(color: AppThemeTokens.borderLight),
         boxShadow: AppThemeTokens.subtleCardShadow(),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          ExpenseKpiStrip(
-            metrics: metrics,
-            accentColor: config.accentColor,
-            totalLoaded: totalLoaded,
-          ),
-          const SizedBox(height: 10),
-          Container(height: 1, color: AppThemeTokens.borderLight),
-          const SizedBox(height: 10),
           LayoutBuilder(
             builder: (context, constraints) {
-              final controls = <Widget>[
-                _buildStatusDropdown(context),
-                if (config.supportsCategoryFilter)
-                  ExpenseCategoryDropdown(
-                    key: ValueKey('filter_category_${selectedCategory ?? 'all'}'),
-                    value: selectedCategory,
-                    showAllOption: true,
-                    label: config.conceptLabel,
-                    categories: categories,
-                    decoration: _filterDecoration(config.conceptLabel),
-                    onChanged: onCategoryChanged,
-                  ),
-                if (config.supportsSupplierFilter) _buildSupplierFilter(context),
-              ];
+              final statusDropdown = _buildStatusDropdown(context);
+              final categoryOrSupplier = config.supportsCategoryFilter
+                  ? ExpenseCategoryDropdown(
+                      key: ValueKey('filter_category_${selectedCategory ?? 'all'}'),
+                      value: selectedCategory,
+                      showAllOption: true,
+                      label: config.conceptLabel,
+                      categories: categories,
+                      decoration: _filterDecoration(config.conceptLabel),
+                      onChanged: onCategoryChanged,
+                    )
+                  : (config.supportsSupplierFilter ? _buildSupplierFilter(context) : null);
 
               final clearButton = TextButton.icon(
                 onPressed: hasActiveFilters ? onClearFilters : null,
-                icon: const Icon(Icons.filter_alt_off_rounded, size: 16),
+                icon: const Icon(Icons.filter_alt_off_rounded, size: 15),
                 label: const Text(
                   'Limpiar',
-                  style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
                 ),
                 style: TextButton.styleFrom(
                   foregroundColor: const Color(0xFF475569),
                   disabledForegroundColor: const Color(0xFFCBD5E1),
-                  minimumSize: const Size(44, 44),
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  minimumSize: const Size(36, 36),
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
                   shape: RoundedRectangleBorder(
                     borderRadius: AppThemeTokens.borderRadiusSm,
                   ),
                 ),
               );
 
-              final dates = Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+              final dateFields = Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   const Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
-                        Icons.event_note_rounded,
-                        size: 13,
-                        color: Color(0xFF64748B),
-                      ),
-                      SizedBox(width: 5),
+                      Icon(Icons.event_note_rounded, size: 12, color: Color(0xFF64748B)),
+                      SizedBox(width: 4),
                       Text(
                         'Fecha de registro',
                         style: TextStyle(
-                          fontSize: 10.5,
+                          fontSize: 9.5,
                           fontWeight: FontWeight.w600,
                           color: Color(0xFF64748B),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 2),
                   ExpenseDateRangeFields(
                     startDate: startDate,
                     endDate: endDate,
@@ -176,46 +161,87 @@ class ExpenseFilterPanel extends StatelessWidget {
                 ],
               );
 
-              final search = _buildSearchField();
+              final searchField = _buildSearchField();
 
-              if (constraints.maxWidth < 620) {
+              // Pantallas de escritorio (>= 860px): Filtros en una fila y buscador debajo
+              if (constraints.maxWidth >= 860) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    for (var index = 0; index < controls.length; index++) ...[
-                      if (index > 0) const SizedBox(height: 8),
-                      controls[index],
-                    ],
-                    const SizedBox(height: 2),
-                    Align(alignment: Alignment.centerRight, child: clearButton),
-                    const SizedBox(height: 8),
-                    dates,
-                    const SizedBox(height: 10),
-                    search,
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        SizedBox(width: 140, child: statusDropdown),
+                        if (categoryOrSupplier != null) ...[
+                          const SizedBox(width: 8),
+                          Expanded(child: categoryOrSupplier),
+                        ],
+                        const SizedBox(width: 8),
+                        Expanded(flex: 2, child: dateFields),
+                        const SizedBox(width: 6),
+                        clearButton,
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    searchField,
                   ],
                 );
               }
 
+              // Vista tablet responsiva compacta (560px - 859px)
+              if (constraints.maxWidth >= 560) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Expanded(child: statusDropdown),
+                        if (categoryOrSupplier != null) ...[
+                          const SizedBox(width: 8),
+                          Expanded(child: categoryOrSupplier),
+                        ],
+                        const SizedBox(width: 6),
+                        clearButton,
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    dateFields,
+                    const SizedBox(height: 6),
+                    searchField,
+                  ],
+                );
+              }
+
+              // Pantallas angostas (< 560px)
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Row(
-                    children: [
-                      for (var index = 0; index < controls.length; index++) ...[
-                        if (index > 0) const SizedBox(width: 10),
-                        Expanded(child: controls[index]),
-                      ],
-                      const SizedBox(width: 6),
-                      clearButton,
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  dates,
-                  const SizedBox(height: 10),
-                  search,
+                  statusDropdown,
+                  if (categoryOrSupplier != null) ...[
+                    const SizedBox(height: 6),
+                    categoryOrSupplier,
+                  ],
+                  const SizedBox(height: 6),
+                  dateFields,
+                  const SizedBox(height: 6),
+                  searchField,
+                  const SizedBox(height: 2),
+                  Align(alignment: Alignment.centerRight, child: clearButton),
                 ],
               );
             },
+          ),
+          const SizedBox(height: 6),
+          Container(height: 1, color: AppThemeTokens.borderLight),
+          const SizedBox(height: 6),
+          ExpenseKpiStrip(
+            metrics: metrics,
+            accentColor: config.accentColor,
+            totalLoaded: totalLoaded,
           ),
         ],
       ),
@@ -232,7 +258,7 @@ class ExpenseFilterPanel extends StatelessWidget {
           isExpanded: true,
           isDense: true,
           icon: const Icon(
-            Icons.expand_more_rounded,
+            Icons.arrow_drop_down_rounded,
             size: 18,
             color: Color(0xFF94A3B8),
           ),
@@ -255,40 +281,47 @@ class ExpenseFilterPanel extends StatelessWidget {
   }
 
   Widget _buildSearchField() {
-    return TextField(
-      controller: searchController,
-      onChanged: onSearchChanged,
-      textInputAction: TextInputAction.search,
-      decoration: InputDecoration(
-        hintText: config.searchHint,
-        hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
-        prefixIcon: const Icon(Icons.search_rounded, size: 19),
-        suffixIcon: searchQuery.isEmpty
-            ? null
-            : IconButton(
-                tooltip: 'Limpiar búsqueda',
-                icon: const Icon(Icons.close_rounded, size: 18),
-                onPressed: () {
-                  searchController.clear();
-                  onSearchChanged('');
-                },
-              ),
-        filled: true,
-        fillColor: const Color(0xFFF8FAFC),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        border: OutlineInputBorder(
-          borderRadius: AppThemeTokens.borderRadiusMd,
-          borderSide: const BorderSide(color: AppThemeTokens.borderLight),
+    return SizedBox(
+      height: 36,
+      child: TextField(
+        controller: searchController,
+        onChanged: onSearchChanged,
+        textInputAction: TextInputAction.search,
+        style: const TextStyle(fontSize: 12.5),
+        decoration: InputDecoration(
+          hintText: config.searchHint,
+          hintStyle: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+          prefixIcon: const Icon(Icons.search_rounded, size: 17),
+          prefixIconConstraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+          suffixIcon: searchQuery.isEmpty
+              ? null
+              : IconButton(
+                  tooltip: 'Limpiar búsqueda',
+                  icon: const Icon(Icons.close_rounded, size: 15),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+                  onPressed: () {
+                    searchController.clear();
+                    onSearchChanged('');
+                  },
+                ),
+          filled: true,
+          fillColor: const Color(0xFFF8FAFC),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          border: OutlineInputBorder(
+            borderRadius: AppThemeTokens.borderRadiusSm,
+            borderSide: const BorderSide(color: AppThemeTokens.borderLight),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: AppThemeTokens.borderRadiusSm,
+            borderSide: const BorderSide(color: AppThemeTokens.borderLight),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: AppThemeTokens.borderRadiusSm,
+            borderSide: BorderSide(color: config.accentColor, width: 1.5),
+          ),
+          isDense: true,
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: AppThemeTokens.borderRadiusMd,
-          borderSide: const BorderSide(color: AppThemeTokens.borderLight),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: AppThemeTokens.borderRadiusMd,
-          borderSide: BorderSide(color: config.accentColor, width: 1.5),
-        ),
-        isDense: true,
       ),
     );
   }
@@ -313,7 +346,7 @@ class ExpenseFilterPanel extends StatelessWidget {
         if (selected == null || !context.mounted) return;
         onSupplierChanged(selected);
       },
-      borderRadius: AppThemeTokens.borderRadiusMd,
+      borderRadius: AppThemeTokens.borderRadiusSm,
       child: InputDecorator(
         decoration: _filterDecoration('Proveedor'),
         isEmpty: selectedSupplier == null,
@@ -325,22 +358,22 @@ class ExpenseFilterPanel extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: 12.5,
                   fontWeight: selectedSupplier == null ? FontWeight.w400 : FontWeight.w600,
                   color: selectedSupplier == null ? const Color(0xFF64748B) : const Color(0xFF0F172A),
                 ),
               ),
             ),
             if (selectedSupplier == null)
-              const Icon(Icons.expand_more_rounded, size: 18, color: Color(0xFF94A3B8))
+              const Icon(Icons.arrow_drop_down_rounded, size: 18, color: Color(0xFF94A3B8))
             else
               IconButton(
                 tooltip: 'Quitar proveedor',
                 onPressed: () => onSupplierChanged(null),
-                icon: const Icon(Icons.close_rounded, size: 15, color: Color(0xFF64748B)),
+                icon: const Icon(Icons.close_rounded, size: 14, color: Color(0xFF64748B)),
                 padding: EdgeInsets.zero,
-                constraints: const BoxConstraints.tightFor(width: 36, height: 36),
-                splashRadius: 18,
+                constraints: const BoxConstraints.tightFor(width: 22, height: 22),
+                splashRadius: 12,
               ),
           ],
         ),
@@ -350,26 +383,26 @@ class ExpenseFilterPanel extends StatelessWidget {
 
   InputDecoration _filterDecoration(String label) {
     final border = OutlineInputBorder(
-      borderRadius: AppThemeTokens.borderRadiusMd,
+      borderRadius: AppThemeTokens.borderRadiusSm,
       borderSide: const BorderSide(color: AppThemeTokens.borderLight),
     );
 
     return InputDecoration(
       labelText: label,
-      labelStyle: const TextStyle(fontSize: 12.5, color: Color(0xFF64748B)),
+      labelStyle: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
       floatingLabelStyle: TextStyle(
-        fontSize: 11.5,
+        fontSize: 10.5,
         fontWeight: FontWeight.w600,
         color: config.accentColor,
       ),
       isDense: true,
       filled: true,
-      fillColor: Colors.white,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+      fillColor: const Color(0xFFF8FAFC),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       border: border,
       enabledBorder: border,
       focusedBorder: OutlineInputBorder(
-        borderRadius: AppThemeTokens.borderRadiusMd,
+        borderRadius: AppThemeTokens.borderRadiusSm,
         borderSide: BorderSide(color: config.accentColor, width: 1.5),
       ),
     );
@@ -388,16 +421,18 @@ class _StatusOption extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: 8,
-          height: 8,
+          width: 7,
+          height: 7,
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
-        const SizedBox(width: 8),
-        Text(
-          label,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontSize: 13),
+        const SizedBox(width: 6),
+        Flexible(
+          child: Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontSize: 12.5),
+          ),
         ),
       ],
     );

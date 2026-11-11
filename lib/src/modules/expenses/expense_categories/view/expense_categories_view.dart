@@ -109,24 +109,8 @@ class _ExpenseCategoriesScaffoldState extends State<_ExpenseCategoriesScaffold> 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF0F172A),
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        title: const Text(
-          'Gastos',
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w700,
-            letterSpacing: -0.2,
-          ),
-        ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Container(height: 1, color: AppThemeTokens.borderLight),
-        ),
+        title: const Text('Categorías de Gastos'),
       ),
       body: SafeArea(
         top: false,

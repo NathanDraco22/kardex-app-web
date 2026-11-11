@@ -55,28 +55,25 @@ class _DesktopSubmenuPanelState extends State<DesktopSubmenuPanel> {
       return inTitle || inSubtitle;
     }).toList();
 
-    return Container(
-      color: const Color(0xFFF8FAFC),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _buildHeader(context, category, accent),
-          const Divider(height: 1, thickness: 1, color: Color(0xFFE2E8F0)),
-          Expanded(
-            child: filteredItems.isEmpty
-                ? _buildEmptyState(accent)
-                : SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
-                    child: Center(
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 960),
-                        child: _buildItemsList(context, filteredItems, accent),
-                      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildHeader(context, category, accent),
+        const Divider(height: 1, thickness: 1, color: Color(0xFFE2E8F0)),
+        Expanded(
+          child: filteredItems.isEmpty
+              ? _buildEmptyState(accent)
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 960),
+                      child: _buildItemsList(context, filteredItems, accent),
                     ),
                   ),
-          ),
-        ],
-      ),
+                ),
+        ),
+      ],
     );
   }
 

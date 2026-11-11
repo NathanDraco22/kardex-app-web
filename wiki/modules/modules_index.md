@@ -10,7 +10,7 @@ Este documento ofrece un panorama general y conciso de cada uno de los módulos 
 | :--- | :--- | :--- | :--- |
 | **Comercial** | `commercial/` | Terminal POS, facturación (nominativa y final), cotizaciones/proformas, recibos de caja, devoluciones y arqueo por usuario. | [commercial.md](./commercial.md) |
 | **Notas de Crédito** | `commercial/credit_notes/` | Sustitución y evolución de devoluciones (por mercancía o monto) con Repositorio Reactivo y amortización en recibos. | [credit_notes.md](./credit_notes.md) |
-| **Inventario** | `inventory/` | Existencias en tiempo real, entradas/salidas (flujo con y sin kárdex), ajustes, transferencias entre sucursales y bitácora de vencimientos. | [inventory.md](./inventory.md) |
+| **Inventario** | `inventory/` | Existencias en tiempo real, entradas/salidas (flujo con y sin kárdex), ajustes, solicitudes de ajuste con aprobación, transferencias entre sucursales y bitácora de vencimientos. | [inventory.md](./inventory.md) |
 | **Catálogo de Productos** | `product_catalog/` | Catálogo maestro de productos, códigos alternativos (`altCode`), categorías taxonómicas, unidades de medida y escalas de conversión estandarizadas (Peso, Volumen, Longitud, Tiempo). | [product_catalog.md](./product_catalog.md) |
 | **Escalas de Unidades** | `product_catalog/unit_scales/` | Plantillas de conversión estandarizadas (Peso, Volumen, Longitud, Tiempo y personalizadas) para productos. | [unit_scales.md](./unit_scales.md) |
 | **Cuentas Pendientes** | `pending_accounts/` | Cuentas por cobrar, cartera de deudores, sesiones de crédito y aplicación de abonos a facturas pendientes. | [pending_accounts.md](./pending_accounts.md) |

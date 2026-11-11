@@ -743,6 +743,15 @@ List<HomeModuleCategory> getHomeModuleCategories(
             ),
           ),
         ),
+        const HomeSubmoduleItem(
+          section: "Ajustes y Mermas",
+          title: "Solicitudes de Ajuste",
+          subtitle: "Conteo físico con aprobación",
+          icon: Icons.fact_check_outlined,
+          accentColor: Color(0xFF4F46E5),
+          routeName: RouteNames.adjustmentRequests,
+          permissions: [Modules.inventory],
+        ),
       ],
     ),
     const HomeModuleCategory(

@@ -3,11 +3,10 @@ import 'package:kardex_app_front/src/modules/expenses/shared/expense_metrics.dar
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 
-/// Barra compacta con los montos principales de la lista de gastos.
+/// Barra ultra compacta con los montos principales de la lista de gastos.
 ///
-/// Sustituye a las tarjetas KPI grandes para que el header y los filtros
-/// ocupen poco espacio vertical. En desktop se muestra en una fila y en
-/// móvil/tablet en una grilla de dos columnas.
+/// Diseñada para ocupar la mínima altura vertical sin tarjetas pesadas,
+/// mostrando chips estilizados en una sola línea o wrap responsivo.
 class ExpenseKpiStrip extends StatelessWidget {
   const ExpenseKpiStrip({
     super.key,
@@ -57,48 +56,38 @@ class ExpenseKpiStrip extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isWide = constraints.maxWidth >= 760;
+        final isWide = constraints.maxWidth >= 720;
         final metricsWidget = isWide
             ? Row(
                 children: [
                   for (var index = 0; index < items.length; index++) ...[
-                    if (index > 0) const _MetricDivider(),
+                    if (index > 0) const SizedBox(width: 8),
                     Expanded(child: _CompactMetric(data: items[index])),
                   ],
                 ],
               )
-            : Column(
+            : Wrap(
+                spacing: 8,
+                runSpacing: 6,
                 children: [
-                  Row(
-                    children: [
-                      Expanded(child: _CompactMetric(data: items[0])),
-                      const SizedBox(width: 12),
-                      Expanded(child: _CompactMetric(data: items[1])),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Expanded(child: _CompactMetric(data: items[2])),
-                      const SizedBox(width: 12),
-                      Expanded(child: _CompactMetric(data: items[3])),
-                    ],
-                  ),
+                  for (final item in items) _CompactMetric(data: item),
                 ],
               );
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
           children: [
             metricsWidget,
             if (totalLoaded > 0) ...[
-              const SizedBox(height: 5),
+              const SizedBox(height: 4),
               Text(
                 'Montos sobre ${metrics.count} registros visibles de $totalLoaded cargados.',
                 textAlign: TextAlign.right,
                 style: const TextStyle(
                   fontSize: 10,
                   color: Color(0xFF94A3B8),
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],
@@ -132,72 +121,65 @@ class _CompactMetric extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 26,
-          height: 26,
-          decoration: BoxDecoration(
-            color: data.color.withValues(alpha: 0.10),
-            borderRadius: AppThemeTokens.borderRadiusSm,
-          ),
-          child: Icon(data.icon, size: 14, color: data.color),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                data.label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF64748B),
-                ),
-              ),
-              Text(
-                NumberFormatter.convertToMoneyLike(data.amount),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w800,
-                  color: Color(0xFF0F172A),
-                  letterSpacing: -0.3,
-                  height: 1.1,
-                ),
-              ),
-              Text(
-                '${data.count} ${data.count == 1 ? 'registro' : 'registros'}',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 9.5,
-                  color: Color(0xFF94A3B8),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _MetricDivider extends StatelessWidget {
-  const _MetricDivider();
-
-  @override
-  Widget build(BuildContext context) {
     return Container(
-      width: 1,
-      height: 32,
-      margin: const EdgeInsets.symmetric(horizontal: 10),
-      color: AppThemeTokens.borderLight,
+      height: 30,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: data.color.withValues(alpha: 0.07),
+        borderRadius: AppThemeTokens.borderRadiusSm,
+        border: Border.all(
+          color: data.color.withValues(alpha: 0.20),
+          width: 0.9,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(
+              color: data.color,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            '${data.label}: ',
+            style: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF64748B),
+              height: 1.0,
+            ),
+          ),
+          Flexible(
+            child: Text(
+              NumberFormatter.convertToMoneyLike(data.amount),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+                color: Color(0xFF0F172A),
+                letterSpacing: -0.2,
+                height: 1.0,
+              ),
+            ),
+          ),
+          const SizedBox(width: 4),
+          Text(
+            '(${data.count})',
+            style: const TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w500,
+              color: Color(0xFF94A3B8),
+              height: 1.0,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

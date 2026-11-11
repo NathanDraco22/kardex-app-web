@@ -29,11 +29,9 @@ class DesktopInitialPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     context.watch<AppSettingsCubit>();
 
-    return Container(
-      color: const Color(0xFFF8FAFC),
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(32),
-        child: Center(
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(32),
+      child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 1100),
             child: Column(
@@ -87,8 +85,7 @@ class DesktopInitialPanel extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 }
 
