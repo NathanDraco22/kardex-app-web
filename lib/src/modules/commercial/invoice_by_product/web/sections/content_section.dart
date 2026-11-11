@@ -107,7 +107,7 @@ class _ContentSection extends StatelessWidget {
                       ),
                     ],
                     rowBuilder: (context, index) {
-                      final rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+                      final rowColor = RowColorTool.getRowColor(index);
                       final currentInvoice = invoices[index];
 
                       // Buscar el SaleItem específico para el producto seleccionado

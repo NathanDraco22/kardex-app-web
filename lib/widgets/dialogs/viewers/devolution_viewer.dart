@@ -11,6 +11,7 @@ import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 import 'package:kardex_app_front/widgets/elements/devolution_status_chip.dart';
 
 import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 Future<void> showDevolutionViewerDialog(BuildContext context, DevolutionInDb devolution) async {
   FocusManager.instance.primaryFocus?.unfocus();
@@ -206,7 +207,7 @@ class _DevolutionViewer extends StatelessWidget {
                             itemCount: devolution.returnedItems.length,
                             itemBuilder: (context, index) {
                               final item = devolution.returnedItems[index];
-                              final rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+                              final rowColor = RowColorTool.getRowColor(index);
                               return Container(
                                 padding: const EdgeInsets.all(4),
                                 color: rowColor,

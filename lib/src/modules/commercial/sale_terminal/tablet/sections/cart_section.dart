@@ -129,7 +129,7 @@ class _TabletCartSectionState extends State<_TabletCartSection> {
                             separatorBuilder: (context, index) => const SizedBox(height: 6),
                             itemBuilder: (context, index) {
                               final item = viewController.items[index];
-                              final color = index.isOdd ? Colors.white : Colors.grey.shade50;
+                              final color = RowColorTool.getRowColor(index);
                               final maxQuantity = item.product.account.availableStock / item.conversionFactor;
                               return TerminalCartItemTile(
                                 key: ValueKey(item),
@@ -194,8 +194,7 @@ class _TabletCartSectionState extends State<_TabletCartSection> {
       viewController.requestSearchFocus();
       return;
     }
-    if (res.product.account.availableStock == 0 ||
-        res.product.account.availableStock < res.baseQuantity) {
+    if (res.product.account.availableStock == 0 || res.product.account.availableStock < res.baseQuantity) {
       DialogManager.showInfoDialog(context, "No hay stock disponible");
       viewController.requestSearchFocus();
       return;

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kardex_app_front/widgets/design_system/design_system.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 import 'adjustment_request_item_formatters.dart';
@@ -8,80 +8,116 @@ class AdjustmentRequestItemTable extends StatelessWidget {
   const AdjustmentRequestItemTable({
     super.key,
     required this.items,
+    required this.entryTotal,
+    required this.exitTotal,
   });
 
   final List<AdjustmentRequestItem> items;
+  final int entryTotal;
+  final int exitTotal;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const _ItemTableHeader(),
-        const Divider(height: 1, color: AppThemeTokens.borderLight),
-        Expanded(
-          child: items.isEmpty
-              ? const Center(
-                  child: Text(
-                    'La solicitud no tiene productos.',
-                    style: TextStyle(color: AppThemeTokens.neutral),
-                  ),
-                )
-              : ListView.separated(
-                  itemCount: items.length,
-                  separatorBuilder: (_, _) => const Divider(
-                    height: 1,
-                    color: AppThemeTokens.borderLight,
-                  ),
-                  itemBuilder: (context, index) {
-                    return AdjustmentRequestItemTableRow(
-                      item: items[index],
-                      isEven: index.isEven,
-                    );
-                  },
-                ),
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            const _HeaderTable(),
+            const Divider(),
+            Expanded(
+              child: items.isEmpty
+                  ? const Center(
+                      child: Text(
+                        'La solicitud no tiene productos.',
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: items.length,
+                      itemBuilder: (context, index) {
+                        return _ItemTableRow(
+                          item: items[index],
+                          index: index,
+                        );
+                      },
+                    ),
+            ),
+            const Divider(height: 0.0),
+            _TableFooter(
+              productCount: items.length,
+              entryTotal: entryTotal,
+              exitTotal: exitTotal,
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }
 
-class _ItemTableHeader extends StatelessWidget {
-  const _ItemTableHeader();
+class _HeaderTable extends StatelessWidget {
+  const _HeaderTable();
 
   @override
   Widget build(BuildContext context) {
-    const style = TextStyle(
-      fontSize: 11.5,
-      fontWeight: FontWeight.w800,
-      color: AppThemeTokens.neutral,
-      letterSpacing: 0.2,
-    );
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      color: AppThemeTokens.surfaceLight,
-      child: const Row(
+    return const Padding(
+      padding: EdgeInsets.symmetric(horizontal: 8),
+      child: Row(
         children: [
-          Expanded(flex: 26, child: Text('PRODUCTO', style: style)),
-          Expanded(
-            flex: 13,
-            child: Text('EXISTENCIA', style: style, textAlign: TextAlign.center),
+          Flexible(
+            flex: 3,
+            fit: FlexFit.tight,
+            child: Text(
+              'Nombre del Producto',
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
           ),
-          Expanded(
-            flex: 13,
-            child: Text('CONTEO REAL', style: style, textAlign: TextAlign.center),
+          Flexible(
+            fit: FlexFit.tight,
+            child: Center(
+              child: Text(
+                'Existencia',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ),
           ),
-          Expanded(
-            flex: 13,
-            child: Text('DIFERENCIA', style: style, textAlign: TextAlign.center),
+          Flexible(
+            fit: FlexFit.tight,
+            child: Center(
+              child: Text(
+                'Conteo Real',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ),
           ),
-          Expanded(
-            flex: 14,
-            child: Text('COSTO', style: style, textAlign: TextAlign.center),
+          Flexible(
+            fit: FlexFit.tight,
+            child: Center(
+              child: Text(
+                'Diferencia',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ),
           ),
-          Expanded(
-            flex: 14,
-            child: Text('SUBTOTAL', style: style, textAlign: TextAlign.right),
+          Flexible(
+            fit: FlexFit.tight,
+            child: Center(
+              child: Text(
+                'Costo Unitario',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ),
+          ),
+          Flexible(
+            fit: FlexFit.tight,
+            child: Center(
+              child: Text(
+                'Subtotal',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ),
           ),
         ],
       ),
@@ -89,99 +125,281 @@ class _ItemTableHeader extends StatelessWidget {
   }
 }
 
-class AdjustmentRequestItemTableRow extends StatelessWidget {
-  const AdjustmentRequestItemTableRow({
-    super.key,
+class _ItemTableRow extends StatelessWidget {
+  const _ItemTableRow({
     required this.item,
-    this.isEven = true,
+    required this.index,
   });
 
   final AdjustmentRequestItem item;
-  final bool isEven;
+  final int index;
 
   @override
   Widget build(BuildContext context) {
     final factor = UnitConversionTool.ensureSafeFactor(item.conversionFactor);
     final unitName = item.unitName ?? item.standardUnitName ?? '';
+    final countedBase = item.countedQuantity;
 
     return Container(
-      color: isEven ? Colors.white : AppThemeTokens.surfaceLight.withValues(alpha: 0.55),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      height: 75,
+      color: RowColorTool.getRowColor(index),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Row(
         children: [
-          Expanded(
-            flex: 26,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item.productName,
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  [
-                    if ((item.code ?? '').isNotEmpty) item.code!,
-                    if ((item.brandName ?? '').isNotEmpty) item.brandName!,
-                    if (unitName.isNotEmpty) unitName,
-                  ].join(' · '),
-                  style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            flex: 13,
-            child: Text(
-              formatAdjustmentDisplayQuantity(item.systemStock, factor),
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600),
-            ),
-          ),
-          Expanded(
-            flex: 13,
-            child: Text(
-              formatAdjustmentDisplayQuantity(item.countedQuantity, factor),
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700),
-            ),
-          ),
-          Expanded(
-            flex: 13,
+          // Producto
+          Flexible(
+            flex: 3,
+            fit: FlexFit.tight,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  adjustmentDifferenceIcon(item.difference),
-                  size: 14,
-                  color: adjustmentDifferenceColor(item.difference),
-                ),
-                const SizedBox(width: 2),
-                Text(
-                  formatAdjustmentSignedQuantity(item.difference, factor),
-                  style: TextStyle(
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w800,
-                    color: adjustmentDifferenceColor(item.difference),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              item.productName,
+                              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (factor > 1) ...[
+                            const SizedBox(width: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.shade50,
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(color: Colors.blue.shade200),
+                              ),
+                              child: Text(
+                                unitName,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blue.shade800,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                      const SizedBox(height: 3),
+                      Row(
+                        children: [
+                          if ((item.code ?? '').isNotEmpty) ...[
+                            Text(
+                              item.code!,
+                              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(width: 6),
+                          ],
+                          if ((item.brandName ?? '').isNotEmpty)
+                            Text(
+                              item.brandName!,
+                              style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                            ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
-          Expanded(
-            flex: 14,
-            child: Text(
-              formatAdjustmentUnitCost(item.cost, factor),
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600),
+
+          // Existencia
+          Flexible(
+            fit: FlexFit.tight,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    formatAdjustmentDisplayQuantity(item.systemStock, factor),
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  ),
+                  if (factor > 1) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      '= ${item.systemStock} ${item.standardUnitName ?? ""}',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontStyle: FontStyle.italic,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
             ),
           ),
-          Expanded(
-            flex: 14,
-            child: Text(
-              NumberFormatter.convertToMoneyLike(item.subtotal),
-              textAlign: TextAlign.right,
-              style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800),
+
+          // Conteo Real
+          Flexible(
+            fit: FlexFit.tight,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    formatAdjustmentDisplayQuantity(item.countedQuantity, factor),
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  ),
+                  if (factor > 1) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      '= $countedBase ${item.standardUnitName ?? ""}',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontStyle: FontStyle.italic,
+                        color: Colors.blue.shade600,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+
+          // Diferencia
+          Flexible(
+            fit: FlexFit.tight,
+            child: Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    adjustmentDifferenceIcon(item.difference),
+                    size: 16,
+                    color: adjustmentDifferenceColor(item.difference),
+                  ),
+                  const SizedBox(width: 4),
+                  Flexible(
+                    child: Text(
+                      formatAdjustmentSignedQuantity(item.difference, factor),
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: adjustmentDifferenceColor(item.difference),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Costo Unitario
+          Flexible(
+            fit: FlexFit.tight,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    NumberFormatter.convertToMoneyLike(item.cost),
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                  ),
+                  if (factor > 1) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      'Base: ${NumberFormatter.convertToMoneyLike((item.cost / factor).round())}',
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+
+          // Subtotal
+          Flexible(
+            fit: FlexFit.tight,
+            child: Center(
+              child: Text(
+                NumberFormatter.convertToMoneyLike(item.subtotal),
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TableFooter extends StatelessWidget {
+  const _TableFooter({
+    required this.productCount,
+    required this.entryTotal,
+    required this.exitTotal,
+  });
+
+  final int productCount;
+  final int entryTotal;
+  final int exitTotal;
+
+  @override
+  Widget build(BuildContext context) {
+    final netTotal = entryTotal - exitTotal;
+
+    return SizedBox(
+      height: 36,
+      child: Row(
+        children: [
+          Text(
+            'Productos: $productCount',
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+          ),
+          const Spacer(),
+          const Text(
+            'Sobrante: ',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+          ),
+          Text(
+            NumberFormatter.convertToMoneyLike(entryTotal),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+              color: Colors.green.shade700,
+            ),
+          ),
+          const SizedBox(width: 20),
+          const Text(
+            'Faltante: ',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+          ),
+          Text(
+            NumberFormatter.convertToMoneyLike(exitTotal),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+              color: Colors.red.shade700,
+            ),
+          ),
+          const SizedBox(width: 24),
+          const Text(
+            'Total Neto: ',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+          Text(
+            NumberFormatter.convertToMoneyLike(netTotal),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              color: netTotal >= 0 ? Colors.green.shade800 : Colors.red.shade800,
             ),
           ),
         ],

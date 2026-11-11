@@ -5,6 +5,7 @@ import 'package:flutter/rendering.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/tools/cache/image_bytes_resolver.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 import 'package:kardex_business/kardex_business.dart';
@@ -653,9 +654,8 @@ class _StatementVisualCard extends StatelessWidget {
                     final discounts = devTotal + cnTotal;
                     final remaining = inv.totalRemaining - discounts;
 
-                    final isEven = index % 2 == 0;
                     return Container(
-                      color: isEven ? Colors.white : const Color(0xFFF8FAFC),
+                      color: RowColorTool.getRowColor(index),
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
                       child: Row(
                         children: [

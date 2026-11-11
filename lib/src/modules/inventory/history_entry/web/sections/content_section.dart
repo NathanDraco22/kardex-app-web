@@ -72,7 +72,7 @@ class _ContentSection extends StatelessWidget {
                     BasicTableColumn(label: const Text(""), flex: 1),
                   ],
                   rowBuilder: (context, index) {
-                    final rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+                    final rowColor = RowColorTool.getRowColor(index);
 
                     final currentEntryHistory = entryHistories[index];
                     final currentDocDate = DateTimeTool.formatddMMyy(currentEntryHistory.docDate);

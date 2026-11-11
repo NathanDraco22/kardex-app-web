@@ -126,7 +126,7 @@ class _Body extends StatelessWidget {
                             rowBuilder: (context, index) {
                               final item = transfer.items[index];
                               final displayFactor = item.displayUnitFactor;
-                              final rowColor = index.isEven ? Colors.grey.shade200 : Colors.white;
+                              final rowColor = RowColorTool.getRowColor(index);
 
                               String expirationTag = "--";
                               final expirationDate = item.expirationDate;

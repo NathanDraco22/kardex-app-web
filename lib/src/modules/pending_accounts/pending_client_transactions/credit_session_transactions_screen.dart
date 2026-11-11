@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/cubits/client_transaction/read_client_transaction_cubit.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/finance/client_movements/view/widgets/movement_mobile_row.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 class CreditSessionTransactionsScreen extends StatelessWidget {
   const CreditSessionTransactionsScreen({super.key, required this.client});
@@ -158,7 +159,7 @@ class _ContentSection extends StatelessWidget {
                     );
                   }
                   final transaction = transactions[index];
-                  final rowColor = index.isOdd ? Colors.grey.shade100 : Colors.white;
+                  final rowColor = RowColorTool.getRowColor(index);
 
                   return MovementMobileRow(
                     currentTransaction: transaction,

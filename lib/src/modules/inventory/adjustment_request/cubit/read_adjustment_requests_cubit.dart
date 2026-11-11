@@ -276,7 +276,13 @@ String mapAdjustmentRequestErrorMessage(Object error) {
   final raw = error.toString().replaceFirst('HttpServiceException: ', '').trim();
 
   if (raw.contains('SELF_APPROVAL_NOT_ALLOWED')) {
-    return 'No puedes aprobar una solicitud creada por ti. Solicita la aprobación a otro usuario.';
+    return 'No puedes aprobar una solicitud creada por ti. Solo un administrador puede hacerlo.';
+  }
+  if (raw.contains('APPROVAL_REQUIRES_SUPERVISOR_OR_ADMIN')) {
+    return 'Solo un supervisor o administrador puede aprobar solicitudes de ajuste.';
+  }
+  if (raw.contains('APPROVER_NOT_FOUND')) {
+    return 'No se encontró al usuario aprobador o está inactivo.';
   }
   if (raw.contains('INSUFFICIENT_STOCK_FOR_ADJUSTMENT')) {
     return 'Stock insuficiente para aplicar el ajuste. Verifica las existencias actuales de la sucursal.';

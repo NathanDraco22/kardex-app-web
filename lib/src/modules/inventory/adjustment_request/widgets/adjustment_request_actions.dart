@@ -27,11 +27,12 @@ class AdjustmentRequestActions extends StatelessWidget {
 
     final isCreator = user.id == request.createdBy.id;
     final isAdmin = user.id == 'root' || user.role == 'Admin';
+    final isSupervisor = user.role == 'Supervisor';
     final isPending = request.status == AdjustmentRequestStatus.pending;
 
     final canEdit = isPending && (isCreator || isAdmin);
     final canCancel = isPending && (isCreator || isAdmin);
-    final canApprove = isPending && !isCreator;
+    final canApprove = isPending && (isAdmin || (isSupervisor && !isCreator));
 
     if (!canEdit && !canCancel && !canApprove) return const SizedBox.shrink();
 

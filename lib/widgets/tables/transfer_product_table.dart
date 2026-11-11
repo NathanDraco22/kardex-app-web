@@ -351,7 +351,7 @@ class _InnerRows extends StatelessWidget {
     final rows = controller.rows;
     for (var i = 0; i < rows.length; i++) {
       final currentRowModel = rows[i];
-      final color = i.isOdd ? Colors.white : Colors.grey.shade200;
+      final color = RowColorTool.getRowColor(i);
       yield EntryRow(
         key: ValueKey(currentRowModel.product),
         rowModel: currentRowModel,

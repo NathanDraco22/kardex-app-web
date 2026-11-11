@@ -10,6 +10,7 @@ import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 import '../cubit/client_read_cubit.dart';
 import '../cubit/client_write_cubit.dart';
 import 'widgets/clients_table.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 part 'web/cliente_catalog_web.dart';
 part 'mobile/client_catalog_mobile.dart';

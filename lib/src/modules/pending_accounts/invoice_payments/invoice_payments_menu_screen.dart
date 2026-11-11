@@ -8,6 +8,7 @@ import 'package:kardex_app_front/widgets/custom_invoice_list_tile.dart';
 
 import 'cubit/read_invoice_payments_cubit.dart';
 import 'invoice_payments_detail_screen.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 class InvoicePaymentsMenuScreen extends StatelessWidget {
   const InvoicePaymentsMenuScreen({super.key});
@@ -172,7 +173,7 @@ class _ContentSection extends StatelessWidget {
       separatorBuilder: (context, index) => const Divider(height: 0.0),
       itemBuilder: (context, index) {
         final invoice = state.invoices[index];
-        final tileColor = index.isOdd ? Colors.grey.shade200 : Colors.white;
+        final tileColor = RowColorTool.getRowColor(index);
 
         return CustomInvoiceListTile(
           invoice: invoice,

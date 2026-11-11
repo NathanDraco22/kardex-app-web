@@ -72,6 +72,7 @@ class _ListContentSectionState extends State<_ListContentSection> {
                             return AdjustmentRequestTableRow(
                               request: request,
                               showDivider: index < success.items.length - 1,
+                              index: index,
                               onTap: () => context.pushNamed(
                                 RouteNames.adjustmentRequestDetail,
                                 pathParameters: {'requestId': request.id},
@@ -113,10 +114,86 @@ class _ListContentSectionState extends State<_ListContentSection> {
                     ],
                   ),
                 ),
+              const Divider(height: 1),
+              _TableFooter(
+                itemCount: success.items.length,
+                entryTotal: success.items.fold<int>(0, (sum, request) => sum + request.entryTotal),
+                exitTotal: success.items.fold<int>(0, (sum, request) => sum + request.exitTotal),
+              ),
             ],
           ),
         );
       },
+    );
+  }
+}
+
+class _TableFooter extends StatelessWidget {
+  const _TableFooter({
+    required this.itemCount,
+    required this.entryTotal,
+    required this.exitTotal,
+  });
+
+  final int itemCount;
+  final int entryTotal;
+  final int exitTotal;
+
+  @override
+  Widget build(BuildContext context) {
+    final netTotal = entryTotal - exitTotal;
+
+    return Container(
+      height: 40,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      color: Colors.grey.shade50,
+      child: Row(
+        children: [
+          Text(
+            'Total Solicitudes: $itemCount',
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+          ),
+          const Spacer(),
+          const Text(
+            'Sobrante: ',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+          ),
+          Text(
+            NumberFormatter.convertToMoneyLike(entryTotal),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+              color: Colors.green.shade700,
+            ),
+          ),
+          const SizedBox(width: 24),
+          const Text(
+            'Faltante: ',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+          ),
+          Text(
+            NumberFormatter.convertToMoneyLike(exitTotal),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+              color: Colors.red.shade700,
+            ),
+          ),
+          const SizedBox(width: 28),
+          const Text(
+            'Total Neto: ',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+          ),
+          Text(
+            NumberFormatter.convertToMoneyLike(netTotal),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 15,
+              color: netTotal >= 0 ? Colors.green.shade800 : Colors.red.shade800,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

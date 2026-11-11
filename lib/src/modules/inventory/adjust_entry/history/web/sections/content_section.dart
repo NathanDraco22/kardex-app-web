@@ -70,7 +70,7 @@ class _ContentSection extends StatelessWidget {
                     ],
                     itemCount: entries.length,
                     rowBuilder: (context, index) {
-                      final rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+                      final rowColor = RowColorTool.getRowColor(index);
 
                       final entry = entries[index];
                       // AdjustEntryInDb only has createdAt (int epoch)

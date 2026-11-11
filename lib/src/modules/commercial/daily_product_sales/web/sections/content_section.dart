@@ -67,7 +67,7 @@ class _ContentSection extends StatelessWidget {
                     ),
                   ],
                   rowBuilder: (context, index) {
-                    final rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+                    final rowColor = RowColorTool.getRowColor(index);
                     final productSale = products[index];
 
                     return BasicTableRow(

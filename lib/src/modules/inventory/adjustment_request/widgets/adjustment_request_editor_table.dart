@@ -7,6 +7,7 @@ import 'package:kardex_app_front/widgets/dialogs/search_products/widgets/display
 import 'package:kardex_business/kardex_business.dart';
 
 import 'adjustment_request_item_formatters.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 class AdjustmentRequestEditorTable extends StatelessWidget {
   const AdjustmentRequestEditorTable({
@@ -164,7 +165,7 @@ class _InnerRows extends StatelessWidget {
             key: ValueKey(rows[i].product.id),
             row: rows[i],
             viewController: viewController,
-            color: i.isOdd ? Colors.white : Colors.grey.shade200,
+            color: RowColorTool.getRowColor(i),
           ),
         const SizedBox(height: 8),
         Row(

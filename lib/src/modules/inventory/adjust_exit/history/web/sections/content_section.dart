@@ -70,7 +70,7 @@ class _ContentSection extends StatelessWidget {
                     ],
                     itemCount: exits.length,
                     rowBuilder: (context, index) {
-                      final rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+                      final rowColor = RowColorTool.getRowColor(index);
 
                       final exit = exits[index];
                       // AdjustExitInDb only has createdAt (int epoch)

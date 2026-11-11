@@ -77,7 +77,7 @@ class _ContentSection extends StatelessWidget {
                       branchName = "Desconocido ($branchId)";
                     }
 
-                    Color rowColor = index.isEven ? Colors.grey.shade200 : Colors.white;
+                    Color rowColor = RowColorTool.getRowColor(index);
 
                     return BasicTableRow(
                       color: rowColor,

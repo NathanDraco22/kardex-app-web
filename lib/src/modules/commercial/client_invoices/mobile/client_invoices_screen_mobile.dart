@@ -16,6 +16,7 @@ import '../widgets/invoice_client_bar.dart';
 import '../widgets/product_invoice_card.dart';
 import 'invoice_client_menu_screen.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 class ClientInvoicesScreenMobile extends StatefulWidget {
   const ClientInvoicesScreenMobile({
@@ -326,7 +327,7 @@ class _Body extends StatelessWidget {
                       height: 4,
                     ),
                     itemBuilder: (context, index) {
-                      final tileColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+                      final tileColor = RowColorTool.getRowColor(index);
 
                       final currentCommercial = viewController.items[index];
 

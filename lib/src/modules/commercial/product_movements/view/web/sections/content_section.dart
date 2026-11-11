@@ -121,7 +121,7 @@ class _ContentSection extends StatelessWidget {
                       itemBuilder: (context, index) {
                         final currentTransaction = state.transactions[index];
 
-                        final rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+                        final rowColor = RowColorTool.getRowColor(index);
 
                         if (index < state.transactions.length - 1) {
                           final nextTransaction = state.transactions[index + 1];

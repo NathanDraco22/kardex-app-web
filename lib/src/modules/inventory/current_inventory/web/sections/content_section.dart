@@ -26,7 +26,7 @@ class _ContentSection extends StatelessWidget {
       rowBuilder: (context, index) {
         final inventory = state.inventories[index];
         final product = inventory.product;
-        final rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+        final rowColor = RowColorTool.getRowColor(index);
         return BasicTableRow(
           color: rowColor,
           cells: [

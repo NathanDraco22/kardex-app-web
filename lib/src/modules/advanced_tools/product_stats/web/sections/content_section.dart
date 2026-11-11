@@ -113,7 +113,7 @@ class _ContentSectionState extends State<_ContentSection> {
                       itemCount: stats.length,
                       itemBuilder: (context, index) {
                         final item = stats[index];
-                        final tileColor = index % 2 == 0 ? Colors.grey[200] : Colors.transparent;
+                        final tileColor = RowColorTool.getRowColor(index);
                         return Container(
                           padding: const EdgeInsets.all(8),
                           color: tileColor,

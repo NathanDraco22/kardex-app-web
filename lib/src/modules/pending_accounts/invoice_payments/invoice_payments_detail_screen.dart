@@ -9,6 +9,7 @@ import 'package:kardex_app_front/widgets/custom_receipt_list_tile.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/receipt_viewer.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 Future<void> showInvoicePaymentsDetailScreen(BuildContext context, InvoiceInDb invoice) async {
   await Navigator.push(
@@ -46,8 +47,7 @@ class _InvoicePaymentsDetailScreenState extends State<InvoicePaymentsDetailScree
     try {
       final repository = context.read<ReceiptsRepository>();
       final response = await repository.getAllReceiptsByInvoiceId(widget.invoice.id);
-      final receipts = [...response.data]
-        ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      final receipts = [...response.data]..sort((a, b) => b.createdAt.compareTo(a.createdAt));
       if (!mounted) return;
       setState(() {
         _receipts = receipts;
@@ -263,7 +263,7 @@ class _InvoicePaymentsDetailScreenState extends State<InvoicePaymentsDetailScree
         separatorBuilder: (context, index) => const Divider(height: 0.0),
         itemBuilder: (context, index) {
           final receipt = receipts[index];
-          final tileColor = index.isOdd ? Colors.grey.shade200 : Colors.white;
+          final tileColor = RowColorTool.getRowColor(index);
           final amountApplied = _amountAppliedToThisInvoice(receipt);
 
           return CustomReceiptListTile(

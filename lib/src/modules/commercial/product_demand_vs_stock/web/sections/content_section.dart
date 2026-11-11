@@ -56,7 +56,7 @@ class _ContentSection extends StatelessWidget {
                   ],
                   rowBuilder: (context, index) {
                     final item = results[index];
-                    final rowColor = index.isOdd ? Colors.white : Colors.grey.shade100;
+                    final rowColor = RowColorTool.getRowColor(index);
                     final totalDemand = item.totalOrdered + item.totalBonification;
 
                     return BasicTableRow(

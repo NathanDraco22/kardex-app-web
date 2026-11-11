@@ -8,6 +8,7 @@ import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 
 import 'mediators/no_paid_mediator.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 part 'no_paid_invoice_sections/content_section.dart';
 part 'no_paid_invoice_sections/header_section.dart';

@@ -61,20 +61,35 @@ lib/src/modules/inventory/
 - **Cubits:** `AdjustEntryCubit`, `AdjustExitCubit`.
 - **Regla de Negocio:** Permite especificar motivo del ajuste (auditoría, rotura, merma, corrección de sistema) y actualiza el saldo contable.
 
-### 2.4.1. Solicitudes de Ajuste (`adjustment_request`)
+### 2.4.1. Solicitudes de Ajuste (`adjustment_request`) — ⭐ Módulo Canónico de Referencia de Diseño y UX
+
+> [!TIP]
+> **Módulo de Ejemplo Canónico del Sistema:**
+> Este módulo es la implementación de referencia recomendada para todo nuevo desarrollo o refactorización en `kardex_app_front`. Contiene la arquitectura modelo en Flutter (Cubit reactivo con stream del repositorio, separación Web/Mobile limpia), soporte integral de teclado para laptops sin numpad, y la aplicación perfecta de la identidad visual de la app: fondo índigo suave, cabecera de 2 tarjetas Bento, contenedor continuo de tarjetas sin márgenes flotantes, pastillas informativas `_InfoPill` y pie de tabla integrado.
 
 - **Propósito:** Registrar un conteo físico y someterlo a aprobación antes de afectar existencias.
 - **Flujo:**
   1. El usuario crea una solicitud **Pendiente** con los productos, la existencia del sistema, el conteo real, la diferencia y el costo.
-  2. Otro usuario con acceso a Inventario la **Aprueba**; el servidor aplica la diferencia original guardada.
+  2. Un **Supervisor o Admin** la **Aprueba**; el servidor aplica la diferencia original guardada. Los Operadores no pueden aprobar.
   3. Si hay sobrantes y faltantes en la misma solicitud, se generan **dos documentos**: un Ajuste de Entrada y un Ajuste de Salida, dentro de la misma transacción Mongo.
   4. Si se **Cancela**, no se toca el inventario.
 - **Reglas:**
-  - El creador no puede aprobar su propia solicitud.
+  - Solo los roles `Supervisor` y `Admin` pueden aprobar solicitudes de ajuste.
+  - Un Supervisor no puede aprobar su propia solicitud. Un Admin sí puede aprobar la suya.
+  - Las solicitudes creadas por un Admin también quedan en estado pendiente y requieren una aprobación explícita.
   - Solo las solicitudes pendientes se pueden editar, cancelar o eliminar lógicamente.
   - El backend vuelve a tomar la foto real del `ProductAccount` al crear/editar; no confía en la existencia enviada por el cliente.
   - La aprobación aplica la diferencia registrada, aunque el stock actual haya cambiado. Si una salida ya no tiene stock suficiente, el servidor rechaza la aprobación.
-- **Vistas:** `AdjustmentRequestListScreen`, `AdjustmentRequestFormScreen`, `AdjustmentRequestDetailScreen`.
+- **Arquitectura de Vistas (Modelo a Seguir):**
+  - **1. Formulario de Creación / Edición (`AdjustmentRequestFormScreen`):**
+    - **Web (`AdjustmentRequestFormWebScreen`):** Envuelto en `ShortcutContainer` para capturar atajos (`Ctrl+G` para guardar, `Ctrl+1` para agregar producto). Cabecera estandarizada de 2 tarjetas Bento (380px fija + flexible). Tabla de productos con filas de 75px, alternancia de colores (`RowColorTool`), navegación rápida por teclado con `Enter` (`FocusScope.nextFocus`) optimizada para laptops sin teclado numérico, y `_TableFooter` con totales al pie del `Card`.
+    - **Mobile (`AdjustmentRequestFormMobileScreen`):** Tarjetas Bento de entrada de datos, `DateFieldSelector` sincronizado, `FloatingActionButton.extended` protegido contra solapamiento con el teclado virtual, y edición ágil de conteo real.
+  - **2. Detalle de la Solicitud (`AdjustmentRequestDetailScreen`):**
+    - **Web (`AdjustmentRequestDetailWebScreen`):** Cabecera Bento de 2 tarjetas con metadatos de solo lectura, chip de estado, panel informativo de aprobación/cancelación con acceso directo a los ajustes generados, y tabla de productos de 75px con `_TableFooter` integrado.
+    - **Mobile (`AdjustmentRequestDetailMobileScreen`):** Metadatos en pastillas Bento `_MobileDetailPill`, contenedor continuo de productos dentro de un único `Card` con `RowColorTool`, divisores sutiles y pastillas Bento compactas `_InfoPill` (Existencia, Costo, Conteo real, Diferencia coloreada con icono y Subtotal). Botones de acción envueltos en tarjeta Bento contenedora (`_MobileActionsCard`).
+  - **3. Listado de Solicitudes (`AdjustmentRequestListScreen`):**
+    - **Web (`AdjustmentRequestListWebScreen`):** Cabecera de filtros compacta y tabla de solicitudes con alternancia de colores, badges de estado y `_TableFooter` integrado directamente al pie del `Card` de la tabla (sin barra flotante exterior).
+    - **Mobile (`AdjustmentRequestListMobileScreen`):** Agrupación continua de todas las solicitudes dentro de un único `Card(margin: EdgeInsets.zero, clipBehavior: Clip.antiAlias)` con `Divider` entre filas, tarjetas Bento compactas con pastillas `_ListInfoPill` (Sobrante verde, Faltante rojo, Total Neto bold) y tarjeta Bento de resumen de totales `_MobileListTotalsCard`.
 - **Cubits:** `ReadAdjustmentRequestsCubit`, `WriteAdjustmentRequestCubit`, `ReadAdjustmentRequestDetailCubit`.
 - **Repositorio:** `AdjustmentRequestsRepository` (reactivo: notifica altas/cambios/bajas al `ReadCubit`).
 

@@ -5,6 +5,7 @@ import 'package:kardex_app_front/src/modules/commercial/pending_invoice/cubit/re
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/widgets/dialogs/show_client_with_balance_search_dialog.dart';
 import 'credit_session_transactions_screen.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 class PendingClientTransactionsMenuScreen extends StatelessWidget {
   const PendingClientTransactionsMenuScreen({super.key});
@@ -134,7 +135,7 @@ class _Content extends StatelessWidget {
             itemBuilder: (context, index) {
               final currentClient = state.clients[index];
               final balanceFormatted = NumberFormatter.convertToMoneyLike(currentClient.balance);
-              final tileColor = index.isOdd ? Colors.grey.shade200 : Colors.white;
+              final tileColor = RowColorTool.getRowColor(index);
 
               return CustomClientListTile(
                 client: currentClient,

@@ -9,4 +9,5 @@ export 'extensiones.dart';
 export 'input_formatters.dart';
 export 'loading_dialog.dart';
 export 'notifications.dart';
+export 'row_color_tool.dart';
 export 'scroll_tools.dart';

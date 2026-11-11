@@ -131,7 +131,7 @@ class MobileClientsTable extends StatelessWidget {
                   itemBuilder: (BuildContext context, int index) {
                     final currentClient = state.clients[index];
 
-                    Color rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+                    Color rowColor = RowColorTool.getRowColor(index);
 
                     if (state is HighlightedClient) {
                       if (state.updatedClients.any((element) => element.id == currentClient.id)) {

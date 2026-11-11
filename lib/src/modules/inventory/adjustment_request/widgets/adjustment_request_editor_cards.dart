@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_app_front/src/modules/inventory/adjustment_request/view_controller.dart';
 import 'package:kardex_app_front/src/tools/input_formatters.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 import 'package:kardex_app_front/widgets/dialogs/inventory_unit_picker.dart';
 import 'package:kardex_business/kardex_business.dart';
@@ -56,6 +57,7 @@ class AdjustmentRequestEditorCards extends StatelessWidget {
             key: ValueKey(rows[index].product.id),
             row: rows[index],
             viewController: viewController,
+            index: index,
           ),
           if (index < rows.length - 1) const SizedBox(height: 10),
         ],
@@ -71,10 +73,12 @@ class _EditorCard extends StatefulWidget {
     super.key,
     required this.row,
     required this.viewController,
+    required this.index,
   });
 
   final AdjustmentRequestRow row;
   final AdjustmentRequestViewController viewController;
+  final int index;
 
   @override
   State<_EditorCard> createState() => _EditorCardState();
@@ -141,7 +145,7 @@ class _EditorCardState extends State<_EditorCard> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: RowColorTool.getRowColor(widget.index),
         borderRadius: AppThemeTokens.borderRadiusLg,
         border: Border.all(color: AppThemeTokens.borderLight),
         boxShadow: AppThemeTokens.subtleCardShadow(),
@@ -212,9 +216,9 @@ class _EditorCardState extends State<_EditorCard> {
               const SizedBox(width: 8),
               Expanded(
                 child: _InfoPill(
-                  label: 'Diferencia',
-                  value: formatAdjustmentSignedQuantity(row.difference, factor),
-                  color: adjustmentDifferenceColor(row.difference),
+                  label: 'Costo unitario',
+                  value: NumberFormatter.convertToMoneyLike(row.unitaryCost),
+                  subValue: factor > 1 ? 'Base: ${NumberFormatter.convertToMoneyLike(row.baseUnitCost)}' : null,
                 ),
               ),
             ],
@@ -240,9 +244,9 @@ class _EditorCardState extends State<_EditorCard> {
               const SizedBox(width: 10),
               Expanded(
                 child: _InfoPill(
-                  label: 'Costo unitario',
-                  value: NumberFormatter.convertToMoneyLike(row.unitaryCost),
-                  subValue: factor > 1 ? 'Base: ${NumberFormatter.convertToMoneyLike(row.baseUnitCost)}' : null,
+                  label: 'Diferencia',
+                  value: formatAdjustmentSignedQuantity(row.difference, factor),
+                  color: adjustmentDifferenceColor(row.difference),
                 ),
               ),
             ],

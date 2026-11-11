@@ -124,7 +124,7 @@ class _ContentSection extends StatelessWidget {
                     itemCount: state.entryHistories.length,
                     itemBuilder: (context, index) {
                       final entryHistory = state.entryHistories[index];
-                      final rowColor = index.isOdd ? Colors.white : Colors.grey.shade100;
+                      final rowColor = RowColorTool.getRowColor(index);
 
                       final entryItem = entryHistory.items.firstWhere(
                         (item) => item.productId == currentProduct.id,

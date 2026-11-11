@@ -8,6 +8,7 @@ import 'package:kardex_app_front/src/tools/printers/invoice_printer.dart';
 import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_invoice_template.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 Future<void> showInvoiceViewerDialog(BuildContext context, InvoiceInDb invoice) async {
   FocusManager.instance.primaryFocus?.unfocus();
@@ -401,7 +402,7 @@ class InvoiceViewerContent extends StatelessWidget {
                   itemCount: invoice.saleItems.length,
                   itemBuilder: (context, index) {
                     final saleItem = invoice.saleItems[index];
-                    final rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+                    final rowColor = RowColorTool.getRowColor(index);
                     return Container(
                       padding: const EdgeInsets.all(4),
                       color: rowColor,

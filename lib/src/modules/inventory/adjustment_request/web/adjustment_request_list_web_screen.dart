@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/constants/route_names.dart';
 import 'package:kardex_app_front/src/modules/inventory/adjustment_request/cubit/read_adjustment_requests_cubit.dart';
 import 'package:kardex_app_front/src/modules/inventory/adjustment_request/widgets/adjustment_request_list_tile.dart';
-import 'package:kardex_app_front/src/modules/inventory/adjustment_request/widgets/adjustment_request_totals_bar.dart';
 import 'package:kardex_app_front/src/tools/role_tools.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
@@ -49,35 +48,10 @@ class AdjustmentRequestListWebScreen extends StatelessWidget {
               _ListHeaderSection(),
               SizedBox(height: 8),
               Expanded(child: _ListContentSection()),
-              SizedBox(height: 8),
-              _ListBottomSummary(),
             ],
           ),
         ),
       ),
-    );
-  }
-}
-
-class _ListBottomSummary extends StatelessWidget {
-  const _ListBottomSummary();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<ReadAdjustmentRequestsCubit, ReadAdjustmentRequestsState>(
-      builder: (context, state) {
-        if (state is! ReadAdjustmentRequestsSuccess) return const SizedBox.shrink();
-
-        final entryTotal = state.items.fold<int>(0, (sum, request) => sum + request.entryTotal);
-        final exitTotal = state.items.fold<int>(0, (sum, request) => sum + request.exitTotal);
-
-        return AdjustmentRequestTotalsBar(
-          itemCount: state.items.length,
-          itemCountLabel: 'Solicitudes',
-          entryTotal: entryTotal,
-          exitTotal: exitTotal,
-        );
-      },
     );
   }
 }

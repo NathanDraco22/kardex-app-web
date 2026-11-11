@@ -6,6 +6,7 @@ import 'package:kardex_app_front/widgets/widgets.dart';
 
 import '../cubits/read_pending_client_cubit.dart';
 import 'no_paid_invoice_web_screen.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 class NoPaidClientScreenWeb extends StatelessWidget {
   const NoPaidClientScreenWeb({super.key});
@@ -140,7 +141,7 @@ class _Content extends StatelessWidget {
             itemBuilder: (context, index) {
               final currentClient = state.clients[index];
               final balanceFormatted = NumberFormatter.convertToMoneyLike(currentClient.balance);
-              final tileColor = index.isOdd ? Colors.grey.shade200 : Colors.white;
+              final tileColor = RowColorTool.getRowColor(index);
               return ListTile(
                 tileColor: tileColor,
                 onTap: () {

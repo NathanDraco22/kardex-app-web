@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/constants/route_names.dart';
 import 'package:kardex_app_front/src/modules/inventory/adjustment_request/cubit/read_adjustment_requests_cubit.dart';
 import 'package:kardex_app_front/src/modules/inventory/adjustment_request/widgets/adjustment_request_list_tile.dart';
-import 'package:kardex_app_front/src/modules/inventory/adjustment_request/widgets/adjustment_request_totals_bar.dart';
 import 'package:kardex_app_front/src/tools/role_tools.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
@@ -100,25 +99,38 @@ class _MobileBody extends StatelessWidget {
                       onAction: () => context.pushNamed(RouteNames.adjustmentRequestCreate),
                     )
                   else ...[
-                    for (final request in success.items) ...[
-                      AdjustmentRequestCardTile(
-                        request: request,
-                        onTap: () => context.pushNamed(
-                          RouteNames.adjustmentRequestDetail,
-                          pathParameters: {'requestId': request.id},
-                          extra: request,
-                        ),
+                    Card(
+                      margin: EdgeInsets.zero,
+                      clipBehavior: Clip.antiAlias,
+                      child: Column(
+                        children: [
+                          for (var index = 0; index < success.items.length; index++) ...[
+                            AdjustmentRequestCardTile(
+                              request: success.items[index],
+                              index: index,
+                              onTap: () => context.pushNamed(
+                                RouteNames.adjustmentRequestDetail,
+                                pathParameters: {'requestId': success.items[index].id},
+                                extra: success.items[index],
+                              ),
+                            ),
+                            if (index < success.items.length - 1)
+                              const Divider(height: 1, thickness: 1, color: Color(0xFFE2E8F0)),
+                          ],
+                        ],
                       ),
-                      const SizedBox(height: 10),
-                    ],
+                    ),
                     if (success.hasMore)
-                      Center(
-                        child: TextButton.icon(
-                          onPressed: success.isLoadingMore
-                              ? null
-                              : () => context.read<ReadAdjustmentRequestsCubit>().loadMore(),
-                          icon: const Icon(Icons.expand_more_rounded, size: 18),
-                          label: Text(success.isLoadingMore ? 'Cargando más...' : 'Cargar más registros'),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Center(
+                          child: TextButton.icon(
+                            onPressed: success.isLoadingMore
+                                ? null
+                                : () => context.read<ReadAdjustmentRequestsCubit>().loadMore(),
+                            icon: const Icon(Icons.expand_more_rounded, size: 18),
+                            label: Text(success.isLoadingMore ? 'Cargando más...' : 'Cargar más registros'),
+                          ),
                         ),
                       ),
                     if (success.loadMoreError != null)
@@ -141,12 +153,11 @@ class _MobileBody extends StatelessWidget {
                           ],
                         ),
                       ),
-                    AdjustmentRequestTotalsBar(
+                    const SizedBox(height: 10),
+                    _MobileListTotalsCard(
                       itemCount: success.items.length,
-                      itemCountLabel: 'Solicitudes',
                       entryTotal: success.items.fold<int>(0, (sum, item) => sum + item.entryTotal),
                       exitTotal: success.items.fold<int>(0, (sum, item) => sum + item.exitTotal),
-                      compact: true,
                     ),
                   ],
                 ],
@@ -330,6 +341,104 @@ class _MobileFiltersState extends State<_MobileFilters> {
                 ],
               ),
             ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MobileListTotalsCard extends StatelessWidget {
+  const _MobileListTotalsCard({
+    required this.itemCount,
+    required this.entryTotal,
+    required this.exitTotal,
+  });
+
+  final int itemCount;
+  final int entryTotal;
+  final int exitTotal;
+
+  @override
+  Widget build(BuildContext context) {
+    final netTotal = entryTotal - exitTotal;
+
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Total Solicitudes ($itemCount):',
+                  style: const TextStyle(fontSize: 12.5, color: Colors.grey),
+                ),
+                Text(
+                  '$itemCount',
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Sobrante:',
+                  style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  NumberFormatter.convertToMoneyLike(entryTotal),
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green.shade700,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Faltante:',
+                  style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  NumberFormatter.convertToMoneyLike(exitTotal),
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red.shade700,
+                  ),
+                ),
+              ],
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 6),
+              child: Divider(height: 1),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Total Neto:',
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  NumberFormatter.convertToMoneyLike(netTotal),
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: netTotal >= 0 ? Colors.green.shade800 : Colors.red.shade800,
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),

@@ -9,6 +9,7 @@ import 'package:kardex_app_front/src/tools/cache/image_bytes_resolver.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 /// Diálogo y generador visual para compartir el historial de abonos de una
 /// factura en formato de imagen PNG.
@@ -737,10 +738,9 @@ class _ReceiptsHistoryVisualCard extends StatelessWidget {
                     itemBuilder: (context, index) {
                       final receipt = receipts[index];
                       final amountApplied = _amountAppliedToInvoice(receipt);
-                      final isEven = index % 2 == 0;
 
                       return Container(
-                        color: isEven ? Colors.white : const Color(0xFFF8FAFC),
+                        color: RowColorTool.getRowColor(index),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 14,
                           vertical: 9,

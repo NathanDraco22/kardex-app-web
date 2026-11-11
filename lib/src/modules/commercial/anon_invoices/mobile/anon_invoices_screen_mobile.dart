@@ -10,6 +10,7 @@ import 'package:kardex_app_front/widgets/widgets.dart';
 import '../../client_invoices/widgets/product_invoice_card.dart';
 import '../view_controller.dart';
 import 'mediator.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 class AnonInvoicesScreenMobile extends StatefulWidget {
   const AnonInvoicesScreenMobile({super.key});
@@ -198,7 +199,7 @@ class _Body extends StatelessWidget {
                       height: 4,
                     ),
                     itemBuilder: (context, index) {
-                      final tileColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+                      final tileColor = RowColorTool.getRowColor(index);
 
                       final currentCommercial = viewController.items[index];
 

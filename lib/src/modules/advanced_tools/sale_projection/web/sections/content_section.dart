@@ -107,7 +107,7 @@ class _ContentSectionState extends State<_ContentSection> {
                       itemCount: stats.length,
                       itemBuilder: (context, index) {
                         final item = stats[index];
-                        final tileColor = index % 2 == 0 ? Colors.grey[200] : Colors.transparent;
+                        final tileColor = RowColorTool.getRowColor(index);
 
                         final stock = item.account.currentStock;
                         final daily = item.unitsPerDay;

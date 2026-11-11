@@ -6,6 +6,7 @@ import 'package:kardex_app_front/src/modules/suppliers_catalog/dialogs/create_su
 import 'package:kardex_app_front/widgets/no_item.dart';
 import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 import 'package:kardex_app_front/widgets/status_tag_label.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 class SuppliersTable extends StatelessWidget {
   const SuppliersTable({
@@ -108,7 +109,7 @@ class _InnerRows extends StatelessWidget {
         itemBuilder: (context, index) {
           final currentSupplier = suppliers[index];
 
-          Color rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+          Color rowColor = RowColorTool.getRowColor(index);
 
           if (state is HighlightedSupplier) {
             if (state.updatedSuppliers.any((element) => element.id == currentSupplier.id)) {

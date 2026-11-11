@@ -7,10 +7,10 @@ class _DetailContentSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.zero,
-      clipBehavior: Clip.antiAlias,
-      child: AdjustmentRequestItemTable(items: request.items),
+    return AdjustmentRequestItemTable(
+      items: request.items,
+      entryTotal: request.entryTotal,
+      exitTotal: request.exitTotal,
     );
   }
 }

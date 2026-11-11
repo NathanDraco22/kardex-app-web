@@ -75,7 +75,7 @@ class _ContentSection extends StatelessWidget {
         ],
         itemCount: products.length,
         rowBuilder: (context, index) {
-          Color color = index.isOdd ? Colors.white : Colors.grey.shade200;
+          Color color = RowColorTool.getRowColor(index);
 
           final product = products[index];
           final editedIndex = state.editedProducts.indexWhere((p) => p.id == product.id);

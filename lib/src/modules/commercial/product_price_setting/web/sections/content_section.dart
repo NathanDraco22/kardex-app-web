@@ -62,7 +62,7 @@ class _ContentSection extends StatelessWidget {
       ],
       itemCount: profiles.length,
       rowBuilder: (context, index) {
-        Color color = index.isOdd ? Colors.white : Colors.grey.shade200;
+        Color color = RowColorTool.getRowColor(index);
 
         if (state is HighlightedProductSaleProfile) {
           if (state.updatedProfiles.any((element) => element.productId == profiles[index].productId)) {

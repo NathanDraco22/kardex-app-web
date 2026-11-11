@@ -131,7 +131,7 @@ class MobileSuppliersTable extends StatelessWidget {
                   itemBuilder: (BuildContext context, int index) {
                     final currentSupplier = state.suppliers[index];
 
-                    Color rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+                    Color rowColor = RowColorTool.getRowColor(index);
 
                     if (state is HighlightedSupplier) {
                       if (state.updatedSuppliers.any((element) => element.id == currentSupplier.id)) {

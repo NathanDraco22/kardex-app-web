@@ -1,3 +1,20 @@
+## Detalle de Solicitud de Ajuste: Documentos en Columna (Noviembre 2026)
+
+- **Web:** `_ApprovedPanel` ahora muestra `Entrada #...` y `Salida #...` en una columna a ancho completo, con mayor padding y tipografía (11.5 px); el header del detalle subió de 160 a 172 px para evitar overflow.
+- **Mobile:** `_ApprovedInfo` reemplazó la fila de botones por una columna; cada `OutlinedButton.icon` ocupa todo el ancho con altura mínima de 40 px y sin `VisualDensity.compact`.
+- **Comportamiento:** si solo existe uno de los documentos, el botón único también ocupa todo el ancho.
+- **Verificación:** `flutter analyze` sin issues, `flutter test` 214/214, hot reload OK y sin errores de runtime.
+
+## Restricción de Aprobación en Solicitudes de Ajuste (Noviembre 2026)
+
+- **Regla:** solo los roles `Supervisor` y `Admin` pueden aprobar solicitudes de ajuste; `Operador` no puede aprobar.
+- **Autoaprobación:** un `Supervisor` no puede aprobar su propia solicitud; un `Admin` sí puede. Toda creación queda en estado `pending` y requiere aprobación explícita.
+- **Backend:** `AdjustmentRequestManager` resuelve el rol del aprobador con `UsersRepository` (rechaza usuarios inexistentes o inactivos); el pipeline recibe `approver_role` y `ValidateRequestStep` aplica la regla.
+- **Frontend:** `AdjustmentRequestActions` oculta “Aprobar” a Operadores y a Supervisores en sus propias solicitudes; los Admins la ven siempre.
+- **Errores:** se agregaron traducciones para `APPROVAL_REQUIRES_SUPERVISOR_OR_ADMIN` y `APPROVER_NOT_FOUND`, y se ajustó el mensaje de `SELF_APPROVAL_NOT_ALLOWED`.
+- **Verificación:** `ruff check`, `ty check` y `pytest test/test_adjustment_request_pipeline.py` (10/10) OK; `flutter analyze lib/src/modules/inventory/adjustment_request` sin issues.
+- **Regla `main`/`lite`:** es una regla de negocio compartida; debe evaluarse y sincronizarse en `lite`.
+
 ## Rediseño del Módulo de Gastos (Noviembre 2026)
 
 - **Contexto:** rediseño completo del módulo de Gastos (Fases 1–3) en la rama `feat/expenses-redesign`.

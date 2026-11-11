@@ -27,7 +27,7 @@ class _ContentSection extends StatelessWidget {
           return ListView.builder(
             itemCount: devolutions.length,
             itemBuilder: (context, index) {
-              final tileColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+              final tileColor = RowColorTool.getRowColor(index);
               final currentDevolution = devolutions[index];
               return ListTile(
                 tileColor: tileColor,
