@@ -6,6 +6,7 @@ import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/cubits/shortcuts/shortcuts_cubit.dart';
 import 'package:kardex_app_front/cubits/toast/toast_cubit.dart';
+import 'package:kardex_app_front/cubits/near_expiration/near_expiration_cubit.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/src/core/access_manager.dart';
 import 'package:kardex_app_front/src/tools/extensiones.dart';
@@ -18,6 +19,7 @@ import 'package:kardex_app_front/constants/route_names.dart';
 import 'widgets/home_desktop_card.dart';
 import 'widgets/home_end_drawer.dart';
 import 'widgets/home_quick_search_dialog.dart';
+import 'widgets/near_expiration_banner.dart';
 import '../data/home_modules_registry.dart';
 import 'desktop/widgets/desktop_initial_panel.dart';
 import 'desktop/widgets/desktop_module_sidebar.dart';
@@ -166,9 +168,9 @@ class _AvatarButtonState extends State<AvatarButton> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    context.read<ToastCubit>().hasNearExpiration(
-      getIt<AuthCubit>().currentBranchId,
-    );
+    final branchId = getIt<AuthCubit>().currentBranchId;
+    context.read<ToastCubit>().hasNearExpiration(branchId);
+    context.read<NearExpirationCubit>().checkNearExpirations(branchId);
   }
 
   @override

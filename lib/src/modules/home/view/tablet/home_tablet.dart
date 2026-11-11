@@ -99,6 +99,8 @@ class _HomeTabletBody extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
+        const NearExpirationBanner(),
+        const SizedBox(height: 8),
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),

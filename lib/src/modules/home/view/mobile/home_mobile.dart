@@ -81,7 +81,9 @@ class _HomeMobileBody extends StatelessWidget {
             color: Colors.grey.shade600,
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
+        const NearExpirationBanner(),
+        const SizedBox(height: 4),
 
         const Text(
           "Elige una opción",

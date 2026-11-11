@@ -8,6 +8,7 @@ import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
 import 'package:kardex_app_front/cubits/shortcuts/shortcuts_cubit.dart';
 import 'package:kardex_app_front/src/modules/home/data/home_shortcut_resolver.dart';
 import 'package:kardex_app_front/src/modules/home/view/widgets/home_desktop_card.dart';
+import 'package:kardex_app_front/src/modules/home/view/widgets/near_expiration_banner.dart';
 import 'package:kardex_app_front/src/tools/cache/image_bytes_resolver.dart';
 import 'package:kardex_app_front/widgets/design_system/app_theme_tokens.dart';
 import 'package:kardex_business/kardex_business.dart';
@@ -39,7 +40,9 @@ class DesktopInitialPanel extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _BranchHero(branch: currentBranch),
-                const SizedBox(height: 28),
+                const SizedBox(height: 20),
+                const NearExpirationBanner(isDesktop: true),
+                const SizedBox(height: 20),
                 Text(
                   "Bienvenido/a, $firstName",
                   style: const TextStyle(
