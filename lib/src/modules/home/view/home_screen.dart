@@ -168,6 +168,14 @@ class _AvatarButtonState extends State<AvatarButton> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    final authState = getIt<AuthCubit>().state;
+    final isAllowedByServin = authState is Authenticated && authState.servin.isUsingExpirationDate;
+    final isAllowedBySettings = getIt<AppSettingsCubit>().useExpirationDates;
+
+    if (!isAllowedByServin || !isAllowedBySettings) {
+      return;
+    }
+
     final branchId = getIt<AuthCubit>().currentBranchId;
     context.read<ToastCubit>().hasNearExpiration(branchId);
     context.read<NearExpirationCubit>().checkNearExpirations(branchId);
