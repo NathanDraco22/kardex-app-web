@@ -93,11 +93,30 @@ class _Body extends StatelessWidget {
             style: const TextStyle(fontWeight: FontWeight.w500),
           ),
           title: Text(currentLog.product.name, style: const TextStyle(fontWeight: FontWeight.w500)),
-          subtitle: Row(
-            spacing: 4,
+          subtitle: Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 6,
+            runSpacing: 2,
             children: [
               Text(currentProduct.brandName, style: const TextStyle(fontWeight: FontWeight.w500)),
               Text(currentProduct.unitName, style: const TextStyle(fontWeight: FontWeight.w500)),
+              if (currentLog.supplierName != null && currentLog.supplierName!.isNotEmpty) ...[
+                const Text("•", style: TextStyle(color: Colors.grey)),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.local_shipping_outlined, size: 14, color: Colors.grey.shade600),
+                    const SizedBox(width: 3),
+                    Text(
+                      currentLog.supplierName!,
+                      style: TextStyle(
+                        color: Colors.grey.shade800,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ],
           ),
           trailing: IconButton(

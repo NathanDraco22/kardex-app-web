@@ -75,6 +75,8 @@ class _ExpirationLogViewer extends StatelessWidget {
             const Divider(height: 24),
 
             _InfoRow(title: 'Número de Lote', value: log.lotNumber ?? 'N/A'),
+            if (log.supplierName != null && log.supplierName!.isNotEmpty)
+              _InfoRow(title: 'Proveedor', value: log.supplierName!),
             _InfoRow(title: 'Fecha de Vencimiento', value: DateFormat('dd/MM/yyyy').format(log.expirationDate)),
             _InfoRow(title: 'Fecha de Registro', value: DateFormat('dd/MM/yyyy').format(log.createdAt)),
             const SizedBox(height: 16),

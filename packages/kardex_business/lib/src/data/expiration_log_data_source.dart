@@ -41,4 +41,13 @@ class ExpirationLogsDataSource with HttpService {
 
     return res['hasExpiration'] ?? false;
   }
+
+  Future<Map<String, dynamic>> getNearExpirationLogs(String branchId, {int limit = 10}) async {
+    final uri = HttpTools.generateUri(
+      "$_endpoint/near/$branchId/list",
+      queryParameters: {"limit": limit.toString()},
+    );
+    final header = HttpTools.generateAuthHeaders();
+    return await getQuery(uri, headers: header);
+  }
 }
