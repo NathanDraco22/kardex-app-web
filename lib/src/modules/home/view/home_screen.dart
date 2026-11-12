@@ -146,6 +146,7 @@ class _RootScaffold extends StatelessWidget {
                 const SizedBox(width: 12),
               ],
             ),
+            backgroundColor: Colors.white,
             body: const _Body(),
           ),
         );
