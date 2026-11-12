@@ -19,6 +19,13 @@ class ServinRepository {
     return servin;
   }
 
+  Future<Servin> activateDemoServin() async {
+    final res = await servinDataSource.getCurrentDemoServin();
+    final servin = Servin.fromJson(res);
+    await appConfigStore.setConfig(servin.toJson());
+    return servin;
+  }
+
   Future<Servin?> getCurrentServinFromLocal() async {
     final config = await appConfigStore.getConfig();
     if (config == null) return null;

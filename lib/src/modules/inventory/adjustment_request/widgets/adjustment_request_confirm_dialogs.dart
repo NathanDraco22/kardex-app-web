@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kardex_app_front/widgets/custom_slider.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 import 'package:kardex_business/kardex_business.dart';
 
@@ -58,19 +59,21 @@ Future<bool> showApproveAdjustmentRequestDialog(
                   ),
                 ),
               ],
+              const SizedBox(height: 20),
+              CustomSlider(
+                hintText: 'Desliza para Aprobar',
+                hintIcon: Icons.verified_outlined,
+                sliderColor: AppThemeTokens.success,
+                sliderText: 'Aprobar',
+                onSubmit: () => Navigator.of(context).pop(true),
+              ),
             ],
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Volver'),
-          ),
-          FilledButton.icon(
-            style: FilledButton.styleFrom(backgroundColor: AppThemeTokens.success),
-            onPressed: () => Navigator.of(context).pop(true),
-            icon: const Icon(Icons.check_rounded, size: 18),
-            label: const Text('Aprobar'),
+            child: const Text('Cancelar'),
           ),
         ],
       );

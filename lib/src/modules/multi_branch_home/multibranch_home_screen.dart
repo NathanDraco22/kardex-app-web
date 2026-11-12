@@ -78,6 +78,7 @@ class _MultibranchBodyState extends State<_MultibranchBody> {
     final companyName = authState.servin.name.trim().isNotEmpty ? authState.servin.name.trim() : "Neptuno";
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: _PageBackground(
         child: SafeArea(
           child: LayoutBuilder(
@@ -183,8 +184,11 @@ class _PageBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox.expand(
-      child: child,
+    return ColoredBox(
+      color: Colors.white,
+      child: SizedBox.expand(
+        child: child,
+      ),
     );
   }
 }
@@ -197,6 +201,7 @@ class _StatusScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: _PageBackground(
         child: Center(child: child),
       ),

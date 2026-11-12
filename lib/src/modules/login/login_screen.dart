@@ -6,10 +6,12 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/config/app_env.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/app_mode/app_mode_cubit.dart';
+import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/tools/loading_dialog.dart';
 import 'package:kardex_app_front/src/tools/navigation_tool.dart';
 import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
+import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/password_title_textfield.dart';
 import 'package:kardex_app_front/widgets/title_texfield.dart';
@@ -112,11 +114,20 @@ class _Body extends StatefulWidget {
 class _BodyState extends State<_Body> {
   String userId = "";
   String password = "";
+  String _businessName = "";
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_businessName.isEmpty) {
+      _businessName = getIt<AuthCubit>().servin?.name ?? "";
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-    final authCubit = getIt<AuthCubit>();
+    final screenSize = MediaQuery.sizeOf(context);
+    final appSettings = context.watch<AppSettingsCubit>();
 
     return Container(
       height: screenSize.height,
@@ -129,84 +140,168 @@ class _BodyState extends State<_Body> {
           opacity: 0.2,
         ),
       ),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 400),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Builder(
-                builder: (context) {
-                  final state = authCubit.state;
-                  if (state is Unauthenticated) {
-                    return Text(
-                      state.servin?.name ?? "",
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white.withAlpha(210),
-                      ),
-                    );
-                  }
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 400),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 32,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _CompanyLoginAvatar(
+                          imageUrl: appSettings.companyLogoUrl,
+                          businessName: _businessName,
+                        ),
+                        const SizedBox(height: 20),
+                        if (_businessName.isNotEmpty) ...[
+                          Text(
+                            _businessName,
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.2,
+                              color: Colors.white.withAlpha(230),
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                        ],
+                        Text(
+                          "Iniciar Sesión",
+                          style: TextStyle(
+                            fontSize: _businessName.isEmpty ? 20 : 14,
+                            fontWeight: _businessName.isEmpty
+                                ? FontWeight.bold
+                                : FontWeight.w500,
+                            letterSpacing: 0.4,
+                            color: Colors.white.withAlpha(
+                              _businessName.isEmpty ? 210 : 155,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 22),
+                        Card(
+                          color: Colors.white.withAlpha(230),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                TitleTextField(
+                                  title: "Codigo de Usuario",
+                                  onEditingComplete: () =>
+                                      FocusScope.of(context).nextFocus(),
+                                  keyboardType: TextInputType.number,
+                                  onChanged: (value) {
+                                    userId = value.trim();
+                                  },
+                                ),
+                                const SizedBox(height: 8),
+                                PasswordTextField(
+                                  title: "Contraseña",
+                                  onEditingComplete: () {
+                                    getIt<AuthCubit>().login(userId, password);
+                                  },
+                                  onChanged: (value) {
+                                    password = value.trim();
+                                  },
+                                ),
 
-                  return const SizedBox.shrink();
-                },
-              ),
+                                const SizedBox(height: 16),
+                                PrimaryMenuButton(
+                                  onPressed: () {
+                                    getIt<AuthCubit>().login(userId, password);
+                                  },
+                                  label: const Text("Iniciar Sesión"),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
 
-              Text(
-                "Iniciar Sesion",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white.withAlpha(210),
-                ),
-              ),
+                        const SizedBox(height: 8),
 
-              const SizedBox(height: 16),
-              Card(
-                color: Colors.white.withAlpha(230),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      TitleTextField(
-                        title: "Codigo de Usuario",
-                        onEditingComplete: () => FocusScope.of(context).nextFocus(),
-                        keyboardType: TextInputType.number,
-                        onChanged: (value) {
-                          userId = value.trim();
-                        },
-                      ),
-                      const SizedBox(height: 8),
-                      PasswordTextField(
-                        title: "Contraseña",
-                        onEditingComplete: () {
-                          getIt<AuthCubit>().login(userId, password);
-                        },
-                        onChanged: (value) {
-                          password = value.trim();
-                        },
-                      ),
-
-                      const SizedBox(height: 16),
-                      PrimaryMenuButton(
-                        onPressed: () {
-                          getIt<AuthCubit>().login(userId, password);
-                        },
-                        label: const Text("Iniciar Sesión"),
-                      ),
-                    ],
+                        const _ModeButton(),
+                      ],
+                    ),
                   ),
                 ),
               ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
 
-              const SizedBox(height: 8),
+/// Avatar circular del negocio, al estilo de la pantalla de login de macOS.
+class _CompanyLoginAvatar extends StatelessWidget {
+  const _CompanyLoginAvatar({
+    required this.imageUrl,
+    required this.businessName,
+  });
 
-              const _ModeButton(),
-            ],
+  static const double _size = 132;
+  static const double _logoPadding = 16;
+
+  final String? imageUrl;
+  final String businessName;
+
+  @override
+  Widget build(BuildContext context) {
+    final name = businessName.trim();
+    final initial = name.isEmpty ? null : name.substring(0, 1).toUpperCase();
+
+    final fallback = Center(
+      child: initial != null
+          ? Text(
+              initial,
+              style: const TextStyle(
+                fontSize: 50,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF072A3C),
+              ),
+            )
+          : const Icon(
+              Icons.storefront_rounded,
+              size: 50,
+              color: Color(0xFF072A3C),
+            ),
+    );
+
+    return Container(
+      width: _size,
+      height: _size,
+      clipBehavior: Clip.antiAlias,
+      padding: const EdgeInsets.all(_logoPadding),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(90),
+            blurRadius: 28,
+            offset: const Offset(0, 12),
           ),
-        ),
+        ],
+      ),
+      child: CompanyLogo(
+        imageUrl: imageUrl,
+        fit: BoxFit.contain,
+        fallback: fallback,
+        placeholder: fallback,
+        fadeInDuration: const Duration(milliseconds: 250),
       ),
     );
   }

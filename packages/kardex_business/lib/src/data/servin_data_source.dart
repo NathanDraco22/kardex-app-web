@@ -18,6 +18,20 @@ class ServinDataSource with HttpService {
     return res;
   }
 
+  Future<Map<String, dynamic>> getCurrentDemoServin() async {
+    const originServer = String.fromEnvironment("ORIGIN_SERVER_URL", defaultValue: '');
+
+    if (originServer.isEmpty) {
+      throw Exception('ORIGIN_SERVER_URL is empty');
+    }
+
+    final url = Uri.parse('$originServer$_activatorEndpoint/demo');
+
+    final res = await getQuery(url);
+
+    return res;
+  }
+
   final _endpoint = "/auths/servin-status";
 
   Future<Map<String, dynamic>> getServinStatus() async {
