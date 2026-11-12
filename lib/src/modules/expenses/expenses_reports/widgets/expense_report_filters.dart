@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_app_front/src/modules/expenses/expenses_reports/expense_report_period.dart';
 import 'package:kardex_app_front/src/modules/expenses/shared/widgets/expense_date_range_fields.dart';
+import 'package:kardex_app_front/src/modules/expenses/shared/widgets/expense_filter_card.dart';
 import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_app_front/widgets/buttons/secondary_menu_button.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
@@ -30,128 +31,184 @@ class ExpenseReportFilters extends StatelessWidget {
   final VoidCallback? onExport;
   final bool isRefreshing;
 
+  /// A partir de este ancho los filtros se muestran siempre visibles.
+  static const double _collapsibleBreakpoint = 860;
+
   @override
   Widget build(BuildContext context) {
-    final dateFields = ExpenseDateRangeFields(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final dateFields = _buildDateFields();
+        final clearButton = _buildClearButton();
+        final exportButton = _buildExportButton();
+        final shortcuts = _buildShortcuts();
+
+        if (constraints.maxWidth < _collapsibleBreakpoint) {
+          return ExpenseFilterCard(
+            headerTrailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (isRefreshing) ...[
+                  const SizedBox(
+                    width: 14,
+                    height: 14,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                  const SizedBox(width: 8),
+                ],
+                exportButton,
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                dateFields,
+                const SizedBox(height: 8),
+                Align(alignment: Alignment.centerRight, child: clearButton),
+                const SizedBox(height: 8),
+                shortcuts,
+              ],
+            ),
+          );
+        }
+
+        final actions = Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            clearButton,
+            const SizedBox(width: 8),
+            exportButton,
+            if (isRefreshing) ...[
+              const SizedBox(width: 8),
+              const SizedBox(
+                width: 14,
+                height: 14,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            ],
+          ],
+        );
+
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: AppThemeTokens.borderRadiusMd,
+            border: Border.all(color: AppThemeTokens.borderLight),
+            boxShadow: AppThemeTokens.subtleCardShadow(),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  if (constraints.maxWidth >= 720) {
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(child: dateFields),
+                        const SizedBox(width: 12),
+                        actions,
+                      ],
+                    );
+                  }
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      dateFields,
+                      const SizedBox(height: 8),
+                      Align(alignment: Alignment.centerRight, child: actions),
+                    ],
+                  );
+                },
+              ),
+              const SizedBox(height: 8),
+              shortcuts,
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildDateFields() {
+    return ExpenseDateRangeFields(
       startDate: startDate,
       endDate: endDate,
       onStartDateChanged: onStartDateChanged,
       onEndDateChanged: onEndDateChanged,
       breakpoint: 280,
     );
+  }
 
-    final actions = Row(
-      mainAxisSize: MainAxisSize.min,
+  Widget _buildClearButton() {
+    return SecondaryMenuButton(
+      onPressed: onClear,
+      icon: const Icon(Icons.restart_alt_rounded, size: 15),
+      label: const Text(
+        'Limpiar',
+        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+    );
+  }
+
+  Widget _buildExportButton() {
+    return Tooltip(
+      message: isRefreshing
+          ? 'Espera a que termine la carga del período'
+          : onExport == null
+          ? 'No hay datos para exportar en este período'
+          : 'Exportar reporte',
+      child: PrimaryMenuButton(
+        onPressed: onExport,
+        icon: const Icon(Icons.download_rounded, size: 16),
+        label: const Text(
+          'Exportar',
+          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      ),
+    );
+  }
+
+  Widget _buildShortcuts() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        SecondaryMenuButton(
-          onPressed: onClear,
-          icon: const Icon(Icons.restart_alt_rounded, size: 15),
-          label: const Text(
-            'Limpiar',
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+        const Text(
+          'Atajos:',
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF64748B),
+            letterSpacing: 0.2,
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         ),
         const SizedBox(width: 8),
-        Tooltip(
-          message: isRefreshing
-              ? 'Espera a que termine la carga del período'
-              : onExport == null
-                  ? 'No hay datos para exportar en este período'
-                  : 'Exportar reporte',
-          child: PrimaryMenuButton(
-            onPressed: onExport,
-            icon: const Icon(Icons.download_rounded, size: 16),
-            label: const Text(
-              'Exportar',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+        Expanded(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                for (final option in ExpenseReportPeriod.values)
+                  if (option != ExpenseReportPeriod.custom) ...[
+                    _PeriodPill(
+                      label: option.label,
+                      isSelected: period == option,
+                      onTap: () => onPeriodSelected(option),
+                    ),
+                    const SizedBox(width: 6),
+                  ],
+              ],
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           ),
         ),
-        if (isRefreshing) ...[
-          const SizedBox(width: 8),
-          const SizedBox(
-            width: 14,
-            height: 14,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
-        ],
       ],
-    );
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: AppThemeTokens.borderRadiusMd,
-        border: Border.all(color: AppThemeTokens.borderLight),
-        boxShadow: AppThemeTokens.subtleCardShadow(),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          LayoutBuilder(
-            builder: (context, constraints) {
-              if (constraints.maxWidth >= 720) {
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(child: dateFields),
-                    const SizedBox(width: 12),
-                    actions,
-                  ],
-                );
-              }
-
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  dateFields,
-                  const SizedBox(height: 8),
-                  Align(alignment: Alignment.centerRight, child: actions),
-                ],
-              );
-            },
-          ),
-          const SizedBox(height: 8),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Text(
-                'Atajos:',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFF64748B),
-                  letterSpacing: 0.2,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      for (final option in ExpenseReportPeriod.values)
-                        if (option != ExpenseReportPeriod.custom) ...[
-                          _PeriodPill(
-                            label: option.label,
-                            isSelected: period == option,
-                            onTap: () => onPeriodSelected(option),
-                          ),
-                          const SizedBox(width: 6),
-                        ],
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
     );
   }
 }

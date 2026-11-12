@@ -3,6 +3,7 @@ import 'package:kardex_app_front/src/modules/expenses/shared/expense_actions.dar
 import 'package:kardex_app_front/src/modules/expenses/shared/expense_list_config.dart';
 import 'package:kardex_app_front/src/modules/expenses/shared/expense_status_ui.dart';
 import 'package:kardex_app_front/src/modules/expenses/shared/widgets/expense_table_header.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 import 'package:kardex_business/kardex_business.dart';
 
@@ -196,6 +197,8 @@ class ExpenseCardTile extends StatefulWidget {
     required this.isNew,
     required this.isUpdated,
     required this.onTap,
+    this.inContinuousCard = false,
+    this.index = 0,
   });
 
   final ExpenseInDb expense;
@@ -203,6 +206,8 @@ class ExpenseCardTile extends StatefulWidget {
   final bool isNew;
   final bool isUpdated;
   final VoidCallback onTap;
+  final bool inContinuousCard;
+  final int index;
 
   @override
   State<ExpenseCardTile> createState() => _ExpenseCardTileState();
@@ -220,6 +225,149 @@ class _ExpenseCardTileState extends State<ExpenseCardTile> {
     final dueDate = expense.expirationDate == null
         ? null
         : DateTime.fromMillisecondsSinceEpoch(expense.expirationDate!);
+
+    final content = Padding(
+      padding: EdgeInsets.all(widget.inContinuousCard ? 11 : 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: config.accentColor.withValues(alpha: 0.12),
+                  borderRadius: AppThemeTokens.borderRadiusSm,
+                  border: Border.all(color: config.accentColor.withValues(alpha: 0.24)),
+                ),
+                child: Icon(config.icon, color: config.accentColor, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _expenseConcept(expense, config),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF0F172A),
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                    if (description != null) ...[
+                      const SizedBox(height: 3),
+                      Text(
+                        description,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF64748B),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 120),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      NumberFormatter.convertToMoneyLike(expense.amount),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.right,
+                      style: TextStyle(
+                        fontSize: 15.5,
+                        fontWeight: FontWeight.w800,
+                        color: config.accentColor,
+                        letterSpacing: -0.3,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    const Text(
+                      'Monto',
+                      style: TextStyle(
+                        fontSize: 10.5,
+                        color: Color(0xFF94A3B8),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          const Divider(height: 1, color: Color(0xFFF1F5F9)),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 12,
+            runSpacing: 6,
+            children: [
+              _MetaItem(
+                icon: Icons.receipt_long_rounded,
+                text: expense.docNumber.isEmpty ? 'Sin documento' : 'Doc. ${expense.docNumber}',
+              ),
+              _MetaItem(
+                icon: Icons.calendar_today_rounded,
+                text: 'Reg. ${DateTimeTool.formatddMMyyEs(expense.createdAt)}',
+              ),
+              if (dueDate != null)
+                _MetaItem(
+                  icon: Icons.event_rounded,
+                  text: 'Vence ${DateTimeTool.formatddMMyyEs(dueDate)}',
+                  color: isOverdue ? AppThemeTokens.danger : null,
+                ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: Wrap(
+                  spacing: 6,
+                  runSpacing: 4,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    ExpenseStatusBadge(status: expense.status, compact: true),
+                    if (isOverdue) const ExpenseOverdueBadge(compact: true),
+                    ExpenseActivityBadge(
+                      isNew: widget.isNew,
+                      isUpdated: widget.isUpdated,
+                      compact: true,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              _ExpenseActionsMenu(
+                expense: expense,
+                config: config,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+
+    if (widget.inContinuousCard) {
+      return Material(
+        color: RowColorTool.getRowColor(widget.index),
+        child: InkWell(
+          onTap: widget.onTap,
+          child: content,
+        ),
+      );
+    }
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -245,138 +393,7 @@ class _ExpenseCardTileState extends State<ExpenseCardTile> {
           child: InkWell(
             onTap: widget.onTap,
             hoverColor: Colors.transparent,
-            child: Padding(
-              padding: const EdgeInsets.all(14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: config.accentColor.withValues(alpha: 0.12),
-                          borderRadius: AppThemeTokens.borderRadiusSm,
-                          border: Border.all(color: config.accentColor.withValues(alpha: 0.24)),
-                        ),
-                        child: Icon(config.icon, color: config.accentColor, size: 20),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              _expenseConcept(expense, config),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 14.5,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF0F172A),
-                                letterSpacing: -0.2,
-                              ),
-                            ),
-                            if (description != null) ...[
-                              const SizedBox(height: 3),
-                              Text(
-                                description,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: Color(0xFF64748B),
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 120),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              NumberFormatter.convertToMoneyLike(expense.amount),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              textAlign: TextAlign.right,
-                              style: TextStyle(
-                                fontSize: 15.5,
-                                fontWeight: FontWeight.w800,
-                                color: config.accentColor,
-                                letterSpacing: -0.3,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            const Text(
-                              'Monto',
-                              style: TextStyle(
-                                fontSize: 10.5,
-                                color: Color(0xFF94A3B8),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  const Divider(height: 1, color: Color(0xFFF1F5F9)),
-                  const SizedBox(height: 10),
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 6,
-                    children: [
-                      _MetaItem(
-                        icon: Icons.receipt_long_rounded,
-                        text: expense.docNumber.isEmpty ? 'Sin documento' : 'Doc. ${expense.docNumber}',
-                      ),
-                      _MetaItem(
-                        icon: Icons.calendar_today_rounded,
-                        text: 'Reg. ${DateTimeTool.formatddMMyyEs(expense.createdAt)}',
-                      ),
-                      if (dueDate != null)
-                        _MetaItem(
-                          icon: Icons.event_rounded,
-                          text: 'Vence ${DateTimeTool.formatddMMyyEs(dueDate)}',
-                          color: isOverdue ? AppThemeTokens.danger : null,
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Wrap(
-                          spacing: 6,
-                          runSpacing: 4,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: [
-                            ExpenseStatusBadge(status: expense.status, compact: true),
-                            if (isOverdue) const ExpenseOverdueBadge(compact: true),
-                            ExpenseActivityBadge(
-                              isNew: widget.isNew,
-                              isUpdated: widget.isUpdated,
-                              compact: true,
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      _ExpenseActionsMenu(
-                        expense: expense,
-                        config: config,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+            child: content,
           ),
         ),
       ),

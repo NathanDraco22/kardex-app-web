@@ -169,6 +169,53 @@ void main() {
       expect(selectedPeriod, ExpenseReportPeriod.yesterday);
       expect(tester.takeException(), isNull);
     });
+
+    testWidgets('en móvil colapsa los filtros y mantiene Exportar visible', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(360, 1000));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      ExpenseReportPeriod? selectedPeriod;
+      final range = rangeFor(
+        ExpenseReportPeriod.last7Days,
+        now: DateTime(2026, 11, 10),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: ExpenseReportFilters(
+                period: ExpenseReportPeriod.last7Days,
+                startDate: range.start,
+                endDate: range.end,
+                onPeriodSelected: (period) => selectedPeriod = period,
+                onStartDateChanged: (_) {},
+                onEndDateChanged: (_) {},
+                onClear: () {},
+                onExport: () {},
+                isRefreshing: false,
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Filtros'), findsOneWidget);
+      expect(find.text('Exportar'), findsOneWidget);
+      expect(find.text('Fecha Inicio'), findsNothing);
+
+      await tester.tap(find.text('Filtros'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Fecha Inicio'), findsOneWidget);
+      expect(find.text('Ayer'), findsOneWidget);
+
+      await tester.tap(find.text('Ayer'));
+      expect(selectedPeriod, ExpenseReportPeriod.yesterday);
+      expect(tester.takeException(), isNull);
+    });
   });
 
   group('agregación del reporte', () {

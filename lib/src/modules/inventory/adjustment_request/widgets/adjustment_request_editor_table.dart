@@ -4,6 +4,7 @@ import 'package:kardex_app_front/src/tools/input_formatters.dart';
 import 'package:kardex_app_front/widgets/buttons/elevated_ctrl_button.dart';
 import 'package:kardex_app_front/widgets/dialogs/inventory_unit_picker.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/widgets/display_product_code.dart';
+import 'package:kardex_app_front/widgets/super_widgets/image_viewer_widget.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 import 'adjustment_request_item_formatters.dart';
@@ -271,35 +272,13 @@ class _EditorRowState extends State<_EditorRow> {
             fit: FlexFit.tight,
             child: Row(
               children: [
-                ExcludeFocus(
-                  child: PopupMenuButton<_RowAction>(
-                    icon: const Icon(Icons.more_vert),
-                    tooltip: 'Opciones',
-                    onSelected: _handleAction,
-                    itemBuilder: (context) => [
-                      const PopupMenuItem(
-                        value: _RowAction.changeUnit,
-                        child: Row(
-                          children: [
-                            Icon(Icons.sync_alt, size: 20),
-                            SizedBox(width: 8),
-                            Text('Cambiar Unidad'),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: _RowAction.remove,
-                        child: Row(
-                          children: [
-                            Icon(Icons.delete_outline, size: 20, color: Colors.red.shade700),
-                            const SizedBox(width: 8),
-                            Text('Eliminar fila', style: TextStyle(color: Colors.red.shade700)),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                ImageViewerWidget(
+                  imageUrls: product.image.isNotEmpty ? [product.image] : [],
+                  width: 40,
+                  height: 40,
+                  borderRadius: BorderRadius.circular(8),
                 ),
+                const SizedBox(width: 6),
                 Expanded(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -332,6 +311,35 @@ class _EditorRowState extends State<_EditorRow> {
                             },
                           ),
                         ],
+                      ),
+                    ],
+                  ),
+                ),
+                ExcludeFocus(
+                  child: PopupMenuButton<_RowAction>(
+                    icon: const Icon(Icons.more_vert),
+                    tooltip: 'Opciones',
+                    onSelected: _handleAction,
+                    itemBuilder: (context) => [
+                      const PopupMenuItem(
+                        value: _RowAction.changeUnit,
+                        child: Row(
+                          children: [
+                            Icon(Icons.sync_alt, size: 20),
+                            SizedBox(width: 8),
+                            Text('Cambiar Unidad'),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: _RowAction.remove,
+                        child: Row(
+                          children: [
+                            Icon(Icons.delete_outline, size: 20, color: Colors.red.shade700),
+                            const SizedBox(width: 8),
+                            Text('Eliminar fila', style: TextStyle(color: Colors.red.shade700)),
+                          ],
+                        ),
                       ),
                     ],
                   ),

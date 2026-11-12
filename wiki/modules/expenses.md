@@ -49,6 +49,7 @@ lib/src/modules/expenses/
 │   ├── expense_metrics.dart                  # Métricas de los registros visibles
 │   ├── expense_status_ui.dart                # Badges y regla de vencido
 │   └── widgets/
+│       ├── expense_filter_card.dart          # Tarjeta colapsable móvil/tablet
 │       ├── expense_filter_panel.dart
 │       ├── expense_form_widgets.dart
 │       ├── expense_kpi_strip.dart
@@ -130,7 +131,8 @@ API FastAPI
 | Widget | Uso |
 | :--- | :--- |
 | `ExpenseKpiStrip` | Barra compacta con Total, Pagado, Pendiente y Vencidos. En desktop va en una fila y en móvil en grilla 2×2. Incluye la nota de alcance “sobre N registros visibles de M cargados”. |
-| `ExpenseFilterPanel` | Tarjeta única con la barra de totales, dropdown de estado, filtro de categoría/proveedor, fechas separadas de registro (inicio/fin) y buscador al final. |
+| `ExpenseFilterCard` | Tarjeta con cabecera “Filtros” y chevron que colapsa los controles en móvil/tablet. Mantiene siempre visible su `footer` (KPIs) y admite una acción fija en la cabecera (Exportar). |
+| `ExpenseFilterPanel` | Tarjeta con la barra de totales, dropdown de estado, filtro de categoría/proveedor, fechas separadas de registro (inicio/fin) y buscador. Por debajo de `860 px` los controles se agrupan en `ExpenseFilterCard` y inician colapsados; desde `860 px` quedan siempre visibles. |
 | `ExpenseDateRangeFields` | Par de campos “Fecha Inicio” y “Fecha Fin” con calendarios individuales, soporte de extremos opcionales y limpieza por campo. Se usa en las listas y en el reporte. |
 | `ExpenseTableHeader` / `ExpenseTableRow` | Tabla desktop: Concepto, Documento, Registro, Vencimiento, Estado, Monto y acciones. |
 | `ExpenseCardTile` | Tarjeta equivalente para móvil/tablet, con metadatos, badges y menú de acciones. |
@@ -180,6 +182,7 @@ Ambas listas reutilizan `ExpenseListScreen` y solo cambian su `ExpenseListConfig
 
 - AppBar con el título específico (“Gastos Operativos” / “Gastos de Proveedores”), refresco y “Nuevo Gasto” como acciones compactas.
 - Tarjeta única de totales y filtros, con estilo compacto similar al módulo “Buscar facturas por producto”.
+- En móvil/tablet (`< 860 px`) los filtros viven en un dropdown “Filtros” colapsado por defecto; la barra de totales permanece visible. Desde `860 px` los filtros quedan siempre desplegados.
 - Barra de totales en formato resumido (Total, Pagado, Pendiente, Vencidos).
 - Dropdown de estado: Todos, Pendientes, Pagados y Vencidos.
 - Fechas separadas de registro (inicio/fin) y buscador al final de la tarjeta.
@@ -339,6 +342,8 @@ Refresco robusto:
 | Fecha Inicio / Fecha Fin | Dos selectores de fecha separados. Los presets los rellenan como atajos y el usuario puede ajustar cada extremo manualmente. |
 
 La tarjeta de filtros muestra **“Fecha Inicio”** y **“Fecha Fin”** como campos separados. Al cambiar cualquiera de los dos, el reporte se recarga automáticamente y no queda ningún preset resaltado. Los presets siguen disponibles como atajos que rellenan ambos campos. El filtro y la columna “Registro” usan `createdAt`, no `date`.
+
+En móvil/tablet (`< 860 px`) la tarjeta usa el mismo dropdown “Filtros” de las listas: inicia colapsada y el botón **Exportar** permanece visible en la cabecera. Desde `860 px` la tarjeta se muestra completa.
 
 #### Carga y límites
 

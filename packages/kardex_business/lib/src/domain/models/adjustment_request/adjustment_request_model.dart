@@ -5,6 +5,7 @@ enum AdjustmentRequestStatus { pending, approved, cancelled }
 class AdjustmentRequestItem {
   final String productId;
   final String productName;
+  final String image;
   final String? code;
   final String? brandName;
   final String? unitName;
@@ -20,6 +21,7 @@ class AdjustmentRequestItem {
   AdjustmentRequestItem({
     required this.productId,
     required this.productName,
+    this.image = "",
     this.code,
     this.brandName,
     this.unitName,
@@ -37,6 +39,7 @@ class AdjustmentRequestItem {
     return AdjustmentRequestItem(
       productId: json['productId'] as String? ?? "",
       productName: json['productName'] as String? ?? "",
+      image: json['image'] as String? ?? "",
       code: json['code'] as String?,
       brandName: json['brandName'] as String?,
       unitName: json['unitName'] as String?,
@@ -55,6 +58,7 @@ class AdjustmentRequestItem {
     return {
       'productId': productId,
       'productName': productName,
+      'image': image,
       'code': code,
       'brandName': brandName,
       'unitName': unitName,

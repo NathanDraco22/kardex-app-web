@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_app_front/src/tools/row_color_tool.dart';
+import 'package:kardex_app_front/widgets/super_widgets/image_viewer_widget.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 import 'adjustment_request_item_formatters.dart';
@@ -152,6 +153,12 @@ class _ItemTableRow extends StatelessWidget {
             fit: FlexFit.tight,
             child: Row(
               children: [
+                ImageViewerWidget(
+                  imageUrls: item.image.isNotEmpty ? [item.image] : [],
+                  width: 40,
+                  height: 40,
+                  borderRadius: BorderRadius.circular(8),
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Column(

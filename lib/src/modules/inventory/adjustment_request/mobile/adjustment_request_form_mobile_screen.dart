@@ -64,7 +64,7 @@ class AdjustmentRequestFormMobileScreen extends StatelessWidget {
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(8, 8, 8, 110),
+        padding: const EdgeInsets.fromLTRB(4, 4, 4, 110),
         children: [
           _MobileFormHeader(editingRequest: editingRequest),
           const SizedBox(height: 10),

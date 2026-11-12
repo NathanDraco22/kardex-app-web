@@ -1,3 +1,18 @@
+## Recorte Cuadrado del Logo de Empresa (Noviembre 2026)
+
+- **Problema:** en Configuraciones → Identidad de la empresa, el logo se elegía con `ImagePicker` directo y se subía sin recorte.
+- **Solución:** `AppSettingsScreen` reutiliza `showImageSelectorDialog` / `showAdaptiveImageCropper` (croppy) con proporción 1:1, igual que el alta de productos. El selector admite salida PNG (`encodeAsPng`) para conservar la transparencia del logo; luego se sube con `ImageUploader`.
+- **UX:** se conserva el botón Quitar con confirmación; el diálogo también permite cambiar o eliminar el logo. La previsualización pasó a formato cuadrado.
+- **Sincronización:** aplica a `lite` (archivos idénticos en ambas ramas); queda pendiente el `git merge main` en `lite` al cerrar la tarea.
+
+## Imágenes de Producto en Solicitudes de Ajuste (Noviembre 2026)
+
+- **Backend:** `AdjustmentRequestItem` ahora guarda `image` como snapshot tomado del producto al crear/editar la solicitud.
+- **Frontend:** `AdjustmentRequestItem` incluye `image`; el formulario y el detalle (web y móvil) muestran la miniatura con `ImageViewerWidget` y un icono de respaldo.
+- **Compatibilidad:** las solicitudes históricas sin imagen muestran el icono; no requiere migraciones de Mongo.
+- **Archivos:** `adjustment_request_editor_cards.dart`, `adjustment_request_editor_table.dart`, `adjustment_request_item_cards.dart`, `adjustment_request_item_table.dart` y `view_controller.dart`.
+- **Regla `main`/`lite`:** el módulo de Solicitudes de Ajuste no existe en `lite`; no aplica sincronización de UI.
+
 ## Detalle de Solicitud de Ajuste: Documentos en Columna (Noviembre 2026)
 
 - **Web:** `_ApprovedPanel` ahora muestra `Entrada #...` y `Salida #...` en una columna a ancho completo, con mayor padding y tipografía (11.5 px); el header del detalle subió de 160 a 172 px para evitar overflow.

@@ -5,6 +5,7 @@ import 'package:kardex_app_front/constants/route_names.dart';
 import 'package:kardex_app_front/src/modules/inventory/adjustment_request/cubit/read_adjustment_requests_cubit.dart';
 import 'package:kardex_app_front/src/modules/inventory/adjustment_request/widgets/adjustment_request_list_tile.dart';
 import 'package:kardex_app_front/src/tools/role_tools.dart';
+import 'package:kardex_app_front/widgets/title_label.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
 
@@ -37,6 +38,7 @@ class AdjustmentRequestListMobileScreen extends StatelessWidget {
           label: const Text('Nueva Solicitud'),
         ),
       ),
+      bottomNavigationBar: const _AdjustmentRequestListBottomAppBar(),
       body: const _MobileBody(),
     );
   }
@@ -63,7 +65,7 @@ class _MobileBody extends StatelessWidget {
             },
             child: ListView(
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(12, 10, 12, 110),
+              padding: const EdgeInsets.fromLTRB(4, 4, 4, 80),
               children: [
                 const _MobileFilters(),
                 if (success?.isRefreshing == true || success?.isLoadingMore == true)
@@ -153,12 +155,6 @@ class _MobileBody extends StatelessWidget {
                           ],
                         ),
                       ),
-                    const SizedBox(height: 10),
-                    _MobileListTotalsCard(
-                      itemCount: success.items.length,
-                      entryTotal: success.items.fold<int>(0, (sum, item) => sum + item.entryTotal),
-                      exitTotal: success.items.fold<int>(0, (sum, item) => sum + item.exitTotal),
-                    ),
                   ],
                 ],
               ],
@@ -183,7 +179,7 @@ class _MobileFiltersState extends State<_MobileFilters> {
   DateTime? _endDate;
   String _status = 'all';
   UserInDb? _selectedUser;
-  bool _expanded = true;
+  bool _expanded = false;
   int _clearGeneration = 0;
 
   @override
@@ -348,100 +344,62 @@ class _MobileFiltersState extends State<_MobileFilters> {
   }
 }
 
-class _MobileListTotalsCard extends StatelessWidget {
-  const _MobileListTotalsCard({
-    required this.itemCount,
-    required this.entryTotal,
-    required this.exitTotal,
-  });
-
-  final int itemCount;
-  final int entryTotal;
-  final int exitTotal;
+class _AdjustmentRequestListBottomAppBar extends StatelessWidget {
+  const _AdjustmentRequestListBottomAppBar();
 
   @override
   Widget build(BuildContext context) {
-    final netTotal = entryTotal - exitTotal;
+    return BlocBuilder<ReadAdjustmentRequestsCubit, ReadAdjustmentRequestsState>(
+      builder: (context, state) {
+        final success = state is ReadAdjustmentRequestsSuccess ? state : null;
+        if (success == null || success.items.isEmpty) return const SizedBox.shrink();
 
-    return Card(
-      margin: EdgeInsets.zero,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Total Solicitudes ($itemCount):',
-                  style: const TextStyle(fontSize: 12.5, color: Colors.grey),
-                ),
-                Text(
-                  '$itemCount',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Sobrante:',
-                  style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  NumberFormatter.convertToMoneyLike(entryTotal),
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green.shade700,
+        final entryTotal = success.items.fold<int>(0, (sum, item) => sum + item.entryTotal);
+        final exitTotal = success.items.fold<int>(0, (sum, item) => sum + item.exitTotal);
+        final netTotal = entryTotal - exitTotal;
+
+        return BottomAppBar(
+          height: 60,
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+          child: Row(
+            children: [
+              Expanded(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: TitleLabel(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    title: 'Sobrante',
+                    bigTitle: NumberFormatter.convertToMoneyLike(entryTotal),
+                    bigTitleColor: Colors.green.shade700,
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Faltante:',
-                  style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  NumberFormatter.convertToMoneyLike(exitTotal),
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.red.shade700,
+              ),
+              Expanded(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: TitleLabel(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    title: 'Faltante',
+                    bigTitle: NumberFormatter.convertToMoneyLike(exitTotal),
+                    bigTitleColor: Colors.red.shade700,
                   ),
                 ),
-              ],
-            ),
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 6),
-              child: Divider(height: 1),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Total Neto:',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  NumberFormatter.convertToMoneyLike(netTotal),
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: netTotal >= 0 ? Colors.green.shade800 : Colors.red.shade800,
+              ),
+              Expanded(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: TitleLabel(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    title: 'Total Neto',
+                    bigTitle: NumberFormatter.convertToMoneyLike(netTotal),
+                    bigTitleColor: netTotal >= 0 ? Colors.green.shade800 : Colors.red.shade800,
                   ),
                 ),
-              ],
-            ),
-          ],
-        ),
-      ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

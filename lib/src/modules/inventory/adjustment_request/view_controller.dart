@@ -238,6 +238,7 @@ class AdjustmentRequestViewController extends ChangeNotifier {
     return AdjustmentRequestItem(
       productId: row.product.id,
       productName: row.product.name,
+      image: row.product.image,
       code: row.product.code,
       brandName: row.product.brandName,
       unitName: row.unitName,

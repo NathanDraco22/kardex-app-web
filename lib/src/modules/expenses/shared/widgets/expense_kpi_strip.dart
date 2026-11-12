@@ -56,7 +56,9 @@ class ExpenseKpiStrip extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isWide = constraints.maxWidth >= 720;
+        // La fila necesita ancho suficiente para las cuatro métricas; con
+        // menos espacio se apilan en un wrap para evitar desbordes.
+        final isWide = constraints.maxWidth >= 820;
         final metricsWidget = isWide
             ? Row(
                 children: [

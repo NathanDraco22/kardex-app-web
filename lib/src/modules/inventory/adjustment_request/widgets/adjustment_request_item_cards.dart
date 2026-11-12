@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
+import 'package:kardex_app_front/widgets/super_widgets/image_viewer_widget.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 import 'adjustment_request_item_formatters.dart';
@@ -69,6 +70,13 @@ class AdjustmentRequestItemCard extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              ImageViewerWidget(
+                imageUrls: item.image.isNotEmpty ? [item.image] : [],
+                width: 46,
+                height: 46,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              const SizedBox(width: 8),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

@@ -5,6 +5,7 @@ import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/modules/expenses/shared/expense_status_ui.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
+import 'package:kardex_app_front/widgets/title_label.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 /// Abre el visor de un gasto usando la sucursal activa de la sesión.
@@ -84,12 +85,7 @@ class ExpenseViewerPage extends StatelessWidget {
     final docNumber = expense.docNumber.trim().isEmpty ? 'S/N' : expense.docNumber;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF0F172A),
-        elevation: 0,
-        scrolledUnderElevation: 0,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -100,42 +96,32 @@ class ExpenseViewerPage extends StatelessWidget {
             ),
             Text(
               _typeTitle(expense.type),
-              style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w500, color: Color(0xFF64748B)),
+              style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w500, color: Colors.white70),
             ),
           ],
         ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Container(height: 1, color: AppThemeTokens.borderLight),
-        ),
       ),
-      bottomNavigationBar: SafeArea(
-        top: false,
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            border: Border(top: BorderSide(color: AppThemeTokens.borderLight)),
-          ),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 720),
-              child: SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  style: OutlinedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(46),
-                    foregroundColor: const Color(0xFF334155),
-                    side: const BorderSide(color: AppThemeTokens.borderLight),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: AppThemeTokens.borderRadiusMd,
-                    ),
+      bottomNavigationBar: BottomAppBar(
+        height: 60,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 720),
+            child: SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: () => Navigator.of(context).pop(),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(44),
+                  foregroundColor: const Color(0xFF334155),
+                  side: const BorderSide(color: AppThemeTokens.borderLight),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: AppThemeTokens.borderRadiusMd,
                   ),
-                  child: const Text(
-                    'Cerrar',
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                  ),
+                ),
+                child: const Text(
+                  'Cerrar',
+                  style: TextStyle(fontWeight: FontWeight.w600),
                 ),
               ),
             ),
@@ -144,34 +130,43 @@ class ExpenseViewerPage extends StatelessWidget {
       ),
       body: SafeArea(
         top: false,
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 720),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _ExpenseHeroCard(
-                    expense: expense,
-                    docNumber: docNumber,
-                    accent: accent,
-                    isOverdue: isOverdue,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final isCompact = constraints.maxWidth < 720;
+            final padding = isCompact
+                ? const EdgeInsets.fromLTRB(4, 6, 4, 16)
+                : const EdgeInsets.symmetric(horizontal: 16, vertical: 20);
+
+            return Center(
+              child: SingleChildScrollView(
+                padding: padding,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 720),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _ExpenseHeroCard(
+                        expense: expense,
+                        docNumber: docNumber,
+                        accent: accent,
+                        isOverdue: isOverdue,
+                      ),
+                      const SizedBox(height: 10),
+                      _ExpenseAmountCard(expense: expense, accent: accent),
+                      const SizedBox(height: 10),
+                      _ExpenseDetailGrid(
+                        expense: expense,
+                        branchName: branchName,
+                        isOverdue: isOverdue,
+                      ),
+                      const SizedBox(height: 10),
+                      _ExpenseDescriptionCard(description: expense.description),
+                    ],
                   ),
-                  const SizedBox(height: 12),
-                  _ExpenseAmountCard(expense: expense, accent: accent),
-                  const SizedBox(height: 12),
-                  _ExpenseDetailGrid(
-                    expense: expense,
-                    branchName: branchName,
-                    isOverdue: isOverdue,
-                  ),
-                  const SizedBox(height: 12),
-                  _ExpenseDescriptionCard(description: expense.description),
-                ],
+                ),
               ),
-            ),
-          ),
+            );
+          },
         ),
       ),
     );
@@ -556,12 +551,7 @@ class _ExpenseViewerLoadingScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF0F172A),
-        elevation: 0,
-        scrolledUnderElevation: 0,
         title: const Text(
           'Detalle del Gasto',
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
@@ -580,12 +570,7 @@ class _ExpenseViewerErrorScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF0F172A),
-        elevation: 0,
-        scrolledUnderElevation: 0,
         title: const Text(
           'Detalle del Gasto',
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),

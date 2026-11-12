@@ -9,6 +9,7 @@ import 'package:kardex_app_front/src/modules/expenses/shared/widgets/expense_fil
 import 'package:kardex_app_front/src/modules/expenses/shared/widgets/expense_list_tile.dart';
 import 'package:kardex_app_front/src/modules/expenses/shared/widgets/expense_table_header.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
+import 'package:kardex_app_front/widgets/title_label.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 /// Orquestador responsive compartido por las listas de gastos.
@@ -48,61 +49,70 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Tooltip(
-          message: widget.config.subtitle,
-          child: Text(
-            widget.config.title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-        actions: [
-          BlocBuilder<ReadExpenseCubit, ReadExpenseState>(
-            builder: (context, state) {
-              final isRefreshing = state is ReadExpenseSearching;
-              return IconButton(
-                tooltip: 'Actualizar',
-                onPressed: isRefreshing ? null : () => context.read<ReadExpenseCubit>().refresh(),
-                icon: isRefreshing
-                    ? const SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                    : const Icon(Icons.refresh_rounded, size: 21),
-              );
-            },
-          ),
-          IconButton(
-            tooltip: widget.config.createButtonLabel,
-            onPressed: _createExpense,
-            icon: const Icon(
-              Icons.add_rounded,
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 4),
-        ],
-      ),
-      body: SafeArea(
-        top: false,
-        child: BlocBuilder<ReadExpenseCubit, ReadExpenseState>(
-          builder: (context, state) {
-            final successState = state is ReadExpenseSuccess ? state : null;
-            final visibleItems = successState == null ? const <ExpenseInDb>[] : _visibleItems(successState);
-            final metrics = ExpenseMetrics.fromExpenses(visibleItems);
+    return BlocBuilder<ReadExpenseCubit, ReadExpenseState>(
+      builder: (context, state) {
+        final successState = state is ReadExpenseSuccess ? state : null;
+        final visibleItems = successState == null ? const <ExpenseInDb>[] : _visibleItems(successState);
+        final metrics = ExpenseMetrics.fromExpenses(visibleItems);
 
-            return LayoutBuilder(
-              builder: (context, constraints) {
-                final horizontalPadding = constraints.maxWidth >= 1280 ? 32.0 : 16.0;
-                final isDesktop = constraints.maxWidth >= _desktopBreakpoint;
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            final isDesktop = constraints.maxWidth >= _desktopBreakpoint;
+            final horizontalPadding = isDesktop ? (constraints.maxWidth >= 1280 ? 32.0 : 16.0) : 4.0;
+            final topFilterPadding = isDesktop ? 12.0 : 4.0;
 
-                return Align(
+            return Scaffold(
+              appBar: AppBar(
+                title: Tooltip(
+                  message: widget.config.subtitle,
+                  child: Text(
+                    widget.config.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                actions: [
+                  BlocBuilder<ReadExpenseCubit, ReadExpenseState>(
+                    builder: (context, state) {
+                      final isRefreshing = state is ReadExpenseSearching;
+                      return IconButton(
+                        tooltip: 'Actualizar',
+                        onPressed: isRefreshing ? null : () => context.read<ReadExpenseCubit>().refresh(),
+                        icon: isRefreshing
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Icon(Icons.refresh_rounded, size: 21),
+                      );
+                    },
+                  ),
+                  const SizedBox(width: 4),
+                ],
+              ),
+              floatingActionButton: Visibility(
+                visible: MediaQuery.viewInsetsOf(context).bottom == 0.0,
+                child: FloatingActionButton.extended(
+                  onPressed: _createExpense,
+                  backgroundColor: widget.config.accentColor,
+                  foregroundColor: Colors.white,
+                  icon: const Icon(Icons.add_rounded),
+                  label: Text(widget.config.createButtonLabel),
+                ),
+              ),
+              bottomNavigationBar: isDesktop
+                  ? null
+                  : _ExpenseListBottomAppBar(
+                      metrics: metrics,
+                      accentColor: widget.config.accentColor,
+                    ),
+              body: SafeArea(
+                top: false,
+                child: Align(
                   alignment: Alignment.topCenter,
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 1400),
@@ -113,7 +123,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
                         physics: const AlwaysScrollableScrollPhysics(),
                         slivers: [
                           SliverPadding(
-                            padding: EdgeInsets.fromLTRB(horizontalPadding, 12, horizontalPadding, 0),
+                            padding: EdgeInsets.fromLTRB(horizontalPadding, topFilterPadding, horizontalPadding, 0),
                             sliver: SliverToBoxAdapter(
                               child: ExpenseFilterPanel(
                                 config: widget.config,
@@ -141,7 +151,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
                             ),
                           ),
                           SliverPadding(
-                            padding: EdgeInsets.fromLTRB(horizontalPadding, 10, horizontalPadding, 0),
+                            padding: EdgeInsets.fromLTRB(horizontalPadding, isDesktop ? 10 : 4, horizontalPadding, 0),
                             sliver: SliverToBoxAdapter(
                               child: SizedBox(
                                 height: 2,
@@ -168,12 +178,12 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
                       ),
                     ),
                   ),
-                );
-              },
+                ),
+              ),
             );
           },
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -302,21 +312,30 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
     } else {
       slivers.add(
         SliverPadding(
-          padding: EdgeInsets.fromLTRB(horizontalPadding, 16, horizontalPadding, 0),
-          sliver: SliverList.separated(
-            itemCount: visibleItems.length,
-            separatorBuilder: (_, _) => const SizedBox(height: 10),
-            itemBuilder: (context, index) {
-              final expense = visibleItems[index];
-              return ExpenseCardTile(
-                key: ValueKey(expense.id),
-                expense: expense,
-                config: widget.config,
-                isNew: newIds.contains(expense.id),
-                isUpdated: updatedIds.contains(expense.id),
-                onTap: () => widget.config.onOpenViewer(context, expense),
-              );
-            },
+          padding: EdgeInsets.fromLTRB(horizontalPadding, 6, horizontalPadding, 0),
+          sliver: SliverToBoxAdapter(
+            child: Card(
+              margin: EdgeInsets.zero,
+              clipBehavior: Clip.antiAlias,
+              child: Column(
+                children: [
+                  for (var index = 0; index < visibleItems.length; index++) ...[
+                    ExpenseCardTile(
+                      key: ValueKey(visibleItems[index].id),
+                      expense: visibleItems[index],
+                      config: widget.config,
+                      isNew: newIds.contains(visibleItems[index].id),
+                      isUpdated: updatedIds.contains(visibleItems[index].id),
+                      inContinuousCard: true,
+                      index: index,
+                      onTap: () => widget.config.onOpenViewer(context, visibleItems[index]),
+                    ),
+                    if (index < visibleItems.length - 1)
+                      const Divider(height: 1, thickness: 1, color: Color(0xFFE2E8F0)),
+                  ],
+                ],
+              ),
+            ),
           ),
         ),
       );
@@ -602,5 +621,64 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
     if (!mounted || !context.mounted || created == null) return;
 
     ExpenseActions.showSnackBar(context, 'Gasto creado correctamente');
+  }
+}
+
+class _ExpenseListBottomAppBar extends StatelessWidget {
+  const _ExpenseListBottomAppBar({
+    required this.metrics,
+    required this.accentColor,
+  });
+
+  final ExpenseMetrics metrics;
+  final Color accentColor;
+
+  @override
+  Widget build(BuildContext context) {
+    if (metrics.count == 0) return const SizedBox.shrink();
+
+    final pendingTotal = metrics.pending;
+
+    return BottomAppBar(
+      height: 60,
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+      child: Row(
+        children: [
+          Expanded(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: TitleLabel(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                title: 'Total',
+                bigTitle: NumberFormatter.convertToMoneyLike(metrics.total),
+                bigTitleColor: accentColor,
+              ),
+            ),
+          ),
+          Expanded(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: TitleLabel(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                title: 'Pagado',
+                bigTitle: NumberFormatter.convertToMoneyLike(metrics.paid),
+                bigTitleColor: Colors.green.shade700,
+              ),
+            ),
+          ),
+          Expanded(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: TitleLabel(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                title: 'Pendiente',
+                bigTitle: NumberFormatter.convertToMoneyLike(pendingTotal),
+                bigTitleColor: pendingTotal > 0 ? Colors.red.shade700 : const Color(0xFF64748B),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

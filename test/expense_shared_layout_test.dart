@@ -145,6 +145,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
+    await _expandFilters(tester);
 
     await tester.enterText(find.byType(TextField).first, 'sin coincidencias');
     await tester.pumpAndSettle();
@@ -526,6 +527,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
+    await _expandFilters(tester);
 
     expect(tester.takeException(), isNull);
   });
@@ -577,6 +579,62 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('en móvil los filtros inician colapsados y los KPIs siguen visibles', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(360, 1600));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    final cubit = _FakeReadExpenseCubit([_expense()]);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: BlocProvider<ReadExpenseCubit>.value(
+          value: cubit,
+          child: const ExpenseListScreen(config: _config),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Filtros'), findsOneWidget);
+    expect(find.text('Fecha de registro'), findsNothing);
+    expect(find.textContaining('Total:'), findsOneWidget);
+
+    await tester.tap(find.text('Filtros'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Fecha de registro'), findsOneWidget);
+    expect(find.text('Fecha Inicio'), findsOneWidget);
+
+    await tester.tap(find.text('Filtros'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Fecha de registro'), findsNothing);
+    expect(find.textContaining('Total:'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('en escritorio los filtros permanecen siempre visibles', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(1280, 1000));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    final cubit = _FakeReadExpenseCubit([_expense()]);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: BlocProvider<ReadExpenseCubit>.value(
+          value: cubit,
+          child: const ExpenseListScreen(config: _config),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Filtros'), findsNothing);
+    expect(find.text('Fecha de registro'), findsOneWidget);
+    expect(find.text('Fecha Inicio'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   for (final size in [const Size(360, 640), const Size(1280, 520)]) {
     testWidgets(
       'el estado vacío no desborda en ${size.width.toInt()}x${size.height.toInt()}',
@@ -606,7 +664,17 @@ void main() {
   }
 }
 
+Future<void> _expandFilters(WidgetTester tester) async {
+  final header = find.text('Filtros');
+  if (header.evaluate().isEmpty) return;
+  if (find.byKey(const Key('expense_status_dropdown')).evaluate().isNotEmpty) return;
+
+  await tester.tap(header);
+  await tester.pumpAndSettle();
+}
+
 Future<void> _selectStatus(WidgetTester tester, String label) async {
+  await _expandFilters(tester);
   await tester.tap(find.byKey(const Key('expense_status_dropdown')));
   await tester.pumpAndSettle();
   await tester.tap(find.text(label).last);

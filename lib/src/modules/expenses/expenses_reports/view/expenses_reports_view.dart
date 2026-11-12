@@ -162,8 +162,10 @@ class _ExpensesReportScaffoldState extends State<_ExpensesReportScaffold> {
 
             return LayoutBuilder(
               builder: (context, constraints) {
-                final horizontalPadding = constraints.maxWidth >= 1280 ? 32.0 : 16.0;
                 final isDesktop = constraints.maxWidth >= _desktopBreakpoint;
+                final horizontalPadding = isDesktop ? (constraints.maxWidth >= 1280 ? 32.0 : 16.0) : 4.0;
+                final topPadding = isDesktop ? 20.0 : 8.0;
+                final sectionPadding = isDesktop ? 16.0 : 6.0;
 
                 return Align(
                   alignment: Alignment.topCenter,
@@ -178,7 +180,7 @@ class _ExpensesReportScaffoldState extends State<_ExpensesReportScaffold> {
                           SliverPadding(
                             padding: EdgeInsets.fromLTRB(
                               horizontalPadding,
-                              20,
+                              topPadding,
                               horizontalPadding,
                               0,
                             ),
@@ -189,7 +191,7 @@ class _ExpensesReportScaffoldState extends State<_ExpensesReportScaffold> {
                           SliverPadding(
                             padding: EdgeInsets.fromLTRB(
                               horizontalPadding,
-                              16,
+                              sectionPadding,
                               horizontalPadding,
                               0,
                             ),

@@ -81,17 +81,19 @@ A partir del rediseño integral de **Solicitudes de Ajuste (`adjustment_request`
 
 ```mermaid
 flowchart TD
-    subgraph MobileLayout ["Patrón Mobile: Contenedor Continuo"]
+    subgraph MobileLayout ["Patrón Mobile: Contenedor Continuo + BottomAppBar (Estándar Buscador de Cotizaciones)"]
+        MPadding["Padding Perimetral de 4px: EdgeInsets.all(4.0)"]
         MCard["Card(margin: EdgeInsets.zero, clipBehavior: Clip.antiAlias)"]
         MRow0["Fila 0: RowColorTool.getRowColor(0) + _InfoPills"]
         MDiv0["Divider(height: 1, color: #E2E8F0)"]
         MRow1["Fila 1: RowColorTool.getRowColor(1) + _InfoPills"]
-        MTotals["_MobileListTotalsCard (Card Bento Integrada de Totales)"]
+        MBottomBar["BottomAppBar(height: 60) con TitleLabel fijos (Sobrante, Faltante, Total Neto)"]
         
+        MPadding --> MCard
         MCard --> MRow0
         MRow0 --> MDiv0
         MDiv0 --> MRow1
-        MCard -.-> MTotals
+        MCard -.-> MBottomBar
     end
 
     subgraph WebLayout ["Patrón Web: Tabla con Footer Integrado"]
@@ -106,7 +108,8 @@ flowchart TD
     end
 ```
 
-### 4.1. Regla 1: Contenedores Continuos en Móvil (No Tarjetas Flotantes Sueltas)
+### 4.1. Regla 1: Contenedores Continuos y Padding Perimetral de 4px en Móvil
+- **Padding Perimetral de 4px:** En vistas móviles de lista y detalle, el padding respecto a la pantalla debe ser estrictamente de **4px** (`EdgeInsets.all(4.0)` o `EdgeInsets.fromLTRB(4, 4, 4, ...)`), aprovechando al máximo el ancho de los dispositivos sin márgenes excesivos (evitando 12px u 8px que reducen el área útil de las tarjetas).
 - **Prohibido:** Renderizar listas de tarjetas flotantes con sombras individuales y separación de `SizedBox(height: 10)`. Esto satura la pantalla móvil y genera una sensación de interfaz desordenada y fragmentada.
 - **Obligatorio:**
   - Encapsular la colección completa de ítems dentro de un **único** `Card(margin: EdgeInsets.zero, clipBehavior: Clip.antiAlias)`.
@@ -122,13 +125,14 @@ flowchart TD
     - **Rojo (`Colors.red.shade700` / `AppThemeTokens.danger`):** Faltantes, salidas, mermas.
     - **Índigo / Oscuro (`Color(0xFF0F172A)`):** Totales neutros o positivos.
 
-### 4.3. Regla 3: Tarjetas Bento de Totales en Móvil (`_TotalsCard` / `_MobileListTotalsCard`)
-- **Prohibido:** Colocar barras de totales flotantes genéricas (`TotalsBar`) desalineadas fuera del contenedor o con diseño plano.
-- **Obligatorio:** Usar una tarjeta Bento limpia `Card(margin: EdgeInsets.zero)` con padding de 12px que agrupe:
-  - Total de ítems o documentos (fila superior con etiqueta gris y valor bold).
-  - Importes parciales (Sobrante en verde, Faltante en rojo).
-  - Divisor horizontal sutil `const Divider(height: 1)`.
-  - Total Neto en tipografía grande (15–16px bold) con color semántico según balance.
+### 4.3. Regla 3: Totales Móviles en `BottomAppBar` Fijo (Estándar Buscador de Cotizaciones)
+- **Prohibido:** Incrustar tarjetas pesadas de totales al final del scroll del `ListView` o usar barras flotantes desalineadas. En listas o detalles largos, esto obliga al usuario a scrollear hasta el fondo para conocer las cifras clave.
+- **Obligatorio:** Mostrar los datos y totales consolidados siempre fijos en la base mediante el `bottomNavigationBar: BottomAppBar(height: 60)` del `Scaffold`:
+  - Fila horizontal (`Row`) con `MainAxisAlignment.spaceAround`.
+  - Cada métrica organizada con `TitleLabel(crossAxisAlignment: CrossAxisAlignment.center)`:
+    - Título descriptivo superior (`Sobrante`, `Faltante`, `Total Neto`).
+    - Importe formateado inferior con tipografía bold (16px) y coloreado semántico (verde para sobrante, rojo para faltante, verde/rojo según balance neto).
+  - El contenido de la lista scrollea libremente por detrás sin tapar ni competir con los totales.
 
 ### 4.4. Regla 4: Pie de Tabla Integrado en Web (`_TableFooter`)
 - **Prohibido:** Renderizar barras de totales (`_ListBottomSummary`) flotando en la pantalla por debajo de la tabla.
@@ -142,6 +146,27 @@ flowchart TD
   1. **Tarjeta Fija Izquierda (380px de ancho):** Metadatos clave organizados verticalmente (Sucursal en `TitleTextField`, `DateFieldSelector` o fecha formateada, y Creador).
   2. **Tarjeta Flexible Derecha (`Expanded`):** Fila superior con identificador de documento, chip de estado y barra de acciones (`ElevatedCtrlButton`); y fila inferior con campo de observaciones (`maxLines: 2`) y paneles de trazabilidad de estados.
 
+### 4.6. Regla 6: Filtros Móviles por Defecto Ocultos / Colapsados
+- **Obligatorio:** En todas las pantallas móviles con panel de filtros (`_MobileFilters`, `ExpenseFilterCard`), los controles deben iniciar **por defecto ocultos/colapsados** (`_expanded = false` o `initiallyExpanded = false`).
+- La cabecera táctil muestra únicamente el icono de filtro, el texto "Filtros" y el chevron interactivo (`Icons.expand_more`), permitiendo que el usuario vea de inmediato los primeros registros de la lista sin tener que desplazarse por bloques extensos de selectores de fecha o desplegables.
+
+### 4.7. Regla 7: Creación Mediante `FloatingActionButton.extended` (Prohibido en `AppBar.actions`)
+- **Prohibido:** Colocar botones de creación o agregar registros (`IconButton(icon: Icon(Icons.add_rounded))`) en `AppBar.actions`. Esto aleja la acción principal del alcance natural del pulgar en dispositivos móviles y viola el estándar ergonómico del sistema.
+- **Obligatorio en Mobile / Pantallas de Lista:** Utilizar exclusivamente `floatingActionButton: FloatingActionButton.extended` en el `Scaffold`:
+  - Protegido contra la elevación del teclado virtual:
+    ```dart
+    floatingActionButton: Visibility(
+      visible: MediaQuery.viewInsetsOf(context).bottom == 0.0,
+      child: FloatingActionButton.extended(
+        onPressed: _onCreateItem,
+        icon: const Icon(Icons.add_rounded),
+        label: const Text('Nuevo Registro'),
+      ),
+    ),
+    ```
+  - `AppBar.actions` queda reservado exclusivamente para acciones secundarias de barra, como el botón de refrescar (`Actualizar`).
+  - En vistas de escritorio o web (`WebScreen`), la creación se expone mediante `PrimaryMenuButton` en la toolbar superior o en las cabeceras de tabla, nunca como un icono suelto en el AppBar.
+
 ---
 
 ## 5. Checklist para Nuevas Pantallas
@@ -149,8 +174,11 @@ flowchart TD
 Al crear una nueva pantalla o refactorizar una existente:
 - [ ] ¿El `Scaffold` omite la propiedad `backgroundColor` para usar el fondo índigo suave del tema?
 - [ ] ¿El `AppBar` utiliza el estilo por defecto del tema (azul marino `ColourPalette.primary` con iconos blancos)?
+- [ ] ¿El `AppBar.actions` está libre de botones de agregar, reservando la creación para un `FloatingActionButton.extended`?
+- [ ] ¿El padding perimetral respecto a la pantalla en dispositivos móviles es estrictamente de 4px (`EdgeInsets.all(4.0)`)?
 - [ ] ¿Las listas móviles están agrupadas en un único `Card` continuo sin márgenes exteriores entre filas y con `RowColorTool`?
+- [ ] ¿Los totales y cifras clave en móvil se anclan en la base mediante un `BottomAppBar(height: 60)` con `TitleLabel`?
+- [ ] ¿Los paneles de filtros móviles inician por defecto colapsados/ocultos?
 - [ ] ¿Las métricas e importes móviles usan el patrón de pastillas Bento `_InfoPill`?
-- [ ] ¿Los totales móviles están estructurados en una tarjeta Bento integrada en lugar de barras flotantes?
 - [ ] ¿Las tablas Web integran el pie de totales (`_TableFooter`) dentro del mismo `Card` de la tabla?
 - [ ] ¿Los formularios y detalles Web emplean la cabecera estándar de 2 tarjetas Bento de 160px?

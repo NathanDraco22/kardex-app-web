@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:image_picker/image_picker.dart';
+import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/widgets/dialogs/selectors/branch_selection_dialog.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
@@ -34,8 +34,6 @@ class _AppSettingsView extends StatefulWidget {
 class _AppSettingsViewState extends State<_AppSettingsView> {
   late final TextEditingController _profitMarginController;
   late final TextEditingController _paymentTermController;
-
-  final ImagePicker _imagePicker = ImagePicker();
 
   bool _initialized = false;
   String? _companyLogoUrl;
@@ -169,46 +167,71 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
     );
   }
 
+  ImageProvider? get _companyLogoImageProvider {
+    final pendingBytes = _pendingCompanyLogoBytes;
+    if (pendingBytes != null && pendingBytes.isNotEmpty) {
+      return MemoryImage(pendingBytes);
+    }
+
+    final url = (_companyLogoUrl ?? '').trim();
+    if (url.isEmpty) return null;
+
+    return CachedNetworkImageProvider(
+      url,
+      cacheManager: AppImageCacheManager.instance,
+      imageRenderMethodForWeb: ImageRenderMethodForWeb.HtmlImage,
+    );
+  }
+
   Future<void> _pickCompanyLogo() async {
+    if (_isSavingCompanyLogo) return;
+
+    final intent = await showImageSelectorDialog(
+      context: context,
+      initialImage: _companyLogoImageProvider,
+      encodeAsPng: true,
+    );
+
+    if (intent == null || !mounted) return;
+
+    switch (intent) {
+      case NewImageIntent(:final bytes):
+        await _uploadCompanyLogo(bytes);
+      case ChangeImageIntent(:final bytes):
+        await _uploadCompanyLogo(bytes);
+      case DeleteImageIntent():
+        await _clearCompanyLogo(confirm: false);
+    }
+  }
+
+  Future<void> _uploadCompanyLogo(Uint8List bytes) async {
+    setState(() {
+      _pendingCompanyLogoBytes = bytes;
+      _isSavingCompanyLogo = true;
+    });
+
     try {
-      final picked = await _imagePicker.pickImage(source: ImageSource.gallery);
-      if (picked == null || !mounted) return;
-
-      final fileName = picked.name.isNotEmpty ? picked.name : picked.path;
-      final dotIndex = fileName.lastIndexOf('.');
-      final extension = dotIndex >= 0 ? fileName.substring(dotIndex + 1).toLowerCase() : '';
-      final isPng = extension == 'png';
-      final isJpeg = extension == 'jpg' || extension == 'jpeg';
-
-      if (!isPng && !isJpeg) {
-        _showSettingsSnackBar(
-          "Formato no soportado. Usa una imagen JPG o PNG.",
-          isError: true,
-        );
-        return;
-      }
-
-      final bytes = await picked.readAsBytes();
-      if (!mounted) return;
-
-      setState(() {
-        _pendingCompanyLogoBytes = bytes;
-        _isSavingCompanyLogo = true;
-      });
-
-      final uploadFileName = 'company_logo_${DateTime.now().millisecondsSinceEpoch}.${isPng ? 'png' : 'jpg'}';
+      final uploadFileName = 'company_logo_${DateTime.now().millisecondsSinceEpoch}.png';
       final url = await ImageUploader.uploadImage(
         bytes: bytes,
         fileName: uploadFileName,
-        mediaType: isPng ? 'image/png' : 'image/jpeg',
+        mediaType: 'image/png',
       );
 
       final success = await getIt<AppSettingsCubit>().updateSettings(
         UpdateAppSetting(companyLogoUrl: url),
       );
 
-      if (mounted && success) {
+      if (!mounted) return;
+
+      if (success) {
+        setState(() => _companyLogoUrl = url);
         _showSettingsSnackBar("Logo de la empresa actualizado");
+      } else {
+        _showSettingsSnackBar(
+          "No se pudo guardar el logo. Inténtalo de nuevo.",
+          isError: true,
+        );
       }
     } catch (_) {
       if (mounted) {
@@ -227,12 +250,16 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
     }
   }
 
-  Future<void> _removeCompanyLogo() async {
-    final confirmed = await DialogManager.confirmActionDialog(
-      context,
-      "¿Quitar el logo de la empresa?",
-    );
-    if (confirmed != true || !mounted) return;
+  Future<void> _removeCompanyLogo() => _clearCompanyLogo(confirm: true);
+
+  Future<void> _clearCompanyLogo({required bool confirm}) async {
+    if (confirm) {
+      final confirmed = await DialogManager.confirmActionDialog(
+        context,
+        "¿Quitar el logo de la empresa?",
+      );
+      if (confirmed != true || !mounted) return;
+    }
 
     setState(() => _isSavingCompanyLogo = true);
 
@@ -240,8 +267,20 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
       final success = await getIt<AppSettingsCubit>().updateSettings(
         const UpdateAppSetting(companyLogoUrl: ""),
       );
-      if (mounted && success) {
+
+      if (!mounted) return;
+
+      if (success) {
+        setState(() {
+          _companyLogoUrl = "";
+          _pendingCompanyLogoBytes = null;
+        });
         _showSettingsSnackBar("Logo de la empresa eliminado");
+      } else {
+        _showSettingsSnackBar(
+          "No se pudo quitar el logo. Inténtalo de nuevo.",
+          isError: true,
+        );
       }
     } catch (_) {
       if (mounted) {
@@ -429,7 +468,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
       children: [
         Container(
           width: 140,
-          height: 120,
+          height: 140,
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -456,7 +495,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
         if (isBusy)
           Container(
             width: 140,
-            height: 120,
+            height: 140,
             decoration: BoxDecoration(
               color: Colors.black45,
               borderRadius: BorderRadius.circular(14),

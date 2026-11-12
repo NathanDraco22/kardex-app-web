@@ -42,6 +42,25 @@ class ImportsCubit extends Cubit<ImportsState> {
     }
   }
 
+  Future<ImportPreviewResult?> previewFile({
+    required ImportType type,
+    required Uint8List bytes,
+    required String fileName,
+    String? branchId,
+  }) async {
+    try {
+      return await importsRepository.previewImport(
+        type: type,
+        bytes: bytes,
+        fileName: fileName,
+        branchId: branchId,
+      );
+    } catch (error) {
+      emit(ImportsError(type: type, message: _friendlyMessage(error)));
+      return null;
+    }
+  }
+
   void reset() {
     emit(const ImportsInitial());
   }

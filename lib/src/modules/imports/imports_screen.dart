@@ -5,7 +5,7 @@ import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/modules/imports/cubit/imports_cubit.dart';
 import 'package:kardex_app_front/src/modules/imports/cubit/imports_state.dart';
-import 'package:kardex_app_front/src/modules/imports/dialogs/import_confirmation_dialog.dart';
+import 'package:kardex_app_front/src/modules/imports/dialogs/import_preview_dialog.dart';
 import 'package:kardex_app_front/src/modules/imports/dialogs/import_result_dialog.dart';
 import 'package:kardex_app_front/src/modules/imports/tools/import_templates.dart';
 import 'package:kardex_app_front/src/modules/imports/widgets/import_option_card.dart';
@@ -193,7 +193,56 @@ class _ImportsView extends StatelessWidget {
 
     if (!context.mounted) return;
 
-    final confirmed = await ImportConfirmationDialog.show(
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(
+        child: Card(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2.5),
+                ),
+                SizedBox(width: 16),
+                Text(
+                  "Analizando archivo...",
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final preview = await cubit.previewFile(
+      type: type,
+      bytes: bytes,
+      fileName: file.name,
+      branchId: branchId,
+    );
+
+    if (context.mounted) {
+      Navigator.of(context, rootNavigator: true).pop();
+    }
+
+    if (!context.mounted) return;
+
+    if (preview == null) {
+      final state = cubit.state;
+      final message = state is ImportsError
+          ? state.message
+          : "No se pudo analizar el archivo CSV.";
+      await ImportResultDialog.showError(context, message: message);
+      return;
+    }
+
+    final confirmed = await ImportPreviewDialog.show(
       context,
       title: config.title,
       fileName: file.name,
@@ -201,6 +250,7 @@ class _ImportsView extends StatelessWidget {
       branchName: branchName,
       icon: config.icon,
       accentColor: config.accentColor,
+      preview: preview,
       warning: config.warning,
     );
 

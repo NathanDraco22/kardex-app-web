@@ -8,6 +8,7 @@ import 'package:kardex_app_front/src/modules/inventory/adjustment_request/widget
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/adjust_entry_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/adjust_exit_viewer.dart';
+import 'package:kardex_app_front/widgets/title_label.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 class AdjustmentRequestDetailMobileScreen extends StatelessWidget {
@@ -29,7 +30,6 @@ class AdjustmentRequestDetailMobileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final createdAt = DateTime.fromMillisecondsSinceEpoch(request.createdAt);
-    final netTotal = request.entryTotal - request.exitTotal;
 
     return Scaffold(
       appBar: AppBar(
@@ -39,8 +39,9 @@ class AdjustmentRequestDetailMobileScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_back),
         ),
       ),
+      bottomNavigationBar: _AdjustmentRequestDetailBottomAppBar(request: request),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(8, 8, 8, 24),
+        padding: const EdgeInsets.fromLTRB(4, 4, 4, 16),
         children: [
           // Tarjeta Cabecera Bento
           Card(
@@ -146,88 +147,61 @@ class AdjustmentRequestDetailMobileScreen extends StatelessWidget {
             AdjustmentRequestItemCards(items: request.items),
           const SizedBox(height: 10),
 
-          // Resumen de Totales Integrado
-          Card(
-            margin: EdgeInsets.zero,
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Total Productos (${request.items.length}):',
-                        style: const TextStyle(fontSize: 12.5, color: Colors.grey),
-                      ),
-                      Text(
-                        '${request.items.length}',
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Sobrante:',
-                        style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        NumberFormatter.convertToMoneyLike(request.entryTotal),
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green.shade700,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Faltante:',
-                        style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        NumberFormatter.convertToMoneyLike(request.exitTotal),
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.red.shade700,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Divider(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Total Neto:',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        NumberFormatter.convertToMoneyLike(netTotal),
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: netTotal >= 0 ? Colors.green.shade800 : Colors.red.shade800,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+          // Acciones envueltas en superficie Card
+          _MobileActionsCard(request: request),
+        ],
+      ),
+    );
+  }
+}
+
+class _AdjustmentRequestDetailBottomAppBar extends StatelessWidget {
+  const _AdjustmentRequestDetailBottomAppBar({required this.request});
+
+  final AdjustmentRequestInDb request;
+
+  @override
+  Widget build(BuildContext context) {
+    final netTotal = request.entryTotal - request.exitTotal;
+
+    return BottomAppBar(
+      height: 60,
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+      child: Row(
+        children: [
+          Expanded(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: TitleLabel(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                title: 'Sobrante',
+                bigTitle: NumberFormatter.convertToMoneyLike(request.entryTotal),
+                bigTitleColor: Colors.green.shade700,
               ),
             ),
           ),
-          const SizedBox(height: 12),
-
-          // Acciones envueltas en superficie Card
-          _MobileActionsCard(request: request),
+          Expanded(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: TitleLabel(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                title: 'Faltante',
+                bigTitle: NumberFormatter.convertToMoneyLike(request.exitTotal),
+                bigTitleColor: Colors.red.shade700,
+              ),
+            ),
+          ),
+          Expanded(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: TitleLabel(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                title: 'Total Neto',
+                bigTitle: NumberFormatter.convertToMoneyLike(netTotal),
+                bigTitleColor: netTotal >= 0 ? Colors.green.shade800 : Colors.red.shade800,
+              ),
+            ),
+          ),
         ],
       ),
     );

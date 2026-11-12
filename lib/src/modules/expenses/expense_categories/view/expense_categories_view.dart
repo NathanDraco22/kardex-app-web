@@ -112,6 +112,16 @@ class _ExpenseCategoriesScaffoldState extends State<_ExpenseCategoriesScaffold> 
       appBar: AppBar(
         title: const Text('Categorías de Gastos'),
       ),
+      floatingActionButton: Visibility(
+        visible: MediaQuery.viewInsetsOf(context).bottom == 0.0,
+        child: FloatingActionButton.extended(
+          onPressed: _openCreateDialog,
+          backgroundColor: AppThemeTokens.indigo,
+          foregroundColor: Colors.white,
+          icon: const Icon(Icons.add_rounded),
+          label: const Text('Nueva Categoría'),
+        ),
+      ),
       body: SafeArea(
         top: false,
         child: BlocBuilder<ReadExpenseCategoryCubit, ReadExpenseCategoryState>(
@@ -125,7 +135,9 @@ class _ExpenseCategoriesScaffoldState extends State<_ExpenseCategoriesScaffold> 
 
             return LayoutBuilder(
               builder: (context, constraints) {
-                final horizontalPadding = constraints.maxWidth >= 1280 ? 32.0 : 16.0;
+                final isDesktop = constraints.maxWidth >= 900;
+                final horizontalPadding = isDesktop ? (constraints.maxWidth >= 1280 ? 32.0 : 16.0) : 4.0;
+                final topPadding = isDesktop ? 20.0 : 8.0;
 
                 return Align(
                   alignment: Alignment.topCenter,
@@ -138,7 +150,7 @@ class _ExpenseCategoriesScaffoldState extends State<_ExpenseCategoriesScaffold> 
                         physics: const AlwaysScrollableScrollPhysics(),
                         padding: EdgeInsets.fromLTRB(
                           horizontalPadding,
-                          20,
+                          topPadding,
                           horizontalPadding,
                           32,
                         ),
