@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/constants/feature_flags.dart';
 import 'package:kardex_app_front/constants/route_names.dart';
+import 'package:kardex_app_front/src/modules/inventory/adjust_exit/adjust_exit_screen.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
 import 'package:kardex_app_front/widgets/menu_app_bar.dart';
@@ -205,6 +206,77 @@ class _Body extends StatelessWidget {
               title: "Crear Transferencia",
               subtitle: "Traslado intersucursal de mercancía",
               onTap: () => context.pushNamed("create-transfer"),
+            ),
+          ),
+
+          const MenuSectionDivider(title: "Ajustes y Mermas"),
+
+          ShortcutAddableListTile(
+            routeName: RouteNames.adjustEntry,
+            child: MenuOptionCard(
+              icon: Icons.add_circle_outline_rounded,
+              accentColor: Colors.blue.shade600,
+              title: "Entrada por Ajuste",
+              subtitle: "Regularización positiva de inventario",
+              onTap: () => context.pushNamed("adjust-entry"),
+            ),
+          ),
+          ShortcutAddableListTile(
+            routeName: RouteNames.historyAdjustEntry,
+            child: MenuOptionCard(
+              icon: FluentIcons.history_24_filled,
+              accentColor: Colors.blue.shade600,
+              title: "Historial de Entradas por Ajuste",
+              subtitle: "Auditoría de ajustes de entrada",
+              onTap: () => context.pushNamed("history-adjust-entry"),
+            ),
+          ),
+          MenuOptionCard(
+            icon: Icons.remove_circle_outline_rounded,
+            accentColor: Colors.red.shade600,
+            title: "Salida por Ajuste",
+            subtitle: "Corrección negativa por conteo físico",
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const AdjustExitScreen(
+                  type: AdjustExitType.adjust,
+                ),
+              ),
+            ),
+          ),
+          ShortcutAddableListTile(
+            routeName: RouteNames.historyAdjustExit,
+            child: MenuOptionCard(
+              icon: FluentIcons.history_24_filled,
+              accentColor: Colors.red.shade600,
+              title: "Historial de Salidas por Ajuste",
+              subtitle: "Auditoría de correcciones de salida",
+              onTap: () => context.pushNamed("history-adjust-exit"),
+            ),
+          ),
+          MenuOptionCard(
+            icon: Icons.delete_sweep_rounded,
+            accentColor: Colors.red.shade700,
+            title: "Mermas",
+            subtitle: "Registro de productos dañados o pérdida",
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const AdjustExitScreen(
+                  type: AdjustExitType.loss,
+                ),
+              ),
+            ),
+          ),
+          ShortcutAddableListTile(
+            routeName: RouteNames.adjustmentRequests,
+            child: MenuOptionCard(
+              icon: Icons.fact_check_outlined,
+              accentColor: Colors.indigo,
+              title: "Solicitudes de Ajuste",
+              subtitle: "Conteo físico con flujo de aprobación",
+              onTap: () => context.pushNamed("adjustment-requests"),
             ),
           ),
         ],

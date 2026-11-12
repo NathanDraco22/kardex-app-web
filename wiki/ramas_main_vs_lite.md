@@ -92,13 +92,13 @@ Esta es la duda más frecuente y la más importante de documentar.
 
 En `main`, la opción **"Movimientos de un Producto"** consulta el **libro kárdex**: los asientos que se generan cuando una entrada, salida, ajuste, transferencia o venta afecta el inventario con costo promedio ponderado. Es una pantalla de auditoría.
 
-En `lite`, las operaciones de stock no escriben ese libro:
+En `lite`, la operación diaria de stock no escribe ese libro:
 
 - El **+/- del editor** llama directamente a `addProductAccount` / `substractProductAccount`, que actualizan la cuenta del producto en la sucursal (existencia y costo).
 - La **Entrada/Salida** se crea con `useKardex: false`, por lo que el cubit deriva a `createNewEntryDocDirect` / `createNewExitDocDirect`.
-- No se generan transacciones de kárdex.
+- **Excepción:** Ajustes, Mermas y Solicitudes de Ajuste usan el flujo estándar de `main`; al guardar/aprobar sí actualizan stock y costo, y generan transacciones de producto.
 
-Por eso la pantalla de movimientos **no tiene fuente de datos que mostrar**. No está rota ni "pendiente": se omitió deliberadamente para no ofrecer una auditoría vacía o engañosa. Si algún día `lite` necesita kárdex, el cambio no es habilitar el menú: implica cambiar el modelo de registro de movimientos y la lógica de costos.
+Por eso la pantalla de movimientos sigue deshabilitada: mostraría una auditoría **parcial** (solo ajustes, mermas y solicitudes), no la operación directa completa. No está rota ni "pendiente": se omitió deliberadamente para no ofrecer una vista incompleta o engañosa. Si algún día `lite` necesita kárdex completo, el cambio no es habilitar el menú: implica cambiar el modelo de registro de la entrada/salida directa y del +/- del editor.
 
 ---
 
@@ -112,9 +112,11 @@ Aunque simplifica el flujo principal, `lite` mantiene las herramientas operativa
 - Transferencias entre sucursales.
 - Bitácora de Vencimientos (si la sucursal/configuración lo habilita).
 - Catálogo de Productos como sección dentro de Inventario (lista global, categorías, unidades y escalas).
+- **Ajustes y Mermas** (entrada/salida por ajuste, mermas e historiales), con el flujo estándar de `main`.
+- **Solicitudes de Ajuste** con flujo de aprobación por roles (Supervisor/Admin).
 - Comercio, Cuentas por Cobrar, Gastos, Finanzas, Clientes, Proveedores y Configuración.
 
-Lo que `lite` **no** incluye: Movimientos de un Producto (kárdex), Ajustes y Mermas, y Herramientas Avanzadas (proyecciones/estadísticas).
+Lo que `lite` **no** incluye: Movimientos de un Producto (kárdex completo), Catálogo de Precios y Herramientas Avanzadas (proyecciones/estadísticas).
 
 ---
 
@@ -122,13 +124,14 @@ Lo que `lite` **no** incluye: Movimientos de un Producto (kárdex), Ajustes y Me
 
 | Si el cliente... | Recomendar |
 | :--- | :--- |
-| Necesita kárdex, costo promedio ponderado y auditoría de cada movimiento | `main` |
-| Maneja ajustes, mermas y conteos con trazabilidad formal | `main` |
+| Necesita kárdex completo, costo promedio ponderado y auditoría de cada movimiento | `main` |
+| Necesita ver todos los movimientos en una sola pantalla de kárdex | `main` |
 | Usa documentos formales como parte de su control interno | `main` |
 | Requiere proyecciones, rotación y herramientas avanzadas | `main` |
 | Es un comercio pequeño/mediano y quiere crear producto, cargar stock y poner precio rápido | `lite` |
 | Tiene poco personal o poca capacitación y prioriza simplicidad | `lite` |
 | No necesita auditoría de kárdex, solo control básico de existencias | `lite` |
+| Quiere ajustes, mermas y solicitudes de ajuste con aprobación, sin auditoría completa de kárdex | `lite` |
 | Quiere documentos solo como respaldo ocasional, no como proceso central | `lite` |
 
 **Regla práctica:** si la primera pregunta del cliente es "¿puedo ver el kárdex de este producto?", va a `main`. Si la primera pregunta es "¿cómo cargo un producto y le pongo precio rápido?", va a `lite`.
@@ -141,12 +144,13 @@ Lo que `lite` **no** incluye: Movimientos de un Producto (kárdex), Ajustes y Me
 > Todo cambio en `main` debe evaluarse para `lite` antes de cerrar la tarea. Si aplica, definir si entra como código compartido (vía `main → lite`) o como implementación lite-only. No asumir que llegará solo.
 
 1. **`lite` no es un feature flag de `main`.** Son dos modelos operativos. No asumas que una mejora de `main` aplica igual en `lite`.
-2. **No habilitar `product-movements` en `lite` sin implementar kárdex.** La pantalla quedaría vacía porque no hay asientos que leer.
+2. **No habilitar `product-movements` en `lite`.** Aunque ajustes, mermas y solicitudes generan transacciones, la entrada/salida directa y el +/- del editor no escriben el libro; la pantalla mostraría una auditoría parcial.
 3. **No portar el editor directo de stock a `main` sin evaluar el kárdex.** En `main`, el flujo formal y la auditoría son parte del valor del producto.
 4. **Mantener los documentos en `lite`.** Aunque sean directos, siguen siendo el respaldo operativo del cliente.
-5. **Revisar ambas ramas ante cualquier cambio de navegación.** La matriz técnica y las reglas están en [sistema_navegacion.md](./sistema_navegacion.md#7-guía-práctica-para-desarrolladores), sección 7.3.
-6. **Actualizar este documento si cambia el flujo de producto/stock/precio.** La documentación debe explicar la intención, no solo la pantalla.
-7. **Evaluar todo cambio de `main` para `lite`.** Antes de dar por terminado un cambio en `main`, revisar si aplica a la operación lite y documentar la decisión:
+5. **Ajustes, Mermas y Solicitudes de Ajuste están activos en `lite`.** Usan el flujo estándar de `main`; no convertirlos a `useKardex: false` sin backend. Mantener las reglas de aprobación (Supervisor/Admin) y sincronizar sus cambios desde `main`.
+6. **Revisar ambas ramas ante cualquier cambio de navegación.** La matriz técnica y las reglas están en [sistema_navegacion.md](./sistema_navegacion.md#7-guía-práctica-para-desarrolladores), sección 7.3.
+7. **Actualizar este documento si cambia el flujo de producto/stock/precio.** La documentación debe explicar la intención, no solo la pantalla.
+8. **Evaluar todo cambio de `main` para `lite`.** Antes de dar por terminado un cambio en `main`, revisar si aplica a la operación lite y documentar la decisión:
    - **Compartido:** entra por `main` y se baja con `git merge main` a `lite`.
    - **Lite-only:** se implementa en `lite`.
    - **No aplica:** se deja constancia del motivo.
@@ -163,6 +167,8 @@ Lo que `lite` **no** incluye: Movimientos de un Producto (kárdex), Ajustes y Me
 | Alta "Nuevo Producto con Datos" | `lite` (invocado) | `lib/widgets/dialogs/create_product_with_data_dialog.dart` |
 | Sumar/restar stock | `lite` | `lib/src/cubits/write_product_account/write_product_account_cubit.dart` |
 | Entrada/Salida en modo directo | `lite` | `write_entry_doc_cubit.dart` / `write_exit_doc_cubit.dart` con `useKardex: false` |
+| Ajustes y Mermas | `lite` | `lib/src/modules/inventory/adjust_entry/` y `adjust_exit/` |
+| Solicitudes de Ajuste | `lite` | `lib/src/modules/inventory/adjustment_request/` y ruta `adjustment-requests` |
 | Movimientos de un Producto | `main` | Módulo `inventory/product_movements` y ruta `product-movements` |
 | Catálogo de Precios | `main` | `lib/src/modules/inventory/product_price_catalog/` y ruta `product-price-catalog` |
 

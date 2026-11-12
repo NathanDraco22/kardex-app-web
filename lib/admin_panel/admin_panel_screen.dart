@@ -45,7 +45,6 @@ class _RootScaffold extends StatelessWidget {
     final user = authState.session.user;
     final appSettings = context.watch<AppSettingsCubit>();
     return Scaffold(
-      backgroundColor: AppThemeTokens.surfaceLight,
       endDrawer: PanelEndDrawer(user: user),
       appBar: AppBar(
         title: Row(
@@ -164,48 +163,45 @@ class _Body extends StatelessWidget {
       ),
     ];
 
-    return ColoredBox(
-      color: AppThemeTokens.surfaceLight,
-      child: SafeArea(
-        top: false,
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 920),
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
-              children: [
-                _WelcomeHeader(
-                  firstName: firstName,
-                  branchName: branchName,
-                ),
-                const SizedBox(height: 22),
-                const _SectionHeader(
-                  title: "Resumen de ventas",
-                  subtitle: "Rendimiento de la empresa",
-                ),
-                const SizedBox(height: 10),
-                _SalesSummary(
-                  yesterdayAmount: NumberFormatter.convertToMoneyLike(yesterdayTotal.total),
-                  last7DaysAmount: NumberFormatter.convertToMoneyLike(last7DaysTotalAmount),
-                ),
-                const SizedBox(height: 12),
-                _SalesChartCard(
-                  data: List.generate(
-                    charts.last7DaysTotals.length,
-                    (index) => CustomChartData(
-                      value: NumberFormatter.convertFromCentsToDouble(charts.last7DaysTotals[index].total),
-                    ),
+    return SafeArea(
+      top: false,
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 920),
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
+            children: [
+              _WelcomeHeader(
+                firstName: firstName,
+                branchName: branchName,
+              ),
+              const SizedBox(height: 22),
+              const _SectionHeader(
+                title: "Resumen de ventas",
+                subtitle: "Rendimiento de la empresa",
+              ),
+              const SizedBox(height: 10),
+              _SalesSummary(
+                yesterdayAmount: NumberFormatter.convertToMoneyLike(yesterdayTotal.total),
+                last7DaysAmount: NumberFormatter.convertToMoneyLike(last7DaysTotalAmount),
+              ),
+              const SizedBox(height: 12),
+              _SalesChartCard(
+                data: List.generate(
+                  charts.last7DaysTotals.length,
+                  (index) => CustomChartData(
+                    value: NumberFormatter.convertFromCentsToDouble(charts.last7DaysTotals[index].total),
                   ),
                 ),
-                const SizedBox(height: 24),
-                const _SectionHeader(
-                  title: "Accesos rápidos",
-                  subtitle: "Herramientas de gestión",
-                ),
-                const SizedBox(height: 10),
-                _ActionGrid(tiles: actions),
-              ],
-            ),
+              ),
+              const SizedBox(height: 24),
+              const _SectionHeader(
+                title: "Accesos rápidos",
+                subtitle: "Herramientas de gestión",
+              ),
+              const SizedBox(height: 10),
+              _ActionGrid(tiles: actions),
+            ],
           ),
         ),
       ),

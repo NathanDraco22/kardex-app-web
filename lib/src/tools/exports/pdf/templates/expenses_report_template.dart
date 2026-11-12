@@ -23,26 +23,32 @@ class ExpensesReportTemplate implements PdfTemplate {
   Future<pw.Document> buildDocument() async {
     final doc = await PdfTheme.newDocument();
 
-    // Lógica de consolidación
-    final operativeExpenses = items.where((e) => e.type == ExpenseType.operative).toList();
-    final supplierExpenses = items.where((e) => e.type == ExpenseType.supplier).toList();
-
+    // Lógica de consolidación equivalente a summarizeExpenseTypes.
     final Map<String, int> operativeByCategory = {};
-    int totalOperative = 0;
-    for (final e in operativeExpenses) {
-      operativeByCategory[e.category] = (operativeByCategory[e.category] ?? 0) + e.amount;
-      totalOperative += e.amount;
-    }
-
     final Map<String, int> supplierBySupplierName = {};
-    int totalSupplier = 0;
-    for (final e in supplierExpenses) {
-      final name = e.supplierName.isEmpty ? 'Desconocido' : e.supplierName;
-      supplierBySupplierName[name] = (supplierBySupplierName[name] ?? 0) + e.amount;
-      totalSupplier += e.amount;
+    var totalOperative = 0;
+    var totalSupplier = 0;
+    var totalTax = 0;
+    var taxCount = 0;
+
+    for (final expense in items) {
+      if (expense.isDeleted) continue;
+
+      switch (expense.type) {
+        case ExpenseType.operative:
+          operativeByCategory[expense.category] = (operativeByCategory[expense.category] ?? 0) + expense.amount;
+          totalOperative += expense.amount;
+        case ExpenseType.supplier:
+          final name = expense.supplierName.isEmpty ? 'Desconocido' : expense.supplierName;
+          supplierBySupplierName[name] = (supplierBySupplierName[name] ?? 0) + expense.amount;
+          totalSupplier += expense.amount;
+        case ExpenseType.tax:
+          totalTax += expense.amount;
+          taxCount++;
+      }
     }
 
-    final grandTotal = totalOperative + totalSupplier;
+    final grandTotal = totalOperative + totalSupplier + totalTax;
 
     doc.addPage(
       pw.MultiPage(
@@ -52,7 +58,7 @@ class ExpensesReportTemplate implements PdfTemplate {
           return [
             _buildHeader(),
             pw.SizedBox(height: 15),
-            _buildSummaryInfo(totalOperative, totalSupplier, grandTotal),
+            _buildSummaryInfo(totalOperative, totalSupplier, totalTax, taxCount, grandTotal),
             pw.SizedBox(height: 20),
             _buildConsolidatedSection(operativeByCategory, supplierBySupplierName),
             pw.SizedBox(height: 20),
@@ -100,7 +106,13 @@ class ExpensesReportTemplate implements PdfTemplate {
     );
   }
 
-  pw.Widget _buildSummaryInfo(int totalOperative, int totalSupplier, int grandTotal) {
+  pw.Widget _buildSummaryInfo(
+    int totalOperative,
+    int totalSupplier,
+    int totalTax,
+    int taxCount,
+    int grandTotal,
+  ) {
     final startStr = startDate != null ? DateTimeTool.formatddMMyyEs(startDate!) : "Inicio";
     final endStr = endDate != null ? DateTimeTool.formatddMMyyEs(endDate!) : "Fin";
     String dateRangeStr = "$startStr - $endStr";
@@ -155,6 +167,18 @@ class ExpensesReportTemplate implements PdfTemplate {
               ),
             ],
           ),
+          if (totalTax > 0) ...[
+            pw.SizedBox(height: 7),
+            pw.Text(
+              "Impuestos${taxCount > 0 ? ' ($taxCount registros)' : ''}: "
+              "${NumberFormatter.convertToMoneyLike(totalTax)}",
+              style: const pw.TextStyle(
+                fontSize: 10,
+                fontWeight: pw.FontWeight.bold,
+                color: PdfColors.blueGrey800,
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -264,7 +288,7 @@ class ExpensesReportTemplate implements PdfTemplate {
       itemCount: items.length,
       columns: [
         BasicPdfTableColumn(
-          label: pw.Text("Fecha", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8)),
+          label: pw.Text("Registro", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8)),
           flex: 2,
         ),
         BasicPdfTableColumn(
@@ -292,9 +316,9 @@ class ExpensesReportTemplate implements PdfTemplate {
         final rowColor = index.isOdd ? PdfColors.white : PdfColors.grey100;
         final expense = items[index];
 
-        final dateFormatted = DateTimeTool.formatddMMyy(DateTime.fromMillisecondsSinceEpoch(expense.date));
-        final typeStr = expense.type == ExpenseType.operative ? "Operativo" : "Proveedor";
-        final concept = expense.type == ExpenseType.operative ? expense.category : expense.supplierName;
+        final dateFormatted = DateTimeTool.formatddMMyy(expense.createdAt);
+        final typeStr = _expenseTypeLabel(expense.type);
+        final concept = _expenseConcept(expense);
         final totalFormatted = NumberFormatter.convertToMoneyLike(expense.amount);
 
         String statusStr = "";
@@ -329,5 +353,29 @@ class ExpensesReportTemplate implements PdfTemplate {
         );
       },
     );
+  }
+}
+
+String _expenseTypeLabel(ExpenseType type) {
+  switch (type) {
+    case ExpenseType.operative:
+      return 'Operativo';
+    case ExpenseType.supplier:
+      return 'Proveedor';
+    case ExpenseType.tax:
+      return 'Impuesto';
+  }
+}
+
+String _expenseConcept(ExpenseInDb expense) {
+  switch (expense.type) {
+    case ExpenseType.operative:
+      return expense.category;
+    case ExpenseType.supplier:
+      return expense.supplierName;
+    case ExpenseType.tax:
+      final category = expense.category.trim();
+      if (category.isNotEmpty) return category;
+      return expense.description?.trim() ?? '';
   }
 }

@@ -12,6 +12,7 @@ import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 
 import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 import 'package:kardex_app_front/src/tools/printers/paper_settings.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 Future<void> showReceiptViewerDialog(BuildContext context, ReceiptInDb receipt) async {
   FocusManager.instance.primaryFocus?.unfocus();
@@ -262,7 +263,7 @@ class _ReceiptViewer extends StatelessWidget {
 Iterable<Widget> _buildInvoiceRows(BuildContext context, List<AppliedInvoice> invoices) sync* {
   for (var i = 0; i < invoices.length; i++) {
     final currentInvoice = invoices[i];
-    final tileColor = i.isOdd ? Colors.white : Colors.grey.shade200;
+    final tileColor = RowColorTool.getRowColor(i);
     yield ListTile(
       tileColor: tileColor,
       minTileHeight: 40,
@@ -284,7 +285,7 @@ Iterable<Widget> _buildInvoiceRows(BuildContext context, List<AppliedInvoice> in
 Iterable<Widget> _buildDevolutionsRows(BuildContext context, List<AppliedDevolution> devolutions) sync* {
   for (var i = 0; i < devolutions.length; i++) {
     final currentDevolutions = devolutions[i];
-    final tileColor = i.isOdd ? Colors.white : Colors.grey.shade200;
+    final tileColor = RowColorTool.getRowColor(i);
     yield ListTile(
       tileColor: tileColor,
       minTileHeight: 40,

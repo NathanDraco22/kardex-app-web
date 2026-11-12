@@ -11,6 +11,7 @@ import '../web/mediator.dart';
 import 'more_action_row_button.dart';
 
 import '../view_controller.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 class ClientInvoiceTable extends StatefulWidget {
   const ClientInvoiceTable({
@@ -242,7 +243,7 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
     for (var i = 0; i < controller.items.length; i++) {
       final currentItem = controller.items[i];
       final isZeroPrice = currentItem.newPrice <= 0;
-      final color = isZeroPrice ? Colors.red.shade200 : (i.isOdd ? Colors.white : Colors.grey.shade200);
+      final color = isZeroPrice ? Colors.red.shade200 : RowColorTool.getRowColor(i);
       yield InvoiceTableRow(
         key: ValueKey(currentItem),
         color: color,

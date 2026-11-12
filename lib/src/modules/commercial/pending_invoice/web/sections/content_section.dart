@@ -82,7 +82,7 @@ class _ContentSection extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 40, right: 4, left: 4),
                   itemCount: invoices.length,
                   itemBuilder: (context, index) {
-              final tileColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+              final tileColor = RowColorTool.getRowColor(index);
 
               final currentInvoice = invoices[index];
 
@@ -228,7 +228,7 @@ class _DevolutionDialog extends StatelessWidget {
             final circleColor = currentDevolutions.status == DevolutionStatus.confirmed ? Colors.green : Colors.blue;
             return ListTile(
               leading: Icon(Icons.circle, color: circleColor),
-              tileColor: index.isOdd ? Colors.white : Colors.grey.shade200,
+              tileColor: RowColorTool.getRowColor(index),
               title: Text("#${currentDevolutions.docNumber}"),
               onTap: () {
                 showDevolutionViewerDialog(context, currentDevolutions);
@@ -283,7 +283,7 @@ class _CreditNotesDialog extends StatelessWidget {
             final circleColor = cn.status == CreditNoteStatus.confirmed ? Colors.deepPurple : Colors.grey;
             return ListTile(
               leading: Icon(Icons.circle, color: circleColor),
-              tileColor: index.isOdd ? Colors.white : Colors.grey.shade200,
+              tileColor: RowColorTool.getRowColor(index),
               title: Text("#${cn.docNumber} (${cn.type.display})"),
               onTap: () {
                 showCreditNoteViewerDialog(context, cn);

@@ -15,13 +15,14 @@ lib/src/modules/inventory/
 ├── inventory_entry/                     # Entrada formal de mercancía por compra o recepción
 ├── inventory_exit/                      # Salida formal de mercancía por consumo o despacho
 ├── adjust_entry/ & adjust_exit/         # Ajustes de inventario (sobrantes y faltantes)
+├── adjustment_request/                  # Solicitudes de ajuste con flujo de aprobación
 ├── history_entry/ & history_exit/       # Historial de entradas y salidas registradas
 ├── create_transfer/                     # Creación y emisión de traslados entre sucursales
 ├── current_tranfers/                    # Recepción y confirmación de traslados en tránsito
 ├── expiration_logs/                     # Bitácora y seguimiento de fechas de vencimiento
-├── product_movements/                   # Trazabilidad completa de movimientos por producto
+├── product_movements/                   # Deshabilitado en Lite: solo auditoría parcial
 ├── product_entry_history/               # Auditoría histórica de compras por ítem
-└── product_price_catalog/               # Consulta y sincronización de precios e inventario
+└── product_inventory_catalog/           # Catálogo de inventario con edición directa (Lite)
 ```
 
 ---
@@ -59,6 +60,43 @@ lib/src/modules/inventory/
 - **Vistas:** `AdjustEntryScreen`, `AdjustExitScreen`, junto con sus historiales `AdjustEntryHistoryScreen` y `AdjustExitHistoryScreen`.
 - **Cubits:** `AdjustEntryCubit`, `AdjustExitCubit`.
 - **Regla de Negocio:** Permite especificar motivo del ajuste (auditoría, rotura, merma, corrección de sistema) y actualiza el saldo contable.
+- **En Lite:** Entrada por Ajuste, Salida por Ajuste, Mermas y sus historiales están activos. Usan el flujo estándar y generan transacciones de producto; no son equivalentes a la entrada/salida directa (`useKardex: false`).
+
+### 2.4.1. Solicitudes de Ajuste (`adjustment_request`) — ⭐ Módulo Canónico de Referencia de Diseño y UX
+
+> [!TIP]
+> **Módulo de Ejemplo Canónico del Sistema:**
+> Este módulo es la implementación de referencia recomendada para todo nuevo desarrollo o refactorización en `kardex_app_front`. Contiene la arquitectura modelo en Flutter (Cubit reactivo con stream del repositorio, separación Web/Mobile limpia), soporte integral de teclado para laptops sin numpad, y la aplicación perfecta de la identidad visual de la app: fondo índigo suave, cabecera de 2 tarjetas Bento, contenedor continuo de tarjetas sin márgenes flotantes, pastillas informativas `_InfoPill` y pie de tabla integrado.
+
+> [!NOTE]
+> **Disponibilidad:** activo en `main` y `lite`. En `lite` usa el mismo flujo estándar y las mismas reglas de aprobación; la pantalla de movimientos de producto sigue deshabilitada.
+
+- **Propósito:** Registrar un conteo físico y someterlo a aprobación antes de afectar existencias.
+- **Flujo:**
+  1. El usuario crea una solicitud **Pendiente** con los productos, la existencia del sistema, el conteo real, la diferencia y el costo.
+  2. Un **Supervisor o Admin** la **Aprueba**; el servidor aplica la diferencia original guardada. Los Operadores no pueden aprobar.
+  3. Si hay sobrantes y faltantes en la misma solicitud, se generan **dos documentos**: un Ajuste de Entrada y un Ajuste de Salida, dentro de la misma transacción Mongo.
+  4. Si se **Cancela**, no se toca el inventario.
+- **Reglas:**
+  - Solo los roles `Supervisor` y `Admin` pueden aprobar solicitudes de ajuste.
+  - Un Supervisor no puede aprobar su propia solicitud. Un Admin sí puede aprobar la suya.
+  - Las solicitudes creadas por un Admin también quedan en estado pendiente y requieren una aprobación explícita.
+  - Solo las solicitudes pendientes se pueden editar, cancelar o eliminar lógicamente.
+  - El backend vuelve a tomar la foto real del `ProductAccount` al crear/editar; no confía en la existencia enviada por el cliente.
+  - La aprobación aplica la diferencia registrada, aunque el stock actual haya cambiado. Si una salida ya no tiene stock suficiente, el servidor rechaza la aprobación.
+- **Arquitectura de Vistas (Modelo a Seguir):**
+  - **Imágenes de producto:** las filas/tarjetas de producto del formulario y del detalle muestran la miniatura del artículo (`ImageViewerWidget`, 40–46 px) con icono de respaldo cuando no existe imagen. El backend guarda la URL de imagen como snapshot en cada `AdjustmentRequestItem` al crear o editar la solicitud; las solicitudes históricas sin el campo muestran el icono.
+  - **1. Formulario de Creación / Edición (`AdjustmentRequestFormScreen`):**
+    - **Web (`AdjustmentRequestFormWebScreen`):** Envuelto en `ShortcutContainer` para capturar atajos (`Ctrl+G` para guardar, `Ctrl+1` para agregar producto). Cabecera estandarizada de 2 tarjetas Bento (380px fija + flexible). Tabla de productos con filas de 75px, alternancia de colores (`RowColorTool`), navegación rápida por teclado con `Enter` (`FocusScope.nextFocus`) optimizada para laptops sin teclado numérico, y `_TableFooter` con totales al pie del `Card`.
+    - **Mobile (`AdjustmentRequestFormMobileScreen`):** Tarjetas Bento de entrada de datos, `DateFieldSelector` sincronizado, `FloatingActionButton.extended` protegido contra solapamiento con el teclado virtual, y edición ágil de conteo real.
+  - **2. Detalle de la Solicitud (`AdjustmentRequestDetailScreen`):**
+    - **Web (`AdjustmentRequestDetailWebScreen`):** Cabecera Bento de 2 tarjetas con metadatos de solo lectura, chip de estado, panel informativo de aprobación/cancelación con acceso directo a los ajustes generados, y tabla de productos de 75px con `_TableFooter` integrado.
+    - **Mobile (`AdjustmentRequestDetailMobileScreen`):** Padding perimetral estricto de 4px (`EdgeInsets.all(4.0)`). Metadatos en pastillas Bento `_MobileDetailPill`, contenedor continuo de productos dentro de un único `Card` con `RowColorTool`, divisores sutiles y pastillas Bento compactas `_InfoPill` (Existencia, Costo, Conteo real, Diferencia coloreada con icono y Subtotal). Totales consolidados siempre fijos en la base mediante `BottomAppBar(height: 60)` con `TitleLabel` (Sobrante verde, Faltante rojo, Total Neto bold). Botones de acción envueltos en tarjeta Bento contenedora (`_MobileActionsCard`).
+  - **3. Listado de Solicitudes (`AdjustmentRequestListScreen`):**
+    - **Web (`AdjustmentRequestListWebScreen`):** Cabecera de filtros compacta y tabla de solicitudes con alternancia de colores, badges de estado y `_TableFooter` integrado directamente al pie del `Card` de la tabla (sin barra flotante exterior).
+    - **Mobile (`AdjustmentRequestListMobileScreen`):** Padding perimetral de 4px (`EdgeInsets.all(4.0)`). Agrupación continua de todas las solicitudes dentro de un único `Card(margin: EdgeInsets.zero, clipBehavior: Clip.antiAlias)` con `Divider` entre filas, tarjetas Bento compactas con pastillas `_ListInfoPill` (Sobrante verde, Faltante rojo, Total Neto bold) y barra inferior fija `BottomAppBar(height: 60)` con `TitleLabel` para Sobrante, Faltante y Total Neto (estándar del Buscador de Cotizaciones).
+- **Cubits:** `ReadAdjustmentRequestsCubit`, `WriteAdjustmentRequestCubit`, `ReadAdjustmentRequestDetailCubit`.
+- **Repositorio:** `AdjustmentRequestsRepository` (reactivo: notifica altas/cambios/bajas al `ReadCubit`).
 
 ### 2.5. Transferencias entre Sucursales (`create_transfer` & `current_tranfers`)
 - **Propósito:** Despacho y recepción controlada de mercadería entre distintas bodegas o puntos de venta.
@@ -83,7 +121,9 @@ lib/src/modules/inventory/
 | Entradas | `EntryDocsDataSource` | `EntryDocsRepository` |
 | Salidas | `ExitDocsDataSource` | `ExitDocsRepository` |
 | Transferencias | `TransfersDataSource` | `TransfersRepository` |
-| Ajustes | `AdjustDocsDataSource` | `AdjustDocsRepository` |
+| Ajustes de Entrada | `AdjustEntriesDataSource` | `AdjustEntriesRepository` |
+| Ajustes de Salida / Mermas | `AdjustExitsDataSource` | `AdjustExitsRepository` |
+| Solicitudes de Ajuste | `AdjustmentRequestsDataSource` | `AdjustmentRequestsRepository` |
 | Lotes / Vencimientos | `ExpirationLogsDataSource` | `ExpirationLogsRepository` |
 
 ---
@@ -98,5 +138,13 @@ lib/src/modules/inventory/
 - `/inventory/create-transfer`: Crear transferencia entre sucursales.
 - `/inventory/current-transfers`: Consultar transferencias activas.
 - `/inventory/expiration-logs`: Bitácora de fechas de caducidad.
-- `/inventory/adjust-entry` & `/inventory/adjust-exit`: Ajustes de inventario.
+- `/inventory/product-inventory-catalog`: Catálogo de Inventario con edición directa (Lite).
+- `/inventory/adjust-entry`: Entrada por Ajuste.
+- `/inventory/history-adjust-entry`: Historial de Entradas por Ajuste.
+- `/inventory/history-adjust-exit`: Historial de Salidas por Ajuste.
+- `Salida por Ajuste` y `Mermas`: se abren con `Navigator` (`AdjustExitScreen`) y no tienen ruta propia.
+- `/inventory/adjustment-requests`: Lista de solicitudes de ajuste.
+- `/inventory/adjustment-requests/create`: Nueva solicitud de ajuste.
+- `/inventory/adjustment-requests/:requestId`: Detalle de la solicitud.
+- `/inventory/adjustment-requests/:requestId/edit`: Edición de una solicitud pendiente.
 - `/inventory/history-entry` & `/inventory/history-exit`: Historiales de movimientos.

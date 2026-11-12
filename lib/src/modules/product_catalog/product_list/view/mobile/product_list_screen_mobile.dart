@@ -124,7 +124,7 @@ class MobileProductsTable extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final currentProduct = state.products[index];
 
-                    Color rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+                    Color rowColor = RowColorTool.getRowColor(index);
 
                     if (state is HighlightedProduct) {
                       if (state.updatedProducts.any((element) => element.id == currentProduct.id)) {

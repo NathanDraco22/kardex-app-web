@@ -58,6 +58,33 @@ class ImportsDataSource with HttpService {
     return _importFile("/suppliers", bytes: bytes, fileName: fileName);
   }
 
+  Future<Map<String, dynamic>> previewImport({
+    required String type,
+    required Uint8List bytes,
+    required String fileName,
+    String? branchId,
+  }) async {
+    final uri = HttpTools.generateUri(
+      "$_endpoint/preview",
+      queryParameters: {"type": type},
+    );
+    final headers = HttpTools.generateAuthHeaders();
+
+    if (branchId != null) {
+      headers["X-Branch"] = branchId;
+      headers["branch-id"] = branchId;
+    }
+
+    return multipartQuery(
+      uri,
+      bytes,
+      fileName: fileName,
+      mediaType: "text/csv",
+      headers: headers,
+      fieldName: "file",
+    );
+  }
+
   Future<Map<String, dynamic>> _importFile(
     String path, {
     required Uint8List bytes,

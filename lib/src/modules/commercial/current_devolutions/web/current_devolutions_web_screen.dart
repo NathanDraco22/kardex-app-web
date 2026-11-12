@@ -5,6 +5,7 @@ import 'package:kardex_app_front/src/modules/commercial/current_devolutions/web/
 import 'package:kardex_app_front/widgets/elements/devolution_status_chip.dart';
 import 'package:kardex_app_front/widgets/super_widgets/custom_autocomplete_textfield.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 part 'sections/header_section.dart';
 part 'sections/content_section.dart';

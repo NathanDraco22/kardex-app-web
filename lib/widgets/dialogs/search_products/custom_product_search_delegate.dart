@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/widgets/display_product_code.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 Future<ProductInDb?> showProductSearchDelegate(BuildContext context) async {
   return await Navigator.push<ProductInDb?>(
@@ -68,7 +69,7 @@ class _CustomProductSearchDelegateState extends State<CustomProductSearchDelegat
         itemBuilder: (context, index) {
           final product = products[index];
           return _ProductResultRow(
-            color: index % 2 == 0 ? Colors.white : Colors.grey.shade100,
+            color: RowColorTool.getRowColor(index),
             product: product,
             onTap: () => Navigator.pop(context, product),
           );

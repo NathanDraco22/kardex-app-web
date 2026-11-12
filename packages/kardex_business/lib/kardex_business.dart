@@ -11,6 +11,7 @@ export 'src/domain/responses/servin_status_response.dart';
 export 'src/domain/responses/user_status_response.dart';
 
 export 'src/domain/query_params/adjust_query_params.dart';
+export 'src/domain/query_params/adjustment_request_query_params.dart';
 export 'src/domain/query_params/client_query_params.dart';
 export 'src/domain/query_params/client_transaction_query_params.dart';
 export 'src/domain/query_params/credit_note_query_params.dart';

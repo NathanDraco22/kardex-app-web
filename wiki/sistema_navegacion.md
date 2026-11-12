@@ -48,7 +48,7 @@ Todos los componentes de navegación están estandarizados en `lib/widgets/` y e
   - Lista de módulos con iconos temáticos redondeados, títulos legibles y distintivo de estado activo (borde de 1 dp y fondo con opacidad del color temático).
   - Contador de módulos en la cabecera.
 - **`DesktopSubmenuPanel` (`lib/.../desktop/widgets/desktop_submenu_panel.dart`):**
-  - Panel derecho con fondo neutro suave (`#F8FAFC`).
+  - Panel derecho que hereda el fondo índigo suave del tema (`Colors.indigo.shade50`).
   - Cabecera con icono grande (48x48 dp), título del módulo, subtítulo explicativo y distintivo de conteo.
   - Buscador reactivo en tiempo real integrado en la cabecera con botón para limpiar búsqueda.
   - Contenedor ergonómico centrado con ancho máximo de 960 dp (`ConstrainedBox(maxWidth: 960)`).
@@ -216,13 +216,16 @@ flowchart TD
 | **Módulos Raíz en Home / Sidebar** | 10 módulos disponibles | 8 módulos disponibles |
 | **Catálogo de Productos** | Módulo raíz independiente (`HomeModuleId.products`) | Integrado como la primera sección dentro de **Inventario** |
 | **Herramientas Avanzadas** | Módulo raíz independiente (`Modules.advancedTools`) con proyecciones y estimación | Totalmente deshabilitado (no figura en sidebar ni en `app_router.dart`) |
-| **Inventario: Secciones** | 5 secciones: Consultas, Entradas/Salidas, Traslados, Precios, Ajustes/Mermas | 4 secciones: Catálogo, Consultas, Entradas/Salidas, Traslados |
+| **Inventario: Secciones** | 5 secciones: Consultas, Entradas/Salidas, Traslados, Precios, Ajustes/Mermas | 5 secciones: Catálogo, Consultas, Entradas/Salidas, Traslados, Ajustes/Mermas |
 | **Inventario: Catálogo** | Usa `product-price-catalog` (`RouteNames.productPriceCatalog`) | Usa `product-inventory-catalog` (`RouteNames.productInventoryCatalog`) con edición directa |
 | **Inventario: Kárdex por Movimiento** | Opción activa `product-movements` | Deshabilitada (`product-movements` comentado) |
-| **Inventario: Ajustes y Mermas** | Rutas activas (`adjust-entry`, `history-adjust-entry`, mermas) | Omitidas por completo (rutas no registradas en router) |
+| **Inventario: Ajustes y Mermas** | Rutas activas (`adjust-entry`, `history-adjust-entry`, mermas, `adjustment-requests` y sus subrutas) | Rutas activas: ajustes, mermas, historiales y `adjustment-requests` con aprobación |
 | **Comercio: Total de Opciones** | 28 opciones | 27 opciones (se omite `commercial-product-movements`) |
 | **Condición de Pago Dinámica** | `SegmentedButton` en cotizaciones / órdenes borrador (`CONTADO`/`CRÉDITO`) | Idéntico (portado) |
 | **Botones en AppBars Oscuros** | `TertiaryMenuButton` tonal | Idéntico (portado) |
+
+> [!NOTE]
+> En `lite`, Ajustes, Mermas y Solicitudes de Ajuste usan el flujo estándar y sí generan transacciones de producto. La pantalla `product-movements` sigue deshabilitada porque mostraría una auditoría parcial: no incluye la entrada/salida directa ni el +/- del editor.
 
 ---
 
@@ -273,6 +276,6 @@ HomeSubmoduleItem(
 ### 7.3. Regla de Oro sobre las Ramas
 Cualquier cambio que se realice en la navegación debe considerar las particularidades de `lite`:
 - **Si agregas un módulo a `main`:** Evalúa si aplica a `lite` o si debe omitirse.
-- **Si modificas `inventory_menu_screen.dart` en `main`:** Recuerda que en `lite` este archivo contiene la sección de *Catálogo de Productos* y carece de *Ajustes y Mermas*.
+- **Si modificas `inventory_menu_screen.dart` en `main`:** Recuerda que en `lite` este archivo contiene la sección de *Catálogo de Productos*, *Ajustes y Mermas* y *Solicitudes de Ajuste*; no contiene *Movimientos de Producto*.
 
 > **Regla general:** todo cambio en `main` debe evaluarse para `lite` antes de cerrarse. Consulta [ramas_main_vs_lite.md](./ramas_main_vs_lite.md#8-reglas-para-desarrollo-y-mantenimiento).

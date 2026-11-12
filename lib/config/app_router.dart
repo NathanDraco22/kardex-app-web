@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/constants/feature_flags.dart';
+import 'package:kardex_app_front/constants/route_names.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/product_demand_vs_stock/product_demand_vs_stock_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/user_operations_results/user_operations_results_screen.dart';
@@ -63,7 +64,12 @@ import 'package:kardex_app_front/src/modules/finance/paid_invoices/paid_invoices
 import 'package:kardex_app_front/src/modules/finance/branch_daily_summary/branch_daily_summary_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/branch_executive_summary/branch_executive_summary_screen.dart';
 import 'package:kardex_app_front/src/modules/home/view/home_screen.dart';
-
+import 'package:kardex_app_front/src/modules/inventory/adjustment_request/adjustment_request_detail_screen.dart';
+import 'package:kardex_app_front/src/modules/inventory/adjustment_request/adjustment_request_form_screen.dart';
+import 'package:kardex_app_front/src/modules/inventory/adjustment_request/adjustment_request_list_screen.dart';
+import 'package:kardex_app_front/src/modules/inventory/adjust_entry/adjust_entry_screen.dart';
+import 'package:kardex_app_front/src/modules/inventory/adjust_entry/history/adjust_entry_history_screen.dart';
+import 'package:kardex_app_front/src/modules/inventory/adjust_exit/history/adjust_exit_history_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/create_transfer/create_transfer_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/current_inventory/current_inventory_screen.dart';
 import 'package:kardex_app_front/src/modules/inventory/current_tranfers/current_tranfers_screen.dart';
@@ -570,11 +576,44 @@ class AppRouter {
             name: "expiration-logs",
             builder: (context, state) => const ExpirationLogsScreen(),
           ),
-          /*
           GoRoute(
             path: "adjust-entry",
             name: "adjust-entry",
             builder: (context, state) => const AdjustEntryScreen(),
+          ),
+          GoRoute(
+            path: "adjustment-requests",
+            name: RouteNames.adjustmentRequests,
+            builder: (context, state) => const AdjustmentRequestListScreen(),
+          ),
+          GoRoute(
+            path: "adjustment-requests/create",
+            name: RouteNames.adjustmentRequestCreate,
+            builder: (context, state) => const AdjustmentRequestFormScreen(),
+          ),
+          GoRoute(
+            path: "adjustment-requests/:requestId",
+            name: RouteNames.adjustmentRequestDetail,
+            builder: (context, state) {
+              final requestId = state.pathParameters['requestId'] ?? '';
+              final extra = state.extra;
+              return AdjustmentRequestDetailScreen(
+                requestId: requestId,
+                initialRequest: extra is AdjustmentRequestInDb ? extra : null,
+              );
+            },
+          ),
+          GoRoute(
+            path: "adjustment-requests/:requestId/edit",
+            name: RouteNames.adjustmentRequestEdit,
+            builder: (context, state) {
+              final requestId = state.pathParameters['requestId'] ?? '';
+              final extra = state.extra;
+              return AdjustmentRequestFormScreen(
+                requestId: requestId,
+                initialRequest: extra is AdjustmentRequestInDb ? extra : null,
+              );
+            },
           ),
           GoRoute(
             path: "history-adjust-entry",
@@ -586,7 +625,6 @@ class AppRouter {
             name: "history-adjust-exit",
             builder: (context, state) => const AdjustExitHistoryScreen(),
           ),
-*/
           /*
           GoRoute(
             path: "product-price-catalog",

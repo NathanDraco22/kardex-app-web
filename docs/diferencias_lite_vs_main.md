@@ -9,7 +9,7 @@ Este documento detalla las diferencias arquitectónicas, funcionales y de módul
 La rama `lite` está diseñada como una versión simplificada y enfocada en operaciones directas del punto de venta y almacén básico:
 - **Reducción de complejidad operativa:** Se eliminan herramientas analíticas o predictivas que no aplican a negocios pequeños o terminales secundarias.
 - **Flujos unificados:** Se agrupan módulos relacionados (por ejemplo, el catálogo de productos se consolida dentro de inventario en lugar de existir como un menú raíz independiente).
-- **Control de inventario esencial:** Se mantiene el catálogo y el kárdex directo sin habilitar módulos de ajustes manuales por merma o auditorías complejas de kárdex físico por movimiento que requieren parametrización avanzada.
+- **Control de inventario esencial:** Se mantiene el catálogo y el flujo directo de stock. Ajustes, Mermas y Solicitudes de Ajuste están activos con el flujo estándar; lo que no se habilita es la pantalla completa de movimientos por producto (kárdex), porque mostraría una auditoría parcial.
 
 ---
 
@@ -36,7 +36,7 @@ Ambas ramas comparten ahora el mismo paradigma responsivo moderno:
 | **Catálogo de Productos** (`Modules.products`) | ✅ Módulo Raíz | 🔄 Integrado en Inventario | En `lite` se eliminó del menú principal para evitar redundancia y se integró como la primera sección de Inventario. |
 | **Comercio** (`Modules.commercial`) | ✅ Activo (si `isCommerce`) | ✅ Activo (si `isCommerce`) | Casi idéntico, con 1 opción omitida en `lite` (*Movimientos de un Producto*). |
 | **Cuentas por Cobrar** (`Modules.pendingInvoices`) | ✅ Activo (si `isCommerce`) | ✅ Activo (si `isCommerce`) | Idéntico. Facturas por cobrar, transacciones pendientes, días de impago y abonos. |
-| **Inventario** (`Modules.inventory`) | ✅ Activo (5 secciones) | ✅ Activo (4 secciones) | Profundamente adaptado: integra el catálogo maestro y elimina ajustes/mermas. |
+| **Inventario** (`Modules.inventory`) | ✅ Activo (5 secciones) | ✅ Activo (5 secciones) | Integra el catálogo maestro y mantiene ajustes, mermas y solicitudes; omite movimientos de producto. |
 | **Gastos** (`Modules.expenses`) | ✅ Activo | ✅ Activo | Idéntico. Gastos operativos, compras a proveedores, categorías y reporte. |
 | **Finanzas** (`Modules.finance`) | ✅ Activo | ✅ Activo | Idéntico. Operaciones diarias, flujos, extracto de clientes, historial, liquidadas y resúmenes. |
 | **Herramientas Avanzadas** (`Modules.advancedTools`) | ✅ Activo | ❌ Deshabilitado | Excluido por completo en `lite` (estimación por ventas y proyección). |
@@ -75,14 +75,19 @@ En `lite`, la estructura adaptada es:
 4. **Sección 4: Transferencias entre Sucursales:**
    - *Transferencias* (`current-tranfers`)
    - *Crear Transferencia* (`create-transfer`)
-5. ❌ **Sección 5: Ajustes y Mermas:**
-   - No disponible en `lite`. Las rutas de ajuste (`adjust-entry`, `history-adjust-entry`, `history-adjust-exit`) no están registradas en el enrutador de `lite`.
+5. **Sección 5: Ajustes y Mermas:**
+   - *Entrada por Ajuste* (`adjust-entry`)
+   - *Historial de Entradas por Ajuste* (`history-adjust-entry`)
+   - *Salida por Ajuste* (Navigator, `AdjustExitType.adjust`)
+   - *Historial de Salidas por Ajuste* (`history-adjust-exit`)
+   - *Mermas* (Navigator, `AdjustExitType.loss`)
+   - *Solicitudes de Ajuste* (`adjustment-requests`) y subrutas `create`, `:requestId` y `:requestId/edit`
 
 ### 4.2. Módulo de Comercio (`Modules.commercial`)
 
 - En `main`: Dispone de 28 opciones entre ventas, POS, arqueos, proformas, órdenes y devoluciones.
-- En `lite`: Dispone de 27 opciones; se deshabilitó la opción:
-  - ❌ *Movimientos de un Producto* (`commercial-product-movements` / `commercialProductMovements`).
+- En `lite`: Dispone de 27 opciones; se ocultó del menú la opción:
+  - ❌ *Movimientos de un Producto* (`commercial-product-movements` / `commercialProductMovements`). La ruta sigue registrada, pero no se expone en la navegación.
 
 ### 4.3. Herramientas Avanzadas (`Modules.advancedTools`)
 
@@ -118,4 +123,7 @@ En `lite`, la estructura adaptada es:
 ### En `lib/config/app_router.dart`
 - En `lite`:
   - `product-inventory-catalog` mapea a `ProductInventoryCatalogScreen()`.
-  - Las rutas de `/advanced-tools`, `adjust-entry`, `history-adjust-entry`, `history-adjust-exit`, `product-price-setting` y `product-price` están explícitamente comentadas.
+  - `adjust-entry`, `history-adjust-entry`, `history-adjust-exit`, `adjustment-requests` y sus subrutas están activas.
+  - `Salida por Ajuste` y `Mermas` se abren con `Navigator` y no tienen ruta propia.
+  - Las rutas de `/advanced-tools`, `product-price-setting`, `product-price`, `product-movements` de Inventario y `product-price-catalog` están comentadas.
+  - La ruta comercial `commercial-product-movements` sigue registrada, pero su opción está oculta en el menú.

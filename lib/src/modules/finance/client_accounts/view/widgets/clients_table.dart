@@ -5,6 +5,7 @@ import 'package:kardex_app_front/src/modules/finance/client_movements/view/clien
 import 'package:kardex_app_front/widgets/widgets.dart';
 
 import '../../cubit/client_read_cubit.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 class ClientsTable extends StatelessWidget {
   const ClientsTable({
@@ -98,7 +99,7 @@ class _InnerRows extends StatelessWidget {
         itemBuilder: (context, index) {
           final currentClient = clients[index];
 
-          Color rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+          Color rowColor = RowColorTool.getRowColor(index);
 
           if (state is HighlightedClient) {
             if (state.updatedClients.any((element) => element.id == currentClient.id)) {

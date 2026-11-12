@@ -10,6 +10,7 @@ import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 
 import '../dialogs/create_supplier_dialog.dart';
 import 'widgets/suppliers_table.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 part 'web/supplier_catalog_web.dart';
 part 'mobile/supplier_catalog_mobile.dart';

@@ -5,6 +5,7 @@ import 'package:kardex_app_front/src/modules/inventory/product_entry_history/cub
 import 'package:kardex_app_front/widgets/dialogs/search_products/widgets/display_product_code.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/entry_history_viewer.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 part 'sections/header_section.dart';
 part 'sections/content_section.dart';

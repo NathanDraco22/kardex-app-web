@@ -52,12 +52,16 @@ class RangeFinanceReportTablet extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 14),
-                          // Columna Derecha: Flujo de Caja y Abonos
+                          // Columna Derecha: Flujo de Caja, Gastos y Abonos
                           Expanded(
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 BranchCashFlowTotalsCard(result: result),
+                                if (result.expenses != null) ...[
+                                  const SizedBox(height: 16),
+                                  BranchExpensesTotalsCard(result: result),
+                                ],
                                 const SizedBox(height: 16),
                                 BranchReceiptsTotalsCard(result: result),
                               ],

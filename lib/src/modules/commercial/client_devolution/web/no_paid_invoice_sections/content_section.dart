@@ -61,7 +61,7 @@ class _ContentSection extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 40),
             itemCount: invoices.length,
             itemBuilder: (context, index) {
-              final tileColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+              final tileColor = RowColorTool.getRowColor(index);
 
               final currentInvoice = invoices[index];
               final total = NumberFormatter.convertToMoneyLike(currentInvoice.total);

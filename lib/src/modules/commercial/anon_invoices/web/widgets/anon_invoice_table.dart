@@ -7,6 +7,7 @@ import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/commercial_product_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/search_product_commercial_dialog.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 class AnonInvoiceTable extends StatefulWidget {
   const AnonInvoiceTable({
@@ -114,7 +115,7 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
   Iterable<Widget> _buildRow(BuildContext context, AnonInvoiceViewController controller) sync* {
     for (var i = 0; i < controller.items.length; i++) {
       final currentItem = controller.items[i];
-      final color = i.isOdd ? Colors.white : Colors.grey.shade200;
+      final color = RowColorTool.getRowColor(i);
       yield InvoiceTableRow(
         key: ValueKey(currentItem),
         color: color,

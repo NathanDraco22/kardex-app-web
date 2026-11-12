@@ -70,7 +70,7 @@ class _ContentSection extends StatelessWidget {
                     ],
                     itemCount: receipts.length,
                     rowBuilder: (context, index) {
-                      final rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+                      final rowColor = RowColorTool.getRowColor(index);
 
                       final receipt = receipts[index];
                       final receiptDate = DateTimeTool.formatddMMyy(receipt.createdAt);

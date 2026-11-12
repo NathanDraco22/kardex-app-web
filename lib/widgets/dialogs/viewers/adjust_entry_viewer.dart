@@ -6,6 +6,7 @@ import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_adjust_entry_template.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 Future<void> showAdjustEntryViewerDialog(BuildContext context, AdjustEntryInDb adjustEntry) async {
   FocusManager.instance.primaryFocus?.unfocus();
@@ -229,7 +230,7 @@ class _AdjustEntryViewer extends StatelessWidget {
                             itemCount: adjustEntry.items.length,
                             itemBuilder: (context, index) {
                               final item = adjustEntry.items[index];
-                              final rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+                              final rowColor = RowColorTool.getRowColor(index);
                               return Container(
                                 padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
                                 color: rowColor,

@@ -8,6 +8,7 @@ import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
 import 'package:kardex_app_front/cubits/shortcuts/shortcuts_cubit.dart';
 import 'package:kardex_app_front/src/modules/home/data/home_shortcut_resolver.dart';
 import 'package:kardex_app_front/src/modules/home/view/widgets/home_desktop_card.dart';
+import 'package:kardex_app_front/src/modules/home/view/widgets/near_expiration_banner.dart';
 import 'package:kardex_app_front/src/tools/cache/image_bytes_resolver.dart';
 import 'package:kardex_app_front/widgets/design_system/app_theme_tokens.dart';
 import 'package:kardex_business/kardex_business.dart';
@@ -28,18 +29,18 @@ class DesktopInitialPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     context.watch<AppSettingsCubit>();
 
-    return Container(
-      color: const Color(0xFFF8FAFC),
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(32),
-        child: Center(
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(32),
+      child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 1100),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _BranchHero(branch: currentBranch),
-                const SizedBox(height: 28),
+                const SizedBox(height: 20),
+                const NearExpirationBanner(isDesktop: true),
+                const SizedBox(height: 20),
                 Text(
                   "Bienvenido/a, $firstName",
                   style: const TextStyle(
@@ -84,8 +85,7 @@ class DesktopInitialPanel extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 }
 
@@ -100,6 +100,7 @@ class _BranchHero extends StatelessWidget {
     if (currentBranch == null) {
       return const _HeroContainer(
         accent: AppThemeTokens.indigo,
+        backgroundColor: Color(0xFFEEF2FF),
         child: Row(
           children: [
             _BranchLogo(branch: null, size: 80),
@@ -131,9 +132,13 @@ class _BranchHero extends StatelessWidget {
 
     final isCommerce = currentBranch.isCommerce;
     final accent = isCommerce ? const Color(0xFFD97706) : const Color(0xFF475569);
+    final backgroundColor = isCommerce
+        ? const Color(0xFFFFF7ED)
+        : const Color(0xFFF8FAFC);
 
     return _HeroContainer(
       accent: accent,
+      backgroundColor: backgroundColor,
       child: LayoutBuilder(
         builder: (context, constraints) {
           final isNarrow = constraints.maxWidth < 680;
@@ -195,24 +200,19 @@ class _HeroContainer extends StatelessWidget {
   const _HeroContainer({
     required this.accent,
     required this.child,
+    this.backgroundColor,
   });
 
   final Color accent;
   final Widget child;
+  final Color? backgroundColor;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            accent.withValues(alpha: 0.07),
-            Colors.white,
-          ],
-        ),
+        color: backgroundColor ?? const Color(0xFFFFF7ED),
         borderRadius: AppThemeTokens.borderRadiusXl,
         border: Border.all(color: accent.withValues(alpha: 0.18)),
         boxShadow: AppThemeTokens.subtleCardShadow(accent: accent),

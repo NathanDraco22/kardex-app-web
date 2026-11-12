@@ -9,6 +9,7 @@ import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_order_te
 import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 
 import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 Future<void> showOrderViewerDialog(BuildContext context, OrderInDb order) async {
   FocusManager.instance.primaryFocus?.unfocus();
@@ -298,7 +299,7 @@ class OrderViewerContent extends StatelessWidget {
                   itemCount: order.saleItems.length,
                   itemBuilder: (context, index) {
                     final saleItem = order.saleItems[index];
-                    final rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+                    final rowColor = RowColorTool.getRowColor(index);
                     return Container(
                       padding: const EdgeInsets.all(4),
                       color: rowColor,

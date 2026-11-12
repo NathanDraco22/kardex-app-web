@@ -43,20 +43,26 @@ class DeleteImageIntent extends ImageSelectorIntent {
 Future<ImageSelectorIntent?> showImageSelectorDialog({
   required BuildContext context,
   ImageProvider? initialImage,
+  bool encodeAsPng = false,
 }) async {
   return await showDialog<ImageSelectorIntent?>(
     context: context,
     barrierDismissible: true,
-    builder: (context) => ImageSelectorDialog(initialImage: initialImage),
+    builder: (context) => ImageSelectorDialog(
+      initialImage: initialImage,
+      encodeAsPng: encodeAsPng,
+    ),
   );
 }
 
 class ImageSelectorDialog extends StatefulWidget {
   final ImageProvider? initialImage;
+  final bool encodeAsPng;
 
   const ImageSelectorDialog({
     super.key,
     this.initialImage,
+    this.encodeAsPng = false,
   });
 
   @override
@@ -146,8 +152,9 @@ class _ImageSelectorDialogState extends State<ImageSelectorDialog> {
         order: img.ChannelOrder.rgba,
       );
 
-      // Convertimos la imagen a un formato JPEG real (RGB) eliminando el canal alfa para el backend
-      final bytes = img.encodeJpg(decodedImage, quality: 70);
+      // El flujo de productos usa JPEG (RGB) para reducir peso. El logo
+      // corporativo solicita PNG para conservar la transparencia original.
+      final bytes = widget.encodeAsPng ? img.encodePng(decodedImage) : img.encodeJpg(decodedImage, quality: 70);
 
       setState(() {
         _tempPickedFile = pickedFile;

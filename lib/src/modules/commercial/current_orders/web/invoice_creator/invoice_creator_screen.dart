@@ -433,7 +433,7 @@ class _BodyState extends State<_Body> {
   ) sync* {
     for (var i = 0; i < saleItems.length; i++) {
       final saleItem = saleItems[i];
-      final color = i.isOdd ? Colors.white : Colors.grey.shade200;
+      final color = RowColorTool.getRowColor(i);
 
       yield SaleItemRow(
         saleItem: saleItem,

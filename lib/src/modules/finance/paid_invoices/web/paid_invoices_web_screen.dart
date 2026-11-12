@@ -7,6 +7,7 @@ import 'package:kardex_app_front/src/modules/finance/paid_invoices/cubit/read_pa
 import 'package:kardex_app_front/widgets/dialogs/inspectors/invoice_inspector.dart';
 import 'package:kardex_app_front/widgets/title_label.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 part 'sections/header_section.dart';
 part 'sections/content_section.dart';

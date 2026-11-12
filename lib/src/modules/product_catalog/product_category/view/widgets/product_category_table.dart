@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/product_category/cubit/read_product_category_cubit.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/product_category/dialogs/create_product_category_dialog.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 class ProductCategoryTable extends StatelessWidget {
   const ProductCategoryTable({
@@ -25,7 +26,7 @@ class ProductCategoryTable extends StatelessWidget {
               itemBuilder: (context, index) {
                 final currentProductCategory = state.productCategories[index];
 
-                Color rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+                Color rowColor = RowColorTool.getRowColor(index);
 
                 if (state is HighlightedProductCategory) {
                   if (state.updatedProductCategories.any((element) => element.id == currentProductCategory.id)) {

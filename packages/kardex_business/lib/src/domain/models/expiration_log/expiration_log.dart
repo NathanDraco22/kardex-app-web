@@ -45,12 +45,16 @@ class BaseExpirationLog {
   final String branchId;
   final String? lotNumber;
   final DateTime expirationDate;
+  final String? supplierId;
+  final String? supplierName;
 
   BaseExpirationLog({
     required this.product,
     required this.branchId,
     this.lotNumber,
     required this.expirationDate,
+    this.supplierId,
+    this.supplierName,
   });
 
   factory BaseExpirationLog.fromJson(Map<String, dynamic> json) => BaseExpirationLog(
@@ -58,6 +62,8 @@ class BaseExpirationLog {
     branchId: json['branchId'],
     lotNumber: json['lotNumber'],
     expirationDate: DateTime.fromMillisecondsSinceEpoch(json['expirationDate']),
+    supplierId: json['supplierId'],
+    supplierName: json['supplierName'],
   );
 
   Map<String, dynamic> toJson() => {
@@ -65,6 +71,8 @@ class BaseExpirationLog {
     'branchId': branchId,
     'lotNumber': lotNumber,
     'expirationDate': expirationDate.millisecondsSinceEpoch,
+    if (supplierId != null) 'supplierId': supplierId,
+    if (supplierName != null) 'supplierName': supplierName,
   };
 }
 
@@ -75,6 +83,8 @@ class CreateExpirationLog extends BaseExpirationLog {
     required super.branchId,
     super.lotNumber,
     required super.expirationDate,
+    super.supplierId,
+    super.supplierName,
   });
 
   factory CreateExpirationLog.fromJson(Map<String, dynamic> json) => CreateExpirationLog(
@@ -82,6 +92,8 @@ class CreateExpirationLog extends BaseExpirationLog {
     branchId: json['branchId'],
     lotNumber: json['lotNumber'],
     expirationDate: DateTime.fromMillisecondsSinceEpoch(json['expirationDate']),
+    supplierId: json['supplierId'],
+    supplierName: json['supplierName'],
   );
 }
 
@@ -102,6 +114,8 @@ class ExpirationLogInDb extends BaseExpirationLog {
     required super.branchId,
     super.lotNumber,
     required super.expirationDate,
+    super.supplierId,
+    super.supplierName,
     required this.createdAt,
     this.updatedAt,
   });
@@ -112,6 +126,8 @@ class ExpirationLogInDb extends BaseExpirationLog {
     branchId: json['branchId'],
     lotNumber: json['lotNumber'],
     expirationDate: DateTime.fromMillisecondsSinceEpoch(json['expirationDate']),
+    supplierId: json['supplierId'],
+    supplierName: json['supplierName'],
     createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt']),
     updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt']) : null,
   );

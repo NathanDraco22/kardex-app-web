@@ -13,6 +13,7 @@ import 'package:kardex_app_front/widgets/title_label.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/orders_by_user_template.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 part 'sections/header_section.dart';
 part 'sections/content_section.dart';

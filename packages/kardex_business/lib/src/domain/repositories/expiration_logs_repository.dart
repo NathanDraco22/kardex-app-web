@@ -40,4 +40,13 @@ class ExpirationLogsRepository {
     final result = await expirationLogsDataSource.hasNearExpiration(branchId);
     return result;
   }
+
+  Future<List<ExpirationLogInDb>> getNearExpirationLogs(String branchId, {int limit = 10}) async {
+    final results = await expirationLogsDataSource.getNearExpirationLogs(branchId, limit: limit);
+    final response = ListResponse<ExpirationLogInDb>.fromJson(
+      results,
+      ExpirationLogInDb.fromJson,
+    );
+    return response.data;
+  }
 }

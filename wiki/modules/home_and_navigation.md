@@ -64,7 +64,7 @@ lib/src/modules/
 
 ### 2.5. Panel Administrativo (`admin_panel`)
 - **Propósito:** Tablero ejecutivo con las ventas del día anterior, el acumulado de los últimos 7 días y accesos rápidos a reportes, existencias globales, cambio de sucursal, catálogos y configuración.
-- **Diseño:** Fondo `AppThemeTokens.surfaceLight`, hero de bienvenida con avatar y sucursal activa, tarjetas de métricas y gráfica de tendencia con estilo suave (sin gradientes).
+- **Diseño:** Fondo global coherente `Colors.indigo.shade50`, hero de bienvenida con avatar y sucursal activa, tarjetas Bento blancas de métricas y gráfica de tendencia con estilo suave (sin gradientes) que contrastan de forma nítida con el fondo.
 - **Componente reutilizable:** Los accesos usan `AppActionTile` (`lib/widgets/design_system/app_action_tile.dart`), un tile con icono tintado, título, subtítulo, hover sutil y chevron. Sustituye la repetición de `ListTile` + `Divider`.
 - **Navegación:** “Ir a sucursal” reutiliza `BranchSelectionDialog` y resalta la sucursal actual.
 

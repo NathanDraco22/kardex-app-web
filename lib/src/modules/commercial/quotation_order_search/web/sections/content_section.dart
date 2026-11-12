@@ -50,7 +50,7 @@ class _ContentSection extends StatelessWidget {
                 child: ListView.builder(
                   itemCount: orders.length,
                   itemBuilder: (context, index) {
-                    final tileColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+                    final tileColor = RowColorTool.getRowColor(index);
                     final currentOrder = orders[index];
 
                     return CustomOrderListTile(

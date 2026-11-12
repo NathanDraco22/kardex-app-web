@@ -8,6 +8,7 @@ import 'package:kardex_app_front/widgets/date_picker_button.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/adjust_exit_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/simple_search_dialog.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 part 'sections/content_section.dart';
 part 'sections/header_section.dart';

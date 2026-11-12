@@ -74,7 +74,7 @@ class _Content extends StatelessWidget {
 
     for (var i = 0; i < rowCard.length; i++) {
       final currentRowCardModel = rowCard[i];
-      final color = i.isOdd ? Colors.white : Colors.grey.shade200;
+      final color = RowColorTool.getRowColor(i);
       yield EntryRowCard(
         key: ValueKey(currentRowCardModel),
         rowColor: color,

@@ -9,6 +9,7 @@ import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 import '../cubit/read_current_inventory_cubit.dart';
 import '../widgets/inventory_mobile_row.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 class CurrentInventoryScreenMobile extends StatelessWidget {
   const CurrentInventoryScreenMobile({super.key});
@@ -165,7 +166,7 @@ class _Body extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final inventory = state.inventories[index];
                     final product = inventory.product;
-                    final rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+                    final rowColor = RowColorTool.getRowColor(index);
                     return InventoryRow(
                       color: rowColor,
                       productName: product.name,

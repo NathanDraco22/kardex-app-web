@@ -6,6 +6,7 @@ import 'package:kardex_app_front/src/modules/product_catalog/product_list/dialog
 import 'package:kardex_app_front/widgets/no_item.dart';
 import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 import 'package:kardex_app_front/widgets/status_tag_label.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 class ProductsTable extends StatelessWidget {
   const ProductsTable({
@@ -111,7 +112,7 @@ class _InnerRows extends StatelessWidget {
         itemBuilder: (context, index) {
           final currentProduct = products[index];
 
-          Color rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+          Color rowColor = RowColorTool.getRowColor(index);
 
           if (state is HighlightedProduct) {
             if (state.updatedProducts.any((element) => element.id == currentProduct.id)) {

@@ -7,6 +7,7 @@ import 'package:kardex_app_front/src/modules/inventory/history_exit/cubit/read_e
 import 'package:kardex_app_front/src/modules/inventory/inventory_exit/cubit/read_exit_doc_cubit.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/exit_history_viewer.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 part 'sections/header_section.dart';
 part 'sections/content_section.dart';

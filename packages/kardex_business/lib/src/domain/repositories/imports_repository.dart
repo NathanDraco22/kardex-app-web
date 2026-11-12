@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:kardex_business/src/data/imports_data_source.dart';
+import 'package:kardex_business/src/domain/models/imports/import_preview_result.dart';
 import 'package:kardex_business/src/domain/models/imports/import_result.dart';
 import 'package:kardex_business/src/domain/models/imports/import_type.dart';
 
@@ -8,6 +9,22 @@ class ImportsRepository {
   ImportsRepository(this.importsDataSource);
 
   final ImportsDataSource importsDataSource;
+
+  Future<ImportPreviewResult> previewImport({
+    required ImportType type,
+    required Uint8List bytes,
+    required String fileName,
+    String? branchId,
+  }) async {
+    final response = await importsDataSource.previewImport(
+      type: type.name,
+      bytes: bytes,
+      fileName: fileName,
+      branchId: branchId,
+    );
+
+    return ImportPreviewResult.fromJson(response);
+  }
 
   Future<ImportResult> importCsv({
     required ImportType type,

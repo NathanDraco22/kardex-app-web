@@ -7,6 +7,7 @@ import 'package:kardex_app_front/src/modules/commercial/current_orders/cubit/rea
 import 'package:kardex_app_front/src/modules/commercial/current_orders/web/invoice_creator/invoice_creator_screen.dart';
 import 'package:kardex_app_front/widgets/custom_order_list_tile.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 part 'sections/header_section.dart';
 part 'sections/content_section.dart';

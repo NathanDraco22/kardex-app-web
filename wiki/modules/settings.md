@@ -91,8 +91,8 @@ lib/src/modules/settings/
 
 #### Identidad de la Empresa (`companyLogoUrl`):
 - La sección **“Identidad de la empresa”** es el primer bloque de `AppSettingsScreen`.
-- Permite **subir, cambiar o quitar** una imagen JPG/PNG desde la galería. La imagen conserva su proporción original y la transparencia del PNG.
-- Al seleccionar una imagen, se sube mediante `ImageUploader` al almacenamiento de imágenes y se guarda la URL con un `PATCH` parcial inmediato de `companyLogoUrl`; no requiere pulsar “Guardar Configuraciones”.
+- Permite **subir, cambiar o quitar** una imagen desde la galería. Al elegirla se abre el mismo editor de recorte cuadrado (1:1) que usa el alta de productos (`showAdaptiveImageCropper` de `croppy`); el resultado se limita a 720 px y se codifica como PNG para conservar la transparencia original antes de subirse.
+- Al confirmar el recorte, la imagen se sube mediante `ImageUploader` al almacenamiento de imágenes y se guarda la URL con un `PATCH` parcial inmediato de `companyLogoUrl`; no requiere pulsar “Guardar Configuraciones”.
 - El logo se muestra en:
   - El `AppBar` del `HomeScreen` (si no existe, se usa el nombre de la empresa como fallback).
   - El `AppBar` del `AdminPanelScreen`.

@@ -6,6 +6,7 @@ import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_exit_history_template.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 // --- FUNCIÓN PARA NAVEGAR CON EL MODELO COMPLETO ---
 Future<void> showExitHistoryViewerDialog(BuildContext context, ExitHistoryInDb exitHistory) async {
@@ -237,7 +238,7 @@ class _ExitHistoryViewer extends StatelessWidget {
                             itemCount: exitHistory.items.length,
                             itemBuilder: (context, index) {
                               final item = exitHistory.items[index];
-                              final rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+                              final rowColor = RowColorTool.getRowColor(index);
                               return Container(
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 4,

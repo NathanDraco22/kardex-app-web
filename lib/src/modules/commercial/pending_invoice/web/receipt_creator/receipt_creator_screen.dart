@@ -637,7 +637,7 @@ class _Body extends StatelessWidget {
 Iterable<Widget> _buildInvoiceRows(List<InvoiceInDb> invoices) sync* {
   for (var i = 0; i < invoices.length; i++) {
     final currentInvoice = invoices[i];
-    final color = i.isOdd ? Colors.white : Colors.grey.shade200;
+    final color = RowColorTool.getRowColor(i);
 
     yield Material(
       color: Colors.transparent,
@@ -663,7 +663,7 @@ Iterable<Widget> _buildInvoiceRows(List<InvoiceInDb> invoices) sync* {
 Iterable<Widget> _buildDevolutionsRows(List<DevolutionInDb> devolutions) sync* {
   for (var i = 0; i < devolutions.length; i++) {
     final currentDevolutions = devolutions[i];
-    final color = i.isOdd ? Colors.white : Colors.grey.shade200;
+    final color = RowColorTool.getRowColor(i);
 
     yield Material(
       color: Colors.transparent,
@@ -693,7 +693,7 @@ Iterable<Widget> _buildDevolutionsRows(List<DevolutionInDb> devolutions) sync* {
 Iterable<Widget> _buildCreditNotesRows(List<CreditNoteInDb> creditNotes) sync* {
   for (var i = 0; i < creditNotes.length; i++) {
     final cn = creditNotes[i];
-    final color = i.isOdd ? Colors.white : Colors.grey.shade200;
+    final color = RowColorTool.getRowColor(i);
 
     yield Material(
       color: Colors.transparent,

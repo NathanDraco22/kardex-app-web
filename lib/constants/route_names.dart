@@ -82,6 +82,10 @@ class RouteNames {
   static const adjustEntry = 'adjust-entry';
   static const historyAdjustEntry = 'history-adjust-entry';
   static const historyAdjustExit = 'history-adjust-exit';
+  static const adjustmentRequests = 'adjustment-requests';
+  static const adjustmentRequestCreate = 'adjustment-request-create';
+  static const adjustmentRequestDetail = 'adjustment-request-detail';
+  static const adjustmentRequestEdit = 'adjustment-request-edit';
   static const productPriceCatalog = 'product-price-catalog';
   static const productInventoryCatalog = 'product-inventory-catalog';
 

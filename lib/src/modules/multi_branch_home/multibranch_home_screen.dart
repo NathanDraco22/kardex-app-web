@@ -183,8 +183,7 @@ class _PageBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: AppThemeTokens.surfaceLight,
+    return SizedBox.expand(
       child: child,
     );
   }

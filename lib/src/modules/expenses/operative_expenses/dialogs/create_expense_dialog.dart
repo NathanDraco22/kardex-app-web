@@ -5,14 +5,15 @@ import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/cubits/expenses/write_expenses_cubit.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
-import 'package:kardex_app_front/widgets/date_picker_button.dart';
+import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
-import 'package:kardex_app_front/widgets/title_texfield.dart';
 import 'package:kardex_app_front/widgets/dropdown/expense_category_dropdown.dart';
 
-import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/src/modules/expenses/shared/expense_form_utils.dart';
+import 'package:kardex_app_front/src/modules/expenses/shared/widgets/expense_form_widgets.dart';
 
 part 'form_section.dart';
 
@@ -81,6 +82,7 @@ class _CreateExpenseDialogState extends State<CreateExpenseDialog> {
       },
       child: Form(
         key: formKey,
+        autovalidateMode: AutovalidateMode.disabled,
         child: _FormContent(
           formKey: formKey,
           creationMap: creationMap,

@@ -1,3 +1,67 @@
+## Sync `main` → `lite` + Ajustes/Mermas/Solicitudes (Noviembre 2026)
+
+- **Objetivo:** sincronizar `lite` con `main` y reactivar Ajustes, Mermas y Solicitudes de Ajuste.
+- **Alcance:** 17 commits de `main`; 276 archivos. Se conservaron branding Lite, catálogo de inventario, edición directa y `useKardex: false`.
+- **Conflictos (6):** `app_router.dart`, `home_modules_registry.dart` e `inventory_menu_screen.dart` se resolvieron conservando la estructura Lite y agregando las rutas/menús de ajustes, mermas y solicitudes; los 3 archivos de Gastos se tomaron de `main` (FAB, filtros, layouts).
+- **Ajustes/Mermas/Solicitudes:** activos. Usan el flujo estándar y generan transacciones de producto. `product-movements` sigue deshabilitado porque la auditoría sería parcial.
+- **Sincronizado desde `main`:** rediseño de Gastos, totales de gastos en Reporte Financiero, banner de vencimientos, `RowColorTool`, preview de importaciones CSV, recorte cuadrado del logo, color del hero desktop y Regla 7 de FAB.
+- **Regla FAB:** móvil/listas con `FloatingActionButton.extended` oculto al abrir el teclado; web con `PrimaryMenuButton` en toolbar/cabecera; sin `+` en `AppBar.actions`.
+- **Verificación:** `flutter analyze` sin issues; `dart analyze packages/kardex_business` sin issues; `flutter test` 237/237.
+
+## Recorte Cuadrado del Logo de Empresa (Noviembre 2026)
+
+- **Problema:** en Configuraciones → Identidad de la empresa, el logo se elegía con `ImagePicker` directo y se subía sin recorte.
+- **Solución:** `AppSettingsScreen` reutiliza `showImageSelectorDialog` / `showAdaptiveImageCropper` (croppy) con proporción 1:1, igual que el alta de productos. El selector admite salida PNG (`encodeAsPng`) para conservar la transparencia del logo; luego se sube con `ImageUploader`.
+- **UX:** se conserva el botón Quitar con confirmación; el diálogo también permite cambiar o eliminar el logo. La previsualización pasó a formato cuadrado.
+- **Sincronización:** aplica a `lite`; ya entró con el sync `main` → `lite`.
+
+## Imágenes de Producto en Solicitudes de Ajuste (Noviembre 2026)
+
+- **Backend:** `AdjustmentRequestItem` ahora guarda `image` como snapshot tomado del producto al crear/editar la solicitud.
+- **Frontend:** `AdjustmentRequestItem` incluye `image`; el formulario y el detalle (web y móvil) muestran la miniatura con `ImageViewerWidget` y un icono de respaldo.
+- **Compatibilidad:** las solicitudes históricas sin imagen muestran el icono; no requiere migraciones de Mongo.
+- **Archivos:** `adjustment_request_editor_cards.dart`, `adjustment_request_editor_table.dart`, `adjustment_request_item_cards.dart`, `adjustment_request_item_table.dart` y `view_controller.dart`.
+- **Regla `main`/`lite`:** el módulo de Solicitudes de Ajuste ya está sincronizado y activo en `lite`; las imágenes aplican a ambas ramas.
+
+## Detalle de Solicitud de Ajuste: Documentos en Columna (Noviembre 2026)
+
+- **Web:** `_ApprovedPanel` ahora muestra `Entrada #...` y `Salida #...` en una columna a ancho completo, con mayor padding y tipografía (11.5 px); el header del detalle subió de 160 a 172 px para evitar overflow.
+- **Mobile:** `_ApprovedInfo` reemplazó la fila de botones por una columna; cada `OutlinedButton.icon` ocupa todo el ancho con altura mínima de 40 px y sin `VisualDensity.compact`.
+- **Comportamiento:** si solo existe uno de los documentos, el botón único también ocupa todo el ancho.
+- **Verificación:** `flutter analyze` sin issues, `flutter test` 214/214, hot reload OK y sin errores de runtime.
+
+## Restricción de Aprobación en Solicitudes de Ajuste (Noviembre 2026)
+
+- **Regla:** solo los roles `Supervisor` y `Admin` pueden aprobar solicitudes de ajuste; `Operador` no puede aprobar.
+- **Autoaprobación:** un `Supervisor` no puede aprobar su propia solicitud; un `Admin` sí puede. Toda creación queda en estado `pending` y requiere aprobación explícita.
+- **Backend:** `AdjustmentRequestManager` resuelve el rol del aprobador con `UsersRepository` (rechaza usuarios inexistentes o inactivos); el pipeline recibe `approver_role` y `ValidateRequestStep` aplica la regla.
+- **Frontend:** `AdjustmentRequestActions` oculta “Aprobar” a Operadores y a Supervisores en sus propias solicitudes; los Admins la ven siempre.
+- **Errores:** se agregaron traducciones para `APPROVAL_REQUIRES_SUPERVISOR_OR_ADMIN` y `APPROVER_NOT_FOUND`, y se ajustó el mensaje de `SELF_APPROVAL_NOT_ALLOWED`.
+- **Verificación:** `ruff check`, `ty check` y `pytest test/test_adjustment_request_pipeline.py` (10/10) OK; `flutter analyze lib/src/modules/inventory/adjustment_request` sin issues.
+- **Regla `main`/`lite`:** es una regla de negocio compartida; debe evaluarse y sincronizarse en `lite`.
+
+## Rediseño del Módulo de Gastos (Noviembre 2026)
+
+- **Contexto:** rediseño completo del módulo de Gastos (Fases 1–3) en la rama `feat/expenses-redesign`.
+- **Commits:** `32d93f6c` (base compartida y listas), `c4ddfad9` (reporte y categorías), `9c340903` (formularios, visores y hub).
+- **Fase 1:** se creó `expenses/shared/` con configuración de lista, orquestador responsive, métricas, badges, acciones, filtros, KPIs y tabla/tarjetas; se eliminaron las vistas Web/Móvil duplicadas de gastos operativos y de proveedores.
+- **Fase 2:** se rediseñaron el reporte (dos campos Fecha Inicio/Fin con presets como atajos, KPIs, detalle paginado 100, consolidado con dona/ranking, exportación CSV/PDF) y el catálogo de categorías (grid responsive, búsqueda, badges, diálogo moderno).
+- **Fase 3:** formularios adaptativos (diálogo desktop con `AppDialogHeader`, pantalla completa móvil), parser robusto de montos, preservación de estado/vencimiento, visor compartido de solo lectura y hub renovado.
+- **Listas:** `ExpenseListScreen` reutiliza `ExpenseListConfig` para operativos y proveedores; incluye AppBar con título específico, tarjeta compacta de totales/filtros, tabla desktop/tarjetas móvil, skeletons, empty/error, paginación y acciones editar/eliminar con regla de 4 horas; “Marcar como pagado” se habilita solo si el gasto está pendiente.
+- **Paginación:** `ReadExpenseCubit.loadMore` deriva el offset de `_serverCountedIds`, usa generaciones de petición/mutación y `loadMoreError`; `loadAll` carga hasta 20 páginas para el reporte.
+- **Formularios:** el N° Documento es read-only en edición; `dateId` se genera como `YYYY-MM-DD`; se conservan estado y vencimiento originales si el usuario no cambia el crédito.
+- **Fechas:** listas y reporte filtran/muestran `createdAt` como “Registro”; `date` queda como fecha del documento. CSV/PDF también usan `createdAt` y la etiqueta “Registro”.
+- **Ajuste posterior (filtros de fechas):** las listas y el reporte usan dos campos separados “Fecha Inicio” y “Fecha Fin” con calendarios individuales, extraídos al componente compartido `ExpenseDateRangeFields`. En el reporte los presets siguen como atajos que rellenan ambos campos; en las listas cada extremo es opcional y el filtro se aplica al cambiar una fecha. Se retiró el `showDateRangePicker` combinado y el pill “Personalizado”. También se corrigieron el desborde del dropdown de categorías con nombres largos y el desborde del estado vacío en ventanas bajas.
+- **Ajuste posterior (UI compacta de listas):** el título específico vive en el AppBar junto a refrescar y “Nuevo Gasto”; se retiró el header grande y las cuatro tarjetas KPI. La tarjeta de filtros ahora incluye una barra de totales compacta, dropdown de estado (Todos/Pendientes/Pagados/Vencidos), fechas separadas y el buscador al final. Aplica a Gastos Operativos y Gastos de Proveedores; el reporte conserva su diseño.
+- **Reporte:** máximo 2,000 registros cargados (20 × 100); si queda `hasMore`, la vista avisa y la exportación solo incluye los cargados.
+- **Verificación:** `flutter analyze` sin issues; `flutter test` completo con **214 tests passed**; `dart analyze packages/kardex_business` sin issues; los tests específicos de Gastos cubren métricas, listas, filtros, reportes, categorías, formularios, visores y hub.
+- **Limitación backend (categorías):** `description` e `isActive` no están en el modelo base de Pydantic (`expense_category_model.py` solo declara `name`; no declara `description` ni `isActive`); el frontend los incluye en su modelo/payload, pero el servidor los descarta y la UI usa fallback.
+- **Limitación backend (`UpdateExpense`):** el backend no incluye `docNumber`, `expirationDate` ni `supplierName`; el DTO Dart envía vencimiento/proveedor cuando tienen valor, pero el servidor los ignora, y `docNumber` no existe en el DTO de actualización.
+- **Limitación backend (`amountPaid`):** existe en el backend y en `AddToAmountRequest`, pero no en `ExpenseInDb` de Dart; los abonos parciales no se muestran ni editan en esta fase.
+- **Visor y KPIs:** el visor es de solo lectura; las acciones de escritura están en la lista. Los KPIs de lista se calculan sobre registros cargados/visibles, no sobre el total global del backend.
+- **Regla `main`/`lite`:** es UI compartida de Gastos; aplica a `lite` y debe sincronizarse con `git merge main` en esa rama. No hay cambios lite-only.
+- **Documentación:** detalle completo en [`wiki/modules/expenses.md`](wiki/modules/expenses.md).
+
 ## Gemini Added Memories
 - Se identificó la causa de pérdida de datos en la pantalla de Facturación Anónima (`anon_invoices`): a diferencia de `client_invoices` (que mantiene `ClientInvoiceViewController` en su estado padre `_ClientInvoiceScreenState`), `anon_invoices` instanciaba dos controladores independientes en Web y Móvil (`AnonInvoiceTableController` en Web y `AnonInvoiceMobileViewController` en Móvil). Al alternar modo Web a Móvil o redimensionar la ventana, la vista Web se destruía junto con sus datos. Se elaboró el plan de implementación para unificar `AnonInvoiceViewController` en el widget raíz `AnonInvoicesScreen`.
 - Se actualizó [shorcut_container.dart](file:///c:/Users/sytru/Developer/Projects/kardex_app/kardex_app_front/lib/widgets/shorcut_container.dart) para soportar tanto las teclas de la fila superior de números (`LogicalKeyboardKey.digit0`..`9`) como las teclas del teclado numérico (`LogicalKeyboardKey.numpad0`..`9`). Se cambió la estructura de `keyMapper` a una lista de teclas asociadas por atajo y se iteró sobre cada una en `initState()` para registrar ambas variantes en `activatorMapper`.
@@ -526,3 +590,9 @@ Esta estructura se ha seguido para módulos como 'Historial de Facturas', 'Histo
 - **Accesos:** los seis `ListTile` con `Divider` se reemplazaron por `AppActionTile` en una grilla de dos columnas en pantallas anchas y una columna en móvil.
 - **Navegación:** “Ir a sucursal” conserva `BranchSelectionDialog` con la sucursal actual resaltada.
 - **Verificación:** `flutter analyze` sin issues y `flutter test` 93/93.
+
+## Gastos en Reporte Financiero por Rango (Noviembre 2026)
+- **Backend:** `TotalsResult.expenses` opcional; agregado por `date`, `branchId`, `isDeleted=False`, `isActive=True` y opcional `createdBy.id`; `paid` por `status == "paid"` y `pending = total - paid`; incluye cancelados; índice `(branchId, date)`.
+- **Frontend:** `ExpenseTotals`/`ExpenseTypeTotal` en `kardex_business`; `TotalsResult.expenses` nullable y tolerante a backend viejo, tipos desconocidos y `byType` ausente; tarjeta `BranchExpensesTotalsCard` en desktop/tablet/móvil, oculta si el backend no envía el campo.
+- **Verificación:** `ruff`/`ty` OK; `flutter analyze` limpio; test `totals_result_expenses_test.dart` 4/4.
+- **Sin commit.**

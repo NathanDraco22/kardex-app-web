@@ -18,6 +18,7 @@
 > 3. Si aplica pero es **UI/arquitectura exclusiva de `lite`** (editor combinado, catálogo de inventario, cubits directos), se implementa en `lite`.
 > 4. Si no aplica, se deja constancia del motivo en la tarea/PR.
 > 5. Nunca se mergea `lite` completo hacia `main`.
+> 6. **Ajustes y Mermas y Solicitudes de Ajuste:** activos en `lite`; se sincronizan desde `main` con el flujo estándar. **Movimientos de un Producto:** no habilitar en `lite`.
 >
 > Consultar siempre [`wiki/ramas_main_vs_lite.md`](file:///c:/Users/sytru/Developer/Projects/kardex_app/kardex_app_front/wiki/ramas_main_vs_lite.md).
 

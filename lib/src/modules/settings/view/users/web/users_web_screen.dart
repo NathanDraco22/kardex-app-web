@@ -5,6 +5,7 @@ import 'package:kardex_app_front/src/modules/settings/view/users/dialog/create_u
 import 'package:kardex_app_front/src/modules/settings/view/users/dialog/update_user_dialog.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 class UsersWebScreen extends StatelessWidget {
   const UsersWebScreen({super.key});
@@ -88,10 +89,7 @@ class _Body extends StatelessWidget {
 
                     final created = DateTimeTool.formatddMMyy(currentUser.createdAt);
 
-                    Color tileColor = Colors.white;
-                    if (index % 2 == 0) {
-                      tileColor = Colors.grey.shade200;
-                    }
+                    Color tileColor = RowColorTool.getRowColor(index);
 
                     if (state is HighlightedUser) {
                       if (state.updatedUsers.any((element) => element.id == currentUser.id)) {

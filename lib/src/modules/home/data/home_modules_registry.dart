@@ -5,6 +5,7 @@ import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/constants/feature_flags.dart';
 import 'package:kardex_app_front/constants/route_names.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/src/modules/inventory/adjust_exit/adjust_exit_screen.dart';
 import 'package:kardex_app_front/src/modules/settings/view/local_printer_settings_dialog.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/clients_catalog_template.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
@@ -524,7 +525,7 @@ List<HomeModuleCategory> getHomeModuleCategories(
     HomeModuleCategory(
       id: HomeModuleId.inventory,
       title: "Inventario",
-      subtitle: "Catálogo, existencias, entradas, salidas y transferencias",
+      subtitle: "Catálogo, existencias, entradas, salidas, transferencias y ajustes",
       icon: FluentIcons.box_toolbox_20_filled,
       accentColor: const Color(0xFFEA580C),
       permissions: const [Modules.inventory],
@@ -659,6 +660,71 @@ List<HomeModuleCategory> getHomeModuleCategories(
           icon: Icons.swap_vert_circle_outlined,
           accentColor: Color(0xFFE11D48),
           routeName: "create-transfer",
+        ),
+
+        // Sección 4: Ajustes y Mermas
+        HomeSubmoduleItem(
+          section: "Ajustes y Mermas",
+          title: "Entrada por Ajuste",
+          subtitle: "Ajuste manual positivo por descuadre",
+          icon: IconWidgets.entryInventoryIcon.icon!,
+          accentColor: const Color(0xFF2563EB),
+          routeName: "adjust-entry",
+        ),
+        const HomeSubmoduleItem(
+          section: "Ajustes y Mermas",
+          title: "Historial de Entradas por Ajuste",
+          subtitle: "Registro de ajustes positivos auditados",
+          icon: FluentIcons.history_28_filled,
+          accentColor: Color(0xFF2563EB),
+          routeName: "history-adjust-entry",
+        ),
+        HomeSubmoduleItem(
+          section: "Ajustes y Mermas",
+          title: "Salida por Ajuste",
+          subtitle: "Ajuste manual negativo por descuadre",
+          icon: IconWidgets.exitInventoryIcon.icon!,
+          accentColor: const Color(0xFFE11D48),
+          customAction: (ctx) => Navigator.push(
+            ctx,
+            MaterialPageRoute(
+              builder: (ctx) => const AdjustExitScreen(
+                type: AdjustExitType.adjust,
+              ),
+            ),
+          ),
+        ),
+        const HomeSubmoduleItem(
+          section: "Ajustes y Mermas",
+          title: "Historial de Salidas por Ajuste",
+          subtitle: "Registro de ajustes negativos auditados",
+          icon: FluentIcons.history_28_filled,
+          accentColor: Color(0xFFE11D48),
+          routeName: "history-adjust-exit",
+        ),
+        HomeSubmoduleItem(
+          section: "Ajustes y Mermas",
+          title: "Mermas",
+          subtitle: "Baja de inventario por avería o daño",
+          icon: IconWidgets.exitInventoryIcon.icon!,
+          accentColor: const Color(0xFFDC2626),
+          customAction: (ctx) => Navigator.push(
+            ctx,
+            MaterialPageRoute(
+              builder: (ctx) => const AdjustExitScreen(
+                type: AdjustExitType.loss,
+              ),
+            ),
+          ),
+        ),
+        const HomeSubmoduleItem(
+          section: "Ajustes y Mermas",
+          title: "Solicitudes de Ajuste",
+          subtitle: "Conteo físico con aprobación",
+          icon: Icons.fact_check_outlined,
+          accentColor: Color(0xFF4F46E5),
+          routeName: RouteNames.adjustmentRequests,
+          permissions: [Modules.inventory],
         ),
       ],
     ),

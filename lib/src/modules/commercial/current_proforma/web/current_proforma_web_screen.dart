@@ -11,6 +11,7 @@ import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/widgets/dialogs/selectors/client_selection_dialog.dart';
 
 import 'invoice_creator/invoice_creator_screen.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 part 'sections/header_section.dart';
 part 'sections/content_section.dart';

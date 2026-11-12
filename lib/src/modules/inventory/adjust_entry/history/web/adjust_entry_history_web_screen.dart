@@ -8,6 +8,7 @@ import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/si
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 part 'sections/content_section.dart';
 part 'sections/header_section.dart';

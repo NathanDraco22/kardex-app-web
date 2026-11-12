@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 Future<void> showTransferViewerDialog(BuildContext context, TransferInDb transfer) async {
   FocusManager.instance.primaryFocus?.unfocus();
@@ -202,7 +203,7 @@ class TransferViewerContent extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final item = transfer.items[index];
                     final display = item.displayQuantity;
-                    final rowColor = index.isOdd ? Colors.white : Colors.grey.shade200;
+                    final rowColor = RowColorTool.getRowColor(index);
                     return Container(
                       padding: const EdgeInsets.all(4),
                       color: rowColor,
