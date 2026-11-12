@@ -5,7 +5,6 @@ import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/modules/expenses/shared/expense_status_ui.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
-import 'package:kardex_app_front/widgets/title_label.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 /// Abre el visor de un gasto usando la sucursal activa de la sesión.
