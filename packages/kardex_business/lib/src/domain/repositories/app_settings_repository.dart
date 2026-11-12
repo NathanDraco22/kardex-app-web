@@ -10,6 +10,10 @@ class AppSettingsRepository {
 
   AppSettingModel? get currentAppSettings => _currentAppSettings;
 
+  void clearCurrentAppSettings() {
+    _currentAppSettings = null;
+  }
+
   Future<AppSettingModel> getCurrentAppSettings() async {
     final result = await appSettingsDataSource.getCurrentAppSettings();
     if (result == null) {

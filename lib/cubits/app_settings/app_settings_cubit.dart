@@ -57,6 +57,12 @@ class AppSettingsCubit extends Cubit<AppSettingsState> {
     }
   }
 
+  /// Descarta la configuración en memoria al salir o cambiar de negocio.
+  void clear() {
+    appSettingsRepository.clearCurrentAppSettings();
+    emit(AppSettingsInitial());
+  }
+
   Future<bool> updateSettings(UpdateAppSetting update) async {
     var current = currentSettings;
 

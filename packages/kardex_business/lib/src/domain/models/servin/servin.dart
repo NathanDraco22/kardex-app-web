@@ -6,6 +6,7 @@ class Servin {
     required this.isActive,
     this.isMultiBranch = false,
     this.isUsingExpirationDate = true,
+    this.isDemo = false,
   });
 
   final String name;
@@ -15,6 +16,7 @@ class Servin {
   final bool isActive;
   final bool isMultiBranch;
   final bool isUsingExpirationDate;
+  final bool isDemo;
 
   factory Servin.fromJson(Map<String, dynamic> json) {
     return Servin(
@@ -24,6 +26,7 @@ class Servin {
       isActive: json['isActive'],
       isMultiBranch: json['isMultiBranch'] ?? false,
       isUsingExpirationDate: json['isUsingExpirationDate'] ?? true,
+      isDemo: json['isDemo'] ?? false,
     );
   }
 
@@ -35,6 +38,7 @@ class Servin {
       'isActive': isActive,
       'isMultiBranch': isMultiBranch,
       'isUsingExpirationDate': isUsingExpirationDate,
+      'isDemo': isDemo,
     };
     return map;
   }
@@ -46,6 +50,7 @@ class Servin {
     bool? isActive,
     bool? isMultiBranch,
     bool? isUsingExpirationDate,
+    bool? isDemo,
   }) {
     return Servin(
       name: name ?? this.name,
@@ -54,6 +59,7 @@ class Servin {
       isActive: isActive ?? this.isActive,
       isMultiBranch: isMultiBranch ?? this.isMultiBranch,
       isUsingExpirationDate: isUsingExpirationDate ?? this.isUsingExpirationDate,
+      isDemo: isDemo ?? this.isDemo,
     );
   }
 }

@@ -144,6 +144,42 @@ class _BodyState extends State<_Body> {
                           ),
                         ],
                       ),
+                      const SizedBox(height: 14),
+                      const Row(
+                        children: [
+                          Expanded(child: Divider(color: Colors.black26, height: 1)),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Text(
+                              "ó",
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black54,
+                              ),
+                            ),
+                          ),
+                          Expanded(child: Divider(color: Colors.black26, height: 1)),
+                        ],
+                      ),
+                      const SizedBox(height: 14),
+                      OutlinedButton.icon(
+                        onPressed: () {
+                          context.read<ActivationCubit>().activateDemo();
+                        },
+                        icon: const Icon(Icons.rocket_launch_outlined, size: 20),
+                        label: const Text(
+                          "Probar Versión Demo",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF0F172A),
+                          side: const BorderSide(color: Color(0xFF0284C7), width: 1.5),
+                          backgroundColor: Colors.white.withValues(alpha: 0.9),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        ),
+                      ),
                     ],
                   ),
                 ),

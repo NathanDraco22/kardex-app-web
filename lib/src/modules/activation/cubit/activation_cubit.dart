@@ -20,4 +20,16 @@ class ActivationCubit extends Cubit<ActivationState> {
       emit(ActivationError(error.toString()));
     }
   }
+
+  Future<void> activateDemo() async {
+    emit(ActivationLoading());
+    try {
+      final servin = await servinRepository.activateDemoServin();
+
+      AppKardexConfig().setBaseUrl(servin.url);
+      emit(ActivationSuccess(servin));
+    } catch (error) {
+      emit(ActivationError(error.toString()));
+    }
+  }
 }

@@ -169,7 +169,9 @@ class AuthCubit extends Cubit<AuthState> {
 
   Future<void> initServinUnauthenticated(Servin servin) async {
     _updateNetworkConfig(servin: servin);
+    _clearAppSettings();
     emit(Unauthenticated(servin: servin));
+    _loadAppSettings();
   }
 
   Future<void> logout() async {
@@ -191,10 +193,27 @@ class AuthCubit extends Cubit<AuthState> {
 
   Future<void> exitFromBusiness() async {
     await servinRepository.clearCurrentServin();
+    _clearAppSettings();
     emit(AuthInactive());
   }
 
   // MARK: - Helpers
+
+  Future<void> _loadAppSettings() async {
+    try {
+      if (getIt.isRegistered<AppSettingsCubit>()) {
+        await getIt<AppSettingsCubit>().loadSettings();
+      }
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
+  void _clearAppSettings() {
+    if (getIt.isRegistered<AppSettingsCubit>()) {
+      getIt<AppSettingsCubit>().clear();
+    }
+  }
 
   void _updateNetworkConfig({
     required Servin servin,
@@ -235,13 +254,7 @@ class AuthCubit extends Cubit<AuthState> {
       branch: branch,
     );
 
-    try {
-      if (getIt.isRegistered<AppSettingsCubit>()) {
-        getIt<AppSettingsCubit>().loadSettings();
-      }
-    } catch (e) {
-      log(e.toString());
-    }
+    _loadAppSettings();
 
     emit(
       Authenticated(
