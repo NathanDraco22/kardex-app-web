@@ -100,6 +100,7 @@ class _BranchHero extends StatelessWidget {
     if (currentBranch == null) {
       return const _HeroContainer(
         accent: AppThemeTokens.indigo,
+        backgroundColor: Color(0xFFEEF2FF),
         child: Row(
           children: [
             _BranchLogo(branch: null, size: 80),
@@ -131,9 +132,13 @@ class _BranchHero extends StatelessWidget {
 
     final isCommerce = currentBranch.isCommerce;
     final accent = isCommerce ? const Color(0xFFD97706) : const Color(0xFF475569);
+    final backgroundColor = isCommerce
+        ? const Color(0xFFFFF7ED)
+        : const Color(0xFFF8FAFC);
 
     return _HeroContainer(
       accent: accent,
+      backgroundColor: backgroundColor,
       child: LayoutBuilder(
         builder: (context, constraints) {
           final isNarrow = constraints.maxWidth < 680;
@@ -195,24 +200,19 @@ class _HeroContainer extends StatelessWidget {
   const _HeroContainer({
     required this.accent,
     required this.child,
+    this.backgroundColor,
   });
 
   final Color accent;
   final Widget child;
+  final Color? backgroundColor;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            accent.withValues(alpha: 0.07),
-            Colors.white,
-          ],
-        ),
+        color: backgroundColor ?? const Color(0xFFFFF7ED),
         borderRadius: AppThemeTokens.borderRadiusXl,
         border: Border.all(color: accent.withValues(alpha: 0.18)),
         boxShadow: AppThemeTokens.subtleCardShadow(accent: accent),
