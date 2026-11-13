@@ -117,7 +117,10 @@ class _ContentSection extends StatelessWidget {
                     final currentBranch = authState.branch;
 
                     final targetDevolutions = devolutions.where((d) => d.originalInvoiceId == currentInvoice.id).toList();
-                    final targetCreditNotes = creditNotes.where((cn) => cn.invoiceId == currentInvoice.id || (cn.invoiceDocNumber.isNotEmpty && cn.invoiceDocNumber == currentInvoice.docNumber)).toList();
+                    final targetCreditNotes = creditNotes.where((cn) =>
+                      (cn.invoiceId == currentInvoice.id || (cn.invoiceDocNumber.isNotEmpty && cn.invoiceDocNumber == currentInvoice.docNumber)) &&
+                      (cn.status == CreditNoteStatus.approved || cn.status == CreditNoteStatus.confirmed)
+                    ).toList();
 
                     final (createReceipt, errorOrSummary) = FastReceiptLogic.allocateFastPayment(
                       paymentAmountCents: amountCents,
@@ -160,8 +163,10 @@ class _ContentSection extends StatelessWidget {
                   final targetCreditNotes = creditNotes
                       .where(
                         (cn) =>
-                            cn.invoiceId == currentInvoice.id ||
-                            (cn.invoiceDocNumber.isNotEmpty && cn.invoiceDocNumber == currentInvoice.docNumber),
+                            (cn.invoiceId == currentInvoice.id ||
+                            (cn.invoiceDocNumber.isNotEmpty && cn.invoiceDocNumber == currentInvoice.docNumber)) &&
+                            cn.status != CreditNoteStatus.rejected &&
+                            cn.status != CreditNoteStatus.cancelled,
                       )
                       .toList();
                   if (targetCreditNotes.length == 1) {

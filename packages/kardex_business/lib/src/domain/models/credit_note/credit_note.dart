@@ -19,6 +19,9 @@ enum CreditNoteType {
 }
 
 enum CreditNoteStatus {
+  emitted,
+  approved,
+  rejected,
   open,
   confirmed,
   cancelled,
@@ -26,6 +29,12 @@ enum CreditNoteStatus {
 
   String get display {
     switch (this) {
+      case CreditNoteStatus.emitted:
+        return "Emitida";
+      case CreditNoteStatus.approved:
+        return "Aprobada";
+      case CreditNoteStatus.rejected:
+        return "Rechazada";
       case CreditNoteStatus.open:
         return "Abierta";
       case CreditNoteStatus.confirmed:
@@ -51,6 +60,11 @@ class BaseCreditNote {
   final String description;
   final CreditNoteStatus status;
   final UserInfo createdBy;
+  final UserInfo? approvedBy;
+  final DateTime? approvedAt;
+  final UserInfo? rejectedBy;
+  final DateTime? rejectedAt;
+  final String? rejectionReason;
   final String? appliedReceiptId;
   final String? appliedReceiptDocNumber;
   final DateTime? appliedAt;
@@ -71,8 +85,13 @@ class BaseCreditNote {
     this.returnedItems = const [],
     required this.amount,
     this.description = "",
-    this.status = CreditNoteStatus.confirmed,
+    this.status = CreditNoteStatus.emitted,
     required this.createdBy,
+    this.approvedBy,
+    this.approvedAt,
+    this.rejectedBy,
+    this.rejectedAt,
+    this.rejectionReason,
     this.appliedReceiptId,
     this.appliedReceiptDocNumber,
     this.appliedAt,
@@ -94,8 +113,24 @@ class BaseCreditNote {
         : const [],
     amount: json['amount'],
     description: json['description'] ?? "",
-    status: CreditNoteStatus.values.byName(json['status']),
+    status: CreditNoteStatus.values.firstWhere(
+      (e) => e.name == json['status'],
+      orElse: () => CreditNoteStatus.emitted,
+    ),
     createdBy: UserInfo.fromJson(json['createdBy']),
+    approvedBy: json['approvedBy'] != null
+        ? UserInfo.fromJson(json['approvedBy'])
+        : null,
+    approvedAt: json['approvedAt'] != null
+        ? DateTime.fromMillisecondsSinceEpoch(json['approvedAt'])
+        : null,
+    rejectedBy: json['rejectedBy'] != null
+        ? UserInfo.fromJson(json['rejectedBy'])
+        : null,
+    rejectedAt: json['rejectedAt'] != null
+        ? DateTime.fromMillisecondsSinceEpoch(json['rejectedAt'])
+        : null,
+    rejectionReason: json['rejectionReason'],
     appliedReceiptId: json['appliedReceiptId'],
     appliedReceiptDocNumber: json['appliedReceiptDocNumber'],
     appliedAt: json['appliedAt'] != null
@@ -118,6 +153,11 @@ class BaseCreditNote {
       'description': description,
       'status': status.name,
       'createdBy': createdBy.toJson(),
+      'approvedBy': approvedBy?.toJson(),
+      'approvedAt': approvedAt?.millisecondsSinceEpoch,
+      'rejectedBy': rejectedBy?.toJson(),
+      'rejectedAt': rejectedAt?.millisecondsSinceEpoch,
+      'rejectionReason': rejectionReason,
       'appliedReceiptId': appliedReceiptId,
       'appliedReceiptDocNumber': appliedReceiptDocNumber,
       'appliedAt': appliedAt?.millisecondsSinceEpoch,
@@ -141,8 +181,13 @@ class CreateCreditNote extends BaseCreditNote {
     super.returnedItems = const [],
     required super.amount,
     super.description = "",
-    super.status = CreditNoteStatus.confirmed,
+    super.status = CreditNoteStatus.emitted,
     required super.createdBy,
+    super.approvedBy,
+    super.approvedAt,
+    super.rejectedBy,
+    super.rejectedAt,
+    super.rejectionReason,
     super.idempotencyKey,
   });
 
@@ -162,20 +207,46 @@ class CreateCreditNote extends BaseCreditNote {
             : const [],
         amount: json['amount'],
         description: json['description'] ?? "",
-        status: CreditNoteStatus.values.byName(json['status']),
+        status: CreditNoteStatus.values.firstWhere(
+          (e) => e.name == json['status'],
+          orElse: () => CreditNoteStatus.emitted,
+        ),
         createdBy: UserInfo.fromJson(json['createdBy']),
+        approvedBy: json['approvedBy'] != null
+            ? UserInfo.fromJson(json['approvedBy'])
+            : null,
+        approvedAt: json['approvedAt'] != null
+            ? DateTime.fromMillisecondsSinceEpoch(json['approvedAt'])
+            : null,
+        rejectedBy: json['rejectedBy'] != null
+            ? UserInfo.fromJson(json['rejectedBy'])
+            : null,
+        rejectedAt: json['rejectedAt'] != null
+            ? DateTime.fromMillisecondsSinceEpoch(json['rejectedAt'])
+            : null,
+        rejectionReason: json['rejectionReason'],
         idempotencyKey: json['idempotencyKey'],
       );
 }
 
 class UpdateCreditNote {
   final CreditNoteStatus? status;
+  final UserInfo? approvedBy;
+  final DateTime? approvedAt;
+  final UserInfo? rejectedBy;
+  final DateTime? rejectedAt;
+  final String? rejectionReason;
   final String? appliedReceiptId;
   final String? appliedReceiptDocNumber;
   final DateTime? appliedAt;
 
   UpdateCreditNote({
     this.status,
+    this.approvedBy,
+    this.approvedAt,
+    this.rejectedBy,
+    this.rejectedAt,
+    this.rejectionReason,
     this.appliedReceiptId,
     this.appliedReceiptDocNumber,
     this.appliedAt,
@@ -184,6 +255,11 @@ class UpdateCreditNote {
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{
       'status': status?.name,
+      'approvedBy': approvedBy?.toJson(),
+      'approvedAt': approvedAt?.millisecondsSinceEpoch,
+      'rejectedBy': rejectedBy?.toJson(),
+      'rejectedAt': rejectedAt?.millisecondsSinceEpoch,
+      'rejectionReason': rejectionReason,
       'appliedReceiptId': appliedReceiptId,
       'appliedReceiptDocNumber': appliedReceiptDocNumber,
       'appliedAt': appliedAt?.millisecondsSinceEpoch,
@@ -210,8 +286,13 @@ class CreditNoteInDb extends BaseCreditNote {
     super.returnedItems = const [],
     required super.amount,
     super.description = "",
-    super.status = CreditNoteStatus.confirmed,
+    super.status = CreditNoteStatus.emitted,
     required super.createdBy,
+    super.approvedBy,
+    super.approvedAt,
+    super.rejectedBy,
+    super.rejectedAt,
+    super.rejectionReason,
     super.appliedReceiptId,
     super.appliedReceiptDocNumber,
     super.appliedAt,
@@ -236,8 +317,24 @@ class CreditNoteInDb extends BaseCreditNote {
         : const [],
     amount: json['amount'],
     description: json['description'] ?? "",
-    status: CreditNoteStatus.values.byName(json['status']),
+    status: CreditNoteStatus.values.firstWhere(
+      (e) => e.name == json['status'],
+      orElse: () => CreditNoteStatus.emitted,
+    ),
     createdBy: UserInfo.fromJson(json['createdBy']),
+    approvedBy: json['approvedBy'] != null
+        ? UserInfo.fromJson(json['approvedBy'])
+        : null,
+    approvedAt: json['approvedAt'] != null
+        ? DateTime.fromMillisecondsSinceEpoch(json['approvedAt'])
+        : null,
+    rejectedBy: json['rejectedBy'] != null
+        ? UserInfo.fromJson(json['rejectedBy'])
+        : null,
+    rejectedAt: json['rejectedAt'] != null
+        ? DateTime.fromMillisecondsSinceEpoch(json['rejectedAt'])
+        : null,
+    rejectionReason: json['rejectionReason'],
     appliedReceiptId: json['appliedReceiptId'],
     appliedReceiptDocNumber: json['appliedReceiptDocNumber'],
     appliedAt: json['appliedAt'] != null

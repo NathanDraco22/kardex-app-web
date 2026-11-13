@@ -5,6 +5,8 @@ import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/printers/receipt_printer.dart';
+import 'package:kardex_app_front/widgets/design_system/design_system.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/credit_note_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/devolution_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_receipt_template.dart';
@@ -226,36 +228,138 @@ class _ReceiptViewer extends StatelessWidget {
                         ..._buildInvoiceRows(context, receipt.appliedInvoices),
                         const SizedBox(height: 8),
 
-                        if (receipt.appliedDevolutions.isNotEmpty)
+                        if (receipt.appliedDevolutions.isNotEmpty) ...[
                           const Text(
                             "Devoluciones Aplicadas",
                             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                           ),
-                        const SizedBox(height: 8),
-                        if (receipt.appliedDevolutions.isNotEmpty) const Divider(height: 2, thickness: 2),
-                        ..._buildDevolutionsRows(context, receipt.appliedDevolutions),
+                          const SizedBox(height: 8),
+                          const Divider(height: 2, thickness: 2),
+                          ..._buildDevolutionsRows(context, receipt.appliedDevolutions),
+                          const SizedBox(height: 8),
+                        ],
+
+                        if (receipt.appliedCreditNotes.isNotEmpty) ...[
+                          const Text(
+                            "Notas de Crédito Aplicadas",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: AppThemeTokens.purple,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          const Divider(height: 2, thickness: 2),
+                          ..._buildCreditNotesRows(context, receipt.appliedCreditNotes),
+                          const SizedBox(height: 8),
+                        ],
                       ],
                     ),
                   ),
                   const Divider(height: 24),
 
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      const Text("Total Recibo:", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                      const SizedBox(width: 16),
-                      Text(
-                        NumberFormatter.convertToMoneyLike(receipt.total),
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                      ),
-                    ],
-                  ),
+                  _buildReceiptTotalsSummary(receipt),
                 ],
               ),
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildReceiptTotalsSummary(ReceiptInDb receipt) {
+    final totalInvoices = receipt.appliedInvoices.fold(
+      0,
+      (previousValue, element) => previousValue + element.amountApplied,
+    );
+    final totalDevolutions = receipt.appliedDevolutions.fold(
+      0,
+      (previousValue, element) => previousValue + element.amountApplied,
+    );
+    final totalCreditNotes = receipt.appliedCreditNotes.fold(
+      0,
+      (previousValue, element) => previousValue + element.amountApplied,
+    );
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (totalDevolutions > 0 || totalCreditNotes > 0) ...[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              const Text("Total Facturas:", style: TextStyle(fontSize: 14, color: Colors.grey)),
+              const SizedBox(width: 12),
+              SizedBox(
+                width: 120,
+                child: Text(
+                  NumberFormatter.convertToMoneyLike(totalInvoices),
+                  style: const TextStyle(fontSize: 14, color: Colors.grey),
+                  textAlign: TextAlign.end,
+                ),
+              ),
+            ],
+          ),
+          if (totalDevolutions > 0) ...[
+            const SizedBox(height: 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                const Text("Devoluciones:", style: TextStyle(fontSize: 14, color: Colors.red)),
+                const SizedBox(width: 12),
+                SizedBox(
+                  width: 120,
+                  child: Text(
+                    "- ${NumberFormatter.convertToMoneyLike(totalDevolutions)}",
+                    style: const TextStyle(fontSize: 14, color: Colors.red, fontWeight: FontWeight.w600),
+                    textAlign: TextAlign.end,
+                  ),
+                ),
+              ],
+            ),
+          ],
+          if (totalCreditNotes > 0) ...[
+            const SizedBox(height: 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                const Text("Notas de Crédito:", style: TextStyle(fontSize: 14, color: AppThemeTokens.purple)),
+                const SizedBox(width: 12),
+                SizedBox(
+                  width: 120,
+                  child: Text(
+                    "- ${NumberFormatter.convertToMoneyLike(totalCreditNotes)}",
+                    style: const TextStyle(fontSize: 14, color: AppThemeTokens.purple, fontWeight: FontWeight.w600),
+                    textAlign: TextAlign.end,
+                  ),
+                ),
+              ],
+            ),
+          ],
+          const SizedBox(height: 6),
+        ],
+        DecoratedBox(
+          decoration: BoxDecoration(
+            color: Colors.grey.shade100,
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                const Text("Total Recibo (Cobrado):", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                const SizedBox(width: 16),
+                Text(
+                  NumberFormatter.convertToMoneyLike(receipt.total),
+                  style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: AppThemeTokens.success),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -299,6 +403,28 @@ Iterable<Widget> _buildDevolutionsRows(BuildContext context, List<AppliedDevolut
       trailing: Text(
         NumberFormatter.convertToMoneyLike(currentDevolutions.amountApplied),
         style: const TextStyle(fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+}
+
+Iterable<Widget> _buildCreditNotesRows(BuildContext context, List<AppliedCreditNote> creditNotes) sync* {
+  for (var i = 0; i < creditNotes.length; i++) {
+    final currentCreditNote = creditNotes[i];
+    final tileColor = RowColorTool.getRowColor(i);
+    yield ListTile(
+      tileColor: tileColor,
+      minTileHeight: 40,
+      onTap: () {
+        showCreditNoteViewerDialogFromId(context, currentCreditNote.creditNoteId);
+      },
+      title: Text(
+        "NC #${currentCreditNote.docNumber}",
+        style: const TextStyle(fontWeight: FontWeight.bold, color: AppThemeTokens.purple),
+      ),
+      trailing: Text(
+        NumberFormatter.convertToMoneyLike(currentCreditNote.amountApplied),
+        style: const TextStyle(fontWeight: FontWeight.bold, color: AppThemeTokens.purple),
       ),
     );
   }

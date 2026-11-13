@@ -162,10 +162,17 @@ class _BodyState extends State<_Body> {
                         ),
                         const SizedBox(width: 6),
                         _buildFilterPill(
-                          label: "Confirmadas",
-                          isSelected: _filterStatus == CreditNoteStatus.confirmed,
+                          label: "Emitidas",
+                          isSelected: _filterStatus == CreditNoteStatus.emitted,
                           accentColor: AppThemeTokens.warning,
-                          onTap: () => setState(() => _filterStatus = _filterStatus == CreditNoteStatus.confirmed ? null : CreditNoteStatus.confirmed),
+                          onTap: () => setState(() => _filterStatus = _filterStatus == CreditNoteStatus.emitted ? null : CreditNoteStatus.emitted),
+                        ),
+                        const SizedBox(width: 6),
+                        _buildFilterPill(
+                          label: "Aprobadas",
+                          isSelected: _filterStatus == CreditNoteStatus.approved,
+                          accentColor: AppThemeTokens.teal,
+                          onTap: () => setState(() => _filterStatus = _filterStatus == CreditNoteStatus.approved ? null : CreditNoteStatus.approved),
                         ),
                         const SizedBox(width: 6),
                         _buildFilterPill(
@@ -173,6 +180,13 @@ class _BodyState extends State<_Body> {
                           isSelected: _filterStatus == CreditNoteStatus.applied,
                           accentColor: AppThemeTokens.success,
                           onTap: () => setState(() => _filterStatus = _filterStatus == CreditNoteStatus.applied ? null : CreditNoteStatus.applied),
+                        ),
+                        const SizedBox(width: 6),
+                        _buildFilterPill(
+                          label: "Rechazadas",
+                          isSelected: _filterStatus == CreditNoteStatus.rejected,
+                          accentColor: AppThemeTokens.danger,
+                          onTap: () => setState(() => _filterStatus = _filterStatus == CreditNoteStatus.rejected ? null : CreditNoteStatus.rejected),
                         ),
                       ],
                     ),
@@ -516,15 +530,30 @@ class _CreditNoteItemCardState extends State<_CreditNoteItemCard> {
 
   Widget _buildStatusBadge(CreditNoteStatus status) {
     switch (status) {
+      case CreditNoteStatus.emitted:
+        return AppStatusBadge.warning(
+          label: status.display,
+          icon: Icons.schedule_rounded,
+        );
+      case CreditNoteStatus.approved:
+        return AppStatusBadge.info(
+          label: status.display,
+          icon: Icons.verified_outlined,
+        );
+      case CreditNoteStatus.rejected:
+        return AppStatusBadge.danger(
+          label: status.display,
+          icon: Icons.block_rounded,
+        );
       case CreditNoteStatus.applied:
         return AppStatusBadge.success(
           label: status.display,
           icon: Icons.check_circle_outline_rounded,
         );
       case CreditNoteStatus.confirmed:
-        return AppStatusBadge.warning(
+        return AppStatusBadge.info(
           label: status.display,
-          icon: Icons.access_time_rounded,
+          icon: Icons.verified_outlined,
         );
       case CreditNoteStatus.cancelled:
         return AppStatusBadge.danger(

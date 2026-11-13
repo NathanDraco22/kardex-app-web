@@ -15,6 +15,14 @@ final class CreditNoteCreated extends WriteCreditNoteSuccess {
   CreditNoteCreated(super.item);
 }
 
+final class CreditNoteApproved extends WriteCreditNoteSuccess {
+  CreditNoteApproved(super.item);
+}
+
+final class CreditNoteRejected extends WriteCreditNoteSuccess {
+  CreditNoteRejected(super.item);
+}
+
 final class CreditNoteUpdated extends WriteCreditNoteSuccess {
   CreditNoteUpdated(super.item);
 }

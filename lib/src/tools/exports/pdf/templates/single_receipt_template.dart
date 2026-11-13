@@ -31,6 +31,10 @@ class SingleReceiptTemplate implements PdfTemplate {
               pw.SizedBox(height: 12),
               _buildAppliedDevolutionsSection(),
             ],
+            if (receipt.appliedCreditNotes.isNotEmpty) ...[
+              pw.SizedBox(height: 12),
+              _buildAppliedCreditNotesSection(),
+            ],
             pw.Divider(color: PdfColors.grey400),
             _buildTotals(),
           ];
@@ -313,12 +317,141 @@ class SingleReceiptTemplate implements PdfTemplate {
     );
   }
 
+  pw.Widget _buildAppliedCreditNotesSection() {
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        pw.Text(
+          "NOTAS DE CRÉDITO APLICADAS",
+          style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 11, color: PdfColors.purple800),
+        ),
+        pw.SizedBox(height: 6),
+        pw.Container(
+          padding: const pw.EdgeInsets.symmetric(vertical: 4),
+          decoration: const pw.BoxDecoration(
+            border: pw.Border(bottom: pw.BorderSide(color: PdfColors.grey300, width: 1)),
+          ),
+          child: pw.Row(
+            children: [
+              pw.Expanded(
+                flex: 3,
+                child: pw.Text(
+                  "Número de Nota de Crédito",
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
+                ),
+              ),
+              pw.Expanded(
+                flex: 2,
+                child: pw.Text(
+                  "Monto Aplicado",
+                  textAlign: pw.TextAlign.right,
+                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
+                ),
+              ),
+            ],
+          ),
+        ),
+        ...List.generate(receipt.appliedCreditNotes.length, (index) {
+          final cn = receipt.appliedCreditNotes[index];
+          final isOdd = index % 2 != 0;
+          return pw.Container(
+            padding: const pw.EdgeInsets.symmetric(vertical: 6, horizontal: 2),
+            color: isOdd ? PdfColors.white : PdfColors.grey100,
+            child: pw.Row(
+              children: [
+                pw.Expanded(
+                  flex: 3,
+                  child: pw.Text("Nota de Crédito #${cn.docNumber}", style: const pw.TextStyle(fontSize: 11)),
+                ),
+                pw.Expanded(
+                  flex: 2,
+                  child: pw.Text(
+                    NumberFormatter.convertToMoneyLike(cn.amountApplied),
+                    textAlign: pw.TextAlign.right,
+                    style: const pw.TextStyle(fontSize: 11, fontWeight: pw.FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
   pw.Widget _buildTotals() {
+    final totalInvoices = receipt.appliedInvoices.fold(
+      0,
+      (previousValue, element) => previousValue + element.amountApplied,
+    );
+    final totalDevolutions = receipt.appliedDevolutions.fold(
+      0,
+      (previousValue, element) => previousValue + element.amountApplied,
+    );
+    final totalCreditNotes = receipt.appliedCreditNotes.fold(
+      0,
+      (previousValue, element) => previousValue + element.amountApplied,
+    );
+
     return pw.Container(
       padding: const pw.EdgeInsets.only(top: 8),
       child: pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.end,
         children: [
+          if (totalDevolutions > 0 || totalCreditNotes > 0) ...[
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.end,
+              children: [
+                pw.Text("Total Facturas:", style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey700)),
+                pw.SizedBox(width: 8),
+                pw.SizedBox(
+                  width: 100,
+                  child: pw.Text(
+                    NumberFormatter.convertToMoneyLike(totalInvoices),
+                    style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey700),
+                    textAlign: pw.TextAlign.right,
+                  ),
+                ),
+              ],
+            ),
+            if (totalDevolutions > 0) ...[
+              pw.SizedBox(height: 3),
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.end,
+                children: [
+                  pw.Text("Devoluciones:", style: const pw.TextStyle(fontSize: 10, color: PdfColors.red800)),
+                  pw.SizedBox(width: 8),
+                  pw.SizedBox(
+                    width: 100,
+                    child: pw.Text(
+                      "- ${NumberFormatter.convertToMoneyLike(totalDevolutions)}",
+                      style: const pw.TextStyle(fontSize: 10, color: PdfColors.red800),
+                      textAlign: pw.TextAlign.right,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+            if (totalCreditNotes > 0) ...[
+              pw.SizedBox(height: 3),
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.end,
+                children: [
+                  pw.Text("Notas de Crédito:", style: const pw.TextStyle(fontSize: 10, color: PdfColors.purple800)),
+                  pw.SizedBox(width: 8),
+                  pw.SizedBox(
+                    width: 100,
+                    child: pw.Text(
+                      "- ${NumberFormatter.convertToMoneyLike(totalCreditNotes)}",
+                      style: const pw.TextStyle(fontSize: 10, color: PdfColors.purple800),
+                      textAlign: pw.TextAlign.right,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+            pw.SizedBox(height: 6),
+          ],
           pw.Container(
             padding: const pw.EdgeInsets.all(6),
             decoration: const pw.BoxDecoration(color: PdfColors.grey200),

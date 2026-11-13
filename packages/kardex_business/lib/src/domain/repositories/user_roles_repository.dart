@@ -21,6 +21,11 @@ class UserRolesRepository {
     return response.data;
   }
 
+  Future<ModulesCatalog> getAvailableModules() async {
+    final result = await userRolesDataSource.getAvailableModules();
+    return ModulesCatalog.fromJson(result);
+  }
+
   Future<UserRoleInDb?> getUserRoleById(String userRoleId) async {
     final result = await userRolesDataSource.getUserRoleById(userRoleId);
     if (result == null) return null;

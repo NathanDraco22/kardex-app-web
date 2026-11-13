@@ -104,6 +104,7 @@ class RouteNames {
 
   static const settings = 'settings';
   static const users = 'users';
+  static const roles = 'roles';
   static const productPrice = 'product-price';
   static const branches = 'branches';
   static const integrations = 'integrations';

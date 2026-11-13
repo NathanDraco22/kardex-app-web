@@ -210,4 +210,42 @@ void main() {
       expect(item.invoiceItemIndex, 3);
     });
   });
+
+  group('CreditNoteStatus y Auditoría', () {
+    test('estados tienen display adecuado y parsean correctamente', () {
+      expect(CreditNoteStatus.emitted.display, 'Emitida');
+      expect(CreditNoteStatus.approved.display, 'Aprobada');
+      expect(CreditNoteStatus.rejected.display, 'Rechazada');
+    });
+
+    test('serializa y deserializa campos de auditoría', () {
+      final now = DateTime.now();
+      final note = CreditNoteInDb(
+        id: 'cn-1',
+        branchId: 'branch-1',
+        clientId: 'client-1',
+        clientInfo: ClientInfo(name: 'Cliente', group: 'GENERAL'),
+        type: CreditNoteType.devolution,
+        amount: 500,
+        status: CreditNoteStatus.approved,
+        createdBy: const UserInfo(id: 'u-1', name: 'Creador'),
+        approvedBy: const UserInfo(id: 'u-2', name: 'Aprobador'),
+        approvedAt: now,
+        rejectedBy: const UserInfo(id: 'u-3', name: 'Rechazador'),
+        rejectedAt: now,
+        rejectionReason: 'Motivo prueba',
+        createdAt: now,
+      );
+
+      final json = note.toJson();
+      expect(json['status'], 'approved');
+      expect(json['approvedBy']['name'], 'Aprobador');
+      expect(json['rejectionReason'], 'Motivo prueba');
+
+      final fromJson = CreditNoteInDb.fromJson(json);
+      expect(fromJson.status, CreditNoteStatus.approved);
+      expect(fromJson.approvedBy?.name, 'Aprobador');
+      expect(fromJson.rejectionReason, 'Motivo prueba');
+    });
+  });
 }

@@ -149,7 +149,71 @@ En compras a crédito, las notas de crédito confirmadas funcionan como saldo a 
 
 ---
 
-## 6. Navegación, Rutas y Permisos
+## 6. Ciclo de Vida y Flujo de Aprobación de Notas de Crédito
+
+Las notas de crédito implementan un flujo de dos etapas para prevenir auto-aprobaciones inmediatas y garantizar el control de devoluciones e inventario:
+
+```mermaid
+stateDiagram-v2
+    [*] --> Emitida: Emisión (createCreditNote)
+    Emitida --> Aprobada: Aprobación (CustomSlider)
+    Emitida --> Rechazada: Rechazo (con motivo obligatorio)
+    Aprobada --> Aplicada: Pago / Recibo (ReceiptCreator)
+    Aprobada --> Cancelada: Anulación / Borrado (revierte stock)
+    Rechazada --> [*]
+    Aplicada --> [*]
+    Cancelada --> [*]
+```
+
+### 6.1. Estados y Reglas de Negocio
+1. **Emitida (`emitted`):**
+   - Estado inicial al crear una nota de crédito.
+   - **No afecta stock físico** ni crea transacciones de kárdex (si es por devolución).
+   - **No descuenta saldos** en cuentas por cobrar ni en cobros rápidos.
+   - En la factura original se muestra un aviso informativo sutil de nota pendiente de revisión, sin alterar el saldo deudor.
+2. **Aprobada (`approved`):**
+   - Transición ejecutada mediante `CustomSlider` ("Desliza para Aprobar") en `CreditNoteViewer`.
+   - **Reingresa el stock físico** en inventario de la sucursal y genera el movimiento de kárdex (`type="entry", subtype="credit_note"`).
+   - Se refleja con saldo descontado en la factura asociada (`InvoiceViewer` e `InvoiceAcreditViewer`), calculando el **Total Neto**.
+   - Queda habilitada para ser aplicada como fondo de pago en `ReceiptCreatorScreen` y `FastReceiptLogic`.
+   - Registra auditoría: `approvedBy` (usuario) y `approvedAt` (timestamp).
+3. **Rechazada (`rejected`):**
+   - Requiere ingresar obligatoriamente un motivo en diálogo modal.
+   - No altera inventario ni cuentas por cobrar.
+   - **Oculta por completo** en el visor de facturas y recibos para no generar ruido visual ni confusión.
+   - Registra auditoría: `rejectedBy`, `rejectedAt` y `rejectionReason`.
+4. **Aplicada (`applied`):**
+   - Utilizada como medio de pago amortizando facturas en un recibo. Bloquea su edición o borrado.
+5. **Cancelada (`cancelled`):**
+   - Anulación desde el visor. Solo revierte stock si la nota se encontraba en estado `approved` o `confirmed`.
+
+---
+
+## 7. Reflejo en Facturas y Recibos de Pago
+
+1. **Visor de Facturas (`invoice_viewer.dart` e `invoice_acredit_viewer.dart`):**
+   - Filtra y **omite notas canceladas o rechazadas**.
+   - Las notas aprobadas (`approved` / `confirmed`) se desglosan en color morado (`- $XX.XX`) con acceso directo a su comprobante mediante tap, recalculando el importe neto de la factura.
+   - Las notas pendientes (`emitted`) muestran un badge informativo sin descontar saldo.
+2. **Visor de Recibos (`receipt_viewer.dart`):**
+   - Despliega la sección **"Notas de Crédito Aplicadas"** con folio, fecha, importe y enlace interactivo al visor de la nota.
+   - En el pie de liquidación, desglosa: `Total Facturas`, `Devoluciones (-)`, `Notas de Crédito (-)` y `Total Recibo (Cobrado)`.
+3. **Impresión de Tickets Térmicos (`receipt_printer.dart`):**
+   - Imprime bloque con correlativo de las notas aplicadas y el descuento correspondiente en el resumen de totales (`N. Créd.: -$XX.XX`).
+4. **Plantilla PDF Oficial A4 (`single_receipt_template.dart`):**
+   - Incorpora tabla formal de notas de crédito aplicadas y fila de deducción en el cuadro de totales.
+
+---
+
+## 8. Pendientes y Roadmap Futuro de Aprobación
+
+> [!NOTE] Deuda Técnica y Pendientes de Control de Acceso
+> - **Aprobación Abierta Temporal:** Actualmente cualquier usuario autenticado con acceso al módulo puede aprobar o rechazar notas de crédito.
+> - **Permiso Granular Planificado:** En próximas versiones se implementará el permiso explícito `RolePermission.APPROVE_CREDIT_NOTE` (y su contraparte en backend), restringiendo la aprobación a supervisores de sucursal o gerentes de crédito.
+
+---
+
+## 9. Navegación, Rutas y Permisos
 
 - **Ruta GoRouter:** `/commercial/credit-notes` (nombre canónico: `RouteNames.creditNotes`).
 - **Acceso:** Tarjeta de menú en [`commercial_menu_screen.dart`](file:///c:/Users/sytru/Developer/Projects/kardex_app/kardex_app_front/lib/src/modules/commercial/commercial_menu_screen.dart) con icono `assignment_return_rounded` y color de acento morado.

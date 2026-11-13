@@ -9,6 +9,8 @@ import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_invoice_template.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 import 'package:kardex_app_front/src/tools/row_color_tool.dart';
+import 'package:kardex_app_front/widgets/design_system/design_system.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/credit_note_viewer.dart';
 
 Future<void> showInvoiceViewerDialog(BuildContext context, InvoiceInDb invoice) async {
   FocusManager.instance.primaryFocus?.unfocus();
@@ -180,9 +182,15 @@ class _InvoiceViewer extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 600),
-              child: InvoiceViewerContent(
-                invoice: invoice,
-                branch: branch,
+              child: FutureBuilder<List<CreditNoteInDb>>(
+                future: context.read<CreditNotesRepository>().getCreditNotesByInvoiceId(invoice.id),
+                builder: (context, snapshot) {
+                  return InvoiceViewerContent(
+                    invoice: invoice,
+                    branch: branch,
+                    creditNotes: snapshot.data ?? const [],
+                  );
+                },
               ),
             ),
           ),
@@ -197,10 +205,12 @@ class InvoiceViewerContent extends StatelessWidget {
     super.key,
     required this.invoice,
     required this.branch,
+    this.creditNotes = const [],
   });
 
   final InvoiceInDb invoice;
   final BranchInDb branch;
+  final List<CreditNoteInDb> creditNotes;
 
   @override
   Widget build(BuildContext context) {
@@ -214,6 +224,21 @@ class InvoiceViewerContent extends StatelessWidget {
     );
     final secondaryTotal = NumberFormatter.convertInvoiceTotalToSecondaryMoney(invoice.total);
     final secondaryCurrency = NumberFormatter.secondaryCurrency;
+
+    final visibleCreditNotes = creditNotes.where((cn) =>
+      cn.status != CreditNoteStatus.rejected && cn.status != CreditNoteStatus.cancelled
+    ).toList();
+
+    final approvedCreditNotes = visibleCreditNotes.where((cn) =>
+      cn.status == CreditNoteStatus.approved || cn.status == CreditNoteStatus.confirmed
+    ).toList();
+    final int creditNotesTotal = approvedCreditNotes.fold(0, (sum, cn) => sum + cn.total);
+
+    final pendingApprovalCreditNotes = visibleCreditNotes.where((cn) =>
+      cn.status == CreditNoteStatus.emitted || cn.status == CreditNoteStatus.open
+    ).toList();
+
+    final netInvoiceTotal = (invoice.total - creditNotesTotal) > 0 ? (invoice.total - creditNotesTotal) : 0;
     return Column(
       children: [
         const Text(
@@ -475,12 +500,11 @@ class InvoiceViewerContent extends StatelessWidget {
                 ),
               ),
               const Divider(),
-              SizedBox(
-                height: secondaryTotal != null ? 92 : 65,
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Spacer(),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -498,6 +522,7 @@ class InvoiceViewerContent extends StatelessWidget {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 4),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -515,6 +540,7 @@ class InvoiceViewerContent extends StatelessWidget {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 4),
                     DecoratedBox(
                       decoration: BoxDecoration(color: Colors.grey.shade200),
                       child: Row(
@@ -535,6 +561,137 @@ class InvoiceViewerContent extends StatelessWidget {
                         ],
                       ),
                     ),
+                    if (approvedCreditNotes.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Text(
+                                "Notas de Crédito:",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                  color: AppThemeTokens.purple,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              IconButton(
+                                visualDensity: VisualDensity.compact,
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                                icon: const Icon(
+                                  Icons.visibility_outlined,
+                                  size: 18,
+                                  color: AppThemeTokens.purple,
+                                ),
+                                tooltip: "Ver Nota de Crédito",
+                                onPressed: () {
+                                  if (approvedCreditNotes.length == 1) {
+                                    showCreditNoteViewerDialog(context, approvedCreditNotes.first);
+                                  } else {
+                                    showDialog(
+                                      context: context,
+                                      builder: (ctx) => AlertDialog(
+                                        title: const Text("Notas de Crédito Aprobadas"),
+                                        content: SizedBox(
+                                          width: double.maxFinite,
+                                          child: ListView.builder(
+                                            shrinkWrap: true,
+                                            itemCount: approvedCreditNotes.length,
+                                            itemBuilder: (_, idx) {
+                                              final cn = approvedCreditNotes[idx];
+                                              return ListTile(
+                                                title: Text("NC #${cn.docNumber}"),
+                                                trailing: Text(NumberFormatter.convertToMoneyLike(cn.total)),
+                                                onTap: () {
+                                                  Navigator.pop(ctx);
+                                                  showCreditNoteViewerDialog(context, cn);
+                                                },
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.pop(ctx),
+                                            child: const Text("Cerrar"),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            width: 120,
+                            child: Text(
+                              "- ${NumberFormatter.convertToMoneyLike(creditNotesTotal)}",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                                color: AppThemeTokens.purple,
+                              ),
+                              textAlign: TextAlign.end,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: AppThemeTokens.success.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            const Text(
+                              "Total Neto:",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                fontSize: 16,
+                                color: AppThemeTokens.success,
+                              ),
+                            ),
+                            SizedBox(
+                              width: 120,
+                              child: Text(
+                                NumberFormatter.convertToMoneyLike(netInvoiceTotal),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 16,
+                                  color: AppThemeTokens.success,
+                                ),
+                                textAlign: TextAlign.end,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                    if (pendingApprovalCreditNotes.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Icon(Icons.schedule_rounded, size: 14, color: Colors.amber.shade900),
+                          const SizedBox(width: 4),
+                          Text(
+                            "NC pendientes de aprobación: ${pendingApprovalCreditNotes.length} (no descuenta)",
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.amber.shade900,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                     if (secondaryTotal != null && secondaryCurrency != null) ...[
                       const SizedBox(height: 6),
                       Row(
