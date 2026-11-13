@@ -10,19 +10,21 @@ class CustomSlider extends StatelessWidget {
     required this.sliderColor,
     required this.sliderText,
     required this.onSubmit,
+    this.width,
   });
 
   final String hintText;
   final IconData hintIcon;
   final Color sliderColor;
   final String sliderText;
+  final double? width;
 
   final void Function() onSubmit;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 100,
+      width: width ?? double.infinity,
       child: SlideToSubmit.custom(
         hint: Align(
           alignment: Alignment.centerRight,
@@ -30,14 +32,19 @@ class CustomSlider extends StatelessWidget {
             baseColor: Colors.grey,
             highlightColor: Colors.grey.shade200,
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Text(
-                  hintText,
-                  style: const TextStyle(
-                    color: Colors.grey,
+                Flexible(
+                  child: Text(
+                    hintText,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.grey,
+                    ),
                   ),
                 ),
+                const SizedBox(width: 4),
                 Icon(
                   hintIcon,
                   color: Colors.grey,

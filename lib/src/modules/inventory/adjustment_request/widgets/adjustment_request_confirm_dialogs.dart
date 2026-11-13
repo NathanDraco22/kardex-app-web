@@ -60,12 +60,18 @@ Future<bool> showApproveAdjustmentRequestDialog(
                 ),
               ],
               const SizedBox(height: 20),
-              CustomSlider(
-                hintText: 'Desliza para Aprobar',
-                hintIcon: Icons.verified_outlined,
-                sliderColor: AppThemeTokens.success,
-                sliderText: 'Aprobar',
-                onSubmit: () => Navigator.of(context).pop(true),
+              Row(
+                children: [
+                  Expanded(
+                    child: CustomSlider(
+                      hintText: 'Desliza para Aprobar',
+                      hintIcon: Icons.verified_outlined,
+                      sliderColor: AppThemeTokens.success,
+                      sliderText: 'Aprobar',
+                      onSubmit: () => Navigator.of(context).pop(true),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
