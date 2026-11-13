@@ -1,4 +1,5 @@
 import 'package:kardex_business/src/data/credit_note_data_source.dart';
+import 'package:kardex_business/src/domain/models/common/user_info.dart';
 import 'package:kardex_business/src/domain/models/credit_note/credit_note.dart';
 import 'package:kardex_business/src/domain/query_params/credit_note_query_params.dart';
 import 'package:kardex_business/src/domain/responses/list_responses.dart';
@@ -69,5 +70,31 @@ class CreditNotesRepository with ReactiveRepository<CreditNoteInDb> {
     final deleted = CreditNoteInDb.fromJson(result);
     notifyItemDeleted(deleted);
     return deleted;
+  }
+
+  Future<CreditNoteInDb> approveCreditNote(
+    String creditNoteId,
+    UserInfo approvedBy,
+  ) async {
+    final result = await creditNotesDataSource.approveCreditNote(creditNoteId, {
+      'approvedBy': approvedBy.toJson(),
+    });
+    final updated = CreditNoteInDb.fromJson(result);
+    notifyItemUpdated(updated);
+    return updated;
+  }
+
+  Future<CreditNoteInDb> rejectCreditNote(
+    String creditNoteId,
+    UserInfo rejectedBy,
+    String reason,
+  ) async {
+    final result = await creditNotesDataSource.rejectCreditNote(creditNoteId, {
+      'rejectedBy': rejectedBy.toJson(),
+      'reason': reason,
+    });
+    final updated = CreditNoteInDb.fromJson(result);
+    notifyItemUpdated(updated);
+    return updated;
   }
 }

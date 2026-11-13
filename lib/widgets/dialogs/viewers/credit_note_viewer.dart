@@ -10,6 +10,7 @@ import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
+import 'package:kardex_app_front/widgets/custom_slider.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 Future<void> showCreditNoteViewerDialog(BuildContext context, CreditNoteInDb creditNote) async {
@@ -138,36 +139,7 @@ class _CreditNoteViewer extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: creditNote.status != CreditNoteStatus.applied
-          ? BottomAppBar(
-              height: 68,
-              color: Colors.white,
-              surfaceTintColor: Colors.transparent,
-              elevation: 4,
-              child: Center(
-                child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppThemeTokens.danger,
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: AppThemeTokens.borderRadiusMd,
-                    ),
-                  ),
-                  onPressed: () => _handleDelete(context, totalFormatted),
-                  icon: const Icon(Icons.delete_outline_rounded, size: 20),
-                  label: const Text(
-                    "Borrar Nota de Crédito",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-              ),
-            )
-          : null,
+      bottomNavigationBar: _buildBottomBar(context, totalFormatted),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -339,6 +311,99 @@ class _CreditNoteViewer extends StatelessWidget {
                                       fontSize: 12,
                                     ),
                                   ),
+                                ],
+                              ),
+                            ),
+                          ],
+                          if (creditNote.status == CreditNoteStatus.emitted) ...[
+                            const SizedBox(height: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: AppThemeTokens.warning.withValues(alpha: 0.12),
+                                borderRadius: AppThemeTokens.borderRadiusSm,
+                                border: Border.all(color: AppThemeTokens.warning.withValues(alpha: 0.3)),
+                              ),
+                              child: const Row(
+                                children: [
+                                  Icon(Icons.info_outline_rounded, size: 16, color: AppThemeTokens.warning),
+                                  SizedBox(width: 6),
+                                  Expanded(
+                                    child: Text(
+                                      "Emitida y pendiente de aprobación. No afecta inventario ni descuenta de la factura hasta ser aprobada.",
+                                      style: TextStyle(
+                                        color: AppThemeTokens.warning,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                          if (creditNote.approvedBy != null) ...[
+                            const SizedBox(height: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: AppThemeTokens.info.withValues(alpha: 0.1),
+                                borderRadius: AppThemeTokens.borderRadiusSm,
+                                border: Border.all(color: AppThemeTokens.info.withValues(alpha: 0.3)),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.verified_outlined, size: 16, color: AppThemeTokens.info),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    "Aprobada por ${creditNote.approvedBy!.name}${creditNote.approvedAt != null ? ' el ${DateTimeTool.formatddMMyy(creditNote.approvedAt!)}' : ''}",
+                                    style: const TextStyle(
+                                      color: AppThemeTokens.info,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                          if (creditNote.status == CreditNoteStatus.rejected) ...[
+                            const SizedBox(height: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: AppThemeTokens.danger.withValues(alpha: 0.1),
+                                borderRadius: AppThemeTokens.borderRadiusSm,
+                                border: Border.all(color: AppThemeTokens.danger.withValues(alpha: 0.3)),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.block_rounded, size: 16, color: AppThemeTokens.danger),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        "Rechazada por ${creditNote.rejectedBy?.name ?? 'Usuario'}",
+                                        style: const TextStyle(
+                                          color: AppThemeTokens.danger,
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  if (creditNote.rejectionReason != null && creditNote.rejectionReason!.isNotEmpty) ...[
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      "Motivo: ${creditNote.rejectionReason}",
+                                      style: TextStyle(
+                                        color: Colors.red.shade900,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
                                 ],
                               ),
                             ),
@@ -579,6 +644,238 @@ class _CreditNoteViewer extends StatelessWidget {
     );
   }
 
+  Widget? _buildBottomBar(BuildContext context, String totalFormatted) {
+    if (creditNote.status == CreditNoteStatus.emitted) {
+      return BottomAppBar(
+        height: 70,
+        color: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        elevation: 4,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppThemeTokens.danger,
+                side: const BorderSide(color: AppThemeTokens.danger),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: AppThemeTokens.borderRadiusMd,
+                ),
+              ),
+              onPressed: () => _handleReject(context),
+              icon: const Icon(Icons.close_rounded, size: 18),
+              label: const Text(
+                "Rechazar",
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ),
+            const SizedBox(width: 14),
+            FilledButton.icon(
+              style: FilledButton.styleFrom(
+                backgroundColor: AppThemeTokens.success,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: AppThemeTokens.borderRadiusMd,
+                ),
+              ),
+              onPressed: () => _handleApprove(context),
+              icon: const Icon(Icons.check_circle_outline_rounded, size: 18),
+              label: const Text(
+                "Aprobar Nota",
+                style: TextStyle(fontWeight: FontWeight.w700),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (creditNote.status == CreditNoteStatus.approved ||
+        creditNote.status == CreditNoteStatus.confirmed ||
+        creditNote.status == CreditNoteStatus.open) {
+      return BottomAppBar(
+        height: 68,
+        color: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        elevation: 4,
+        child: Center(
+          child: ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppThemeTokens.danger,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: AppThemeTokens.borderRadiusMd,
+              ),
+            ),
+            onPressed: () => _handleDelete(context, totalFormatted),
+            icon: const Icon(Icons.delete_outline_rounded, size: 20),
+            label: const Text(
+              "Borrar Nota de Crédito",
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return null;
+  }
+
+  Future<void> _handleApprove(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        title: const Text("Aprobar Nota de Crédito"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "¿Confirmas la aprobación de la Nota de Crédito #${creditNote.docNumber}?",
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+            if (creditNote.type == CreditNoteType.devolution) ...[
+              const SizedBox(height: 10),
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.blue.shade200),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.inventory_2_outlined, color: Colors.blue.shade800, size: 18),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        "Los artículos devueltos se reingresarán automáticamente al stock disponible en el Kárdex.",
+                        style: TextStyle(fontSize: 12, color: Colors.blue.shade900),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: CustomSlider(
+                    hintText: "Desliza para Aprobar",
+                    hintIcon: Icons.verified_outlined,
+                    sliderColor: AppThemeTokens.success,
+                    sliderText: "Aprobar",
+                    onSubmit: () => Navigator.of(dialogCtx).pop(true),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogCtx).pop(false),
+            child: const Text("Cancelar"),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+    if (!context.mounted) return;
+
+    final authState = getIt<AuthCubit>().state;
+    if (authState is! Authenticated) return;
+    final currentUser = authState.session.user;
+    final userInfo = UserInfo(id: currentUser.id, name: currentUser.username);
+
+    try {
+      LoadingDialogManager.showLoadingDialog(context);
+      await context.read<CreditNotesRepository>().approveCreditNote(creditNote.id, userInfo);
+      if (!context.mounted) return;
+      LoadingDialogManager.closeLoadingDialog(context);
+      Navigator.pop(context);
+      await DialogManager.showInfoDialog(context, "Nota de crédito aprobada correctamente.");
+    } catch (e) {
+      if (!context.mounted) return;
+      LoadingDialogManager.closeLoadingDialog(context);
+      await DialogManager.showErrorDialog(context, "Error al aprobar: $e");
+    }
+  }
+
+  Future<void> _handleReject(BuildContext context) async {
+    final reasonController = TextEditingController();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        title: const Text("Rechazar Nota de Crédito"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Ingresa el motivo del rechazo de la Nota de Crédito #${creditNote.docNumber}:"),
+            const SizedBox(height: 12),
+            TextField(
+              controller: reasonController,
+              decoration: const InputDecoration(
+                hintText: "Motivo del rechazo...",
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 2,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogCtx).pop(false),
+            child: const Text("Cancelar"),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: AppThemeTokens.danger),
+            onPressed: () {
+              if (reasonController.text.trim().isEmpty) return;
+              Navigator.of(dialogCtx).pop(true);
+            },
+            child: const Text("Rechazar"),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+    if (!context.mounted) return;
+
+    final authState = getIt<AuthCubit>().state;
+    if (authState is! Authenticated) return;
+    final currentUser = authState.session.user;
+    final userInfo = UserInfo(id: currentUser.id, name: currentUser.username);
+
+    try {
+      LoadingDialogManager.showLoadingDialog(context);
+      await context.read<CreditNotesRepository>().rejectCreditNote(
+        creditNote.id,
+        userInfo,
+        reasonController.text.trim(),
+      );
+      if (!context.mounted) return;
+      LoadingDialogManager.closeLoadingDialog(context);
+      Navigator.pop(context);
+      await DialogManager.showInfoDialog(context, "Nota de crédito rechazada.");
+    } catch (e) {
+      if (!context.mounted) return;
+      LoadingDialogManager.closeLoadingDialog(context);
+      await DialogManager.showErrorDialog(context, "Error al rechazar: $e");
+    }
+  }
+
   Future<void> _handleDelete(BuildContext context, String totalFormatted) async {
     final isDev = creditNote.type == CreditNoteType.devolution;
     final warningMsg = isDev
@@ -609,15 +906,30 @@ class _CreditNoteViewer extends StatelessWidget {
 
   Widget _buildStatusBadge(CreditNoteStatus status) {
     switch (status) {
+      case CreditNoteStatus.emitted:
+        return AppStatusBadge.warning(
+          label: status.display,
+          icon: Icons.schedule_rounded,
+        );
+      case CreditNoteStatus.approved:
+        return AppStatusBadge.info(
+          label: status.display,
+          icon: Icons.verified_outlined,
+        );
+      case CreditNoteStatus.rejected:
+        return AppStatusBadge.danger(
+          label: status.display,
+          icon: Icons.block_rounded,
+        );
       case CreditNoteStatus.applied:
         return AppStatusBadge.success(
           label: status.display,
           icon: Icons.check_circle_outline_rounded,
         );
       case CreditNoteStatus.confirmed:
-        return AppStatusBadge.warning(
+        return AppStatusBadge.info(
           label: status.display,
-          icon: Icons.access_time_rounded,
+          icon: Icons.verified_outlined,
         );
       case CreditNoteStatus.cancelled:
         return AppStatusBadge.danger(

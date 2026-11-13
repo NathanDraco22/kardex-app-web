@@ -13,14 +13,18 @@ class FastReceiptLogic {
     PaymentMethod paymentMethod = PaymentMethod.cash,
     String bankReference = "",
   }) {
-    if (paymentAmountCents <= 0 && devolutions.isEmpty && creditNotes.isEmpty) {
+    final validCreditNotes = creditNotes.where((cn) =>
+      cn.status == CreditNoteStatus.approved || cn.status == CreditNoteStatus.confirmed
+    ).toList();
+
+    if (paymentAmountCents <= 0 && devolutions.isEmpty && validCreditNotes.isEmpty) {
       return (null, "Debe existir al menos un monto en efectivo, devoluciones o notas de crédito pendientes para abonar.");
     }
 
     final totalInvoicesDebt = invoices.fold(0, (sum, inv) => sum + (inv.total - inv.amountPaid));
     final totalDevolutions = devolutions.fold(0, (sum, dev) => sum + dev.total);
     final netInvoicesDebt = totalInvoicesDebt - totalDevolutions;
-    final totalCreditNotes = creditNotes.fold(0, (sum, cn) => sum + cn.total);
+    final totalCreditNotes = validCreditNotes.fold(0, (sum, cn) => sum + cn.total);
 
     if (totalCreditNotes > 0 && totalCreditNotes > netInvoicesDebt) {
       return (
@@ -71,7 +75,7 @@ class FastReceiptLogic {
       }
 
       // 2. Linked credit notes
-      final linkedCreditNotes = creditNotes.where(
+      final linkedCreditNotes = validCreditNotes.where(
         (cn) =>
             !usedCreditNoteIds.contains(cn.id) &&
             (cn.invoiceId == invoice.id || (cn.invoiceDocNumber.isNotEmpty && cn.invoiceDocNumber == invoice.docNumber)),

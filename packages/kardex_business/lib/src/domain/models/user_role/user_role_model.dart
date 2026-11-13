@@ -56,6 +56,7 @@ class UserRoleInDb extends BaseUserRole {
   final String id;
   final DateTime createdAt;
   final DateTime? updatedAt;
+  final bool isDefault;
 
   UserRoleInDb({
     required this.id,
@@ -63,6 +64,7 @@ class UserRoleInDb extends BaseUserRole {
     required super.access,
     required this.createdAt,
     this.updatedAt,
+    this.isDefault = false,
   });
 
   factory UserRoleInDb.fromJson(Map<String, dynamic> json) {
@@ -71,7 +73,8 @@ class UserRoleInDb extends BaseUserRole {
       name: json['name'] as String,
       access: List<String>.from(json['access'] as List),
       createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
-      updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updated_at'] as int) : null,
+      updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt'] as int) : null,
+      isDefault: json['isDefault'] as bool? ?? false,
     );
   }
 
@@ -82,7 +85,74 @@ class UserRoleInDb extends BaseUserRole {
       'id': id,
       'createdAt': createdAt.millisecondsSinceEpoch,
       'updatedAt': updatedAt?.millisecondsSinceEpoch,
+      'isDefault': isDefault,
     });
     return data;
+  }
+}
+
+class SubModuleDefinition {
+  final String key;
+  final String name;
+  final String description;
+
+  const SubModuleDefinition({
+    required this.key,
+    required this.name,
+    required this.description,
+  });
+
+  factory SubModuleDefinition.fromJson(Map<String, dynamic> json) {
+    return SubModuleDefinition(
+      key: json['key'] as String,
+      name: json['name'] as String,
+      description: json['description'] as String? ?? '',
+    );
+  }
+}
+
+class ModuleDefinition {
+  final String key;
+  final String name;
+  final String description;
+  final List<SubModuleDefinition> submodules;
+
+  const ModuleDefinition({
+    required this.key,
+    required this.name,
+    required this.description,
+    this.submodules = const [],
+  });
+
+  factory ModuleDefinition.fromJson(Map<String, dynamic> json) {
+    final rawSubmodules = json['submodules'] as List? ?? [];
+    return ModuleDefinition(
+      key: json['key'] as String,
+      name: json['name'] as String,
+      description: json['description'] as String? ?? '',
+      submodules: rawSubmodules
+          .map((e) => SubModuleDefinition.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}
+
+class ModulesCatalog {
+  final String allAccessKey;
+  final List<ModuleDefinition> modules;
+
+  const ModulesCatalog({
+    required this.allAccessKey,
+    required this.modules,
+  });
+
+  factory ModulesCatalog.fromJson(Map<String, dynamic> json) {
+    final rawModules = json['modules'] as List? ?? [];
+    return ModulesCatalog(
+      allAccessKey: json['allAccessKey'] as String? ?? 'all',
+      modules: rawModules
+          .map((e) => ModuleDefinition.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
   }
 }

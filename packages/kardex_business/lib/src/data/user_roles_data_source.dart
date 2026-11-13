@@ -24,6 +24,13 @@ class UserRolesDataSource with HttpService {
     return res;
   }
 
+  Future<Map<String, dynamic>> getAvailableModules() async {
+    final uri = HttpTools.generateUri("$_endpoint/modules");
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
+    return res;
+  }
+
   Future<Map<String, dynamic>?> getUserRoleById(String userRoleId) async {
     final uri = HttpTools.generateUri("$_endpoint/$userRoleId");
     final headers = HttpTools.generateAuthHeaders();

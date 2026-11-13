@@ -844,6 +844,13 @@ List<HomeModuleCategory> getHomeModuleCategories(
           routeName: "users",
         ),
         const HomeSubmoduleItem(
+          title: "Roles y Permisos",
+          subtitle: "Creación de roles y control de acceso por módulo",
+          icon: Icons.admin_panel_settings_rounded,
+          accentColor: Color(0xFF4F46E5),
+          routeName: RouteNames.roles,
+        ),
+        const HomeSubmoduleItem(
           title: "Ramas / Sucursales",
           subtitle: "Gestión de sedes, almacenes y parámetros",
           icon: Icons.other_houses,

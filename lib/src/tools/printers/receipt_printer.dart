@@ -41,6 +41,10 @@ Future<Uint8List> generateTicketPdfFromReceipt(
     0,
     (previousValue, element) => previousValue + element.amountApplied,
   );
+  final totalCreditNote = receipt.appliedCreditNotes.fold(
+    0,
+    (previousValue, element) => previousValue + element.amountApplied,
+  );
 
   final logoSize = TicketSettings.logoSize(paperSize);
 
@@ -216,6 +220,44 @@ Future<Uint8List> generateTicketPdfFromReceipt(
               }).toList(),
             ),
 
+            if (receipt.appliedCreditNotes.isNotEmpty) pw.Divider(color: PdfColors.grey800),
+
+            if (receipt.appliedCreditNotes.isNotEmpty)
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Text(
+                    'N. Créd.',
+                    style: pw.TextStyle(fontSize: TicketSettings.contentFontSize(paperSize)),
+                  ),
+                  pw.Text(
+                    "Monto",
+                    style: pw.TextStyle(fontSize: TicketSettings.contentFontSize(paperSize)),
+                  ),
+                ],
+              ),
+            if (receipt.appliedCreditNotes.isNotEmpty)
+              pw.Column(
+                children: receipt.appliedCreditNotes.map((creditNote) {
+                  return pw.Padding(
+                    padding: const pw.EdgeInsets.symmetric(vertical: 2),
+                    child: pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        pw.Text(
+                          '#${creditNote.docNumber}',
+                          style: pw.TextStyle(fontSize: TicketSettings.contentFontSize(paperSize)),
+                        ),
+                        pw.Text(
+                          NumberFormatter.convertToMoneyLike(creditNote.amountApplied),
+                          style: pw.TextStyle(fontSize: TicketSettings.contentFontSize(paperSize)),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
+
             pw.Divider(color: PdfColors.grey800),
 
             pw.Row(
@@ -243,30 +285,57 @@ Future<Uint8List> generateTicketPdfFromReceipt(
               ],
             ),
 
-            pw.Row(
-              mainAxisAlignment: pw.MainAxisAlignment.end,
-              children: [
-                pw.Text(
-                  'Devol.: ',
-                  style: pw.TextStyle(
-                    fontWeight: pw.FontWeight.bold,
-                    fontSize: TicketSettings.contentFontSize(paperSize),
-                  ),
-                ),
-
-                pw.SizedBox(
-                  width: 80,
-                  child: pw.Text(
-                    NumberFormatter.convertToMoneyLike(totalDevolution),
+            if (totalDevolution > 0)
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.end,
+                children: [
+                  pw.Text(
+                    'Devol.: ',
                     style: pw.TextStyle(
                       fontWeight: pw.FontWeight.bold,
                       fontSize: TicketSettings.contentFontSize(paperSize),
                     ),
-                    textAlign: pw.TextAlign.right,
                   ),
-                ),
-              ],
-            ),
+
+                  pw.SizedBox(
+                    width: 80,
+                    child: pw.Text(
+                      '-${NumberFormatter.convertToMoneyLike(totalDevolution)}',
+                      style: pw.TextStyle(
+                        fontWeight: pw.FontWeight.bold,
+                        fontSize: TicketSettings.contentFontSize(paperSize),
+                      ),
+                      textAlign: pw.TextAlign.right,
+                    ),
+                  ),
+                ],
+              ),
+
+            if (totalCreditNote > 0)
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.end,
+                children: [
+                  pw.Text(
+                    'N. Créd.: ',
+                    style: pw.TextStyle(
+                      fontWeight: pw.FontWeight.bold,
+                      fontSize: TicketSettings.contentFontSize(paperSize),
+                    ),
+                  ),
+
+                  pw.SizedBox(
+                    width: 80,
+                    child: pw.Text(
+                      '-${NumberFormatter.convertToMoneyLike(totalCreditNote)}',
+                      style: pw.TextStyle(
+                        fontWeight: pw.FontWeight.bold,
+                        fontSize: TicketSettings.contentFontSize(paperSize),
+                      ),
+                      textAlign: pw.TextAlign.right,
+                    ),
+                  ),
+                ],
+              ),
 
             pw.SizedBox(height: 4),
 

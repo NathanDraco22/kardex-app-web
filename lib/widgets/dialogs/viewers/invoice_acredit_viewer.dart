@@ -117,11 +117,23 @@ class _InvoiceAcreditViewer extends StatelessWidget {
     final targetDevolution = devolutions.where((d) => d.originalInvoiceId == invoice.id).toList();
     final int devolutionsTotal = targetDevolution.fold(0, (sum, d) => sum + d.total);
 
-    final targetCreditNotes = creditNotes.where((cn) =>
-      cn.invoiceId == invoice.id ||
-      (cn.invoiceDocNumber.isNotEmpty && cn.invoiceDocNumber == invoice.docNumber)
+    final visibleCreditNotes = creditNotes.where((cn) {
+      final isMatchingInvoice = cn.invoiceId == invoice.id ||
+          (cn.invoiceDocNumber.isNotEmpty && cn.invoiceDocNumber == invoice.docNumber);
+      if (!isMatchingInvoice) return false;
+      // Las rechazadas o canceladas no se ven
+      return cn.status != CreditNoteStatus.rejected && cn.status != CreditNoteStatus.cancelled;
+    }).toList();
+
+    // Solo las aprobadas (o confirmed) se descuentan del saldo
+    final approvedCreditNotes = visibleCreditNotes.where((cn) =>
+      cn.status == CreditNoteStatus.approved || cn.status == CreditNoteStatus.confirmed
     ).toList();
-    final int creditNotesTotal = targetCreditNotes.fold(0, (sum, cn) => sum + cn.total);
+    final int creditNotesTotal = approvedCreditNotes.fold(0, (sum, cn) => sum + cn.total);
+
+    final pendingApprovalCreditNotes = visibleCreditNotes.where((cn) =>
+      cn.status == CreditNoteStatus.emitted || cn.status == CreditNoteStatus.open
+    ).toList();
 
     final int netDebtBeforeCreditNotes = invoice.totalRemaining - devolutionsTotal;
     final bool isCreditNotesExceeding = creditNotesTotal > 0 && creditNotesTotal > netDebtBeforeCreditNotes;
@@ -187,9 +199,9 @@ class _InvoiceAcreditViewer extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     AppStatusBadge.purple(
-                      label: targetCreditNotes.length == 1
-                          ? "1 nota"
-                          : "${targetCreditNotes.length} notas",
+                      label: approvedCreditNotes.length == 1
+                          ? "1 aprobada"
+                          : "${approvedCreditNotes.length} aprobadas",
                     ),
                   ],
                 ),
@@ -215,10 +227,65 @@ class _InvoiceAcreditViewer extends StatelessWidget {
                       ),
                       tooltip: "Ver Nota de Crédito",
                       onPressed: () {
-                        if (targetCreditNotes.length == 1) {
-                          showCreditNoteViewerDialog(context, targetCreditNotes.first);
+                        if (approvedCreditNotes.length == 1) {
+                          showCreditNoteViewerDialog(context, approvedCreditNotes.first);
                         } else {
-                          _showCreditNotesSelector(context, targetCreditNotes);
+                          _showCreditNotesSelector(context, approvedCreditNotes);
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+          if (pendingApprovalCreditNotes.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      "NC Emitidas (Pendientes):",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.amber.shade900,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    AppStatusBadge.warning(
+                      label: "${pendingApprovalCreditNotes.length} por aprobar",
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Text(
+                      "No descuenta aún",
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.amber.shade900,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    IconButton(
+                      visualDensity: VisualDensity.compact,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      icon: Icon(
+                        Icons.visibility_outlined,
+                        size: 20,
+                        color: Colors.amber.shade900,
+                      ),
+                      tooltip: "Ver Notas Emitidas",
+                      onPressed: () {
+                        if (pendingApprovalCreditNotes.length == 1) {
+                          showCreditNoteViewerDialog(context, pendingApprovalCreditNotes.first);
+                        } else {
+                          _showCreditNotesSelector(context, pendingApprovalCreditNotes);
                         }
                       },
                     ),

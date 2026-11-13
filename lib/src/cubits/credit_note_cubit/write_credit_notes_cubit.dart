@@ -22,4 +22,38 @@ class WriteCreditNoteCubit extends Cubit<WriteCreditNoteState> {
       return null;
     }
   }
+
+  Future<CreditNoteInDb?> approve(String id, UserInfo approvedBy) async {
+    emit(WritingCreditNote());
+    try {
+      final item = await _repository.approveCreditNote(id, approvedBy);
+      if (isClosed) return item;
+      emit(CreditNoteApproved(item));
+      emit(WriteCreditNoteInitial());
+      return item;
+    } catch (error) {
+      if (isClosed) return null;
+      emit(WriteCreditNoteError(error.toString()));
+      return null;
+    }
+  }
+
+  Future<CreditNoteInDb?> reject(
+    String id,
+    UserInfo rejectedBy,
+    String reason,
+  ) async {
+    emit(WritingCreditNote());
+    try {
+      final item = await _repository.rejectCreditNote(id, rejectedBy, reason);
+      if (isClosed) return item;
+      emit(CreditNoteRejected(item));
+      emit(WriteCreditNoteInitial());
+      return item;
+    } catch (error) {
+      if (isClosed) return null;
+      emit(WriteCreditNoteError(error.toString()));
+      return null;
+    }
+  }
 }

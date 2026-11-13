@@ -93,6 +93,7 @@ import 'package:kardex_app_front/src/modules/settings/view/branches/branches_scr
 
 import 'package:kardex_app_front/src/modules/settings/view/settings_screen.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/units_and_scales/units_and_scales_screen.dart';
+import 'package:kardex_app_front/src/modules/settings/view/roles/roles_screen.dart';
 import 'package:kardex_app_front/src/modules/settings/view/users/users_screen.dart';
 import 'package:kardex_app_front/src/modules/inactive/inactive_screen.dart';
 import 'package:kardex_app_front/src/modules/splash/splash_screen.dart';
@@ -721,6 +722,11 @@ class AppRouter {
             builder: (context, state) => const UsersScreen(),
           ),
           /*
+          GoRoute(
+            path: "roles",
+            name: "roles",
+            builder: (context, state) => const RolesScreen(),
+          ),
           GoRoute(
             path: "product-price",
             name: "product-price",

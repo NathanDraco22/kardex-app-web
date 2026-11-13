@@ -65,6 +65,16 @@ class _Body extends StatelessWidget {
               ),
             ),
             ShortcutAddableListTile(
+              routeName: RouteNames.roles,
+              child: MenuOptionCard(
+                icon: Icons.admin_panel_settings_rounded,
+                accentColor: Colors.indigo.shade600,
+                title: "Roles y Permisos",
+                subtitle: "Creación de roles y control de acceso por módulo",
+                onTap: () => context.pushNamed(RouteNames.roles),
+              ),
+            ),
+            ShortcutAddableListTile(
               routeName: RouteNames.branches,
               child: MenuOptionCard(
                 icon: Icons.other_houses,

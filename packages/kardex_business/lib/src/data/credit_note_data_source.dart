@@ -71,4 +71,22 @@ class CreditNotesDataSource with HttpService {
     final header = HttpTools.generateAuthHeaders();
     return await deleteQuery(uri, headers: header);
   }
+
+  Future<Map<String, dynamic>> approveCreditNote(
+    String creditNoteId,
+    Map<String, dynamic> body,
+  ) async {
+    final uri = HttpTools.generateUri("$_endpoint/$creditNoteId/approve");
+    final headers = HttpTools.generateAuthHeaders();
+    return await postQuery(uri, body, headers: headers);
+  }
+
+  Future<Map<String, dynamic>> rejectCreditNote(
+    String creditNoteId,
+    Map<String, dynamic> body,
+  ) async {
+    final uri = HttpTools.generateUri("$_endpoint/$creditNoteId/reject");
+    final headers = HttpTools.generateAuthHeaders();
+    return await postQuery(uri, body, headers: headers);
+  }
 }
