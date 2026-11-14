@@ -159,8 +159,18 @@ class _ContentSection extends StatelessWidget {
             BasicTableCell(
               content: SecondaryMenuButton(
                 onPressed: () async {
-                  if (currentInvoice.clientId != kSaleClientId && currentInvoice.amountPaid > 0) {
-                    DialogManager.showInfoDialog(context, "Los clientes de crédito con facturas abonadas no pueden hacer devoluciones de productos");
+                  if (currentInvoice.status == InvoiceStatus.cancelled) {
+                    DialogManager.showInfoDialog(
+                      context,
+                      "No se pueden realizar devoluciones sobre facturas canceladas.",
+                    );
+                    return;
+                  }
+                  if (currentInvoice.paymentType == PaymentType.credit) {
+                    DialogManager.showInfoDialog(
+                      context,
+                      "Las facturas a crédito deben procesarse desde el módulo de Notas de Crédito.",
+                    );
                     return;
                   }
                   final result = await context
