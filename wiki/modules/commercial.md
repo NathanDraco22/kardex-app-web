@@ -97,7 +97,7 @@ lib/src/modules/commercial/
 
 ## 3. Repositorios y Fuentes de Datos Involucrados
 
-| Concepto | DataSource (`lib/src/data/`) | Repositorio (`lib/src/domain/repositories/`) |
+| Concepto | DataSource (`packages/kardex_business/lib/src/data/`) | Repositorio (`packages/kardex_business/lib/src/domain/repositories/`) |
 | :--- | :--- | :--- |
 | Facturas | `InvoiceDataSource` | `InvoiceRepository` |
 | Recibos | `ReceiptDataSource` | `ReceiptRepository` |

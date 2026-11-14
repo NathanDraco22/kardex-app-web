@@ -23,10 +23,10 @@ lib/src/modules/imports/
 
 Capa de datos en `packages/kardex_business`:
 
-- `lib/src/data/imports_data_source.dart`
-- `lib/src/domain/repositories/imports_repository.dart`
-- `lib/src/domain/models/imports/import_result.dart`
-- `lib/src/domain/models/imports/import_type.dart`
+- `packages/kardex_business/lib/src/data/imports_data_source.dart`
+- `packages/kardex_business/lib/src/domain/repositories/imports_repository.dart`
+- `packages/kardex_business/lib/src/domain/models/imports/import_result.dart`
+- `packages/kardex_business/lib/src/domain/models/imports/import_type.dart`
 
 ---
 

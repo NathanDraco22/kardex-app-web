@@ -2,6 +2,10 @@
 
 Este documento ofrece un panorama general y conciso de cada uno de los módulos funcionales que componen **Kardex App Front**. Su objetivo es permitir a desarrolladores y agentes de IA comprender a grandes rasgos qué hace cada módulo, su rol en el negocio y acceder directamente a su documentación técnica detallada.
 
+> **Punto de entrada:** [`../INDEX.md`](../INDEX.md) — estructura del proyecto, dónde está cada cosa y enlaces por tema.
+>
+> Si ya sabes qué módulo te toca, usa la tabla siguiente para abrir su ficha o su carpeta en `lib/src/modules/`.
+
 ---
 
 ## 🧭 Mapa General de Módulos

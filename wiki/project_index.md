@@ -2,8 +2,18 @@
 
 Bienvenido a la documentación arquitectónica y técnica de **Kardex App Front**. 
 
+> **Navegación rápida para agentes**
+>
+> - 🧭 [`INDEX.md`](./INDEX.md) — hub: estructura, dónde está cada cosa y catálogo de enlaces.
+> - 🧱 [`conventions.md`](./conventions.md) — capas, naming, UI y verificación.
+> - 🔐 [`security.md`](./security.md) — sesión, permisos y guards.
+> - ⚙️ [`operations.md`](./operations.md) — ejecución, defines y builds.
+> - 🗂️ [`modules/modules_index.md`](./modules/modules_index.md) — catálogo de módulos.
+>
+> Este documento sigue siendo la referencia de la **arquitectura Onion / BLoC** y del ciclo de vida global.
+
 > [!IMPORTANT]
-> **Lectura Obligatoria:** Cualquier desarrollador o agente de Inteligencia Artificial que trabaje en esta aplicación **DEBE leer este documento y [modules_index.md](./modules/modules_index.md) antes de realizar cualquier acción, análisis o modificación de código**.
+> **Lectura Obligatoria:** Cualquier desarrollador o agente de Inteligencia Artificial que trabaje en esta aplicación **DEBE leer [`INDEX.md`](./INDEX.md) antes de realizar cualquier acción, análisis o modificación de código**.
 
 > [!IMPORTANT]
 > **Regla de ediciones `main` / `lite`:** todo cambio realizado en `main` debe evaluarse explícitamente para `lite` antes de darse por terminado. Consulta el flujo y las reglas en [ramas_main_vs_lite.md](./ramas_main_vs_lite.md#8-reglas-para-desarrollo-y-mantenimiento).
@@ -35,15 +45,15 @@ flowchart TD
 ```
 
 ### Reglas por Capa:
-1. **Modelos (`lib/src/domain/models/` o paquete `kardex_business`):**
+1. **Modelos (`packages/kardex_business/lib/src/domain/models/`):**
    - Entidades inmutables fuertemente tipadas.
    - Proveen métodos `fromJson()`, `toJson()` y `copyWith()`.
    - **Regla:** No contienen lógica de llamadas de red ni estado mutable.
-2. **DataSources (`lib/src/data/`):**
-   - Son **Singletons** que mezclan `with HttpService`.
+2. **DataSources (`packages/kardex_business/lib/src/data/`):**
+   - Clases con `with HttpService` (se instancian en `lib/provider_container.dart`).
    - Utilizan `HttpTools.generateUri(_endpoint)` y `HttpTools.generateAuthHeaders()`.
    - **Regla:** Retornan únicamente `Map<String, dynamic>`. No conocen los modelos de dominio.
-3. **Repositorios (`lib/src/domain/repositories/`):**
+3. **Repositorios (`packages/kardex_business/lib/src/domain/repositories/`):**
    - Representan la fuente de verdad en memoria de la aplicación.
    - Reciben los mapas crudos de los DataSources y los transforman en modelos de dominio mediante `.fromJson()`.
    - Manejan caché local en memoria cuando aplica y notifican mediante reactividad (`ReactiveRepository`).
@@ -74,18 +84,12 @@ lib/
 │   └── shortcut_registry.dart   # Registro global de atajos de teclado
 ├── cubits/                      # Cubits globales (AuthCubit, AppModeCubit, AppSettingsCubit, ShortcutsCubit, ToastCubit)
 ├── src/
-│   ├── core/                    # Gestores de borradores y sincronizadores core
-│   ├── data/                    # DataSources (*_data_source.dart)
-│   ├── domain/                  # Capa de Dominio
-│   │   ├── models/              # Modelos y DTOs
-│   │   ├── repositories/        # Repositorios (*_repository.dart)
-│   │   ├── query_params/        # Parámetros de búsqueda HTTP tipados
-│   │   └── responses/           # Envolturas de respuestas (ListResponse, etc.)
+│   ├── core/                    # AccessManager, SessionManager, config y borradores
 │   ├── modules/                 # Módulos de funcionalidad y pantallas
-│   ├── services/                # Servicios (http_service.dart, thermal_printer_service.dart)
-│   └── tools/                   # Utilidades (factories, printers, formatters, excel/pdf)
+│   ├── services/                # thermal_printer_service.dart
+│   └── tools/                   # Utilidades (extensiones, formatters, printers, exportadores)
 ├── widgets/                     # Widgets y componentes globales reutilizables
-│   ├── calculator/              # Calculadora flotante y numpad
+│   ├── design_system/           # Tokens, botones, cards y estados
 │   ├── dialogs/                 # Modales, visores y selectores globales
 │   ├── gates/                   # Control de acceso por roles (RolePermissionGate)
 │   ├── pdf/                     # Plantillas imprimibles PDF A4
@@ -93,7 +97,19 @@ lib/
 ├── main.dart                    # Bootstrap principal de la aplicación
 ├── material_app_builder.dart    # Configuración de MaterialApp.router y atajos globales
 └── provider_container.dart      # MultiBlocProvider e inyección de Repositorios en el árbol
+
+packages/kardex_business/lib/src/
+├── data/                        # DataSources (*_data_source.dart)
+├── domain/
+│   ├── models/                  # Modelos y DTOs
+│   ├── repositories/            # Repositorios y caché
+│   ├── query_params/            # Filtros tipados
+│   └── responses/               # Envolturas de respuesta (ListResponse, etc.)
+├── services/                    # http_service.dart, dio_http_service.dart
+└── tools/                       # TokenManager, ReactiveRepository, utilidades
 ```
+
+> `lib/src/data/` **no existe** y `lib/src/domain/` está vacío: la capa de datos/dominio vive en `packages/kardex_business`.
 
 ---
 

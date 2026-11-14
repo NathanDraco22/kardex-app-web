@@ -101,7 +101,7 @@ class ReadCreditNoteCubit extends Cubit<ReadCreditNoteState> {
 
 ## 3. Modalidades de Emisión en la UI
 
-El diálogo interactivo [`create_credit_note_dialog.dart`](file:///c:/Users/sytru/Developer/Projects/kardex_app/kardex_app_front/lib/src/modules/commercial/credit_notes/dialogs/create_credit_note_dialog.dart) ofrece un conmutador de tipo:
+El diálogo interactivo [`create_credit_note_dialog.dart`](../../lib/src/modules/commercial/credit_notes/dialogs/create_credit_note_dialog.dart) ofrece un conmutador de tipo:
 
 ### 3.1. Por Devolución (`CreditNoteType.devolution`)
 - **Búsqueda en Vivo:** Permite buscar una factura emitida por su número correlativo (`docNumber`).
@@ -120,16 +120,16 @@ El diálogo interactivo [`create_credit_note_dialog.dart`](file:///c:/Users/sytr
 ## 4. Trazabilidad en Visores, Movimientos y Eliminación
 
 1. **Visor Dedicado (`credit_note_viewer.dart`):**
-   - Ubicado de manera canónica en [`lib/widgets/dialogs/viewers/credit_note_viewer.dart`](file:///c:/Users/sytru/Developer/Projects/kardex_app/kardex_app_front/lib/widgets/dialogs/viewers/credit_note_viewer.dart) junto al resto de visores (`invoice_viewer.dart`, `receipt_viewer.dart`, `devolution_viewer.dart`, etc.).
+   - Ubicado de manera canónica en [`lib/widgets/dialogs/viewers/credit_note_viewer.dart`](../../lib/widgets/dialogs/viewers/credit_note_viewer.dart) junto al resto de visores (`invoice_viewer.dart`, `receipt_viewer.dart`, `devolution_viewer.dart`, etc.).
    - Modal responsive estilo Bento/Voucher que detalla folio, cliente, fecha, sucursal, creador, desglose de ítems devueltos o motivo de monto, e información de aplicación (recibo asociado y fecha).
    - **Acción Destructiva en BottomAppBar:** El botón `"Borrar Nota de Crédito"` se ubica centrado en un `BottomAppBar` al pie de la pantalla y **se oculta por completo si la nota ya está aplicada** (`creditNote.status == CreditNoteStatus.applied`), manteniendo el `AppBar` limpio únicamente con las acciones de PDF, Compartir e Imprimir.
 2. **Eliminación y Reversión Reactiva:**
    - La eliminación de notas confirmadas o abiertas se ejecuta desde el visor con diálogo deslizante de confirmación (`slideToConfirmDeleteActionDialog`), evitando borrados accidentales desde el listado general.
    - Al confirmarse el borrado, el backend revierte automáticamente el stock reingresado si era por devolución, y `CreditNotesRepository` notifica via `notifyItemDeleted`, actualizando instantáneamente la lista en memoria de `ReadCreditNoteCubit` sin recargar la pantalla.
 3. **Kárdex de Productos:**
-   - Conectado en [`show_doc_viewer.dart`](file:///c:/Users/sytru/Developer/Projects/kardex_app/kardex_app_front/lib/src/tools/show_doc_viewer.dart). Al presionar sobre un movimiento de kárdex con subtipo `credit_note`, se abre directamente el visor de la nota.
+   - Conectado en [`show_doc_viewer.dart`](../../lib/src/tools/show_doc_viewer.dart). Al presionar sobre un movimiento de kárdex con subtipo `credit_note`, se abre directamente el visor de la nota.
 4. **Estado de Cuenta de Clientes:**
-   - Conectado en [`movement_mobile_row.dart`](file:///c:/Users/sytru/Developer/Projects/kardex_app/kardex_app_front/lib/src/modules/finance/client_movements/view/widgets/movement_mobile_row.dart), visualizando la etiqueta `"Nota de Crédito"` en morado y permitiendo auditar el documento desde la lista de transacciones.
+   - Conectado en [`movement_mobile_row.dart`](../../lib/src/modules/finance/client_movements/view/widgets/movement_mobile_row.dart), visualizando la etiqueta `"Nota de Crédito"` en morado y permitiendo auditar el documento desde la lista de transacciones.
 
 ---
 
@@ -216,5 +216,5 @@ stateDiagram-v2
 ## 9. Navegación, Rutas y Permisos
 
 - **Ruta GoRouter:** `/commercial/credit-notes` (nombre canónico: `RouteNames.creditNotes`).
-- **Acceso:** Tarjeta de menú en [`commercial_menu_screen.dart`](file:///c:/Users/sytru/Developer/Projects/kardex_app/kardex_app_front/lib/src/modules/commercial/commercial_menu_screen.dart) con icono `assignment_return_rounded` y color de acento morado.
+- **Acceso:** Tarjeta de menú en [`commercial_menu_screen.dart`](../../lib/src/modules/commercial/commercial_menu_screen.dart) con icono `assignment_return_rounded` y color de acento morado.
 - **Permisos:** Protegido por `RolePermissionGate` requiriendo `CommercialSubModules.createCreditNote` o `CommercialSubModules.creditNoteHistory`.
