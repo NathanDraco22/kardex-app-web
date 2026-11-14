@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_app_front/widgets/bank_chips_selector.dart';
 import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 
 class FastPaymentResult {
@@ -48,6 +49,24 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
   final TextEditingController _refController = TextEditingController();
   double _currentInput = 0.0;
   PaymentMethod _selectedMethod = PaymentMethod.cash;
+  String? _selectedBank;
+
+  void _submit() {
+    if (!_canConfirm) return;
+    Navigator.pop(
+      context,
+      FastPaymentResult(
+        amount: _currentInput,
+        method: _selectedMethod,
+        bankReference: _selectedMethod == PaymentMethod.cash
+            ? ""
+            : formatBankReference(
+                bank: _selectedBank,
+                reference: _refController.text,
+              ),
+      ),
+    );
+  }
 
   @override
   void dispose() {
@@ -162,6 +181,9 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
                 onSelectionChanged: (newSelection) {
                   setState(() {
                     _selectedMethod = newSelection.first;
+                    if (_selectedMethod == PaymentMethod.cash) {
+                      _selectedBank = null;
+                    }
                   });
                 },
               ),
@@ -190,21 +212,15 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
                     _currentInput = double.tryParse(value) ?? 0.0;
                   });
                 },
-                onSubmitted: (value) {
-                  if (_canConfirm) {
-                    Navigator.pop(
-                      context,
-                      FastPaymentResult(
-                        amount: _currentInput,
-                        method: _selectedMethod,
-                        bankReference: _selectedMethod == PaymentMethod.cash ? "" : _refController.text.trim(),
-                      ),
-                    );
-                  }
-                },
+                onSubmitted: (_) => _submit(),
               ),
               if (_selectedMethod != PaymentMethod.cash) ...[
-                const SizedBox(height: 16),
+                const SizedBox(height: 14),
+                BankChipsSelector(
+                  selectedBank: _selectedBank,
+                  onChanged: (bank) => setState(() => _selectedBank = bank),
+                ),
+                const SizedBox(height: 12),
                 TextField(
                   controller: _refController,
                   style: const TextStyle(
@@ -230,18 +246,7 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
                   ),
                   const SizedBox(width: 16),
                   PrimaryMenuButton(
-                    onPressed: _canConfirm
-                        ? () {
-                            Navigator.pop(
-                              context,
-                              FastPaymentResult(
-                                amount: _currentInput,
-                                method: _selectedMethod,
-                                bankReference: _selectedMethod == PaymentMethod.cash ? "" : _refController.text.trim(),
-                              ),
-                            );
-                          }
-                        : null,
+                    onPressed: _canConfirm ? _submit : null,
                     label: const Text("Aplicar Abono"),
                   ),
                 ],

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/cubits/shift/shift_cubit.dart';
+import 'package:kardex_app_front/src/core/shift_guard.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_devolution/cubits/write_devolution_cubit.dart';
@@ -100,6 +102,8 @@ class _RootScaffold extends StatelessWidget {
           icon: const Icon(Icons.check),
           label: const Text("Finalizar Devolución"),
           onPressed: () async {
+            if (!await ShiftGuard.ensureShiftReady(context)) return;
+            if (!context.mounted) return;
             final total = selectedItems.fold<int>(
               0,
               (previousValue, element) => previousValue + element.total,
@@ -123,6 +127,7 @@ class _RootScaffold extends StatelessWidget {
               totalCost: totalCost,
               total: total,
               createdBy: userInfo,
+              shiftId: getIt.isRegistered<ShiftCubit>() ? getIt<ShiftCubit>().activeShiftId : null,
             );
 
             final res = await showConfirmationDevolutionModal(context, createDevolution);

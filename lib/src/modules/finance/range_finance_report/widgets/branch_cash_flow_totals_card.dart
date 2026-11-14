@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:kardex_app_front/src/tools/bank_breakdown_helper.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'bank_breakdown_sublist.dart';
 import 'section_card.dart';
 import 'summary_row_item.dart';
 
@@ -25,6 +27,15 @@ class BranchCashFlowTotalsCard extends StatelessWidget {
         transferInvoices.fold<int>(0, (prev, inv) => prev + inv.total) +
         transferReceipts.fold<int>(0, (prev, rec) => prev + rec.total);
     final countTransferencias = transferInvoices.length + transferReceipts.length;
+
+    final cardByBank = groupReferencesByBank([
+      ...cardInvoices.map((inv) => (bankReference: inv.bankReference, amount: inv.total)),
+      ...cardReceipts.map((rec) => (bankReference: rec.bankReference, amount: rec.total)),
+    ]);
+    final transferByBank = groupReferencesByBank([
+      ...transferInvoices.map((inv) => (bankReference: inv.bankReference, amount: inv.total)),
+      ...transferReceipts.map((rec) => (bankReference: rec.bankReference, amount: rec.total)),
+    ]);
 
     // 3. Efectivo (Facturas Contado Efectivo + Abonos Efectivo)
     final cashInvoices = result.detailInvoices.where((inv) => inv.paymentType == PaymentType.cash);
@@ -59,6 +70,7 @@ class BranchCashFlowTotalsCard extends StatelessWidget {
             total: totalTarjetas,
             totalColor: Colors.black87,
           ),
+          if (cardByBank.isNotEmpty) BankBreakdownSublist(entries: cardByBank),
           SummaryRowItem(
             icon: Icons.account_balance_rounded,
             title: "Transferencias Bancarias",
@@ -66,6 +78,7 @@ class BranchCashFlowTotalsCard extends StatelessWidget {
             total: totalTransferencias,
             totalColor: Colors.black87,
           ),
+          if (transferByBank.isNotEmpty) BankBreakdownSublist(entries: transferByBank),
           SummaryRowItem(
             icon: Icons.savings_rounded,
             title: "Total Ingresos Reales",

@@ -5,6 +5,7 @@ class CreditNoteQueryParams {
   String? clientId;
   CreditNoteType? type;
   CreditNoteStatus? status;
+  String? shiftId;
 
   Map<String, String> toMap() {
     return {
@@ -12,6 +13,7 @@ class CreditNoteQueryParams {
       if (clientId != null) 'clientId': clientId.toString(),
       if (type != null) 'type': type!.name,
       if (status != null) 'status': status!.name,
+      'shiftId': ?shiftId,
     };
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_app_front/widgets/bank_chips_selector.dart';
 import 'package:kardex_app_front/widgets/custom_slider.dart';
 
 class TerminalPaymentResult {
@@ -67,6 +68,7 @@ class _TerminalPaymentDialogState extends State<_TerminalPaymentDialog> {
     text: widget.initialObservations ?? "",
   );
   int _receivedAmount = 0;
+  String? _selectedBank;
 
   @override
   void initState() {
@@ -153,6 +155,10 @@ class _TerminalPaymentDialogState extends State<_TerminalPaymentDialog> {
               onSelectionChanged: (newSelection) {
                 setState(() {
                   _selectedMethod = newSelection.first;
+                  if (_selectedMethod == PaymentType.cash ||
+                      _selectedMethod == PaymentType.credit) {
+                    _selectedBank = null;
+                  }
                 });
               },
             ),
@@ -188,7 +194,12 @@ class _TerminalPaymentDialogState extends State<_TerminalPaymentDialog> {
                 ),
               ),
             ],
-            if (![PaymentType.cash, PaymentType.credit].contains(_selectedMethod))
+            if (![PaymentType.cash, PaymentType.credit].contains(_selectedMethod)) ...[
+              BankChipsSelector(
+                selectedBank: _selectedBank,
+                onChanged: (bank) => setState(() => _selectedBank = bank),
+              ),
+              const SizedBox(height: 12),
               TextField(
                 controller: _refController,
                 autofocus: true,
@@ -204,6 +215,7 @@ class _TerminalPaymentDialogState extends State<_TerminalPaymentDialog> {
                 ),
                 onChanged: (_) => setState(() {}),
               ),
+            ],
 
             const SizedBox(height: 12),
             TextField(
@@ -237,7 +249,10 @@ class _TerminalPaymentDialogState extends State<_TerminalPaymentDialog> {
                             amountReceived: _selectedMethod == PaymentType.cash ? _receivedAmount : widget.total,
                             reference: (_selectedMethod == PaymentType.cash || _selectedMethod == PaymentType.credit)
                                 ? null
-                                : _refController.text,
+                                : formatBankReference(
+                                    bank: _selectedBank,
+                                    reference: _refController.text,
+                                  ),
                             observations: observations.isEmpty ? null : observations,
                           ),
                         );

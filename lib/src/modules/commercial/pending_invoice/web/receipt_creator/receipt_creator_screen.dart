@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/cubits/shift/shift_cubit.dart';
+import 'package:kardex_app_front/src/core/shift_guard.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/cubit/read_pending_invoice_cubit.dart';
@@ -249,6 +251,8 @@ class _CreateReceiptBottomBar extends StatelessWidget {
                   }).toList();
 
                   // 4. Create Receipt
+                  if (!await ShiftGuard.ensureShiftReady(context)) return;
+                  if (!context.mounted) return;
                   final createReceipt = CreateReceipt(
                     branchId: currentBranch.id,
                     clientInfo: ClientInfo(
@@ -266,6 +270,7 @@ class _CreateReceiptBottomBar extends StatelessWidget {
                     appliedCreditNotes: appliedCreditNotes,
                     paymentMethod: PaymentMethod.cash,
                     total: receiptTotalCents, // Only the cash amount is the receipt total
+                    shiftId: getIt.isRegistered<ShiftCubit>() ? getIt<ShiftCubit>().activeShiftId : null,
                     createdBy: UserInfo(
                       id: currentUser.id,
                       name: currentUser.username,
@@ -302,6 +307,9 @@ class _CreateReceiptBottomBar extends StatelessWidget {
                     totalPayableFormatted,
                   );
                   if (res != true) return;
+                  if (!context.mounted) return;
+                  if (!await ShiftGuard.ensureShiftReady(context)) return;
+                  if (!context.mounted) return;
 
                   final appliedInvoices = invoices.map((invoice) {
                     return AppliedInvoice(
@@ -351,6 +359,7 @@ class _CreateReceiptBottomBar extends StatelessWidget {
                     appliedCreditNotes: appliedCreditNotes,
                     paymentMethod: PaymentMethod.cash,
                     total: totalPayable,
+                    shiftId: getIt.isRegistered<ShiftCubit>() ? getIt<ShiftCubit>().activeShiftId : null,
                     createdBy: UserInfo(
                       id: currentUser.id,
                       name: currentUser.username,

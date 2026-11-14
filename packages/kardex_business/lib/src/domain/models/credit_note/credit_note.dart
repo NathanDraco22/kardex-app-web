@@ -69,6 +69,7 @@ class BaseCreditNote {
   final String? appliedReceiptDocNumber;
   final DateTime? appliedAt;
   final String? idempotencyKey;
+  final String? shiftId;
 
   int get total => amount;
   String get invoiceId => originalInvoiceId;
@@ -96,6 +97,7 @@ class BaseCreditNote {
     this.appliedReceiptDocNumber,
     this.appliedAt,
     this.idempotencyKey,
+    this.shiftId,
   });
 
   factory BaseCreditNote.fromJson(Map<String, dynamic> json) => BaseCreditNote(
@@ -137,6 +139,7 @@ class BaseCreditNote {
         ? DateTime.fromMillisecondsSinceEpoch(json['appliedAt'])
         : null,
     idempotencyKey: json['idempotencyKey'],
+    shiftId: json['shiftId'] as String?,
   );
 
   Map<String, dynamic> toJson() {
@@ -165,6 +168,9 @@ class BaseCreditNote {
     if (idempotencyKey != null) {
       data['idempotencyKey'] = idempotencyKey;
     }
+    if (shiftId != null) {
+      data['shiftId'] = shiftId;
+    }
     return data;
   }
 }
@@ -189,6 +195,7 @@ class CreateCreditNote extends BaseCreditNote {
     super.rejectedAt,
     super.rejectionReason,
     super.idempotencyKey,
+    super.shiftId,
   });
 
   factory CreateCreditNote.fromJson(Map<String, dynamic> json) =>
@@ -226,6 +233,7 @@ class CreateCreditNote extends BaseCreditNote {
             : null,
         rejectionReason: json['rejectionReason'],
         idempotencyKey: json['idempotencyKey'],
+        shiftId: json['shiftId'] as String?,
       );
 }
 
@@ -297,6 +305,7 @@ class CreditNoteInDb extends BaseCreditNote {
     super.appliedReceiptDocNumber,
     super.appliedAt,
     super.idempotencyKey,
+    super.shiftId,
     required this.createdAt,
     this.updatedAt,
   });
@@ -341,6 +350,7 @@ class CreditNoteInDb extends BaseCreditNote {
         ? DateTime.fromMillisecondsSinceEpoch(json['appliedAt'])
         : null,
     idempotencyKey: json['idempotencyKey'],
+    shiftId: json['shiftId'] as String?,
     createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt']),
     updatedAt: json['updatedAt'] != null
         ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt'])

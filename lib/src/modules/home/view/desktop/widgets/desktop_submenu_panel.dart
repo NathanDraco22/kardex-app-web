@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/src/modules/home/data/home_modules_registry.dart';
 import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
 import 'package:kardex_app_front/widgets/gates/orders_gate.dart';
+import 'package:kardex_app_front/widgets/gates/shifts_gate.dart';
 import 'package:kardex_app_front/widgets/gates/quotations_gate.dart';
 import 'package:kardex_app_front/widgets/gates/role_permission_gate.dart';
 import 'package:kardex_app_front/widgets/gates/root_user_gate.dart';
@@ -196,6 +197,10 @@ class _DesktopSubmenuPanelState extends State<DesktopSubmenuPanel> {
 
     if (item.isQuotationsOrOrdersGate) {
       card = QuotationsOrOrdersGate(child: card);
+    }
+
+    if (item.isShiftsGate) {
+      card = ShiftsGate(child: card);
     }
 
     if (item.isRootGate) {

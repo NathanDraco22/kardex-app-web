@@ -47,6 +47,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
   bool _alertMinStock = true;
   bool _useHoldSales = true;
   bool _useQuickProductSearch = false;
+  bool _useShifts = false;
   AppCurrency _currency = AppCurrency.nio;
   AppCurrency _secondaryCurrency = AppCurrency.usd;
   double _exchangeRate = 0.0;
@@ -85,6 +86,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
       _paymentTermController.text = settings.defaultPaymentTermDays.toString();
       _useHoldSales = settings.useHoldSales;
       _useQuickProductSearch = settings.useQuickProductSearch;
+      _useShifts = settings.useShifts;
       _showInvoiceTotalInSecondaryCurrency = settings.showInvoiceTotalInSecondaryCurrency;
       _initialized = true;
     }
@@ -128,6 +130,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
         _paymentTermValue != settings.defaultPaymentTermDays ||
         _useHoldSales != settings.useHoldSales ||
         _useQuickProductSearch != settings.useQuickProductSearch ||
+        _useShifts != settings.useShifts ||
         _showInvoiceTotalInSecondaryCurrency != settings.showInvoiceTotalInSecondaryCurrency;
   }
 
@@ -146,6 +149,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
       defaultPaymentTermDays: paymentTerm,
       useHoldSales: _useHoldSales,
       useQuickProductSearch: _useQuickProductSearch,
+      useShifts: _useShifts,
       showInvoiceTotalInSecondaryCurrency: _showInvoiceTotalInSecondaryCurrency,
     );
 
@@ -905,6 +909,19 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                           ),
                           value: _useHoldSales,
                           onChanged: isSaving ? null : (val) => setState(() => _useHoldSales = val),
+                        ),
+                        const Divider(height: 1),
+                        SwitchListTile(
+                          title: const Text(
+                            "Activar Control de Caja y Turnos",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: const Text(
+                            "Requiere abrir turno de caja por cajero para facturar, cobrar y registrar movimientos de efectivo",
+                            style: TextStyle(fontSize: 13, color: Colors.black54),
+                          ),
+                          value: _useShifts,
+                          onChanged: isSaving ? null : (val) => setState(() => _useShifts = val),
                         ),
                       ],
                     ),

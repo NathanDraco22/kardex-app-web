@@ -9,6 +9,7 @@ import 'package:kardex_app_front/src/modules/commercial/sale_terminal/view_contr
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/hold_sale_description_dialog.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/hold_sales_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
+import 'package:kardex_app_front/widgets/dialogs/recent_invoices_dialog.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 /// Procesa la búsqueda en la terminal de venta con soporte para escáner
@@ -121,6 +122,24 @@ void openHoldSalesModal(
     branchId: authState.branch.id,
     viewController: viewController,
   );
+}
+
+/// Abre el diálogo modal con las últimas 15 facturas emitidas en la sucursal.
+Future<void> openRecentInvoicesModal(
+  BuildContext context, {
+  SaleTerminalViewController? viewController,
+}) async {
+  final authState = getIt<AuthCubit>().state;
+  if (authState is! Authenticated) return;
+
+  await showRecentInvoicesDialog(
+    context,
+    branchId: authState.branch.id,
+  );
+
+  if (context.mounted) {
+    viewController?.requestSearchFocus();
+  }
 }
 
 /// Solicita confirmación al usuario antes de vaciar los productos de la venta actual.

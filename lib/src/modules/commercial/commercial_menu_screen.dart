@@ -7,6 +7,7 @@ import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/widgets/gates/role_permission_gate.dart';
 import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
 import 'package:kardex_app_front/widgets/gates/orders_gate.dart';
+import 'package:kardex_app_front/widgets/gates/shifts_gate.dart';
 import 'package:kardex_app_front/widgets/gates/quotations_gate.dart';
 import 'package:kardex_app_front/widgets/menu_app_bar.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/search_product_commercial_delegate.dart';
@@ -458,6 +459,24 @@ class _Body extends StatelessWidget {
                 subtitle: "Gestión de notas de crédito por devolución o monto",
                 onTap: () => context.pushNamed(RouteNames.creditNotes),
               ),
+            ),
+          ),
+          ShiftsGate(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const MenuSectionDivider(title: "Control de Caja"),
+                ShortcutAddableListTile(
+                  routeName: RouteNames.shifts,
+                  child: MenuOptionCard(
+                    icon: Icons.point_of_sale_rounded,
+                    accentColor: Colors.teal.shade600,
+                    title: "Turnos y Caja",
+                    subtitle: "Apertura, movimientos de efectivo, arqueos e historial",
+                    onTap: () => context.pushNamed(RouteNames.shifts),
+                  ),
+                ),
+              ],
             ),
           ),
         ],

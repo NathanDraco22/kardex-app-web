@@ -29,6 +29,29 @@ mixin HttpService {
     return body;
   }
 
+  Future<Map<String, dynamic>?> getNullableQuery(Uri url, {Map<String, String>? headers}) async {
+    late http.Response response;
+
+    try {
+      response = await http.get(url, headers: _withTenant(headers));
+    } catch (error) {
+      throw NoInternetException({"message": error.toString()});
+    }
+
+    final utf8Body = utf8.decode(response.bodyBytes);
+    final decoded = jsonDecode(utf8Body);
+    if (decoded == null) {
+      if (response.statusCode >= 400) {
+        _processStatusCode(response.statusCode, {});
+      }
+      return null;
+    }
+
+    final body = decoded as Map<String, dynamic>;
+    _processStatusCode(response.statusCode, body);
+    return body;
+  }
+
   Future<Map<String, dynamic>> postQuery(Uri url, Map<String, dynamic> body, {Map<String, String>? headers}) async {
     final jsonEncoded = jsonEncode(body);
     final contentType = {'Content-Type': 'application/json'};

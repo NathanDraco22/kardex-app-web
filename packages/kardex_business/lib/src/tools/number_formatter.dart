@@ -106,4 +106,13 @@ class NumberFormatter {
       standardUnitFactor: standardUnitFactor,
     ).quantityText;
   }
+
+  /// Convierte un monto ingresado como texto (ej. `"50"` o `"50.25"`) a centavos (`5000`, `5025`).
+  static int parseMoneyToCents(String raw) {
+    final normalized = raw.trim().replaceAll(',', '.');
+    if (normalized.isEmpty) return 0;
+    final parsed = double.tryParse(normalized);
+    if (parsed == null || parsed.isNaN || parsed.isInfinite) return 0;
+    return (parsed * 100).round();
+  }
 }

@@ -122,6 +122,9 @@ class _ContentSection extends StatelessWidget {
                       (cn.status == CreditNoteStatus.approved || cn.status == CreditNoteStatus.confirmed)
                     ).toList();
 
+                    if (!await ShiftGuard.ensureShiftReady(context)) return;
+                    if (!context.mounted) return;
+
                     final (createReceipt, errorOrSummary) = FastReceiptLogic.allocateFastPayment(
                       paymentAmountCents: amountCents,
                       invoices: [currentInvoice],
@@ -133,6 +136,7 @@ class _ContentSection extends StatelessWidget {
                       currentUserName: currentUser.username,
                       paymentMethod: paymentResult.method,
                       bankReference: paymentResult.bankReference,
+                      shiftId: getIt.isRegistered<ShiftCubit>() ? getIt<ShiftCubit>().activeShiftId : null,
                     );
 
                     if (createReceipt != null) {

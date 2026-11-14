@@ -1,3 +1,12 @@
+## Control de Turnos y Caja (`Shifts` & `ShiftCashMovements`) (Noviembre 2026)
+
+- **Alcance:** Implementación completa del módulo opcional de Control de Turnos y Caja en `packages/kardex_business` y `kardex_app_front` (rama `main`), alineado con `kardex-server`.
+- **Dominio y Datos (`packages/kardex_business`):** `useShifts` en `AppSettingModel`/`UpdateAppSetting`; modelos `ShiftModel` y `ShiftCashMovementModel`; `shiftId` opcional en modelos y query params de `Invoice`, `Receipt`, `Devolution`, `CreditNote` y `Expense`; `HttpService.getNullableQuery`, `ShiftsDataSource`, `ShiftCashMovementsDataSource`, `ShiftsRepository` y `ShiftCashMovementsRepository`.
+- **Estado Global y Guards:** `ShiftCubit` global en `getIt`/`MultiBlocProvider` enlazado a `AuthCubit` y `AppSettingsCubit.useShifts`; `ShiftsGate` para visibilidad de menú/atajos; `ShiftGuard.ensureShiftReady` e inyección de `shiftId` en terminal de ventas, facturación, cobros, devoluciones y notas de crédito.
+- **UI, Impresión y PDF:** `ShiftsView` (`/shifts`), `ShiftStatusButton`, `ShiftManagementDialog`, `OpenShiftDialog`, `CreateCashMovementDialog`, `CloseShiftDialog` (reutilizando `CashCounterDialog`), `ShiftViewerDialog` (optimizado con `GET /composite/shift-arqueo/{shiftId}` para cargar totales, movimientos y pestaña de Documentos en una sola petición), `shift_printer.dart` y `ShiftClosePdfTemplate`.
+- **Verificación:** `dart analyze` en `packages/kardex_business` sin issues; `flutter analyze` en `kardex_app_front` sin issues; `flutter test test/shift_cubit_test.dart` con 6/6 pruebas aprobadas.
+- **Regla `main`/`lite`:** Cambios implementados en `main` (pendiente commit en `main` y posterior `git merge main` en `lite` para sincronizar).
+
 ## Guardar Configuraciones en el AppBar (Noviembre 2026)
 
 - **Problema:** en `AppSettingsScreen` el botón "Guardar Configuraciones" vivía al final del `ListView`, justo antes de la Zona de Peligro; en móvil quedaba al fondo del scroll y en desktop pegado a las acciones destructivas.

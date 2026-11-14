@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_app_front/widgets/bank_chips_selector.dart';
 import 'package:kardex_app_front/widgets/custom_slider.dart';
 
 class PaymentResult {
@@ -58,6 +59,7 @@ class _PaymentDialogState extends State<_PaymentDialog> {
   final TextEditingController _receivedController = TextEditingController();
   final TextEditingController _refController = TextEditingController();
   int _receivedAmount = 0;
+  String? _selectedBank;
 
   @override
   void initState() {
@@ -135,6 +137,10 @@ class _PaymentDialogState extends State<_PaymentDialog> {
               onSelectionChanged: (newSelection) {
                 setState(() {
                   _selectedMethod = newSelection.first;
+                  if (_selectedMethod == PaymentType.cash ||
+                      _selectedMethod == PaymentType.credit) {
+                    _selectedBank = null;
+                  }
                 });
               },
             ),
@@ -170,6 +176,14 @@ class _PaymentDialogState extends State<_PaymentDialog> {
                 ),
               ),
             ] else ...[
+              if (_selectedMethod == PaymentType.card ||
+                  _selectedMethod == PaymentType.transfer) ...[
+                BankChipsSelector(
+                  selectedBank: _selectedBank,
+                  onChanged: (bank) => setState(() => _selectedBank = bank),
+                ),
+                const SizedBox(height: 12),
+              ],
               TextField(
                 controller: _refController,
                 autofocus: true,
@@ -207,7 +221,10 @@ class _PaymentDialogState extends State<_PaymentDialog> {
                             amountReceived: _selectedMethod == PaymentType.cash ? _receivedAmount : widget.total,
                             reference: (_selectedMethod == PaymentType.cash || _selectedMethod == PaymentType.credit)
                                 ? null
-                                : _refController.text,
+                                : formatBankReference(
+                                    bank: _selectedBank,
+                                    reference: _refController.text,
+                                  ),
                           ),
                         );
                       },

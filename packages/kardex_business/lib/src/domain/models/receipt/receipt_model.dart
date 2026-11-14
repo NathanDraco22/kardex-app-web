@@ -109,6 +109,7 @@ class BaseReceipt {
   final String bankReference;
   final int total;
   final UserInfo createdBy;
+  final String? shiftId;
 
   BaseReceipt({
     required this.branchId,
@@ -122,6 +123,7 @@ class BaseReceipt {
     this.bankReference = "",
     required this.total,
     required this.createdBy,
+    this.shiftId,
   });
 
   factory BaseReceipt.fromJson(Map<String, dynamic> json) => BaseReceipt(
@@ -138,6 +140,7 @@ class BaseReceipt {
     bankReference: json['bankReference'] ?? "",
     total: json['total'],
     createdBy: UserInfo.fromJson(json['createdBy']),
+    shiftId: json['shiftId'] as String?,
   );
 
   Map<String, dynamic> toJson() => {
@@ -152,6 +155,7 @@ class BaseReceipt {
     'bankReference': bankReference,
     'total': total,
     'createdBy': createdBy.toJson(),
+    if (shiftId != null) 'shiftId': shiftId,
   };
 }
 
@@ -168,6 +172,7 @@ class CreateReceipt extends BaseReceipt {
     super.bankReference,
     required super.total,
     required super.createdBy,
+    super.shiftId,
   });
 
   factory CreateReceipt.fromJson(Map<String, dynamic> json) => CreateReceipt(
@@ -184,6 +189,7 @@ class CreateReceipt extends BaseReceipt {
     bankReference: json['bankReference'] ?? "",
     total: json['total'],
     createdBy: UserInfo.fromJson(json['createdBy']),
+    shiftId: json['shiftId'] as String?,
   );
 }
 
@@ -211,6 +217,7 @@ class ReceiptInDb extends BaseReceipt {
     required this.createdAt,
     required this.updatedAt,
     required super.createdBy,
+    super.shiftId,
   });
 
   factory ReceiptInDb.fromJson(Map<String, dynamic> json) => ReceiptInDb(
@@ -230,6 +237,7 @@ class ReceiptInDb extends BaseReceipt {
     createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt']),
     updatedAt: (json['updatedAt'] != null) ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt']) : null,
     createdBy: UserInfo.fromJson(json['createdBy']),
+    shiftId: json['shiftId'] as String?,
   );
 
   @override

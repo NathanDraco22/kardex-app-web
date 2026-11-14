@@ -18,6 +18,7 @@ import 'package:toastification/toastification.dart';
 import 'package:kardex_app_front/constants/route_names.dart';
 import 'widgets/home_desktop_card.dart';
 import 'widgets/home_end_drawer.dart';
+import 'package:kardex_app_front/src/modules/commercial/shifts/widgets/shift_status_button.dart';
 import 'widgets/home_quick_search_dialog.dart';
 import 'widgets/near_expiration_banner.dart';
 import '../data/home_modules_registry.dart';
@@ -136,6 +137,11 @@ class _RootScaffold extends StatelessWidget {
                 ),
               ),
               actions: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: ShiftStatusButton(compact: !context.isDesktop()),
+                ),
+                const SizedBox(width: 4),
                 if (context.isMobileOrTablet() && canShowHomeQuickSearch(context))
                   IconButton(
                     tooltip: "Búsqueda rápida",

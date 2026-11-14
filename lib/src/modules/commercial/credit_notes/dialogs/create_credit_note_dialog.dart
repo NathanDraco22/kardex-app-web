@@ -6,6 +6,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/cubits/shift/shift_cubit.dart';
+import 'package:kardex_app_front/src/core/shift_guard.dart';
 import 'package:kardex_app_front/src/cubits/credit_note_cubit/write_credit_notes_cubit.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/selectors/client_selection_dialog.dart';
@@ -347,6 +349,9 @@ class _CreateCreditNoteDialogState extends State<_CreateCreditNoteDialog> {
         return;
       }
 
+      if (!await ShiftGuard.ensureShiftReady(context)) return;
+      if (!mounted) return;
+
       final createDoc = CreateCreditNote(
         branchId: currentBranch.id,
         clientId: _searchedInvoice!.clientId,
@@ -360,6 +365,7 @@ class _CreateCreditNoteDialogState extends State<_CreateCreditNoteDialog> {
         status: CreditNoteStatus.confirmed,
         createdBy: UserInfo(id: currentUser.id, name: currentUser.username),
         idempotencyKey: _idempotencyKey,
+        shiftId: getIt.isRegistered<ShiftCubit>() ? getIt<ShiftCubit>().activeShiftId : null,
       );
 
       final created = await context.read<WriteCreditNoteCubit>().create(createDoc);
@@ -388,6 +394,9 @@ class _CreateCreditNoteDialogState extends State<_CreateCreditNoteDialog> {
         return;
       }
 
+      if (!await ShiftGuard.ensureShiftReady(context)) return;
+      if (!mounted) return;
+
       final createDoc = CreateCreditNote(
         branchId: currentBranch.id,
         clientId: _selectedClient!.id,
@@ -405,6 +414,7 @@ class _CreateCreditNoteDialogState extends State<_CreateCreditNoteDialog> {
         status: CreditNoteStatus.confirmed,
         createdBy: UserInfo(id: currentUser.id, name: currentUser.username),
         idempotencyKey: _idempotencyKey,
+        shiftId: getIt.isRegistered<ShiftCubit>() ? getIt<ShiftCubit>().activeShiftId : null,
       );
 
       final created = await context.read<WriteCreditNoteCubit>().create(createDoc);

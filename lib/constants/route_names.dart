@@ -51,6 +51,7 @@ class RouteNames {
   static const clientDevolution = 'client-devolution';
   static const devolutionHistory = 'devolution-history';
   static const creditNotes = 'credit-notes';
+  static const shifts = 'shifts';
   static const productPriceSetting = 'product-price-setting';
   static const commercialProductMovements = 'commercial-product-movements';
   static const proformaHistory = 'proforma-history';

@@ -24,4 +24,20 @@ class CompositeDataSource with HttpService {
     final headers = HttpTools.generateAuthHeaders();
     return await getQuery(uri, headers: headers);
   }
+
+  Future<Map<String, dynamic>> getShiftArqueo({
+    required String shiftId,
+    bool includeDocuments = true,
+    int documentsLimit = 500,
+  }) async {
+    final uri = HttpTools.generateUri(
+      "$_endpoint/shift-arqueo/$shiftId",
+      queryParameters: {
+        'includeDocuments': includeDocuments.toString(),
+        'documentsLimit': documentsLimit.toString(),
+      },
+    );
+    final headers = HttpTools.generateAuthHeaders();
+    return await getQuery(uri, headers: headers);
+  }
 }

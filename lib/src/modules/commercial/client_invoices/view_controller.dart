@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/cubits/shift/shift_cubit.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 
@@ -172,6 +173,7 @@ class ClientInvoiceViewController extends ChangeNotifier {
         id: currentUser.id,
         name: currentUser.username,
       ),
+      shiftId: getIt.isRegistered<ShiftCubit>() ? getIt<ShiftCubit>().activeShiftId : null,
     );
 
     return newInvoice;

@@ -174,6 +174,9 @@ class _HeaderSection extends StatelessWidget {
                         final currentUser = authState.session.user;
                         final currentBranch = authState.branch;
 
+                        if (!await ShiftGuard.ensureShiftReady(context)) return;
+                        if (!context.mounted) return;
+
                         final amountCents = (paymentResult.amount * 100).round();
                         final (createReceiptPayload, summary) = FastReceiptLogic.allocateFastPayment(
                           paymentAmountCents: amountCents,
@@ -186,6 +189,7 @@ class _HeaderSection extends StatelessWidget {
                           currentUserName: currentUser.username,
                           paymentMethod: paymentResult.method,
                           bankReference: paymentResult.bankReference,
+                          shiftId: getIt.isRegistered<ShiftCubit>() ? getIt<ShiftCubit>().activeShiftId : null,
                         );
 
                         if (createReceiptPayload == null) {

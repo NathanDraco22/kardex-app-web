@@ -7,6 +7,7 @@ import 'package:kardex_app_front/cubits/near_expiration/near_expiration_cubit.da
 import 'package:kardex_app_front/cubits/shortcuts/shortcuts_cubit.dart';
 import 'package:kardex_app_front/cubits/toast/toast_cubit.dart';
 import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
+import 'package:kardex_app_front/cubits/shift/shift_cubit.dart';
 
 import 'package:kardex_app_front/src/core/app_config_manager.dart';
 import 'package:kardex_app_front/src/core/app_kardex_config.dart';
@@ -68,6 +69,8 @@ class ProviderContainer extends StatelessWidget {
     final appSettingsDataSource = AppSettingsDataSource();
     final unitScaleDataSource = UnitScalesDataSource();
     final importsDataSource = ImportsDataSource();
+    final shiftsDataSource = ShiftsDataSource();
+    final shiftCashMovementsDataSource = ShiftCashMovementsDataSource();
 
     return MultiRepositoryProvider(
       providers: [
@@ -276,6 +279,14 @@ class ProviderContainer extends StatelessWidget {
         RepositoryProvider(
           create: (context) => ImportsRepository(importsDataSource),
         ),
+        RepositoryProvider(
+          create: (context) => ShiftsRepository(shiftsDataSource),
+          dispose: (repo) => repo.disposeReactiveRepo(),
+        ),
+        RepositoryProvider(
+          create: (context) => ShiftCashMovementsRepository(shiftCashMovementsDataSource),
+          dispose: (repo) => repo.disposeReactiveRepo(),
+        ),
       ],
       child: GlobalCubitProvider(
         child: child,
@@ -296,6 +307,7 @@ class GlobalCubitProvider extends StatefulWidget {
 class _GlobalCubitProviderState extends State<GlobalCubitProvider> {
   late final AuthCubit _authCubit;
   late final AppSettingsCubit _appSettingsCubit;
+  late final ShiftCubit _shiftCubit;
 
   @override
   void initState() {
@@ -305,6 +317,7 @@ class _GlobalCubitProviderState extends State<GlobalCubitProvider> {
     final servinRepo = context.read<ServinRepository>();
     final clientGroupRepo = context.read<ClientGroupsRepository>();
     final appSettingsRepo = context.read<AppSettingsRepository>();
+    final shiftsRepo = context.read<ShiftsRepository>();
 
     _authCubit = AuthCubit(
       authRepository: authRepo,
@@ -316,10 +329,15 @@ class _GlobalCubitProviderState extends State<GlobalCubitProvider> {
 
     _appSettingsCubit = AppSettingsCubit(appSettingsRepo);
     getIt.registerSingleton<AppSettingsCubit>(_appSettingsCubit);
+
+    _shiftCubit = ShiftCubit(shiftsRepository: shiftsRepo);
+    getIt.registerSingleton<ShiftCubit>(_shiftCubit);
   }
 
   @override
   void dispose() {
+    getIt.unregister<ShiftCubit>();
+    _shiftCubit.close();
     getIt.unregister<AuthCubit>();
     _authCubit.close();
     getIt.unregister<AppSettingsCubit>();
@@ -345,6 +363,7 @@ class _GlobalCubitProviderState extends State<GlobalCubitProvider> {
           ),
         ),
         BlocProvider.value(value: _appSettingsCubit),
+        BlocProvider.value(value: _shiftCubit),
       ],
       child: widget.child,
     );
