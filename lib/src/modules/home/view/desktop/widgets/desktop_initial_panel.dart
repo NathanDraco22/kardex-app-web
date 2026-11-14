@@ -339,10 +339,10 @@ class _BranchDetails extends StatelessWidget {
           text: branch.email,
           accent: accent,
         ),
-      if (branch.idCard.trim().isNotEmpty)
+      if (branch.formattedRuc != null)
         _BranchInfoItem(
           icon: Icons.badge_outlined,
-          text: branch.idCard,
+          text: branch.formattedRuc!,
           accent: accent,
         ),
     ];

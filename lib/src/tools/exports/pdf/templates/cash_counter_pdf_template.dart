@@ -63,6 +63,11 @@ class CashCounterPdfTemplate implements PdfTemplate {
                               branch.name,
                               style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 13),
                             ),
+                            if (branch.formattedRuc != null)
+                              pw.Text(
+                                branch.formattedRuc!,
+                                style: const pw.TextStyle(fontSize: 8.5, color: PdfColors.grey700),
+                              ),
                             pw.SizedBox(height: 2),
                             pw.Text(
                               branch.address,

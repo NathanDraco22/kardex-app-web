@@ -93,6 +93,14 @@ Future<Uint8List> generateShiftTicketPdf(
               fontWeight: pw.FontWeight.bold,
             ),
           ),
+          if (branch.formattedRuc != null)
+            pw.Text(
+              branch.formattedRuc!,
+              textAlign: pw.TextAlign.center,
+              style: pw.TextStyle(
+                fontSize: TicketSettings.contentFontSize(paperSize),
+              ),
+            ),
           pw.Text(
             'CORTE DE TURNO #${shift.docNumber}',
             textAlign: pw.TextAlign.center,

@@ -83,6 +83,13 @@ class InvoiceReceiptsHistoryTemplate implements PdfTemplate {
                       branch.name,
                       style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
                     ),
+                    if (branch.formattedRuc != null) ...[
+                      pw.SizedBox(height: 2),
+                      pw.Text(
+                        branch.formattedRuc!,
+                        style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey700),
+                      ),
+                    ],
                     pw.SizedBox(height: 4),
                     pw.Text(
                       branch.address,

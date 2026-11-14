@@ -114,6 +114,12 @@ Future<Uint8List> generateTicketPdfFromCashCount(
               style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: titleFontSize + 1),
               textAlign: pw.TextAlign.center,
             ),
+            if (branch.formattedRuc != null)
+              pw.Text(
+                branch.formattedRuc!,
+                style: pw.TextStyle(fontSize: contentFontSize - 1),
+                textAlign: pw.TextAlign.center,
+              ),
             if (branch.address.isNotEmpty)
               pw.Text(
                 branch.address,

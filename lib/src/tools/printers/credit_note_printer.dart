@@ -77,6 +77,14 @@ Future<Uint8List> generateTicketPdfFromCreditNote(
               ),
               textAlign: pw.TextAlign.center,
             ),
+            if (branch.formattedRuc != null)
+              pw.Text(
+                branch.formattedRuc!,
+                style: pw.TextStyle(
+                  fontSize: TicketSettings.contentFontSize(paperSize),
+                ),
+                textAlign: pw.TextAlign.center,
+              ),
             pw.Text(
               branch.address,
               style: pw.TextStyle(

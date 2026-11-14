@@ -98,6 +98,11 @@ class _RootScaffold extends StatelessWidget {
             ),
             const SizedBox(width: 4),
             IconButton(
+              icon: const Icon(Icons.account_balance_wallet_outlined),
+              tooltip: "Cuentas por cobrar",
+              onPressed: () => openPendingClientsModal(context, viewController: viewController),
+            ),
+            IconButton(
               icon: const Icon(Icons.receipt_long_outlined),
               tooltip: "Últimas facturas",
               onPressed: () => openRecentInvoicesModal(context, viewController: viewController),

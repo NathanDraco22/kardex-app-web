@@ -15,6 +15,12 @@ class BaseBranch {
   String? imageUrl;
   Coordinates? coordinates;
 
+  /// Retorna el número RUC/Cédula formateado (`RUC: <valor>`) si está registrado.
+  String? get formattedRuc {
+    final trimmed = idCard.trim();
+    return trimmed.isEmpty ? null : 'RUC: $trimmed';
+  }
+
   BaseBranch({
     required this.name,
     required this.idCard,

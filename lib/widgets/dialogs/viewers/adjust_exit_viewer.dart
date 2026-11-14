@@ -144,7 +144,9 @@ class _AdjustExitViewer extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        "Sucursal: ${branch.name}",
+                        branch.formattedRuc != null
+                            ? "Sucursal: ${branch.name} • ${branch.formattedRuc!}"
+                            : "Sucursal: ${branch.name}",
                         style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
                       ),
                       if (adjustExit.description.isNotEmpty)

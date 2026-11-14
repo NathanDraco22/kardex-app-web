@@ -213,6 +213,11 @@ class OrderViewerContent extends StatelessWidget {
               branch.name,
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
+            if (branch.formattedRuc != null)
+              Text(
+                branch.formattedRuc!,
+                style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+              ),
             Builder(
               builder: (context) {
                 return Text(

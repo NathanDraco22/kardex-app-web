@@ -222,7 +222,10 @@ class _WebBody extends StatelessWidget {
                               ],
                             ),
                             subtitle: Text(
-                              branch.description.isNotEmpty ? branch.description : "Sin descripción",
+                              [
+                                if (branch.formattedRuc != null) branch.formattedRuc!,
+                                branch.description.isNotEmpty ? branch.description : "Sin descripción",
+                              ].join(" • "),
                             ),
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,

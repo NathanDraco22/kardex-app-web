@@ -8,7 +8,9 @@ import 'package:kardex_app_front/src/modules/commercial/sale_terminal/cubit/read
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/view_controller.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/hold_sale_description_dialog.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/hold_sales_dialog.dart';
+import 'package:kardex_app_front/src/modules/commercial/pending_invoice/web/pending_invoice_web_screen.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
+import 'package:kardex_app_front/widgets/dialogs/pending_clients_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/recent_invoices_dialog.dart';
 import 'package:kardex_business/kardex_business.dart';
 
@@ -136,6 +138,28 @@ Future<void> openRecentInvoicesModal(
     context,
     branchId: authState.branch.id,
   );
+
+  if (context.mounted) {
+    viewController?.requestSearchFocus();
+  }
+}
+
+/// Abre el diálogo de clientes con saldo pendiente (cuentas por cobrar)
+/// y navega al detalle de facturas pendientes del cliente seleccionado.
+Future<void> openPendingClientsModal(
+  BuildContext context, {
+  SaleTerminalViewController? viewController,
+}) async {
+  final selectedClient = await showPendingClientsDialog(context);
+  if (!context.mounted) return;
+
+  if (selectedClient != null) {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => PendingInvoiceWebScreen(client: selectedClient),
+      ),
+    );
+  }
 
   if (context.mounted) {
     viewController?.requestSearchFocus();
