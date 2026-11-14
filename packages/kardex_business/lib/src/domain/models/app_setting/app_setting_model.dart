@@ -1,4 +1,5 @@
 import 'app_currency.dart';
+import 'app_tax_id_label.dart';
 
 class AppSettingModel {
   final String id;
@@ -18,6 +19,7 @@ class AppSettingModel {
   final double exchangeRate;
   final bool showInvoiceTotalInSecondaryCurrency;
   final String? companyLogoUrl;
+  final String taxIdLabel;
   final int createdAt;
   final int? updatedAt;
 
@@ -39,6 +41,7 @@ class AppSettingModel {
     this.exchangeRate = 0.0,
     this.showInvoiceTotalInSecondaryCurrency = false,
     this.companyLogoUrl,
+    this.taxIdLabel = 'RUC',
     required this.createdAt,
     this.updatedAt,
   });
@@ -67,6 +70,7 @@ class AppSettingModel {
       showInvoiceTotalInSecondaryCurrency:
           json['showInvoiceTotalInSecondaryCurrency'] as bool? ?? false,
       companyLogoUrl: json['companyLogoUrl'] as String?,
+      taxIdLabel: AppTaxIdLabel.normalize(json['taxIdLabel'] as String?),
       createdAt: json['createdAt'] as int? ?? 0,
       updatedAt: json['updatedAt'] as int?,
     );
@@ -92,6 +96,7 @@ class AppSettingModel {
       'showInvoiceTotalInSecondaryCurrency':
           showInvoiceTotalInSecondaryCurrency,
       'companyLogoUrl': companyLogoUrl,
+      'taxIdLabel': taxIdLabel,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };
@@ -115,6 +120,7 @@ class AppSettingModel {
     double? exchangeRate,
     bool? showInvoiceTotalInSecondaryCurrency,
     String? companyLogoUrl,
+    String? taxIdLabel,
     int? createdAt,
     int? updatedAt,
   }) {
@@ -141,6 +147,7 @@ class AppSettingModel {
           showInvoiceTotalInSecondaryCurrency ??
           this.showInvoiceTotalInSecondaryCurrency,
       companyLogoUrl: companyLogoUrl ?? this.companyLogoUrl,
+      taxIdLabel: taxIdLabel ?? this.taxIdLabel,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -164,6 +171,7 @@ class UpdateAppSetting {
   final double? exchangeRate;
   final bool? showInvoiceTotalInSecondaryCurrency;
   final String? companyLogoUrl;
+  final String? taxIdLabel;
 
   const UpdateAppSetting({
     this.useDefaultProfitMargin,
@@ -182,6 +190,7 @@ class UpdateAppSetting {
     this.exchangeRate,
     this.showInvoiceTotalInSecondaryCurrency,
     this.companyLogoUrl,
+    this.taxIdLabel,
   });
 
   Map<String, dynamic> toJson() {
@@ -234,6 +243,9 @@ class UpdateAppSetting {
     }
     if (companyLogoUrl != null) {
       data['companyLogoUrl'] = companyLogoUrl;
+    }
+    if (taxIdLabel != null && taxIdLabel!.trim().isNotEmpty) {
+      data['taxIdLabel'] = taxIdLabel!.trim();
     }
     return data;
   }

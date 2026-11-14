@@ -30,14 +30,14 @@ Future<Uint8List> generateTicketPdfFromDevolution(
   DevolutionInDb devolution,
   BranchInDb branch, {
   PaperSize paperSize = PaperSize.mm80,
+  double? extraRightMarginMm,
 }) async {
   final pdf = pw.Document();
   final NumberFormat currencyFormat = NumberFormatter.currencyFormat;
 
-  final pageFormat = PdfPageFormat(
-    TicketSettings.ticketWidth(paperSize) * PdfPageFormat.mm,
-    double.infinity,
-    marginAll: TicketSettings.ticketMargin(paperSize) * PdfPageFormat.mm,
+  final pageFormat = await PrintManager.getTicketPageFormat(
+    paperSize,
+    extraRightMarginMm: extraRightMarginMm,
   );
 
   final branchImage = await branch.resolveLogoBytes();
@@ -79,6 +79,14 @@ Future<Uint8List> generateTicketPdfFromDevolution(
               ),
               textAlign: pw.TextAlign.center,
             ),
+            if (branch.formattedRuc != null)
+              pw.Text(
+                branch.formattedRuc!,
+                style: pw.TextStyle(
+                  fontSize: TicketSettings.contentFontSize(paperSize),
+                ),
+                textAlign: pw.TextAlign.center,
+              ),
             pw.Text(
               branch.address,
               style: pw.TextStyle(

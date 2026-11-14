@@ -15,6 +15,31 @@ class BaseBranch {
   String? imageUrl;
   Coordinates? coordinates;
 
+  static String Function() _taxIdLabelResolver = () => 'RUC';
+
+  /// Configura el resolvedor global de etiqueta tributaria (ej. `RUC`, `RTN`, `NIT`).
+  static void configureTaxIdLabelResolver(String Function() resolver) {
+    _taxIdLabelResolver = resolver;
+  }
+
+  /// Etiqueta tributaria activa en la configuración global (por defecto `'RUC'`).
+  static String get activeTaxIdLabel {
+    final resolved = _taxIdLabelResolver().trim();
+    return resolved.isEmpty ? 'RUC' : resolved;
+  }
+
+  /// Retorna el identificador tributario formateado (`<etiqueta>: <valor>`) si está registrado.
+  String? formattedTaxId({String? label}) {
+    final trimmed = idCard.trim();
+    if (trimmed.isEmpty) return null;
+    final resolvedLabel = (label ?? activeTaxIdLabel).trim();
+    final prefix = resolvedLabel.isEmpty ? 'RUC' : resolvedLabel;
+    return '$prefix: $trimmed';
+  }
+
+  /// Retorna el identificador tributario formateado con la etiqueta configurada globalmente.
+  String? get formattedRuc => formattedTaxId();
+
   BaseBranch({
     required this.name,
     required this.idCard,

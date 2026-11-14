@@ -144,6 +144,11 @@ class UserOperationsArqueoPdfTemplate implements PdfTemplate {
                             color: PdfColors.black,
                           ),
                         ),
+                        if (branch.formattedRuc != null)
+                          pw.Text(
+                            branch.formattedRuc!,
+                            style: const pw.TextStyle(fontSize: 8.5, color: PdfColors.grey700),
+                          ),
                         pw.SizedBox(height: 2),
                         if (branch.address.isNotEmpty)
                           pw.Text(

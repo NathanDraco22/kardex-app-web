@@ -14,6 +14,7 @@ import 'package:kardex_app_front/cubits/app_settings/app_settings_state.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/tools/uploaders/image_uploader.dart';
 import 'currency_settings_dialog.dart';
+import 'tax_id_label_settings_dialog.dart';
 
 class AppSettingsScreen extends StatelessWidget {
   const AppSettingsScreen({super.key});
@@ -52,6 +53,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
   AppCurrency _secondaryCurrency = AppCurrency.usd;
   double _exchangeRate = 0.0;
   bool _showInvoiceTotalInSecondaryCurrency = false;
+  String _taxIdLabel = 'RUC';
 
   @override
   void initState() {
@@ -97,6 +99,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
     _secondaryCurrency = settings.secondaryCurrency;
     _exchangeRate = settings.exchangeRate;
     _companyLogoUrl = settings.companyLogoUrl;
+    _taxIdLabel = settings.taxIdLabel;
   }
 
   static const double _fallbackProfitMargin = 20.0;
@@ -192,6 +195,17 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
           behavior: SnackBarBehavior.floating,
         ),
       );
+    }
+  }
+
+  Future<void> _openTaxIdLabelSettingsDialog() async {
+    final saved = await showTaxIdLabelSettingsDialog(
+      context,
+      currentLabel: _taxIdLabel,
+    );
+
+    if (saved == true && mounted) {
+      _showSettingsSnackBar("Etiqueta tributaria actualizada");
     }
   }
 
@@ -415,6 +429,79 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                         color: hasRate ? Colors.teal.shade900 : Colors.orange.shade800,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTaxIdLabelSummaryTile({required bool isSaving}) {
+    final preset = AppTaxIdLabel.tryFromLabel(_taxIdLabel);
+    final subtitle = preset != null
+        ? '${preset.label}  ·  ${preset.countries}'
+        : '$_taxIdLabel  ·  Personalizado';
+
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: BorderSide(color: Colors.teal.shade100),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: isSaving ? null : _openTaxIdLabelSettingsDialog,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.teal.shade50,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.badge_outlined,
+                  color: Colors.teal.shade700,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Expanded(
+                          child: Text(
+                            "Identificación tributaria",
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        Icon(
+                          Icons.edit_outlined,
+                          size: 18,
+                          color: Colors.teal.shade700,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.teal.shade900,
                       ),
                     ),
                   ],
@@ -766,6 +853,8 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                   _buildCompanyLogoCard(isSaving: isSaving),
                   const SizedBox(height: 24),
                   _buildCurrencySummaryTile(isSaving: isSaving),
+                  const SizedBox(height: 12),
+                  _buildTaxIdLabelSummaryTile(isSaving: isSaving),
                   const SizedBox(height: 12),
                   _buildInvoiceSecondaryTotalSwitch(isSaving: isSaving),
                   const SizedBox(height: 24),

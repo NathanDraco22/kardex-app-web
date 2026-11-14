@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
@@ -12,78 +11,71 @@ import 'package:kardex_app_front/widgets/elements/devolution_status_chip.dart';
 
 import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 import 'package:kardex_app_front/src/tools/row_color_tool.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/adaptive_viewer.dart';
 
 Future<void> showDevolutionViewerDialog(BuildContext context, DevolutionInDb devolution) async {
-  FocusManager.instance.primaryFocus?.unfocus();
-  SystemChannels.textInput.invokeMethod('TextInput.hide');
   final currentBranch = (getIt<AuthCubit>().state as Authenticated).branch;
   final paperSize = await PrintManager.getLocalPaperSize();
   if (!context.mounted) return;
 
-  await Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) {
-        return _DevolutionViewer(
-          devolution: devolution,
-          branch: currentBranch,
-          onShare: () => shareDevolution(devolution, currentBranch, paperSize: paperSize),
-          onPrint: () => printDevolution(devolution, currentBranch, paperSize: paperSize),
-          onExportPdf: () async {
-            final template = SingleDevolutionTemplate(devolution: devolution, branch: currentBranch);
-            await PdfExportTool.export(template, fileName: "devolucion_${devolution.docNumber}.pdf");
-          },
-        );
-      },
-    ),
+  await showAdaptiveViewer(
+    context: context,
+    builder: (context) {
+      return _DevolutionViewer(
+        devolution: devolution,
+        branch: currentBranch,
+        onShare: () => shareDevolution(devolution, currentBranch, paperSize: paperSize),
+        onPrint: () => printDevolution(devolution, currentBranch, paperSize: paperSize),
+        onExportPdf: () async {
+          final template = SingleDevolutionTemplate(devolution: devolution, branch: currentBranch);
+          await PdfExportTool.export(template, fileName: "devolucion_${devolution.docNumber}.pdf");
+        },
+      );
+    },
   );
 }
 
 // --- FUNCIÓN PARA NAVEGAR CON SOLO EL ID ---
 Future<void> showDevolutionViewerDialogFromId(BuildContext context, String devolutionId) async {
-  FocusManager.instance.primaryFocus?.unfocus();
-  SystemChannels.textInput.invokeMethod('TextInput.hide');
   final currentBranch = (getIt<AuthCubit>().state as Authenticated).branch;
   final paperSize = await PrintManager.getLocalPaperSize();
   if (!context.mounted) return;
 
-  await Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) {
-        return FutureBuilder<DevolutionInDb?>(
-          future: context.read<DevolutionsRepository>().getDevolutionById(devolutionId),
-          builder: (context, asyncSnapshot) {
-            if (asyncSnapshot.connectionState != ConnectionState.done) {
-              return Scaffold(
-                appBar: AppBar(),
-                body: const Center(child: CircularProgressIndicator()),
-              );
-            }
-
-            if (asyncSnapshot.hasError || asyncSnapshot.data == null) {
-              return Scaffold(
-                appBar: AppBar(),
-                body: Center(child: Text("Error al cargar la devolución \n ${asyncSnapshot.error}")),
-              );
-            }
-
-            final devolution = asyncSnapshot.data!;
-
-            return _DevolutionViewer(
-              devolution: devolution,
-              branch: currentBranch,
-              onShare: () => shareDevolution(devolution, currentBranch, paperSize: paperSize),
-              onPrint: () => printDevolution(devolution, currentBranch, paperSize: paperSize),
-              onExportPdf: () async {
-                final template = SingleDevolutionTemplate(devolution: devolution, branch: currentBranch);
-                await PdfExportTool.export(template, fileName: "devolucion_${devolution.docNumber}.pdf");
-              },
+  await showAdaptiveViewer(
+    context: context,
+    builder: (context) {
+      return FutureBuilder<DevolutionInDb?>(
+        future: context.read<DevolutionsRepository>().getDevolutionById(devolutionId),
+        builder: (context, asyncSnapshot) {
+          if (asyncSnapshot.connectionState != ConnectionState.done) {
+            return Scaffold(
+              appBar: AppBar(),
+              body: const Center(child: CircularProgressIndicator()),
             );
-          },
-        );
-      },
-    ),
+          }
+
+          if (asyncSnapshot.hasError || asyncSnapshot.data == null) {
+            return Scaffold(
+              appBar: AppBar(),
+              body: Center(child: Text("Error al cargar la devolución \n ${asyncSnapshot.error}")),
+            );
+          }
+
+          final devolution = asyncSnapshot.data!;
+
+          return _DevolutionViewer(
+            devolution: devolution,
+            branch: currentBranch,
+            onShare: () => shareDevolution(devolution, currentBranch, paperSize: paperSize),
+            onPrint: () => printDevolution(devolution, currentBranch, paperSize: paperSize),
+            onExportPdf: () async {
+              final template = SingleDevolutionTemplate(devolution: devolution, branch: currentBranch);
+              await PdfExportTool.export(template, fileName: "devolucion_${devolution.docNumber}.pdf");
+            },
+          );
+        },
+      );
+    },
   );
 }
 
@@ -164,6 +156,11 @@ class _DevolutionViewer extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       Text(branch.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      if (branch.formattedRuc != null)
+                        Text(
+                          branch.formattedRuc!,
+                          style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                        ),
                       Text(
                         devolution.clientInfo.name,
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
@@ -15,74 +14,67 @@ import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 import 'package:kardex_app_front/src/tools/printers/paper_settings.dart';
 import 'package:kardex_app_front/src/tools/row_color_tool.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/adaptive_viewer.dart';
 
 Future<void> showReceiptViewerDialog(BuildContext context, ReceiptInDb receipt) async {
-  FocusManager.instance.primaryFocus?.unfocus();
-  SystemChannels.textInput.invokeMethod('TextInput.hide');
   final currentBranch = (getIt<AuthCubit>().state as Authenticated).branch;
   final paperSize = await PrintManager.getLocalPaperSize();
   if (!context.mounted) return;
-  await Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => _ReceiptViewer(
-        receipt,
-        paperSize: paperSize,
-        onExportPdf: () async {
-          final template = SingleReceiptTemplate(receipt: receipt, branch: currentBranch);
-          await PdfExportTool.export(template, fileName: "recibo_${receipt.docNumber}.pdf");
-        },
-      ),
+  await showAdaptiveViewer(
+    context: context,
+    builder: (context) => _ReceiptViewer(
+      receipt,
+      paperSize: paperSize,
+      onExportPdf: () async {
+        final template = SingleReceiptTemplate(receipt: receipt, branch: currentBranch);
+        await PdfExportTool.export(template, fileName: "recibo_${receipt.docNumber}.pdf");
+      },
     ),
   );
 }
 
 Future<void> showReceiptViewerDialogFromDocNumber(BuildContext context, String docNumber) async {
-  FocusManager.instance.primaryFocus?.unfocus();
-  SystemChannels.textInput.invokeMethod('TextInput.hide');
   final currentBranch = (getIt<AuthCubit>().state as Authenticated).branch;
   final paperSize = await PrintManager.getLocalPaperSize();
   if (!context.mounted) return;
 
-  await Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) {
-        return FutureBuilder<ReceiptInDb>(
-          future: context.read<ReceiptsRepository>().getReceiptByDocNumber(docNumber),
-          builder: (context, asyncSnapshot) {
-            if (asyncSnapshot.connectionState != ConnectionState.done) {
-              return Scaffold(
-                appBar: AppBar(),
-                body: const Center(
-                  child: CircularProgressIndicator(),
-                ),
-              );
-            }
-
-            if (asyncSnapshot.hasError) {
-              return Scaffold(
-                appBar: AppBar(),
-                body: Center(
-                  child: Text("Error al cargar el recibo \n ${asyncSnapshot.error}"),
-                ),
-              );
-            }
-
-            final receipt = asyncSnapshot.data!;
-
-            return _ReceiptViewer(
-              receipt,
-              paperSize: paperSize,
-              onExportPdf: () async {
-                final template = SingleReceiptTemplate(receipt: receipt, branch: currentBranch);
-                await PdfExportTool.export(template, fileName: "recibo_${receipt.docNumber}.pdf");
-              },
+  await showAdaptiveViewer(
+    context: context,
+    builder: (context) {
+      return FutureBuilder<ReceiptInDb>(
+        future: context.read<ReceiptsRepository>().getReceiptByDocNumber(docNumber),
+        builder: (context, asyncSnapshot) {
+          if (asyncSnapshot.connectionState != ConnectionState.done) {
+            return Scaffold(
+              appBar: AppBar(),
+              body: const Center(
+                child: CircularProgressIndicator(),
+              ),
             );
-          },
-        );
-      },
-    ),
+          }
+
+          if (asyncSnapshot.hasError) {
+            return Scaffold(
+              appBar: AppBar(),
+              body: Center(
+                child: Text("Error al cargar el recibo \n ${asyncSnapshot.error}"),
+              ),
+            );
+          }
+
+          final receipt = asyncSnapshot.data!;
+
+          return _ReceiptViewer(
+            receipt,
+            paperSize: paperSize,
+            onExportPdf: () async {
+              final template = SingleReceiptTemplate(receipt: receipt, branch: currentBranch);
+              await PdfExportTool.export(template, fileName: "recibo_${receipt.docNumber}.pdf");
+            },
+          );
+        },
+      );
+    },
   );
 }
 
@@ -172,6 +164,11 @@ class _ReceiptViewer extends StatelessWidget {
                       fontSize: 16,
                     ),
                   ),
+                  if (currentBranch.formattedRuc != null)
+                    Text(
+                      currentBranch.formattedRuc!,
+                      style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                    ),
                   Builder(
                     builder: (context) {
                       final label = Text(

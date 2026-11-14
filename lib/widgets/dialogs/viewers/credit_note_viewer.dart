@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
@@ -11,85 +10,78 @@ import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/custom_slider.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/adaptive_viewer.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 Future<void> showCreditNoteViewerDialog(BuildContext context, CreditNoteInDb creditNote) async {
-  FocusManager.instance.primaryFocus?.unfocus();
-  SystemChannels.textInput.invokeMethod('TextInput.hide');
   final currentBranch = (getIt<AuthCubit>().state as Authenticated).branch;
   final paperSize = await PrintManager.getLocalPaperSize();
   if (!context.mounted) return;
 
-  await Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) {
-        return _CreditNoteViewer(
-          creditNote: creditNote,
-          branch: currentBranch,
-          onShare: () => shareCreditNote(creditNote, currentBranch, paperSize: paperSize),
-          onPrint: () => printCreditNote(creditNote, currentBranch, paperSize: paperSize),
-          onExportPdf: () async {
-            final template = SingleCreditNoteTemplate(creditNote: creditNote, branch: currentBranch);
-            await PdfExportTool.export(template, fileName: "nota_credito_${creditNote.docNumber}.pdf");
-          },
-        );
-      },
-    ),
+  await showAdaptiveViewer(
+    context: context,
+    builder: (context) {
+      return _CreditNoteViewer(
+        creditNote: creditNote,
+        branch: currentBranch,
+        onShare: () => shareCreditNote(creditNote, currentBranch, paperSize: paperSize),
+        onPrint: () => printCreditNote(creditNote, currentBranch, paperSize: paperSize),
+        onExportPdf: () async {
+          final template = SingleCreditNoteTemplate(creditNote: creditNote, branch: currentBranch);
+          await PdfExportTool.export(template, fileName: "nota_credito_${creditNote.docNumber}.pdf");
+        },
+      );
+    },
   );
 }
 
 Future<void> showCreditNoteViewerDialogFromId(BuildContext context, String creditNoteId) async {
-  FocusManager.instance.primaryFocus?.unfocus();
-  SystemChannels.textInput.invokeMethod('TextInput.hide');
   final currentBranch = (getIt<AuthCubit>().state as Authenticated).branch;
   final paperSize = await PrintManager.getLocalPaperSize();
   if (!context.mounted) return;
 
-  await Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) {
-        return FutureBuilder<CreditNoteInDb?>(
-          future: context.read<CreditNotesRepository>().getCreditNoteById(creditNoteId),
-          builder: (context, asyncSnapshot) {
-            if (asyncSnapshot.connectionState != ConnectionState.done) {
-              return Scaffold(
-                backgroundColor: const Color(0xFFF8FAFC),
-                appBar: AppBar(title: const Text("Cargando Nota...")),
-                body: AppSkeletonLoader.cards(count: 3),
-              );
-            }
-
-            if (asyncSnapshot.hasError || asyncSnapshot.data == null) {
-              return Scaffold(
-                backgroundColor: const Color(0xFFF8FAFC),
-                appBar: AppBar(title: const Text("Nota de Crédito")),
-                body: AppEmptyState(
-                  icon: Icons.error_outline_rounded,
-                  title: "Error al cargar la nota de crédito",
-                  subtitle: asyncSnapshot.error?.toString() ?? "Documento no encontrado",
-                  accentColor: AppThemeTokens.danger,
-                ),
-              );
-            }
-
-            final creditNote = asyncSnapshot.data!;
-
-            return _CreditNoteViewer(
-              creditNote: creditNote,
-              branch: currentBranch,
-              onShare: () => shareCreditNote(creditNote, currentBranch, paperSize: paperSize),
-              onPrint: () => printCreditNote(creditNote, currentBranch, paperSize: paperSize),
-              onExportPdf: () async {
-                final template = SingleCreditNoteTemplate(creditNote: creditNote, branch: currentBranch);
-                await PdfExportTool.export(template, fileName: "nota_credito_${creditNote.docNumber}.pdf");
-              },
+  await showAdaptiveViewer(
+    context: context,
+    builder: (context) {
+      return FutureBuilder<CreditNoteInDb?>(
+        future: context.read<CreditNotesRepository>().getCreditNoteById(creditNoteId),
+        builder: (context, asyncSnapshot) {
+          if (asyncSnapshot.connectionState != ConnectionState.done) {
+            return Scaffold(
+              backgroundColor: const Color(0xFFF8FAFC),
+              appBar: AppBar(title: const Text("Cargando Nota...")),
+              body: AppSkeletonLoader.cards(count: 3),
             );
-          },
-        );
-      },
-    ),
+          }
+
+          if (asyncSnapshot.hasError || asyncSnapshot.data == null) {
+            return Scaffold(
+              backgroundColor: const Color(0xFFF8FAFC),
+              appBar: AppBar(title: const Text("Nota de Crédito")),
+              body: AppEmptyState(
+                icon: Icons.error_outline_rounded,
+                title: "Error al cargar la nota de crédito",
+                subtitle: asyncSnapshot.error?.toString() ?? "Documento no encontrado",
+                accentColor: AppThemeTokens.danger,
+              ),
+            );
+          }
+
+          final creditNote = asyncSnapshot.data!;
+
+          return _CreditNoteViewer(
+            creditNote: creditNote,
+            branch: currentBranch,
+            onShare: () => shareCreditNote(creditNote, currentBranch, paperSize: paperSize),
+            onPrint: () => printCreditNote(creditNote, currentBranch, paperSize: paperSize),
+            onExportPdf: () async {
+              final template = SingleCreditNoteTemplate(creditNote: creditNote, branch: currentBranch);
+              await PdfExportTool.export(template, fileName: "nota_credito_${creditNote.docNumber}.pdf");
+            },
+          );
+        },
+      );
+    },
   );
 }
 
@@ -195,7 +187,9 @@ class _CreditNoteViewer extends StatelessWidget {
                                     ),
                                     const SizedBox(height: 2),
                                     Text(
-                                      "Sucursal: ${branch.name}",
+                                      branch.formattedRuc != null
+                                          ? "Sucursal: ${branch.name} • ${branch.formattedRuc!}"
+                                          : "Sucursal: ${branch.name}",
                                       style: TextStyle(
                                         fontSize: 12.5,
                                         color: Colors.grey.shade600,

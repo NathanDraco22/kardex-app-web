@@ -16,6 +16,7 @@ Future<void> showLocalPrinterSettingsDialog(BuildContext context) async {
   final autoCut = await PrintManager.getAutoCutEnabled();
   final invertColor = await PrintManager.getInvertColorEnabled();
   final dithering = await PrintManager.getDitheringEnabled();
+  final extraRightMargin80mm = await PrintManager.getExtraRightMargin80mm();
 
   if (!context.mounted) return;
 
@@ -29,6 +30,7 @@ Future<void> showLocalPrinterSettingsDialog(BuildContext context) async {
         initialAutoCut: autoCut,
         initialInvertColor: invertColor,
         initialDithering: dithering,
+        initialExtraRightMargin80mm: extraRightMargin80mm,
       );
     },
   );
@@ -41,6 +43,7 @@ class _LocalPrinterSettingsDialog extends StatefulWidget {
   final bool initialAutoCut;
   final bool initialInvertColor;
   final bool initialDithering;
+  final double initialExtraRightMargin80mm;
 
   const _LocalPrinterSettingsDialog({
     required this.initialSize,
@@ -49,6 +52,7 @@ class _LocalPrinterSettingsDialog extends StatefulWidget {
     required this.initialAutoCut,
     required this.initialInvertColor,
     required this.initialDithering,
+    required this.initialExtraRightMargin80mm,
   });
 
   @override
@@ -61,6 +65,7 @@ class _LocalPrinterSettingsDialogState extends State<_LocalPrinterSettingsDialog
   late bool _autoCut;
   late bool _invertColor;
   late bool _dithering;
+  late double _extraRightMargin80mm;
   Printer? _selectedPrinter;
 
   final ThermalPrinterService _printerService = getIt<ThermalPrinterService>();
@@ -78,6 +83,7 @@ class _LocalPrinterSettingsDialogState extends State<_LocalPrinterSettingsDialog
     _autoCut = widget.initialAutoCut;
     _invertColor = widget.initialInvertColor;
     _dithering = widget.initialDithering;
+    _extraRightMargin80mm = widget.initialExtraRightMargin80mm.clamp(0.0, 10.0).toDouble();
 
     _devicesSubscription = _printerService.devicesStream.listen((printers) {
       if (mounted) {
@@ -143,6 +149,7 @@ class _LocalPrinterSettingsDialogState extends State<_LocalPrinterSettingsDialog
 
   Future<void> _saveSettings() async {
     await PrintManager.saveLocalPaperSize(_selectedSize);
+    await PrintManager.saveExtraRightMargin80mm(_extraRightMargin80mm);
 
     if (kIsWeb) {
       await PrintManager.saveIsDirectPrintEnabled(false);
@@ -203,6 +210,43 @@ class _LocalPrinterSettingsDialogState extends State<_LocalPrinterSettingsDialog
                   });
                 },
               ),
+
+              if (_selectedSize == PaperSize.mm80) ...[
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Margen Derecho Extra (80 mm)',
+                      style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      '+${_extraRightMargin80mm.toStringAsFixed(0)} mm',
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        color: theme.colorScheme.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Auméntalo si tu impresora de 80 mm recorta texto o montos por el borde derecho.',
+                  style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                ),
+                Slider(
+                  value: _extraRightMargin80mm,
+                  min: 0,
+                  max: 10,
+                  divisions: 10,
+                  label: '+${_extraRightMargin80mm.toStringAsFixed(0)} mm',
+                  onChanged: (value) {
+                    setState(() {
+                      _extraRightMargin80mm = value;
+                    });
+                  },
+                ),
+              ],
 
               const SizedBox(height: 20),
               const Divider(),

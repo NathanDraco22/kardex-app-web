@@ -189,6 +189,13 @@ class ShiftClosePdfTemplate implements PdfTemplate {
                             color: PdfColors.black,
                           ),
                         ),
+                        if (branch.formattedRuc != null) ...[
+                          pw.SizedBox(height: 2),
+                          pw.Text(
+                            branch.formattedRuc!,
+                            style: const pw.TextStyle(fontSize: 8.5, color: PdfColors.grey700),
+                          ),
+                        ],
                         if (branch.address.isNotEmpty) ...[
                           pw.SizedBox(height: 2),
                           pw.Text(
