@@ -159,11 +159,31 @@ El detalle completo está en [`diseno_e_identidad_visual.md`](./diseno_e_identid
 
 ## 11. Ramas `main` y `lite`
 
+**Antes de tocar código, identifica la edición:**
+
+```powershell
+git branch --show-current   # main | lite
+```
+
+También puedes verificar `applicationId` en `android/app/build.gradle.kts` (`...neptuno_system` vs `...neptuno_system_lite`).
+
+Reglas:
+
 - Todo cambio en `main` debe evaluarse para `lite` **antes** de cerrar la tarea.
 - Código compartido (modelos, data sources, repositories, `kardex_business`, widgets comunes): entra por `main` y se sincroniza con `git merge main` en `lite`.
 - UI/arquitectura exclusiva de `lite`: se implementa en `lite`.
 - Nunca se mergea `lite` completo hacia `main`.
-- Reglas de negocio: [`ramas_main_vs_lite.md`](./ramas_main_vs_lite.md).
+- **Implementado ≠ registrado ≠ expuesto.** Una ruta en `app_router.dart` puede estar dentro de `/* ... */`. Confirma en `lib/src/modules/home/data/home_modules_registry.dart` si la pantalla se muestra.
+- En `lite`, `product-movements`, `product-price-catalog` y `/advanced-tools` están comentadas; `commercial-product-movements` está activa pero no expuesta.
+- Reglas de negocio y tabla verificada: [`ramas_main_vs_lite.md`](./ramas_main_vs_lite.md).
+
+**Checklist de edición:**
+
+- [ ] ¿Identifiqué la edición activa?
+- [ ] ¿El cambio aplica a la otra edición? (sí / no / parcial)
+- [ ] ¿Definí si es compartido, lite-only o no aplica?
+- [ ] ¿La ruta nueva quedó registrada **y** expuesta en el Home?
+- [ ] ¿Actualicé la documentación de diferencias si cambió la exposición?
 
 ---
 

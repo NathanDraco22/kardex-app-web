@@ -2,15 +2,18 @@
 
 > [!IMPORTANT]
 > ### 🛑 REGLA DE ORO OBLIGATORIA
-> **Antes de realizar CUALQUIER acción, análisis, refactorización o modificación de código en este proyecto, el agente DEBE leer obligatoriamente:**
+> **Antes de realizar CUALQUIER acción, análisis, refactorización o modificación de código en este proyecto, el agente DEBE:**
+> 0. **Determinar la edición activa** con `git branch --show-current` (`main` o `lite`). No asumas paridad entre ediciones. Ver [`wiki/ramas_main_vs_lite.md`](wiki/ramas_main_vs_lite.md).
 > 1. 📖 [`wiki/INDEX.md`](wiki/INDEX.md): contexto rápido — estructura, dónde está cada cosa, qué hace y catálogo de enlaces.
 > 2. 🏗️ [`wiki/project_index.md`](wiki/project_index.md): arquitectura Onion / BLoC y ciclo de vida.
 > 3. 🗂️ [`wiki/modules/modules_index.md`](wiki/modules/modules_index.md): catálogo de módulos de la aplicación.
 > 4. 📂 **La ficha del módulo correspondiente** dentro de [`wiki/modules/`](wiki/modules/) si existe.
 > 5. 🧱 [`wiki/conventions.md`](wiki/conventions.md), 🔐 [`wiki/security.md`](wiki/security.md) y ⚙️ [`wiki/operations.md`](wiki/operations.md) según la tarea.
-> 6. 🔄 [`wiki/ramas_main_vs_lite.md`](wiki/ramas_main_vs_lite.md): regla de sincronización `main` ↔ `lite` y diferencias entre ediciones.
 >
 > **No explores el árbol a ciegas.** Si un módulo no tiene ficha, usa `modules_index.md` para ubicar su carpeta en `lib/src/modules/` y sigue el flujo vista → cubit → repositorio.
+
+> [!WARNING]
+> **Implementado ≠ registrado ≠ expuesto.** Que exista un archivo o una ruta en `app_router.dart` no significa que la pantalla esté disponible. Revisa si la ruta está dentro de un bloque `/* ... */` y confirma en `lib/src/modules/home/data/home_modules_registry.dart`. En `lite` hay rutas comentadas y una ruta activa que no está en el Home (`commercial-product-movements`).
 
 > [!IMPORTANT]
 > ### 🔄 REGLA DE SINCRONIZACIÓN `main` ↔ `lite`
@@ -23,6 +26,14 @@
 > 4. Si no aplica, se deja constancia del motivo en la tarea/PR.
 > 5. Nunca se mergea `lite` completo hacia `main`.
 > 6. **Ajustes y Mermas y Solicitudes de Ajuste:** activos en `lite`; se sincronizan desde `main` con el flujo estándar. **Movimientos de un Producto:** no habilitar en `lite`.
+>
+> **Checklist de cierre por edición:**
+> - [ ] ¿Identifiqué la edición activa?
+> - [ ] ¿El cambio aplica a la otra edición (sí / no / parcial)?
+> - [ ] Si es compartido, ¿entra por `main` y se sincroniza a `lite`?
+> - [ ] Si es lite-only, ¿se documentó el motivo?
+> - [ ] Si no aplica, ¿quedó constancia?
+> - [ ] ¿La ruta nueva está registrada **y** expuesta en `home_modules_registry.dart`?
 >
 > Consultar siempre [`wiki/ramas_main_vs_lite.md`](wiki/ramas_main_vs_lite.md).
 

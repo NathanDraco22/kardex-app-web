@@ -1,7 +1,29 @@
 # Ediciones `main` vs `lite`: Contexto de Negocio y Reglas de Producto (`wiki/ramas_main_vs_lite.md`)
 
 > [!IMPORTANT]
-> Este documento explica **por qué** existen las dos ediciones de Kardex App Front (Neptuno App) y qué decisiones de producto hay detrás. La **matriz técnica** de navegación, rutas y módulos está en [sistema_navegacion.md](./sistema_navegacion.md#6-matriz-de-diferencias-entre-ramas-main-vs-lite). Este documento no duplica esa matriz: la interpreta desde el negocio.
+> **Este es el documento canónico de la distinción `main` / `lite`.** Explica **por qué** existen las dos ediciones y **qué** cambia técnicamente. La navegación detallada está en [sistema_navegacion.md](./sistema_navegacion.md), pero la verdad de negocio y la tabla verificada viven aquí.
+>
+> **Verificado contra el código:** `main` @ `5d83c101` y `lite` @ `debed32d` (2026-11-13). Si el código cambia, actualiza esta tabla y la fecha.
+
+---
+
+## 0. Cómo identificar la edición activa
+
+Antes de leer o modificar cualquier archivo, determina en qué edición estás:
+
+| Método | Comando / archivo | `main` | `lite` |
+| :--- | :--- | :--- | :--- |
+| Rama Git | `git branch --show-current` | `main` | `lite` |
+| `applicationId` Android | `android/app/build.gradle.kts` | `com.nathandraco22.neptuno_system` | `com.nathandraco22.neptuno_system_lite` |
+| Salida de APK | `scripts/compile_android*.py` | `neptuno-arm64-v8a.apk` | `neptuno-lite-arm64-v8a.apk` |
+
+> [!WARNING]
+> **No confundas “implementado”, “registrado en el router” y “expuesto en el Home”.**
+> - **Implementado:** existe el archivo/carpeta.
+> - **Registrado:** existe la ruta en `app_router.dart` y **no está comentada**.
+> - **Expuesto:** aparece en `lib/src/modules/home/data/home_modules_registry.dart`.
+>
+> En `lite` hay código implementado que no se expone, rutas comentadas y, al menos, una ruta activa que no está en el Home (`commercial-product-movements`). Un `grep` del router no basta: revisa si la ruta está dentro de un bloque `/* ... */` y confirma en el registry.
 
 ---
 
@@ -88,8 +110,6 @@ flowchart LR
 
 ## 5. Por qué no existe "Movimientos de un Producto" en `lite`
 
-Esta es la duda más frecuente y la más importante de documentar.
-
 En `main`, la opción **"Movimientos de un Producto"** consulta el **libro kárdex**: los asientos que se generan cuando una entrada, salida, ajuste, transferencia o venta afecta el inventario con costo promedio ponderado. Es una pantalla de auditoría.
 
 En `lite`, la operación diaria de stock no escribe ese libro:
@@ -99,6 +119,8 @@ En `lite`, la operación diaria de stock no escribe ese libro:
 - **Excepción:** Ajustes, Mermas y Solicitudes de Ajuste usan el flujo estándar de `main`; al guardar/aprobar sí actualizan stock y costo, y generan transacciones de producto.
 
 Por eso la pantalla de movimientos sigue deshabilitada: mostraría una auditoría **parcial** (solo ajustes, mermas y solicitudes), no la operación directa completa. No está rota ni "pendiente": se omitió deliberadamente para no ofrecer una vista incompleta o engañosa. Si algún día `lite` necesita kárdex completo, el cambio no es habilitar el menú: implica cambiar el modelo de registro de la entrada/salida directa y del +/- del editor.
+
+> **Nota de verificación (2026-11-13):** en `lite`, la ruta `product-movements` del inventario está **comentada** en `app_router.dart` y no aparece en el Home. Los archivos de `product_movements/` existen en la rama, pero la pantalla no está activa. No la habilites sin implementar kárdex completo.
 
 ---
 
@@ -113,14 +135,61 @@ Aunque simplifica el flujo principal, `lite` mantiene las herramientas operativa
 - Bitácora de Vencimientos (si la sucursal/configuración lo habilita).
 - Catálogo de Productos como sección dentro de Inventario (lista global, categorías, unidades y escalas).
 - **Ajustes y Mermas** (entrada/salida por ajuste, mermas e historiales), con el flujo estándar de `main`.
-- **Solicitudes de Ajuste** con flujo de aprobación por roles (Supervisor/Admin).
-- Comercio, Cuentas por Cobrar, Gastos, Finanzas, Clientes, Proveedores y Configuración.
+- **Solicitudes de Ajuste** con flujo de aprobación por roles (Supervisor/Admin): creación, listado, detalle, edición, aprobación y cancelación.
+- Comercio, Cuentas por Cobrar, Gastos, Finanzas, Clientes, Proveedores, Importaciones y Configuración (sucursales, usuarios, roles, API keys, periféricos y parámetros).
 
-Lo que `lite` **no** incluye: Movimientos de un Producto (kárdex completo), Catálogo de Precios y Herramientas Avanzadas (proyecciones/estadísticas).
+> Actualización 2026-11-13: Ajustes, Mermas y Solicitudes de Ajuste ya están **activos** en `lite`. La versión anterior de este documento decía lo contrario y quedó obsoleta.
 
 ---
 
-## 7. Cómo decidir entre `main` y `lite`
+## 7. Qué NO incluye `lite`
+
+| Elemento | Estado real en `lite` |
+| :--- | :--- |
+| Módulo raíz **Productos** | No existe como raíz; sus secciones viven dentro de Inventario. |
+| Módulo raíz **Herramientas Avanzadas** | Código presente, ruta `/advanced-tools` comentada y no expuesta. |
+| **Movimientos de un Producto** (kárdex) | Ruta comentada y no expuesta. Requiere kárdex completo; la entrada/salida directa y el +/- del editor no lo escriben (los ajustes sí generan transacciones). |
+| **Catálogo de Precios** | Ruta comentada y no expuesta; el precio se edita desde el Catálogo de Inventario. |
+| **Movimientos de producto en Comercio** | Ruta `commercial-product-movements` **activa** en el router, pero **no expuesta** en el Home. |
+
+Ninguno de estos elementos debe habilitarse “para igualar a `main`” sin evaluar el modelo operativo y la fuente de datos.
+
+---
+
+## 8. Tabla técnica verificada (`main` vs `lite`)
+
+| Aspecto | `main` @ `5d83c101` | `lite` @ `debed32d` |
+| :--- | :--- | :--- |
+| Módulos raíz en Home | 10 (`clients`, `suppliers`, `products`, `commercial`, `pendingAccounts`, `inventory`, `expenses`, `finance`, `advancedTools`, `settings`) | 8 (sin `products` ni `advancedTools`) |
+| Catálogo de inventario | `product-price-catalog` | `product-inventory-catalog` |
+| Catálogo de Precios | Expuesto | Ruta comentada y no expuesta |
+| Movimientos de Producto (inventario) | Expuesto | Ruta comentada y no expuesta |
+| Movimientos de Producto (comercio) | Expuesto | Ruta activa, no expuesta en Home |
+| Herramientas Avanzadas | Expuesto | Ruta comentada y no expuesta |
+| Ajustes y Mermas | Activo | **Activo** |
+| Solicitudes de Ajuste | Activas | **Activas** |
+| Importaciones CSV | Expuesto | Expuesto |
+| `applicationId` Android | `com.nathandraco22.neptuno_system` | `com.nathandraco22.neptuno_system_lite` |
+| Script APK | `scripts/compile_android.py` | `scripts/compile_android_lite.py` |
+| Script Web | `scripts/compile_web.py` | `scripts/compile_web_lite.py` |
+
+### Cómo se verificó
+
+```powershell
+git branch --show-current
+git ls-tree --name-only main:lib/src/modules
+git ls-tree --name-only lite:lib/src/modules
+git show main:lib/src/modules/home/data/home_modules_registry.dart
+git show lite:lib/src/modules/home/data/home_modules_registry.dart
+git show main:lib/config/app_router.dart
+git show lite:lib/config/app_router.dart
+```
+
+Recuerda que un `grep` puede encontrar rutas dentro de bloques `/* ... */`. Verifica el contexto antes de concluir que una ruta está activa.
+
+---
+
+## 9. Cómo decidir entre `main` y `lite`
 
 | Si el cliente... | Recomendar |
 | :--- | :--- |
@@ -138,17 +207,17 @@ Lo que `lite` **no** incluye: Movimientos de un Producto (kárdex completo), Cat
 
 ---
 
-## 8. Reglas para desarrollo y mantenimiento
+## 10. Reglas para desarrollo y mantenimiento
 
 > [!IMPORTANT]
-> Todo cambio en `main` debe evaluarse para `lite` antes de cerrar la tarea. Si aplica, definir si entra como código compartido (vía `main → lite`) o como implementación lite-only. No asumir que llegará solo.
+> Todo cambio en `main` debe evaluarse para `lite` antes de cerrar la tarea. No asumir que llegará solo.
 
 1. **`lite` no es un feature flag de `main`.** Son dos modelos operativos. No asumas que una mejora de `main` aplica igual en `lite`.
 2. **No habilitar `product-movements` en `lite`.** Aunque ajustes, mermas y solicitudes generan transacciones, la entrada/salida directa y el +/- del editor no escriben el libro; la pantalla mostraría una auditoría parcial.
 3. **No portar el editor directo de stock a `main` sin evaluar el kárdex.** En `main`, el flujo formal y la auditoría son parte del valor del producto.
 4. **Mantener los documentos en `lite`.** Aunque sean directos, siguen siendo el respaldo operativo del cliente.
 5. **Ajustes, Mermas y Solicitudes de Ajuste están activos en `lite`.** Usan el flujo estándar de `main`; no convertirlos a `useKardex: false` sin backend. Mantener las reglas de aprobación (Supervisor/Admin) y sincronizar sus cambios desde `main`.
-6. **Revisar ambas ramas ante cualquier cambio de navegación.** La matriz técnica y las reglas están en [sistema_navegacion.md](./sistema_navegacion.md#7-guía-práctica-para-desarrolladores), sección 7.3.
+6. **Revisar ambas ramas ante cualquier cambio de navegación.** La matriz técnica y las reglas están en [sistema_navegacion.md](./sistema_navegacion.md#6-matriz-de-diferencias-entre-ramas-main-vs-lite), sección 7.3.
 7. **Actualizar este documento si cambia el flujo de producto/stock/precio.** La documentación debe explicar la intención, no solo la pantalla.
 8. **Evaluar todo cambio de `main` para `lite`.** Antes de dar por terminado un cambio en `main`, revisar si aplica a la operación lite y documentar la decisión:
    - **Compartido:** entra por `main` y se baja con `git merge main` a `lite`.
@@ -156,22 +225,34 @@ Lo que `lite` **no** incluye: Movimientos de un Producto (kárdex completo), Cat
    - **No aplica:** se deja constancia del motivo.
    No asumir que el cambio llegará a `lite` solo por existir en `main`.
 
+### Checklist de cierre por edición
+
+Antes de dar una tarea por terminada:
+
+- [ ] ¿Identifiqué la edición activa (`git branch --show-current`)?
+- [ ] ¿El cambio aplica a la otra edición? ¿Sí / No / Parcial?
+- [ ] Si es **compartido**: ¿entra por `main` y se sincroniza con `git merge main` en `lite`?
+- [ ] Si es **lite-only**: ¿se implementó en `lite` y se documentó el motivo?
+- [ ] Si **no aplica**: ¿dejé constancia del motivo?
+- [ ] ¿La ruta nueva está registrada **y** expuesta en `home_modules_registry.dart`?
+- [ ] ¿Actualicé esta tabla o la matriz de navegación si cambió la exposición?
+
 ---
 
-## 9. Referencias de implementación
+## 11. Referencias de implementación
 
-| Tema | Rama | Referencia |
+| Tema | Edición | Referencia |
 | :--- | :--- | :--- |
 | Catálogo de Inventario | `lite` | `lib/src/modules/inventory/product_inventory_catalog/product_inventory_catalog_screen.dart` |
 | Editor de Inventario y Precios | `lite` | `lib/widgets/dialogs/product_inventory_editor_dialog.dart` |
 | Alta "Nuevo Producto con Datos" | `lite` (invocado) | `lib/widgets/dialogs/create_product_with_data_dialog.dart` |
 | Sumar/restar stock | `lite` | `lib/src/cubits/write_product_account/write_product_account_cubit.dart` |
 | Entrada/Salida en modo directo | `lite` | `write_entry_doc_cubit.dart` / `write_exit_doc_cubit.dart` con `useKardex: false` |
-| Ajustes y Mermas | `lite` | `lib/src/modules/inventory/adjust_entry/` y `adjust_exit/` |
-| Solicitudes de Ajuste | `lite` | `lib/src/modules/inventory/adjustment_request/` y ruta `adjustment-requests` |
-| Movimientos de un Producto | `main` | Módulo `inventory/product_movements` y ruta `product-movements` |
-| Catálogo de Precios | `main` | `lib/src/modules/inventory/product_price_catalog/` y ruta `product-price-catalog` |
+| Ajustes y Mermas | Ambas | `lib/src/modules/inventory/adjust_entry/` y `adjust_exit/` |
+| Solicitudes de Ajuste | Ambas | `lib/src/modules/inventory/adjustment_request/` y ruta `adjustment-requests` |
+| Movimientos de un Producto | `main` | `lib/src/modules/inventory/product_movements/view/product_movements_screen.dart` |
+| Catálogo de Precios | `main` | `lib/src/modules/inventory/product_price_catalog/product_price_catalog_screen.dart` |
 
 ---
 
-*Documento de contexto de producto. Para la especificación técnica de navegación, consulta [sistema_navegacion.md](./sistema_navegacion.md).*
+*Documento canónico de producto y diferencias técnicas. Para la especificación de navegación, consulta [sistema_navegacion.md](./sistema_navegacion.md).*

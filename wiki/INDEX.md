@@ -4,6 +4,14 @@ Punto de entrada de la wiki del frontend. **Lee esto antes de explorar el códig
 
 > Si llegaste aquí desde [`../agents.md`](../agents.md): estás en el lugar correcto. Continúa con la sección que corresponda a tu tarea.
 
+> [!WARNING]
+> **Este proyecto tiene dos ediciones: `main` y `lite`.** Antes de leer o modificar código, determina en cuál estás:
+> ```powershell
+> git branch --show-current
+> ```
+> También puedes verificar el `applicationId` en `android/app/build.gradle.kts` (`...neptuno_system` vs `...neptuno_system_lite`).
+> La fuente canónica es [`ramas_main_vs_lite.md`](./ramas_main_vs_lite.md). **No asumas paridad entre ediciones.**
+
 ---
 
 ## 1. Qué es este proyecto
@@ -27,7 +35,25 @@ La arquitectura es **Onion + BLoC/Cubit**: la UI consume cubits, los cubits cons
 
 ---
 
-## 2. Mapa de un vistazo
+## 2. Edición activa (`main` vs `lite`)
+
+| Aspecto | `main` | `lite` |
+| :--- | :--- | :--- |
+| Módulos raíz | 10 | 8 |
+| Productos | Módulo raíz propio | Integrado en Inventario |
+| Catálogo de inventario | `product-price-catalog` | `product-inventory-catalog` |
+| Movimientos de Producto | Expuesto | No expuesto |
+| Herramientas Avanzadas | Expuesto | No expuesto |
+| Ajustes, Mermas y Solicitudes | Activos | **Activos** |
+| `applicationId` | `...neptuno_system` | `...neptuno_system_lite` |
+
+> **Implementado ≠ registrado en el router ≠ expuesto en el Home.** En `lite` hay rutas comentadas y una ruta activa que no aparece en `home_modules_registry.dart`. Verifica el contexto antes de concluir que una pantalla está disponible.
+>
+> Tabla completa, método de verificación y checklist de cierre: [`ramas_main_vs_lite.md`](./ramas_main_vs_lite.md).
+
+---
+
+## 3. Mapa de un vistazo
 
 | Carpeta | Qué hace |
 | :--- | :--- |
@@ -60,7 +86,7 @@ La arquitectura es **Onion + BLoC/Cubit**: la UI consume cubits, los cubits cons
 
 ---
 
-## 3. Dónde está cada cosa
+## 4. Dónde está cada cosa
 
 | Si buscas… | Ve a… |
 | :--- | :--- |
@@ -87,7 +113,7 @@ La arquitectura es **Onion + BLoC/Cubit**: la UI consume cubits, los cubits cons
 
 ---
 
-## 4. Catálogo de enlaces
+## 5. Catálogo de enlaces
 
 ### 🧭 Para empezar
 
@@ -144,45 +170,50 @@ La arquitectura es **Onion + BLoC/Cubit**: la UI consume cubits, los cubits cons
 
 ---
 
-## 5. Rutas rápidas por tarea
+## 6. Rutas rápidas por tarea
 
-| Tarea | Archivos a abrir |
-| :--- | :--- |
-| POS / venta rápida | `lib/src/modules/commercial/sale_terminal/`, [`modules/commercial.md`](./modules/commercial.md) |
-| Facturación / proformas | `lib/src/modules/commercial/client_invoices/`, `proforma/`, `current_proforma/` |
-| Notas de crédito | `lib/src/modules/commercial/credit_notes/`, [`modules/credit_notes.md`](./modules/credit_notes.md) |
-| Cobros / recibos | `lib/src/modules/commercial/receipt_history/`, `lib/src/modules/pending_accounts/` |
-| Devoluciones | `lib/src/modules/commercial/devolutions/`, `current_devolutions/` |
-| Inventario / kárdex | `lib/src/modules/inventory/`, [`modules/inventory.md`](./modules/inventory.md) |
-| Ajustes y solicitudes | `lib/src/modules/inventory/adjustment_request/`, `adjust_entry/`, `adjust_exit/` |
-| Transferencias | `lib/src/modules/inventory/create_transfer/`, `current_tranfers/` |
-| Productos y precios | `lib/src/modules/product_catalog/`, [`modules/product_catalog.md`](./modules/product_catalog.md) |
-| Clientes | `lib/src/modules/client_catalog/`, [`modules/client_catalog.md`](./modules/client_catalog.md) |
-| Proveedores | `lib/src/modules/suppliers_catalog/`, [`modules/suppliers_catalog.md`](./modules/suppliers_catalog.md) |
-| Gastos | `lib/src/modules/expenses/`, [`modules/expenses.md`](./modules/expenses.md) |
-| Finanzas / reportes | `lib/src/modules/finance/`, [`modules/finance.md`](./modules/finance.md) |
-| Importaciones CSV | `lib/src/modules/imports/`, [`modules/imports.md`](./modules/imports.md) |
-| Configuración / roles | `lib/src/modules/settings/`, [`modules/settings.md`](./modules/settings.md) |
-| Home / navegación / atajos | `lib/src/modules/home/`, [`sistema_navegacion.md`](./sistema_navegacion.md) |
-| Estilos y fondos | [`diseno_e_identidad_visual.md`](./diseno_e_identidad_visual.md), `lib/config/app_theme.dart` |
-| Impresión / PDF | [`sistema_impresion_termica.md`](./sistema_impresion_termica.md), `lib/src/tools/printers/`, `lib/widgets/pdf/` |
+| Tarea | Edición | Archivos a abrir |
+| :--- | :--- | :--- |
+| POS / venta rápida | Ambas | `lib/src/modules/commercial/sale_terminal/`, [`modules/commercial.md`](./modules/commercial.md) |
+| Facturación / proformas | Ambas | `lib/src/modules/commercial/client_invoices/`, `proforma/`, `current_proforma/` |
+| Notas de crédito | Ambas | `lib/src/modules/commercial/credit_notes/`, [`modules/credit_notes.md`](./modules/credit_notes.md) |
+| Cobros / recibos | Ambas | `lib/src/modules/commercial/receipt_history/`, `lib/src/modules/pending_accounts/` |
+| Devoluciones | Ambas | `lib/src/modules/commercial/devolutions/`, `current_devolutions/` |
+| Inventario / kárdex | Ambas (comportamiento distinto) | `lib/src/modules/inventory/`, [`modules/inventory.md`](./modules/inventory.md), [`ramas_main_vs_lite.md`](./ramas_main_vs_lite.md) |
+| Catálogo de inventario | `lite` | `lib/src/modules/inventory/product_inventory_catalog/` |
+| Catálogo de precios | `main` | `lib/src/modules/inventory/product_price_catalog/` |
+| Ajustes y solicitudes | Ambas | `lib/src/modules/inventory/adjustment_request/`, `adjust_entry/`, `adjust_exit/` |
+| Transferencias | Ambas | `lib/src/modules/inventory/create_transfer/`, `current_tranfers/` |
+| Productos y precios | Ambas (raíz en `main`, dentro de Inventario en `lite`) | `lib/src/modules/product_catalog/`, `lib/src/modules/inventory/product_inventory_catalog/`, [`modules/product_catalog.md`](./modules/product_catalog.md) |
+| Clientes | Ambas | `lib/src/modules/client_catalog/`, [`modules/client_catalog.md`](./modules/client_catalog.md) |
+| Proveedores | Ambas | `lib/src/modules/suppliers_catalog/`, [`modules/suppliers_catalog.md`](./modules/suppliers_catalog.md) |
+| Gastos | Ambas | `lib/src/modules/expenses/`, [`modules/expenses.md`](./modules/expenses.md) |
+| Finanzas / reportes | Ambas | `lib/src/modules/finance/`, [`modules/finance.md`](./modules/finance.md) |
+| Importaciones CSV | Ambas | `lib/src/modules/imports/`, [`modules/imports.md`](./modules/imports.md) |
+| Configuración / roles | Ambas | `lib/src/modules/settings/`, [`modules/settings.md`](./modules/settings.md) |
+| Home / navegación / atajos | Ambas (menú distinto) | `lib/src/modules/home/`, [`sistema_navegacion.md`](./sistema_navegacion.md) |
+| Estadísticas / proyecciones | `main` | `lib/src/modules/advanced_tools/`, [`modules/advanced_tools.md`](./modules/advanced_tools.md) |
+| Estilos y fondos | Ambas | [`diseno_e_identidad_visual.md`](./diseno_e_identidad_visual.md), `lib/config/app_theme.dart` |
+| Impresión / PDF | Ambas | [`sistema_impresion_termica.md`](./sistema_impresion_termica.md), `lib/src/tools/printers/`, `lib/widgets/pdf/` |
 
 ---
 
-## 6. Observaciones conocidas
+## 7. Observaciones conocidas
 
 | Observación | Impacto |
 | :--- | :--- |
 | `lib/src/data/` **no existe** y `lib/src/domain/` está vacío. | La capa de datos/dominio vive en `packages/kardex_business/lib/src/`. Los documentos que digan lo contrario están desactualizados. |
 | `agents.md` y `project_index.md` mencionan rutas antiguas (`lib/src/data/`, `lib/src/services/http_service.dart`). | Se corrigieron en esta actualización; si ves otra referencia, prioriza el código. |
 | `DIRECTORY_INDEX.md` (raíz) está desactualizado: no incluye todos los módulos ni los widgets nuevos. | Úsalo como pista, no como fuente de verdad. El mapa de este INDEX es el vigente. |
-| El repo tiene dos ediciones (`main` y `lite`). | Todo cambio en `main` debe evaluarse para `lite`. Ver [`ramas_main_vs_lite.md`](./ramas_main_vs_lite.md). |
+| El repo tiene dos ediciones (`main` y `lite`) con módulos y menús distintos. | Verifica la rama antes de tocar código y evalúa el impacto en la otra edición. Tabla verificada en [`ramas_main_vs_lite.md`](./ramas_main_vs_lite.md). |
+| En `lite`, `product-movements`, `product-price-catalog` y `/advanced-tools` están **comentadas** en el router; `commercial-product-movements` está registrada pero **no expuesta** en el Home. | No asumas que una ruta existe por encontrarla con `grep`; revisa el bloque de comentario y el `home_modules_registry.dart`. |
+| La documentación anterior decía que `lite` no incluía Ajustes, Mermas ni Solicitudes de Ajuste. | Desde 2026-11-13 están activos en `lite`; la matriz de [`sistema_navegacion.md`](./sistema_navegacion.md) fue corregida. |
 | `secrets.json`, `secrets_dev.json`, `secrets_prod.json` contienen defines de entorno. | No los commitees con credenciales reales ni los compartas. |
 | `scripts/compile_web.py` incluye un token de Netlify embebido. | Trátalo como secreto; no lo reproduzcas en documentación pública. |
 
 ---
 
-## 7. Cómo mantener esta wiki
+## 8. Cómo mantener esta wiki
 
 1. **Módulo nuevo:** agrégalo a [`modules/modules_index.md`](./modules/modules_index.md) y crea su ficha si el flujo es complejo.
 2. **Cambio de arquitectura o convención:** actualiza [`conventions.md`](./conventions.md) o [`project_index.md`](./project_index.md).

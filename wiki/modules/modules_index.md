@@ -10,23 +10,25 @@ Este documento ofrece un panorama general y conciso de cada uno de los módulos 
 
 ## 🧭 Mapa General de Módulos
 
-| Módulo | Carpeta (`lib/src/modules/`) | Rol de Negocio Principal | Documento Detallado |
-| :--- | :--- | :--- | :--- |
-| **Comercial** | `commercial/` | Terminal POS, facturación (nominativa y final), cotizaciones/proformas, recibos de caja, devoluciones y arqueo por usuario. | [commercial.md](./commercial.md) |
-| **Notas de Crédito** | `commercial/credit_notes/` | Sustitución y evolución de devoluciones (por mercancía o monto) con Repositorio Reactivo y amortización en recibos. | [credit_notes.md](./credit_notes.md) |
-| **Inventario** | `inventory/` | Existencias en tiempo real, entradas/salidas (flujo con y sin kárdex), ajustes, solicitudes de ajuste con aprobación, transferencias entre sucursales y bitácora de vencimientos. | [inventory.md](./inventory.md) |
-| **Catálogo de Productos** | `product_catalog/` | Catálogo maestro de productos, códigos alternativos (`altCode`), categorías taxonómicas, unidades de medida y escalas de conversión estandarizadas (Peso, Volumen, Longitud, Tiempo). | [product_catalog.md](./product_catalog.md) |
-| **Escalas de Unidades** | `product_catalog/unit_scales/` | Plantillas de conversión estandarizadas (Peso, Volumen, Longitud, Tiempo y personalizadas) para productos. | [unit_scales.md](./unit_scales.md) |
-| **Cuentas Pendientes** | `pending_accounts/` | Cuentas por cobrar, cartera de deudores, sesiones de crédito y aplicación de abonos a facturas pendientes. | [pending_accounts.md](./pending_accounts.md) |
-| **Finanzas** | `finance/` | Cierre diario y resumen ejecutivo de sucursal, reportes por rangos de fecha, arqueos de operaciones y estados de cuenta de clientes. | [finance.md](./finance.md) |
-| **Gastos** | `expenses/` | Hub de egresos con listas operativas/proveedor, formularios adaptativos, visores de solo lectura, categorías y reporte por período con KPIs, consolidado y exportación CSV/PDF. | [expenses.md](./expenses.md) |
-| **Catálogo de Clientes** | `client_catalog/` | Directorio de clientes, límites de crédito, grupos comerciales, balances iniciales históricos y mapa geolocalizado de clientes. | [client_catalog.md](./client_catalog.md) |
-| **Catálogo de Proveedores** | `suppliers_catalog/` | Directorio de abastecedores de mercancía, plazos de pago, condiciones crediticias e integración con compras e inventario. | [suppliers_catalog.md](./suppliers_catalog.md) |
-| **Configuración** | `settings/` | Administración de sucursales (`isCommerce`), usuarios, roles y permisos, llaves de API, periféricos/impresoras y matriz de precios. | [settings.md](./settings.md) |
-| **Importaciones CSV** | `imports/` | Carga masiva de inventario inicial, inventario, clientes y proveedores desde archivos CSV con plantillas descargables. | [imports.md](./imports.md) |
-| **Navegación y Sesión** | `home/`, `login/`, `splash/`... | Bootstrap inicial, autenticación JWT, menú responsivo comercial vs bodega, conmutador multi-sucursal y atajos de teclado. | [home_and_navigation.md](./home_and_navigation.md) |
-| **Herramientas Avanzadas** | `advanced_tools/` | Estadísticas avanzadas de rotación de productos, días de inventario y proyecciones automáticas de demanda para reabastecimiento. | [advanced_tools.md](./advanced_tools.md) |
-| **Impresión Térmica** | `services/`, `tools/printers/` | Impresión directa en 1 clic para tickets térmicos (Bluetooth/USB) sin drivers externos, fallback al spooler y tramado gráfico. | [sistema_impresion_termica.md](../sistema_impresion_termica.md) |
+| Módulo | Edición | Carpeta (`lib/src/modules/`) | Rol de Negocio Principal | Documento Detallado |
+| :--- | :--- | :--- | :--- | :--- |
+| **Comercial** | Ambas (en `lite` se omite `commercial-product-movements`) | `commercial/` | Terminal POS, facturación (nominativa y final), cotizaciones/proformas, recibos de caja, devoluciones y arqueo por usuario. | [commercial.md](./commercial.md) |
+| **Notas de Crédito** | Ambas | `commercial/credit_notes/` | Sustitución y evolución de devoluciones (por mercancía o monto) con Repositorio Reactivo y amortización en recibos. | [credit_notes.md](./credit_notes.md) |
+| **Inventario** | Ambas (comportamiento distinto) | `inventory/` | Existencias en tiempo real, entradas/salidas (flujo con y sin kárdex), ajustes, solicitudes de ajuste con aprobación, transferencias entre sucursales y bitácora de vencimientos. | [inventory.md](./inventory.md) |
+| **Catálogo de Productos** | `main` como raíz; en `lite` dentro de Inventario | `product_catalog/` | Catálogo maestro de productos, códigos alternativos (`altCode`), categorías taxonómicas, unidades de medida y escalas de conversión estandarizadas (Peso, Volumen, Longitud, Tiempo). | [product_catalog.md](./product_catalog.md) |
+| **Escalas de Unidades** | Ambas | `product_catalog/unit_scales/` | Plantillas de conversión estandarizadas (Peso, Volumen, Longitud, Tiempo y personalizadas) para productos. | [unit_scales.md](./unit_scales.md) |
+| **Cuentas Pendientes** | Ambas | `pending_accounts/` | Cuentas por cobrar, cartera de deudores, sesiones de crédito y aplicación de abonos a facturas pendientes. | [pending_accounts.md](./pending_accounts.md) |
+| **Finanzas** | Ambas | `finance/` | Cierre diario y resumen ejecutivo de sucursal, reportes por rangos de fecha, arqueos de operaciones y estados de cuenta de clientes. | [finance.md](./finance.md) |
+| **Gastos** | Ambas | `expenses/` | Hub de egresos con listas operativas/proveedor, formularios adaptativos, visores de solo lectura, categorías y reporte por período con KPIs, consolidado y exportación CSV/PDF. | [expenses.md](./expenses.md) |
+| **Catálogo de Clientes** | Ambas | `client_catalog/` | Directorio de clientes, límites de crédito, grupos comerciales, balances iniciales históricos y mapa geolocalizado de clientes. | [client_catalog.md](./client_catalog.md) |
+| **Catálogo de Proveedores** | Ambas | `suppliers_catalog/` | Directorio de abastecedores de mercancía, plazos de pago, condiciones crediticias e integración con compras e inventario. | [suppliers_catalog.md](./suppliers_catalog.md) |
+| **Configuración** | Ambas | `settings/` | Administración de sucursales (`isCommerce`), usuarios, roles y permisos, llaves de API, periféricos/impresoras y matriz de precios. | [settings.md](./settings.md) |
+| **Importaciones CSV** | Ambas | `imports/` | Carga masiva de inventario inicial, inventario, clientes y proveedores desde archivos CSV con plantillas descargables. | [imports.md](./imports.md) |
+| **Navegación y Sesión** | Ambas (menú distinto) | `home/`, `login/`, `splash/`... | Bootstrap inicial, autenticación JWT, menú responsivo comercial vs bodega, conmutador multi-sucursal y atajos de teclado. | [home_and_navigation.md](./home_and_navigation.md) |
+| **Herramientas Avanzadas** | `main` | `advanced_tools/` | Estadísticas avanzadas de rotación de productos, días de inventario y proyecciones automáticas de demanda para reabastecimiento. | [advanced_tools.md](./advanced_tools.md) |
+| **Impresión Térmica** | Ambas | `services/`, `tools/printers/` | Impresión directa en 1 clic para tickets térmicos (Bluetooth/USB) sin drivers externos, fallback al spooler y tramado gráfico. | [sistema_impresion_termica.md](../sistema_impresion_termica.md) |
+
+> **Cómo leer la columna Edición:** “Ambas” significa que el módulo existe en las dos ramas, pero puede tener comportamiento distinto. “`main`” o “`lite`” indica que solo se expone en esa edición. El detalle está en [`../ramas_main_vs_lite.md`](../ramas_main_vs_lite.md).
 
 ---
 

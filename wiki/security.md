@@ -104,6 +104,9 @@ Los permisos se declaran como enums en
 
 > Las pantallas operativas se abren a pantalla completa. Si agregas una ruta nueva, decide explícitamente si necesita guard de sesión, de `isCommerce` o de permisos.
 
+> [!WARNING]
+> **Los guards y las rutas pueden diferir entre `main` y `lite`.** Antes de asumir que una pantalla está protegida o disponible, verifica la edición activa (`git branch --show-current`), si la ruta está comentada en `app_router.dart` y si el módulo aparece en `home_modules_registry.dart`. Ver [`ramas_main_vs_lite.md`](./ramas_main_vs_lite.md).
+
 ---
 
 ## 5. Sucursal y multi-tenant
