@@ -15,6 +15,7 @@ import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/te
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/terminal_product_tile.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/terminal_totals_summary.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/terminal_unit_type_selector.dart';
+import 'package:kardex_app_front/src/modules/commercial/shifts/widgets/shift_cash_movements_icon_button.dart';
 import 'package:kardex_app_front/src/modules/commercial/shifts/widgets/shift_status_button.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
@@ -97,6 +98,12 @@ class _RootScaffold extends StatelessWidget {
               child: ShiftStatusButton(),
             ),
             const SizedBox(width: 4),
+            ShiftCashMovementsIconButton(
+              onPressed: () => openShiftCashMovementsModal(
+                context,
+                viewController: viewController,
+              ),
+            ),
             IconButton(
               icon: const Icon(Icons.account_balance_wallet_outlined),
               tooltip: "Cuentas por cobrar",

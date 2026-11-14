@@ -103,24 +103,6 @@ class _RootScaffold extends StatelessWidget {
               child: ShiftStatusButton(compact: true),
             ),
             IconButton(
-              icon: const Icon(Icons.account_balance_wallet_outlined),
-              tooltip: "Cuentas por cobrar",
-              onPressed: () {
-                FocusManager.instance.primaryFocus?.unfocus();
-                SystemChannels.textInput.invokeMethod('TextInput.hide');
-                openPendingClientsModal(context);
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.receipt_long_outlined),
-              tooltip: "Últimas facturas",
-              onPressed: () {
-                FocusManager.instance.primaryFocus?.unfocus();
-                SystemChannels.textInput.invokeMethod('TextInput.hide');
-                openRecentInvoicesModal(context);
-              },
-            ),
-            IconButton(
               icon: Icon(Icons.pause_circle_outline, color: Colors.amber.shade800),
               tooltip: "Ventas en espera",
               onPressed: () {
