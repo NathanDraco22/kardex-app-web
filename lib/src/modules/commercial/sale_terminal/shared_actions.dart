@@ -3,12 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/cubits/shift/shift_cubit.dart';
 import 'package:kardex_app_front/src/core/terminal_draft_manager.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/cubit/read_terminal_product_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/view_controller.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/hold_sale_description_dialog.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/hold_sales_dialog.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/web/pending_invoice_web_screen.dart';
+import 'package:kardex_app_front/src/modules/commercial/shifts/dialogs/cash_movements_list_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/pending_clients_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/recent_invoices_dialog.dart';
@@ -160,6 +162,25 @@ Future<void> openPendingClientsModal(
       ),
     );
   }
+
+  if (context.mounted) {
+    viewController?.requestSearchFocus();
+  }
+}
+
+/// Abre directamente el diálogo de movimientos de efectivo del turno activo
+/// en la sucursal actual.
+Future<void> openShiftCashMovementsModal(
+  BuildContext context, {
+  SaleTerminalViewController? viewController,
+}) async {
+  final shiftCubit = getIt<ShiftCubit>();
+  if (!shiftCubit.isOpenInCurrentBranch) return;
+
+  final activeShift = shiftCubit.currentShift;
+  if (activeShift == null) return;
+
+  await showCashMovementsListDialog(context, shift: activeShift);
 
   if (context.mounted) {
     viewController?.requestSearchFocus();
