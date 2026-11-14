@@ -14,6 +14,7 @@ class DailySummaryInDb {
   final int totalInvoices;
   final int totalReceiptCash;
   final int totalReceiptDevolutions;
+  final int totalCashDevolutions;
   final int totalReceipts;
   final int receiptCount;
   final List<CommercialBranchDetail> branches;
@@ -33,6 +34,7 @@ class DailySummaryInDb {
     required this.totalInvoices,
     required this.totalReceiptCash,
     required this.totalReceiptDevolutions,
+    this.totalCashDevolutions = 0,
     required this.totalReceipts,
     required this.receiptCount,
     required this.branches,
@@ -54,6 +56,7 @@ class DailySummaryInDb {
       totalInvoices: json['totalInvoices'] as int,
       totalReceiptCash: (json['totalReceiptCash'] as int?) ?? 0,
       totalReceiptDevolutions: (json['totalReceiptDevolutions'] as int?) ?? 0,
+      totalCashDevolutions: (json['totalCashDevolutions'] as int?) ?? 0,
       totalReceipts: (json['totalReceipts'] as int?) ?? 0,
       receiptCount: (json['receiptCount'] as int?) ?? 0,
       branches: (json['branches'] as List<dynamic>)

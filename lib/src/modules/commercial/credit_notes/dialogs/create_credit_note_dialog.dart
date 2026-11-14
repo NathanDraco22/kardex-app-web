@@ -98,6 +98,32 @@ class _CreateCreditNoteDialogState extends State<_CreateCreditNoteDialog> {
       final invoice = await widget.invoicesRepository.getInvoiceByDocNumber(docNumber);
       if (!mounted) return;
 
+      if (invoice.status == InvoiceStatus.cancelled) {
+        DialogManager.showErrorDialog(
+          context,
+          "La factura \"$docNumber\" está cancelada y no admite notas de crédito.",
+        );
+        setState(() {
+          _searchedInvoice = null;
+          _previouslyReturnedBase.clear();
+          _returnedQuantities.clear();
+        });
+        return;
+      }
+
+      if (invoice.paymentType != PaymentType.credit) {
+        DialogManager.showErrorDialog(
+          context,
+          "La factura \"$docNumber\" es de contado. Las devoluciones de ventas de contado deben realizarse desde el módulo de Devoluciones.",
+        );
+        setState(() {
+          _searchedInvoice = null;
+          _previouslyReturnedBase.clear();
+          _returnedQuantities.clear();
+        });
+        return;
+      }
+
       setState(() {
         if (_searchedInvoice?.id != invoice.id) {
           _idempotencyKey = generateCreditNoteIdempotencyKey();
