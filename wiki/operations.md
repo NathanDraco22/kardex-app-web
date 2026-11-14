@@ -125,6 +125,21 @@ Objetivo: **0 errores y 0 warnings**. No silencies lints sin justificación.
 
 ## 7. Compilación
 
+### Compilar por edición
+
+Antes de compilar, confirma la rama y el `applicationId`:
+
+| Aspecto | `main` | `lite` |
+| :--- | :--- | :--- |
+| Rama | `main` | `lite` |
+| Web | `python scripts/compile_web.py` | `python scripts/compile_web_lite.py` |
+| Android | `python scripts/compile_android.py` | `python scripts/compile_android_lite.py` |
+| APK | `neptuno-arm64-v8a.apk` / `neptuno-armeabi-v7a.apk` | `neptuno-lite-arm64-v8a.apk` / `neptuno-lite-armeabi-v7a.apk` |
+| `applicationId` | `com.nathandraco22.neptuno_system` | `com.nathandraco22.neptuno_system_lite` |
+
+> [!WARNING]
+> Los scripts no cambian de rama por ti. Ejecuta la compilación **desde la rama correcta** y verifica el `applicationId` antes de publicar. Ver [`ramas_main_vs_lite.md`](./ramas_main_vs_lite.md).
+
 ### Web
 
 ```powershell

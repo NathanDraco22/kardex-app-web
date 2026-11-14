@@ -82,13 +82,13 @@ Toda la estructura de navegación está centralizada en `lib/src/modules/home/da
 enum HomeModuleId {
   clients,
   suppliers,
-  products,        // Solo en rama main
+  products,        // Expuesto solo en main
   commercial,
   pendingAccounts,
   inventory,
   expenses,
   finance,
-  advancedTools,   // Solo en rama main
+  advancedTools,   // Expuesto solo en main
   settings,
 }
 
@@ -210,19 +210,26 @@ flowchart TD
 
 > [!NOTE]
 > Esta sección resume el **qué** cambia técnicamente entre ramas. Para el **por qué** —el problema que originó `lite`, el flujo simplificado de producto/stock/precio y las reglas de producto detrás de estas diferencias— consulta [ramas_main_vs_lite.md](./ramas_main_vs_lite.md).
+>
+> **Verificado contra el código:** `main` @ `5d83c101` y `lite` @ `debed32d` (2026-11-13). Si cambia el router o el registro de módulos, actualiza esta matriz.
 
 | Característica | Rama `main` (Estándar) | Rama `lite` (Ligera) |
 | :--- | :--- | :--- |
-| **Módulos Raíz en Home / Sidebar** | 10 módulos disponibles | 8 módulos disponibles |
-| **Catálogo de Productos** | Módulo raíz independiente (`HomeModuleId.products`) | Integrado como la primera sección dentro de **Inventario** |
-| **Herramientas Avanzadas** | Módulo raíz independiente (`Modules.advancedTools`) con proyecciones y estimación | Totalmente deshabilitado (no figura en sidebar ni en `app_router.dart`) |
-| **Inventario: Secciones** | 5 secciones: Consultas, Entradas/Salidas, Traslados, Precios, Ajustes/Mermas | 4 secciones: Catálogo, Consultas, Entradas/Salidas, Traslados |
-| **Inventario: Catálogo** | Usa `product-price-catalog` (`RouteNames.productPriceCatalog`) | Usa `product-inventory-catalog` (`RouteNames.productInventoryCatalog`) con edición directa |
-| **Inventario: Kárdex por Movimiento** | Opción activa `product-movements` | Deshabilitada (`product-movements` comentado) |
-| **Inventario: Ajustes y Mermas** | Rutas activas (`adjust-entry`, `history-adjust-entry`, mermas, `adjustment-requests` y sus subrutas) | Omitidas por completo (rutas no registradas en router) |
-| **Comercio: Total de Opciones** | 28 opciones | 27 opciones (se omite `commercial-product-movements`) |
+| **Módulos Raíz en Home / Sidebar** | 10 módulos (`clients`, `suppliers`, `products`, `commercial`, `pendingAccounts`, `inventory`, `expenses`, `finance`, `advancedTools`, `settings`) | 8 módulos (sin `products` ni `advancedTools`) |
+| **Catálogo de Productos** | Módulo raíz independiente (`HomeModuleId.products`) | Integrado como la primera sección dentro de **Inventario** (`Catálogo de Productos`) |
+| **Herramientas Avanzadas** | Módulo raíz independiente (`Modules.advancedTools`) con proyecciones y estimación | Código presente, ruta `/advanced-tools` **comentada** y no expuesta |
+| **Inventario: Secciones** | 4 secciones base: Existencias y Consultas, Entradas y Salidas, Transferencias, Ajustes y Mermas | 5 secciones: **Catálogo de Productos**, Existencias y Consultas, Entradas y Salidas, Transferencias, Ajustes y Mermas |
+| **Inventario: Catálogo** | `product-price-catalog` (`RouteNames.productPriceCatalog`) | `product-inventory-catalog` (`RouteNames.productInventoryCatalog`) con edición directa |
+| **Inventario: Kárdex por Movimiento** | Opción activa `product-movements` | Ruta `product-movements` **comentada** y no expuesta |
+| **Inventario: Catálogo de Precios** | Ruta activa `product-price-catalog` | Ruta **comentada**; el precio se edita desde el Catálogo de Inventario |
+| **Inventario: Ajustes y Mermas** | Rutas activas (`adjust-entry`, `history-adjust-entry`, mermas, `adjustment-requests` y subrutas) | **También activas** (entradas/salidas por ajuste, historiales y solicitudes) |
+| **Comercio: Total de Opciones** | 28 opciones | 27 opciones en Home (se omite `commercial-product-movements`) |
+| **Comercio: Movimientos de Producto** | Expuesto en Home | Ruta `commercial-product-movements` **activa**, pero **no expuesta** en Home |
 | **Condición de Pago Dinámica** | `SegmentedButton` en cotizaciones / órdenes borrador (`CONTADO`/`CRÉDITO`) | Idéntico (portado) |
 | **Botones en AppBars Oscuros** | `TertiaryMenuButton` tonal | Idéntico (portado) |
+
+> [!WARNING]
+> Un `grep` de `app_router.dart` puede encontrar rutas dentro de bloques `/* ... */`. En `lite`, `product-movements`, `product-price-catalog` y `/advanced-tools` están comentadas. La fuente de verdad de lo que el usuario ve es `lib/src/modules/home/data/home_modules_registry.dart`.
 
 ---
 
@@ -273,6 +280,6 @@ HomeSubmoduleItem(
 ### 7.3. Regla de Oro sobre las Ramas
 Cualquier cambio que se realice en la navegación debe considerar las particularidades de `lite`:
 - **Si agregas un módulo a `main`:** Evalúa si aplica a `lite` o si debe omitirse.
-- **Si modificas `inventory_menu_screen.dart` en `main`:** Recuerda que en `lite` este archivo contiene la sección de *Catálogo de Productos* y carece de *Ajustes y Mermas*.
+- **Si modificas `inventory_menu_screen.dart` en `main`:** Recuerda que en `lite` este archivo incluye la sección de *Catálogo de Productos* y **también** *Ajustes y Mermas*, pero no expone *Movimientos de Producto* ni *Catálogo de Precios*.
 
-> **Regla general:** todo cambio en `main` debe evaluarse para `lite` antes de cerrarse. Consulta [ramas_main_vs_lite.md](./ramas_main_vs_lite.md#8-reglas-para-desarrollo-y-mantenimiento).
+> **Regla general:** todo cambio en `main` debe evaluarse para `lite` antes de cerrarse. Consulta [ramas_main_vs_lite.md](./ramas_main_vs_lite.md#10-reglas-para-desarrollo-y-mantenimiento).
