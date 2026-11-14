@@ -74,6 +74,7 @@ export 'imports/import_preview_result.dart';
 export 'imports/import_result.dart';
 export 'imports/import_type.dart';
 export 'app_setting/app_currency.dart';
+export 'app_setting/app_tax_id_label.dart';
 export 'app_setting/app_setting_model.dart';
 export 'unit_scale/unit_scale_model.dart';
 export 'shift_model/shift_model.dart';

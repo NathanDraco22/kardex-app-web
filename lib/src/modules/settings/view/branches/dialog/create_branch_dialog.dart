@@ -132,7 +132,7 @@ class _CreateProductPriceDialogState extends State<CreateProductPriceDialog> {
                             ),
                             const SizedBox(height: 12),
                             TitleTextField(
-                              title: "Numero Ruc/Cedula",
+                              title: "Número ${BaseBranch.activeTaxIdLabel}/Cédula",
                               initialValue: currenBranch?.idCard,
                               textCapitalization: TextCapitalization.sentences,
                               textInputAction: TextInputAction.next,

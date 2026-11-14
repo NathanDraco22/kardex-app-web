@@ -22,13 +22,13 @@ Future<Uint8List> generateTicketPdfFromReceipt(
   ReceiptInDb receipt,
   BranchInDb branch, {
   PaperSize paperSize = PaperSize.mm80,
+  double? extraRightMarginMm,
 }) async {
   final pdf = pw.Document();
 
-  final pageFormat = PdfPageFormat(
-    TicketSettings.ticketWidth(paperSize) * PdfPageFormat.mm,
-    double.infinity,
-    marginAll: TicketSettings.ticketMargin(paperSize) * PdfPageFormat.mm,
+  final pageFormat = await PrintManager.getTicketPageFormat(
+    paperSize,
+    extraRightMarginMm: extraRightMarginMm,
   );
 
   final branchImage = await branch.resolveLogoBytes();

@@ -56,13 +56,13 @@ Future<Uint8List> generateTicketPdfFromCashCount(
   String? userName,
   double? expectedCash,
   PaperSize paperSize = PaperSize.mm80,
+  double? extraRightMarginMm,
 }) async {
   final pdf = pw.Document();
 
-  final pageFormat = PdfPageFormat(
-    TicketSettings.ticketWidth(paperSize) * PdfPageFormat.mm,
-    double.infinity,
-    marginAll: TicketSettings.ticketMargin(paperSize) * PdfPageFormat.mm,
+  final pageFormat = await PrintManager.getTicketPageFormat(
+    paperSize,
+    extraRightMarginMm: extraRightMarginMm,
   );
 
   final f = NumberFormat('#,##0.00', 'en_US');

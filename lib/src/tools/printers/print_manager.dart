@@ -5,6 +5,7 @@ import 'package:kardex_app_front/src/services/thermal_printer/thermal_printer_ty
 import 'package:kardex_app_front/src/services/thermal_printer_service.dart';
 import 'package:kardex_app_front/src/tools/printers/paper_settings.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart' hide Printer;
 
 import 'package:kardex_app_front/src/tools/printers/devolution_printer.dart';
@@ -20,6 +21,7 @@ class PrintManager with HiveService {
   static const String _autoCutKey = "autoCutEnabled";
   static const String _invertColorKey = "invertColorEnabled";
   static const String _ditheringKey = "ditheringEnabled";
+  static const String _extraRightMargin80mmKey = "extraRightMargin80mm";
 
   /// Obtiene el tamaño de papel configurado localmente. Si no existe, retorna 80mm por defecto.
   static Future<PaperSize> getLocalPaperSize() async {
@@ -91,6 +93,35 @@ class PrintManager with HiveService {
     final hiveService = PrintManager();
     final box = await hiveService.getBox(_boxName);
     await box.put(_ditheringKey, enabled);
+  }
+
+  /// Obtiene el margen derecho adicional (en mm) configurado para tickets de 80mm.
+  static Future<double> getExtraRightMargin80mm() async {
+    final hiveService = PrintManager();
+    final box = await hiveService.getBox(_boxName);
+    final raw = box.get(_extraRightMargin80mmKey, defaultValue: 0.0);
+    return (raw is num) ? raw.toDouble() : 0.0;
+  }
+
+  /// Guarda el margen derecho adicional (en mm) para tickets de 80mm.
+  static Future<void> saveExtraRightMargin80mm(double marginMm) async {
+    final hiveService = PrintManager();
+    final box = await hiveService.getBox(_boxName);
+    await box.put(_extraRightMargin80mmKey, marginMm.clamp(0.0, 15.0).toDouble());
+  }
+
+  /// Construye el [PdfPageFormat] para un ticket aplicando la configuración local de márgenes.
+  static Future<PdfPageFormat> getTicketPageFormat(
+    PaperSize paperSize, {
+    double? extraRightMarginMm,
+  }) async {
+    final resolvedExtra = paperSize == PaperSize.mm80
+        ? (extraRightMarginMm ?? await getExtraRightMargin80mm())
+        : 0.0;
+    return TicketSettings.buildPageFormat(
+      paperSize,
+      extraRightMarginMm: resolvedExtra,
+    );
   }
 
   /// Obtiene la impresora térmica directa guardada en configuración local.

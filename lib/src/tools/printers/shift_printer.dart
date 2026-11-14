@@ -4,7 +4,6 @@ import 'package:kardex_app_front/src/tools/cache/image_bytes_resolver.dart';
 import 'package:kardex_app_front/src/tools/printers/paper_settings.dart';
 import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 import 'package:kardex_business/kardex_business.dart';
-import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
@@ -37,12 +36,12 @@ Future<Uint8List> generateShiftTicketPdf(
   BaseShift shift,
   BranchInDb branch, {
   PaperSize paperSize = PaperSize.mm80,
+  double? extraRightMarginMm,
 }) async {
   final pdf = pw.Document();
-  final pageFormat = PdfPageFormat(
-    TicketSettings.ticketWidth(paperSize) * PdfPageFormat.mm,
-    double.infinity,
-    marginAll: TicketSettings.ticketMargin(paperSize) * PdfPageFormat.mm,
+  final pageFormat = await PrintManager.getTicketPageFormat(
+    paperSize,
+    extraRightMarginMm: extraRightMarginMm,
   );
 
   final branchImage = await branch.resolveLogoBytes();

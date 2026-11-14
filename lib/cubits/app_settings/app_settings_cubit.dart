@@ -14,6 +14,7 @@ class AppSettingsCubit extends Cubit<AppSettingsState> {
         showInvoiceTotal: showInvoiceTotalInSecondaryCurrency,
       ),
     );
+    BaseBranch.configureTaxIdLabelResolver(() => taxIdLabel);
   }
 
   AppSettingModel? get currentSettings {
@@ -31,6 +32,8 @@ class AppSettingsCubit extends Cubit<AppSettingsState> {
   bool get showInvoiceTotalInSecondaryCurrency => currentSettings?.showInvoiceTotalInSecondaryCurrency ?? false;
 
   String? get companyLogoUrl => currentSettings?.companyLogoUrl;
+
+  String get taxIdLabel => currentSettings?.taxIdLabel ?? 'RUC';
 
   bool get hasCompanyLogo => (companyLogoUrl ?? '').trim().isNotEmpty;
 
