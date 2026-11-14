@@ -721,12 +721,12 @@ class AppRouter {
             name: "users",
             builder: (context, state) => const UsersScreen(),
           ),
-          /*
           GoRoute(
             path: "roles",
             name: "roles",
             builder: (context, state) => const RolesScreen(),
           ),
+          /*
           GoRoute(
             path: "product-price",
             name: "product-price",
