@@ -20,6 +20,7 @@ class BaseExpense {
   final int? expirationDate;
   final UserInfo createdBy;
   final int? paidAt;
+  final String? shiftId;
 
   BaseExpense({
     required this.branchId,
@@ -37,6 +38,7 @@ class BaseExpense {
     this.expirationDate,
     required this.createdBy,
     this.paidAt,
+    this.shiftId,
   });
 
   factory BaseExpense.fromJson(Map<String, dynamic> json) {
@@ -56,6 +58,7 @@ class BaseExpense {
       expirationDate: json['expirationDate'] as int?,
       createdBy: UserInfo.fromJson(json['createdBy']),
       paidAt: json['paidAt'] as int?,
+      shiftId: json['shiftId'] as String?,
     );
   }
 
@@ -76,6 +79,7 @@ class BaseExpense {
       'expirationDate': expirationDate,
       'createdBy': createdBy.toJson(),
       'paidAt': paidAt,
+      if (shiftId != null) 'shiftId': shiftId,
     };
   }
 }
@@ -97,6 +101,7 @@ class CreateExpense extends BaseExpense {
     super.expirationDate,
     required super.createdBy,
     super.paidAt,
+    super.shiftId,
   });
 
   factory CreateExpense.fromJson(Map<String, dynamic> json) {
@@ -116,6 +121,7 @@ class CreateExpense extends BaseExpense {
       expirationDate: json['expirationDate'] as int?,
       createdBy: UserInfo.fromJson(json['createdBy']),
       paidAt: json['paidAt'] as int?,
+      shiftId: json['shiftId'] as String?,
     );
   }
 }
@@ -225,6 +231,7 @@ class ExpenseInDb extends BaseExpense {
     super.expirationDate,
     required super.createdBy,
     super.paidAt,
+    super.shiftId,
   });
 
   factory ExpenseInDb.fromJson(Map<String, dynamic> json) {
@@ -248,6 +255,7 @@ class ExpenseInDb extends BaseExpense {
       expirationDate: json['expirationDate'] as int?,
       createdBy: UserInfo.fromJson(json['createdBy']),
       paidAt: json['paidAt'] as int?,
+      shiftId: json['shiftId'] as String?,
     );
   }
 

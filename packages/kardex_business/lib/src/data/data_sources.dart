@@ -42,6 +42,8 @@ export 'receipt_data_source.dart';
 export 'reports_data_source.dart';
 export 'servin_data_source.dart';
 export 'servin_status_data_source.dart';
+export 'shift_cash_movements_data_source.dart';
+export 'shifts_data_source.dart';
 export 'supplier_data_source.dart';
 export 'transfers_data_source.dart';
 export 'unit_data_source.dart';

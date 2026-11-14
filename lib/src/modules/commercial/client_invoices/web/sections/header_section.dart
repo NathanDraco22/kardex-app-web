@@ -212,6 +212,10 @@ class MenuActions extends StatelessWidget {
                         );
                         return;
                       }
+                      if (!cubit.isOrder && !await ShiftGuard.ensureShiftReady(context)) {
+                        return;
+                      }
+                      if (!context.mounted) return;
                       final newInvoice = viewController.generateCreateInvoice(context);
                       if (newInvoice == null) return;
 

@@ -9,6 +9,7 @@ class InvoicePayAtQueryParams {
   DateTime? endDate;
   bool byPaidAt = false;
   InvoiceStatus? status;
+  String? shiftId;
 
   Map<String, String> toMap() {
     return {
@@ -20,6 +21,7 @@ class InvoicePayAtQueryParams {
       'endDate': ?(endDate?.millisecondsSinceEpoch.toString()),
       'byPaidAt': byPaidAt.toString(),
       'status': ?(status?.name),
+      'shiftId': ?shiftId,
     };
   }
 }

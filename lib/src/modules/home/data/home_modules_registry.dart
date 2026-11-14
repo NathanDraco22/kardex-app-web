@@ -40,6 +40,7 @@ class HomeSubmoduleItem {
   final bool isOrdersGate;
   final bool isQuotationsGate;
   final bool isQuotationsOrOrdersGate;
+  final bool isShiftsGate;
   final bool isRootGate;
   final String? section;
 
@@ -55,6 +56,7 @@ class HomeSubmoduleItem {
     this.isOrdersGate = false,
     this.isQuotationsGate = false,
     this.isQuotationsOrOrdersGate = false,
+    this.isShiftsGate = false,
     this.isRootGate = false,
     this.section,
   });
@@ -478,6 +480,15 @@ List<HomeModuleCategory> getHomeModuleCategories(
               CommercialSubModules.createCreditNote,
               CommercialSubModules.creditNoteHistory,
             ],
+          ),
+          const HomeSubmoduleItem(
+            section: "Control de Caja",
+            title: "Turnos y Caja",
+            subtitle: "Apertura, movimientos de efectivo, arqueos e historial",
+            icon: Icons.point_of_sale_rounded,
+            accentColor: Color(0xFF0D9488),
+            routeName: RouteNames.shifts,
+            isShiftsGate: true,
           ),
         ],
       ),

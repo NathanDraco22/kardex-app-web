@@ -22,6 +22,7 @@ class BaseInvoice {
   int total;
   final DateTime? paidAt;
   final UserInfo createdBy;
+  final String? shiftId;
 
   BaseInvoice({
     required this.branchId,
@@ -40,6 +41,7 @@ class BaseInvoice {
     required this.total,
     this.paidAt,
     required this.createdBy,
+    this.shiftId,
   });
 
   int get totalRemaining => total - amountPaid;
@@ -61,6 +63,7 @@ class BaseInvoice {
     total: json['total'],
     paidAt: json['paidAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['paidAt']) : null,
     createdBy: UserInfo.fromJson(json['createdBy']),
+    shiftId: json['shiftId'] as String?,
   );
 
   Map<String, dynamic> toJson() => {
@@ -80,6 +83,7 @@ class BaseInvoice {
     'total': total,
     'paidAt': paidAt?.millisecondsSinceEpoch,
     'createdBy': createdBy.toJson(),
+    if (shiftId != null) 'shiftId': shiftId,
   };
 }
 
@@ -100,6 +104,7 @@ class CreateInvoice extends BaseInvoice {
     required super.totalCost,
     required super.total,
     required super.createdBy,
+    super.shiftId,
   });
 
   factory CreateInvoice.fromJson(Map<String, dynamic> json) => CreateInvoice(
@@ -118,6 +123,7 @@ class CreateInvoice extends BaseInvoice {
     totalCost: json['totalCost'],
     total: json['total'],
     createdBy: UserInfo.fromJson(json['createdBy']),
+    shiftId: json['shiftId'] as String?,
   );
 
   CreateInvoice copyWithPaymentMethod(PaymentType paymentType, String? bankReference) {
@@ -137,6 +143,7 @@ class CreateInvoice extends BaseInvoice {
       totalCost: totalCost,
       total: total,
       createdBy: createdBy,
+      shiftId: shiftId,
     );
   }
 
@@ -193,6 +200,7 @@ class InvoiceInDb extends BaseInvoice {
     this.updatedAt,
     super.paidAt,
     required super.createdBy,
+    super.shiftId,
   });
 
   factory InvoiceInDb.fromJson(Map<String, dynamic> json) => InvoiceInDb(
@@ -215,6 +223,7 @@ class InvoiceInDb extends BaseInvoice {
     createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt']),
     updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt']) : null,
     createdBy: UserInfo.fromJson(json['createdBy']),
+    shiftId: json['shiftId'] as String?,
   );
 
   @override

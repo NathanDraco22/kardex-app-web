@@ -16,6 +16,7 @@ import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/te
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/terminal_product_tile.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/terminal_totals_summary.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/terminal_unit_type_selector.dart';
+import 'package:kardex_app_front/src/modules/commercial/shifts/widgets/shift_status_button.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/commercial_product_modal.dart';
@@ -97,6 +98,19 @@ class _RootScaffold extends StatelessWidget {
           ),
           title: const Text("Terminal de Venta"),
           actions: [
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: ShiftStatusButton(compact: true),
+            ),
+            IconButton(
+              icon: const Icon(Icons.receipt_long_outlined),
+              tooltip: "Últimas facturas",
+              onPressed: () {
+                FocusManager.instance.primaryFocus?.unfocus();
+                SystemChannels.textInput.invokeMethod('TextInput.hide');
+                openRecentInvoicesModal(context);
+              },
+            ),
             IconButton(
               icon: Icon(Icons.pause_circle_outline, color: Colors.amber.shade800),
               tooltip: "Ventas en espera",

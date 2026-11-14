@@ -29,16 +29,22 @@ class HttpTools {
     }
   }
 
-  static Map<String, String> generateAuthHeaders() {
+  static Map<String, String> generateTenantHeaders() {
     final config = KardexClient.instance;
-    final token = config.authToken;
     final servinNickname = config.servinNickname;
     final branchId = config.branchId;
     return {
-      "Authorization": "Bearer $token",
       "X-Agent": "Neptuno",
       "X-Servin": ?servinNickname,
       "X-Branch": ?branchId,
+    };
+  }
+
+  static Map<String, String> generateAuthHeaders() {
+    final token = KardexClient.instance.authToken;
+    return {
+      "Authorization": "Bearer $token",
+      ...generateTenantHeaders(),
     };
   }
 }

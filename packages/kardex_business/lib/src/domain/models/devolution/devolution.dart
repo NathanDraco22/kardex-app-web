@@ -17,6 +17,7 @@ class BaseDevolution {
   final int totalCost;
   final int total;
   final UserInfo createdBy;
+  final String? shiftId;
 
   BaseDevolution({
     required this.branchId,
@@ -31,6 +32,7 @@ class BaseDevolution {
     required this.totalCost,
     required this.total,
     required this.createdBy,
+    this.shiftId,
   });
 
   factory BaseDevolution.fromJson(Map<String, dynamic> json) => BaseDevolution(
@@ -46,6 +48,7 @@ class BaseDevolution {
     totalCost: json['totalCost'],
     total: json['total'],
     createdBy: UserInfo.fromJson(json['createdBy']),
+    shiftId: json['shiftId'] as String?,
   );
 
   Map<String, dynamic> toJson() => {
@@ -61,6 +64,7 @@ class BaseDevolution {
     'totalCost': totalCost,
     'total': total,
     'createdBy': createdBy.toJson(),
+    if (shiftId != null) 'shiftId': shiftId,
   };
 }
 
@@ -78,6 +82,7 @@ class CreateDevolution extends BaseDevolution {
     required super.totalCost,
     required super.total,
     required super.createdBy,
+    super.shiftId,
   });
 
   factory CreateDevolution.fromJson(Map<String, dynamic> json) => CreateDevolution(
@@ -93,6 +98,7 @@ class CreateDevolution extends BaseDevolution {
     totalCost: json['totalCost'],
     total: json['total'],
     createdBy: UserInfo.fromJson(json['createdBy']),
+    shiftId: json['shiftId'] as String?,
   );
 }
 
@@ -127,6 +133,7 @@ class DevolutionInDb extends BaseDevolution {
     required super.totalCost,
     required super.total,
     required super.createdBy,
+    super.shiftId,
     required this.createdAt,
     this.updatedAt,
   });
@@ -145,6 +152,7 @@ class DevolutionInDb extends BaseDevolution {
     totalCost: json['totalCost'],
     total: json['total'],
     createdBy: UserInfo.fromJson(json['createdBy']),
+    shiftId: json['shiftId'] as String?,
     createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt']),
     updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt']) : null,
   );

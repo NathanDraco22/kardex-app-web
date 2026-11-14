@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_app_front/src/core/shift_guard.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/view_controller.dart';
 import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_app_front/widgets/client_selector_card.dart';
@@ -271,6 +272,10 @@ class _SendButton extends StatelessWidget {
                     );
                     return;
                   }
+                  if (!cubit.isOrder && !await ShiftGuard.ensureShiftReady(context)) {
+                    return;
+                  }
+                  if (!context.mounted) return;
                   final createInvoice = viewController.generateCreateInvoice(context);
 
                   if (createInvoice == null) return;

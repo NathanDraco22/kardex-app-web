@@ -3,6 +3,7 @@ class ReceiptQueryParams {
   String? branchId;
   int? startDate;
   int? endDate;
+  String? shiftId;
   int offset;
   int limit;
 
@@ -11,6 +12,7 @@ class ReceiptQueryParams {
     this.branchId,
     this.startDate,
     this.endDate,
+    this.shiftId,
     this.offset = 0,
     this.limit = 50,
   });
@@ -21,6 +23,7 @@ class ReceiptQueryParams {
       'branchId': ?branchId,
       'startDate': ?startDate?.toString(),
       'endDate': ?endDate?.toString(),
+      'shiftId': ?shiftId,
       'offset': offset.toString(),
       'limit': limit.toString(),
     };

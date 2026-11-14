@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/cubits/shift/shift_cubit.dart';
+import 'package:kardex_app_front/src/core/shift_guard.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/cubits/write_invoice_cubit.dart';
@@ -225,6 +227,8 @@ class _SendButton extends StatelessWidget {
       builder: (context, _) {
         return PrimaryMenuButton(
           onPressed: () async {
+            if (!await ShiftGuard.ensureShiftReady(context)) return;
+            if (!context.mounted) return;
             final totalCost = widget.saleItems.fold<int>(
               0,
               (previousValue, element) => previousValue + (element.cost * element.quantity),
@@ -257,6 +261,7 @@ class _SendButton extends StatelessWidget {
                 id: currentUser.id,
                 name: currentUser.username,
               ),
+              shiftId: getIt.isRegistered<ShiftCubit>() ? getIt<ShiftCubit>().activeShiftId : null,
             );
 
             final paymentResult = await showPaymentConfirmationDialog(

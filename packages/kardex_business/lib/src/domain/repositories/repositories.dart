@@ -39,6 +39,8 @@ export 'product_transaction_repository.dart';
 export 'receipt_repository.dart';
 export 'reports_repository.dart';
 export 'servin_repository.dart';
+export 'shift_cash_movements_repository.dart';
+export 'shifts_repository.dart';
 export 'supplier_repository.dart';
 export 'transfers_repository.dart';
 export 'unit_repository.dart';

@@ -6,6 +6,7 @@ import 'package:kardex_app_front/src/core/session_manager.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
+import 'package:kardex_app_front/cubits/shift/shift_cubit.dart';
 
 part 'auth_state.dart';
 
@@ -188,12 +189,16 @@ class AuthCubit extends Cubit<AuthState> {
 
     TokenManager().removeToken();
     await SessionManager().removeSession();
+    _clearShift();
     emit(Unauthenticated(servin: currentServin));
   }
 
   Future<void> exitFromBusiness() async {
     await servinRepository.clearCurrentServin();
+    AppKardexConfig().setServinNickname(null);
+    AppKardexConfig().setBranchId(null);
     _clearAppSettings();
+    _clearShift();
     emit(AuthInactive());
   }
 
@@ -212,6 +217,18 @@ class AuthCubit extends Cubit<AuthState> {
   void _clearAppSettings() {
     if (getIt.isRegistered<AppSettingsCubit>()) {
       getIt<AppSettingsCubit>().clear();
+    }
+  }
+
+  void _clearShift() {
+    if (getIt.isRegistered<ShiftCubit>()) {
+      getIt<ShiftCubit>().clear();
+    }
+  }
+
+  void _loadActiveShift() {
+    if (getIt.isRegistered<ShiftCubit>()) {
+      getIt<ShiftCubit>().loadActiveShift();
     }
   }
 
@@ -264,5 +281,6 @@ class AuthCubit extends Cubit<AuthState> {
         refreshedServin ?? currentServin,
       ),
     );
+    _loadActiveShift();
   }
 }

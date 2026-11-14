@@ -4,12 +4,14 @@ class DevolutionQueryParams {
   String? branchId;
   String? clientId;
   DevolutionStatus? status;
+  String? shiftId;
 
   Map<String, String> toMap() {
     return {
       if (branchId != null) 'branchId': branchId.toString(),
       if (clientId != null) 'clientId': clientId.toString(),
       if (status != null) 'status': status!.name,
+      'shiftId': ?shiftId,
     };
   }
 }

@@ -12,6 +12,7 @@ class ExpenseQueryParams {
   int? maxAmount;
   String? type;
   String? supplierId;
+  String? shiftId;
 
   Map<String, String> toMap() {
     final data = <String, dynamic>{
@@ -28,6 +29,7 @@ class ExpenseQueryParams {
       'maxAmount': maxAmount?.toString(),
       'type': type,
       'supplierId': supplierId,
+      'shiftId': shiftId,
     };
 
     data.removeWhere((_, v) => v == null);

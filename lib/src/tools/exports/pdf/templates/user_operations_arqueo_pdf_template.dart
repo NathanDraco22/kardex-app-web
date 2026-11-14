@@ -1,3 +1,4 @@
+import 'package:kardex_app_front/src/tools/bank_breakdown_helper.dart';
 import 'package:kardex_app_front/src/tools/cache/image_bytes_resolver.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/pdf_template.dart';
@@ -51,15 +52,30 @@ class UserOperationsArqueoPdfTemplate implements PdfTemplate {
     final cashReceipts = result.detailReceipts.where((rec) => rec.paymentMethod == PaymentMethod.cash);
     final totalAbonosEfectivo = cashReceipts.fold<int>(0, (prev, rec) => prev + rec.total);
 
+    final cardByBank = groupReferencesByBank([
+      ...cardInvoices.map((inv) => (bankReference: inv.bankReference, amount: inv.total)),
+      ...cardReceipts.map((rec) => (bankReference: rec.bankReference, amount: rec.total)),
+    ]);
+    final transferByBank = groupReferencesByBank([
+      ...transferInvoices.map((inv) => (bankReference: inv.bankReference, amount: inv.total)),
+      ...transferReceipts.map((rec) => (bankReference: rec.bankReference, amount: rec.total)),
+    ]);
+
+    final dateStr = date != null ? DateTimeTool.formatddMMyyEs(date!) : DateTimeTool.formatddMMyyEs(DateTime.now());
+    final userName = user != null ? user!.username : "Todos los Usuarios";
+
     doc.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
-        margin: const pw.EdgeInsets.all(32),
+        margin: const pw.EdgeInsets.fromLTRB(32, 28, 32, 32),
+        footer: (context) => _buildFooter(context, dateStr),
         build: (pw.Context context) {
           return [
             _buildHeader(),
-            pw.SizedBox(height: 14),
+            pw.SizedBox(height: 12),
             _buildSummaryInfo(
+              userName: userName,
+              dateStr: dateStr,
               invoicesTotal: invoicesTotal,
               receiptsTotal: receiptsTotal,
               grandTotal: grandTotal,
@@ -67,39 +83,25 @@ class UserOperationsArqueoPdfTemplate implements PdfTemplate {
               totalTarjetas: totalTarjetas,
               totalTransferencias: totalTransferencias,
               totalCreditos: creditInvoicesTotal,
+              cardByBank: cardByBank,
+              transferByBank: transferByBank,
             ),
             pw.SizedBox(height: 18),
-            pw.Text(
-              "Detalle de Recibos y Abonos",
-              style: const pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold, color: PdfColors.teal900),
-            ),
-            pw.SizedBox(height: 6),
+            _sectionTitle("Detalle de Recibos y Abonos (${validReceipts.length})"),
             _buildReceiptsTable(validReceipts),
             pw.SizedBox(height: 18),
-            pw.Text(
-              "Detalle de Facturas de Contado",
-              style: const pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold, color: PdfColors.blue900),
-            ),
-            pw.SizedBox(height: 6),
+            _sectionTitle("Detalle de Facturas de Contado (${validInvoices.length})"),
             _buildInvoicesTable(validInvoices),
             if (creditInvoices.isNotEmpty) ...[
               pw.SizedBox(height: 18),
-              pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                children: [
-                  pw.Text(
-                    "Ventas al Crédito (${creditInvoices.length})",
-                    style: const pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold, color: PdfColors.orange900),
-                  ),
-                  pw.Text(
-                    "Total Créditos: ${NumberFormatter.convertToMoneyLike(creditInvoicesTotal)}",
-                    style: const pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold, color: PdfColors.orange900),
-                  ),
-                ],
+              _sectionTitle(
+                "Ventas al Crédito (${creditInvoices.length})",
+                trailing: "Total Créditos: ${NumberFormatter.convertToMoneyLike(creditInvoicesTotal)}",
               ),
-              pw.SizedBox(height: 6),
               _buildCreditInvoicesTable(creditInvoices),
             ],
+            pw.SizedBox(height: 28),
+            _buildSignaturesBlock(userName),
           ];
         },
       ),
@@ -111,70 +113,95 @@ class UserOperationsArqueoPdfTemplate implements PdfTemplate {
   pw.Widget _buildHeader() {
     final branchImage = branch.image;
 
-    return pw.Row(
-      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
+    return pw.Column(
       children: [
-        pw.Expanded(
-          child: pw.Row(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              if (branchImage != null && branchImage.isNotEmpty) ...[
-                pw.Image(
-                  pw.MemoryImage(branchImage),
-                  width: 50,
-                  height: 50,
-                ),
-                pw.SizedBox(width: 12),
-              ],
-              pw.Expanded(
-                child: pw.Column(
-                  crossAxisAlignment: pw.CrossAxisAlignment.start,
-                  children: [
-                    pw.Text(
-                      branch.name,
-                      style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 13),
-                    ),
-                    pw.SizedBox(height: 2),
-                    pw.Text(
-                      branch.address,
-                      style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey700),
-                    ),
-                    if (branch.phone.isNotEmpty || branch.email.isNotEmpty)
-                      pw.Text(
-                        "Tel: ${branch.phone} | Email: ${branch.email}",
-                        style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey700),
-                      ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        pw.SizedBox(width: 16),
-        pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.end,
+        pw.Row(
+          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            pw.Text(
-              "ARQUEO DE CAJA / TURNO",
-              style: const pw.TextStyle(
-                fontSize: 14,
-                fontWeight: pw.FontWeight.bold,
-                color: PdfColors.teal800,
+            pw.Expanded(
+              child: pw.Row(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  if (branchImage != null && branchImage.isNotEmpty) ...[
+                    pw.Image(
+                      pw.MemoryImage(branchImage),
+                      width: 48,
+                      height: 48,
+                      fit: pw.BoxFit.contain,
+                    ),
+                    pw.SizedBox(width: 12),
+                  ],
+                  pw.Expanded(
+                    child: pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Text(
+                          branch.name,
+                          style: const pw.TextStyle(
+                            fontWeight: pw.FontWeight.bold,
+                            fontSize: 14,
+                            color: PdfColors.black,
+                          ),
+                        ),
+                        pw.SizedBox(height: 2),
+                        if (branch.address.isNotEmpty)
+                          pw.Text(
+                            branch.address,
+                            style: const pw.TextStyle(fontSize: 8.5, color: PdfColors.grey700),
+                          ),
+                        if (branch.phone.isNotEmpty || branch.email.isNotEmpty)
+                          pw.Text(
+                            [
+                              if (branch.phone.isNotEmpty) "Tel: ${branch.phone}",
+                              if (branch.email.isNotEmpty) branch.email,
+                            ].join("  |  "),
+                            style: const pw.TextStyle(fontSize: 8.5, color: PdfColors.grey700),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
-            pw.SizedBox(height: 3),
-            pw.Text(
-              "Emisión: ${DateTimeTool.formatddMMyyEs(DateTime.now())} ${DateTimeTool.formatHHmm(DateTime.now())}",
-              style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey700),
+            pw.SizedBox(width: 16),
+            pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.end,
+              children: [
+                pw.Container(
+                  padding: const pw.EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: pw.BoxDecoration(
+                    color: PdfColors.grey100,
+                    border: pw.Border.all(color: PdfColors.black, width: 1.2),
+                    borderRadius: pw.BorderRadius.circular(3),
+                  ),
+                  child: pw.Text(
+                    "ARQUEO DE CAJA / TURNO",
+                    style: const pw.TextStyle(
+                      fontSize: 11,
+                      fontWeight: pw.FontWeight.bold,
+                      color: PdfColors.black,
+                    ),
+                  ),
+                ),
+                pw.SizedBox(height: 5),
+                pw.Text(
+                  "Emisión: ${DateTimeTool.formatddMMyyEs(DateTime.now())} ${DateTimeTool.formatHHmm(DateTime.now())}",
+                  style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey600),
+                ),
+              ],
             ),
           ],
         ),
+        pw.SizedBox(height: 10),
+        pw.Container(height: 1.5, color: PdfColors.black),
       ],
     );
   }
 
   pw.Widget _buildSummaryInfo({
+    required String userName,
+    required String dateStr,
     required int invoicesTotal,
     required int receiptsTotal,
     required int grandTotal,
@@ -182,20 +209,19 @@ class UserOperationsArqueoPdfTemplate implements PdfTemplate {
     required int totalTarjetas,
     required int totalTransferencias,
     required int totalCreditos,
+    required List<BankBreakdownEntry> cardByBank,
+    required List<BankBreakdownEntry> transferByBank,
   }) {
-    final dateStr = date != null ? DateTimeTool.formatddMMyyEs(date!) : DateTimeTool.formatddMMyyEs(DateTime.now());
-    final userName = user != null ? user!.username : "Todos los Usuarios";
-
-    return pw.Container(
-      padding: const pw.EdgeInsets.all(10),
-      decoration: pw.BoxDecoration(
-        color: PdfColors.grey100,
-        borderRadius: const pw.BorderRadius.all(pw.Radius.circular(6)),
-        border: pw.Border.all(color: PdfColors.grey300),
-      ),
-      child: pw.Column(
-        children: [
-          pw.Row(
+    return pw.Column(
+      children: [
+        pw.Container(
+          padding: const pw.EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+          decoration: pw.BoxDecoration(
+            color: PdfColors.grey100,
+            border: pw.Border.all(color: PdfColors.grey400, width: 0.8),
+            borderRadius: const pw.BorderRadius.all(pw.Radius.circular(4)),
+          ),
+          child: pw.Row(
             mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
             children: [
               pw.Column(
@@ -203,12 +229,12 @@ class UserOperationsArqueoPdfTemplate implements PdfTemplate {
                 children: [
                   pw.Text(
                     "Usuario / Cajero: $userName",
-                    style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 11),
+                    style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10, color: PdfColors.black),
                   ),
                   pw.SizedBox(height: 2),
                   pw.Text(
                     "Fecha de Operaciones: $dateStr",
-                    style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey800),
+                    style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey700),
                   ),
                 ],
               ),
@@ -217,52 +243,158 @@ class UserOperationsArqueoPdfTemplate implements PdfTemplate {
                 children: [
                   pw.Text(
                     "TOTAL ARQUEO: ${NumberFormatter.convertToMoneyLike(grandTotal)}",
-                    style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 13, color: PdfColors.teal900),
+                    style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12, color: PdfColors.black),
                   ),
                   pw.SizedBox(height: 2),
                   pw.Text(
                     "Efectivo en Caja: ${NumberFormatter.convertToMoneyLike(totalEfectivo)}",
-                    style: const pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold, color: PdfColors.green800),
+                    style: const pw.TextStyle(fontSize: 9.5, fontWeight: pw.FontWeight.bold, color: PdfColors.grey800),
                   ),
                 ],
               ),
             ],
           ),
-          pw.Divider(color: PdfColors.grey300, height: 10),
-          pw.Row(
-            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+        ),
+        pw.SizedBox(height: 8),
+        pw.Container(
+          padding: const pw.EdgeInsets.all(10),
+          decoration: pw.BoxDecoration(
+            color: PdfColors.white,
+            border: pw.Border.all(color: PdfColors.grey400, width: 0.8),
+            borderRadius: const pw.BorderRadius.all(pw.Radius.circular(4)),
+          ),
+          child: pw.Column(
             children: [
-              pw.Text(
-                "Facturas Contado: ${NumberFormatter.convertToMoneyLike(invoicesTotal)}",
-                style: const pw.TextStyle(fontSize: 9),
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Text(
+                    "Facturas Contado: ${NumberFormatter.convertToMoneyLike(invoicesTotal)}",
+                    style: const pw.TextStyle(fontSize: 9, color: PdfColors.black),
+                  ),
+                  pw.Text(
+                    "Recibos / Abonos: ${NumberFormatter.convertToMoneyLike(receiptsTotal)}",
+                    style: const pw.TextStyle(fontSize: 9, color: PdfColors.black),
+                  ),
+                  pw.Text(
+                    "Tarjetas: ${NumberFormatter.convertToMoneyLike(totalTarjetas)}",
+                    style: const pw.TextStyle(fontSize: 9, color: PdfColors.black),
+                  ),
+                ],
               ),
-              pw.Text(
-                "Recibos / Abonos: ${NumberFormatter.convertToMoneyLike(receiptsTotal)}",
-                style: const pw.TextStyle(fontSize: 9),
+              pw.SizedBox(height: 5),
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Text(
+                    "Transferencias: ${NumberFormatter.convertToMoneyLike(totalTransferencias)}",
+                    style: const pw.TextStyle(fontSize: 9, color: PdfColors.black),
+                  ),
+                  pw.Text(
+                    "Créditos Emitidos: ${NumberFormatter.convertToMoneyLike(totalCreditos)}",
+                    style: const pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold, color: PdfColors.black),
+                  ),
+                  pw.SizedBox(width: 80),
+                ],
               ),
-              pw.Text(
-                "Tarjetas: ${NumberFormatter.convertToMoneyLike(totalTarjetas)}",
-                style: const pw.TextStyle(fontSize: 9),
-              ),
+              if (transferByBank.isNotEmpty || cardByBank.isNotEmpty) ...[
+                pw.Divider(color: PdfColors.grey300, height: 10),
+                pw.Row(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    if (transferByBank.isNotEmpty)
+                      pw.Expanded(
+                        child: _buildBankBreakdownPdfColumn(
+                          'Transferencias por Banco',
+                          transferByBank,
+                        ),
+                      ),
+                    if (transferByBank.isNotEmpty && cardByBank.isNotEmpty)
+                      pw.SizedBox(width: 16),
+                    if (cardByBank.isNotEmpty)
+                      pw.Expanded(
+                        child: _buildBankBreakdownPdfColumn(
+                          'Tarjetas por Banco',
+                          cardByBank,
+                        ),
+                      ),
+                  ],
+                ),
+              ],
             ],
           ),
-          pw.SizedBox(height: 5),
-          pw.Row(
-            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-            children: [
-              pw.Text(
-                "Transferencias: ${NumberFormatter.convertToMoneyLike(totalTransferencias)}",
-                style: const pw.TextStyle(fontSize: 9),
-              ),
-              pw.Text(
-                "Créditos Emitidos: ${NumberFormatter.convertToMoneyLike(totalCreditos)}",
-                style: const pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold, color: PdfColors.orange900),
-              ),
-              pw.SizedBox(width: 80),
-            ],
+        ),
+      ],
+    );
+  }
+
+  pw.Widget _sectionTitle(String title, {String? trailing}) {
+    return pw.Container(
+      width: double.infinity,
+      padding: const pw.EdgeInsets.only(bottom: 4),
+      margin: const pw.EdgeInsets.only(bottom: 4),
+      decoration: const pw.BoxDecoration(
+        border: pw.Border(
+          bottom: pw.BorderSide(color: PdfColors.black, width: 1.0),
+        ),
+      ),
+      child: pw.Row(
+        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+        children: [
+          pw.Text(
+            title.toUpperCase(),
+            style: const pw.TextStyle(
+              fontSize: 9.5,
+              fontWeight: pw.FontWeight.bold,
+              color: PdfColors.black,
+            ),
           ),
+          if (trailing != null)
+            pw.Text(
+              trailing,
+              style: const pw.TextStyle(
+                fontSize: 9,
+                fontWeight: pw.FontWeight.bold,
+                color: PdfColors.black,
+              ),
+            ),
         ],
       ),
+    );
+  }
+
+  pw.Widget _buildBankBreakdownPdfColumn(
+    String title,
+    List<BankBreakdownEntry> entries,
+  ) {
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        pw.Text(
+          title,
+          style: const pw.TextStyle(
+            fontSize: 8.5,
+            fontWeight: pw.FontWeight.bold,
+            color: PdfColors.grey800,
+          ),
+        ),
+        pw.SizedBox(height: 3),
+        ...entries.map(
+          (e) => pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+            children: [
+              pw.Text(
+                '• ${e.bankName} (${e.count})',
+                style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey700),
+              ),
+              pw.Text(
+                NumberFormatter.convertToMoneyLike(e.totalCents),
+                style: const pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -317,7 +449,14 @@ class UserOperationsArqueoPdfTemplate implements PdfTemplate {
             BasicPdfTableCell(content: pw.Text(timeStr, style: const pw.TextStyle(fontSize: 9))),
             BasicPdfTableCell(content: pw.Text("#${r.docNumber}", style: const pw.TextStyle(fontSize: 9))),
             BasicPdfTableCell(content: pw.Text(r.clientInfo.name, style: const pw.TextStyle(fontSize: 9))),
-            BasicPdfTableCell(content: pw.Text(r.paymentMethod.display, style: const pw.TextStyle(fontSize: 9))),
+            BasicPdfTableCell(
+              content: pw.Text(
+                r.bankReference.trim().isNotEmpty
+                    ? '${r.paymentMethod.display} (${r.bankReference.trim()})'
+                    : r.paymentMethod.display,
+                style: const pw.TextStyle(fontSize: 8.5),
+              ),
+            ),
             BasicPdfTableCell(
               content: pw.Text(
                 NumberFormatter.convertToMoneyLike(r.total),
@@ -382,7 +521,14 @@ class UserOperationsArqueoPdfTemplate implements PdfTemplate {
             BasicPdfTableCell(content: pw.Text(timeStr, style: const pw.TextStyle(fontSize: 9))),
             BasicPdfTableCell(content: pw.Text("#${inv.docNumber}", style: const pw.TextStyle(fontSize: 9))),
             BasicPdfTableCell(content: pw.Text(inv.clientInfo.name, style: const pw.TextStyle(fontSize: 9))),
-            BasicPdfTableCell(content: pw.Text(inv.paymentType.typeLabel, style: const pw.TextStyle(fontSize: 9))),
+            BasicPdfTableCell(
+              content: pw.Text(
+                inv.bankReference.trim().isNotEmpty
+                    ? '${inv.paymentType.typeLabel} (${inv.bankReference.trim()})'
+                    : inv.paymentType.typeLabel,
+                style: const pw.TextStyle(fontSize: 8.5),
+              ),
+            ),
             BasicPdfTableCell(
               content: pw.Text(
                 NumberFormatter.convertToMoneyLike(inv.total),
@@ -439,7 +585,7 @@ class UserOperationsArqueoPdfTemplate implements PdfTemplate {
             BasicPdfTableCell(
               content: pw.Text(
                 inv.paymentType.typeLabel,
-                style: const pw.TextStyle(fontSize: 9, color: PdfColors.orange900),
+                style: const pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold, color: PdfColors.grey800),
               ),
             ),
             BasicPdfTableCell(
@@ -452,6 +598,65 @@ class UserOperationsArqueoPdfTemplate implements PdfTemplate {
           ],
         );
       },
+    );
+  }
+
+  pw.Widget _buildSignaturesBlock(String userName) {
+    return pw.Row(
+      mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
+      children: [
+        _signatureColumn('Cajero / Responsable', userName),
+        pw.SizedBox(width: 40),
+        _signatureColumn('Supervisor / Recibido por', ''),
+      ],
+    );
+  }
+
+  pw.Widget _signatureColumn(String role, String name) {
+    return pw.Expanded(
+      child: pw.Column(
+        children: [
+          pw.Container(height: 1, color: PdfColors.black),
+          pw.SizedBox(height: 4),
+          pw.Text(
+            role,
+            style: const pw.TextStyle(
+              fontSize: 8.5,
+              fontWeight: pw.FontWeight.bold,
+              color: PdfColors.black,
+            ),
+          ),
+          if (name.isNotEmpty)
+            pw.Text(
+              name,
+              style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey700),
+            ),
+        ],
+      ),
+    );
+  }
+
+  pw.Widget _buildFooter(pw.Context context, String dateStr) {
+    return pw.Container(
+      padding: const pw.EdgeInsets.only(top: 6),
+      decoration: const pw.BoxDecoration(
+        border: pw.Border(
+          top: pw.BorderSide(color: PdfColors.grey300, width: 0.6),
+        ),
+      ),
+      child: pw.Row(
+        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+        children: [
+          pw.Text(
+            "${branch.name}  •  Arqueo de Operaciones ($dateStr)",
+            style: const pw.TextStyle(fontSize: 7.5, color: PdfColors.grey600),
+          ),
+          pw.Text(
+            "Página ${context.pageNumber} de ${context.pagesCount}",
+            style: const pw.TextStyle(fontSize: 7.5, color: PdfColors.grey600),
+          ),
+        ],
+      ),
     );
   }
 }

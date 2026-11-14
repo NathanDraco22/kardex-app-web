@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:kardex_app_front/src/modules/finance/range_finance_report/widgets/bank_breakdown_sublist.dart';
 import 'package:kardex_app_front/src/modules/finance/range_finance_report/widgets/section_card.dart';
 import 'package:kardex_app_front/src/modules/finance/range_finance_report/widgets/summary_row_item.dart';
+import 'package:kardex_app_front/src/tools/bank_breakdown_helper.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 class DailyCashFlowTotalsCard extends StatelessWidget {
@@ -23,6 +25,15 @@ class DailyCashFlowTotalsCard extends StatelessWidget {
     final totalTransferencias = transferInvoices.fold<int>(0, (prev, inv) => prev + inv.total) +
         transferReceipts.fold<int>(0, (prev, rec) => prev + rec.total);
     final countTransferencias = transferInvoices.length + transferReceipts.length;
+
+    final cardByBank = groupReferencesByBank([
+      ...cardInvoices.map((inv) => (bankReference: inv.bankReference, amount: inv.total)),
+      ...cardReceipts.map((rec) => (bankReference: rec.bankReference, amount: rec.total)),
+    ]);
+    final transferByBank = groupReferencesByBank([
+      ...transferInvoices.map((inv) => (bankReference: inv.bankReference, amount: inv.total)),
+      ...transferReceipts.map((rec) => (bankReference: rec.bankReference, amount: rec.total)),
+    ]);
 
     // 3. Facturas Contado (Efectivo)
     final cashInvoices = result.detailInvoices.where((inv) => inv.paymentType == PaymentType.cash);
@@ -52,6 +63,7 @@ class DailyCashFlowTotalsCard extends StatelessWidget {
             total: totalTarjetas,
             totalColor: Colors.black87,
           ),
+          if (cardByBank.isNotEmpty) BankBreakdownSublist(entries: cardByBank),
           SummaryRowItem(
             icon: Icons.account_balance_rounded,
             title: "Transferencias",
@@ -59,6 +71,7 @@ class DailyCashFlowTotalsCard extends StatelessWidget {
             total: totalTransferencias,
             totalColor: Colors.black87,
           ),
+          if (transferByBank.isNotEmpty) BankBreakdownSublist(entries: transferByBank),
           SummaryRowItem(
             icon: Icons.point_of_sale_rounded,
             title: "Facturas Contado (Efectivo)",

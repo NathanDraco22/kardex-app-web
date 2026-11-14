@@ -76,6 +76,7 @@ class HomeShortcutResolver {
 
     if (item.isOrdersGate && !appSettings.useOrders) return false;
     if (item.isQuotationsGate && !appSettings.useQuotations) return false;
+    if (item.isShiftsGate && !appSettings.useShifts) return false;
     if (item.isQuotationsOrOrdersGate && !(appSettings.useQuotations || appSettings.useOrders)) {
       return false;
     }

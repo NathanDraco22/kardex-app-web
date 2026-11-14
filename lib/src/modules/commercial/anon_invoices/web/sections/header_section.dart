@@ -175,6 +175,9 @@ Future<void> saveAnonInvoiceAction(
     }
   }
 
+  if (!await ShiftGuard.ensureShiftReady(context)) return;
+  if (!context.mounted) return;
+
   CreateInvoice newInvoice = createAnonInvoiceFromControllers(
     viewController,
     context,
@@ -236,6 +239,7 @@ CreateInvoice createAnonInvoiceFromControllers(
       id: currentUser.id,
       name: currentUser.username,
     ),
+    shiftId: getIt.isRegistered<ShiftCubit>() ? getIt<ShiftCubit>().activeShiftId : null,
   );
 
   return createClientInvoice;
