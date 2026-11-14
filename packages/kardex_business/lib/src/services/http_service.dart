@@ -4,14 +4,19 @@ import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 
+import '../tools/http_tool.dart';
 import 'exceptions/http_exceptions.dart';
 
 mixin HttpService {
+  Map<String, String> _withTenant(Map<String, String>? headers) {
+    return {...HttpTools.generateTenantHeaders(), ...?headers};
+  }
+
   Future<Map<String, dynamic>> getQuery(Uri url, {Map<String, String>? headers}) async {
     late http.Response response;
 
     try {
-      response = await http.get(url, headers: headers);
+      response = await http.get(url, headers: _withTenant(headers));
     } catch (error) {
       throw NoInternetException({"message": error.toString()});
     }
@@ -28,7 +33,7 @@ mixin HttpService {
     final jsonEncoded = jsonEncode(body);
     final contentType = {'Content-Type': 'application/json'};
 
-    final applicationHeaders = {...contentType, ...headers ?? {}};
+    final applicationHeaders = {...contentType, ..._withTenant(headers)};
 
     late http.Response response;
 
@@ -50,7 +55,7 @@ mixin HttpService {
     final jsonEncoded = jsonEncode(body);
     final contentType = {'Content-Type': 'application/json'};
 
-    final applicationHeaders = {...contentType, ...headers ?? {}};
+    final applicationHeaders = {...contentType, ..._withTenant(headers)};
 
     late http.Response response;
 
@@ -73,7 +78,7 @@ mixin HttpService {
     if (body != null) jsonEncoded = jsonEncode(body);
 
     final contentType = {'Content-Type': 'application/json'};
-    final applicationHeaders = {...contentType, ...headers ?? {}};
+    final applicationHeaders = {...contentType, ..._withTenant(headers)};
 
     late http.Response response;
 
@@ -95,7 +100,7 @@ mixin HttpService {
     late http.Response response;
 
     try {
-      response = await http.delete(url, headers: headers);
+      response = await http.delete(url, headers: _withTenant(headers));
     } catch (error) {
       throw NoInternetException({"message": error.toString()});
     }
@@ -118,9 +123,7 @@ mixin HttpService {
   }) async {
     final request = http.MultipartRequest("POST", url);
 
-    if (headers != null) {
-      request.headers.addAll(headers);
-    }
+    request.headers.addAll(_withTenant(headers));
 
     request.files.add(
       http.MultipartFile.fromBytes(fieldName, bytes, filename: fileName, contentType: MediaType.parse(mediaType)),

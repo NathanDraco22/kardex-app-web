@@ -193,6 +193,8 @@ class AuthCubit extends Cubit<AuthState> {
 
   Future<void> exitFromBusiness() async {
     await servinRepository.clearCurrentServin();
+    AppKardexConfig().setServinNickname(null);
+    AppKardexConfig().setBranchId(null);
     _clearAppSettings();
     emit(AuthInactive());
   }

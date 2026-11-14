@@ -1,3 +1,11 @@
+## Guardar Configuraciones en el AppBar (Noviembre 2026)
+
+- **Problema:** en `AppSettingsScreen` el botón "Guardar Configuraciones" vivía al final del `ListView`, justo antes de la Zona de Peligro; en móvil quedaba al fondo del scroll y en desktop pegado a las acciones destructivas.
+- **UI:** el guardado se movió al `AppBar` como `TertiaryMenuButton` blanco (label "Guardar" / "Guardando..." con spinner) a la derecha de "Recargar". Se eliminó el botón inferior.
+- **Cambios pendientes:** un `Badge` ámbar sobre el botón indica que hay parámetros sin guardar; `_hasUnsavedChanges` compara solo los campos que guarda ese botón (moneda, tasa y logo se guardan aparte). Los campos numéricos usan `onChanged` para refrescar el indicador sin listeners de controller, evitando `setState` durante el build.
+- **Verificación:** `flutter analyze lib/src/modules/settings/view/app_settings/app_settings_screen.dart` sin issues. No había app en ejecución para hot reload.
+- **Regla `main`/`lite`:** la pantalla es compartida y debe entrar por `main` y sincronizarse con `git merge main` en `lite`.
+
 ## Recorte Cuadrado del Logo de Empresa (Noviembre 2026)
 
 - **Problema:** en Configuraciones → Identidad de la empresa, el logo se elegía con `ImagePicker` directo y se subía sin recorte.

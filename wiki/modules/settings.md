@@ -63,6 +63,7 @@ lib/src/modules/settings/
 - **Ubicación en Navegación:**
   - Móvil (`SettingsScreen`): Tarjeta `MenuOptionCard` al final del listado, justo después de *Configuración de Impresora Local*.
   - Escritorio (`home_modules_registry.dart`): Submódulo `HomeSubmoduleItem` al final de la categoría `Modules.settings`, después de *Impresora Local*.
+- **Guardado en el `AppBar`:** la acción principal es un `TertiaryMenuButton` “Guardar” (spinner y “Guardando...” mientras persiste) a la derecha de “Recargar”, fuera del alcance de la Zona de Peligro. Un `Badge` ámbar sobre el botón indica cambios pendientes; `_hasUnsavedChanges` compara solo los parámetros que guarda ese botón (la moneda, la tasa y el logo se guardan por su propio flujo inmediato).
 - **Cubit / Estado:** `AppSettingsCubit` y `AppSettingsState` (`lib/cubits/app_settings/`), inyectado globalmente en `ProviderContainer` como Singleton en `getIt<AppSettingsCubit>()` y precargado en `SplashScreen`.
 - **Parámetros Configurados (`AppSettingModel` / `UpdateAppSetting`):**
   - `useDefaultProfitMargin` (bool): Habilitar o no el cálculo automático de margen de ganancia por defecto.
@@ -81,9 +82,9 @@ lib/src/modules/settings/
   - `secondaryCurrency` (`AppCurrency`): Moneda secundaria informativa (`USD` por defecto). Se muestra junto a la moneda principal en la tile superior de configuración; no convierte montos ni modifica precios.
   - `exchangeRate` (double): Tasa informativa donde `1` unidad de la moneda secundaria equivale a `exchangeRate` unidades de la moneda principal. `0.0` significa “sin configurar”. No se usa en cálculos, tickets ni reportes.
     - La tile “Moneda y tasa de cambio” es el primer elemento de `AppSettingsScreen`. Al tocarla se abre `showCurrencySettingsDialog`, que guarda únicamente `currency`, `secondaryCurrency` y `exchangeRate` mediante un PATCH parcial.
-    - El botón inferior “Guardar Configuraciones” conserva el resto de parámetros y no sobrescribe la moneda ni la tasa.
+    - El botón “Guardar” del `AppBar` conserva el resto de parámetros y no sobrescribe la moneda ni la tasa.
   - `showInvoiceTotalInSecondaryCurrency` (bool): Muestra el equivalente del total de facturas en la moneda secundaria (`false` por defecto).
-    - La opción se controla con el switch “Mostrar total de facturas en moneda secundaria (USD)” debajo de la tile de moneda y se guarda con el botón inferior.
+    - La opción se controla con el switch “Mostrar total de facturas en moneda secundaria (USD)” debajo de la tile de moneda y se guarda con el botón “Guardar” del `AppBar`.
     - El equivalente aparece después del total final en el visor de facturas, el ticket térmico (imprimir/compartir) y el PDF A4.
     - Solo se muestra si la moneda secundaria es distinta a la principal y la tasa es mayor que cero. No modifica montos, pagos, cuentas por cobrar ni inventario.
     - La línea usa el formato `Total(USD): US$27.31`.
@@ -92,7 +93,7 @@ lib/src/modules/settings/
 #### Identidad de la Empresa (`companyLogoUrl`):
 - La sección **“Identidad de la empresa”** es el primer bloque de `AppSettingsScreen`.
 - Permite **subir, cambiar o quitar** una imagen desde la galería. Al elegirla se abre el mismo editor de recorte cuadrado (1:1) que usa el alta de productos (`showAdaptiveImageCropper` de `croppy`); el resultado se limita a 720 px y se codifica como PNG para conservar la transparencia original antes de subirse.
-- Al confirmar el recorte, la imagen se sube mediante `ImageUploader` al almacenamiento de imágenes y se guarda la URL con un `PATCH` parcial inmediato de `companyLogoUrl`; no requiere pulsar “Guardar Configuraciones”.
+- Al confirmar el recorte, la imagen se sube mediante `ImageUploader` al almacenamiento de imágenes y se guarda la URL con un `PATCH` parcial inmediato de `companyLogoUrl`; no requiere pulsar “Guardar”.
 - El logo se muestra en:
   - El `AppBar` del `HomeScreen` (si no existe, se usa el nombre de la empresa como fallback).
   - El `AppBar` del `AdminPanelScreen`.

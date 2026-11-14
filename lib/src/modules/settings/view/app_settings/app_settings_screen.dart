@@ -97,9 +97,43 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
     _companyLogoUrl = settings.companyLogoUrl;
   }
 
+  static const double _fallbackProfitMargin = 20.0;
+  static const int _fallbackPaymentTerm = 30;
+
+  double get _profitMarginValue =>
+      double.tryParse(_profitMarginController.text.trim()) ?? _fallbackProfitMargin;
+
+  int get _paymentTermValue =>
+      int.tryParse(_paymentTermController.text.trim()) ?? _fallbackPaymentTerm;
+
+  /// Fuerza el rebuild del punto ámbar del AppBar al escribir en los campos
+  /// numéricos. Se invoca desde `onChanged`, no desde listeners del controller,
+  /// para no disparar `setState` cuando `_syncWithSettings` asigna texto durante
+  /// el build.
+  void _onFieldChanged() {
+    if (!mounted) return;
+    setState(() {});
+  }
+
+  /// Compara solo los parámetros que guarda el botón "Guardar" del AppBar.
+  /// Moneda, tasa y logo se guardan de inmediato en su propio flujo.
+  bool _hasUnsavedChanges(AppSettingModel settings) {
+    return _useDefaultProfitMargin != settings.useDefaultProfitMargin ||
+        _profitMarginValue != settings.defaultProfitMargin ||
+        _useExpirationDates != settings.useExpirationDates ||
+        _useOrders != settings.useOrders ||
+        _useQuotations != settings.useQuotations ||
+        _allowNegativeStock != settings.allowNegativeStock ||
+        _alertMinStock != settings.alertMinStock ||
+        _paymentTermValue != settings.defaultPaymentTermDays ||
+        _useHoldSales != settings.useHoldSales ||
+        _useQuickProductSearch != settings.useQuickProductSearch ||
+        _showInvoiceTotalInSecondaryCurrency != settings.showInvoiceTotalInSecondaryCurrency;
+  }
+
   Future<void> _saveSettings() async {
-    final profitMargin = double.tryParse(_profitMarginController.text) ?? 20.0;
-    final paymentTerm = int.tryParse(_paymentTermController.text) ?? 30;
+    final profitMargin = _profitMarginValue;
+    final paymentTerm = _paymentTermValue;
 
     final update = UpdateAppSetting(
       useDefaultProfitMargin: _useDefaultProfitMargin,
@@ -590,9 +624,15 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
 
   @override
   Widget build(BuildContext context) {
+    final appSettingsCubit = getIt<AppSettingsCubit>();
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Configuraciones del Sistema"),
+        title: const Text(
+          "Configuraciones del Sistema",
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded),
@@ -601,13 +641,52 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
               setState(() {
                 _initialized = false;
               });
-              getIt<AppSettingsCubit>().loadSettings();
+              appSettingsCubit.loadSettings();
+            },
+          ),
+          BlocBuilder<AppSettingsCubit, AppSettingsState>(
+            bloc: appSettingsCubit,
+            builder: (context, state) {
+              final isBusy = state is AppSettingsSaving || _isSavingCompanyLogo;
+              final currentSettings = appSettingsCubit.currentSettings;
+              final hasUnsavedChanges =
+                  currentSettings != null && _hasUnsavedChanges(currentSettings);
+
+              return Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: Badge(
+                  alignment: Alignment.topRight,
+                  offset: const Offset(-2, 2),
+                  smallSize: 8,
+                  backgroundColor: Colors.amber,
+                  isLabelVisible: hasUnsavedChanges && !isBusy,
+                  child: TertiaryMenuButton(
+                    foregroundColor: Colors.white,
+                    tooltip: "Guardar configuraciones",
+                    onPressed:
+                        isBusy || state is AppSettingsLoading || state is AppSettingsInitial
+                        ? null
+                        : _saveSettings,
+                    icon: isBusy
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Icon(Icons.save_rounded, size: 18),
+                    label: Text(isBusy ? "Guardando..." : "Guardar"),
+                  ),
+                ),
+              );
             },
           ),
         ],
       ),
       body: BlocConsumer<AppSettingsCubit, AppSettingsState>(
-        bloc: getIt<AppSettingsCubit>(),
+        bloc: appSettingsCubit,
         listener: (context, state) {
           if (state is AppSettingsLoaded) {
             _syncWithSettings(state.settings);
@@ -727,6 +806,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                             TextFormField(
                               controller: _profitMarginController,
                               enabled: !isSaving,
+                              onChanged: (_) => _onFieldChanged(),
                               keyboardType: const TextInputType.numberWithOptions(
                                 decimal: true,
                               ),
@@ -877,6 +957,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                           TextFormField(
                             controller: _paymentTermController,
                             enabled: !isSaving,
+                            onChanged: (_) => _onFieldChanged(),
                             keyboardType: TextInputType.number,
                             inputFormatters: [IntegerTextInputFormatter()],
                             decoration: InputDecoration(
@@ -890,35 +971,6 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                             ),
                           ),
                         ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  SizedBox(
-                    height: 50,
-                    child: FilledButton.icon(
-                      style: FilledButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      onPressed: isSaving ? null : _saveSettings,
-                      icon: isSaving
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : const Icon(Icons.save_rounded),
-                      label: Text(
-                        isSaving ? "Guardando..." : "Guardar Configuraciones",
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
                       ),
                     ),
                   ),
