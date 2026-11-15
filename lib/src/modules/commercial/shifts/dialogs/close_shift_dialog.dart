@@ -35,13 +35,16 @@ class CloseShiftDialog extends StatefulWidget {
 }
 
 class _CloseShiftDialogState extends State<CloseShiftDialog> {
+  final _formKey = GlobalKey<FormState>();
   final _countedController = TextEditingController();
+  final _countedFocusNode = FocusNode();
   final _notesController = TextEditingController();
   ShiftPreview? _preview;
 
   @override
   void dispose() {
     _countedController.dispose();
+    _countedFocusNode.dispose();
     _notesController.dispose();
     super.dispose();
   }
@@ -63,17 +66,13 @@ class _CloseShiftDialogState extends State<CloseShiftDialog> {
       setState(() {
         _countedController.text = record.grandTotalCordobas.toStringAsFixed(2);
       });
+      _formKey.currentState?.validate();
     }
   }
 
   Future<void> _confirmClose() async {
-    if (_countedController.text.trim().isEmpty) {
-      toastification.show(
-        context: context,
-        title: const Text('Ingresa el efectivo contado en caja'),
-        type: ToastificationType.warning,
-        autoCloseDuration: const Duration(seconds: 3),
-      );
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      _countedFocusNode.requestFocus();
       return;
     }
 
@@ -168,83 +167,110 @@ class _CloseShiftDialogState extends State<CloseShiftDialog> {
                     child: Center(child: CircularProgressIndicator()),
                   )
                 : SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        _buildCashBreakdownCard(preview),
-                        const SizedBox(height: 12),
-                        _buildOtherMethodsCard(preview),
-                        const SizedBox(height: 16),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: TextFormField(
-                                controller: _countedController,
-                                enabled: !isLoading,
-                                keyboardType:
-                                    const TextInputType.numberWithOptions(
-                                  decimal: true,
-                                ),
-                                inputFormatters: const [
-                                  DecimalTextInputFormatter(),
-                                ],
-                                onChanged: (_) => setState(() {}),
-                                decoration: InputDecoration(
-                                  labelText: 'Efectivo físico contado',
-                                  prefixIcon: const Icon(Icons.payments_rounded),
-                                  prefixText: '${NumberFormatter.currencySymbol} ',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _buildCashBreakdownCard(preview),
+                          const SizedBox(height: 12),
+                          _buildOtherMethodsCard(preview),
+                          const SizedBox(height: 16),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _countedController,
+                                  focusNode: _countedFocusNode,
+                                  enabled: !isLoading,
+                                  autovalidateMode:
+                                      AutovalidateMode.onUserInteraction,
+                                  keyboardType:
+                                      const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
+                                  inputFormatters: const [
+                                    DecimalTextInputFormatter(),
+                                  ],
+                                  validator: (value) {
+                                    final text = value?.trim() ?? '';
+                                    if (text.isEmpty) {
+                                      return 'Ingresa el efectivo contado en caja';
+                                    }
+                                    if (double.tryParse(text) == null) {
+                                      return 'Ingresa un monto válido';
+                                    }
+                                    return null;
+                                  },
+                                  onChanged: (_) => setState(() {}),
+                                  decoration: InputDecoration(
+                                    labelText: 'Efectivo físico contado',
+                                    prefixIcon:
+                                        const Icon(Icons.payments_rounded),
+                                    prefixText:
+                                        '${NumberFormatter.currencySymbol} ',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 10),
-                            SizedBox(
-                              height: 54,
-                              child: OutlinedButton.icon(
-                                onPressed: isLoading ? null : _openCashCounter,
-                                icon: const Icon(Icons.dialpad_rounded),
-                                label: const Text('Contar Billetes'),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        _buildDifferenceBanner(preview.expectedCash),
-                        const SizedBox(height: 12),
-                        TextFormField(
-                          controller: _notesController,
-                          enabled: !isLoading,
-                          maxLines: 2,
-                          decoration: InputDecoration(
-                            labelText: 'Observaciones de cierre (opcional)',
-                            prefixIcon: const Icon(Icons.notes_rounded),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 18),
-                        if (isLoading)
-                          const Center(child: CircularProgressIndicator())
-                        else
-                          Row(
-                            children: [
-                              Expanded(
-                                child: CustomSlider(
-                                  hintText: 'Desliza para Cerrar Turno',
-                                  hintIcon: Icons.lock_outline_rounded,
-                                  sliderColor: AppThemeTokens.danger,
-                                  sliderText: 'Cerrar',
-                                  onSubmit: _confirmClose,
+                              const SizedBox(width: 10),
+                              SizedBox(
+                                height: 54,
+                                child: OutlinedButton.icon(
+                                  onPressed: isLoading ? null : _openCashCounter,
+                                  icon: const Icon(Icons.dialpad_rounded),
+                                  label: const Text('Contar Billetes'),
                                 ),
                               ),
                             ],
                           ),
-                      ],
+                          const SizedBox(height: 12),
+                          _buildDifferenceBanner(preview.expectedCash),
+                          const SizedBox(height: 12),
+                          TextFormField(
+                            controller: _notesController,
+                            enabled: !isLoading,
+                            maxLines: 2,
+                            decoration: InputDecoration(
+                              labelText: 'Observaciones de cierre (opcional)',
+                              prefixIcon: const Icon(Icons.notes_rounded),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+                          if (isLoading)
+                            const Center(child: CircularProgressIndicator())
+                          else
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: CustomSlider(
+                                    hintText: 'Desliza para Cerrar Turno',
+                                    hintIcon: Icons.lock_outline_rounded,
+                                    sliderColor: AppThemeTokens.danger,
+                                    sliderText: 'Cerrar',
+                                    validator: () {
+                                      final isValid =
+                                          _formKey.currentState?.validate() ??
+                                              false;
+                                      if (!isValid) {
+                                        _countedFocusNode.requestFocus();
+                                      }
+                                      return isValid;
+                                    },
+                                    onSubmit: _confirmClose,
+                                  ),
+                                ),
+                              ],
+                            ),
+                        ],
+                      ),
                     ),
                   ),
           ),
