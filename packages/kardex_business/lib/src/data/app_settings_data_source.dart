@@ -12,7 +12,7 @@ class AppSettingsDataSource with HttpService, DioHttpService {
   final _endpoint = "/app-settings";
 
   Future<Map<String, dynamic>?> getCurrentAppSettings() async {
-    final headers = HttpTools.generateAuthHeaders();
+    final headers = HttpTools.generateTenantHeaders();
     final uri = HttpTools.generateUri("$_endpoint/current");
     final res = await getCachedQuery(uri, headers: headers);
     return res;

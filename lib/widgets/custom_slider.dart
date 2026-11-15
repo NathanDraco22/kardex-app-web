@@ -10,6 +10,7 @@ class CustomSlider extends StatelessWidget {
     required this.sliderColor,
     required this.sliderText,
     required this.onSubmit,
+    this.validator,
     this.width,
   });
 
@@ -20,6 +21,9 @@ class CustomSlider extends StatelessWidget {
   final double? width;
 
   final void Function() onSubmit;
+
+  /// Validación previa al envío; si retorna `false`, el slider se reinicia.
+  final bool Function()? validator;
 
   @override
   Widget build(BuildContext context) {
@@ -84,6 +88,10 @@ class CustomSlider extends StatelessWidget {
         sliderWidth: 120,
         height: 60,
         onSubmit: (controller) {
+          if (validator != null && !validator!()) {
+            controller.reset();
+            return;
+          }
           onSubmit();
         },
         threshold: 0.95,
