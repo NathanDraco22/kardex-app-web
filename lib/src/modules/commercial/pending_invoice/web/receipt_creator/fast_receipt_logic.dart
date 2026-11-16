@@ -12,6 +12,7 @@ class FastReceiptLogic {
     required String currentUserName,
     PaymentMethod paymentMethod = PaymentMethod.cash,
     String bankReference = "",
+    PaymentDetail? paymentDetail,
     String? shiftId,
   }) {
     final validCreditNotes = creditNotes.where((cn) =>
@@ -182,6 +183,7 @@ class FastReceiptLogic {
       appliedCreditNotes: appliedCreditNotes,
       paymentMethod: paymentMethod,
       bankReference: bankReference,
+      paymentDetail: paymentDetail,
       total: cashUsed,
       shiftId: shiftId,
       createdBy: UserInfo(

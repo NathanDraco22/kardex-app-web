@@ -228,6 +228,7 @@ class MenuActions extends StatelessWidget {
                         final updatedInvoice = newInvoice.copyWithPaymentMethod(
                           paymentResult.method,
                           paymentResult.reference,
+                          paymentDetail: paymentResult.paymentDetail,
                         );
 
                         if (!context.mounted) return;

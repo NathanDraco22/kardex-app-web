@@ -1,4 +1,5 @@
 import 'package:kardex_business/src/domain/models/common/client_info.dart';
+import 'package:kardex_business/src/domain/models/common/payment_detail.dart';
 import 'package:kardex_business/src/domain/models/common/user_info.dart';
 
 enum PaymentMethod {
@@ -107,6 +108,7 @@ class BaseReceipt {
   final List<AppliedCreditNote> appliedCreditNotes;
   final PaymentMethod paymentMethod;
   final String bankReference;
+  final PaymentDetail? paymentDetail;
   final int total;
   final UserInfo createdBy;
   final String? shiftId;
@@ -121,6 +123,7 @@ class BaseReceipt {
     this.appliedCreditNotes = const [],
     required this.paymentMethod,
     this.bankReference = "",
+    this.paymentDetail,
     required this.total,
     required this.createdBy,
     this.shiftId,
@@ -138,6 +141,9 @@ class BaseReceipt {
         : const [],
     paymentMethod: PaymentMethod.values.byName(json['paymentMethod']),
     bankReference: json['bankReference'] ?? "",
+    paymentDetail: json['paymentDetail'] != null
+        ? PaymentDetail.fromJson(Map<String, dynamic>.from(json['paymentDetail']))
+        : null,
     total: json['total'],
     createdBy: UserInfo.fromJson(json['createdBy']),
     shiftId: json['shiftId'] as String?,
@@ -153,6 +159,7 @@ class BaseReceipt {
     'appliedCreditNotes': appliedCreditNotes.map((e) => e.toJson()).toList(),
     'paymentMethod': paymentMethod.name,
     'bankReference': bankReference,
+    if (paymentDetail != null) 'paymentDetail': paymentDetail!.toJson(),
     'total': total,
     'createdBy': createdBy.toJson(),
     if (shiftId != null) 'shiftId': shiftId,
@@ -170,6 +177,7 @@ class CreateReceipt extends BaseReceipt {
     super.appliedCreditNotes = const [],
     required super.paymentMethod,
     super.bankReference,
+    super.paymentDetail,
     required super.total,
     required super.createdBy,
     super.shiftId,
@@ -187,6 +195,9 @@ class CreateReceipt extends BaseReceipt {
         : const [],
     paymentMethod: PaymentMethod.values.byName(json['paymentMethod']),
     bankReference: json['bankReference'] ?? "",
+    paymentDetail: json['paymentDetail'] != null
+        ? PaymentDetail.fromJson(Map<String, dynamic>.from(json['paymentDetail']))
+        : null,
     total: json['total'],
     createdBy: UserInfo.fromJson(json['createdBy']),
     shiftId: json['shiftId'] as String?,
@@ -213,6 +224,7 @@ class ReceiptInDb extends BaseReceipt {
     super.appliedCreditNotes = const [],
     required super.paymentMethod,
     super.bankReference,
+    super.paymentDetail,
     required super.total,
     required this.createdAt,
     required this.updatedAt,
@@ -233,6 +245,9 @@ class ReceiptInDb extends BaseReceipt {
         : const [],
     paymentMethod: PaymentMethod.values.byName(json['paymentMethod']),
     bankReference: json['bankReference'] ?? "",
+    paymentDetail: json['paymentDetail'] != null
+        ? PaymentDetail.fromJson(Map<String, dynamic>.from(json['paymentDetail']))
+        : null,
     total: json['total'],
     createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt']),
     updatedAt: (json['updatedAt'] != null) ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt']) : null,

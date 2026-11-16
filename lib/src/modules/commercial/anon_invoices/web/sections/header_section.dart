@@ -193,6 +193,7 @@ Future<void> saveAnonInvoiceAction(
   newInvoice = newInvoice.copyWithPaymentMethod(
     paymentMethodSelected.method,
     paymentMethodSelected.reference,
+    paymentDetail: paymentMethodSelected.paymentDetail,
   );
 
   if (!context.mounted) return;

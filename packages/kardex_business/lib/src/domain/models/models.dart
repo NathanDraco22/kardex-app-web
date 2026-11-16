@@ -15,6 +15,7 @@ export 'common/coordinates.dart';
 export 'common/entry_items.dart';
 export 'common/exit_items.dart';
 export 'common/order_info.dart';
+export 'common/payment_detail.dart';
 export 'common/product_sale_total.dart';
 export 'common/product_stock_demand.dart';
 export 'common/sale_item_model.dart';

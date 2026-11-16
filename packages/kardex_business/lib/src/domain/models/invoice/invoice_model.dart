@@ -1,5 +1,6 @@
 import 'package:kardex_business/src/domain/models/common/client_info.dart';
 import 'package:kardex_business/src/domain/models/common/order_info.dart';
+import 'package:kardex_business/src/domain/models/common/payment_detail.dart';
 import 'package:kardex_business/src/domain/models/common/sale_item_model.dart';
 import 'package:kardex_business/src/domain/models/common/user_info.dart';
 
@@ -18,6 +19,7 @@ class BaseInvoice {
   final InvoiceStatus status;
   final PaymentType paymentType;
   final String bankReference;
+  final PaymentDetail? paymentDetail;
   int totalCost;
   int total;
   final DateTime? paidAt;
@@ -37,6 +39,7 @@ class BaseInvoice {
     required this.status,
     required this.paymentType,
     required this.bankReference,
+    this.paymentDetail,
     required this.totalCost,
     required this.total,
     this.paidAt,
@@ -59,6 +62,9 @@ class BaseInvoice {
     status: InvoiceStatus.values.byName(json['status'].toString().toLowerCase()),
     paymentType: PaymentType.values.byName(json['paymentType'].toString().toLowerCase()),
     bankReference: json['bankReference'] ?? "",
+    paymentDetail: json['paymentDetail'] != null
+        ? PaymentDetail.fromJson(Map<String, dynamic>.from(json['paymentDetail']))
+        : null,
     totalCost: json['totalCost'],
     total: json['total'],
     paidAt: json['paidAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['paidAt']) : null,
@@ -79,6 +85,7 @@ class BaseInvoice {
     'status': status.name,
     'paymentType': paymentType.name,
     'bankReference': bankReference,
+    if (paymentDetail != null) 'paymentDetail': paymentDetail!.toJson(),
     'totalCost': totalCost,
     'total': total,
     'paidAt': paidAt?.millisecondsSinceEpoch,
@@ -101,6 +108,7 @@ class CreateInvoice extends BaseInvoice {
     required super.status,
     required super.paymentType,
     required super.bankReference,
+    super.paymentDetail,
     required super.totalCost,
     required super.total,
     required super.createdBy,
@@ -120,13 +128,20 @@ class CreateInvoice extends BaseInvoice {
     status: InvoiceStatus.values.byName(json['status'].toString().toLowerCase()),
     paymentType: PaymentType.values.byName(json['paymentType'].toString().toLowerCase()),
     bankReference: json['bankReference'] ?? "",
+    paymentDetail: json['paymentDetail'] != null
+        ? PaymentDetail.fromJson(Map<String, dynamic>.from(json['paymentDetail']))
+        : null,
     totalCost: json['totalCost'],
     total: json['total'],
     createdBy: UserInfo.fromJson(json['createdBy']),
     shiftId: json['shiftId'] as String?,
   );
 
-  CreateInvoice copyWithPaymentMethod(PaymentType paymentType, String? bankReference) {
+  CreateInvoice copyWithPaymentMethod(
+    PaymentType paymentType,
+    String? bankReference, {
+    PaymentDetail? paymentDetail,
+  }) {
     return CreateInvoice(
       branchId: branchId,
       clientId: clientId,
@@ -140,6 +155,7 @@ class CreateInvoice extends BaseInvoice {
       status: status,
       paymentType: paymentType,
       bankReference: bankReference ?? "",
+      paymentDetail: paymentDetail ?? this.paymentDetail,
       totalCost: totalCost,
       total: total,
       createdBy: createdBy,
@@ -194,6 +210,7 @@ class InvoiceInDb extends BaseInvoice {
     required super.status,
     required super.paymentType,
     required super.bankReference,
+    super.paymentDetail,
     required super.totalCost,
     required super.total,
     required this.createdAt,
@@ -217,6 +234,9 @@ class InvoiceInDb extends BaseInvoice {
     status: InvoiceStatus.values.byName(json['status'].toString().toLowerCase()),
     paymentType: PaymentType.values.byName(json['paymentType'].toString().toLowerCase()),
     bankReference: json['bankReference'] ?? "",
+    paymentDetail: json['paymentDetail'] != null
+        ? PaymentDetail.fromJson(Map<String, dynamic>.from(json['paymentDetail']))
+        : null,
     totalCost: json['totalCost'],
     total: json['total'],
     paidAt: json['paidAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['paidAt']) : null,

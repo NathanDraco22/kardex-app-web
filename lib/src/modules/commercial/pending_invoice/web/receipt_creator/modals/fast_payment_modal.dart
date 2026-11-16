@@ -3,16 +3,19 @@ import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/bank_chips_selector.dart';
 import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
+import 'package:kardex_app_front/widgets/payment_currency_selector.dart';
 
 class FastPaymentResult {
   final double amount;
   final PaymentMethod method;
   final String bankReference;
+  final PaymentDetail? paymentDetail;
 
   FastPaymentResult({
     required this.amount,
     required this.method,
     required this.bankReference,
+    this.paymentDetail,
   });
 }
 
@@ -49,14 +52,53 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
   final TextEditingController _refController = TextEditingController();
   double _currentInput = 0.0;
   PaymentMethod _selectedMethod = PaymentMethod.cash;
+  bool _useSecondaryCurrency = false;
   String? _selectedBank;
 
-  void _submit() {
-    if (!_canConfirm) return;
+  int _tenderedCents() => NumberFormatter.convertFromDoubleToCents(_currentInput);
+
+  int _convertedPrimaryCents(PaymentCurrencySettings settings) {
+    final tendered = _tenderedCents();
+    if (!_useSecondaryCurrency) return tendered;
+    return NumberFormatter.convertSecondaryToPrimaryCents(
+      tendered,
+      settings.exchangeRate,
+    );
+  }
+
+  int _appliedPrimaryCents(PaymentCurrencySettings settings) {
+    final maxCents = (widget.maxAmountToPay * 100).round();
+    final primary = _convertedPrimaryCents(settings);
+    if (_useSecondaryCurrency && primary > maxCents) {
+      return maxCents;
+    }
+    return primary;
+  }
+
+  int _changePrimaryCents(PaymentCurrencySettings settings) {
+    if (_selectedMethod != PaymentMethod.cash || !_useSecondaryCurrency) {
+      return 0;
+    }
+    final maxCents = (widget.maxAmountToPay * 100).round();
+    final primary = _convertedPrimaryCents(settings);
+    return primary > maxCents ? primary - maxCents : 0;
+  }
+
+  void _submit(PaymentCurrencySettings settings) {
+    if (!_canConfirmFor(settings)) return;
+    final appliedCents = _appliedPrimaryCents(settings);
+    final detail = _selectedMethod == PaymentMethod.cash
+        ? buildPaymentDetail(
+            useSecondary: _useSecondaryCurrency,
+            tenderedCents: _tenderedCents(),
+            changePrimaryCents: _changePrimaryCents(settings),
+            settings: settings,
+          )
+        : null;
     Navigator.pop(
       context,
       FastPaymentResult(
-        amount: _currentInput,
+        amount: appliedCents / 100.0,
         method: _selectedMethod,
         bankReference: _selectedMethod == PaymentMethod.cash
             ? ""
@@ -64,6 +106,7 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
                 bank: _selectedBank,
                 reference: _refController.text,
               ),
+        paymentDetail: detail,
       ),
     );
   }
@@ -75,12 +118,20 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
     super.dispose();
   }
 
-  bool get _canConfirm {
-    final inputCents = (_currentInput * 100).round();
+  bool _canConfirmFor(PaymentCurrencySettings settings) {
     final maxCents = (widget.maxAmountToPay * 100).round();
     if (maxCents <= 0) return false;
-    final isAmountValid = inputCents > 0 && inputCents <= maxCents;
-    if (!isAmountValid) return false;
+    if (_selectedMethod == PaymentMethod.cash &&
+        _useSecondaryCurrency &&
+        !settings.hasValidExchangeRate) {
+      return false;
+    }
+    final tenderedCents = _tenderedCents();
+    if (tenderedCents <= 0) return false;
+
+    final primaryCents = _convertedPrimaryCents(settings);
+    if (primaryCents <= 0) return false;
+    if (!_useSecondaryCurrency && primaryCents > maxCents) return false;
 
     if (_selectedMethod == PaymentMethod.cash) return true;
     return _refController.text.trim().isNotEmpty;
@@ -88,9 +139,13 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
 
   @override
   Widget build(BuildContext context) {
-    // Current input converted to cents for exact comparison
-    final inputCents = (_currentInput * 100).round();
+    final currencySettings = PaymentCurrencySettings.fromContext(context);
+    final tenderedCents = _tenderedCents();
+    final convertedPrimaryCents = _convertedPrimaryCents(currencySettings);
+    final appliedPrimaryCents = _appliedPrimaryCents(currencySettings);
+    final changePrimaryCents = _changePrimaryCents(currencySettings);
     final maxCents = (widget.maxAmountToPay * 100).round();
+    final canConfirm = _canConfirmFor(currencySettings);
 
     final maxAmountFormatted = NumberFormatter.convertToMoneyLike(maxCents);
 
@@ -183,10 +238,23 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
                     _selectedMethod = newSelection.first;
                     if (_selectedMethod == PaymentMethod.cash) {
                       _selectedBank = null;
+                    } else {
+                      _useSecondaryCurrency = false;
                     }
                   });
                 },
               ),
+              if (_selectedMethod == PaymentMethod.cash &&
+                  currencySettings.canUseDifferentSecondary) ...[
+                const SizedBox(height: 16),
+                PaymentCurrencySelector(
+                  settings: currencySettings,
+                  useSecondary: _useSecondaryCurrency,
+                  onChanged: (useSecondary) {
+                    setState(() => _useSecondaryCurrency = useSecondary);
+                  },
+                ),
+              ],
               const SizedBox(height: 20),
               TextField(
                 controller: _amountController,
@@ -196,12 +264,14 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
                 decoration: InputDecoration(
                   labelText: "Monto a Abonar",
                   border: const OutlineInputBorder(),
-                  prefixText: r"$ ",
+                  prefixText: _useSecondaryCurrency
+                      ? '${currencySettings.secondaryCurrency.symbol} '
+                      : '${currencySettings.primaryCurrency.symbol} ',
                   errorText: () {
-                    if (inputCents <= 0 && _amountController.text.isNotEmpty) {
+                    if (tenderedCents <= 0 && _amountController.text.isNotEmpty) {
                       return "Ingrese un monto mayor a 0";
                     }
-                    if (inputCents > maxCents) {
+                    if (!_useSecondaryCurrency && convertedPrimaryCents > maxCents) {
                       return "El monto excede la deuda total";
                     }
                     return null;
@@ -212,8 +282,34 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
                     _currentInput = double.tryParse(value) ?? 0.0;
                   });
                 },
-                onSubmitted: (_) => _submit(),
+                onSubmitted: (_) => _submit(currencySettings),
               ),
+              if (_useSecondaryCurrency &&
+                  currencySettings.hasValidExchangeRate &&
+                  tenderedCents > 0) ...[
+                const SizedBox(height: 8),
+                Text(
+                  changePrimaryCents > 0
+                      ? 'Equivalente: ${NumberFormatter.formatMoney(convertedPrimaryCents, currencySettings.primaryCurrency)} (Se aplican ${NumberFormatter.formatMoney(appliedPrimaryCents, currencySettings.primaryCurrency)})'
+                      : 'Equivalente a abonar: ${NumberFormatter.formatMoney(appliedPrimaryCents, currencySettings.primaryCurrency)}',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey.shade800,
+                  ),
+                ),
+                if (changePrimaryCents > 0) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    'Cambio: ${formatPaymentChangeLabel(changePrimaryCents, primaryCurrency: currencySettings.primaryCurrency, secondaryCurrency: currencySettings.secondaryCurrency, exchangeRate: currencySettings.exchangeRate)}',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green,
+                    ),
+                  ),
+                ],
+              ],
               if (_selectedMethod != PaymentMethod.cash) ...[
                 const SizedBox(height: 14),
                 BankChipsSelector(
@@ -246,7 +342,7 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
                   ),
                   const SizedBox(width: 16),
                   PrimaryMenuButton(
-                    onPressed: _canConfirm ? _submit : null,
+                    onPressed: canConfirm ? () => _submit(currencySettings) : null,
                     label: const Text("Aplicar Abono"),
                   ),
                 ],
