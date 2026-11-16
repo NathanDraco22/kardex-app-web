@@ -28,15 +28,13 @@ class ExchangeRateStatusButton extends StatelessWidget {
         final settings = cubit.currentSettings;
         if (settings == null) return const SizedBox.shrink();
 
-        final featureEnabled =
-            settings.allowSecondaryCurrencyPayment ||
-            settings.showInvoiceTotalInSecondaryCurrency;
+        final featureEnabled = settings.allowSecondaryCurrencyPayment || settings.showInvoiceTotalInSecondaryCurrency;
         if (!featureEnabled || settings.secondaryCurrency == settings.currency) {
           return const SizedBox.shrink();
         }
 
         final hasRate = settings.exchangeRate > 0;
-        final color = hasRate ? Colors.teal.shade700 : AppThemeTokens.warning;
+        final color = hasRate ? Colors.teal.shade500 : AppThemeTokens.warning;
         final formattedRate = NumberFormat('#,##0.##', 'en_US').format(
           settings.exchangeRate,
         );
