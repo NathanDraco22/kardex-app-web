@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'app_theme_tokens.dart';
 
 /// Encabezado moderno para modales y diálogos interactivos (Modern Modal Header).

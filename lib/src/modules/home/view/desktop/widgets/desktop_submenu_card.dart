@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:kardex_app_front/src/modules/home/data/home_modules_registry.dart';
 import 'package:kardex_app_front/widgets/design_system/app_theme_tokens.dart';
 

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/cash_counter_pdf_template.dart';
 import 'package:kardex_app_front/src/tools/printers/cash_counter_ticket_printer.dart';

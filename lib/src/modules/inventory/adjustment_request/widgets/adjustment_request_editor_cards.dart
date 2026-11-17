@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:kardex_app_front/src/modules/inventory/adjustment_request/view_controller.dart';
 import 'package:kardex_app_front/src/tools/input_formatters.dart';
 import 'package:kardex_app_front/src/tools/row_color_tool.dart';

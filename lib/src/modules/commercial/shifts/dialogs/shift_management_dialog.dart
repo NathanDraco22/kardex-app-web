@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:kardex_app_front/src/modules/commercial/shifts/dialogs/cash_movements_list_dialog.dart';
 import 'package:kardex_app_front/src/modules/commercial/shifts/dialogs/close_shift_dialog.dart';
 import 'package:kardex_app_front/src/modules/commercial/shifts/dialogs/shift_viewer_dialog.dart';

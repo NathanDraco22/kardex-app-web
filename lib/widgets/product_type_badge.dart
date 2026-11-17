@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 /// Badge compacto que identifica el tipo de producto cuando no es un artículo inventariable.

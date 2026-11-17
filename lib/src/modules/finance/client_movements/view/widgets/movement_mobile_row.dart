@@ -1,5 +1,5 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:kardex_business/kardex_business.dart' hide TransactionType, TransactionSubType;
 import 'package:kardex_business/client_transaction.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/credit_note_viewer.dart';

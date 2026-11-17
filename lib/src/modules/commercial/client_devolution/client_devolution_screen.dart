@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_devolution/web/no_paid_client_screen_web.dart';
 
 class ClientDevolutionScreen extends StatelessWidget {

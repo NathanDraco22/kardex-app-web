@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/widget/invoice_receipts_history_image_dialog.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';

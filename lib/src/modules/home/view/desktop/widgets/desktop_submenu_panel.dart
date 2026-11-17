@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/src/modules/home/data/home_modules_registry.dart';
 import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';

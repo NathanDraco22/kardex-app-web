@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Widget informativo cuando el carrito de la Terminal de Venta está vacío.
 class TerminalEmptyCart extends StatelessWidget {

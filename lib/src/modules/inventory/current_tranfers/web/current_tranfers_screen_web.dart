@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/cubits/transfers/read_transfers_cubit.dart';
 import 'package:kardex_app_front/src/modules/inventory/current_tranfers/transfer_detail/transfer_detail_screen.dart';

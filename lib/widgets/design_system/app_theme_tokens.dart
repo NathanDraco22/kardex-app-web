@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Tokens de diseño globales para Kardex App (Bento UI / Modern SaaS).
 class AppThemeTokens {

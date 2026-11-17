@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import '../buttons/primary_menu_button.dart';
 
 /// Estado vacío expresivo y moderno estilo SaaS con burbuja cromática y llamada a la acción (CTA).
