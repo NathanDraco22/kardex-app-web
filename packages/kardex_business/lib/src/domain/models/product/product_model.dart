@@ -203,6 +203,7 @@ class UpdateProduct {
   final bool? isActive;
   final String? image;
   final ProductType? productType;
+  // Solo se envía al convertir un artículo en servicio/no inventariable.
   final String? branchId;
   final List<ExtraUnit>? extraUnits;
   final int? defaultUnitIndex;

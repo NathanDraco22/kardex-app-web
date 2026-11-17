@@ -112,18 +112,31 @@ class _FormContentState extends State<_FormContent> {
     final activeBranchId = _activeBranchId();
     final activeBranchName = _activeBranchName();
 
-    if (!_selectedType.tracksInventory && activeBranchId.isNotEmpty) {
+    if (!_selectedType.tracksInventory &&
+        (widget.currentProduct == null ||
+            widget.currentProduct!.tracksInventory) &&
+        activeBranchId.isNotEmpty) {
       widget.creationMap['branchId'] = activeBranchId;
     }
 
-    if (widget.currentProduct != null &&
-        widget.currentProduct!.tracksInventory &&
-        !_selectedType.tracksInventory) {
-      final confirmed = await DialogManager.confirmActionDialog(
-        context,
-        "Al convertir este artículo a ${_selectedType.label}, quedará asignado únicamente a la sucursal actual ($activeBranchName) y sus existencias y costos actuales pasarán a 0 (se conservarán las facturas, el kárdex previo y los precios).\n\n¿Deseas continuar?",
-      );
-      if (confirmed != true || !mounted) return;
+    if (widget.currentProduct != null) {
+      if (widget.currentProduct!.tracksInventory &&
+          !_selectedType.tracksInventory) {
+        final confirmed = await DialogManager.confirmActionDialog(
+          context,
+          "Al convertir este artículo a ${_selectedType.label}, quedará asignado únicamente a la sucursal actual ($activeBranchName). "
+          "Solo es posible si no tiene existencias ni stock comprometido en ninguna sucursal. "
+          "Se conservan las facturas, el kárdex previo y los precios.\n\n¿Deseas continuar?",
+        );
+        if (confirmed != true || !mounted) return;
+      } else if (!widget.currentProduct!.tracksInventory &&
+          _selectedType.tracksInventory) {
+        final confirmed = await DialogManager.confirmActionDialog(
+          context,
+          "Al convertir este ${widget.currentProduct!.productType.label} a artículo, pasará al catálogo global de todas las sucursales y sus costos de referencia se reiniciarán.\n\n¿Deseas continuar?",
+        );
+        if (confirmed != true || !mounted) return;
+      }
     }
 
     final writeCubit = context.read<WriteProductCubit>();

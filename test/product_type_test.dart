@@ -139,6 +139,31 @@ void main() {
       });
       expect(invProduct.productType, ProductType.service);
     });
+
+    test('UpdateProduct solo envía branchId cuando se provee (conversión a servicio)', () {
+      final plain = UpdateProduct.fromJson({
+        'name': 'Consulta',
+        'productType': 'item',
+      });
+      expect(plain.toJson().containsKey('branchId'), isFalse);
+
+      final conversion = UpdateProduct.fromJson({
+        'name': 'Consulta',
+        'productType': 'service',
+        'branchId': 'branch-1',
+      });
+      expect(conversion.toJson()['branchId'], 'branch-1');
+
+      final create = CreateProduct.fromJson({
+        'name': 'Consulta',
+        'unitName': 'Unidad',
+        'tags': <String>[],
+        'hasIva': false,
+        'productType': 'service',
+        'branchId': 'branch-1',
+      });
+      expect(create.toJson()['branchId'], 'branch-1');
+    });
   });
 
   group('resolveQuickItemQuantity', () {
