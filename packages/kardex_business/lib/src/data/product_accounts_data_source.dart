@@ -18,6 +18,17 @@ class ProductAccountsDataSource with HttpService, DioHttpService {
     return res;
   }
 
+  Future<Map<String, dynamic>> updateProductAccount(
+    String productId,
+    String branchId,
+    Map<String, dynamic> body,
+  ) async {
+    final uri = HttpTools.generateUri("$_endpoint/products/$productId/branches/$branchId");
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await patchQuery(uri, headers: headers, body: body);
+    return res;
+  }
+
   Future<Map<String, dynamic>> addProductAccount(String productId, String branchId, Map<String, dynamic> body) async {
     final uri = HttpTools.generateUri("$_endpoint/products/$productId/branches/$branchId/add");
     final headers = HttpTools.generateAuthHeaders();

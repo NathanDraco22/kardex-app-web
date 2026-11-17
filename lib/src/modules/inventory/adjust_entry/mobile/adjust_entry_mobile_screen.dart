@@ -20,7 +20,11 @@ class _MobileScaffold extends StatelessWidget {
         visible: MediaQuery.viewInsetsOf(context).bottom == 0.0,
         child: FloatingActionButton.extended(
           onPressed: () async {
-            final res = await showSearchProductInBranchDelegate(context, true);
+            final res = await showSearchProductInBranchDelegate(
+              context,
+              true,
+              onlyInventory: true,
+            );
             if (res == null) return;
             if (viewController.tableController.rows.length > 99) {
               if (!context.mounted) return;

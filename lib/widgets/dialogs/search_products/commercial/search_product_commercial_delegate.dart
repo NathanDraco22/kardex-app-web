@@ -195,29 +195,37 @@ class _ProductInBranchResultRow extends StatelessWidget {
                           ),
                           Flexible(
                             fit: FlexFit.tight,
-                            child: Builder(
-                              builder: (context) {
-                                Color color = Colors.blue;
+                            child: !product.tracksInventory
+                                ? Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: ProductTypeBadge(
+                                      productType: product.productType,
+                                      compact: true,
+                                    ),
+                                  )
+                                : Builder(
+                                    builder: (context) {
+                                      Color color = Colors.blue;
 
-                                if (product.account.availableStock <= 0) {
-                                  color = Colors.red;
-                                }
-                                return Text(
-                                  NumberFormatter.formatDisplayStock(
-                                    product.account.availableStock,
-                                    product.defaultUnitFactor,
-                                    selectedUnitName: product.defaultUnitName,
-                                    standardUnitName: product.defaultUnitName,
-                                    standardUnitFactor: product.defaultUnitFactor,
+                                      if (product.account.availableStock <= 0) {
+                                        color = Colors.red;
+                                      }
+                                      return Text(
+                                        NumberFormatter.formatDisplayStock(
+                                          product.account.availableStock,
+                                          product.defaultUnitFactor,
+                                          selectedUnitName: product.defaultUnitName,
+                                          standardUnitName: product.defaultUnitName,
+                                          standardUnitFactor: product.defaultUnitFactor,
+                                        ),
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w600,
+                                          color: color,
+                                        ),
+                                      );
+                                    },
                                   ),
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: color,
-                                  ),
-                                );
-                              },
-                            ),
                           ),
                         ],
                       ),

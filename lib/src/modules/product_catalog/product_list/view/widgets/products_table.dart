@@ -4,6 +4,7 @@ import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/product_list/cubit/read_product_cubit.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/product_list/dialogs/create_product_dialog.dart';
 import 'package:kardex_app_front/widgets/no_item.dart';
+import 'package:kardex_app_front/widgets/product_type_badge.dart';
 import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 import 'package:kardex_app_front/widgets/status_tag_label.dart';
 import 'package:kardex_app_front/src/tools/row_color_tool.dart';
@@ -33,6 +34,22 @@ class ProductsTable extends StatelessWidget {
                       cubit.searchProductByKeyword(value);
                     },
                   ),
+                ),
+                const Spacer(),
+                SegmentedButton<ProductType?>(
+                  segments: const [
+                    ButtonSegment<ProductType?>(value: null, label: Text("Todos")),
+                    ButtonSegment<ProductType?>(value: ProductType.item, label: Text("Artículos")),
+                    ButtonSegment<ProductType?>(value: ProductType.nonInventory, label: Text("No inv.")),
+                    ButtonSegment<ProductType?>(value: ProductType.service, label: Text("Servicios")),
+                  ],
+                  selected: {cubit.selectedTypeFilter},
+                  showSelectedIcon: false,
+                  onSelectionChanged: (selection) {
+                    if (selection.isNotEmpty) {
+                      cubit.setTypeFilter(selection.first);
+                    }
+                  },
                 ),
               ],
             ),
@@ -156,6 +173,7 @@ class _RowWidget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(product.name),
+                  const SizedBox(height: 2),
                   Row(
                     children: [
                       const Icon(
@@ -169,6 +187,10 @@ class _RowWidget extends StatelessWidget {
                           color: Colors.grey,
                         ),
                       ),
+                      if (!product.tracksInventory) ...[
+                        const SizedBox(width: 8),
+                        ProductTypeBadge(productType: product.productType, compact: true),
+                      ],
                     ],
                   ),
                 ],

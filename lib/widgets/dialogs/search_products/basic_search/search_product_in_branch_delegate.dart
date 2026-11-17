@@ -6,20 +6,30 @@ import 'package:kardex_app_front/widgets/dialogs/search_products/widgets/display
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 
-Future<ProductInDbInBranch?> showSearchProductInBranchDelegate(BuildContext context, bool useAverageCost) async {
+Future<ProductInDbInBranch?> showSearchProductInBranchDelegate(
+  BuildContext context,
+  bool useAverageCost, {
+  bool onlyInventory = false,
+}) async {
   return await Navigator.push<ProductInDbInBranch?>(
     context,
     MaterialPageRoute(
       builder: (context) => CustomProductSearchDelegate(
         useAverageCost: useAverageCost,
+        onlyInventory: onlyInventory,
       ),
     ),
   );
 }
 
 class CustomProductSearchDelegate extends StatefulWidget {
-  const CustomProductSearchDelegate({super.key, required this.useAverageCost});
+  const CustomProductSearchDelegate({
+    super.key,
+    required this.useAverageCost,
+    this.onlyInventory = false,
+  });
   final bool useAverageCost;
+  final bool onlyInventory;
 
   @override
   State<CustomProductSearchDelegate> createState() => _CustomProductSearchDelegateState();
@@ -51,7 +61,11 @@ class _CustomProductSearchDelegateState extends State<CustomProductSearchDelegat
                         isSearching = true;
                         setState(() {});
                         final branchId = getIt<AuthCubit>().currentBranchId;
-                        products = await context.read<ProductsRepository>().searchProductInBranch(value, branchId);
+                        products = await context.read<ProductsRepository>().searchProductInBranch(
+                              value,
+                              branchId,
+                              onlyInventory: widget.onlyInventory ? true : null,
+                            );
                         isSearching = false;
                         setState(() {});
                       },

@@ -138,8 +138,12 @@ class MobileProductsTable extends StatelessWidget {
                       title: currentProduct.name,
                       color: rowColor,
                       isActive: currentProduct.isActive,
-                      subtitle1: currentProduct.brandName,
-                      subtitle2: currentProduct.defaultUnitName,
+                      subtitle1: currentProduct.brandName.isNotEmpty
+                          ? currentProduct.brandName
+                          : currentProduct.productType.label,
+                      subtitle2: currentProduct.tracksInventory
+                          ? currentProduct.defaultUnitName
+                          : '${currentProduct.defaultUnitName} • ${currentProduct.productType.label}',
                       onEditButtonPresesed: () async {
                         final res = await showCreateProductDialog(context, product: currentProduct);
 

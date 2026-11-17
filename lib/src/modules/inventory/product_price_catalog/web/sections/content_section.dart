@@ -123,6 +123,13 @@ class _ContentSection extends StatelessWidget {
                             children: [
                               const Icon(Icons.qr_code, size: 12),
                               Text(currentProduct.displayCode),
+                              if (!currentProduct.tracksInventory) ...[
+                                const SizedBox(width: 6),
+                                ProductTypeBadge(
+                                  productType: currentProduct.productType,
+                                  compact: true,
+                                ),
+                              ],
                             ],
                           ),
                           Row(
@@ -181,7 +188,16 @@ class _ContentSection extends StatelessWidget {
                   onPressed: () async {
                     final newProfile = await showProductPriceEditor(context, currentProduct);
                     if (newProfile != null && context.mounted) {
-                      final updatedProduct = currentProduct.copyWith(saleProfile: newProfile);
+                      var updatedProduct = currentProduct.copyWith(saleProfile: newProfile);
+                      if (!currentProduct.tracksInventory) {
+                        try {
+                          updatedProduct = await context.read<ProductsRepository>().getProductInBranchById(
+                            currentProduct.id,
+                            getIt<AuthCubit>().currentBranchId,
+                          );
+                        } catch (_) {}
+                      }
+                      if (!context.mounted) return;
                       context.read<ReadProductInBranchCubit>().markProductAsEdited(updatedProduct);
                     }
                   },

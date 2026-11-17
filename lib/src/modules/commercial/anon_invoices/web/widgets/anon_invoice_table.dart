@@ -90,8 +90,9 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
                           if (res == null) return;
                           // La venta directa agrega la fila sin cantidad para
                           // capturarla luego en la tabla.
-                          if (res.product.account.availableStock <= 0 ||
-                              res.baseQuantity > res.product.account.availableStock) {
+                          if (res.product.tracksInventory &&
+                              (res.product.account.availableStock <= 0 ||
+                                  res.baseQuantity > res.product.account.availableStock)) {
                             DialogManager.showInfoDialog(
                               context,
                               "No hay stock disponible",
@@ -131,7 +132,8 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
           if (res == null) return;
           // La venta directa agrega la fila sin cantidad para capturarla
           // luego en la tabla.
-          if (res.product.account.availableStock <= 0 || res.baseQuantity > res.product.account.availableStock) {
+          if (res.product.tracksInventory &&
+              (res.product.account.availableStock <= 0 || res.baseQuantity > res.product.account.availableStock)) {
             if (!context.mounted) return;
             await DialogManager.showErrorDialog(
               context,
@@ -156,7 +158,7 @@ class _AnonInvoiceTableState extends State<AnonInvoiceTable> {
             );
             return;
           }
-          if (res.baseQuantity > res.product.account.availableStock) {
+          if (res.product.tracksInventory && res.baseQuantity > res.product.account.availableStock) {
             if (!context.mounted) return;
             await DialogManager.showErrorDialog(
               context,
@@ -204,9 +206,11 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
 
     final product = widget.item.product;
     final isSuperiorUnit = widget.item.selectedUnitIndex > product.defaultUnitIndex;
-    final maxDisplayQuantity = isSuperiorUnit
-        ? (product.account.availableStock / widget.item.conversionFactor).floorToDouble()
-        : product.account.availableStock / widget.item.conversionFactor;
+    final maxDisplayQuantity = !product.tracksInventory
+        ? null
+        : isSuperiorUnit
+            ? (product.account.availableStock / widget.item.conversionFactor).floorToDouble()
+            : product.account.availableStock / widget.item.conversionFactor;
 
     final price = NumberFormatter.convertToMoneyLike(
       widget.item.newPrice * widget.item.conversionFactor,
@@ -293,13 +297,21 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
                                 ),
                               ),
                               Expanded(
-                                child: Text(
-                                  NumberFormatter.formatDisplayStock(
-                                    product.account.availableStock,
-                                    widget.item.conversionFactor,
-                                  ),
-                                  textAlign: TextAlign.left,
-                                ),
+                                child: !product.tracksInventory
+                                    ? Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: ProductTypeBadge(
+                                          productType: product.productType,
+                                          compact: true,
+                                        ),
+                                      )
+                                    : Text(
+                                        NumberFormatter.formatDisplayStock(
+                                          product.account.availableStock,
+                                          widget.item.conversionFactor,
+                                        ),
+                                        textAlign: TextAlign.left,
+                                      ),
                               ),
                             ],
                           ),

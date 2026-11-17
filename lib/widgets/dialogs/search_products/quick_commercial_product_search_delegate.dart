@@ -19,13 +19,14 @@ double? resolveQuickItemQuantity({
   required int conversionFactor,
   required bool restrictStock,
   required int availableStock,
+  bool tracksInventory = true,
 }) {
   if (displayQuantity <= 0) return null;
 
   final factor = conversionFactor > 0 ? conversionFactor : 1;
   var finalQuantity = displayQuantity;
 
-  if (restrictStock) {
+  if (restrictStock && tracksInventory) {
     if (availableStock <= 0) return null;
     if ((displayQuantity * factor).round() > availableStock) {
       finalQuantity = availableStock / factor;
@@ -126,6 +127,7 @@ class _QuickProductSearchDelegateState extends State<QuickProductSearchDelegate>
       conversionFactor: factor,
       restrictStock: widget.restrictStock,
       availableStock: product.account.availableStock,
+      tracksInventory: product.tracksInventory,
     );
 
     setState(() {
@@ -233,6 +235,7 @@ class _QuickProductSearchDelegateState extends State<QuickProductSearchDelegate>
 
           bool canIncrement = true;
           if (widget.restrictStock &&
+              product.tracksInventory &&
               ((quantity + 1) * _resolveDisplayFactor(product)) > product.account.availableStock) {
             canIncrement = false;
           }
@@ -422,14 +425,20 @@ class _ProductInBranchQuickResultRowState extends State<_ProductInBranchQuickRes
                         ),
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        "Stock: ${stockDisplay.quantityText} ${stockDisplay.unitName}",
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: widget.product.account.availableStock > 0 ? Colors.green.shade700 : Colors.red,
-                          fontWeight: FontWeight.w600,
+                      if (!widget.product.tracksInventory)
+                        ProductTypeBadge(
+                          productType: widget.product.productType,
+                          compact: true,
+                        )
+                      else
+                        Text(
+                          "Stock: ${stockDisplay.quantityText} ${stockDisplay.unitName}",
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: widget.product.account.availableStock > 0 ? Colors.green.shade700 : Colors.red,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ),

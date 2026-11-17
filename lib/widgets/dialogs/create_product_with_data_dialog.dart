@@ -76,10 +76,16 @@ class _CreateProductWithDataDialogState extends State<CreateProductWithDataDialo
   final Map<String, dynamic> _creationMap = {};
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     _creationMap['isActive'] = true;
     _creationMap['hasIva'] = false;
     _creationMap['altCode'] = "";
+    _creationMap['productType'] = ProductType.item.apiValue;
+  }
+
+  @override
+  Widget build(BuildContext context) {
 
     return BlocListener<WriteProductCubit, WriteProductState>(
       listener: (context, state) async {
@@ -134,6 +140,7 @@ class _FormContentState extends State<_FormContent> {
   ImageProvider? _currentImageProvider;
   Uint8List? _selectedImageBytes;
   bool _isImageDeleted = false;
+  ProductType _selectedType = ProductType.item;
 
   @override
   void initState() {
@@ -143,6 +150,26 @@ class _FormContentState extends State<_FormContent> {
     _costController = TextEditingController(text: "0.00");
     _priceController = TextEditingController(text: "0.00");
     _unitController = TextEditingController();
+    widget.creationMap['productType'] = _selectedType.apiValue;
+  }
+
+  void _onTypeChanged(ProductType nextType) {
+    setState(() {
+      _selectedType = nextType;
+      widget.creationMap['productType'] = nextType.apiValue;
+      if (!nextType.tracksInventory) {
+        _quantityController.text = "0";
+      }
+      if (nextType == ProductType.service) {
+        if (_unitController.text.trim().isEmpty) {
+          _unitController.text = 'Servicio';
+          widget.creationMap['unitName'] = 'Servicio';
+        }
+        widget.creationMap['extraUnits'] = const <ExtraUnit>[];
+        widget.creationMap['defaultUnitIndex'] = 0;
+        widget.creationMap['wholesaleUnitIndex'] = 0;
+      }
+    });
   }
 
   @override
@@ -157,6 +184,7 @@ class _FormContentState extends State<_FormContent> {
 
   Future<void> _submitForm() async {
     widget.creationMap['unitName'] = _unitController.text.trim();
+    widget.creationMap['productType'] = _selectedType.apiValue;
     if (!widget.formKey.currentState!.validate()) return;
 
     final writeCubit = context.read<WriteProductCubit>();
@@ -187,19 +215,24 @@ class _FormContentState extends State<_FormContent> {
 
       widget.creationMap['image'] = imageUrl;
 
+      final activeBranchId = widget.branchId ?? authCubit.currentBranchId;
+      if (!_selectedType.tracksInventory) {
+        widget.creationMap['branchId'] = activeBranchId;
+      }
+
       final createProduct = CreateProduct.fromJson(widget.creationMap);
 
-      final quantity = int.tryParse(_quantityController.text.trim()) ?? 0;
-      final costDouble = double.tryParse(_costController.text.trim()) ?? 0.0;
-      final priceDouble = double.tryParse(_priceController.text.trim()) ?? 0.0;
+      final quantity = _selectedType.tracksInventory
+          ? (int.tryParse(_quantityController.text.trim()) ?? 0)
+          : 0;
+      final costDouble = double.tryParse(_costController.text.trim().replaceAll(',', '')) ?? 0.0;
+      final priceDouble = double.tryParse(_priceController.text.trim().replaceAll(',', '')) ?? 0.0;
 
       final inventoryInfo = InventoryInfo(
         quantity: quantity,
         cost: NumberFormatter.convertFromDoubleToCents(costDouble),
         price: NumberFormatter.convertFromDoubleToCents(priceDouble),
       );
-
-      final activeBranchId = widget.branchId ?? authCubit.currentBranchId;
 
       final createProductWithData = CreateProductWithData(
         createProduct: createProduct,
@@ -275,6 +308,8 @@ class _FormContentState extends State<_FormContent> {
             _InnerContent(
               creationMap: widget.creationMap,
               branchId: widget.branchId,
+              selectedType: _selectedType,
+              onTypeChanged: _onTypeChanged,
               unitsMenuEntries: unitsMenuEntries,
               productCategoriesEntries: productCateEntries,
               tagController: _tagController,
@@ -333,6 +368,8 @@ class _FormContentState extends State<_FormContent> {
             content: _InnerContent(
               creationMap: widget.creationMap,
               branchId: widget.branchId,
+              selectedType: _selectedType,
+              onTypeChanged: _onTypeChanged,
               unitsMenuEntries: unitsMenuEntries,
               productCategoriesEntries: productCateEntries,
               tagController: _tagController,
@@ -354,6 +391,8 @@ class _InnerContent extends StatelessWidget {
   const _InnerContent({
     required this.creationMap,
     this.branchId,
+    required this.selectedType,
+    required this.onTypeChanged,
     required this.unitsMenuEntries,
     required this.productCategoriesEntries,
     required this.tagController,
@@ -367,6 +406,8 @@ class _InnerContent extends StatelessWidget {
 
   final Map<String, dynamic> creationMap;
   final String? branchId;
+  final ProductType selectedType;
+  final ValueChanged<ProductType> onTypeChanged;
   final Iterable<DropdownMenuEntry<String>> unitsMenuEntries;
   final Iterable<DropdownMenuEntry<String>> productCategoriesEntries;
   final _WordChipTextController tagController;
@@ -391,14 +432,19 @@ class _InnerContent extends StatelessWidget {
               image: imageProvider,
               width: 140,
               height: 140,
-              placeholderText: "Foto del producto",
+              placeholderText: selectedType.isService ? "Foto del servicio" : "Foto del producto",
               onIntent: onImageIntent,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
+          ProductTypeSelector(
+            selectedType: selectedType,
+            onChanged: onTypeChanged,
+          ),
+          const SizedBox(height: 14),
           TitleTextField(
             key: const ValueKey("product_name"),
-            title: "Nombre del Producto*",
+            title: selectedType.isService ? "Nombre del Servicio*" : "Nombre del Producto*",
             textCapitalization: TextCapitalization.words,
             autofocus: true,
             onEditingComplete: () => FocusScope.of(context).nextFocus(),
@@ -413,10 +459,11 @@ class _InnerContent extends StatelessWidget {
             key: const ValueKey("product_brand"),
             textCapitalization: TextCapitalization.words,
             onEditingComplete: () => FocusScope.of(context).nextFocus(),
-            title: "Marca*",
+            title: selectedType.tracksInventory ? "Marca*" : "Marca (Opcional)",
             validator: (value) {
-              if (value == null || value.trim().isEmpty) return "Campo requerido";
-              creationMap['brandName'] = value.trim();
+              final trimmed = value?.trim() ?? '';
+              if (selectedType.tracksInventory && trimmed.isEmpty) return "Campo requerido";
+              creationMap['brandName'] = trimmed;
               return null;
             },
           ),
@@ -554,14 +601,16 @@ class _InnerContent extends StatelessWidget {
               return null;
             },
           ),
-          const SizedBox(height: 16),
-          _ExtraUnitsSection(
-            creationMap: creationMap,
-            onPresetApplied: (preset) {
-              unitController.text = preset.baseUnit;
-              creationMap['unitName'] = preset.baseUnit;
-            },
-          ),
+          if (!selectedType.isService) ...[
+            const SizedBox(height: 16),
+            _ExtraUnitsSection(
+              creationMap: creationMap,
+              onPresetApplied: (preset) {
+                unitController.text = preset.baseUnit;
+                creationMap['unitName'] = preset.baseUnit;
+              },
+            ),
+          ],
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(12),
@@ -575,11 +624,17 @@ class _InnerContent extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.inventory_2_outlined, size: 18, color: Colors.blue.shade700),
+                    Icon(
+                      selectedType.tracksInventory ? Icons.inventory_2_outlined : Icons.sell_outlined,
+                      size: 18,
+                      color: Colors.blue.shade700,
+                    ),
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
-                        "Inventario y Precio Inicial ($branchName)",
+                        selectedType.tracksInventory
+                            ? "Inventario y Precio Inicial ($branchName)"
+                            : "Precio y Costo de Referencia ($branchName)",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 13,
@@ -590,30 +645,37 @@ class _InnerContent extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 10),
-                TitleTextField(
-                  key: const ValueKey("initial_quantity"),
-                  title: "Cantidad Inicial*",
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [IntegerTextInputFormatter()],
-                  controller: quantityController,
-                  validator: (val) {
-                    if (val == null || val.trim().isEmpty) return "Campo requerido";
-                    final n = int.tryParse(val.trim());
-                    if (n == null || n < 0) return "Debe ser un número >= 0";
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 8),
+                if (selectedType.tracksInventory) ...[
+                  TitleTextField(
+                    key: const ValueKey("initial_quantity"),
+                    title: "Cantidad Inicial*",
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [IntegerTextInputFormatter()],
+                    controller: quantityController,
+                    validator: (val) {
+                      if (val == null || val.trim().isEmpty) return "Campo requerido";
+                      final n = int.tryParse(val.trim());
+                      if (n == null || n < 0) return "Debe ser un número >= 0";
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                ],
                 Row(
                   children: [
                     Flexible(
                       child: TitleTextField(
                         key: const ValueKey("initial_cost"),
-                        title: "Costo Unitario (${NumberFormatter.currencySymbol})*",
+                        title: selectedType.tracksInventory
+                            ? "Costo Unitario (${NumberFormatter.currencySymbol})*"
+                            : "Costo Ref. (${NumberFormatter.currencySymbol})",
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
                         inputFormatters: [const DecimalTextInputFormatter()],
                         controller: costController,
                         validator: (val) {
+                          if (!selectedType.tracksInventory && (val == null || val.trim().isEmpty)) {
+                            return null;
+                          }
                           if (val == null || val.trim().isEmpty) return "Requerido";
                           final d = double.tryParse(val.trim());
                           if (d == null || d < 0) return ">= 0";

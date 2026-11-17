@@ -1,3 +1,4 @@
+import 'package:kardex_business/src/domain/models/product/product_type.dart';
 import 'package:kardex_business/src/tools/unit_display_formatter.dart';
 
 enum PaymentType {
@@ -34,25 +35,28 @@ class ProductItem {
   final String? code;
   final String? categoryName;
   final List<String> tags;
+  final ProductType productType;
 
   ProductItem({
     required this.id,
     required this.name,
     required this.unitName,
-    required this.brandName,
+    this.brandName = "",
     this.code,
     this.categoryName,
     this.tags = const [],
+    this.productType = ProductType.item,
   });
 
   factory ProductItem.fromJson(Map<String, dynamic> json) => ProductItem(
     id: json['id'],
     name: json['name'],
     unitName: json['unitName'],
-    brandName: json['brandName'],
+    brandName: json['brandName'] as String? ?? "",
     code: json['code'],
     categoryName: json['categoryName'],
     tags: List<String>.from(json['tags'] ?? []),
+    productType: ProductType.fromJson(json['productType']),
   );
 
   Map<String, dynamic> toJson() => {
@@ -63,6 +67,7 @@ class ProductItem {
     'code': code,
     'categoryName': categoryName,
     'tags': tags,
+    'productType': productType.apiValue,
   };
 }
 

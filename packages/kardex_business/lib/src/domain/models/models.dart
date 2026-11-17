@@ -46,6 +46,7 @@ export 'invoice/invoice_totals.dart';
 export 'order/order_model.dart';
 export 'product/product.dart';
 export 'product/product_model.dart';
+export 'product/product_type.dart';
 export 'product_account/product_account.dart';
 export 'product_category/product_category.dart';
 export 'product_category/product_category_model.dart';

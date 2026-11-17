@@ -97,6 +97,11 @@ class SaleTerminalViewController extends ChangeNotifier {
     final existingIndex = items.indexWhere((i) => i.product.id == item.product.id);
     if (existingIndex != -1) {
       final existing = items[existingIndex];
+      if (!existing.product.tracksInventory) {
+        existing.quantity += 1.0;
+        notifyListeners();
+        return;
+      }
       final maxQuantity = existing.product.account.availableStock / existing.conversionFactor;
       if (existing.quantity + 1.0 <= maxQuantity) {
         existing.quantity += 1.0;
@@ -116,20 +121,22 @@ class SaleTerminalViewController extends ChangeNotifier {
     );
     result.quantity = 1.0;
 
-    final existingIndex = items.indexWhere((i) => i.product.id == product.id);
-    if (existingIndex != -1) {
-      final existing = items[existingIndex];
-      final maxQuantity = existing.product.account.availableStock / existing.conversionFactor;
-      if (existing.quantity + 1.0 > maxQuantity) {
-        DialogManager.showInfoDialog(context, "No hay más stock disponible para este producto");
-        requestSearchFocus();
-        return false;
-      }
-    } else {
-      if (product.account.availableStock < result.baseQuantity) {
-        DialogManager.showInfoDialog(context, "No hay stock disponible para este producto");
-        requestSearchFocus();
-        return false;
+    if (product.tracksInventory) {
+      final existingIndex = items.indexWhere((i) => i.product.id == product.id);
+      if (existingIndex != -1) {
+        final existing = items[existingIndex];
+        final maxQuantity = existing.product.account.availableStock / existing.conversionFactor;
+        if (existing.quantity + 1.0 > maxQuantity) {
+          DialogManager.showInfoDialog(context, "No hay más stock disponible para este producto");
+          requestSearchFocus();
+          return false;
+        }
+      } else {
+        if (product.account.availableStock < result.baseQuantity) {
+          DialogManager.showInfoDialog(context, "No hay stock disponible para este producto");
+          requestSearchFocus();
+          return false;
+        }
       }
     }
 

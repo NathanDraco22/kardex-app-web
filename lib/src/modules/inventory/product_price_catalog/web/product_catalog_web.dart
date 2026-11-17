@@ -75,7 +75,16 @@ class _Body extends StatelessWidget {
                           if (selectedProduct != null && context.mounted) {
                             final newProfile = await showProductPriceEditor(context, selectedProduct);
                             if (newProfile != null && context.mounted) {
-                              final updatedProduct = selectedProduct.copyWith(saleProfile: newProfile);
+                              var updatedProduct = selectedProduct.copyWith(saleProfile: newProfile);
+                              if (!selectedProduct.tracksInventory) {
+                                try {
+                                  updatedProduct = await context.read<ProductsRepository>().getProductInBranchById(
+                                    selectedProduct.id,
+                                    getIt<AuthCubit>().currentBranchId,
+                                  );
+                                } catch (_) {}
+                              }
+                              if (!context.mounted) return;
                               context.read<ReadProductInBranchCubit>().markProductAsEdited(updatedProduct);
                             }
                           }

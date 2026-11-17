@@ -1,21 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/widgets/display_product_code.dart';
 import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
-Future<ProductInDb?> showProductSearchDelegate(BuildContext context) async {
+Future<ProductInDb?> showProductSearchDelegate(
+  BuildContext context, {
+  bool onlyInventory = false,
+}) async {
   return await Navigator.push<ProductInDb?>(
     context,
     MaterialPageRoute(
-      builder: (context) => const CustomProductSearchDelegate(),
+      builder: (context) => CustomProductSearchDelegate(onlyInventory: onlyInventory),
     ),
   );
 }
 
 class CustomProductSearchDelegate extends StatefulWidget {
-  const CustomProductSearchDelegate({super.key});
+  const CustomProductSearchDelegate({super.key, this.onlyInventory = false});
+
+  final bool onlyInventory;
 
   @override
   State<CustomProductSearchDelegate> createState() => _CustomProductSearchDelegateState();
@@ -46,7 +53,16 @@ class _CustomProductSearchDelegateState extends State<CustomProductSearchDelegat
                         if (value.isEmpty) return;
                         isSearching = true;
                         setState(() {});
-                        products = await context.read<ProductsRepository>().searchProductByKeyword(value);
+                        String? activeBranchId;
+                        if (getIt.isRegistered<AuthCubit>()) {
+                          final authState = getIt<AuthCubit>().state;
+                          if (authState is Authenticated) activeBranchId = authState.branch.id;
+                        }
+                        products = await context.read<ProductsRepository>().searchProductByKeyword(
+                              value,
+                              branchId: activeBranchId,
+                              onlyInventory: widget.onlyInventory ? true : null,
+                            );
                         isSearching = false;
                         setState(() {});
                       },

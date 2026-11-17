@@ -1,25 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/widgets/display_product_code.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/widgets/search_product_dialog_panel.dart';
 
-Future<ProductInDb?> showSearchProductDialog(BuildContext context, {ProductInDb? product}) async {
+Future<ProductInDb?> showSearchProductDialog(
+  BuildContext context, {
+  ProductInDb? product,
+  bool onlyInventory = false,
+}) async {
   final res = await showDialog<ProductInDb?>(
     context: context,
     builder: (context) => SearchProductDialog(
       product: product,
+      onlyInventory: onlyInventory,
     ),
   );
   return res;
 }
 
 class SearchProductDialog extends StatefulWidget {
-  const SearchProductDialog({super.key, this.product});
+  const SearchProductDialog({
+    super.key,
+    this.product,
+    this.onlyInventory = false,
+  });
 
   final ProductInDb? product;
+  final bool onlyInventory;
 
   @override
   State<SearchProductDialog> createState() => _SearchProductDialogState();
@@ -94,7 +106,16 @@ class _SearchProductDialogState extends State<SearchProductDialog> {
                       }
                       isSearching = true;
                       setState(() {});
-                      products = await _productsRepository.searchProductByKeyword(value);
+                      String? activeBranchId;
+                      if (getIt.isRegistered<AuthCubit>()) {
+                        final authState = getIt<AuthCubit>().state;
+                        if (authState is Authenticated) activeBranchId = authState.branch.id;
+                      }
+                      products = await _productsRepository.searchProductByKeyword(
+                        value,
+                        branchId: activeBranchId,
+                        onlyInventory: widget.onlyInventory ? true : null,
+                      );
                       isSearching = false;
                       setState(() {});
                     },

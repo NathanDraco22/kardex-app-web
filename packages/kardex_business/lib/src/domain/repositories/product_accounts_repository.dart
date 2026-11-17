@@ -13,6 +13,20 @@ class ProductAccountsRepository {
     return response.data;
   }
 
+  Future<ProductAccountInDb> updateProductAccount(
+    String productId,
+    String branchId, {
+    int? currentStock,
+    int? averageCost,
+  }) async {
+    final body = <String, dynamic>{
+      "currentStock": ?currentStock,
+      "averageCost": ?averageCost,
+    };
+    final res = await dataSource.updateProductAccount(productId, branchId, body);
+    return ProductAccountInDb.fromJson(res);
+  }
+
   Future<ProductAccountInDb> addProductAccount(
     String productId,
     String branchId, {

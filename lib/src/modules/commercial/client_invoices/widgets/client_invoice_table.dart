@@ -213,6 +213,7 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
                           if (res == null) return;
                           if (res.quantity <= 0) return;
                           if (widget.restrictStock &&
+                              res.product.tracksInventory &&
                               (res.baseQuantity > res.product.account.availableStock ||
                                   res.product.account.availableStock == 0)) {
                             if (!context.mounted) return;
@@ -259,6 +260,7 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
           );
           if (res == null) return;
           if (widget.restrictStock &&
+              res.product.tracksInventory &&
               (res.baseQuantity > res.product.account.availableStock ||
                   res.product.account.availableStock == 0)) {
             if (!context.mounted) return;
@@ -280,6 +282,7 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
           );
           if (res == null) return;
           if (widget.restrictStock &&
+              res.product.tracksInventory &&
               (res.baseQuantity > res.product.account.availableStock ||
                   res.product.account.availableStock == 0)) {
             if (!context.mounted) return;

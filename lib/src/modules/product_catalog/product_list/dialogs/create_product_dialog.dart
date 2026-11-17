@@ -2,6 +2,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/constants/feature_flags.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
@@ -72,22 +74,19 @@ class CreateProductDialog extends StatefulWidget {
 
 class _CreateProductDialogState extends State<CreateProductDialog> {
   final formKey = GlobalKey<FormState>();
-  final creationMap = {};
+  final creationMap = <String, dynamic>{};
+
+  @override
+  void initState() {
+    super.initState();
+    creationMap['isActive'] = widget.product?.isActive ?? true;
+    creationMap['hasIva'] = widget.product?.hasIva ?? false;
+    creationMap['altCode'] = widget.product?.altCode ?? "";
+    creationMap['productType'] = (widget.product?.productType ?? ProductType.item).apiValue;
+  }
 
   @override
   Widget build(BuildContext context) {
-    bool isActive = true;
-    bool hasIva = false;
-
-    if (widget.product != null) {
-      isActive = widget.product!.isActive;
-      hasIva = widget.product!.hasIva;
-    }
-
-    creationMap['isActive'] = isActive;
-    creationMap['hasIva'] = hasIva;
-    creationMap['altCode'] = widget.product?.altCode ?? "";
-
     final currentProduct = widget.product;
 
     return BlocListener<WriteProductCubit, WriteProductState>(

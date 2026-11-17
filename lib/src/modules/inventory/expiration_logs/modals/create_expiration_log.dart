@@ -117,9 +117,9 @@ class _ExpirationLogCreationScreenState extends State<ExpirationLogCreationScree
                       final isMobile = context.isMobileOrTablet();
 
                       if (isMobile) {
-                        _selectedProduct = await showProductSearchDelegate(context);
+                        _selectedProduct = await showProductSearchDelegate(context, onlyInventory: true);
                       } else {
-                        _selectedProduct = await showSearchProductDialog(context);
+                        _selectedProduct = await showSearchProductDialog(context, onlyInventory: true);
                       }
 
                       setState(() {});

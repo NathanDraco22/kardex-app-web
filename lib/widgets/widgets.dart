@@ -1,6 +1,7 @@
 export 'bank_chips_selector.dart';
 export 'exchange_rate_status_button.dart';
 export 'payment_currency_selector.dart';
+export 'product_type_badge.dart';
 export 'basic_table_listview.dart';
 export 'elements/elements.dart';
 export 'client_list_tile.dart';

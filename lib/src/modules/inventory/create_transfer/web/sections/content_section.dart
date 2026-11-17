@@ -10,7 +10,10 @@ class _ContentSection extends StatelessWidget {
     return TransferProductTable(
       controller: tableController,
       onAddRowAction: (controller) async {
-        final res = await showSearchProductInBranchDialog(context);
+        final res = await showSearchProductInBranchDialog(
+          context,
+          onlyInventory: true,
+        );
         if (res == null) return;
 
         final currentTotalRow = controller.totalRow;
@@ -40,7 +43,11 @@ class _ContentSection extends StatelessWidget {
         mediator.refresh();
       },
       onUpdateRowAction: (controller, row) async {
-        final res = await showSearchProductInBranchDialog(context, product: row.product);
+        final res = await showSearchProductInBranchDialog(
+          context,
+          product: row.product,
+          onlyInventory: true,
+        );
         if (res == null) return;
         if (!context.mounted) return;
         final unit = await showInventoryUnitPicker(context, res);

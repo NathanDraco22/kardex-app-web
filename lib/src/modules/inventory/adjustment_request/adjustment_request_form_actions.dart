@@ -11,7 +11,11 @@ import 'package:kardex_business/kardex_business.dart';
 Future<void> addAdjustmentRequestProductAction(BuildContext context) async {
   final viewController = AdjustmentRequestMediator.read(context);
 
-  final product = await showSearchProductInBranchDialog(context, useAverageCost: true);
+  final product = await showSearchProductInBranchDialog(
+    context,
+    useAverageCost: true,
+    onlyInventory: true,
+  );
   if (product == null || !context.mounted) return;
 
   if (viewController.containsProduct(product.id)) {

@@ -42,7 +42,7 @@ class _TabletProductsSectionState extends State<_TabletProductsSection> {
       viewController.requestSearchFocus();
       return;
     }
-    if (result.baseQuantity > product.account.availableStock) {
+    if (product.tracksInventory && result.baseQuantity > product.account.availableStock) {
       DialogManager.showInfoDialog(context, "No hay stock disponible");
       viewController.requestSearchFocus();
       return;
@@ -68,7 +68,7 @@ class _TabletProductsSectionState extends State<_TabletProductsSection> {
       viewController.requestSearchFocus();
       return;
     }
-    if (res.baseQuantity > res.product.account.availableStock) {
+    if (res.product.tracksInventory && res.baseQuantity > res.product.account.availableStock) {
       DialogManager.showInfoDialog(context, "No hay stock disponible");
       viewController.requestSearchFocus();
       return;

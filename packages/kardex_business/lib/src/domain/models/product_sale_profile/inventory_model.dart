@@ -1,3 +1,5 @@
+import '../product/product_type.dart';
+
 // Modelo para los detalles del producto en el perfil de venta
 class InventoryProduct {
   final String id;
@@ -9,6 +11,7 @@ class InventoryProduct {
   final String? categoryName;
   final List<String> tags;
   final bool isActive;
+  final ProductType productType;
   final String image;
 
   InventoryProduct({
@@ -16,11 +19,12 @@ class InventoryProduct {
     required this.name,
     this.description,
     this.code,
-    required this.brandName,
+    this.brandName = "",
     required this.unitName,
     this.categoryName,
     required this.tags,
     this.isActive = true,
+    this.productType = ProductType.item,
     this.image = "",
   });
 
@@ -30,11 +34,12 @@ class InventoryProduct {
       name: json['name'] as String,
       description: json['description'] as String?,
       code: json['code'] as String?,
-      brandName: json['brandName'] as String,
+      brandName: json['brandName'] as String? ?? "",
       unitName: json['unitName'] as String,
       categoryName: json['categoryName'] as String?,
-      tags: List<String>.from(json['tags'] as List),
+      tags: List<String>.from(json['tags'] as List? ?? const []),
       isActive: json['isActive'] as bool? ?? true,
+      productType: ProductType.fromJson(json['productType']),
       image: json['image'] as String? ?? "",
     );
   }
@@ -50,6 +55,7 @@ class InventoryProduct {
       'categoryName': categoryName,
       'tags': tags,
       'isActive': isActive,
+      'productType': productType.apiValue,
       'image': image,
     };
   }
