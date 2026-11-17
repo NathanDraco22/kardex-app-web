@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:kardex_app_front/src/tools/inventory_unit_tool.dart';
 
 /// Muestra una cantidad de stock en la unidad de venta y, si aplica, también
