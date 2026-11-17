@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:kardex_app_front/widgets/status_tag_label.dart';
 
 class MobileRow extends StatelessWidget {

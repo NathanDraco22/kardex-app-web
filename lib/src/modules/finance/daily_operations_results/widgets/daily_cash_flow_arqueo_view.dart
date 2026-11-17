@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:kardex_app_front/src/tools/extensiones.dart';
 import 'package:kardex_app_front/widgets/custom_invoice_list_tile.dart';
 import 'package:kardex_app_front/widgets/custom_receipt_list_tile.dart';

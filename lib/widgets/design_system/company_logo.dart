@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:cached_network_image_ce/cached_network_image.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:kardex_app_front/src/tools/cache/app_image_cache_manager.dart';
 
 /// Imagen corporativa global de la empresa.

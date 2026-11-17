@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/modules/inventory/adjustment_request/cubit/read_adjustment_request_detail_cubit.dart';
 import 'package:kardex_app_front/src/modules/inventory/adjustment_request/cubit/write_adjustment_request_cubit.dart';

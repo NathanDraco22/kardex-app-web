@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:kardex_app_front/widgets/dialogs/selectors/image_selector_dialog.dart';
 
 /// Un widget premium e interactivo para visualizar y seleccionar imágenes.

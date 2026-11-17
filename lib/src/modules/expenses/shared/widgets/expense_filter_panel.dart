@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:kardex_app_front/src/modules/expenses/shared/expense_list_config.dart';
 import 'package:kardex_app_front/src/modules/expenses/shared/expense_metrics.dart';
 import 'package:kardex_app_front/src/modules/expenses/shared/widgets/expense_date_range_fields.dart';

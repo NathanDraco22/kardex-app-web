@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 
 /// Tarjeta de filtros colapsable para las vistas compactas de Gastos.

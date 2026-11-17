@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'ctrl_key_tip.dart';
 import 'primary_menu_button.dart';

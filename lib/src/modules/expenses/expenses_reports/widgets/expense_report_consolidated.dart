@@ -1,5 +1,5 @@
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:kardex_app_front/src/modules/expenses/expenses_reports/expense_report_aggregation.dart';
 import 'package:kardex_app_front/src/modules/expenses/shared/expense_metrics.dart';
 import 'package:kardex_app_front/src/tools/color_tool.dart';

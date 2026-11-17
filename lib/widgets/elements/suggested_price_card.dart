@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 /// Tarjeta de precio sugerido calculado a partir del costo y el margen.
