@@ -12,12 +12,14 @@ Future<ProductInDbInBranch?> showSearchProductInBranchDialog(
   BuildContext context, {
   ProductInDbInBranch? product,
   bool useAverageCost = false,
+  bool onlyInventory = false,
 }) async {
   final res = await showDialog<ProductInDbInBranch?>(
     context: context,
     builder: (context) => SearchProductInBranchDialog(
       product: product,
       useAverageCost: useAverageCost,
+      onlyInventory: onlyInventory,
     ),
   );
   return res;
@@ -28,10 +30,12 @@ class SearchProductInBranchDialog extends StatefulWidget {
     super.key,
     this.product,
     this.useAverageCost = false,
+    this.onlyInventory = false,
   });
 
   final ProductInDbInBranch? product;
   final bool useAverageCost;
+  final bool onlyInventory;
 
   @override
   State<SearchProductInBranchDialog> createState() => _SearchProductInBranchDialogState();
@@ -110,7 +114,11 @@ class _SearchProductInBranchDialogState extends State<SearchProductInBranchDialo
                       isSearching = true;
                       setState(() {});
                       final branchId = getIt<AuthCubit>().currentBranchId;
-                      products = await _productsRepository.searchProductInBranch(value, branchId);
+                      products = await _productsRepository.searchProductInBranch(
+                        value,
+                        branchId,
+                        onlyInventory: widget.onlyInventory ? true : null,
+                      );
                       if (!mounted) return;
                       isSearching = false;
                       setState(() {});

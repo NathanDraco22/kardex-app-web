@@ -93,6 +93,13 @@ class _RootScaffold extends StatelessWidget {
           ),
           title: const Text("Terminal de Venta"),
           actions: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: ExchangeRateStatusButton(
+                onUpdated: viewController.requestSearchFocus,
+              ),
+            ),
+            const SizedBox(width: 4),
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 8),
               child: ShiftStatusButton(),

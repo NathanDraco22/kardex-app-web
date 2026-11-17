@@ -118,7 +118,9 @@ class _RootScaffold extends StatelessWidget {
               restrictStock: isRestrictStock,
             );
             if (res == null) return;
-            if (isRestrictStock && res.baseQuantity > res.product.account.availableStock) {
+            if (isRestrictStock &&
+                res.product.tracksInventory &&
+                res.baseQuantity > res.product.account.availableStock) {
               if (!context.mounted) return;
               await DialogManager.showErrorDialog(
                 context,
@@ -345,7 +347,9 @@ class _Body extends StatelessWidget {
                             restrictStock: isRestrictStock,
                           );
                           if (res == null) return;
-                          if (isRestrictStock && res.baseQuantity > res.product.account.availableStock) {
+                          if (isRestrictStock &&
+                              res.product.tracksInventory &&
+                              res.baseQuantity > res.product.account.availableStock) {
                             if (!context.mounted) return;
                             await DialogManager.showErrorDialog(
                               context,
@@ -368,7 +372,9 @@ class _Body extends StatelessWidget {
                             restrictStock: isRestrictStock,
                           );
                           if (res == null) return;
-                          if (isRestrictStock && res.baseQuantity > res.product.account.availableStock) {
+                          if (isRestrictStock &&
+                              res.product.tracksInventory &&
+                              res.baseQuantity > res.product.account.availableStock) {
                             if (!context.mounted) return;
                             await DialogManager.showErrorDialog(
                               context,

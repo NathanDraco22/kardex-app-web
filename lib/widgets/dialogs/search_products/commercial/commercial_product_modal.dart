@@ -236,27 +236,32 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                             onChanged: () => setState(() {}),
                           ),
                           const SizedBox(height: 12),
-                          Builder(
-                            builder: (context) {
-                              Color? stockColor;
+                          if (!widget.product.tracksInventory)
+                            Center(
+                              child: ProductTypeBadge(productType: widget.product.productType),
+                            )
+                          else
+                            Builder(
+                              builder: (context) {
+                                Color? stockColor;
 
-                              if (commercialProductResult.selectedUnitIndex != 0) {
-                                stockColor = Colors.blue;
-                              }
+                                if (commercialProductResult.selectedUnitIndex != 0) {
+                                  stockColor = Colors.blue;
+                                }
 
-                              if (availableStock <= 0) {
-                                stockColor = Colors.red;
-                              }
+                                if (availableStock <= 0) {
+                                  stockColor = Colors.red;
+                                }
 
-                              return TitleLabel(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                title: "Existencia",
-                                bigTitle: displayStock,
-                                bigTitleColor: stockColor,
-                              );
-                            },
-                          ),
-                          if (isUserAdmin) ...[
+                                return TitleLabel(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  title: "Existencia",
+                                  bigTitle: displayStock,
+                                  bigTitleColor: stockColor,
+                                );
+                              },
+                            ),
+                          if (isUserAdmin && widget.product.tracksInventory) ...[
                             const SizedBox(height: 8),
                             UnitCostComparison(
                               items: [
@@ -310,7 +315,9 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                                     if (requestedUnits <= 0) {
                                       return "Cantidad invalida";
                                     }
-                                    if (widget.restrictStock && requestedUnits > availableStock) {
+                                    if (widget.restrictStock &&
+                                        widget.product.tracksInventory &&
+                                        requestedUnits > availableStock) {
                                       return "Supera la existencia ($availableStock $baseUnitName)";
                                     }
 

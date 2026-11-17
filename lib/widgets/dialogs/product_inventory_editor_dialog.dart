@@ -73,16 +73,32 @@ class _RootScaffoldState extends State<_RootScaffold> {
 
   late final PriceLevelSyncController priceController;
   late List<Discount> currentDiscounts;
+  final TextEditingController _referenceCostController = TextEditingController();
 
   bool hasLowerPrices = false;
   bool stockWasModified = false;
   bool productWasModified = false;
+
+  int get _referenceCostInCents {
+    final parsed = double.tryParse(_referenceCostController.text.trim().replaceAll(',', '.'));
+    if (parsed == null || parsed < 0) return 0;
+    return (parsed * 100).round();
+  }
+
+  void _syncReferenceCostField() {
+    if (!currentProduct.tracksInventory && currentProduct.account.averageCost > 0) {
+      _referenceCostController.text = (currentProduct.account.averageCost / 100).toStringAsFixed(2);
+    } else {
+      _referenceCostController.clear();
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     currentProduct = widget.initialProduct;
     final saleProfile = currentProduct.saleProfile;
+    _syncReferenceCostField();
 
     priceController = PriceLevelSyncController(
       initialPrices: [
@@ -107,10 +123,36 @@ class _RootScaffoldState extends State<_RootScaffold> {
   @override
   void dispose() {
     priceController.dispose();
+    _referenceCostController.dispose();
     super.dispose();
   }
 
-  void _saveProduct() {
+  Future<void> _saveProduct() async {
+    final branchId = getIt<AuthCubit>().currentBranchId;
+    if (!currentProduct.tracksInventory && _referenceCostInCents != currentProduct.account.averageCost) {
+      try {
+        LoadingDialogManager.showLoadingDialog(context);
+        final updatedAccount = await context
+            .read<WriteProductAccountCubit>()
+            .productAccountsRepository
+            .updateProductAccount(
+              currentProduct.id,
+              branchId,
+              averageCost: _referenceCostInCents,
+            );
+        if (!mounted) return;
+        LoadingDialogManager.closeLoadingDialog(context);
+        currentProduct = currentProduct.copyWith(account: updatedAccount);
+        stockWasModified = true;
+      } catch (e) {
+        if (!mounted) return;
+        LoadingDialogManager.closeLoadingDialog(context);
+        await DialogManager.showErrorDialog(context, e.toString());
+        return;
+      }
+    }
+
+    if (!mounted) return;
     final prices = priceController.prices;
     final updatedDto = UpdateProductSaleProfile(
       salePrice: prices[0],
@@ -120,7 +162,6 @@ class _RootScaffoldState extends State<_RootScaffold> {
       discounts: currentDiscounts,
     );
 
-    final branchId = getIt<AuthCubit>().currentBranchId;
     context.read<WriteProductSaleProfileCubit>().updateProfile(
       branchId,
       currentProduct.id,
@@ -137,6 +178,9 @@ class _RootScaffoldState extends State<_RootScaffold> {
     }
 
     final isAdmin = currentAuthState.session.isAdmin;
+    final effectiveCostInCents = currentProduct.tracksInventory
+        ? currentProduct.account.averageCost
+        : _referenceCostInCents;
 
     final currentPrices = priceController.prices;
     hasLowerPrices =
@@ -146,7 +190,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
           if (currentPrices[2] > 0) currentPrices[2],
           if (currentPrices[3] > 0) currentPrices[3],
         ].any(
-          (price) => price < currentProduct.account.averageCost,
+          (price) => price < effectiveCostInCents,
         );
 
     return PopScope(
@@ -247,6 +291,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
 
                       setState(() {
                         currentProduct = currentProduct.updateWithProduct(updatedProduct);
+                        _syncReferenceCostField();
                         priceController.updateExtraUnits(
                           currentProduct.extraUnits,
                           defaultUnitIndex: currentProduct.defaultUnitIndex,
@@ -310,17 +355,17 @@ class _RootScaffoldState extends State<_RootScaffold> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(
-                              currentProduct.brandName,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
+                            if (currentProduct.brandName.isNotEmpty) ...[
+                              Text(
+                                currentProduct.brandName,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
                               ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(
-                              width: 12,
-                            ),
+                              const SizedBox(width: 12),
+                            ],
                             Text(
                               currentProduct.unitName,
                               style: const TextStyle(
@@ -331,113 +376,128 @@ class _RootScaffoldState extends State<_RootScaffold> {
                             ),
                           ],
                         ),
-                        const SizedBox(
-                          height: 16,
-                        ),
-                        StockQuantityLabel(
-                          title: "Existencia",
-                          baseStock: currentProduct.account.currentStock,
-                          baseUnitName: currentProduct.unitName,
-                          displayUnitName: currentProduct.defaultUnitName,
-                          displayUnitFactor: currentProduct.defaultUnitFactor,
-                          color: currentProduct.account.currentStock > 0
-                              ? Colors.green.shade900
-                              : Colors.red.shade900,
-                        ),
-                        const SizedBox(height: 8),
-                        UnitCostComparison(
-                          items: [
-                            UnitCostItem(
-                              label: "Costo",
-                              baseCostInCents: currentProduct.account.averageCost,
-                            ),
-                            UnitCostItem(
-                              label: "Última Compra",
-                              baseCostInCents: currentProduct.account.lastCost,
-                            ),
-                            UnitCostItem(
-                              label: "Costo Máximo",
-                              baseCostInCents: currentProduct.account.maximumCost,
-                            ),
-                          ],
-                          baseUnitName: currentProduct.unitName,
-                          selectedUnitName: priceController.selectedUnit?.name ?? currentProduct.unitName,
-                          selectedUnitFactor: priceController.factor,
-                        ),
+                        if (!currentProduct.tracksInventory) ...[
+                          const SizedBox(height: 8),
+                          Center(
+                            child: ProductTypeBadge(productType: currentProduct.productType),
+                          ),
+                        ],
                         const SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: TextButton.icon(
-                                style: TextButton.styleFrom(
-                                  backgroundColor: Colors.red.shade100,
-                                  foregroundColor: Colors.red.shade900,
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                ),
-                                icon: const Icon(Icons.remove_circle_outline),
-                                label: const Text("Restar al inventario"),
-                                onPressed: isAdmin
-                                    ? () async {
-                                        final authState = getIt<AuthCubit>().state;
-                                        if (authState is! Authenticated) return;
-                                        final branchId = authState.branch.id;
-
-                                        final res = await showSubstractProductInventoryDialog(
-                                          context,
-                                          product: currentProduct,
-                                          allowNegativeStock: getIt<AppSettingsCubit>().allowNegativeStock,
-                                        );
-
-                                        if (res == null) return;
-                                        if (!context.mounted) return;
-
-                                        context.read<WriteProductAccountCubit>().substractProductAccount(
-                                          currentProduct.id,
-                                          branchId,
-                                          currentStock: res,
-                                        );
-                                      }
-                                    : null,
+                        if (currentProduct.tracksInventory) ...[
+                          StockQuantityLabel(
+                            title: "Existencia",
+                            baseStock: currentProduct.account.currentStock,
+                            baseUnitName: currentProduct.unitName,
+                            displayUnitName: currentProduct.defaultUnitName,
+                            displayUnitFactor: currentProduct.defaultUnitFactor,
+                            color: currentProduct.account.currentStock > 0
+                                ? Colors.green.shade900
+                                : Colors.red.shade900,
+                          ),
+                          const SizedBox(height: 8),
+                          UnitCostComparison(
+                            items: [
+                              UnitCostItem(
+                                label: "Costo",
+                                baseCostInCents: currentProduct.account.averageCost,
                               ),
-                            ),
-
-                            const SizedBox(width: 16),
-
-                            Expanded(
-                              child: TextButton.icon(
-                                style: TextButton.styleFrom(
-                                  backgroundColor: Colors.green.shade100,
-                                  foregroundColor: Colors.green.shade900,
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                ),
-                                icon: const Icon(Icons.add_circle_outline),
-                                label: const Text("Agregar al inventario"),
-                                onPressed: () async {
-                                  final authState = getIt<AuthCubit>().state;
-                                  if (authState is! Authenticated) return;
-                                  final branchId = authState.branch.id;
-
-                                  final res = await showAddProductInventoryDialog(
-                                    context,
-                                    product: currentProduct,
-                                  );
-
-                                  if (res == null) return;
-                                  if (!context.mounted) return;
-
-                                  context.read<WriteProductAccountCubit>().addProductAccount(
-                                    currentProduct.id,
-                                    branchId,
-                                    currentStock: res['currentStock']!,
-                                    averageCost: res['averageCost']!,
-                                    expirationDate: res['expirationDate'],
-                                  );
-                                },
+                              UnitCostItem(
+                                label: "Última Compra",
+                                baseCostInCents: currentProduct.account.lastCost,
                               ),
-                            ),
-                          ],
-                        ),
+                              UnitCostItem(
+                                label: "Costo Máximo",
+                                baseCostInCents: currentProduct.account.maximumCost,
+                              ),
+                            ],
+                            baseUnitName: currentProduct.unitName,
+                            selectedUnitName: priceController.selectedUnit?.name ?? currentProduct.unitName,
+                            selectedUnitFactor: priceController.factor,
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: TextButton.icon(
+                                  style: TextButton.styleFrom(
+                                    backgroundColor: Colors.red.shade100,
+                                    foregroundColor: Colors.red.shade900,
+                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                  ),
+                                  icon: const Icon(Icons.remove_circle_outline),
+                                  label: const Text("Restar al inventario"),
+                                  onPressed: isAdmin
+                                      ? () async {
+                                          final authState = getIt<AuthCubit>().state;
+                                          if (authState is! Authenticated) return;
+                                          final branchId = authState.branch.id;
+
+                                          final res = await showSubstractProductInventoryDialog(
+                                            context,
+                                            product: currentProduct,
+                                            allowNegativeStock: getIt<AppSettingsCubit>().allowNegativeStock,
+                                          );
+
+                                          if (res == null) return;
+                                          if (!context.mounted) return;
+
+                                          context.read<WriteProductAccountCubit>().substractProductAccount(
+                                            currentProduct.id,
+                                            branchId,
+                                            currentStock: res,
+                                          );
+                                        }
+                                      : null,
+                                ),
+                              ),
+
+                              const SizedBox(width: 16),
+
+                              Expanded(
+                                child: TextButton.icon(
+                                  style: TextButton.styleFrom(
+                                    backgroundColor: Colors.green.shade100,
+                                    foregroundColor: Colors.green.shade900,
+                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                  ),
+                                  icon: const Icon(Icons.add_circle_outline),
+                                  label: const Text("Agregar al inventario"),
+                                  onPressed: () async {
+                                    final authState = getIt<AuthCubit>().state;
+                                    if (authState is! Authenticated) return;
+                                    final branchId = authState.branch.id;
+
+                                    final res = await showAddProductInventoryDialog(
+                                      context,
+                                      product: currentProduct,
+                                    );
+
+                                    if (res == null) return;
+                                    if (!context.mounted) return;
+
+                                    context.read<WriteProductAccountCubit>().addProductAccount(
+                                      currentProduct.id,
+                                      branchId,
+                                      currentStock: res['currentStock']!,
+                                      averageCost: res['averageCost']!,
+                                      expirationDate: res['expirationDate'],
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ] else ...[
+                          TitleTextField(
+                            title: "Costo de referencia (opcional, ${NumberFormatter.currencySymbol})",
+                            decoration: const InputDecoration(hintText: "0.00"),
+                            controller: _referenceCostController,
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            inputFormatters: [const DecimalTextInputFormatter()],
+                            onChanged: (_) => setState(() {}),
+                          ),
+                        ],
 
                         const SizedBox(
                           height: 16,
@@ -489,9 +549,11 @@ class _RootScaffoldState extends State<_RootScaffold> {
                             if (!appSettings.useDefaultProfitMargin) {
                               return const SizedBox.shrink();
                             }
-                            final costInCents = currentProduct.account.averageCost > 0
-                                ? currentProduct.account.averageCost
-                                : currentProduct.account.lastCost;
+                            final costInCents = currentProduct.tracksInventory
+                                ? (currentProduct.account.averageCost > 0
+                                      ? currentProduct.account.averageCost
+                                      : currentProduct.account.lastCost)
+                                : _referenceCostInCents;
 
                             return SuggestedPriceCard(
                               costInCents: costInCents,

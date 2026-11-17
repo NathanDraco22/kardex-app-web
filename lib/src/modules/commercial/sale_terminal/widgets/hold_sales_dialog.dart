@@ -62,6 +62,7 @@ class _HoldSalesDialogContentState extends State<_HoldSalesDialogContent> {
 
     final lowStockItems = <String>[];
     for (final item in draft.items) {
+      if (!item.product.tracksInventory) continue;
       final requiredUnits = item.quantity;
       final available = item.product.account.availableStock;
       if (requiredUnits > available) {

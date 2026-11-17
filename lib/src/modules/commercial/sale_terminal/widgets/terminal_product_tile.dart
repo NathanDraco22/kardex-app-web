@@ -51,6 +51,7 @@ class TerminalProductTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final stock = product.account.availableStock;
     final hasStock = stock > 0;
+    final canSell = !product.tracksInventory || hasStock;
 
     return ListenableBuilder(
       listenable: priceLevelListenable,
@@ -79,10 +80,10 @@ class TerminalProductTile extends StatelessWidget {
             children: [
               InkWell(
                 canRequestFocus: false,
-                onTap: hasStock ? onTap : null,
-                onLongPress: hasStock ? onLongPress : null,
+                onTap: canSell ? onTap : null,
+                onLongPress: canSell ? onLongPress : null,
                 child: Opacity(
-                  opacity: hasStock ? 1.0 : 0.45,
+                  opacity: canSell ? 1.0 : 0.45,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                     child: Row(
@@ -182,25 +183,31 @@ class TerminalProductTile extends StatelessWidget {
                                     ),
                                   ),
                                   const SizedBox(width: 4),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-                                    decoration: BoxDecoration(
-                                      color: hasStock ? Colors.blue.shade50 : Colors.red.shade50,
-                                      borderRadius: BorderRadius.circular(4),
-                                      border: Border.all(
-                                        color: hasStock ? Colors.blue.shade200 : Colors.red.shade200,
-                                        width: 0.5,
+                                  if (!product.tracksInventory)
+                                    ProductTypeBadge(
+                                      productType: product.productType,
+                                      compact: true,
+                                    )
+                                  else
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                                      decoration: BoxDecoration(
+                                        color: hasStock ? Colors.blue.shade50 : Colors.red.shade50,
+                                        borderRadius: BorderRadius.circular(4),
+                                        border: Border.all(
+                                          color: hasStock ? Colors.blue.shade200 : Colors.red.shade200,
+                                          width: 0.5,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        NumberFormatter.formatDisplayStock(convertedStock, 1),
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold,
+                                          color: hasStock ? Colors.blue.shade800 : Colors.red.shade700,
+                                        ),
                                       ),
                                     ),
-                                    child: Text(
-                                      NumberFormatter.formatDisplayStock(convertedStock, 1),
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
-                                        color: hasStock ? Colors.blue.shade800 : Colors.red.shade700,
-                                      ),
-                                    ),
-                                  ),
                                 ],
                               ),
                             ],

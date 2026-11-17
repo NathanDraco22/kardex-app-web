@@ -136,6 +136,7 @@ class _ContentSection extends StatelessWidget {
                       currentUserName: currentUser.username,
                       paymentMethod: paymentResult.method,
                       bankReference: paymentResult.bankReference,
+                      paymentDetail: paymentResult.paymentDetail,
                       shiftId: getIt.isRegistered<ShiftCubit>() ? getIt<ShiftCubit>().activeShiftId : null,
                     );
 

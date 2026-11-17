@@ -114,14 +114,15 @@ class _CartSectionState extends State<_CartSection> {
                             itemBuilder: (context, index) {
                               final item = viewController.items[index];
                               final color = RowColorTool.getRowColor(index);
-                              final maxQuantity = item.product.account.availableStock / item.conversionFactor;
+                              final canIncrement = !item.product.tracksInventory ||
+                                  item.quantity + 1.0 <= (item.product.account.availableStock / item.conversionFactor);
                               return TerminalCartItemTile(
                                 key: ValueKey(item),
                                 item: item,
                                 backgroundColor: color,
                                 onRemove: () => viewController.removeItem(item),
                                 onEdit: () => _editItem(context, viewController, item),
-                                onQuantityIncrement: item.quantity + 1.0 <= maxQuantity
+                                onQuantityIncrement: canIncrement
                                     ? () {
                                         item.quantity += 1.0;
                                         viewController.refresh();
@@ -169,8 +170,9 @@ class _CartSectionState extends State<_CartSection> {
       viewController.requestSearchFocus();
       return;
     }
-    if (res.product.account.availableStock == 0 ||
-        res.product.account.availableStock < res.baseQuantity) {
+    if (res.product.tracksInventory &&
+        (res.product.account.availableStock == 0 ||
+            res.product.account.availableStock < res.baseQuantity)) {
       DialogManager.showInfoDialog(context, "No hay stock disponible");
       viewController.requestSearchFocus();
       return;

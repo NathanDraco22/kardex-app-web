@@ -423,6 +423,18 @@ class SingleInvoiceTemplate implements PdfTemplate {
               ],
             ),
           ],
+          if (invoice.paymentDetail != null) ...[
+            pw.SizedBox(height: 4),
+            pw.Text(
+              "Pagó con: ${invoice.paymentDetail!.formatTenderedLabel(NumberFormatter.currency)}",
+              style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey700),
+            ),
+            if (invoice.paymentDetail!.changeAmount > 0)
+              pw.Text(
+                "Cambio: ${invoice.paymentDetail!.formatChangeLabel(NumberFormatter.currency)}",
+                style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey700),
+              ),
+          ],
         ],
       ),
     );

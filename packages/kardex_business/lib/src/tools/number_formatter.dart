@@ -80,6 +80,24 @@ class NumberFormatter {
     return (value * 100).round();
   }
 
+  /// Convierte centavos de moneda secundaria a centavos de moneda primaria.
+  static int convertSecondaryToPrimaryCents(
+    int secondaryCents,
+    double exchangeRate,
+  ) {
+    if (exchangeRate <= 0) return 0;
+    return (secondaryCents * exchangeRate).round();
+  }
+
+  /// Convierte centavos de moneda primaria a centavos de moneda secundaria.
+  static int convertPrimaryToSecondaryCents(
+    int primaryCents,
+    double exchangeRate,
+  ) {
+    if (exchangeRate <= 0) return 0;
+    return (primaryCents / exchangeRate).round();
+  }
+
   static double convertFromCentsToDouble(int value) {
     return value / 100;
   }

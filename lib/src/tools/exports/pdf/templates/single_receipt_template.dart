@@ -478,6 +478,18 @@ class SingleReceiptTemplate implements PdfTemplate {
               ],
             ),
           ),
+          if (receipt.paymentDetail != null) ...[
+            pw.SizedBox(height: 4),
+            pw.Text(
+              "Pagó con: ${receipt.paymentDetail!.formatTenderedLabel(NumberFormatter.currency)}",
+              style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey700),
+            ),
+            if (receipt.paymentDetail!.changeAmount > 0)
+              pw.Text(
+                "Cambio: ${receipt.paymentDetail!.formatChangeLabel(NumberFormatter.currency)}",
+                style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey700),
+              ),
+          ],
         ],
       ),
     );

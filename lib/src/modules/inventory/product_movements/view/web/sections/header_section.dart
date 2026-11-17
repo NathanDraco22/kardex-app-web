@@ -27,7 +27,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
               children: [
                 SecondaryMenuButton(
                   onPressed: () async {
-                    selectedProduct = await showSearchProductDialog(context);
+                    selectedProduct = await showSearchProductDialog(context, onlyInventory: true);
                     if (selectedProduct == null) return;
 
                     readCubit.loadPaginatedTransactions(

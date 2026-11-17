@@ -31,6 +31,8 @@ class AppSettingsCubit extends Cubit<AppSettingsState> {
 
   bool get showInvoiceTotalInSecondaryCurrency => currentSettings?.showInvoiceTotalInSecondaryCurrency ?? false;
 
+  bool get allowSecondaryCurrencyPayment => currentSettings?.allowSecondaryCurrencyPayment ?? false;
+
   String? get companyLogoUrl => currentSettings?.companyLogoUrl;
 
   String get taxIdLabel => currentSettings?.taxIdLabel ?? 'RUC';

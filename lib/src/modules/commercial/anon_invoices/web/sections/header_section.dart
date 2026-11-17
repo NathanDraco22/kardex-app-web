@@ -164,7 +164,7 @@ Future<void> saveAnonInvoiceAction(
       return;
     }
 
-    if (item.baseQuantity > item.product.account.availableStock) {
+    if (item.product.tracksInventory && item.baseQuantity > item.product.account.availableStock) {
       await DialogManager.showErrorDialog(
         context,
         "${item.product.name}: la cantidad $displayQuantity $displayUnit equivale a "
@@ -193,6 +193,7 @@ Future<void> saveAnonInvoiceAction(
   newInvoice = newInvoice.copyWithPaymentMethod(
     paymentMethodSelected.method,
     paymentMethodSelected.reference,
+    paymentDetail: paymentMethodSelected.paymentDetail,
   );
 
   if (!context.mounted) return;

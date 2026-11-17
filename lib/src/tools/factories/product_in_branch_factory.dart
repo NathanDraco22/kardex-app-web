@@ -18,6 +18,8 @@ ProductInDbInBranch productInBranchFromProduct({
     tags: product.tags,
     hasIva: product.hasIva,
     isActive: product.isActive,
+    productType: product.productType,
+    branchId: product.branchId,
     extraUnits: product.extraUnits,
     defaultUnitIndex: product.defaultUnitIndex,
     wholesaleUnitIndex: product.wholesaleUnitIndex,
@@ -31,9 +33,24 @@ ProductInDbInBranch productInBranchFromProduct({
 
 extension ProductInDbInBranchUpdateX on ProductInDbInBranch {
   ProductInDbInBranch updateWithProduct(ProductInDb product) {
+    final convertedToNonInventory = tracksInventory && !product.tracksInventory;
+    final nextAccount = convertedToNonInventory
+        ? ProductAccountInDb(
+            productId: account.productId,
+            branchId: account.branchId,
+            currentStock: 0,
+            promiseStock: 0,
+            averageCost: 0,
+            lastCost: 0,
+            maximumCost: 0,
+            createdAt: account.createdAt,
+            updatedAt: DateTime.now(),
+          )
+        : account;
+
     return productInBranchFromProduct(
       product: product,
-      account: account,
+      account: nextAccount,
       saleProfile: saleProfile,
     );
   }

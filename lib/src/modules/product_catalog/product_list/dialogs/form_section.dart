@@ -18,6 +18,9 @@ class _FormContent extends StatefulWidget {
 class _FormContentState extends State<_FormContent> {
   late WordChipTextController controller;
   late TextEditingController _unitController;
+  late TextEditingController _initialPriceController;
+  late TextEditingController _initialCostController;
+  late ProductType _selectedType;
 
   String tagField = "";
 
@@ -29,9 +32,13 @@ class _FormContentState extends State<_FormContent> {
   void initState() {
     super.initState();
     controller = WordChipTextController();
+    _selectedType = widget.currentProduct?.productType ?? ProductType.item;
+    widget.creationMap['productType'] = _selectedType.apiValue;
     _unitController = TextEditingController(
       text: widget.currentProduct?.unitName ?? (widget.creationMap['unitName'] as String? ?? ''),
     );
+    _initialPriceController = TextEditingController();
+    _initialCostController = TextEditingController();
 
     tagField = "";
     if (widget.currentProduct != null) {
@@ -56,12 +63,68 @@ class _FormContentState extends State<_FormContent> {
   void dispose() {
     controller.dispose();
     _unitController.dispose();
+    _initialPriceController.dispose();
+    _initialCostController.dispose();
     super.dispose();
+  }
+
+  void _onTypeChanged(ProductType nextType) {
+    setState(() {
+      _selectedType = nextType;
+      widget.creationMap['productType'] = nextType.apiValue;
+      if (nextType == ProductType.service) {
+        if (_unitController.text.trim().isEmpty) {
+          _unitController.text = 'Servicio';
+          widget.creationMap['unitName'] = 'Servicio';
+        }
+        widget.creationMap['extraUnits'] = const <ExtraUnit>[];
+        widget.creationMap['defaultUnitIndex'] = 0;
+        widget.creationMap['wholesaleUnitIndex'] = 0;
+      }
+    });
+  }
+
+  String _activeBranchId() {
+    if (getIt.isRegistered<AuthCubit>()) {
+      final auth = getIt<AuthCubit>();
+      if (auth.state is Authenticated) {
+        return auth.currentBranchId;
+      }
+    }
+    return '';
+  }
+
+  String _activeBranchName() {
+    if (getIt.isRegistered<AuthCubit>()) {
+      final auth = getIt<AuthCubit>();
+      if (auth.state is Authenticated) {
+        return auth.currentBranchName;
+      }
+    }
+    return 'Sucursal actual';
   }
 
   Future<void> _submitForm() async {
     widget.creationMap['unitName'] = _unitController.text.trim();
+    widget.creationMap['productType'] = _selectedType.apiValue;
     if (!widget.formKey.currentState!.validate()) return;
+
+    final activeBranchId = _activeBranchId();
+    final activeBranchName = _activeBranchName();
+
+    if (!_selectedType.tracksInventory && activeBranchId.isNotEmpty) {
+      widget.creationMap['branchId'] = activeBranchId;
+    }
+
+    if (widget.currentProduct != null &&
+        widget.currentProduct!.tracksInventory &&
+        !_selectedType.tracksInventory) {
+      final confirmed = await DialogManager.confirmActionDialog(
+        context,
+        "Al convertir este artículo a ${_selectedType.label}, quedará asignado únicamente a la sucursal actual ($activeBranchName) y sus existencias y costos actuales pasarán a 0 (se conservarán las facturas, el kárdex previo y los precios).\n\n¿Deseas continuar?",
+      );
+      if (confirmed != true || !mounted) return;
+    }
 
     final writeCubit = context.read<WriteProductCubit>();
 
@@ -86,11 +149,30 @@ class _FormContentState extends State<_FormContent> {
         }
       }
 
+      if (!mounted) return;
       widget.creationMap['image'] = imageUrl ?? "";
 
       if (widget.currentProduct == null) {
         final createProduct = CreateProduct.fromJson(widget.creationMap);
-        writeCubit.createNewProduct(createProduct);
+        final priceDouble = double.tryParse(_initialPriceController.text.trim().replaceAll(',', '')) ?? 0.0;
+        final costDouble = double.tryParse(_initialCostController.text.trim().replaceAll(',', '')) ?? 0.0;
+
+        if (!_selectedType.tracksInventory &&
+            activeBranchId.isNotEmpty &&
+            (priceDouble > 0 || costDouble > 0)) {
+          final data = CreateProductWithData(
+            createProduct: createProduct,
+            branchId: activeBranchId,
+            inventoryInfo: InventoryInfo(
+              quantity: 0,
+              cost: NumberFormatter.convertFromDoubleToCents(costDouble),
+              price: NumberFormatter.convertFromDoubleToCents(priceDouble),
+            ),
+          );
+          writeCubit.createProductWithData(data);
+        } else {
+          writeCubit.createNewProduct(createProduct);
+        }
       } else {
         final updateProduct = UpdateProduct.fromJson(widget.creationMap);
         writeCubit.updateProduct(widget.currentProduct!.id, updateProduct);
@@ -173,6 +255,11 @@ class _FormContentState extends State<_FormContent> {
               productCaterogriesEntries: productCaterogriesEntries,
               controller: controller,
               unitController: _unitController,
+              initialPriceController: _initialPriceController,
+              initialCostController: _initialCostController,
+              selectedType: _selectedType,
+              onTypeChanged: _onTypeChanged,
+              branchName: _activeBranchName(),
               imageProvider: _currentImageProvider,
               onImageIntent: _onImageIntent,
             ),
@@ -234,6 +321,11 @@ class _FormContentState extends State<_FormContent> {
               productCaterogriesEntries: productCaterogriesEntries,
               controller: controller,
               unitController: _unitController,
+              initialPriceController: _initialPriceController,
+              initialCostController: _initialCostController,
+              selectedType: _selectedType,
+              onTypeChanged: _onTypeChanged,
+              branchName: _activeBranchName(),
               imageProvider: _currentImageProvider,
               onImageIntent: _onImageIntent,
             ),
@@ -251,6 +343,11 @@ class _InnerContent extends StatelessWidget {
     required this.productCaterogriesEntries,
     required this.controller,
     required this.unitController,
+    required this.initialPriceController,
+    required this.initialCostController,
+    required this.selectedType,
+    required this.onTypeChanged,
+    required this.branchName,
     required this.imageProvider,
     required this.onImageIntent,
   });
@@ -260,6 +357,11 @@ class _InnerContent extends StatelessWidget {
   final Iterable<DropdownMenuEntry<String>> productCaterogriesEntries;
   final WordChipTextController controller;
   final TextEditingController unitController;
+  final TextEditingController initialPriceController;
+  final TextEditingController initialCostController;
+  final ProductType selectedType;
+  final ValueChanged<ProductType> onTypeChanged;
+  final String branchName;
   final ImageProvider? imageProvider;
   final void Function(ImageSelectorIntent intent) onImageIntent;
 
@@ -282,14 +384,53 @@ class _InnerContent extends StatelessWidget {
               image: imageProvider,
               width: 140,
               height: 140,
-              placeholderText: "Foto del producto",
+              placeholderText: selectedType.isService ? "Foto del servicio" : "Foto del producto",
               onIntent: onImageIntent,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
+          ProductTypeSelector(
+            selectedType: selectedType,
+            onChanged: onTypeChanged,
+          ),
+          if (!selectedType.tracksInventory) ...[
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              decoration: BoxDecoration(
+                color: selectedType.isService ? Colors.deepPurple.shade50 : Colors.teal.shade50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: selectedType.isService ? Colors.deepPurple.shade200 : Colors.teal.shade200,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    size: 16,
+                    color: selectedType.isService ? Colors.deepPurple.shade700 : Colors.teal.shade800,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      selectedType.isService
+                          ? "Servicio exclusivo de $branchName: siempre disponible para facturar sin control de stock ni kárdex."
+                          : "Producto no inventariable de $branchName: se factura sin validar ni descontar existencias.",
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        color: selectedType.isService ? Colors.deepPurple.shade900 : Colors.teal.shade900,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          const SizedBox(height: 14),
           TitleTextField(
             key: const ValueKey("product_name"),
-            title: "Nombre del Producto*",
+            title: selectedType.isService ? "Nombre del Servicio*" : "Nombre del Producto*",
             textCapitalization: TextCapitalization.words,
             autofocus: true,
             onEditingComplete: () => FocusScope.of(context).nextFocus(),
@@ -307,10 +448,11 @@ class _InnerContent extends StatelessWidget {
             textCapitalization: TextCapitalization.words,
             initialValue: widget.currentProduct?.brandName,
             onEditingComplete: () => FocusScope.of(context).nextFocus(),
-            title: "Marca*",
+            title: selectedType.tracksInventory ? "Marca*" : "Marca (Opcional)",
             validator: (value) {
-              if (value == null || value.isEmpty) return "Campo requerido";
-              widget.creationMap['brandName'] = value.trim();
+              final trimmed = value?.trim() ?? '';
+              if (selectedType.tracksInventory && trimmed.isEmpty) return "Campo requerido";
+              widget.creationMap['brandName'] = trimmed;
               return null;
             },
           ),
@@ -467,15 +609,76 @@ class _InnerContent extends StatelessWidget {
             },
           ),
 
-          const SizedBox(height: 16),
-          ExtraUnitsSection(
-            creationMap: widget.creationMap,
-            currentProduct: widget.currentProduct,
-            onPresetApplied: (preset) {
-              unitController.text = preset.baseUnit;
-              widget.creationMap['unitName'] = preset.baseUnit;
-            },
-          ),
+          if (!selectedType.isService) ...[
+            const SizedBox(height: 16),
+            ExtraUnitsSection(
+              creationMap: widget.creationMap,
+              currentProduct: widget.currentProduct,
+              onPresetApplied: (preset) {
+                unitController.text = preset.baseUnit;
+                widget.creationMap['unitName'] = preset.baseUnit;
+              },
+            ),
+          ],
+
+          if (widget.currentProduct == null && !selectedType.tracksInventory) ...[
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade50.withValues(alpha: 0.6),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.blue.shade200),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.sell_outlined, size: 17, color: Colors.blue.shade700),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          "Precio y Costo Inicial ($branchName)",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12.5,
+                            color: Colors.blue.shade900,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Flexible(
+                        child: TitleTextField(
+                          key: const ValueKey("service_initial_price"),
+                          title: "Precio Venta (${NumberFormatter.currencySymbol})",
+                          decoration: const InputDecoration(hintText: "0.00"),
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          inputFormatters: [const DecimalTextInputFormatter()],
+                          controller: initialPriceController,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Flexible(
+                        child: TitleTextField(
+                          key: const ValueKey("service_initial_cost"),
+                          title: "Costo Ref. (${NumberFormatter.currencySymbol})",
+                          decoration: const InputDecoration(hintText: "0.00"),
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          inputFormatters: [const DecimalTextInputFormatter()],
+                          controller: initialCostController,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
 
           const SizedBox(height: 16),
           StatefulBuilder(

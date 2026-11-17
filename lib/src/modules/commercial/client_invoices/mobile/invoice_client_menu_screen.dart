@@ -289,6 +289,7 @@ class _SendButton extends StatelessWidget {
                     final updatedInvoice = createInvoice.copyWithPaymentMethod(
                       paymentResult.method,
                       paymentResult.reference,
+                      paymentDetail: paymentResult.paymentDetail,
                     );
 
                     if (!context.mounted) return;

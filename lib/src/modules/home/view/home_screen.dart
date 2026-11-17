@@ -13,6 +13,7 @@ import 'package:kardex_app_front/src/tools/extensiones.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
+import 'package:kardex_app_front/widgets/exchange_rate_status_button.dart';
 import 'package:kardex_app_front/widgets/gates/role_permission_gate.dart';
 import 'package:toastification/toastification.dart';
 import 'package:kardex_app_front/constants/route_names.dart';
@@ -137,6 +138,11 @@ class _RootScaffold extends StatelessWidget {
                 ),
               ),
               actions: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: ExchangeRateStatusButton(compact: !context.isDesktop()),
+                ),
+                const SizedBox(width: 4),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   child: ShiftStatusButton(compact: !context.isDesktop()),

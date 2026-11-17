@@ -12,7 +12,11 @@ class _ContentSection extends StatelessWidget {
       controller: tableController,
       haveExpirationDate: false,
       onAddRowAction: (controller) async {
-        final res = await showSearchProductInBranchDialog(context, useAverageCost: true);
+        final res = await showSearchProductInBranchDialog(
+          context,
+          useAverageCost: true,
+          onlyInventory: true,
+        );
         if (res == null) return;
         if (controller.rows.length > 99) {
           if (!context.mounted) return;
@@ -38,7 +42,7 @@ class _ContentSection extends StatelessWidget {
         controller.removeRow(row);
       },
       onUpdateRowAction: (controller, row) async {
-        final res = await showSearchProductInBranchDialog(context);
+        final res = await showSearchProductInBranchDialog(context, onlyInventory: true);
         if (res == null) return;
         if (!context.mounted) return;
         final unit = await showInventoryUnitPicker(context, res);

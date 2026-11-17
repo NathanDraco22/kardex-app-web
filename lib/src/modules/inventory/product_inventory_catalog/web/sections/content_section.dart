@@ -129,6 +129,13 @@ class _ContentSection extends StatelessWidget {
                             children: [
                               const Icon(Icons.qr_code, size: 12),
                               Text(currentProduct.displayCode),
+                              if (!currentProduct.tracksInventory) ...[
+                                const SizedBox(width: 6),
+                                ProductTypeBadge(
+                                  productType: currentProduct.productType,
+                                  compact: true,
+                                ),
+                              ],
                             ],
                           ),
                           Row(
@@ -163,18 +170,29 @@ class _ContentSection extends StatelessWidget {
               BasicTableCell(
                 content: Column(
                   children: [
-                    StockQuantityLabel(
-                      baseStock: currentProduct.account.currentStock,
-                      baseUnitName: currentProduct.unitName,
-                      displayUnitName: currentProduct.defaultUnitName,
-                      displayUnitFactor: currentProduct.defaultUnitFactor,
-                      color: currentProduct.account.currentStock > 0
-                          ? Colors.green.shade900
-                          : Colors.red.shade900,
-                      textAlign: TextAlign.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      showBase: false,
-                    ),
+                    if (currentProduct.tracksInventory)
+                      StockQuantityLabel(
+                        baseStock: currentProduct.account.currentStock,
+                        baseUnitName: currentProduct.unitName,
+                        displayUnitName: currentProduct.defaultUnitName,
+                        displayUnitFactor: currentProduct.defaultUnitFactor,
+                        color: currentProduct.account.currentStock > 0
+                            ? Colors.green.shade900
+                            : Colors.red.shade900,
+                        textAlign: TextAlign.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        showBase: false,
+                      )
+                    else
+                      Text(
+                        "Ilimitado",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.teal.shade700,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     const SizedBox(height: 12),
 
                     Text(

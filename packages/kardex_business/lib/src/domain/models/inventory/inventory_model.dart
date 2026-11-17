@@ -1,4 +1,5 @@
 import '../product/product_model.dart';
+import '../product/product_type.dart';
 
 class InventoryProduct {
   final String id;
@@ -10,6 +11,7 @@ class InventoryProduct {
   final String? categoryName;
   final List<String> tags;
   final bool isActive;
+  final ProductType productType;
   final String image;
   final List<ExtraUnit> extraUnits;
   final int defaultUnitIndex;
@@ -20,11 +22,12 @@ class InventoryProduct {
     required this.name,
     this.description,
     this.code,
-    required this.brandName,
+    this.brandName = "",
     required this.unitName,
     this.categoryName,
     required this.tags,
     this.isActive = true,
+    this.productType = ProductType.item,
     this.image = "",
     this.extraUnits = const [],
     this.defaultUnitIndex = 0,
@@ -51,11 +54,12 @@ class InventoryProduct {
       name: json['name'] as String,
       description: json['description'] as String?,
       code: json['code'] as String?,
-      brandName: json['brandName'] as String,
+      brandName: json['brandName'] as String? ?? "",
       unitName: json['unitName'] as String,
       categoryName: json['categoryName'] as String?,
-      tags: List<String>.from(json['tags'] as List),
+      tags: List<String>.from(json['tags'] as List? ?? const []),
       isActive: json['isActive'] as bool? ?? true,
+      productType: ProductType.fromJson(json['productType']),
       image: json['image'] as String? ?? "",
       extraUnits: json['extraUnits'] != null
           ? (json['extraUnits'] as List).map((e) => ExtraUnit.fromJson(e as Map<String, dynamic>)).toList()
@@ -76,6 +80,7 @@ class InventoryProduct {
       'categoryName': categoryName,
       'tags': tags,
       'isActive': isActive,
+      'productType': productType.apiValue,
       'image': image,
       'extraUnits': extraUnits.map((e) => e.toJson()).toList(),
       'defaultUnitIndex': defaultUnitIndex,

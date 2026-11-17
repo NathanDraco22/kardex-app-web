@@ -73,6 +73,7 @@ class _RootScaffold extends StatefulWidget {
 
 class _RootScaffoldState extends State<_RootScaffold> {
   late final PriceLevelSyncController priceController;
+  late final TextEditingController _referenceCostController;
   late List<Discount> currentDiscounts;
 
   bool hasLowerPrices = false;
@@ -93,6 +94,12 @@ class _RootScaffoldState extends State<_RootScaffold> {
       defaultUnitIndex: widget.product.defaultUnitIndex,
       wholesaleUnitIndex: widget.product.wholesaleUnitIndex,
     );
+    final initialRefCost = widget.product.account.averageCost;
+    _referenceCostController = TextEditingController(
+      text: initialRefCost > 0
+          ? NumberFormatter.convertFromCentsToDouble(initialRefCost).toStringAsFixed(2)
+          : '',
+    );
     currentDiscounts = [...saleProfile.discounts];
 
     Future(
@@ -105,10 +112,39 @@ class _RootScaffoldState extends State<_RootScaffold> {
   @override
   void dispose() {
     priceController.dispose();
+    _referenceCostController.dispose();
     super.dispose();
   }
 
-  void _saveProduct() {
+  int get _effectiveReferenceCostCents {
+    if (widget.product.tracksInventory) {
+      return widget.product.account.averageCost;
+    }
+    final parsed = double.tryParse(_referenceCostController.text.trim().replaceAll(',', '')) ?? 0.0;
+    if (parsed < 0) return 0;
+    return NumberFormatter.convertFromDoubleToCents(parsed);
+  }
+
+  Future<void> _saveProduct() async {
+    final branchId = getIt<AuthCubit>().currentBranchId;
+    if (!widget.product.tracksInventory) {
+      final newRefCost = _effectiveReferenceCostCents;
+      if (newRefCost != widget.product.account.averageCost) {
+        try {
+          await context.read<ProductAccountsRepository>().updateProductAccount(
+            widget.product.id,
+            branchId,
+            averageCost: newRefCost,
+          );
+        } catch (e) {
+          if (!mounted) return;
+          await DialogManager.showErrorDialog(context, "Error al actualizar costo de referencia: $e");
+          return;
+        }
+      }
+    }
+
+    if (!mounted) return;
     final prices = priceController.prices;
     final updatedDto = UpdateProductSaleProfile(
       salePrice: prices[0],
@@ -117,7 +153,6 @@ class _RootScaffoldState extends State<_RootScaffold> {
       salePrice4: prices[3],
       discounts: currentDiscounts,
     );
-    final branchId = getIt<AuthCubit>().currentBranchId;
     context.read<WriteProductSaleProfileCubit>().updateProfile(
       branchId,
       widget.product.id,
@@ -128,6 +163,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
   @override
   Widget build(BuildContext context) {
     final currentPrices = priceController.prices;
+    final effectiveCost = _effectiveReferenceCostCents;
     hasLowerPrices =
         [
           currentPrices[0],
@@ -135,7 +171,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
           if (currentPrices[2] > 0) currentPrices[2],
           if (currentPrices[3] > 0) currentPrices[3],
         ].any(
-          (price) => price < widget.product.account.averageCost,
+          (price) => effectiveCost > 0 && price < effectiveCost,
         );
 
     return PopScope(
@@ -207,6 +243,12 @@ class _RootScaffoldState extends State<_RootScaffold> {
                         ),
                       ),
                       const SizedBox(height: 8),
+                      if (!widget.product.tracksInventory) ...[
+                        Center(
+                          child: ProductTypeBadge(productType: widget.product.productType),
+                        ),
+                        const SizedBox(height: 8),
+                      ],
                       Text(
                         widget.product.name,
                         style: const TextStyle(
@@ -218,18 +260,17 @@ class _RootScaffoldState extends State<_RootScaffold> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
-                            widget.product.brandName,
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
+                          if (widget.product.brandName.isNotEmpty) ...[
+                            Text(
+                              widget.product.brandName,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-
-                          const SizedBox(
-                            width: 12,
-                          ),
+                            const SizedBox(width: 12),
+                          ],
 
                           Text(
                             widget.product.unitName,
@@ -246,25 +287,35 @@ class _RootScaffoldState extends State<_RootScaffold> {
                         height: 8,
                       ),
 
-                      UnitCostComparison(
-                        items: [
-                          UnitCostItem(
-                            label: "Costo",
-                            baseCostInCents: widget.product.account.averageCost,
-                          ),
-                          UnitCostItem(
-                            label: "Última Compra",
-                            baseCostInCents: widget.product.account.lastCost,
-                          ),
-                          UnitCostItem(
-                            label: "Costo Máximo",
-                            baseCostInCents: widget.product.account.maximumCost,
-                          ),
-                        ],
-                        baseUnitName: widget.product.unitName,
-                        selectedUnitName: priceController.selectedUnit?.name ?? widget.product.unitName,
-                        selectedUnitFactor: priceController.factor,
-                      ),
+                      if (widget.product.tracksInventory)
+                        UnitCostComparison(
+                          items: [
+                            UnitCostItem(
+                              label: "Costo",
+                              baseCostInCents: widget.product.account.averageCost,
+                            ),
+                            UnitCostItem(
+                              label: "Última Compra",
+                              baseCostInCents: widget.product.account.lastCost,
+                            ),
+                            UnitCostItem(
+                              label: "Costo Máximo",
+                              baseCostInCents: widget.product.account.maximumCost,
+                            ),
+                          ],
+                          baseUnitName: widget.product.unitName,
+                          selectedUnitName: priceController.selectedUnit?.name ?? widget.product.unitName,
+                          selectedUnitFactor: priceController.factor,
+                        )
+                      else
+                        TitleTextField(
+                          title: "Costo de referencia (opcional, ${NumberFormatter.currencySymbol})",
+                          decoration: const InputDecoration(hintText: "0.00"),
+                          controller: _referenceCostController,
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          inputFormatters: [const DecimalTextInputFormatter()],
+                          onChanged: (_) => setState(() {}),
+                        ),
 
                       const SizedBox(
                         height: 6,
@@ -313,8 +364,8 @@ class _RootScaffoldState extends State<_RootScaffold> {
                           if (!appSettings.useDefaultProfitMargin) {
                             return const SizedBox.shrink();
                           }
-                          final costInCents = widget.product.account.averageCost > 0
-                              ? widget.product.account.averageCost
+                          final costInCents = _effectiveReferenceCostCents > 0
+                              ? _effectiveReferenceCostCents
                               : widget.product.account.lastCost;
 
                           return SuggestedPriceCard(

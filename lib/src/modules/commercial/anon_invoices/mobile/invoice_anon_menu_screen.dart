@@ -273,6 +273,7 @@ class _SendButton extends StatelessWidget {
             newInvoice = newInvoice.copyWithPaymentMethod(
               paymentResult.method,
               paymentResult.reference,
+              paymentDetail: paymentResult.paymentDetail,
             );
             if (!context.mounted) return;
             context.read<WriteAnonInvoiceCubit>().createNewAnonInvoice(

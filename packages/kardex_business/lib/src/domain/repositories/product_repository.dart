@@ -1,5 +1,6 @@
 import 'package:kardex_business/src/data/data.dart';
 import 'package:kardex_business/src/domain/models/product/product_model.dart';
+import 'package:kardex_business/src/domain/models/product/product_type.dart';
 import 'package:kardex_business/src/domain/query_params/product_query_params.dart';
 import 'package:kardex_business/src/domain/responses/list_responses.dart';
 
@@ -19,8 +20,18 @@ class ProductsRepository {
     return ProductInDbInBranch.fromJson(result);
   }
 
-  Future<List<ProductInDb>> getPaginatedProducts(int offset) async {
-    final results = await productsDataSource.getPaginatedProducts(offset);
+  Future<List<ProductInDb>> getPaginatedProducts(
+    int offset, {
+    String? branchId,
+    ProductType? productType,
+    bool? onlyInventory,
+  }) async {
+    final results = await productsDataSource.getPaginatedProducts(
+      offset,
+      branchId: branchId,
+      productType: productType?.apiValue,
+      onlyInventory: onlyInventory,
+    );
     final response = ListResponse.fromJson(results, ProductInDb.fromJson);
     return response.data;
   }
@@ -31,8 +42,18 @@ class ProductsRepository {
     return ProductInDb.fromJson(result);
   }
 
-  Future<List<ProductInDb>> searchProductByKeyword(String keyword) async {
-    final result = await productsDataSource.searchProductByKeyword(keyword.trim());
+  Future<List<ProductInDb>> searchProductByKeyword(
+    String keyword, {
+    String? branchId,
+    ProductType? productType,
+    bool? onlyInventory,
+  }) async {
+    final result = await productsDataSource.searchProductByKeyword(
+      keyword.trim(),
+      branchId: branchId,
+      productType: productType?.apiValue,
+      onlyInventory: onlyInventory,
+    );
     final response = ListResponse<ProductInDb>.fromJson(
       result,
       ProductInDb.fromJson,
@@ -54,8 +75,18 @@ class ProductsRepository {
     return ProductInDbInBranch.fromJson(result);
   }
 
-  Future<List<ProductInDbInBranch>> searchProductInBranch(String keyword, String branchId) async {
-    final result = await productsDataSource.searchProductInBranch(keyword.trim(), branchId);
+  Future<List<ProductInDbInBranch>> searchProductInBranch(
+    String keyword,
+    String branchId, {
+    ProductType? productType,
+    bool? onlyInventory,
+  }) async {
+    final result = await productsDataSource.searchProductInBranch(
+      keyword.trim(),
+      branchId,
+      productType: productType?.apiValue,
+      onlyInventory: onlyInventory,
+    );
     final response = ListResponse<ProductInDbInBranch>.fromJson(
       result,
       ProductInDbInBranch.fromJson,

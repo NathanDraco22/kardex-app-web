@@ -10,7 +10,7 @@ class _ContentSection extends StatelessWidget {
     return InventoryMovementProductTable(
       controller: tableController,
       onAddRowAction: (controller) async {
-        final res = await showSearchProductDialog(context);
+        final res = await showSearchProductDialog(context, onlyInventory: true);
         if (res == null) return;
         if (controller.rows.length > 99) {
           if (!context.mounted) return;
@@ -35,7 +35,11 @@ class _ContentSection extends StatelessWidget {
         controller.removeRow(row);
       },
       onUpdateRowAction: (controller, row) async {
-        final res = await showSearchProductDialog(context, product: row.product);
+        final res = await showSearchProductDialog(
+          context,
+          product: row.product,
+          onlyInventory: true,
+        );
         if (res == null) return;
         if (!context.mounted) return;
         final unit = await showInventoryUnitPicker(context, res);

@@ -467,6 +467,32 @@ Future<Uint8List> generateTicketPdfFromInvoice(
                   ),
                 ],
               ),
+            if (invoice.paymentDetail != null) ...[
+              pw.SizedBox(height: 2),
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.end,
+                children: [
+                  pw.Text(
+                    'Pagó con: ${invoice.paymentDetail!.formatTenderedLabel(NumberFormatter.currency)}',
+                    style: pw.TextStyle(
+                      fontSize: TicketSettings.contentFontSize(paperSize) - 1,
+                    ),
+                  ),
+                ],
+              ),
+              if (invoice.paymentDetail!.changeAmount > 0)
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.end,
+                  children: [
+                    pw.Text(
+                      'Cambio: ${invoice.paymentDetail!.formatChangeLabel(NumberFormatter.currency)}',
+                      style: pw.TextStyle(
+                        fontSize: TicketSettings.contentFontSize(paperSize) - 1,
+                      ),
+                    ),
+                  ],
+                ),
+            ],
             pw.SizedBox(height: 5),
             pw.Divider(color: PdfColors.grey),
 

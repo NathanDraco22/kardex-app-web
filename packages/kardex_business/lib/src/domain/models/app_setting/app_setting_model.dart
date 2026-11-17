@@ -18,6 +18,7 @@ class AppSettingModel {
   final AppCurrency secondaryCurrency;
   final double exchangeRate;
   final bool showInvoiceTotalInSecondaryCurrency;
+  final bool allowSecondaryCurrencyPayment;
   final String? companyLogoUrl;
   final String taxIdLabel;
   final int createdAt;
@@ -40,6 +41,7 @@ class AppSettingModel {
     this.secondaryCurrency = AppCurrency.usd,
     this.exchangeRate = 0.0,
     this.showInvoiceTotalInSecondaryCurrency = false,
+    this.allowSecondaryCurrencyPayment = false,
     this.companyLogoUrl,
     this.taxIdLabel = 'RUC',
     required this.createdAt,
@@ -69,6 +71,8 @@ class AppSettingModel {
       exchangeRate: (json['exchangeRate'] as num?)?.toDouble() ?? 0.0,
       showInvoiceTotalInSecondaryCurrency:
           json['showInvoiceTotalInSecondaryCurrency'] as bool? ?? false,
+      allowSecondaryCurrencyPayment:
+          json['allowSecondaryCurrencyPayment'] as bool? ?? false,
       companyLogoUrl: json['companyLogoUrl'] as String?,
       taxIdLabel: AppTaxIdLabel.normalize(json['taxIdLabel'] as String?),
       createdAt: json['createdAt'] as int? ?? 0,
@@ -95,6 +99,7 @@ class AppSettingModel {
       'exchangeRate': exchangeRate,
       'showInvoiceTotalInSecondaryCurrency':
           showInvoiceTotalInSecondaryCurrency,
+      'allowSecondaryCurrencyPayment': allowSecondaryCurrencyPayment,
       'companyLogoUrl': companyLogoUrl,
       'taxIdLabel': taxIdLabel,
       'createdAt': createdAt,
@@ -119,6 +124,7 @@ class AppSettingModel {
     AppCurrency? secondaryCurrency,
     double? exchangeRate,
     bool? showInvoiceTotalInSecondaryCurrency,
+    bool? allowSecondaryCurrencyPayment,
     String? companyLogoUrl,
     String? taxIdLabel,
     int? createdAt,
@@ -146,6 +152,9 @@ class AppSettingModel {
       showInvoiceTotalInSecondaryCurrency:
           showInvoiceTotalInSecondaryCurrency ??
           this.showInvoiceTotalInSecondaryCurrency,
+      allowSecondaryCurrencyPayment:
+          allowSecondaryCurrencyPayment ??
+          this.allowSecondaryCurrencyPayment,
       companyLogoUrl: companyLogoUrl ?? this.companyLogoUrl,
       taxIdLabel: taxIdLabel ?? this.taxIdLabel,
       createdAt: createdAt ?? this.createdAt,
@@ -170,6 +179,7 @@ class UpdateAppSetting {
   final AppCurrency? secondaryCurrency;
   final double? exchangeRate;
   final bool? showInvoiceTotalInSecondaryCurrency;
+  final bool? allowSecondaryCurrencyPayment;
   final String? companyLogoUrl;
   final String? taxIdLabel;
 
@@ -189,6 +199,7 @@ class UpdateAppSetting {
     this.secondaryCurrency,
     this.exchangeRate,
     this.showInvoiceTotalInSecondaryCurrency,
+    this.allowSecondaryCurrencyPayment,
     this.companyLogoUrl,
     this.taxIdLabel,
   });
@@ -240,6 +251,9 @@ class UpdateAppSetting {
     if (showInvoiceTotalInSecondaryCurrency != null) {
       data['showInvoiceTotalInSecondaryCurrency'] =
           showInvoiceTotalInSecondaryCurrency;
+    }
+    if (allowSecondaryCurrencyPayment != null) {
+      data['allowSecondaryCurrencyPayment'] = allowSecondaryCurrencyPayment;
     }
     if (companyLogoUrl != null) {
       data['companyLogoUrl'] = companyLogoUrl;

@@ -1,6 +1,8 @@
 import 'dart:developer';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 part 'read_product_state.dart';
@@ -10,24 +12,46 @@ class ReadProductCubit extends Cubit<ReadProductState> {
     required this.productsRepository,
     required this.unitsRepository,
     required this.categoriesRepository,
+    this.branchId,
   }) : super(ReadProductInitial());
 
   final ProductsRepository productsRepository;
   final UnitsRepository unitsRepository;
   final ProductCategoriesRepository categoriesRepository;
+  final String? branchId;
 
   bool isLastPage = false;
+  ProductType? selectedTypeFilter;
+  String _lastKeyword = '';
 
   List<ProductInDb> _productsCache = [];
 
-  Future<void> loadPaginatedProducts() async {
+  String? get _activeBranchId {
+    if (branchId != null && branchId!.isNotEmpty) return branchId;
+    if (getIt.isRegistered<AuthCubit>()) {
+      final authState = getIt<AuthCubit>().state;
+      if (authState is Authenticated) return authState.branch.id;
+    }
+    return null;
+  }
+
+  Future<void> loadPaginatedProducts({ProductType? productType, bool reset = false}) async {
+    if (reset) {
+      _productsCache = [];
+      isLastPage = false;
+      selectedTypeFilter = productType;
+    }
     emit(ReadProductLoading());
     try {
       await Future.wait([
         unitsRepository.getAllUnits(),
         categoriesRepository.getAllProductCategories(),
       ]);
-      final products = await productsRepository.getPaginatedProducts(_productsCache.length);
+      final products = await productsRepository.getPaginatedProducts(
+        _productsCache.length,
+        branchId: _activeBranchId,
+        productType: selectedTypeFilter,
+      );
       if (products.length < paginationItems) isLastPage = true;
       _productsCache = [..._productsCache, ...products];
       emit(ReadProductSuccess(_productsCache));
@@ -36,10 +60,23 @@ class ReadProductCubit extends Cubit<ReadProductState> {
     }
   }
 
+  Future<void> setTypeFilter(ProductType? productType) async {
+    selectedTypeFilter = productType;
+    if (_lastKeyword.isNotEmpty) {
+      await searchProductByKeyword(_lastKeyword);
+      return;
+    }
+    await loadPaginatedProducts(productType: productType, reset: true);
+  }
+
   Future<void> getNextPagedProducts() async {
-    if (isLastPage) return;
+    if (isLastPage || _lastKeyword.isNotEmpty) return;
     try {
-      final products = await productsRepository.getPaginatedProducts(_productsCache.length);
+      final products = await productsRepository.getPaginatedProducts(
+        _productsCache.length,
+        branchId: _activeBranchId,
+        productType: selectedTypeFilter,
+      );
       if (products.length < paginationItems) isLastPage = true;
       _productsCache = [..._productsCache, ...products];
       emit(ReadProductSuccess(_productsCache));
@@ -49,16 +86,21 @@ class ReadProductCubit extends Cubit<ReadProductState> {
   }
 
   Future<void> searchProductByKeyword(String keyword) async {
+    _lastKeyword = keyword.trim();
     final currentState = state as ReadProductSuccess;
 
-    if (keyword.isEmpty) {
+    if (_lastKeyword.isEmpty) {
       emit(ReadProductSuccess(_productsCache));
       return;
     }
 
     emit(ReadProductSearching(currentState.products));
     try {
-      final products = await productsRepository.searchProductByKeyword(keyword);
+      final products = await productsRepository.searchProductByKeyword(
+        _lastKeyword,
+        branchId: _activeBranchId,
+        productType: selectedTypeFilter,
+      );
       emit(ReadProductSuccess(products));
     } catch (error) {
       emit(ProductReadError(error.toString()));

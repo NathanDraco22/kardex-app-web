@@ -60,6 +60,7 @@ Future<void> startTerminalPayment(BuildContext context) async {
   final finalInvoice = invoice.copyWithPaymentMethod(
     paymentResult.method,
     paymentResult.reference,
+    paymentDetail: paymentResult.paymentDetail,
   );
 
   context.read<WriteTerminalInvoiceCubit>().createSaleInvoice(finalInvoice);

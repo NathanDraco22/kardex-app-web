@@ -32,12 +32,20 @@ class ProductsDataSource with HttpService {
     return res;
   }
 
-  Future<Map<String, dynamic>> getPaginatedProducts(int offset) async {
+  Future<Map<String, dynamic>> getPaginatedProducts(
+    int offset, {
+    String? branchId,
+    String? productType,
+    bool? onlyInventory,
+  }) async {
     final uri = HttpTools.generateUri(
       "$_endpoint/paginated",
       queryParameters: {
         "offset": offset.toString(),
         "limit": paginationItems.toString(),
+        "branchId": ?branchId,
+        "productType": ?productType,
+        if (onlyInventory != null) "onlyInventory": onlyInventory.toString(),
       },
     );
     final headers = HttpTools.generateAuthHeaders();
@@ -52,8 +60,21 @@ class ProductsDataSource with HttpService {
     return res;
   }
 
-  Future<Map<String, dynamic>> searchProductByKeyword(String keyword) async {
-    final uri = HttpTools.generateUri("$_endpoint/search/$keyword");
+  Future<Map<String, dynamic>> searchProductByKeyword(
+    String keyword, {
+    String? branchId,
+    String? productType,
+    bool? onlyInventory,
+  }) async {
+    final queryParameters = <String, String>{
+      "branchId": ?branchId,
+      "productType": ?productType,
+      if (onlyInventory != null) "onlyInventory": onlyInventory.toString(),
+    };
+    final uri = HttpTools.generateUri(
+      "$_endpoint/search/$keyword",
+      queryParameters: queryParameters.isEmpty ? null : queryParameters,
+    );
     final headers = HttpTools.generateAuthHeaders();
     final res = await getQuery(uri, headers: headers);
     return res;
@@ -61,9 +82,18 @@ class ProductsDataSource with HttpService {
 
   Future<Map<String, dynamic>> searchProductInBranch(
     String textQuery,
-    String branchId,
-  ) async {
-    final uri = HttpTools.generateUri("$_endpoint/branch/$branchId/search/$textQuery");
+    String branchId, {
+    String? productType,
+    bool? onlyInventory,
+  }) async {
+    final queryParameters = <String, String>{
+      "productType": ?productType,
+      if (onlyInventory != null) "onlyInventory": onlyInventory.toString(),
+    };
+    final uri = HttpTools.generateUri(
+      "$_endpoint/branch/$branchId/search/$textQuery",
+      queryParameters: queryParameters.isEmpty ? null : queryParameters,
+    );
     final headers = HttpTools.generateAuthHeaders();
     final res = await getQuery(uri, headers: headers);
     return res;

@@ -355,19 +355,27 @@ class ProductResultRow extends StatelessWidget {
 
               Flexible(
                 fit: FlexFit.tight,
-                child: Text(
-                  NumberFormatter.formatDisplayStock(
-                    product.account.availableStock,
-                    product.defaultUnitFactor,
-                    selectedUnitName: product.defaultUnitName,
-                    standardUnitName: product.defaultUnitName,
-                    standardUnitFactor: product.defaultUnitFactor,
-                  ),
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
+                child: !product.tracksInventory
+                    ? Align(
+                        alignment: Alignment.centerLeft,
+                        child: ProductTypeBadge(
+                          productType: product.productType,
+                          compact: true,
+                        ),
+                      )
+                    : Text(
+                        NumberFormatter.formatDisplayStock(
+                          product.account.availableStock,
+                          product.defaultUnitFactor,
+                          selectedUnitName: product.defaultUnitName,
+                          standardUnitName: product.defaultUnitName,
+                          standardUnitFactor: product.defaultUnitFactor,
+                        ),
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
               ),
               Flexible(
                 fit: FlexFit.tight,

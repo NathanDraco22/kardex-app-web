@@ -715,6 +715,40 @@ class InvoiceViewerContent extends StatelessWidget {
                         ],
                       ),
                     ],
+                    if (invoice.paymentDetail != null) ...[
+                      const SizedBox(height: 6),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            "Pagó con:",
+                            style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            invoice.paymentDetail!.formatTenderedLabel(NumberFormatter.currency),
+                            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                          ),
+                        ],
+                      ),
+                      if (invoice.paymentDetail!.changeAmount > 0) ...[
+                        const SizedBox(height: 2),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(
+                              "Cambio:",
+                              style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              invoice.paymentDetail!.formatChangeLabel(NumberFormatter.currency),
+                              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ],
                   ],
                 ),
               ),

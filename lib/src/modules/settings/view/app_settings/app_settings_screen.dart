@@ -53,6 +53,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
   AppCurrency _secondaryCurrency = AppCurrency.usd;
   double _exchangeRate = 0.0;
   bool _showInvoiceTotalInSecondaryCurrency = false;
+  bool _allowSecondaryCurrencyPayment = false;
   String _taxIdLabel = 'RUC';
 
   @override
@@ -90,6 +91,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
       _useQuickProductSearch = settings.useQuickProductSearch;
       _useShifts = settings.useShifts;
       _showInvoiceTotalInSecondaryCurrency = settings.showInvoiceTotalInSecondaryCurrency;
+      _allowSecondaryCurrencyPayment = settings.allowSecondaryCurrencyPayment;
       _initialized = true;
     }
 
@@ -105,11 +107,9 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
   static const double _fallbackProfitMargin = 20.0;
   static const int _fallbackPaymentTerm = 30;
 
-  double get _profitMarginValue =>
-      double.tryParse(_profitMarginController.text.trim()) ?? _fallbackProfitMargin;
+  double get _profitMarginValue => double.tryParse(_profitMarginController.text.trim()) ?? _fallbackProfitMargin;
 
-  int get _paymentTermValue =>
-      int.tryParse(_paymentTermController.text.trim()) ?? _fallbackPaymentTerm;
+  int get _paymentTermValue => int.tryParse(_paymentTermController.text.trim()) ?? _fallbackPaymentTerm;
 
   /// Fuerza el rebuild del punto ámbar del AppBar al escribir en los campos
   /// numéricos. Se invoca desde `onChanged`, no desde listeners del controller,
@@ -134,7 +134,8 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
         _useHoldSales != settings.useHoldSales ||
         _useQuickProductSearch != settings.useQuickProductSearch ||
         _useShifts != settings.useShifts ||
-        _showInvoiceTotalInSecondaryCurrency != settings.showInvoiceTotalInSecondaryCurrency;
+        _showInvoiceTotalInSecondaryCurrency != settings.showInvoiceTotalInSecondaryCurrency ||
+        _allowSecondaryCurrencyPayment != settings.allowSecondaryCurrencyPayment;
   }
 
   Future<void> _saveSettings() async {
@@ -154,6 +155,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
       useQuickProductSearch: _useQuickProductSearch,
       useShifts: _useShifts,
       showInvoiceTotalInSecondaryCurrency: _showInvoiceTotalInSecondaryCurrency,
+      allowSecondaryCurrencyPayment: _allowSecondaryCurrencyPayment,
     );
 
     final success = await getIt<AppSettingsCubit>().updateSettings(update);
@@ -443,9 +445,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
 
   Widget _buildTaxIdLabelSummaryTile({required bool isSaving}) {
     final preset = AppTaxIdLabel.tryFromLabel(_taxIdLabel);
-    final subtitle = preset != null
-        ? '${preset.label}  ·  ${preset.countries}'
-        : '$_taxIdLabel  ·  Personalizado';
+    final subtitle = preset != null ? '${preset.label}  ·  ${preset.countries}' : '$_taxIdLabel  ·  Personalizado';
 
     return Card(
       elevation: 0,
@@ -569,6 +569,75 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                   Expanded(
                     child: Text(
                       "Configura una tasa de cambio mayor que cero para que el total secundario aparezca en las facturas.",
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        color: Colors.orange.shade900,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSecondaryPaymentSwitch({required bool isSaving}) {
+    final hasRate = _exchangeRate > 0;
+    final isEnabled = _allowSecondaryCurrencyPayment;
+
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: BorderSide(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        children: [
+          SwitchListTile(
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 4,
+            ),
+            secondary: Icon(
+              Icons.currency_exchange_rounded,
+              color: Colors.teal.shade700,
+            ),
+            title: Text(
+              "Permitir cobro en moneda secundaria (${_secondaryCurrency.code})",
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            subtitle: Text(
+              "Habilita el selector de ${_secondaryCurrency.code} al cobrar facturas y registrar abonos.",
+              style: const TextStyle(
+                fontSize: 13,
+                color: Colors.black54,
+              ),
+            ),
+            value: isEnabled,
+            onChanged: isSaving
+                ? null
+                : (value) {
+                    setState(() {
+                      _allowSecondaryCurrencyPayment = value;
+                    });
+                  },
+          ),
+          if (isEnabled && !hasRate)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.warning_amber_rounded,
+                    size: 18,
+                    color: Colors.orange.shade800,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      "Configura una tasa de cambio mayor que cero para poder recibir pagos en ${_secondaryCurrency.code}.",
                       style: TextStyle(
                         fontSize: 12.5,
                         color: Colors.orange.shade900,
@@ -725,14 +794,23 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
           overflow: TextOverflow.ellipsis,
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh_rounded),
-            tooltip: "Recargar",
-            onPressed: () {
-              setState(() {
-                _initialized = false;
-              });
-              appSettingsCubit.loadSettings();
+          BlocBuilder<AppSettingsCubit, AppSettingsState>(
+            bloc: appSettingsCubit,
+            builder: (context, state) {
+              final currentSettings = appSettingsCubit.currentSettings;
+              final hasUnsavedChanges = currentSettings != null && _hasUnsavedChanges(currentSettings);
+              return IconButton(
+                icon: const Icon(Icons.refresh_rounded),
+                tooltip: "Recargar",
+                onPressed: hasUnsavedChanges
+                    ? null
+                    : () {
+                        setState(() {
+                          _initialized = false;
+                        });
+                        appSettingsCubit.loadSettings();
+                      },
+              );
             },
           ),
           BlocBuilder<AppSettingsCubit, AppSettingsState>(
@@ -740,22 +818,16 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
             builder: (context, state) {
               final isBusy = state is AppSettingsSaving || _isSavingCompanyLogo;
               final currentSettings = appSettingsCubit.currentSettings;
-              final hasUnsavedChanges =
-                  currentSettings != null && _hasUnsavedChanges(currentSettings);
+              final hasUnsavedChanges = currentSettings != null && _hasUnsavedChanges(currentSettings);
 
               return Padding(
                 padding: const EdgeInsets.only(right: 8),
-                child: Badge(
-                  alignment: Alignment.topRight,
-                  offset: const Offset(-2, 2),
-                  smallSize: 8,
-                  backgroundColor: Colors.amber,
-                  isLabelVisible: hasUnsavedChanges && !isBusy,
+                child: SizedBox(
+                  height: 48,
                   child: TertiaryMenuButton(
-                    foregroundColor: Colors.white,
+                    foregroundColor: hasUnsavedChanges ? Colors.amber : Colors.white,
                     tooltip: "Guardar configuraciones",
-                    onPressed:
-                        isBusy || state is AppSettingsLoading || state is AppSettingsInitial
+                    onPressed: isBusy || state is AppSettingsLoading || state is AppSettingsInitial
                         ? null
                         : _saveSettings,
                     icon: isBusy
@@ -857,6 +929,8 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                   _buildTaxIdLabelSummaryTile(isSaving: isSaving),
                   const SizedBox(height: 12),
                   _buildInvoiceSecondaryTotalSwitch(isSaving: isSaving),
+                  const SizedBox(height: 12),
+                  _buildSecondaryPaymentSwitch(isSaving: isSaving),
                   const SizedBox(height: 24),
                   _buildSectionHeader(
                     icon: Icons.trending_up_rounded,

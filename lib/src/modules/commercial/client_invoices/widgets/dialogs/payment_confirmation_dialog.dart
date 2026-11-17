@@ -4,16 +4,19 @@ import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/bank_chips_selector.dart';
 import 'package:kardex_app_front/widgets/custom_slider.dart';
+import 'package:kardex_app_front/widgets/payment_currency_selector.dart';
 
 class PaymentResult {
   final PaymentType method;
   final int amountReceived;
   final String? reference;
+  final PaymentDetail? paymentDetail;
 
   PaymentResult({
     required this.method,
     required this.amountReceived,
     this.reference,
+    this.paymentDetail,
   });
 }
 
@@ -59,6 +62,7 @@ class _PaymentDialogState extends State<_PaymentDialog> {
   final TextEditingController _receivedController = TextEditingController();
   final TextEditingController _refController = TextEditingController();
   int _receivedAmount = 0;
+  bool _useSecondaryCurrency = false;
   String? _selectedBank;
 
   @override
@@ -67,15 +71,26 @@ class _PaymentDialogState extends State<_PaymentDialog> {
     _selectedMethod = widget.initialMethod;
   }
 
-  int get _change {
+  int _effectivePrimaryCents(PaymentCurrencySettings settings) {
+    if (!_useSecondaryCurrency) return _receivedAmount;
+    return NumberFormatter.convertSecondaryToPrimaryCents(
+      _receivedAmount,
+      settings.exchangeRate,
+    );
+  }
+
+  int _changeFor(PaymentCurrencySettings settings) {
     if (_selectedMethod != PaymentType.cash) return 0;
-    final change = _receivedAmount - widget.total;
+    final change = _effectivePrimaryCents(settings) - widget.total;
     return change > 0 ? change : 0;
   }
 
-  bool get _canConfirm {
+  bool _canConfirmFor(PaymentCurrencySettings settings) {
     if (_selectedMethod == PaymentType.cash) {
-      return _receivedAmount >= widget.total;
+      if (_useSecondaryCurrency && !settings.hasValidExchangeRate) {
+        return false;
+      }
+      return _effectivePrimaryCents(settings) >= widget.total;
     }
     if (_selectedMethod == PaymentType.credit) {
       return true;
@@ -85,6 +100,11 @@ class _PaymentDialogState extends State<_PaymentDialog> {
 
   @override
   Widget build(context) {
+    final currencySettings = PaymentCurrencySettings.fromContext(context);
+    final canConfirm = _canConfirmFor(currencySettings);
+    final change = _changeFor(currencySettings);
+    final effectivePrimary = _effectivePrimaryCents(currencySettings);
+
     return AlertDialog(
       title: const Text("Confirmar Pago", textAlign: TextAlign.center),
       content: SizedBox(
@@ -146,6 +166,15 @@ class _PaymentDialogState extends State<_PaymentDialog> {
             ),
             const SizedBox(height: 20),
             if (_selectedMethod == PaymentType.cash) ...[
+              PaymentCurrencySelector(
+                settings: currencySettings,
+                useSecondary: _useSecondaryCurrency,
+                onChanged: (useSecondary) {
+                  setState(() => _useSecondaryCurrency = useSecondary);
+                },
+              ),
+              if (currencySettings.canUseDifferentSecondary)
+                const SizedBox(height: 12),
               TextField(
                 controller: _receivedController,
                 autofocus: true,
@@ -157,21 +186,31 @@ class _PaymentDialogState extends State<_PaymentDialog> {
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   labelText: "Dinero Recibido",
-                  prefixText: NumberFormatter.currencySymbol,
+                  prefixText: _useSecondaryCurrency
+                      ? '${currencySettings.secondaryCurrency.symbol} '
+                      : '${currencySettings.primaryCurrency.symbol} ',
+                  helperText: (_useSecondaryCurrency &&
+                          currencySettings.hasValidExchangeRate &&
+                          _receivedAmount > 0)
+                      ? 'Equivalente: ${NumberFormatter.formatMoney(effectivePrimary, currencySettings.primaryCurrency)}'
+                      : null,
                   border: const OutlineInputBorder(),
                 ),
                 onChanged: (value) {
                   setState(() {
-                    _receivedAmount = ((double.tryParse(value) ?? 0) * 100).toInt();
+                    _receivedAmount =
+                        NumberFormatter.convertFromDoubleToCents(
+                          double.tryParse(value) ?? 0,
+                        );
                   });
                 },
               ),
               const SizedBox(height: 10),
               Text(
-                "Cambio: ${NumberFormatter.convertToMoneyLike(_change)}",
+                "Cambio: ${formatPaymentChangeLabel(change, primaryCurrency: currencySettings.primaryCurrency, secondaryCurrency: _useSecondaryCurrency ? currencySettings.secondaryCurrency : null, exchangeRate: _useSecondaryCurrency ? currencySettings.exchangeRate : null)}",
                 style: TextStyle(
                   fontSize: 18,
-                  color: _change >= 0 ? Colors.green : Colors.red,
+                  color: change >= 0 ? Colors.green : Colors.red,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -202,29 +241,38 @@ class _PaymentDialogState extends State<_PaymentDialog> {
             ],
             const SizedBox(height: 30),
             AbsorbPointer(
-              absorbing: !_canConfirm,
+              absorbing: !canConfirm,
               child: Row(
                 children: [
                   Expanded(
                     child: CustomSlider(
                       hintText: "Desliza para Confirmar",
                       hintIcon: Icons.check_circle,
-                      sliderColor: _canConfirm ? Colors.green : Colors.grey,
+                      sliderColor: canConfirm ? Colors.green : Colors.grey,
                       sliderText: "Confirmar",
                       onSubmit: () {
-                        if (!_canConfirm) {
+                        if (!canConfirm) {
                           return;
                         }
+                        final detail = _selectedMethod == PaymentType.cash
+                            ? buildPaymentDetail(
+                                useSecondary: _useSecondaryCurrency,
+                                tenderedCents: _receivedAmount,
+                                changePrimaryCents: change,
+                                settings: currencySettings,
+                              )
+                            : null;
                         context.pop(
                           PaymentResult(
                             method: _selectedMethod,
-                            amountReceived: _selectedMethod == PaymentType.cash ? _receivedAmount : widget.total,
+                            amountReceived: _selectedMethod == PaymentType.cash ? effectivePrimary : widget.total,
                             reference: (_selectedMethod == PaymentType.cash || _selectedMethod == PaymentType.credit)
                                 ? null
                                 : formatBankReference(
                                     bank: _selectedBank,
                                     reference: _refController.text,
                                   ),
+                            paymentDetail: detail,
                           ),
                         );
                       },
