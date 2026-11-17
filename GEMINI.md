@@ -612,3 +612,9 @@ Esta estructura se ha seguido para módulos como 'Historial de Facturas', 'Histo
 - **Frontend:** `ExpenseTotals`/`ExpenseTypeTotal` en `kardex_business`; `TotalsResult.expenses` nullable y tolerante a backend viejo, tipos desconocidos y `byType` ausente; tarjeta `BranchExpensesTotalsCard` en desktop/tablet/móvil, oculta si el backend no envía el campo.
 - **Verificación:** `ruff`/`ty` OK; `flutter analyze` limpio; test `totals_result_expenses_test.dart` 4/4.
 - **Sin commit.**
+
+## Productos no inventariables y servicios: sucursal inmutable (Noviembre 2026)
+- **Modelo:** `UpdateProduct` solo serializa `branchId` cuando la pantalla lo provee (conversion Articulo -> Servicio/No inventariable); el backend descarta cualquier cambio de sucursal en el resto de actualizaciones y el producto conserva la sucursal donde fue creado.
+- **Formulario:** `form_section.dart` envia `branchId` al crear o al convertir un articulo; al editar un servicio/no inventariable no lo envia. Se actualizo la confirmacion Articulo -> Servicio (requiere existencias y comprometido en 0 en todas las sucursales) y se agrego la confirmacion Servicio/No inventariable -> Articulo (pasa al catalogo global y reinicia costos de referencia).
+- **Tests:** `test/product_type_test.dart` valida que `UpdateProduct` solo serializa `branchId` cuando se provee y que `CreateProduct` lo conserva (6 pruebas).
+- **Verificacion:** `flutter analyze` limpio; `flutter test` 260/260. Sin commit.
