@@ -7,7 +7,6 @@ import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/modules/settings/view/local_printer_settings_dialog.dart';
 import 'package:kardex_app_front/src/tools/extensiones.dart';
 import 'package:kardex_app_front/widgets/dialogs/selectors/branch_selection_dialog.dart';
-import 'package:kardex_app_front/widgets/gates/root_user_gate.dart';
 import 'package:kardex_app_front/widgets/shortcut_addable_list_tile.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
@@ -94,7 +93,8 @@ class _Body extends StatelessWidget {
                 onTap: () => context.pushNamed("integrations"),
               ),
             ),
-            RootUserGate(
+            Gate(
+              filters: const [RootUserGateFilter()],
               child: ShortcutAddableListTile(
                 routeName: RouteNames.imports,
                 child: MenuOptionCard(

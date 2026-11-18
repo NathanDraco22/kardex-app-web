@@ -38,7 +38,7 @@ lib/src/modules/settings/
   - Asignación de roles predefinidos (Admin, Cajero, Bodeguero, Vendedor, Supervisor).
   - Asociación de sucursales permitidas para cada usuario.
   - Activación/desactivación de cuentas y reseteo de contraseñas.
-  - Integración con `RolePermissionGate` (`lib/widgets/gates/`) para mostrar u ocultar componentes según los permisos del usuario activo.
+  - Integración con `Gate` y `RolePermissionGateFilter` (`lib/widgets/gates/`) para mostrar u ocultar componentes según los permisos del usuario activo.
 
 ### 2.3. Llaves de API (`api_keys`)
 - **Propósito:** Configuración de tokens y credenciales para APIs externas de facturación electrónica gubernamental, pasarelas de pago o servicios de mensajería SMS/WhatsApp.

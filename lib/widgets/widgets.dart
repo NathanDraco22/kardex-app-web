@@ -51,3 +51,4 @@ export 'dialogs/recent_invoices_dialog.dart';
 export 'dialogs/pending_clients_dialog.dart';
 export 'dialogs/reset_inventory_danger_dialog.dart';
 export 'design_system/design_system.dart';
+export 'gates/gates.dart';

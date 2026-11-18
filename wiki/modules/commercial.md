@@ -127,12 +127,12 @@ lib/src/modules/commercial/
 
 ## 5. Control de Visibilidad y Reglas Globales (`AppSettings` & Gates)
 
-El módulo Comercial interactúa de forma directa y reactiva con la configuración global del sistema (`AppSettingsCubit`) a través de componentes **Gate**:
+El módulo Comercial interactúa de forma directa y reactiva con la configuración global del sistema (`AppSettingsCubit`) a través del widget `Gate` y sus filtros (`GateFilter`):
 
-| Bandera en `AppSettings` | Gate Asociado | Herramientas y Submódulos Afectados | Comportamiento si está Deshabilitado |
+| Bandera en `AppSettings` | Filtro Asociado | Herramientas y Submódulos Afectados | Comportamiento si está Deshabilitado |
 | :--- | :--- | :--- | :--- |
-| `useOrders` | `OrdersGate` | Órdenes de Compra (`current-orders`), Crear Orden (`sale-order`), Crear Orden Mayorista (`sale-order-wholesale`), Productos en Órdenes (`daily-product-in-orders`). | Oculta automáticamente las tarjetas y opciones en Desktop y Móvil. |
-| `useQuotations` | `QuotationsGate` | Historial de Cotizaciones (`proforma-history`), Crear Cotización (`proforma`), Crear Cotización Mayorista (`proforma-wholesale`), Cotizaciones vs Existencias (`product-demand-vs-stock`). | Oculta las opciones y el separador completo de sección de cotizaciones. |
-| `useOrders` o `useQuotations` | `QuotationsOrOrdersGate` | Buscador de Cotizaciones / Órdenes (`quotation-order-search`). | Solo se muestra si al menos una de las dos modalidades está activa en la configuración. |
-| `useExpirationDates` | `ExpirationDateGate` | Bitácora de Vencimientos (`expiration-logs`), columnas de lotes y fechas de caducidad. | Oculta la herramienta si la sucursal o las configuraciones globales tienen apagado el control de caducidad. |
+| `useOrders` | `OrdersGateFilter` | Órdenes de Compra (`current-orders`), Crear Orden (`sale-order`), Crear Orden Mayorista (`sale-order-wholesale`), Productos en Órdenes (`daily-product-in-orders`). | Oculta automáticamente las tarjetas y opciones en Desktop y Móvil. |
+| `useQuotations` | `QuotationsGateFilter` | Historial de Cotizaciones (`proforma-history`), Crear Cotización (`proforma`), Crear Cotización Mayorista (`proforma-wholesale`), Cotizaciones vs Existencias (`product-demand-vs-stock`). | Oculta las opciones y el separador completo de sección de cotizaciones. |
+| `useOrders` o `useQuotations` | `AnyGateFilter([QuotationsGateFilter(), OrdersGateFilter()])` | Buscador de Cotizaciones / Órdenes (`quotation-order-search`). | Solo se muestra si al menos una de las dos modalidades está activa en la configuración. |
+| `useExpirationDates` | `ExpirationDateGateFilter` | Bitácora de Vencimientos (`expiration-logs`), columnas de lotes y fechas de caducidad. | Oculta la herramienta si la sucursal o las configuraciones globales tienen apagado el control de caducidad. |
 

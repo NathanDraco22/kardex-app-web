@@ -5,7 +5,6 @@ import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/tools/input_formatter/input_formatter.dart';
 import 'package:kardex_app_front/widgets/calculator/calculator_field.dart';
 import 'package:kardex_app_front/widgets/elements/quantity_unit_rules.dart';
-import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/widgets/dialogs/inventory_unit_picker.dart';
 
@@ -353,7 +352,8 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
                     color: Colors.black12,
                   ),
                   if (rowCard.haveExpirationDate)
-                    ExpirationDateGate(
+                    Gate(
+                      filters: const [ExpirationDateGateFilter()],
                       child: Row(
                         children: [
                           Flexible(

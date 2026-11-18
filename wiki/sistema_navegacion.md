@@ -99,8 +99,7 @@ class HomeSubmoduleItem {
   final Color? accentColor;
   final String? routeName;
   final void Function(BuildContext context)? customAction;
-  final List<Enum> permissions;
-  final bool isExpirationGate;
+  final List<GateFilter> gates;
   final String? section;
   // ...
 }
@@ -159,50 +158,50 @@ final activeId = _selectedModuleId != null &&
 - **Nunca abre un módulo no autorizado por defecto.**
 - Si el usuario no tiene permisos en ningún módulo, se renderiza una vista de advertencia: *"No tienes permisos asignados para acceder a los módulos de esta sucursal"*.
 
-### 5.4. Sistema de Gates Reactivos y Filtrado de Opciones (`AppSettingsCubit`)
+### 5.4. Sistema Unificado `Gate` y Filtros Reactivos (`GateFilter`)
 
-El sistema cuenta con una arquitectura de protección y filtrado multinivel mediante componentes **Gate** reactivos suscritos a los cubits globales:
+El sistema cuenta con un widget único `Gate` (`lib/widgets/gates/gate.dart`) que recibe una lista plana de `GateFilter` componibles (estilo `TextInputFormatter`), evitando anidar múltiples widgets en el árbol:
 
 ```mermaid
 flowchart TD
     AppSettingsCubit["AppSettingsCubit (Singleton en getIt)"]
     AuthCubit["AuthCubit (Sesión y Roles)"]
 
-    subgraph Gates ["Componentes Gate Reactivos"]
-        RoleGate["RolePermissionGate (Permisos de Rol)"]
-        OrdersGate["OrdersGate (useOrders)"]
-        QuotGate["QuotationsGate (useQuotations)"]
-        QuotOrOrdersGate["QuotationsOrOrdersGate (useOrders || useQuotations)"]
-        ExpGate["ExpirationDateGate (isUsingExpirationDate && useExpirationDates)"]
+    subgraph Filters ["Filtros GateFilter Componibles"]
+        RoleFilter["RolePermissionGateFilter (Permisos de Rol)"]
+        RootFilter["RootUserGateFilter (Usuario root)"]
+        OrdersFilter["OrdersGateFilter (useOrders)"]
+        QuotFilter["QuotationsGateFilter (useQuotations)"]
+        ShiftsFilter["ShiftsGateFilter (useShifts)"]
+        ExpFilter["ExpirationDateGateFilter (isUsingExpirationDate && useExpirationDates)"]
+        Comb["AnyGateFilter / NotGateFilter / PredicateGateFilter"]
     end
 
-    AppSettingsCubit --> OrdersGate
-    AppSettingsCubit --> QuotGate
-    AppSettingsCubit --> QuotOrOrdersGate
-    AppSettingsCubit --> ExpGate
-    AuthCubit --> RoleGate
-    AuthCubit --> ExpGate
+    AppSettingsCubit --> OrdersFilter
+    AppSettingsCubit --> QuotFilter
+    AppSettingsCubit --> ShiftsFilter
+    AppSettingsCubit --> ExpFilter
+    AuthCubit --> RoleFilter
+    AuthCubit --> RootFilter
+    AuthCubit --> ExpFilter
 
-    Gates --> UI["Renderizado Condicional (Widget o SizedBox.shrink)"]
+    Filters --> GateWidget["Gate(filters: [...])"]
+    GateWidget --> UI["Renderizado Condicional (Widget, fallback o SizedBox.shrink)"]
 ```
 
 1. **Inyección y Precarga Global:**
    - `AppSettingsCubit` se instancia y registra como Singleton en `getIt` dentro de `ProviderContainer` (idéntico a `AuthCubit`), y se provee en el árbol de widgets mediante `BlocProvider.value`.
    - Se precarga automáticamente en `SplashScreen` (`getIt<AppSettingsCubit>().loadSettings()`) en paralelo con la verificación de sesión `checkSession()`.
-2. **`RolePermissionGate`:**
-   - Evalúa los permisos del rol activo contra `AccessManager().hasCurrentAccess(context, p.name)`. Si el rol carece del permiso, retorna `const SizedBox.shrink()`.
-3. **`OrdersGate` (`lib/widgets/gates/orders_gate.dart`):**
-   - Se suscribe reactivamente a `AppSettingsCubit`.
-   - Si `useOrders == false`, oculta automáticamente las opciones de creación y seguimiento de órdenes de compra tanto en el panel de escritorio como en el menú móvil.
-4. **`QuotationsGate` y `QuotationsOrOrdersGate` (`lib/widgets/gates/quotations_gate.dart`):**
-   - Oculta reactivamente las opciones de proformas/cotizaciones (`useQuotations == false`).
-   - `QuotationsOrOrdersGate` protege herramientas híbridas (como el buscador conjunto de órdenes y cotizaciones) mostrándolas si al menos una de las dos banderas está encendida.
-   - En escritorio, el divisor de sección `MenuSectionDivider` de *Cotizaciones y Proformas* se envuelve en `QuotationsGate` para ocultar la sección completa si está deshabilitada.
-5. **`ExpirationDateGate` (`lib/widgets/gates/expiration_date_gate.dart`):**
+2. **`RolePermissionGateFilter` (`lib/widgets/gates/filters/role_permission_gate_filter.dart`):**
+   - Evalúa los permisos del rol activo contra `AccessManager().hasAccessTo(user, p.name)`.
+3. **`OrdersGateFilter`, `QuotationsGateFilter` y `ShiftsGateFilter`:**
+   - Se suscriben reactivamente al stream de `AppSettingsCubit` para ocultar o mostrar opciones cuando cambian `useOrders`, `useQuotations` o `useShifts`.
+   - Para condiciones combinadas (`useOrders || useQuotations`), se compone con `AnyGateFilter([QuotationsGateFilter(), OrdersGateFilter()])`.
+   - En escritorio, el divisor de sección `MenuSectionDivider` de *Cotizaciones y Proformas* se envuelve en `Gate(filters: const [QuotationsGateFilter()])`.
+4. **`ExpirationDateGateFilter`:**
    - Combina la validación de servidor (`authState.servin.isUsingExpirationDate`) con la bandera global del sistema (`getIt<AppSettingsCubit>().useExpirationDates`).
-   - Si cualquiera es falsa, oculta las opciones de bitácoras de vencimiento y columnas de lotes.
-6. **Banderas en `HomeSubmoduleItem` (`home_modules_registry.dart`):**
-   - Los elementos del catálogo maestro cuentan con las banderas booleanas `isExpirationGate`, `isOrdersGate`, `isQuotationsGate` e `isQuotationsOrOrdersGate`, aplicadas de forma declarativa y procesadas automáticamente por `DesktopSubmenuPanel`.
+5. **Lista `gates` en `HomeSubmoduleItem` (`home_modules_registry.dart`):**
+   - Cada elemento del catálogo maestro declara sus condiciones en `gates: [...]`, evaluadas tanto declarativamente por `DesktopSubmenuPanel` mediante `Gate` como síncronamente por `HomeShortcutResolver` mediante `filter.isAllowed(context)`.
 
 ---
 

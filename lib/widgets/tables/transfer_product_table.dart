@@ -9,7 +9,6 @@ import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/tools/input_formatter/input_formatter.dart';
 import 'package:kardex_app_front/widgets/dialogs/inventory_unit_picker.dart';
-import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
 
 class TransferProductRow {
   TransferProductRow({
@@ -238,7 +237,8 @@ class _HeaderTable extends StatelessWidget {
             child: Text("Nombre del Producto"),
           ),
 
-          ExpirationDateGate(
+          Gate(
+            filters: [ExpirationDateGateFilter()],
             child: Flexible(
               fit: FlexFit.tight,
               child: Center(child: Text("F. Vencimiento")),
@@ -483,7 +483,8 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
             ),
           ),
 
-          ExpirationDateGate(
+          Gate(
+            filters: const [ExpirationDateGateFilter()],
             child: Flexible(
               fit: FlexFit.tight,
               child: Center(

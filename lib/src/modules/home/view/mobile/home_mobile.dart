@@ -96,8 +96,10 @@ class _HomeMobileBody extends StatelessWidget {
         const SizedBox(height: 12),
 
         ...getHomeOptions(context, currentBranch).map((option) {
-          return RolePermissionGate(
-            permissions: option.permissions,
+          return Gate(
+            filters: [
+              RolePermissionGateFilter(permissions: option.permissions),
+            ],
             child: Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: HomeMobileOptionCard(

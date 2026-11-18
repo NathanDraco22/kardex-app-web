@@ -4,11 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/constants/route_names.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
-import 'package:kardex_app_front/widgets/gates/role_permission_gate.dart';
-import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
-import 'package:kardex_app_front/widgets/gates/orders_gate.dart';
-import 'package:kardex_app_front/widgets/gates/shifts_gate.dart';
-import 'package:kardex_app_front/widgets/gates/quotations_gate.dart';
 import 'package:kardex_app_front/widgets/menu_app_bar.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/search_product_commercial_delegate.dart';
 import 'package:kardex_app_front/widgets/shortcut_addable_list_tile.dart';
@@ -52,8 +47,12 @@ class _Body extends StatelessWidget {
             title: "Punto de Venta y Facturación",
             isFirst: true,
           ),
-          RolePermissionGate(
-            permissions: [CommercialSubModules.createInvoice],
+          Gate(
+            filters: const [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createInvoice],
+              ),
+            ],
             child: ShortcutAddableListTile(
               routeName: RouteNames.saleTerminal,
               child: MenuOptionCard(
@@ -65,8 +64,12 @@ class _Body extends StatelessWidget {
               ),
             ),
           ),
-          RolePermissionGate(
-            permissions: [CommercialSubModules.createInvoice],
+          Gate(
+            filters: const [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createInvoice],
+              ),
+            ],
             child: ShortcutAddableListTile(
               routeName: RouteNames.anonInvoice,
               child: MenuOptionCard(
@@ -78,8 +81,12 @@ class _Body extends StatelessWidget {
               ),
             ),
           ),
-          RolePermissionGate(
-            permissions: [CommercialSubModules.createInvoice],
+          Gate(
+            filters: const [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createInvoice],
+              ),
+            ],
             child: ShortcutAddableListTile(
               routeName: RouteNames.userOperationsResults,
               child: MenuOptionCard(
@@ -91,8 +98,12 @@ class _Body extends StatelessWidget {
               ),
             ),
           ),
-          RolePermissionGate(
-            permissions: [CommercialSubModules.createInvoice],
+          Gate(
+            filters: const [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createInvoice],
+              ),
+            ],
             child: ShortcutAddableListTile(
               routeName: RouteNames.dailyInvoice,
               child: MenuOptionCard(
@@ -104,8 +115,12 @@ class _Body extends StatelessWidget {
               ),
             ),
           ),
-          RolePermissionGate(
-            permissions: [CommercialSubModules.createInvoice],
+          Gate(
+            filters: const [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createInvoice],
+              ),
+            ],
             child: ShortcutAddableListTile(
               routeName: RouteNames.clientInvoice,
               child: MenuOptionCard(
@@ -117,8 +132,12 @@ class _Body extends StatelessWidget {
               ),
             ),
           ),
-          RolePermissionGate(
-            permissions: [CommercialSubModules.createInvoice],
+          Gate(
+            filters: const [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createInvoice],
+              ),
+            ],
             child: ShortcutAddableListTile(
               routeName: RouteNames.clientInvoiceWholesale,
               child: MenuOptionCard(
@@ -133,7 +152,8 @@ class _Body extends StatelessWidget {
 
           const MenuSectionDivider(title: "Consultas y Existencias"),
 
-          ExpirationDateGate(
+          Gate(
+            filters: const [ExpirationDateGateFilter()],
             child: ShortcutAddableListTile(
               routeName: RouteNames.expirationLogs,
               child: MenuOptionCard(
@@ -145,8 +165,12 @@ class _Body extends StatelessWidget {
               ),
             ),
           ),
-          RolePermissionGate(
-            permissions: [CommercialSubModules.createInvoice],
+          Gate(
+            filters: const [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createInvoice],
+              ),
+            ],
             child: ShortcutAddableListTile(
               routeName: RouteNames.commercialProductMovements,
               child: MenuOptionCard(
@@ -158,8 +182,12 @@ class _Body extends StatelessWidget {
               ),
             ),
           ),
-          RolePermissionGate(
-            permissions: [CommercialSubModules.createInvoice],
+          Gate(
+            filters: const [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createInvoice],
+              ),
+            ],
             child: MenuOptionCard(
               icon: Icons.info_outline,
               accentColor: Colors.blueAccent,
@@ -168,8 +196,12 @@ class _Body extends StatelessWidget {
               onTap: () => showProductInfoSearchDelegate(context),
             ),
           ),
-          RolePermissionGate(
-            permissions: [CommercialSubModules.createInvoice],
+          Gate(
+            filters: const [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createInvoice],
+              ),
+            ],
             child: ShortcutAddableListTile(
               routeName: RouteNames.globalStockSearch,
               child: MenuOptionCard(
@@ -181,8 +213,12 @@ class _Body extends StatelessWidget {
               ),
             ),
           ),
-          RolePermissionGate(
-            permissions: [CommercialSubModules.createInvoice],
+          Gate(
+            filters: const [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createInvoice],
+              ),
+            ],
             child: ShortcutAddableListTile(
               routeName: RouteNames.invoiceHistory,
               child: MenuOptionCard(
@@ -194,8 +230,12 @@ class _Body extends StatelessWidget {
               ),
             ),
           ),
-          RolePermissionGate(
-            permissions: [CommercialSubModules.createInvoice],
+          Gate(
+            filters: const [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createInvoice],
+              ),
+            ],
             child: ShortcutAddableListTile(
               routeName: RouteNames.invoicesByProduct,
               child: MenuOptionCard(
@@ -207,8 +247,12 @@ class _Body extends StatelessWidget {
               ),
             ),
           ),
-          RolePermissionGate(
-            permissions: [CommercialSubModules.createInvoice],
+          Gate(
+            filters: const [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createInvoice],
+              ),
+            ],
             child: ShortcutAddableListTile(
               routeName: RouteNames.dailyProductSales,
               child: MenuOptionCard(
@@ -220,8 +264,12 @@ class _Body extends StatelessWidget {
               ),
             ),
           ),
-          RolePermissionGate(
-            permissions: [CommercialSubModules.createInvoice],
+          Gate(
+            filters: const [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createInvoice],
+              ),
+            ],
             child: ShortcutAddableListTile(
               routeName: RouteNames.dailyClientInvoices,
               child: MenuOptionCard(
@@ -233,151 +281,183 @@ class _Body extends StatelessWidget {
               ),
             ),
           ),
-          OrdersGate(
-            child: RolePermissionGate(
-              permissions: [CommercialSubModules.createInvoice],
-              child: ShortcutAddableListTile(
-                routeName: RouteNames.dailyProductInOrders,
-                child: MenuOptionCard(
-                  icon: Icons.list,
-                  accentColor: Colors.orange.shade600,
-                  title: "Productos en Órdenes de Compra",
-                  subtitle: "Seguimiento de pedidos activos",
-                  onTap: () => context.pushNamed("daily-product-in-orders"),
-                ),
+          Gate(
+            filters: const [
+              OrdersGateFilter(),
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createInvoice],
+              ),
+            ],
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.dailyProductInOrders,
+              child: MenuOptionCard(
+                icon: Icons.list,
+                accentColor: Colors.orange.shade600,
+                title: "Productos en Órdenes de Compra",
+                subtitle: "Seguimiento de pedidos activos",
+                onTap: () => context.pushNamed("daily-product-in-orders"),
               ),
             ),
           ),
-          QuotationsGate(
-            child: RolePermissionGate(
-              permissions: [CommercialSubModules.createInvoice],
-              child: ShortcutAddableListTile(
-                routeName: RouteNames.productDemandVsStock,
-                child: MenuOptionCard(
-                  icon: Icons.analytics_outlined,
-                  accentColor: Colors.blue.shade800,
-                  title: "Cotizaciones vs Existencias",
-                  subtitle: "Demanda potencial comparada con almacén",
-                  onTap: () => context.pushNamed("product-demand-vs-stock"),
-                ),
+          Gate(
+            filters: const [
+              QuotationsGateFilter(),
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createInvoice],
+              ),
+            ],
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.productDemandVsStock,
+              child: MenuOptionCard(
+                icon: Icons.analytics_outlined,
+                accentColor: Colors.blue.shade800,
+                title: "Cotizaciones vs Existencias",
+                subtitle: "Demanda potencial comparada con almacén",
+                onTap: () => context.pushNamed("product-demand-vs-stock"),
               ),
             ),
           ),
 
-          const QuotationsGate(
+          const Gate(
+            filters: [QuotationsGateFilter()],
             child: MenuSectionDivider(title: "Cotizaciones y Proformas"),
           ),
 
-          QuotationsGate(
-            child: RolePermissionGate(
-              permissions: [CommercialSubModules.orders],
-              child: ShortcutAddableListTile(
-                routeName: RouteNames.proformaHistory,
-                child: MenuOptionCard(
-                  icon: FluentIcons.clipboard_search_24_filled,
-                  accentColor: Colors.blue.shade600,
-                  title: "Cotizaciones",
-                  subtitle: "Historial y seguimiento de presupuestos",
-                  onTap: () => context.pushNamed("proforma-history"),
-                ),
+          Gate(
+            filters: const [
+              QuotationsGateFilter(),
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.orders],
+              ),
+            ],
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.proformaHistory,
+              child: MenuOptionCard(
+                icon: FluentIcons.clipboard_search_24_filled,
+                accentColor: Colors.blue.shade600,
+                title: "Cotizaciones",
+                subtitle: "Historial y seguimiento de presupuestos",
+                onTap: () => context.pushNamed("proforma-history"),
               ),
             ),
           ),
-          QuotationsGate(
-            child: RolePermissionGate(
-              permissions: [CommercialSubModules.createOrder],
-              child: ShortcutAddableListTile(
-                routeName: RouteNames.proforma,
-                child: MenuOptionCard(
-                  icon: FluentIcons.document_text_24_filled,
-                  accentColor: Colors.blue.shade600,
-                  title: "Crear Cotización",
-                  subtitle: "Nuevo presupuesto para cliente",
-                  onTap: () => context.pushNamed("proforma"),
-                ),
+          Gate(
+            filters: const [
+              QuotationsGateFilter(),
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createOrder],
+              ),
+            ],
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.proforma,
+              child: MenuOptionCard(
+                icon: FluentIcons.document_text_24_filled,
+                accentColor: Colors.blue.shade600,
+                title: "Crear Cotización",
+                subtitle: "Nuevo presupuesto para cliente",
+                onTap: () => context.pushNamed("proforma"),
               ),
             ),
           ),
-          QuotationsGate(
-            child: RolePermissionGate(
-              permissions: [CommercialSubModules.createOrder],
-              child: ShortcutAddableListTile(
-                routeName: RouteNames.proformaWholesale,
-                child: MenuOptionCard(
-                  icon: FluentIcons.document_text_24_filled,
-                  accentColor: Colors.blue.shade800,
-                  title: "Crear Cotización (Mayorista)",
-                  subtitle: "Cotización con tarifas al por mayor",
-                  onTap: () => context.pushNamed("proforma-wholesale"),
-                ),
+          Gate(
+            filters: const [
+              QuotationsGateFilter(),
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createOrder],
+              ),
+            ],
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.proformaWholesale,
+              child: MenuOptionCard(
+                icon: FluentIcons.document_text_24_filled,
+                accentColor: Colors.blue.shade800,
+                title: "Crear Cotización (Mayorista)",
+                subtitle: "Cotización con tarifas al por mayor",
+                onTap: () => context.pushNamed("proforma-wholesale"),
               ),
             ),
           ),
-          QuotationsOrOrdersGate(
-            child: RolePermissionGate(
-              permissions: [CommercialSubModules.orders],
-              child: ShortcutAddableListTile(
-                routeName: RouteNames.quotationOrderSearch,
-                child: MenuOptionCard(
-                  icon: Icons.manage_search,
-                  accentColor: Colors.indigo.shade600,
-                  title: "Buscador de Cotizaciones/Órdenes",
-                  subtitle: "Rastreo por folio, fecha o cliente",
-                  onTap: () => context.pushNamed("quotation-order-search"),
-                ),
+          Gate(
+            filters: const [
+              AnyGateFilter([QuotationsGateFilter(), OrdersGateFilter()]),
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.orders],
+              ),
+            ],
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.quotationOrderSearch,
+              child: MenuOptionCard(
+                icon: Icons.manage_search,
+                accentColor: Colors.indigo.shade600,
+                title: "Buscador de Cotizaciones/Órdenes",
+                subtitle: "Rastreo por folio, fecha o cliente",
+                onTap: () => context.pushNamed("quotation-order-search"),
               ),
             ),
           ),
 
           const MenuSectionDivider(title: "Órdenes de Compra y Recibos"),
 
-          OrdersGate(
-            child: RolePermissionGate(
-              permissions: [CommercialSubModules.orders],
-              child: ShortcutAddableListTile(
-                routeName: RouteNames.currentOrders,
-                child: MenuOptionCard(
-                  icon: FluentIcons.receipt_bag_24_filled,
-                  accentColor: Colors.orange.shade600,
-                  title: "Órdenes de Compra",
-                  subtitle: "Control y facturación de pedidos pendientes",
-                  onTap: () => context.pushNamed("current-orders"),
-                ),
+          Gate(
+            filters: const [
+              OrdersGateFilter(),
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.orders],
+              ),
+            ],
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.currentOrders,
+              child: MenuOptionCard(
+                icon: FluentIcons.receipt_bag_24_filled,
+                accentColor: Colors.orange.shade600,
+                title: "Órdenes de Compra",
+                subtitle: "Control y facturación de pedidos pendientes",
+                onTap: () => context.pushNamed("current-orders"),
               ),
             ),
           ),
-          OrdersGate(
-            child: RolePermissionGate(
-              permissions: [CommercialSubModules.createOrder],
-              child: ShortcutAddableListTile(
-                routeName: RouteNames.saleOrder,
-                child: MenuOptionCard(
-                  icon: FluentIcons.receipt_add_24_filled,
-                  accentColor: Colors.lightBlue.shade600,
-                  title: "Crear Órden de Compra",
-                  subtitle: "Nuevo pedido formal de compra",
-                  onTap: () => context.pushNamed("sale-order"),
-                ),
+          Gate(
+            filters: const [
+              OrdersGateFilter(),
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createOrder],
+              ),
+            ],
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.saleOrder,
+              child: MenuOptionCard(
+                icon: FluentIcons.receipt_add_24_filled,
+                accentColor: Colors.lightBlue.shade600,
+                title: "Crear Órden de Compra",
+                subtitle: "Nuevo pedido formal de compra",
+                onTap: () => context.pushNamed("sale-order"),
               ),
             ),
           ),
-          OrdersGate(
-            child: RolePermissionGate(
-              permissions: [CommercialSubModules.createOrder],
-              child: ShortcutAddableListTile(
-                routeName: RouteNames.saleOrderWholesale,
-                child: MenuOptionCard(
-                  icon: FluentIcons.receipt_add_24_filled,
-                  accentColor: Colors.blue.shade600,
-                  title: "Crear Órden de Compra (Mayorista)",
-                  subtitle: "Nuevo pedido con tarifas de volumen",
-                  onTap: () => context.pushNamed("sale-order-wholesale"),
-                ),
+          Gate(
+            filters: const [
+              OrdersGateFilter(),
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createOrder],
+              ),
+            ],
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.saleOrderWholesale,
+              child: MenuOptionCard(
+                icon: FluentIcons.receipt_add_24_filled,
+                accentColor: Colors.blue.shade600,
+                title: "Crear Órden de Compra (Mayorista)",
+                subtitle: "Nuevo pedido con tarifas de volumen",
+                onTap: () => context.pushNamed("sale-order-wholesale"),
               ),
             ),
           ),
-          RolePermissionGate(
-            permissions: [CommercialSubModules.pendingInvoices],
+          Gate(
+            filters: const [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.pendingInvoices],
+              ),
+            ],
             child: ShortcutAddableListTile(
               routeName: RouteNames.receiptHistory,
               child: MenuOptionCard(
@@ -392,8 +472,12 @@ class _Body extends StatelessWidget {
 
           const MenuSectionDivider(title: "Devoluciones"),
 
-          RolePermissionGate(
-            permissions: [CommercialSubModules.processDevolution],
+          Gate(
+            filters: const [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.processDevolution],
+              ),
+            ],
             child: ShortcutAddableListTile(
               routeName: RouteNames.currentDevolution,
               child: MenuOptionCard(
@@ -405,8 +489,12 @@ class _Body extends StatelessWidget {
               ),
             ),
           ),
-          RolePermissionGate(
-            permissions: [CommercialSubModules.createInvoice],
+          Gate(
+            filters: const [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createInvoice],
+              ),
+            ],
             child: ShortcutAddableListTile(
               routeName: RouteNames.devolutions,
               child: MenuOptionCard(
@@ -418,8 +506,12 @@ class _Body extends StatelessWidget {
               ),
             ),
           ),
-          RolePermissionGate(
-            permissions: [CommercialSubModules.createDevolution],
+          Gate(
+            filters: const [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createDevolution],
+              ),
+            ],
             child: ShortcutAddableListTile(
               routeName: RouteNames.clientDevolution,
               child: MenuOptionCard(
@@ -431,8 +523,12 @@ class _Body extends StatelessWidget {
               ),
             ),
           ),
-          RolePermissionGate(
-            permissions: [CommercialSubModules.createDevolution],
+          Gate(
+            filters: const [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createDevolution],
+              ),
+            ],
             child: ShortcutAddableListTile(
               routeName: RouteNames.devolutionHistory,
               child: MenuOptionCard(
@@ -445,10 +541,14 @@ class _Body extends StatelessWidget {
             ),
           ),
           const MenuSectionDivider(title: "Notas de Crédito"),
-          RolePermissionGate(
-            permissions: [
-              CommercialSubModules.createCreditNote,
-              CommercialSubModules.creditNoteHistory,
+          Gate(
+            filters: const [
+              RolePermissionGateFilter(
+                permissions: [
+                  CommercialSubModules.createCreditNote,
+                  CommercialSubModules.creditNoteHistory,
+                ],
+              ),
             ],
             child: ShortcutAddableListTile(
               routeName: RouteNames.creditNotes,
@@ -461,7 +561,8 @@ class _Body extends StatelessWidget {
               ),
             ),
           ),
-          ShiftsGate(
+          Gate(
+            filters: const [ShiftsGateFilter()],
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [

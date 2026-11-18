@@ -7,7 +7,7 @@ import 'package:kardex_app_front/cubits/shift/shift_state.dart';
 import 'package:kardex_app_front/src/modules/commercial/shifts/dialogs/open_shift_dialog.dart';
 import 'package:kardex_app_front/src/modules/commercial/shifts/dialogs/shift_management_dialog.dart';
 import 'package:kardex_app_front/widgets/design_system/app_theme_tokens.dart';
-import 'package:kardex_app_front/widgets/gates/shifts_gate.dart';
+import 'package:kardex_app_front/widgets/gates/gates.dart';
 
 class ShiftStatusButton extends StatelessWidget {
   final bool compact;
@@ -16,7 +16,8 @@ class ShiftStatusButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ShiftsGate(
+    return Gate(
+      filters: const [ShiftsGateFilter()],
       child: BlocBuilder<AuthCubit, AuthState>(
         bloc: getIt<AuthCubit>(),
         builder: (context, _) {

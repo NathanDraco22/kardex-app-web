@@ -8,7 +8,7 @@ import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/tools/input_formatter/input_formatter.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/widgets/display_product_code.dart';
 import 'package:kardex_app_front/widgets/elements/quantity_unit_rules.dart';
-import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
+import 'package:kardex_app_front/widgets/gates/gates.dart';
 import 'package:kardex_app_front/widgets/dialogs/inventory_unit_picker.dart';
 
 class ProductRow {
@@ -250,7 +250,8 @@ class _HeaderTable extends StatelessWidget {
             child: Text("Nombre del Producto"),
           ),
           if (haveExpirationDate)
-            const ExpirationDateGate(
+            const Gate(
+              filters: [ExpirationDateGateFilter()],
               child: Flexible(
                 fit: FlexFit.tight,
                 child: Center(child: Text("F. Vencimiento")),
@@ -502,7 +503,8 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
             ),
           ),
           if (widget.rowModel.haveExpirationDate)
-            ExpirationDateGate(
+            Gate(
+              filters: const [ExpirationDateGateFilter()],
               child: Flexible(
                 fit: FlexFit.tight,
                 child: Center(

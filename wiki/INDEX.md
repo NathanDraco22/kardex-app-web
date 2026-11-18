@@ -101,7 +101,7 @@ La arquitectura es **Onion + BLoC/Cubit**: la UI consume cubits, los cubits cons
 | Tokens y tema | `lib/config/app_theme.dart` y `lib/widgets/design_system/app_theme_tokens.dart` |
 | Rutas y guards | `lib/config/app_router.dart` + `lib/constants/route_names.dart` |
 | Inyección de dependencias | `lib/config/get_it_config.dart` y `lib/provider_container.dart` |
-| Permisos y roles | `lib/src/core/access_manager.dart` y `lib/widgets/gates/role_permission_gate.dart` |
+| Permisos y roles | `lib/src/core/access_manager.dart` y `lib/widgets/gates/gate.dart` |
 | Sesión y token | `lib/src/core/session_manager.dart` + `packages/.../tools/token_manager.dart` |
 | Impresión térmica | `lib/src/services/thermal_printer_service.dart` y `lib/src/tools/printers/` |
 | Plantillas PDF | `lib/widgets/pdf/` |
@@ -128,7 +128,7 @@ La arquitectura es **Onion + BLoC/Cubit**: la UI consume cubits, los cubits cons
 | Enlace | Qué encontrarás |
 | :--- | :--- |
 | [`conventions.md`](./conventions.md) | Capas, naming, modelos, reactividad, reglas de UI, atajos, lints y tests. |
-| [`security.md`](./security.md) | Autenticación, sesión, permisos (`AccessManager`, `RolePermissionGate`), guards de router y `isCommerce`. |
+| [`security.md`](./security.md) | Autenticación, sesión, permisos (`AccessManager`, `Gate` / `RolePermissionGateFilter`), guards de router y `isCommerce`. |
 | [`operations.md`](./operations.md) | `flutter pub get`, ejecución con `secrets.json`, defines, analyze/test, builds y problemas comunes. |
 | [`../agents.md`](../agents.md) | Reglas de arquitectura y sincronización de ramas. |
 
