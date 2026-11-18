@@ -64,8 +64,6 @@ class ClientInvoiceViewController extends ChangeNotifier {
 
   int get totalItems => items.length;
 
-  int get totalAmount => items.fold(0, (previousValue, element) => previousValue + element.total);
-
   void addItem(CommercialProductResult item) {
     final existingItem = items.any((i) => i.product.id == item.product.id);
     if (existingItem) return;
@@ -100,8 +98,50 @@ class ClientInvoiceViewController extends ChangeNotifier {
   void clear() {
     description = '';
     items = [];
+    invoiceDiscountType = null;
+    invoiceDiscountValue = 0;
     selectedClient = null;
     selectedPaymentType = PaymentType.cash;
+    notifyListeners();
+  }
+
+  DiscountType? invoiceDiscountType;
+  int invoiceDiscountValue = 0;
+
+  int get itemsSubTotal => items.fold<int>(0, (sum, e) => sum + e.subTotal);
+
+  int get itemDiscounts => items.fold<int>(0, (sum, e) => sum + e.totalDiscount);
+
+  int get itemsNetTotal => items.fold<int>(0, (sum, e) => sum + e.total);
+
+  int get invoiceDiscountAmount => DiscountType.calculateDiscountAmount(
+    type: invoiceDiscountType,
+    discountValue: invoiceDiscountValue,
+    baseAmount: itemsNetTotal,
+  );
+
+  int get totalDiscount => itemDiscounts + invoiceDiscountAmount;
+
+  int get totalAmount =>
+      (itemsNetTotal - invoiceDiscountAmount).clamp(0, itemsNetTotal);
+
+  void setInvoiceDiscount(DiscountType? type, int value) {
+    if (type == null || value <= 0) {
+      invoiceDiscountType = null;
+      invoiceDiscountValue = 0;
+    } else {
+      invoiceDiscountType = type;
+      invoiceDiscountValue = type == DiscountType.percentage
+          ? value.clamp(0, 100)
+          : value.clamp(0, itemsNetTotal);
+    }
+    notifyListeners();
+  }
+
+  void clearInvoiceDiscount() {
+    if (invoiceDiscountType == null && invoiceDiscountValue == 0) return;
+    invoiceDiscountType = null;
+    invoiceDiscountValue = 0;
     notifyListeners();
   }
 
@@ -117,6 +157,7 @@ class ClientInvoiceViewController extends ChangeNotifier {
         cost: product.account.averageCost,
         price: commercial.newPrice,
         quantity: commercial.baseQuantity,
+        discountType: commercial.effectiveDiscountType,
         discountPercentage: commercial.discountPercent,
         totalDiscount: commercial.totalDiscount,
         subTotal: commercial.subTotal,
@@ -138,11 +179,19 @@ class ClientInvoiceViewController extends ChangeNotifier {
     if (currentClient == null) return null;
 
     int totalCost = 0;
-    int total = 0;
+    int itemsNet = 0;
+    int itemsDisc = 0;
     for (final item in saleItems) {
       totalCost += item.cost * (item.quantity + item.bonQuantity);
-      total += item.total;
+      itemsNet += item.total;
+      itemsDisc += item.totalDiscount;
     }
+    final invDisc = DiscountType.calculateDiscountAmount(
+      type: invoiceDiscountType,
+      discountValue: invoiceDiscountValue,
+      baseAmount: itemsNet,
+    );
+    final total = (itemsNet - invDisc).clamp(0, itemsNet);
 
     final authState = getIt<AuthCubit>().state;
     if (authState is! Authenticated) throw Exception("User or branch not found");
@@ -167,6 +216,10 @@ class ClientInvoiceViewController extends ChangeNotifier {
       status: InvoiceStatus.open,
       paymentType: selectedPaymentType,
       bankReference: "",
+      discountType: invoiceDiscountType,
+      discountValue: invoiceDiscountValue,
+      itemDiscounts: itemsDisc,
+      invoiceDiscount: invDisc,
       totalCost: totalCost,
       total: total,
       createdBy: UserInfo(

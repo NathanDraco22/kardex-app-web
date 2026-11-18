@@ -40,6 +40,8 @@ class CommercialProductResult {
   int _newPrice = 0;
   int selectedPriceLevel = 1;
   Discount? selectedDiscount;
+  DiscountType? manualDiscountType;
+  int manualDiscountValue = 0;
   double quantity = 0.0;
   
   int selectedUnitIndex = 0;
@@ -58,18 +60,74 @@ class CommercialProductResult {
 
   set newPrice(int value) {
     selectedDiscount = null;
+    manualDiscountType = null;
+    manualDiscountValue = 0;
     _newPrice = value;
   }
 
-  int get discountPercent => selectedDiscount?.percentValue ?? 0;
+  void applyPredefinedDiscount(Discount? discount) {
+    selectedDiscount = discount;
+    manualDiscountType = null;
+    manualDiscountValue = 0;
+  }
+
+  void applyManualDiscount(DiscountType? type, int value) {
+    selectedDiscount = null;
+    if (type == null || value <= 0) {
+      manualDiscountType = null;
+      manualDiscountValue = 0;
+    } else {
+      manualDiscountType = type;
+      manualDiscountValue = type == DiscountType.percentage
+          ? value.clamp(0, 100)
+          : value.clamp(0, subTotal);
+    }
+  }
+
+  void clearDiscount() {
+    selectedDiscount = null;
+    manualDiscountType = null;
+    manualDiscountValue = 0;
+  }
+
+  DiscountType? get effectiveDiscountType {
+    if (manualDiscountType != null && manualDiscountValue > 0) {
+      return manualDiscountType;
+    }
+    if (selectedDiscount != null && selectedDiscount!.percentValue > 0) {
+      return DiscountType.percentage;
+    }
+    return null;
+  }
+
+  int get discountPercent {
+    if (manualDiscountType == DiscountType.percentage &&
+        manualDiscountValue > 0) {
+      return manualDiscountValue.clamp(0, 100);
+    }
+    if (manualDiscountType == DiscountType.amount) {
+      return 0;
+    }
+    return selectedDiscount?.percentValue ?? 0;
+  }
 
   int get totalDiscount {
-    final decimalResult = subTotal * ((selectedDiscount?.percentValue ?? 0) / 100);
-    return decimalResult.round();
+    if (manualDiscountType != null && manualDiscountValue > 0) {
+      return DiscountType.calculateDiscountAmount(
+        type: manualDiscountType,
+        discountValue: manualDiscountValue,
+        baseAmount: subTotal,
+      );
+    }
+    return DiscountType.calculateDiscountAmount(
+      type: selectedDiscount != null ? DiscountType.percentage : null,
+      discountValue: selectedDiscount?.percentValue ?? 0,
+      baseAmount: subTotal,
+    );
   }
 
   int get total {
-    return subTotal - totalDiscount;
+    return (subTotal - totalDiscount).clamp(0, subTotal);
   }
 
   CommercialProductResult copyWith({
@@ -77,6 +135,8 @@ class CommercialProductResult {
     int? newPrice,
     int? selectedPriceLevel,
     Discount? selectedDiscount,
+    DiscountType? manualDiscountType,
+    int? manualDiscountValue,
     double? quantity,
     int? selectedUnitIndex,
     int? conversionFactor,
@@ -99,6 +159,15 @@ class CommercialProductResult {
       result.selectedDiscount = selectedDiscount;
     } else if (newPrice == null) {
       result.selectedDiscount = this.selectedDiscount;
+    }
+
+    if (manualDiscountType != null) {
+      result.manualDiscountType = manualDiscountType;
+      result.manualDiscountValue =
+          manualDiscountValue ?? this.manualDiscountValue;
+    } else if (newPrice == null && selectedDiscount == null) {
+      result.manualDiscountType = this.manualDiscountType;
+      result.manualDiscountValue = this.manualDiscountValue;
     }
 
     result.quantity = quantity ?? this.quantity;

@@ -12,6 +12,7 @@ export 'common/branches_detail.dart';
 export 'common/change_password.dart';
 export 'common/client_info.dart';
 export 'common/coordinates.dart';
+export 'common/discount_type.dart';
 export 'common/entry_items.dart';
 export 'common/exit_items.dart';
 export 'common/order_info.dart';

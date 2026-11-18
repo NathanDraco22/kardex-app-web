@@ -1,4 +1,5 @@
 import 'package:kardex_business/src/domain/models/common/client_info.dart';
+import 'package:kardex_business/src/domain/models/common/discount_type.dart';
 import 'package:kardex_business/src/domain/models/common/order_info.dart';
 import 'package:kardex_business/src/domain/models/common/payment_detail.dart';
 import 'package:kardex_business/src/domain/models/common/sale_item_model.dart';
@@ -20,6 +21,10 @@ class BaseInvoice {
   final PaymentType paymentType;
   final String bankReference;
   final PaymentDetail? paymentDetail;
+  final DiscountType? discountType;
+  final int discountValue;
+  int itemDiscounts;
+  int invoiceDiscount;
   int totalCost;
   int total;
   final DateTime? paidAt;
@@ -40,12 +45,28 @@ class BaseInvoice {
     required this.paymentType,
     required this.bankReference,
     this.paymentDetail,
+    this.discountType,
+    this.discountValue = 0,
+    this.itemDiscounts = 0,
+    this.invoiceDiscount = 0,
     required this.totalCost,
     required this.total,
     this.paidAt,
     required this.createdBy,
     this.shiftId,
   });
+
+  int get itemsSubTotal =>
+      saleItems.fold<int>(0, (sum, item) => sum + item.subTotal);
+
+  int get effectiveItemDiscounts => itemDiscounts > 0
+      ? itemDiscounts
+      : saleItems.fold<int>(0, (sum, item) => sum + item.totalDiscount);
+
+  int get itemsNetTotal =>
+      saleItems.fold<int>(0, (sum, item) => sum + item.total);
+
+  int get totalDiscount => effectiveItemDiscounts + invoiceDiscount;
 
   int get totalRemaining => total - amountPaid;
 
@@ -65,6 +86,10 @@ class BaseInvoice {
     paymentDetail: json['paymentDetail'] != null
         ? PaymentDetail.fromJson(Map<String, dynamic>.from(json['paymentDetail']))
         : null,
+    discountType: DiscountType.tryFromApi(json['discountType'] as String?),
+    discountValue: json['discountValue'] as int? ?? 0,
+    itemDiscounts: json['itemDiscounts'] as int? ?? 0,
+    invoiceDiscount: json['invoiceDiscount'] as int? ?? 0,
     totalCost: json['totalCost'],
     total: json['total'],
     paidAt: json['paidAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['paidAt']) : null,
@@ -86,6 +111,10 @@ class BaseInvoice {
     'paymentType': paymentType.name,
     'bankReference': bankReference,
     if (paymentDetail != null) 'paymentDetail': paymentDetail!.toJson(),
+    if (discountType != null) 'discountType': discountType!.apiValue,
+    'discountValue': discountValue,
+    'itemDiscounts': itemDiscounts,
+    'invoiceDiscount': invoiceDiscount,
     'totalCost': totalCost,
     'total': total,
     'paidAt': paidAt?.millisecondsSinceEpoch,
@@ -109,6 +138,10 @@ class CreateInvoice extends BaseInvoice {
     required super.paymentType,
     required super.bankReference,
     super.paymentDetail,
+    super.discountType,
+    super.discountValue = 0,
+    super.itemDiscounts = 0,
+    super.invoiceDiscount = 0,
     required super.totalCost,
     required super.total,
     required super.createdBy,
@@ -131,6 +164,10 @@ class CreateInvoice extends BaseInvoice {
     paymentDetail: json['paymentDetail'] != null
         ? PaymentDetail.fromJson(Map<String, dynamic>.from(json['paymentDetail']))
         : null,
+    discountType: DiscountType.tryFromApi(json['discountType'] as String?),
+    discountValue: json['discountValue'] as int? ?? 0,
+    itemDiscounts: json['itemDiscounts'] as int? ?? 0,
+    invoiceDiscount: json['invoiceDiscount'] as int? ?? 0,
     totalCost: json['totalCost'],
     total: json['total'],
     createdBy: UserInfo.fromJson(json['createdBy']),
@@ -156,6 +193,10 @@ class CreateInvoice extends BaseInvoice {
       paymentType: paymentType,
       bankReference: bankReference ?? "",
       paymentDetail: paymentDetail ?? this.paymentDetail,
+      discountType: discountType,
+      discountValue: discountValue,
+      itemDiscounts: itemDiscounts,
+      invoiceDiscount: invoiceDiscount,
       totalCost: totalCost,
       total: total,
       createdBy: createdBy,
@@ -165,13 +206,21 @@ class CreateInvoice extends BaseInvoice {
 
   void ensureCostAndTotal() {
     int newTotalCost = 0;
-    int newTotal = 0;
+    int newItemsNet = 0;
+    int newItemDiscounts = 0;
     for (var item in saleItems) {
       newTotalCost += item.cost * (item.quantity + item.bonQuantity);
-      newTotal += item.total;
+      newItemsNet += item.total;
+      newItemDiscounts += item.totalDiscount;
     }
+    itemDiscounts = newItemDiscounts;
+    invoiceDiscount = DiscountType.calculateDiscountAmount(
+      type: discountType,
+      discountValue: discountValue,
+      baseAmount: newItemsNet,
+    );
     totalCost = newTotalCost;
-    total = newTotal;
+    total = (newItemsNet - invoiceDiscount).clamp(0, newItemsNet);
   }
 }
 
@@ -211,6 +260,10 @@ class InvoiceInDb extends BaseInvoice {
     required super.paymentType,
     required super.bankReference,
     super.paymentDetail,
+    super.discountType,
+    super.discountValue = 0,
+    super.itemDiscounts = 0,
+    super.invoiceDiscount = 0,
     required super.totalCost,
     required super.total,
     required this.createdAt,
@@ -237,6 +290,10 @@ class InvoiceInDb extends BaseInvoice {
     paymentDetail: json['paymentDetail'] != null
         ? PaymentDetail.fromJson(Map<String, dynamic>.from(json['paymentDetail']))
         : null,
+    discountType: DiscountType.tryFromApi(json['discountType'] as String?),
+    discountValue: json['discountValue'] as int? ?? 0,
+    itemDiscounts: json['itemDiscounts'] as int? ?? 0,
+    invoiceDiscount: json['invoiceDiscount'] as int? ?? 0,
     totalCost: json['totalCost'],
     total: json['total'],
     paidAt: json['paidAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['paidAt']) : null,

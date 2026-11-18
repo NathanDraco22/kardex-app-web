@@ -1,3 +1,4 @@
+import 'package:kardex_business/src/domain/models/common/discount_type.dart';
 import 'package:kardex_business/src/domain/models/product/product_type.dart';
 import 'package:kardex_business/src/tools/unit_display_formatter.dart';
 
@@ -79,6 +80,7 @@ class SaleItem {
   final int cost;
   final int price;
   final int subTotal;
+  final DiscountType? discountType;
   final int discountPercentage;
   final int totalDiscount;
   final int total;
@@ -105,6 +107,7 @@ class SaleItem {
     required this.cost,
     required this.price,
     required this.subTotal,
+    this.discountType,
     this.discountPercentage = 0,
     this.totalDiscount = 0,
     required this.total,
@@ -150,23 +153,34 @@ class SaleItem {
 
   String get formattedDisplayBonQuantity => _bonQuantityDisplay.quantityText;
 
-  factory SaleItem.fromJson(Map<String, dynamic> json) => SaleItem(
-    product: ProductItem.fromJson(json['product']),
-    selectedPrice: json['selectedPrice'],
-    quantity: json['quantity'],
-    bonQuantity: json['bonQuantity'] ?? 0,
-    cost: json['cost'],
-    price: json['price'],
-    subTotal: json['subTotal'],
-    discountPercentage: json['discountPercentage'] ?? 0,
-    totalDiscount: json['totalDiscount'] ?? 0,
-    total: json['total'],
-    conversionFactor: json['conversionFactor'] ?? 1,
-    selectedUnitName: json['selectedUnitName'] as String?,
-    standardUnitName: json['standardUnitName'] as String?,
-    standardUnitFactor: json['standardUnitFactor'] as int?,
-    invoiceItemIndex: json['invoiceItemIndex'] as int?,
-  );
+  factory SaleItem.fromJson(Map<String, dynamic> json) {
+    final pct = json['discountPercentage'] ?? 0;
+    final totalDisc = json['totalDiscount'] ?? 0;
+    final parsedType =
+        DiscountType.tryFromApi(json['discountType'] as String?) ??
+        (pct > 0
+            ? DiscountType.percentage
+            : (totalDisc > 0 ? DiscountType.amount : null));
+
+    return SaleItem(
+      product: ProductItem.fromJson(json['product']),
+      selectedPrice: json['selectedPrice'],
+      quantity: json['quantity'],
+      bonQuantity: json['bonQuantity'] ?? 0,
+      cost: json['cost'],
+      price: json['price'],
+      subTotal: json['subTotal'],
+      discountType: parsedType,
+      discountPercentage: pct,
+      totalDiscount: totalDisc,
+      total: json['total'],
+      conversionFactor: json['conversionFactor'] ?? 1,
+      selectedUnitName: json['selectedUnitName'] as String?,
+      standardUnitName: json['standardUnitName'] as String?,
+      standardUnitFactor: json['standardUnitFactor'] as int?,
+      invoiceItemIndex: json['invoiceItemIndex'] as int?,
+    );
+  }
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{
@@ -177,6 +191,7 @@ class SaleItem {
       'cost': cost,
       'price': price,
       'subTotal': subTotal,
+      if (discountType != null) 'discountType': discountType!.apiValue,
       'discountPercentage': discountPercentage,
       'totalDiscount': totalDiscount,
       'total': total,

@@ -17,6 +17,8 @@ extension HoldSaleItemToCommercial on HoldSaleItem {
     result.conversionFactor = conversionFactor;
     result.selectedUnitName = selectedUnitName;
     result.selectedDiscount = selectedDiscount;
+    result.manualDiscountType = manualDiscountType;
+    result.manualDiscountValue = manualDiscountValue;
     return result;
   }
 }
@@ -32,6 +34,8 @@ extension CommercialProductResultToHoldSaleItem on CommercialProductResult {
       conversionFactor: conversionFactor,
       selectedUnitName: selectedUnitName,
       selectedDiscount: selectedDiscount,
+      manualDiscountType: manualDiscountType,
+      manualDiscountValue: manualDiscountValue,
     );
   }
 }
@@ -76,6 +80,8 @@ class SaleTerminalDraftManager {
           isWholesale: draft.isWholesale,
           selectedPaymentType: draft.selectedPaymentType,
           items: draft.items,
+          discountType: draft.discountType,
+          discountValue: draft.discountValue,
           totalQuantity: draft.totalQuantity,
           totalAmount: draft.totalAmount,
         ),

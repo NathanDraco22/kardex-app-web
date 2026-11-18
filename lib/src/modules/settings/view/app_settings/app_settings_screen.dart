@@ -49,6 +49,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
   bool _useHoldSales = true;
   bool _useQuickProductSearch = false;
   bool _useShifts = false;
+  bool _useDiscounts = false;
   AppCurrency _currency = AppCurrency.nio;
   AppCurrency _secondaryCurrency = AppCurrency.usd;
   double _exchangeRate = 0.0;
@@ -90,6 +91,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
       _useHoldSales = settings.useHoldSales;
       _useQuickProductSearch = settings.useQuickProductSearch;
       _useShifts = settings.useShifts;
+      _useDiscounts = settings.useDiscounts;
       _showInvoiceTotalInSecondaryCurrency = settings.showInvoiceTotalInSecondaryCurrency;
       _allowSecondaryCurrencyPayment = settings.allowSecondaryCurrencyPayment;
       _initialized = true;
@@ -134,6 +136,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
         _useHoldSales != settings.useHoldSales ||
         _useQuickProductSearch != settings.useQuickProductSearch ||
         _useShifts != settings.useShifts ||
+        _useDiscounts != settings.useDiscounts ||
         _showInvoiceTotalInSecondaryCurrency != settings.showInvoiceTotalInSecondaryCurrency ||
         _allowSecondaryCurrencyPayment != settings.allowSecondaryCurrencyPayment;
   }
@@ -154,6 +157,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
       useHoldSales: _useHoldSales,
       useQuickProductSearch: _useQuickProductSearch,
       useShifts: _useShifts,
+      useDiscounts: _useDiscounts,
       showInvoiceTotalInSecondaryCurrency: _showInvoiceTotalInSecondaryCurrency,
       allowSecondaryCurrencyPayment: _allowSecondaryCurrencyPayment,
     );
@@ -1085,6 +1089,19 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                           ),
                           value: _useShifts,
                           onChanged: isSaving ? null : (val) => setState(() => _useShifts = val),
+                        ),
+                        const Divider(height: 1),
+                        SwitchListTile(
+                          title: const Text(
+                            "Descuentos en Facturación",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: const Text(
+                            "Habilita descuentos por producto y por factura total (porcentaje o monto) en POS y facturación",
+                            style: TextStyle(fontSize: 13, color: Colors.black54),
+                          ),
+                          value: _useDiscounts,
+                          onChanged: isSaving ? null : (val) => setState(() => _useDiscounts = val),
                         ),
                       ],
                     ),

@@ -12,11 +12,8 @@ import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/cubits/shift/shift_cubit.dart';
 import 'package:kardex_app_front/src/core/shift_guard.dart';
-import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/global_stock_search_modal.dart';
-import 'package:kardex_app_front/widgets/empty_scaffold.dart';
-import 'package:kardex_app_front/widgets/text_field_date_selector.dart';
-import 'package:kardex_app_front/widgets/title_texfield.dart';
+import 'package:kardex_app_front/widgets/widgets.dart';
 
 import '../view_controller.dart';
 import 'mediator.dart';
@@ -138,8 +135,17 @@ class _AnonBottomAppBar extends StatelessWidget {
             return Row(
               children: [
                 const Spacer(
-                  flex: 4,
+                  flex: 2,
                 ),
+                InvoiceDiscountActionChip(
+                  itemsNetTotal: viewController.itemsNetTotal,
+                  discountType: viewController.invoiceDiscountType,
+                  discountValue: viewController.invoiceDiscountValue,
+                  invoiceDiscountAmount: viewController.invoiceDiscountAmount,
+                  onDiscountChanged: viewController.setInvoiceDiscount,
+                  onClearDiscount: viewController.clearInvoiceDiscount,
+                ),
+                const SizedBox(width: 16),
                 Expanded(
                   child: Row(
                     spacing: 16,

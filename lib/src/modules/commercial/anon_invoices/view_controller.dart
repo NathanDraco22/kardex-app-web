@@ -15,7 +15,45 @@ class AnonInvoiceViewController extends ChangeNotifier {
 
   int get totalItems => items.length;
 
-  int get totalAmount => items.fold<int>(0, (previousValue, element) => previousValue + element.total);
+  DiscountType? invoiceDiscountType;
+  int invoiceDiscountValue = 0;
+
+  int get itemsSubTotal => items.fold<int>(0, (sum, e) => sum + e.subTotal);
+
+  int get itemDiscounts => items.fold<int>(0, (sum, e) => sum + e.totalDiscount);
+
+  int get itemsNetTotal => items.fold<int>(0, (sum, e) => sum + e.total);
+
+  int get invoiceDiscountAmount => DiscountType.calculateDiscountAmount(
+    type: invoiceDiscountType,
+    discountValue: invoiceDiscountValue,
+    baseAmount: itemsNetTotal,
+  );
+
+  int get totalDiscount => itemDiscounts + invoiceDiscountAmount;
+
+  int get totalAmount =>
+      (itemsNetTotal - invoiceDiscountAmount).clamp(0, itemsNetTotal);
+
+  void setInvoiceDiscount(DiscountType? type, int value) {
+    if (type == null || value <= 0) {
+      invoiceDiscountType = null;
+      invoiceDiscountValue = 0;
+    } else {
+      invoiceDiscountType = type;
+      invoiceDiscountValue = type == DiscountType.percentage
+          ? value.clamp(0, 100)
+          : value.clamp(0, itemsNetTotal);
+    }
+    notifyListeners();
+  }
+
+  void clearInvoiceDiscount() {
+    if (invoiceDiscountType == null && invoiceDiscountValue == 0) return;
+    invoiceDiscountType = null;
+    invoiceDiscountValue = 0;
+    notifyListeners();
+  }
 
   void addItem(CommercialProductResult item) {
     final existingItem = items.any((i) => i.product.id == item.product.id);
@@ -45,6 +83,8 @@ class AnonInvoiceViewController extends ChangeNotifier {
   void clear() {
     description = '';
     items = [];
+    invoiceDiscountType = null;
+    invoiceDiscountValue = 0;
     _selectedDate = null;
     notifyListeners();
   }
@@ -61,6 +101,7 @@ class AnonInvoiceViewController extends ChangeNotifier {
         cost: product.account.averageCost,
         price: commercial.newPrice,
         quantity: commercial.baseQuantity,
+        discountType: commercial.effectiveDiscountType,
         discountPercentage: commercial.discountPercent,
         totalDiscount: commercial.totalDiscount,
         subTotal: commercial.subTotal,

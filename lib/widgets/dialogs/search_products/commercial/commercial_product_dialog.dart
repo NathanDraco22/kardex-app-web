@@ -13,6 +13,7 @@ import 'package:kardex_app_front/widgets/widgets.dart';
 import '../../models/commercial_product_result.dart';
 import '../widgets/commercial_product_unit_selector.dart';
 import '../widgets/price_level_dropdown_selector.dart';
+import '../widgets/product_discount_controls.dart';
 import '../widgets/product_header_info.dart';
 
 Future<CommercialProductResult?> showCommercialProductDialogFromId(
@@ -41,19 +42,23 @@ Future<CommercialProductResult?> showCommercialProductDialogFromId(
     CommercialProductResult? initialResult;
     if (previousSaleItem != null) {
       Discount? appliedDiscount;
+      DiscountType? manualType;
+      int manualValue = 0;
 
-      if (previousSaleItem.discountPercentage > 0) {
+      if (previousSaleItem.discountType == DiscountType.amount ||
+          (previousSaleItem.discountPercentage == 0 &&
+              previousSaleItem.totalDiscount > 0)) {
+        manualType = DiscountType.amount;
+        manualValue = previousSaleItem.totalDiscount;
+      } else if (previousSaleItem.discountPercentage > 0) {
         final match = product.saleProfile.discounts.where(
           (d) => d.percentValue == previousSaleItem.discountPercentage,
         );
         if (match.isNotEmpty) {
           appliedDiscount = match.first;
         } else {
-          appliedDiscount = Discount(
-            name: "Descuento",
-            percentValue: previousSaleItem.discountPercentage,
-            isActive: true,
-          );
+          manualType = DiscountType.percentage;
+          manualValue = previousSaleItem.discountPercentage;
         }
       }
 
@@ -86,7 +91,9 @@ Future<CommercialProductResult?> showCommercialProductDialogFromId(
             ..quantity = resolvedQuantity
             ..selectedPriceLevel = previousSaleItem.selectedPrice
             ..newPrice = previousSaleItem.price
-            ..selectedDiscount = appliedDiscount;
+            ..selectedDiscount = appliedDiscount
+            ..manualDiscountType = manualType
+            ..manualDiscountValue = manualValue;
     }
 
     return await showCommercialProductDialog(
@@ -475,6 +482,13 @@ class _FormContentState extends State<_FormContent> {
                             ],
                           ),
 
+                          Gate(
+                            filters: const [DiscountsGateFilter()],
+                            child: ProductDiscountControls(
+                              result: commercialProductResult,
+                              onChanged: () => setState(() {}),
+                            ),
+                          ),
                           SecondaryMenuButton(
                             onPressed: () {
                               final priceString = NumberFormatter.convertToMoneyLike(

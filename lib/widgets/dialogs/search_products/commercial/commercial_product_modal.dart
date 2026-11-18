@@ -8,6 +8,7 @@ import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 import '../widgets/commercial_product_unit_selector.dart';
 import '../widgets/price_level_dropdown_selector.dart';
+import '../widgets/product_discount_controls.dart';
 import '../widgets/product_header_info.dart';
 import 'package:kardex_app_front/widgets/title_label.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
@@ -374,6 +375,13 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                             ],
                           ),
 
+                          Gate(
+                            filters: const [DiscountsGateFilter()],
+                            child: ProductDiscountControls(
+                              result: commercialProductResult,
+                              onChanged: () => setState(() {}),
+                            ),
+                          ),
                           SecondaryMenuButton(
                             onPressed: () {
                               final priceString = NumberFormatter.convertToMoneyLike(commercialProductResult.newPrice);

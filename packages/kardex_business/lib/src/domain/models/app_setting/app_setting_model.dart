@@ -14,6 +14,7 @@ class AppSettingModel {
   final bool useHoldSales;
   final bool useQuickProductSearch;
   final bool useShifts;
+  final bool useDiscounts;
   final AppCurrency currency;
   final AppCurrency secondaryCurrency;
   final double exchangeRate;
@@ -37,6 +38,7 @@ class AppSettingModel {
     this.useHoldSales = true,
     this.useQuickProductSearch = false,
     this.useShifts = false,
+    this.useDiscounts = false,
     this.currency = AppCurrency.nio,
     this.secondaryCurrency = AppCurrency.usd,
     this.exchangeRate = 0.0,
@@ -63,6 +65,7 @@ class AppSettingModel {
       useHoldSales: json['useHoldSales'] as bool? ?? true,
       useQuickProductSearch: json['useQuickProductSearch'] as bool? ?? false,
       useShifts: json['useShifts'] as bool? ?? false,
+      useDiscounts: json['useDiscounts'] as bool? ?? false,
       currency: AppCurrency.fromCode(json['currency'] as String?),
       secondaryCurrency: AppCurrency.fromCode(
         json['secondaryCurrency'] as String?,
@@ -94,6 +97,7 @@ class AppSettingModel {
       'useHoldSales': useHoldSales,
       'useQuickProductSearch': useQuickProductSearch,
       'useShifts': useShifts,
+      'useDiscounts': useDiscounts,
       'currency': currency.code,
       'secondaryCurrency': secondaryCurrency.code,
       'exchangeRate': exchangeRate,
@@ -120,6 +124,7 @@ class AppSettingModel {
     bool? useHoldSales,
     bool? useQuickProductSearch,
     bool? useShifts,
+    bool? useDiscounts,
     AppCurrency? currency,
     AppCurrency? secondaryCurrency,
     double? exchangeRate,
@@ -146,6 +151,7 @@ class AppSettingModel {
       useQuickProductSearch:
           useQuickProductSearch ?? this.useQuickProductSearch,
       useShifts: useShifts ?? this.useShifts,
+      useDiscounts: useDiscounts ?? this.useDiscounts,
       currency: currency ?? this.currency,
       secondaryCurrency: secondaryCurrency ?? this.secondaryCurrency,
       exchangeRate: exchangeRate ?? this.exchangeRate,
@@ -175,6 +181,7 @@ class UpdateAppSetting {
   final bool? useHoldSales;
   final bool? useQuickProductSearch;
   final bool? useShifts;
+  final bool? useDiscounts;
   final AppCurrency? currency;
   final AppCurrency? secondaryCurrency;
   final double? exchangeRate;
@@ -195,6 +202,7 @@ class UpdateAppSetting {
     this.useHoldSales,
     this.useQuickProductSearch,
     this.useShifts,
+    this.useDiscounts,
     this.currency,
     this.secondaryCurrency,
     this.exchangeRate,
@@ -238,6 +246,9 @@ class UpdateAppSetting {
     }
     if (useShifts != null) {
       data['useShifts'] = useShifts;
+    }
+    if (useDiscounts != null) {
+      data['useDiscounts'] = useDiscounts;
     }
     if (currency != null) {
       data['currency'] = currency!.code;

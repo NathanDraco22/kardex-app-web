@@ -204,14 +204,14 @@ class InvoiceViewerContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final totalDiscount = invoice.saleItems.fold(
-      0,
-      (previousValue, element) => previousValue + element.totalDiscount,
-    );
-    final invoiceSubTotal = invoice.saleItems.fold(
-      0,
-      (element, previousValue) => previousValue.subTotal + element,
-    );
+    final itemDiscounts = invoice.effectiveItemDiscounts;
+    final invoiceDiscount = invoice.invoiceDiscount;
+    final totalDiscount = invoice.totalDiscount;
+    final invoiceDiscountTag =
+        invoice.discountType == DiscountType.percentage && invoice.discountValue > 0
+            ? ' (${invoice.discountValue}%)'
+            : '';
+    final invoiceSubTotal = invoice.itemsSubTotal;
     final secondaryTotal = NumberFormatter.convertInvoiceTotalToSecondaryMoney(invoice.total);
     final secondaryCurrency = NumberFormatter.secondaryCurrency;
 
@@ -518,23 +518,62 @@ class InvoiceViewerContent extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 4),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        const Text(
-                          "Total Descuento:",
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    if (invoiceDiscount > 0) ...[
+                      if (itemDiscounts > 0) ...[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            const Text(
+                              "Desc. Productos:",
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                            SizedBox(
+                              width: 120,
+                              child: Text(
+                                NumberFormatter.convertToMoneyLike(itemDiscounts),
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                textAlign: TextAlign.end,
+                              ),
+                            ),
+                          ],
                         ),
-                        SizedBox(
-                          width: 120,
-                          child: Text(
-                            NumberFormatter.convertToMoneyLike(totalDiscount),
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                            textAlign: TextAlign.end,
-                          ),
-                        ),
+                        const SizedBox(height: 4),
                       ],
-                    ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            "Desc. Factura$invoiceDiscountTag:",
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                          ),
+                          SizedBox(
+                            width: 120,
+                            child: Text(
+                              NumberFormatter.convertToMoneyLike(invoiceDiscount),
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                              textAlign: TextAlign.end,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ] else
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          const Text(
+                            "Total Descuento:",
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                          ),
+                          SizedBox(
+                            width: 120,
+                            child: Text(
+                              NumberFormatter.convertToMoneyLike(totalDiscount),
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                              textAlign: TextAlign.end,
+                            ),
+                          ),
+                        ],
+                      ),
                     const SizedBox(height: 4),
                     DecoratedBox(
                       decoration: BoxDecoration(color: Colors.grey.shade200),

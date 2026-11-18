@@ -293,6 +293,13 @@ class _CreateCreditNoteDialogState extends State<_CreateCreditNoteDialog> {
         DialogManager.showErrorDialog(context, "Debes buscar y seleccionar una factura de origen");
         return;
       }
+      if (_searchedInvoice!.invoiceDiscount > 0) {
+        DialogManager.showErrorDialog(
+          context,
+          "No se permiten devoluciones por producto en facturas con descuento global. Usa una nota de crédito por monto.",
+        );
+        return;
+      }
 
       final itemsToReturn = <SaleItem>[];
       final invoiceItems = _searchedInvoice!.saleItems;
@@ -639,6 +646,31 @@ class _CreateCreditNoteDialogState extends State<_CreateCreditNoteDialog> {
                                   child: LinearProgressIndicator(minHeight: 2),
                                 ),
 
+                              if (_searchedInvoice!.invoiceDiscount > 0)
+                                Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red.shade50,
+                                    borderRadius: AppThemeTokens.borderRadiusMd,
+                                    border: Border.all(color: Colors.red.shade200),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.block, color: Colors.red.shade700),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: Text(
+                                          "Esta factura tiene un descuento global (${NumberFormatter.convertToMoneyLike(_searchedInvoice!.invoiceDiscount)}). No se permiten devoluciones por producto; usa una nota de crédito por monto.",
+                                          style: TextStyle(
+                                            color: Colors.red.shade900,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              else
                               Container(
                                 decoration: BoxDecoration(
                                   color: Colors.white,

@@ -330,14 +330,14 @@ class SingleInvoiceTemplate implements PdfTemplate {
   }
 
   pw.Widget _buildTotals() {
-    final totalDiscount = invoice.saleItems.fold<int>(
-      0,
-      (previousValue, element) => previousValue + element.totalDiscount,
-    );
-    final invoiceSubTotal = invoice.saleItems.fold<int>(
-      0,
-      (previousValue, element) => previousValue + element.subTotal,
-    );
+    final itemDiscounts = invoice.effectiveItemDiscounts;
+    final invoiceDiscount = invoice.invoiceDiscount;
+    final totalDiscount = invoice.totalDiscount;
+    final invoiceDiscountTag =
+        invoice.discountType == DiscountType.percentage && invoice.discountValue > 0
+            ? ' (${invoice.discountValue}%)'
+            : '';
+    final invoiceSubTotal = invoice.itemsSubTotal;
     final secondaryTotal = NumberFormatter.convertInvoiceTotalToSecondaryMoney(invoice.total);
     final secondaryCurrency = NumberFormatter.secondaryCurrency;
 
@@ -361,20 +361,53 @@ class SingleInvoiceTemplate implements PdfTemplate {
             ],
           ),
           pw.SizedBox(height: 4),
-          pw.Row(
-            mainAxisAlignment: pw.MainAxisAlignment.end,
-            children: [
-              pw.Text("Total Descuento:", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
-              pw.SizedBox(
-                width: 110,
-                child: pw.Text(
-                  NumberFormatter.convertToMoneyLike(totalDiscount),
-                  style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
-                  textAlign: pw.TextAlign.right,
-                ),
+          if (invoiceDiscount > 0) ...[
+            if (itemDiscounts > 0) ...[
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.end,
+                children: [
+                  pw.Text("Desc. Productos:", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
+                  pw.SizedBox(
+                    width: 110,
+                    child: pw.Text(
+                      NumberFormatter.convertToMoneyLike(itemDiscounts),
+                      style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                      textAlign: pw.TextAlign.right,
+                    ),
+                  ),
+                ],
               ),
+              pw.SizedBox(height: 4),
             ],
-          ),
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.end,
+              children: [
+                pw.Text("Desc. Factura$invoiceDiscountTag:", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
+                pw.SizedBox(
+                  width: 110,
+                  child: pw.Text(
+                    NumberFormatter.convertToMoneyLike(invoiceDiscount),
+                    style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                    textAlign: pw.TextAlign.right,
+                  ),
+                ),
+              ],
+            ),
+          ] else
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.end,
+              children: [
+                pw.Text("Total Descuento:", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
+                pw.SizedBox(
+                  width: 110,
+                  child: pw.Text(
+                    NumberFormatter.convertToMoneyLike(totalDiscount),
+                    style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                    textAlign: pw.TextAlign.right,
+                  ),
+                ),
+              ],
+            ),
           pw.SizedBox(height: 4),
           pw.Container(
             padding: const pw.EdgeInsets.all(4),

@@ -36,15 +36,15 @@ Future<Uint8List> generateTicketPdfFromInvoice(
 
   String paymentType = invoice.paymentType == PaymentType.credit ? "CREDITO" : "CONTADO";
 
-  final totalDiscount = invoice.saleItems.fold(
-    0,
-    (previousValue, element) => previousValue + element.totalDiscount,
-  );
+  final itemDiscounts = invoice.effectiveItemDiscounts;
+  final invoiceDiscount = invoice.invoiceDiscount;
+  final totalDiscount = invoice.totalDiscount;
+  final invoiceDiscountTag =
+      invoice.discountType == DiscountType.percentage && invoice.discountValue > 0
+          ? ' (${invoice.discountValue}%)'
+          : '';
 
-  final invoiceSubTotal = invoice.saleItems.fold(
-    0,
-    (element, previousValue) => previousValue.subTotal + element,
-  );
+  final invoiceSubTotal = invoice.itemsSubTotal;
 
   final secondaryTotal = NumberFormatter.convertInvoiceTotalToSecondaryMoney(invoice.total);
   final secondaryCurrency = NumberFormatter.secondaryCurrency;
@@ -382,34 +382,91 @@ Future<Uint8List> generateTicketPdfFromInvoice(
               ],
             ),
 
-            pw.Row(
-              mainAxisAlignment: pw.MainAxisAlignment.end,
-              children: [
-                pw.SizedBox(
-                  width: 60,
-                  child: pw.Text(
-                    'DESCUENTO: ',
-                    style: pw.TextStyle(
-                      fontWeight: pw.FontWeight.bold,
-                      fontSize: TicketSettings.contentFontSize(paperSize),
+            if (invoiceDiscount > 0) ...[
+              if (itemDiscounts > 0)
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.end,
+                  children: [
+                    pw.SizedBox(
+                      width: 68,
+                      child: pw.Text(
+                        'DESC. PROD: ',
+                        style: pw.TextStyle(
+                          fontWeight: pw.FontWeight.bold,
+                          fontSize: TicketSettings.contentFontSize(paperSize),
+                        ),
+                        textAlign: pw.TextAlign.right,
+                      ),
                     ),
-                    textAlign: pw.TextAlign.right,
-                  ),
+                    pw.SizedBox(
+                      width: 60,
+                      child: pw.Text(
+                        currencyFormat.format(itemDiscounts / 100),
+                        style: pw.TextStyle(
+                          fontWeight: pw.FontWeight.bold,
+                          fontSize: TicketSettings.contentFontSize(paperSize),
+                        ),
+                        textAlign: pw.TextAlign.right,
+                      ),
+                    ),
+                  ],
                 ),
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.end,
+                children: [
+                  pw.SizedBox(
+                    width: 68,
+                    child: pw.Text(
+                      'DESC. FACT$invoiceDiscountTag: ',
+                      style: pw.TextStyle(
+                        fontWeight: pw.FontWeight.bold,
+                        fontSize: TicketSettings.contentFontSize(paperSize),
+                      ),
+                      textAlign: pw.TextAlign.right,
+                    ),
+                  ),
+                  pw.SizedBox(
+                    width: 60,
+                    child: pw.Text(
+                      currencyFormat.format(invoiceDiscount / 100),
+                      style: pw.TextStyle(
+                        fontWeight: pw.FontWeight.bold,
+                        fontSize: TicketSettings.contentFontSize(paperSize),
+                      ),
+                      textAlign: pw.TextAlign.right,
+                    ),
+                  ),
+                ],
+              ),
+            ] else
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.end,
+                children: [
+                  pw.SizedBox(
+                    width: 60,
+                    child: pw.Text(
+                      'DESCUENTO: ',
+                      style: pw.TextStyle(
+                        fontWeight: pw.FontWeight.bold,
+                        fontSize: TicketSettings.contentFontSize(paperSize),
+                      ),
+                      textAlign: pw.TextAlign.right,
+                    ),
+                  ),
 
-                pw.SizedBox(
-                  width: 60,
-                  child: pw.Text(
-                    currencyFormat.format(totalDiscount / 100),
-                    style: pw.TextStyle(
-                      fontWeight: pw.FontWeight.bold,
-                      fontSize: TicketSettings.contentFontSize(paperSize),
+                  pw.SizedBox(
+                    width: 60,
+                    child: pw.Text(
+                      currencyFormat.format(totalDiscount / 100),
+                      style: pw.TextStyle(
+                        fontWeight: pw.FontWeight.bold,
+                        fontSize: TicketSettings.contentFontSize(paperSize),
+                      ),
+                      textAlign: pw.TextAlign.right,
                     ),
-                    textAlign: pw.TextAlign.right,
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
 
             pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.end,

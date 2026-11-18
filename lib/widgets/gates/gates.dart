@@ -1,3 +1,4 @@
+export 'filters/discounts_gate_filter.dart';
 export 'filters/expiration_date_gate_filter.dart';
 export 'filters/orders_gate_filter.dart';
 export 'filters/quotations_gate_filter.dart';
