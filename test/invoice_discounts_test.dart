@@ -82,6 +82,20 @@ void main() {
         ),
         10000,
       );
+      expect(
+        DiscountType.formatEquivalentPercentage(
+          discountAmount: 5000,
+          baseAmount: 50000,
+        ),
+        '10%',
+      );
+      expect(
+        DiscountType.formatEquivalentPercentage(
+          discountAmount: 5000,
+          baseAmount: 40000,
+        ),
+        '12.5%',
+      );
     });
 
     test('SaleItem.fromJson infers discountType for legacy items', () {

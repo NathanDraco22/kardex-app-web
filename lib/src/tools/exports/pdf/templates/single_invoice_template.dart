@@ -333,10 +333,14 @@ class SingleInvoiceTemplate implements PdfTemplate {
     final itemDiscounts = invoice.effectiveItemDiscounts;
     final invoiceDiscount = invoice.invoiceDiscount;
     final totalDiscount = invoice.totalDiscount;
-    final invoiceDiscountTag =
+    final pctLabel =
         invoice.discountType == DiscountType.percentage && invoice.discountValue > 0
-            ? ' (${invoice.discountValue}%)'
-            : '';
+            ? '${invoice.discountValue}%'
+            : DiscountType.formatEquivalentPercentage(
+                discountAmount: invoiceDiscount,
+                baseAmount: invoice.itemsNetTotal,
+              );
+    final invoiceDiscountTag = pctLabel.isNotEmpty ? ' ($pctLabel)' : '';
     final invoiceSubTotal = invoice.itemsSubTotal;
     final secondaryTotal = NumberFormatter.convertInvoiceTotalToSecondaryMoney(invoice.total);
     final secondaryCurrency = NumberFormatter.secondaryCurrency;

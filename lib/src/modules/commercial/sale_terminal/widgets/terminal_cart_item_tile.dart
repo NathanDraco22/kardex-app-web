@@ -27,6 +27,17 @@ class TerminalCartItemTile extends StatelessWidget {
       item.newPrice * item.conversionFactor,
     );
     final total = NumberFormatter.convertToMoneyLike(item.total);
+    final hasDiscount = item.totalDiscount > 0;
+    final discountPct = item.effectiveDiscountType == DiscountType.percentage &&
+            item.discountPercent > 0
+        ? '${item.discountPercent}%'
+        : DiscountType.formatEquivalentPercentage(
+            discountAmount: item.totalDiscount,
+            baseAmount: item.subTotal,
+          );
+    final discountLabel = discountPct.isNotEmpty
+        ? '-$discountPct (-${NumberFormatter.convertToMoneyLike(item.totalDiscount)})'
+        : '-${NumberFormatter.convertToMoneyLike(item.totalDiscount)}';
     final isZeroPrice = item.newPrice <= 0;
 
     return Card(
@@ -175,6 +186,42 @@ class TerminalCartItemTile extends StatelessWidget {
                             ),
                           ],
                         ),
+                        if (hasDiscount) ...[
+                          const SizedBox(height: 4),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.orange.shade50,
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(color: Colors.orange.shade200),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.local_offer,
+                                    size: 12,
+                                    color: Colors.orange.shade800,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    discountLabel,
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.orange.shade900,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -235,13 +282,28 @@ class TerminalCartItemTile extends StatelessWidget {
                     child: const Icon(Icons.add, size: 18),
                   ),
                   const Spacer(),
-                  Text(
-                    total,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: Colors.green.shade800,
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (hasDiscount)
+                        Text(
+                          NumberFormatter.convertToMoneyLike(item.subTotal),
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.grey.shade500,
+                            decoration: TextDecoration.lineThrough,
+                          ),
+                        ),
+                      Text(
+                        total,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.green.shade800,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

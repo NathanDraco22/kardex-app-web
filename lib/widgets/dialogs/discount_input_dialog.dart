@@ -123,6 +123,12 @@ class _DiscountInputDialogState extends State<_DiscountInputDialog> {
       discountValue: currentValue,
       baseAmount: widget.baseAmount,
     );
+    final pctLabel = DiscountType.formatEquivalentPercentage(
+      discountAmount: computedDiscount,
+      baseAmount: widget.baseAmount,
+    );
+    final discountPreviewLabel =
+        pctLabel.isNotEmpty ? 'Descuento ($pctLabel)' : 'Descuento';
     final netAmount = (widget.baseAmount - computedDiscount).clamp(0, widget.baseAmount);
     final hasInitialDiscount =
         widget.initialType != null && widget.initialValue > 0;
@@ -217,7 +223,7 @@ class _DiscountInputDialogState extends State<_DiscountInputDialog> {
                     ),
                     const SizedBox(height: 4),
                     _PreviewRow(
-                      label: 'Descuento',
+                      label: discountPreviewLabel,
                       value: '-${NumberFormatter.convertToMoneyLike(computedDiscount)}',
                       valueColor: Colors.red.shade600,
                     ),
@@ -309,9 +315,13 @@ class InvoiceDiscountActionChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasDiscount = invoiceDiscountAmount > 0;
-    final tag = discountType == DiscountType.percentage && discountValue > 0
-        ? ' ($discountValue%)'
-        : '';
+    final pctLabel = discountType == DiscountType.percentage && discountValue > 0
+        ? '$discountValue%'
+        : DiscountType.formatEquivalentPercentage(
+            discountAmount: invoiceDiscountAmount,
+            baseAmount: itemsNetTotal,
+          );
+    final tag = pctLabel.isNotEmpty ? ' ($pctLabel)' : '';
     final label = hasDiscount
         ? 'Desc. factura$tag: -${NumberFormatter.convertToMoneyLike(invoiceDiscountAmount)}'
         : 'Desc. factura';

@@ -39,11 +39,15 @@ class TerminalTotalsSummary extends StatelessWidget {
     final totalAmount = viewController.totalAmount;
     final hasInvoiceDiscount = invoiceDiscount > 0;
 
-    final invoiceDiscountTag =
+    final pctLabel =
         viewController.invoiceDiscountType == DiscountType.percentage &&
                 viewController.invoiceDiscountValue > 0
-            ? ' (${viewController.invoiceDiscountValue}%)'
-            : '';
+            ? '${viewController.invoiceDiscountValue}%'
+            : DiscountType.formatEquivalentPercentage(
+                discountAmount: invoiceDiscount,
+                baseAmount: viewController.itemsNetTotal,
+              );
+    final invoiceDiscountTag = pctLabel.isNotEmpty ? ' ($pctLabel)' : '';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

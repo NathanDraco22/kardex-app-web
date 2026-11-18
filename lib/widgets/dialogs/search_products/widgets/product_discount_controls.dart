@@ -21,11 +21,15 @@ class ProductDiscountControls extends StatelessWidget {
         .where((d) => d.isActive)
         .toList();
     final hasDiscount = result.totalDiscount > 0;
+    final equivalentPct = DiscountType.formatEquivalentPercentage(
+      discountAmount: result.totalDiscount,
+      baseAmount: result.subTotal,
+    );
     final discountLabel = switch (result.effectiveDiscountType) {
       DiscountType.percentage =>
         'Descuento: ${result.discountPercent}% (-${NumberFormatter.convertToMoneyLike(result.totalDiscount)})',
       DiscountType.amount =>
-        'Descuento: -${NumberFormatter.convertToMoneyLike(result.totalDiscount)}',
+        'Descuento: -${NumberFormatter.convertToMoneyLike(result.totalDiscount)}${equivalentPct.isNotEmpty ? ' ($equivalentPct)' : ''}',
       null => 'Aplicar descuento (% o monto)',
     };
 
