@@ -33,4 +33,22 @@ enum DiscountType {
         return math.min(discountValue, baseAmount).clamp(0, baseAmount);
     }
   }
+
+  /// Formatea el porcentaje que representa [discountAmount] respecto a [baseAmount].
+  /// Retorna vacío si alguno es `<= 0`.
+  static String formatEquivalentPercentage({
+    required int discountAmount,
+    required int baseAmount,
+  }) {
+    if (discountAmount <= 0 || baseAmount <= 0) return '';
+    final scaled = discountAmount * 100;
+    if (scaled % baseAmount == 0) {
+      return '${scaled ~/ baseAmount}%';
+    }
+    final pct = scaled / baseAmount;
+    final formatted = pct.toStringAsFixed(1);
+    return formatted.endsWith('.0')
+        ? '${formatted.substring(0, formatted.length - 2)}%'
+        : '$formatted%';
+  }
 }
