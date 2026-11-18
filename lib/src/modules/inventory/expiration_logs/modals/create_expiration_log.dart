@@ -8,7 +8,6 @@ import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 
 import 'package:kardex_app_front/src/tools/input_formatter/input_formatter.dart';
 
-import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
 import '../cubit/read_expiration_log_cubit.dart';
@@ -171,7 +170,8 @@ class _ExpirationLogCreationScreenState extends State<ExpirationLogCreationScree
                       ),
 
                       Flexible(
-                        child: ExpirationDateGate(
+                        child: Gate(
+                          filters: const [ExpirationDateGateFilter()],
                           child: TitleTextField(
                             textInputAction: TextInputAction.done,
                             inputFormatters: [

@@ -1,12 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/src/modules/home/data/home_modules_registry.dart';
-import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
-import 'package:kardex_app_front/widgets/gates/orders_gate.dart';
-import 'package:kardex_app_front/widgets/gates/shifts_gate.dart';
-import 'package:kardex_app_front/widgets/gates/quotations_gate.dart';
-import 'package:kardex_app_front/widgets/gates/role_permission_gate.dart';
-import 'package:kardex_app_front/widgets/gates/root_user_gate.dart';
+import 'package:kardex_app_front/widgets/gates/gates.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 import 'package:kardex_app_front/widgets/dividers/menu_section_divider.dart';
 import 'package:kardex_app_front/widgets/shortcut_addable_list_tile.dart';
@@ -136,7 +131,10 @@ class _DesktopSubmenuPanelState extends State<DesktopSubmenuPanel> {
       );
 
       if (sectionName == "Cotizaciones y Proformas") {
-        divider = QuotationsGate(child: divider);
+        divider = Gate(
+          filters: const [QuotationsGateFilter()],
+          child: divider,
+        );
       }
 
       sectionWidgets.add(divider);
@@ -183,33 +181,9 @@ class _DesktopSubmenuPanelState extends State<DesktopSubmenuPanel> {
       );
     }
 
-    if (item.isExpirationGate) {
-      card = ExpirationDateGate(child: card);
-    }
-
-    if (item.isOrdersGate) {
-      card = OrdersGate(child: card);
-    }
-
-    if (item.isQuotationsGate) {
-      card = QuotationsGate(child: card);
-    }
-
-    if (item.isQuotationsOrOrdersGate) {
-      card = QuotationsOrOrdersGate(child: card);
-    }
-
-    if (item.isShiftsGate) {
-      card = ShiftsGate(child: card);
-    }
-
-    if (item.isRootGate) {
-      card = RootUserGate(child: card);
-    }
-
-    if (item.permissions.isNotEmpty) {
-      card = RolePermissionGate(
-        permissions: item.permissions,
+    if (item.gates.isNotEmpty) {
+      card = Gate(
+        filters: item.gates,
         child: card,
       );
     }

@@ -91,7 +91,7 @@ lib/
 ├── widgets/                     # Widgets y componentes globales reutilizables
 │   ├── design_system/           # Tokens, botones, cards y estados
 │   ├── dialogs/                 # Modales, visores y selectores globales
-│   ├── gates/                   # Control de acceso por roles (RolePermissionGate)
+│   ├── gates/                   # Widget único Gate y filtros GateFilter componibles
 │   ├── pdf/                     # Plantillas imprimibles PDF A4
 │   └── tables/                  # Componentes de tablas interactivas
 ├── main.dart                    # Bootstrap principal de la aplicación

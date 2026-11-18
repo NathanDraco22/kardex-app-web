@@ -35,13 +35,7 @@ class HomeSubmoduleItem {
   final Color? accentColor;
   final String? routeName;
   final void Function(BuildContext context)? customAction;
-  final List<Enum> permissions;
-  final bool isExpirationGate;
-  final bool isOrdersGate;
-  final bool isQuotationsGate;
-  final bool isQuotationsOrOrdersGate;
-  final bool isShiftsGate;
-  final bool isRootGate;
+  final List<GateFilter> gates;
   final String? section;
 
   const HomeSubmoduleItem({
@@ -51,13 +45,7 @@ class HomeSubmoduleItem {
     this.accentColor,
     this.routeName,
     this.customAction,
-    this.permissions = const [],
-    this.isExpirationGate = false,
-    this.isOrdersGate = false,
-    this.isQuotationsGate = false,
-    this.isQuotationsOrOrdersGate = false,
-    this.isShiftsGate = false,
-    this.isRootGate = false,
+    this.gates = const [],
     this.section,
   });
 }
@@ -218,7 +206,11 @@ List<HomeModuleCategory> getHomeModuleCategories(
             icon: FluentIcons.cart_24_filled,
             accentColor: Color(0xFF0D9488),
             routeName: "sale-terminal",
-            permissions: [CommercialSubModules.createInvoice],
+            gates: [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createInvoice],
+              ),
+            ],
           ),
           const HomeSubmoduleItem(
             section: "Punto de Venta y Facturación",
@@ -227,7 +219,11 @@ List<HomeModuleCategory> getHomeModuleCategories(
             icon: FluentIcons.building_retail_money_24_filled,
             accentColor: Color(0xFF16A34A),
             routeName: "anon-invoice",
-            permissions: [CommercialSubModules.createInvoice],
+            gates: [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createInvoice],
+              ),
+            ],
           ),
           const HomeSubmoduleItem(
             section: "Punto de Venta y Facturación",
@@ -236,7 +232,11 @@ List<HomeModuleCategory> getHomeModuleCategories(
             icon: Icons.badge_outlined,
             accentColor: Color(0xFF0F766E),
             routeName: "user-operations-results",
-            permissions: [CommercialSubModules.createInvoice],
+            gates: [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createInvoice],
+              ),
+            ],
           ),
           const HomeSubmoduleItem(
             section: "Punto de Venta y Facturación",
@@ -245,7 +245,11 @@ List<HomeModuleCategory> getHomeModuleCategories(
             icon: Icons.date_range,
             accentColor: Color(0xFFD97706),
             routeName: "daily-invoice",
-            permissions: [CommercialSubModules.createInvoice],
+            gates: [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createInvoice],
+              ),
+            ],
           ),
           const HomeSubmoduleItem(
             section: "Punto de Venta y Facturación",
@@ -254,7 +258,11 @@ List<HomeModuleCategory> getHomeModuleCategories(
             icon: FluentIcons.person_money_20_filled,
             accentColor: Color(0xFF16A34A),
             routeName: "client-invoice",
-            permissions: [CommercialSubModules.createInvoice],
+            gates: [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createInvoice],
+              ),
+            ],
           ),
           const HomeSubmoduleItem(
             section: "Punto de Venta y Facturación",
@@ -263,7 +271,11 @@ List<HomeModuleCategory> getHomeModuleCategories(
             icon: FluentIcons.person_money_20_filled,
             accentColor: Color(0xFF2563EB),
             routeName: "client-invoice-wholesale",
-            permissions: [CommercialSubModules.createInvoice],
+            gates: [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createInvoice],
+              ),
+            ],
           ),
           const HomeSubmoduleItem(
             section: "Punto de Venta y Facturación",
@@ -272,7 +284,11 @@ List<HomeModuleCategory> getHomeModuleCategories(
             icon: Icons.calendar_month,
             accentColor: Color(0xFFEA580C),
             routeName: "daily-client-invoices",
-            permissions: [CommercialSubModules.createInvoice],
+            gates: [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createInvoice],
+              ),
+            ],
           ),
           const HomeSubmoduleItem(
             section: "Punto de Venta y Facturación",
@@ -281,7 +297,11 @@ List<HomeModuleCategory> getHomeModuleCategories(
             icon: FluentIcons.building_retail_money_24_filled,
             accentColor: Color(0xFFF59E0B),
             routeName: "daily-product-sales",
-            permissions: [CommercialSubModules.createInvoice],
+            gates: [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createInvoice],
+              ),
+            ],
           ),
           const HomeSubmoduleItem(
             section: "Punto de Venta y Facturación",
@@ -290,7 +310,11 @@ List<HomeModuleCategory> getHomeModuleCategories(
             icon: Icons.content_paste_search_rounded,
             accentColor: Color(0xFF16A34A),
             routeName: "invoice-history",
-            permissions: [CommercialSubModules.createInvoice],
+            gates: [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createInvoice],
+              ),
+            ],
           ),
           const HomeSubmoduleItem(
             section: "Punto de Venta y Facturación",
@@ -299,7 +323,11 @@ List<HomeModuleCategory> getHomeModuleCategories(
             icon: Icons.find_in_page_rounded,
             accentColor: Color(0xFF15803D),
             routeName: "invoices-by-product",
-            permissions: [CommercialSubModules.createInvoice],
+            gates: [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createInvoice],
+              ),
+            ],
           ),
 
           // Sección 2: Consultas y Existencias
@@ -310,7 +338,11 @@ List<HomeModuleCategory> getHomeModuleCategories(
             icon: Icons.search,
             accentColor: Color(0xFF9333EA),
             routeName: "global-stock-search",
-            permissions: [CommercialSubModules.createInvoice],
+            gates: [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createInvoice],
+              ),
+            ],
           ),
           HomeSubmoduleItem(
             section: "Consultas y Existencias",
@@ -319,7 +351,11 @@ List<HomeModuleCategory> getHomeModuleCategories(
             icon: Icons.info_outline,
             accentColor: const Color(0xFF2563EB),
             customAction: (ctx) => showProductInfoSearchDelegate(ctx),
-            permissions: const [CommercialSubModules.createInvoice],
+            gates: const [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createInvoice],
+              ),
+            ],
           ),
           const HomeSubmoduleItem(
             section: "Consultas y Existencias",
@@ -328,7 +364,7 @@ List<HomeModuleCategory> getHomeModuleCategories(
             icon: Icons.timer_sharp,
             accentColor: Color(0xFFD97706),
             routeName: "expiration-logs",
-            isExpirationGate: true,
+            gates: [ExpirationDateGateFilter()],
           ),
           const HomeSubmoduleItem(
             section: "Consultas y Existencias",
@@ -337,7 +373,11 @@ List<HomeModuleCategory> getHomeModuleCategories(
             icon: Icons.analytics_outlined,
             accentColor: Color(0xFF1D4ED8),
             routeName: "product-demand-vs-stock",
-            permissions: [CommercialSubModules.createInvoice],
+            gates: [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createInvoice],
+              ),
+            ],
           ),
           const HomeSubmoduleItem(
             section: "Consultas y Existencias",
@@ -346,7 +386,11 @@ List<HomeModuleCategory> getHomeModuleCategories(
             icon: Icons.list,
             accentColor: Color(0xFFEA580C),
             routeName: "daily-product-in-orders",
-            permissions: [CommercialSubModules.createInvoice],
+            gates: [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createInvoice],
+              ),
+            ],
           ),
 
           // Sección 3: Cotizaciones y Proformas
@@ -357,8 +401,12 @@ List<HomeModuleCategory> getHomeModuleCategories(
             icon: FluentIcons.clipboard_search_24_filled,
             accentColor: Color(0xFF2563EB),
             routeName: "proforma-history",
-            permissions: [CommercialSubModules.orders],
-            isQuotationsGate: true,
+            gates: [
+              QuotationsGateFilter(),
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.orders],
+              ),
+            ],
           ),
           const HomeSubmoduleItem(
             section: "Cotizaciones y Proformas",
@@ -367,8 +415,12 @@ List<HomeModuleCategory> getHomeModuleCategories(
             icon: FluentIcons.document_text_24_filled,
             accentColor: Color(0xFF3B82F6),
             routeName: "proforma",
-            permissions: [CommercialSubModules.createOrder],
-            isQuotationsGate: true,
+            gates: [
+              QuotationsGateFilter(),
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createOrder],
+              ),
+            ],
           ),
           const HomeSubmoduleItem(
             section: "Cotizaciones y Proformas",
@@ -377,8 +429,12 @@ List<HomeModuleCategory> getHomeModuleCategories(
             icon: FluentIcons.document_text_24_filled,
             accentColor: Color(0xFF1D4ED8),
             routeName: "proforma-wholesale",
-            permissions: [CommercialSubModules.createOrder],
-            isQuotationsGate: true,
+            gates: [
+              QuotationsGateFilter(),
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createOrder],
+              ),
+            ],
           ),
           const HomeSubmoduleItem(
             section: "Cotizaciones y Proformas",
@@ -387,8 +443,12 @@ List<HomeModuleCategory> getHomeModuleCategories(
             icon: Icons.manage_search,
             accentColor: Color(0xFF4F46E5),
             routeName: "quotation-order-search",
-            permissions: [CommercialSubModules.orders],
-            isQuotationsOrOrdersGate: true,
+            gates: [
+              AnyGateFilter([QuotationsGateFilter(), OrdersGateFilter()]),
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.orders],
+              ),
+            ],
           ),
 
           // Sección 4: Órdenes de Compra y Cobranza
@@ -399,8 +459,12 @@ List<HomeModuleCategory> getHomeModuleCategories(
             icon: FluentIcons.receipt_bag_24_filled,
             accentColor: Color(0xFFEA580C),
             routeName: "current-orders",
-            permissions: [CommercialSubModules.orders],
-            isOrdersGate: true,
+            gates: [
+              OrdersGateFilter(),
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.orders],
+              ),
+            ],
           ),
           const HomeSubmoduleItem(
             section: "Órdenes de Compra y Recibos",
@@ -409,8 +473,12 @@ List<HomeModuleCategory> getHomeModuleCategories(
             icon: FluentIcons.receipt_add_24_filled,
             accentColor: Color(0xFF0284C7),
             routeName: "sale-order",
-            permissions: [CommercialSubModules.createOrder],
-            isOrdersGate: true,
+            gates: [
+              OrdersGateFilter(),
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createOrder],
+              ),
+            ],
           ),
           const HomeSubmoduleItem(
             section: "Órdenes de Compra y Recibos",
@@ -419,8 +487,12 @@ List<HomeModuleCategory> getHomeModuleCategories(
             icon: FluentIcons.receipt_add_24_filled,
             accentColor: Color(0xFF2563EB),
             routeName: "sale-order-wholesale",
-            permissions: [CommercialSubModules.createOrder],
-            isOrdersGate: true,
+            gates: [
+              OrdersGateFilter(),
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createOrder],
+              ),
+            ],
           ),
           const HomeSubmoduleItem(
             section: "Órdenes de Compra y Recibos",
@@ -429,7 +501,11 @@ List<HomeModuleCategory> getHomeModuleCategories(
             icon: Icons.content_paste_search_rounded,
             accentColor: Color(0xFF0D9488),
             routeName: "receipt-history",
-            permissions: [CommercialSubModules.pendingInvoices],
+            gates: [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.pendingInvoices],
+              ),
+            ],
           ),
 
           // Sección 5: Devoluciones
@@ -440,7 +516,11 @@ List<HomeModuleCategory> getHomeModuleCategories(
             icon: Icons.file_open_rounded,
             accentColor: Color(0xFFEA580C),
             routeName: "current-devolution",
-            permissions: [CommercialSubModules.processDevolution],
+            gates: [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.processDevolution],
+              ),
+            ],
           ),
           const HomeSubmoduleItem(
             section: "Devoluciones",
@@ -449,7 +529,11 @@ List<HomeModuleCategory> getHomeModuleCategories(
             icon: Icons.file_open_rounded,
             accentColor: Color(0xFF475569),
             routeName: "devolutions",
-            permissions: [CommercialSubModules.createInvoice],
+            gates: [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createInvoice],
+              ),
+            ],
           ),
           const HomeSubmoduleItem(
             section: "Devoluciones",
@@ -458,7 +542,11 @@ List<HomeModuleCategory> getHomeModuleCategories(
             icon: Icons.file_open_rounded,
             accentColor: Color(0xFF2563EB),
             routeName: "client-devolution",
-            permissions: [CommercialSubModules.createDevolution],
+            gates: [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createDevolution],
+              ),
+            ],
           ),
           const HomeSubmoduleItem(
             section: "Devoluciones",
@@ -467,7 +555,11 @@ List<HomeModuleCategory> getHomeModuleCategories(
             icon: Icons.content_paste_search_rounded,
             accentColor: Color(0xFFEA580C),
             routeName: "devolution-history",
-            permissions: [CommercialSubModules.createDevolution],
+            gates: [
+              RolePermissionGateFilter(
+                permissions: [CommercialSubModules.createDevolution],
+              ),
+            ],
           ),
           const HomeSubmoduleItem(
             section: "Notas de Crédito",
@@ -476,9 +568,13 @@ List<HomeModuleCategory> getHomeModuleCategories(
             icon: Icons.assignment_return_rounded,
             accentColor: Color(0xFF7C3AED),
             routeName: RouteNames.creditNotes,
-            permissions: [
-              CommercialSubModules.createCreditNote,
-              CommercialSubModules.creditNoteHistory,
+            gates: [
+              RolePermissionGateFilter(
+                permissions: [
+                  CommercialSubModules.createCreditNote,
+                  CommercialSubModules.creditNoteHistory,
+                ],
+              ),
             ],
           ),
           const HomeSubmoduleItem(
@@ -488,7 +584,7 @@ List<HomeModuleCategory> getHomeModuleCategories(
             icon: Icons.point_of_sale_rounded,
             accentColor: Color(0xFF0D9488),
             routeName: RouteNames.shifts,
-            isShiftsGate: true,
+            gates: [ShiftsGateFilter()],
           ),
         ],
       ),
@@ -610,7 +706,7 @@ List<HomeModuleCategory> getHomeModuleCategories(
           icon: Icons.timer_sharp,
           accentColor: Color(0xFFD97706),
           routeName: "expiration-logs",
-          isExpirationGate: true,
+          gates: [ExpirationDateGateFilter()],
         ),
 
         // Sección 3: Entradas y Salidas Regulares
@@ -735,7 +831,9 @@ List<HomeModuleCategory> getHomeModuleCategories(
           icon: Icons.fact_check_outlined,
           accentColor: Color(0xFF4F46E5),
           routeName: RouteNames.adjustmentRequests,
-          permissions: [Modules.inventory],
+          gates: [
+            RolePermissionGateFilter(permissions: [Modules.inventory]),
+          ],
         ),
       ],
     ),
@@ -881,7 +979,7 @@ List<HomeModuleCategory> getHomeModuleCategories(
           icon: Icons.upload_file_rounded,
           accentColor: Color(0xFFEA580C),
           routeName: RouteNames.imports,
-          isRootGate: true,
+          gates: [RootUserGateFilter()],
         ),
         const HomeSubmoduleItem(
           title: "Llaves de API (Neptuno)",

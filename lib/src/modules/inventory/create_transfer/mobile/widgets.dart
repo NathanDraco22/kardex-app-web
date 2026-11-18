@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/modules/inventory/create_transfer/mediator.dart';
 import 'package:kardex_app_front/widgets/tables/transfer_product_table.dart';
 import 'package:kardex_app_front/src/tools/input_formatter/input_formatter.dart';
-import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/src/cubits/transfers/write_transfer_cubit.dart';
 import 'package:kardex_business/kardex_business.dart';
@@ -173,7 +172,8 @@ class MobileProductCardState extends State<MobileProductCard> with AutomaticKeep
             const Divider(),
             Row(
               children: [
-                ExpirationDateGate(
+                Gate(
+                  filters: const [ExpirationDateGateFilter()],
                   child: Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -205,7 +205,8 @@ class MobileProductCardState extends State<MobileProductCard> with AutomaticKeep
                     ),
                   ),
                 ),
-                const ExpirationDateGate(
+                const Gate(
+                  filters: [ExpirationDateGateFilter()],
                   child: SizedBox(width: 16),
                 ),
                 Expanded(

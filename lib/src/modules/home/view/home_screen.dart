@@ -14,7 +14,7 @@ import 'package:kardex_business/kardex_business.dart';
 
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 import 'package:kardex_app_front/widgets/exchange_rate_status_button.dart';
-import 'package:kardex_app_front/widgets/gates/role_permission_gate.dart';
+import 'package:kardex_app_front/widgets/gates/gates.dart';
 import 'package:toastification/toastification.dart';
 import 'package:kardex_app_front/constants/route_names.dart';
 import 'widgets/home_desktop_card.dart';

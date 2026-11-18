@@ -6,7 +6,6 @@ import 'package:kardex_app_front/constants/feature_flags.dart';
 import 'package:kardex_app_front/constants/route_names.dart';
 import 'package:kardex_app_front/src/modules/inventory/adjust_exit/adjust_exit_screen.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
-import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
 import 'package:kardex_app_front/widgets/menu_app_bar.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/search_product_commercial_delegate.dart';
 import 'package:kardex_app_front/widgets/shortcut_addable_list_tile.dart';
@@ -120,7 +119,8 @@ class _Body extends StatelessWidget {
               onTap: () => context.pushNamed("product-inventory-catalog"),
             ),
           ),
-          ExpirationDateGate(
+          Gate(
+            filters: const [ExpirationDateGateFilter()],
             child: ShortcutAddableListTile(
               routeName: RouteNames.expirationLogs,
               child: MenuOptionCard(

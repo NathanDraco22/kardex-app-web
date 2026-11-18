@@ -4,7 +4,7 @@ import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/cubits/shift/shift_cubit.dart';
 import 'package:kardex_app_front/cubits/shift/shift_state.dart';
-import 'package:kardex_app_front/widgets/gates/shifts_gate.dart';
+import 'package:kardex_app_front/widgets/gates/gates.dart';
 
 /// Botón de acción compacto para abrir directamente los movimientos de efectivo
 /// del turno activo en la sucursal actual. Se oculta si los turnos están
@@ -19,7 +19,8 @@ class ShiftCashMovementsIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ShiftsGate(
+    return Gate(
+      filters: const [ShiftsGateFilter()],
       child: BlocBuilder<AuthCubit, AuthState>(
         bloc: getIt<AuthCubit>(),
         builder: (context, _) {

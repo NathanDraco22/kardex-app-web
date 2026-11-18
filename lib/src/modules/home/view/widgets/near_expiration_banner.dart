@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/constants/route_names.dart';
 import 'package:kardex_app_front/cubits/near_expiration/near_expiration_cubit.dart';
-import 'package:kardex_app_front/widgets/gates/expiration_date_gate.dart';
+import 'package:kardex_app_front/widgets/gates/gates.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 /// Alerta visual de productos próximos a vencer o vencidos en pantalla de inicio.
@@ -18,7 +18,8 @@ class NearExpirationBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ExpirationDateGate(
+    return Gate(
+      filters: const [ExpirationDateGateFilter()],
       child: BlocBuilder<NearExpirationCubit, NearExpirationState>(
         builder: (context, state) {
           if (state is! NearExpirationLoaded || !state.hasLogs) {

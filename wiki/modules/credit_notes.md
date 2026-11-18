@@ -217,4 +217,4 @@ stateDiagram-v2
 
 - **Ruta GoRouter:** `/commercial/credit-notes` (nombre canónico: `RouteNames.creditNotes`).
 - **Acceso:** Tarjeta de menú en [`commercial_menu_screen.dart`](../../lib/src/modules/commercial/commercial_menu_screen.dart) con icono `assignment_return_rounded` y color de acento morado.
-- **Permisos:** Protegido por `RolePermissionGate` requiriendo `CommercialSubModules.createCreditNote` o `CommercialSubModules.creditNoteHistory`.
+- **Permisos:** Protegido por `Gate` con `RolePermissionGateFilter` requiriendo `CommercialSubModules.createCreditNote` o `CommercialSubModules.creditNoteHistory`.

@@ -70,17 +70,20 @@ Archivos:
 - `access.contains("all")` → comodín.
 - `hasCurrentAccess(context, permissionName)` lee el `AuthCubit` actual.
 
-### `RolePermissionGate`
+### `Gate` y `GateFilter` (`RolePermissionGateFilter`)
 
-`lib/widgets/gates/role_permission_gate.dart`:
+`lib/widgets/gates/gate.dart` y `lib/widgets/gates/filters/role_permission_gate_filter.dart`:
 
+- `Gate` recibe una lista componible de `GateFilter` (análogo a `inputFormatters`) y evalúa acceso/visibilidad sin anidar múltiples widgets en el árbol (`GateMatchMode.all` por defecto o `GateMatchMode.any`).
 - `PermissionMode.whitelist` → muestra el hijo si **algún** permiso coincide.
 - `PermissionMode.blacklist` → muestra el hijo si **ningún** permiso coincide.
-- Permite `fallback` para un estado alternativo.
+- Permite `fallback` global en `Gate` o específico en cada filtro.
 
 ```dart
-RolePermissionGate(
-  permissions: [Modules.commercial],
+Gate(
+  filters: const [
+    RolePermissionGateFilter(permissions: [Modules.commercial]),
+  ],
   child: const CommercialMenuButton(),
 )
 ```
@@ -100,7 +103,7 @@ Los permisos se declaran como enums en
 | Estado de sesión | `SplashScreen` + `AuthCubit` | Redirige a `login`, `activation` o `inactive`. |
 | `isCommerce` | `app_router.dart` (comercial y cuentas pendientes) | Si la sucursal no es comercial, redirige a `/home`. |
 | Feature flags | `app_router.dart` (escalas de unidades) | Redirige a la pestaña permitida si `SHOW_UNIT_SCALES=false`. |
-| Permisos de UI | `RolePermissionGate` / `AccessManager` | Oculta o reemplaza widgets. |
+| Permisos de UI | `Gate` (`RolePermissionGateFilter`) / `AccessManager` | Oculta o reemplaza widgets. |
 
 > Las pantallas operativas se abren a pantalla completa. Si agregas una ruta nueva, decide explícitamente si necesita guard de sesión, de `isCommerce` o de permisos.
 
@@ -131,7 +134,7 @@ Los permisos se declaran como enums en
 - [ ] ¿El endpoint del backend también valida el permiso? Si no, el cambio es solo cosmético.
 - [ ] ¿La ruta nueva tiene el guard de sesión/`isCommerce` que corresponde?
 - [ ] ¿Los permisos nuevos se agregaron al enum `Modules` y al rol por defecto?
-- [ ] ¿El `RolePermissionGate` tiene un `fallback` sensato (no una pantalla en blanco)?
+- [ ] ¿El `Gate` tiene un `fallback` sensato (no una pantalla en blanco)?
 - [ ] ¿El cambio aplica a `lite`? (los permisos y rutas pueden diferir).
 - [ ] ¿Evitaste guardar secretos o tokens en logs?
 

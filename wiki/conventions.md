@@ -102,7 +102,7 @@ class CreditNotesRepository with ReactiveRepository<CreditNoteInDb> {
 - Reciben repositorios por constructor o vía `context.read<TRepository>()` / `getIt`.
 - Nunca hacen HTTP ni conocen DataSources.
 - Cierran suscripciones y streams en `close()`.
-- Para permisos, consulta `AccessManager` o envuelve la UI en `RolePermissionGate`.
+- Para permisos, consulta `AccessManager` o envuelve la UI en `Gate(filters: [RolePermissionGateFilter(...)])`.
 
 ---
 
