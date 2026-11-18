@@ -168,15 +168,27 @@ class _RootScaffold extends StatelessWidget {
                   listenable: controller,
                   builder: (context, _) {
                     final totalMoney = NumberFormatter.convertToMoneyLike(controller.totalAmount);
-                    return Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                        totalMoney,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        InvoiceDiscountActionChip(
+                          itemsNetTotal: controller.itemsNetTotal,
+                          discountType: controller.invoiceDiscountType,
+                          discountValue: controller.invoiceDiscountValue,
+                          invoiceDiscountAmount: controller.invoiceDiscountAmount,
+                          onDiscountChanged: controller.setInvoiceDiscount,
+                          onClearDiscount: controller.clearInvoiceDiscount,
                         ),
-                      ),
+                        const SizedBox(width: 16),
+                        Text(
+                          totalMoney,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                      ],
                     );
                   },
                 ),

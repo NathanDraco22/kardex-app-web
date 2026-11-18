@@ -87,7 +87,12 @@ class _RootScaffold extends StatelessWidget {
                         ? null
                         : () async {
                             final saleItems = viewController.createSaleItemFromCommercial();
-                            await showInvoiceAnonMenuScreen(context, saleItems);
+                            await showInvoiceAnonMenuScreen(
+                              context,
+                              saleItems,
+                              discountType: viewController.invoiceDiscountType,
+                              discountValue: viewController.invoiceDiscountValue,
+                            );
                           },
                     label: const Text("Facturar"),
                     icon: const Icon(
@@ -120,65 +125,77 @@ class _Body extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Card(
-            child: SizedBox(
-              height: 40,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ListenableBuilder(
-                  listenable: viewController,
-                  builder: (context, _) {
-                    final formattedTotal = NumberFormatter.convertToMoneyLike(viewController.totalAmount);
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text.rich(
-                          TextSpan(
-                            children: [
-                              const TextSpan(
-                                text: 'Productos: ',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.grey,
-                                  fontSize: 16,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ListenableBuilder(
+                listenable: viewController,
+                builder: (context, _) {
+                  final formattedTotal = NumberFormatter.convertToMoneyLike(viewController.totalAmount);
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text.rich(
+                            TextSpan(
+                              children: [
+                                const TextSpan(
+                                  text: 'Productos: ',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey,
+                                    fontSize: 16,
+                                  ),
                                 ),
-                              ),
-                              TextSpan(
-                                text: viewController.totalItems.toString(),
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
+                                TextSpan(
+                                  text: viewController.totalItems.toString(),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-
-                        Text.rich(
-                          TextSpan(
-                            children: [
-                              const TextSpan(
-                                text: 'Total: ',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.grey,
-                                  fontSize: 16,
+                          Text.rich(
+                            TextSpan(
+                              children: [
+                                const TextSpan(
+                                  text: 'Total: ',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey,
+                                    fontSize: 16,
+                                  ),
                                 ),
-                              ),
-                              TextSpan(
-                                text: formattedTotal,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.green.shade700,
+                                TextSpan(
+                                  text: formattedTotal,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: Colors.green.shade700,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
+                        ],
+                      ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: InvoiceDiscountActionChip(
+                          itemsNetTotal: viewController.itemsNetTotal,
+                          discountType: viewController.invoiceDiscountType,
+                          discountValue: viewController.invoiceDiscountValue,
+                          invoiceDiscountAmount: viewController.invoiceDiscountAmount,
+                          onDiscountChanged: viewController.setInvoiceDiscount,
+                          onClearDiscount: viewController.clearInvoiceDiscount,
                         ),
-                      ],
-                    );
-                  },
-                ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
           ),

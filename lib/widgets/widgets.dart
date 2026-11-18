@@ -46,6 +46,7 @@ export 'cash_counter/cash_counter_dialog.dart';
 export 'cash_counter/cash_counter_models.dart';
 export 'cash_counter/cash_counter_export_dialog.dart';
 export 'dialogs/create_product_with_data_dialog.dart';
+export 'dialogs/discount_input_dialog.dart';
 export 'dialogs/recent_invoices_dialog.dart';
 export 'dialogs/pending_clients_dialog.dart';
 export 'dialogs/reset_inventory_danger_dialog.dart';

@@ -16,8 +16,10 @@ import 'package:kardex_app_front/widgets/title_texfield.dart';
 
 Future<void> showInvoiceAnonMenuScreen(
   BuildContext context,
-  List<SaleItem> saleItems,
-) async {
+  List<SaleItem> saleItems, {
+  DiscountType? discountType,
+  int discountValue = 0,
+}) async {
   final writeCubit = context.read<WriteAnonInvoiceCubit>();
 
   await Navigator.push(
@@ -27,6 +29,8 @@ Future<void> showInvoiceAnonMenuScreen(
         value: writeCubit,
         child: InvoiceClientMenuScreen(
           saleItems: saleItems,
+          discountType: discountType,
+          discountValue: discountValue,
         ),
       ),
     ),
@@ -41,20 +45,34 @@ class InvoiceClientMenuScreen extends StatelessWidget {
   const InvoiceClientMenuScreen({
     super.key,
     required this.saleItems,
+    this.discountType,
+    this.discountValue = 0,
   });
 
   final List<SaleItem> saleItems;
+  final DiscountType? discountType;
+  final int discountValue;
 
   @override
   Widget build(BuildContext context) {
-    return _RootScaffold(saleItems);
+    return _RootScaffold(
+      saleItems,
+      discountType: discountType,
+      discountValue: discountValue,
+    );
   }
 }
 
 class _RootScaffold extends StatelessWidget {
-  const _RootScaffold(this.saleItems);
+  const _RootScaffold(
+    this.saleItems, {
+    this.discountType,
+    this.discountValue = 0,
+  });
 
   final List<SaleItem> saleItems;
+  final DiscountType? discountType;
+  final int discountValue;
 
   @override
   Widget build(BuildContext context) {
@@ -82,16 +100,26 @@ class _RootScaffold extends StatelessWidget {
       },
       child: Scaffold(
         appBar: AppBar(title: const Text("Cliente")),
-        body: _Body(saleItems),
+        body: _Body(
+          saleItems,
+          discountType: discountType,
+          discountValue: discountValue,
+        ),
       ),
     );
   }
 }
 
 class _Body extends StatefulWidget {
-  const _Body(this.saleItems);
+  const _Body(
+    this.saleItems, {
+    this.discountType,
+    this.discountValue = 0,
+  });
 
   final List<SaleItem> saleItems;
+  final DiscountType? discountType;
+  final int discountValue;
 
   @override
   State<_Body> createState() => _BodyState();
@@ -234,10 +262,20 @@ class _SendButton extends StatelessWidget {
               (previousValue, element) => previousValue + (element.cost * element.quantity),
             );
 
-            final total = widget.saleItems.fold<int>(
+            final itemsNet = widget.saleItems.fold<int>(
               0,
               (previousValue, element) => previousValue + element.total,
             );
+            final itemsDisc = widget.saleItems.fold<int>(
+              0,
+              (previousValue, element) => previousValue + element.totalDiscount,
+            );
+            final invDisc = DiscountType.calculateDiscountAmount(
+              type: widget.discountType,
+              discountValue: widget.discountValue,
+              baseAmount: itemsNet,
+            );
+            final total = (itemsNet - invDisc).clamp(0, itemsNet);
 
             final authState = getIt<AuthCubit>().state;
             if (authState is! Authenticated) throw Exception("User or branch not found");
@@ -254,6 +292,10 @@ class _SendButton extends StatelessWidget {
               status: InvoiceStatus.paid,
               paymentType: PaymentType.cash,
               bankReference: "",
+              discountType: widget.discountType,
+              discountValue: widget.discountValue,
+              itemDiscounts: itemsDisc,
+              invoiceDiscount: invDisc,
               totalCost: totalCost,
               amountPaid: total,
               total: total,

@@ -1,4 +1,5 @@
 import 'package:kardex_business/src/domain/models/client/client_model.dart';
+import 'package:kardex_business/src/domain/models/common/discount_type.dart';
 import 'package:kardex_business/src/domain/models/common/sale_item_model.dart';
 import 'package:kardex_business/src/domain/models/common/user_info.dart';
 import 'package:kardex_business/src/domain/models/product/product_model.dart';
@@ -14,6 +15,8 @@ class HoldSaleItem {
   final int conversionFactor;
   final String selectedUnitName;
   final Discount? selectedDiscount;
+  final DiscountType? manualDiscountType;
+  final int manualDiscountValue;
 
   HoldSaleItem({
     required this.product,
@@ -24,6 +27,8 @@ class HoldSaleItem {
     this.conversionFactor = 1,
     this.selectedUnitName = '',
     this.selectedDiscount,
+    this.manualDiscountType,
+    this.manualDiscountValue = 0,
   });
 
   double get displayQuantity => conversionFactor <= 1
@@ -45,6 +50,9 @@ class HoldSaleItem {
       selectedDiscount: json['selectedDiscount'] != null
           ? Discount.fromJson(json['selectedDiscount'] as Map<String, dynamic>)
           : null,
+      manualDiscountType:
+          DiscountType.tryFromApi(json['manualDiscountType'] as String?),
+      manualDiscountValue: json['manualDiscountValue'] as int? ?? 0,
     );
   }
 
@@ -58,6 +66,9 @@ class HoldSaleItem {
       'conversionFactor': conversionFactor,
       'selectedUnitName': selectedUnitName,
       'selectedDiscount': selectedDiscount?.toJson(),
+      if (manualDiscountType != null)
+        'manualDiscountType': manualDiscountType!.apiValue,
+      'manualDiscountValue': manualDiscountValue,
     };
   }
 }
@@ -70,6 +81,8 @@ class BaseHoldSale {
   final String description;
   final PaymentType selectedPaymentType;
   final List<HoldSaleItem> items;
+  final DiscountType? discountType;
+  final int discountValue;
   final int totalQuantity;
   final int totalAmount;
   final UserInfo? createdBy;
@@ -82,6 +95,8 @@ class BaseHoldSale {
     this.description = '',
     this.selectedPaymentType = PaymentType.cash,
     this.items = const [],
+    this.discountType,
+    this.discountValue = 0,
     this.totalQuantity = 0,
     this.totalAmount = 0,
     this.createdBy,
@@ -97,6 +112,8 @@ class CreateHoldSale extends BaseHoldSale {
     super.description = '',
     super.selectedPaymentType = PaymentType.cash,
     super.items = const [],
+    super.discountType,
+    super.discountValue = 0,
     super.totalQuantity = 0,
     super.totalAmount = 0,
     super.createdBy,
@@ -111,6 +128,8 @@ class CreateHoldSale extends BaseHoldSale {
       'description': description,
       'selectedPaymentType': selectedPaymentType.name,
       'items': items.map((e) => e.toJson()).toList(),
+      if (discountType != null) 'discountType': discountType!.apiValue,
+      'discountValue': discountValue,
       'totalQuantity': totalQuantity,
       'totalAmount': totalAmount,
       'createdBy': createdBy?.toJson(),
@@ -125,6 +144,8 @@ class UpdateHoldSale {
   final bool? isWholesale;
   final PaymentType? selectedPaymentType;
   final List<HoldSaleItem>? items;
+  final DiscountType? discountType;
+  final int? discountValue;
   final int? totalQuantity;
   final int? totalAmount;
 
@@ -135,6 +156,8 @@ class UpdateHoldSale {
     this.isWholesale,
     this.selectedPaymentType,
     this.items,
+    this.discountType,
+    this.discountValue,
     this.totalQuantity,
     this.totalAmount,
   });
@@ -147,6 +170,8 @@ class UpdateHoldSale {
     if (isWholesale != null) map['isWholesale'] = isWholesale;
     if (selectedPaymentType != null) map['selectedPaymentType'] = selectedPaymentType!.name;
     if (items != null) map['items'] = items!.map((e) => e.toJson()).toList();
+    if (discountType != null) map['discountType'] = discountType!.apiValue;
+    if (discountValue != null) map['discountValue'] = discountValue;
     if (totalQuantity != null) map['totalQuantity'] = totalQuantity;
     if (totalAmount != null) map['totalAmount'] = totalAmount;
     return map;
@@ -167,6 +192,8 @@ class HoldSaleInDb extends BaseHoldSale {
     super.description = '',
     super.selectedPaymentType = PaymentType.cash,
     super.items = const [],
+    super.discountType,
+    super.discountValue = 0,
     super.totalQuantity = 0,
     super.totalAmount = 0,
     super.createdBy,
@@ -212,6 +239,8 @@ class HoldSaleInDb extends BaseHoldSale {
               .map((i) => HoldSaleItem.fromJson(i as Map<String, dynamic>))
               .toList()
           : [],
+      discountType: DiscountType.tryFromApi(json['discountType'] as String?),
+      discountValue: json['discountValue'] as int? ?? 0,
       totalQuantity: json['totalQuantity'] as int? ?? 0,
       totalAmount: json['totalAmount'] as int? ?? 0,
       createdBy: createdByJson != null ? UserInfo.fromJson(createdByJson) : null,
@@ -230,6 +259,8 @@ class HoldSaleInDb extends BaseHoldSale {
       'description': description,
       'selectedPaymentType': selectedPaymentType.name,
       'items': items.map((e) => e.toJson()).toList(),
+      if (discountType != null) 'discountType': discountType!.apiValue,
+      'discountValue': discountValue,
       'totalQuantity': totalQuantity,
       'totalAmount': totalAmount,
       'createdBy': createdBy?.toJson(),

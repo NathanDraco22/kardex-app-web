@@ -213,10 +213,9 @@ CreateInvoice createAnonInvoiceFromControllers(
     (previousValue, element) => previousValue + (element.cost * element.quantity),
   );
 
-  final total = salesItems.fold<int>(
-    0,
-    (previousValue, element) => previousValue + element.total,
-  );
+  final total = viewController.totalAmount;
+  final itemsDisc = viewController.itemDiscounts;
+  final invDisc = viewController.invoiceDiscountAmount;
 
   final authState = getIt<AuthCubit>().state;
   if (authState is! Authenticated) throw Exception("User or branch not found");
@@ -233,6 +232,10 @@ CreateInvoice createAnonInvoiceFromControllers(
     status: InvoiceStatus.paid,
     paymentType: PaymentType.cash,
     bankReference: "",
+    discountType: viewController.invoiceDiscountType,
+    discountValue: viewController.invoiceDiscountValue,
+    itemDiscounts: itemsDisc,
+    invoiceDiscount: invDisc,
     amountPaid: total,
     totalCost: totalCost,
     total: total,
