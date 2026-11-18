@@ -1,3 +1,10 @@
+## Sistema Unificado `Gate` con `GateFilter` Componibles (Noviembre 2026)
+
+- **Alcance:** Consolidación de los 7 widgets Gate independientes (`ExpirationDateGate`, `OrdersGate`, `QuotationsGate`, `QuotationsOrOrdersGate`, `RolePermissionGate`, `RootUserGate`, `ShiftsGate`) en un único widget `Gate` (`lib/widgets/gates/gate.dart`) que recibe `List<GateFilter>` (patrón análogo a `inputFormatters`).
+- **Filtros y combinadores:** `GateFilter` base, `AnyGateFilter`, `NotGateFilter`, `PredicateGateFilter` y filtros en `lib/widgets/gates/filters/` (`RolePermissionGateFilter`, `RootUserGateFilter`, `ExpirationDateGateFilter`, `OrdersGateFilter`, `QuotationsGateFilter`, `ShiftsGateFilter`), exportados en `lib/widgets/gates/gates.dart` y `lib/widgets/widgets.dart`.
+- **Navegación y menús:** `HomeSubmoduleItem` reemplaza las 6 banderas booleanas y `permissions` por `List<GateFilter> gates`, eliminando la duplicación en `HomeShortcutResolver` y la anidación en `DesktopSubmenuPanel`.
+- **Documentación y verificación:** Apartado técnico completo en `wiki/sistema_gates.md` (enlazado desde `agents.md`, `wiki/INDEX.md`, `wiki/security.md` y `wiki/sistema_navegacion.md`). `flutter analyze` limpio y `flutter test` (`267` tests en `main`, `286` tests en `lite` tras migrar `add_product_inventory_dialog.dart`).
+
 ## Sync `main` → `lite` + Ajustes/Mermas/Solicitudes (Noviembre 2026)
 
 - **Objetivo:** sincronizar `lite` con `main` y reactivar Ajustes, Mermas y Solicitudes de Ajuste.
