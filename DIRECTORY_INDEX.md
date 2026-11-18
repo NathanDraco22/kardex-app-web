@@ -89,7 +89,7 @@ Herramientas utilitarias y complementos del sistema (impresoras PDF/Ticket `prin
 - **`dialogs/`**: Cuadros de diálogo y visores globales (`viewers/` como `InvoiceViewer`, `ReceiptViewer`, `DevolutionViewer`, `selectors/` como selección de clientes/proveedores, e `ImageViewerDialog`).
 - **`dropdown/`**: Desplegables estilizados.
 - **`elements/`**: Elementos atómicos UI (`ClientShortInfo`, etiquetas, indicadores).
-- **`gates/`**: Guardas de renderizado declarativo por roles y permisos (`RolePermissionGate`).
+- **`gates/`**: Widget único `Gate` y filtros componibles `GateFilter` para visibilidad, configuración y permisos (`RolePermissionGateFilter`, `OrdersGateFilter`, etc.). Ver `wiki/sistema_gates.md`.
 - **`map/`**: Widgets para visualización de mapas y direcciones.
 - **`modals/`**: Diálogos modales genéricos.
 - **`pdf/`**: Plantillas PDF A4 de documentos comercializados (`SingleInvoiceTemplate`, `SingleOrderTemplate`, `SingleReceiptTemplate`, `SingleDevolutionTemplate`).

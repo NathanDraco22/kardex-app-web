@@ -65,6 +65,7 @@
 | **Arquitectura Global y Ciclo de Vida** | [`wiki/project_index.md`](wiki/project_index.md) |
 | **Convenciones de código y UI** | [`wiki/conventions.md`](wiki/conventions.md) |
 | **Seguridad, sesión y permisos** | [`wiki/security.md`](wiki/security.md) |
+| **Sistema de `Gate` y filtros (`GateFilter`)** | [`wiki/sistema_gates.md`](wiki/sistema_gates.md) |
 | **Operación, defines y builds** | [`wiki/operations.md`](wiki/operations.md) |
 | **Mapa Panorámico de Módulos** | [`wiki/modules/modules_index.md`](wiki/modules/modules_index.md) |
 | **Ventas, POS y Facturación** | [`wiki/modules/commercial.md`](wiki/modules/commercial.md) |

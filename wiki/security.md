@@ -72,7 +72,7 @@ Archivos:
 
 ### `Gate` y `GateFilter` (`RolePermissionGateFilter`)
 
-`lib/widgets/gates/gate.dart` y `lib/widgets/gates/filters/role_permission_gate_filter.dart`:
+`lib/widgets/gates/gate.dart` y `lib/widgets/gates/filters/role_permission_gate_filter.dart` (ver arquitectura completa en [`sistema_gates.md`](./sistema_gates.md)):
 
 - `Gate` recibe una lista componible de `GateFilter` (análogo a `inputFormatters`) y evalúa acceso/visibilidad sin anidar múltiples widgets en el árbol (`GateMatchMode.all` por defecto o `GateMatchMode.any`).
 - `PermissionMode.whitelist` → muestra el hijo si **algún** permiso coincide.

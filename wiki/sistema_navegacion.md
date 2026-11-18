@@ -160,7 +160,7 @@ final activeId = _selectedModuleId != null &&
 
 ### 5.4. Sistema Unificado `Gate` y Filtros Reactivos (`GateFilter`)
 
-El sistema cuenta con un widget único `Gate` (`lib/widgets/gates/gate.dart`) que recibe una lista plana de `GateFilter` componibles (estilo `TextInputFormatter`), evitando anidar múltiples widgets en el árbol:
+El sistema cuenta con un widget único `Gate` (`lib/widgets/gates/gate.dart`) que recibe una lista plana de `GateFilter` componibles (estilo `TextInputFormatter`), evitando anidar múltiples widgets en el árbol (ver referencia completa en [`sistema_gates.md`](./sistema_gates.md)):
 
 ```mermaid
 flowchart TD
