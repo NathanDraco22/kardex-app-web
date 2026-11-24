@@ -5,6 +5,7 @@ import 'package:kardex_app_front/src/modules/product_catalog/product_list/cubit/
 import 'package:kardex_app_front/src/modules/product_catalog/product_list/dialogs/create_product_dialog.dart';
 import 'package:kardex_app_front/widgets/no_item.dart';
 import 'package:kardex_app_front/widgets/product_type_badge.dart';
+import 'package:kardex_app_front/widgets/super_widgets/image_viewer_widget.dart';
 import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 import 'package:kardex_app_front/widgets/status_tag_label.dart';
 import 'package:kardex_app_front/src/tools/row_color_tool.dart';
@@ -18,17 +19,23 @@ class ProductsTable extends StatelessWidget {
   Widget build(BuildContext context) {
     final cubit = context.watch<ReadProductCubit>();
     final state = cubit.state as ReadProductSuccess;
+    final headerStyle = TextStyle(
+      fontWeight: FontWeight.w600,
+      fontSize: 13,
+      color: Colors.grey.shade700,
+    );
 
     return Card(
       margin: EdgeInsets.zero,
+      clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             child: Row(
               children: [
                 SizedBox(
-                  width: MediaQuery.sizeOf(context).width * 0.3,
+                  width: 340,
                   child: SearchFieldDebounced(
                     onSearch: (value) {
                       cubit.searchProductByKeyword(value);
@@ -57,55 +64,48 @@ class ProductsTable extends StatelessWidget {
 
           if (state is ReadProductSearching) const LinearProgressIndicator(),
 
-          const SizedBox(height: 12),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12),
+          Container(
+            color: Colors.grey.shade50,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             child: Row(
               children: [
-                Flexible(
-                  fit: FlexFit.tight,
-                  flex: 2,
-                  child: Text("Nombre del Producto"),
+                Expanded(
+                  flex: 3,
+                  child: Text("Producto", style: headerStyle),
                 ),
-                Flexible(
-                  fit: FlexFit.tight,
-                  child: Text("Marca"),
+                Expanded(
+                  child: Text("Marca", style: headerStyle),
                 ),
-
-                Flexible(
-                  fit: FlexFit.tight,
-                  child: Text("Unidad"),
+                Expanded(
+                  child: Text("Unidad", style: headerStyle),
                 ),
-
-                Flexible(
-                  fit: FlexFit.tight,
-                  child: Text("Categoria"),
+                Expanded(
+                  child: Text("Categoría", style: headerStyle),
                 ),
-                Flexible(
-                  fit: FlexFit.tight,
-                  child: Center(child: Text("Estado")),
+                Expanded(
+                  child: Center(child: Text("Estado", style: headerStyle)),
                 ),
-                Flexible(
-                  fit: FlexFit.tight,
-                  child: SizedBox(),
-                ),
+                const SizedBox(width: 48),
               ],
             ),
           ),
-          const Divider(),
+          const Divider(height: 1, thickness: 1, color: Color(0xFFE2E8F0)),
 
-          Builder(
-            builder: (context) {
-              if (state.products.isEmpty) {
-                return const Center(
-                  child: NoItemWidget(
-                    icon: Icons.qr_code,
-                    text: "No se encontraron productos",
-                  ),
-                );
-              }
-              return const _InnerRows();
-            },
+          Expanded(
+            child: state.products.isEmpty
+                ? const Center(
+                    child: NoItemWidget(
+                      icon: Icons.qr_code,
+                      text: "No se encontraron productos",
+                    ),
+                  )
+                : const _InnerRows(),
+          ),
+
+          _TableFooter(
+            totalCount: state.products.length,
+            isSearching: state is ReadProductSearching,
+            hasMore: !cubit.isLastPage && state.products.isNotEmpty,
           ),
         ],
       ),
@@ -122,29 +122,31 @@ class _InnerRows extends StatelessWidget {
     final state = cubit.state as ReadProductSuccess;
     final products = state.products;
 
-    return Expanded(
-      child: ListView.builder(
-        itemCount: products.length,
-
-        itemBuilder: (context, index) {
-          final currentProduct = products[index];
-
-          Color rowColor = RowColorTool.getRowColor(index);
-
-          if (state is HighlightedProduct) {
-            if (state.updatedProducts.any((element) => element.id == currentProduct.id)) {
-              rowColor = Colors.blue.shade100;
-            } else if (state.newProducts.any((element) => element.id == currentProduct.id)) {
-              rowColor = Colors.yellow.shade200;
-            }
-          }
-
-          return _RowWidget(
-            product: currentProduct,
-            color: rowColor,
-          );
-        },
+    return ListView.separated(
+      itemCount: products.length,
+      separatorBuilder: (_, _) => const Divider(
+        height: 1,
+        thickness: 1,
+        color: Color(0xFFE2E8F0),
       ),
+      itemBuilder: (context, index) {
+        final currentProduct = products[index];
+
+        Color rowColor = RowColorTool.getRowColor(index);
+
+        if (state is HighlightedProduct) {
+          if (state.updatedProducts.any((element) => element.id == currentProduct.id)) {
+            rowColor = Colors.blue.shade100;
+          } else if (state.newProducts.any((element) => element.id == currentProduct.id)) {
+            rowColor = Colors.yellow.shade200;
+          }
+        }
+
+        return _RowWidget(
+          product: currentProduct,
+          color: rowColor,
+        );
+      },
     );
   }
 }
@@ -158,95 +160,196 @@ class _RowWidget extends StatelessWidget {
   final ProductInDb product;
   final Color color;
 
+  Future<void> _openEditor(BuildContext context) async {
+    final res = await showCreateProductDialog(context, product: product);
+    if (res == null) return;
+    if (!context.mounted) return;
+    await context.read<ReadProductCubit>().markProductUpdated(res);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final brand = product.brandName.trim();
+    final category = product.categoryName?.trim() ?? "";
+
+    return Material(
+      color: color,
+      child: InkWell(
+        onTap: () => _openEditor(context),
+        hoverColor: Colors.indigo.withValues(alpha: 0.04),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          child: Row(
+            children: [
+              Expanded(
+                flex: 3,
+                child: Row(
+                  children: [
+                    ImageViewerWidget(
+                      imageUrls: product.image.isNotEmpty ? [product.image] : const [],
+                      width: 48,
+                      height: 48,
+                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            product.name,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              color: Color(0xFF0F172A),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Wrap(
+                            spacing: 6,
+                            runSpacing: 4,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.qr_code,
+                                    size: 14,
+                                    color: Colors.grey.shade600,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    product.displayCode,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey.shade700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              if (product.altCode.trim().isNotEmpty)
+                                Text(
+                                  "• Alt: ${product.altCode.trim()}",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey.shade600,
+                                  ),
+                                ),
+                              if (!product.tracksInventory)
+                                ProductTypeBadge(
+                                  productType: product.productType,
+                                  compact: true,
+                                ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Text(
+                  brand.isEmpty ? "--" : brand,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: brand.isEmpty ? Colors.grey.shade500 : const Color(0xFF334155),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Text(
+                  product.defaultUnitName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Color(0xFF334155)),
+                ),
+              ),
+              Expanded(
+                child: Text(
+                  category.isEmpty ? "--" : category,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: category.isEmpty ? Colors.grey.shade500 : const Color(0xFF334155),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Center(
+                  child: StatusTagLabel(
+                    label: product.isActive ? "Activo" : "Inactivo",
+                    isActive: product.isActive,
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 48,
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: IconButton(
+                    tooltip: "Editar producto",
+                    onPressed: () => _openEditor(context),
+                    icon: const Icon(Icons.edit_outlined, size: 20),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TableFooter extends StatelessWidget {
+  const _TableFooter({
+    required this.totalCount,
+    required this.isSearching,
+    required this.hasMore,
+  });
+
+  final int totalCount;
+  final bool isSearching;
+  final bool hasMore;
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: color,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Row(
-          children: [
-            Flexible(
-              fit: FlexFit.tight,
-              flex: 2,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(product.name),
-                  const SizedBox(height: 2),
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.qr_code,
-                        size: 16,
-                        color: Colors.grey,
-                      ),
-                      Text(
-                        product.displayCode,
-                        style: const TextStyle(
-                          color: Colors.grey,
-                        ),
-                      ),
-                      if (!product.tracksInventory) ...[
-                        const SizedBox(width: 8),
-                        ProductTypeBadge(productType: product.productType, compact: true),
-                      ],
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            Flexible(
-              fit: FlexFit.tight,
-              child: Text(product.brandName),
-            ),
-            Flexible(
-              fit: FlexFit.tight,
-              child: Text(product.defaultUnitName),
-            ),
-            Flexible(
-              fit: FlexFit.tight,
-              child: Text(product.categoryName ?? "--"),
-            ),
-            Flexible(
-              fit: FlexFit.tight,
-              child: Center(
-                child: Builder(
-                  builder: (context) {
-                    if (product.isActive) {
-                      return const StatusTagLabel(
-                        label: "Activo",
-                        isActive: true,
-                      );
-                    } else {
-                      return const StatusTagLabel(
-                        label: "Inactivo",
-                        isActive: false,
-                      );
-                    }
-                  },
-                ),
-              ),
-            ),
-
-            Flexible(
-              fit: FlexFit.tight,
-              child: Align(
-                alignment: Alignment.centerRight,
-
-                child: IconButton(
-                  onPressed: () async {
-                    final res = await showCreateProductDialog(context, product: product);
-                    if (res == null) return;
-                    if (!context.mounted) return;
-                    await context.read<ReadProductCubit>().markProductUpdated(res);
-                  },
-                  icon: const Icon(Icons.edit),
-                ),
-              ),
-            ),
-          ],
+      height: 40,
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        border: const Border(
+          top: BorderSide(color: Color(0xFFE2E8F0)),
         ),
+      ),
+      child: Row(
+        children: [
+          Text(
+            "Productos mostrados: $totalCount",
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey.shade700,
+            ),
+          ),
+          const Spacer(),
+          if (isSearching)
+            Text(
+              "Buscando...",
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+            )
+          else if (hasMore)
+            Text(
+              "Desliza hacia abajo para cargar más",
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+            ),
+        ],
       ),
     );
   }

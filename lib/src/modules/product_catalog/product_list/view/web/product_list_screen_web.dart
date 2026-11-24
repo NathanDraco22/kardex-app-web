@@ -42,37 +42,33 @@ class _WebBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                const Spacer(),
-                SizedBox(
-                  height: 40,
-                  child: PrimaryMenuButton(
-                    onPressed: () async {
-                      final res = await showCreateProductDialog(context);
-                      if (res == null) return;
-                      if (!context.mounted) return;
-                      await context.read<ReadProductCubit>().putProductFirst(res);
-                    },
-                    icon: const Icon(Icons.add),
-                    label: const Text("Agregar Nuevo Producto"),
-                  ),
+    return Padding(
+      padding: const EdgeInsets.all(12.0),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              const Spacer(),
+              SizedBox(
+                height: 40,
+                child: PrimaryMenuButton(
+                  onPressed: () async {
+                    final res = await showCreateProductDialog(context);
+                    if (res == null) return;
+                    if (!context.mounted) return;
+                    await context.read<ReadProductCubit>().putProductFirst(res);
+                  },
+                  icon: const Icon(Icons.add),
+                  label: const Text("Agregar Nuevo Producto"),
                 ),
-              ],
-            ),
-
-            const SizedBox(height: 12),
-
-            const Expanded(
-              child: ProductsTable(),
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          const Expanded(
+            child: ProductsTable(),
+          ),
+        ],
       ),
     );
   }
