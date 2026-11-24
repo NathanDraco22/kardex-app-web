@@ -99,6 +99,19 @@ class _Body extends StatelessWidget {
             ),
           ),
           Gate(
+            filters: const [ShiftsGateFilter()],
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.shifts,
+              child: MenuOptionCard(
+                icon: Icons.point_of_sale_rounded,
+                accentColor: Colors.teal.shade600,
+                title: "Turnos y Caja",
+                subtitle: "Apertura, movimientos de efectivo, arqueos e historial",
+                onTap: () => context.pushNamed(RouteNames.shifts),
+              ),
+            ),
+          ),
+          Gate(
             filters: const [
               RolePermissionGateFilter(
                 permissions: [CommercialSubModules.createInvoice],
@@ -559,25 +572,6 @@ class _Body extends StatelessWidget {
                 subtitle: "Gestión de notas de crédito por devolución o monto",
                 onTap: () => context.pushNamed(RouteNames.creditNotes),
               ),
-            ),
-          ),
-          Gate(
-            filters: const [ShiftsGateFilter()],
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const MenuSectionDivider(title: "Control de Caja"),
-                ShortcutAddableListTile(
-                  routeName: RouteNames.shifts,
-                  child: MenuOptionCard(
-                    icon: Icons.point_of_sale_rounded,
-                    accentColor: Colors.teal.shade600,
-                    title: "Turnos y Caja",
-                    subtitle: "Apertura, movimientos de efectivo, arqueos e historial",
-                    onTap: () => context.pushNamed(RouteNames.shifts),
-                  ),
-                ),
-              ],
             ),
           ),
         ],

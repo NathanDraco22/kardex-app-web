@@ -3,6 +3,7 @@ import 'package:kardex_business/src/domain/models/receipt/receipt_model.dart';
 import 'package:kardex_business/src/domain/models/invoice/invoice_totals.dart';
 import 'package:kardex_business/src/domain/models/receipt/receipt_total.dart';
 import 'package:kardex_business/src/domain/models/reports/expense_totals.dart';
+import 'package:kardex_business/src/domain/models/shift_cash_movement_model/shift_cash_movement_model.dart';
 
 class TotalsResult {
   TotalsResult({
@@ -12,6 +13,7 @@ class TotalsResult {
     required this.invoices,
     required this.detailInvoices,
     this.expenses,
+    this.shiftCashMovements = const [],
   });
 
   String branchId;
@@ -20,6 +22,7 @@ class TotalsResult {
   List<InvoiceInDb> detailInvoices;
   List<ReceiptInDb> detailReceipts;
   final ExpenseTotals? expenses;
+  final List<ShiftCashMovementInDb> shiftCashMovements;
 
   factory TotalsResult.fromJson(Map<String, dynamic> map) {
     return TotalsResult(
@@ -43,6 +46,11 @@ class TotalsResult {
       expenses: map['expenses'] is Map<String, dynamic>
           ? ExpenseTotals.fromJson(map['expenses'] as Map<String, dynamic>)
           : null,
+      shiftCashMovements:
+          (map['shiftCashMovements'] as List<dynamic>?)
+              ?.map((e) => ShiftCashMovementInDb.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
   }
 
@@ -54,6 +62,7 @@ class TotalsResult {
       'invoices': invoices.map((e) => e.toJson()).toList(),
       'detailInvoices': detailInvoices.map((e) => e.toJson()).toList(),
       if (expenses != null) 'expenses': expenses!.toJson(),
+      'shiftCashMovements': shiftCashMovements.map((e) => e.toJson()).toList(),
     };
   }
 }

@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:kardex_app_front/src/tools/extensiones.dart';
 import 'package:kardex_app_front/widgets/custom_invoice_list_tile.dart';
@@ -25,10 +26,20 @@ class _DailyCashFlowArqueoViewState extends State<DailyCashFlowArqueoView> {
         .where((e) => e.paymentType != PaymentType.credit)
         .toList();
     final validReceipts = widget.result.detailReceipts;
+    final activeMovements = widget.result.shiftCashMovements
+        .where((m) => !m.isDeleted)
+        .toList();
 
     final invoicesTotal = validInvoices.fold<int>(0, (prev, e) => prev + e.total);
     final receiptsTotal = validReceipts.fold<int>(0, (prev, e) => prev + e.total);
-    final grandTotal = invoicesTotal + receiptsTotal;
+    final cashInTotal = activeMovements
+        .where((m) => m.type == CashMovementType.inMovement)
+        .fold<int>(0, (prev, m) => prev + m.amount);
+    final cashOutTotal = activeMovements
+        .where((m) => m.type == CashMovementType.outMovement)
+        .fold<int>(0, (prev, m) => prev + m.amount);
+    final movementsNetTotal = cashInTotal - cashOutTotal;
+    final grandTotal = invoicesTotal + receiptsTotal + movementsNetTotal;
 
     final isWide = context.isTabletOrDesktop();
 
@@ -37,11 +48,12 @@ class _DailyCashFlowArqueoViewState extends State<DailyCashFlowArqueoView> {
         _TotalsHeader(
           invoicesTotal: invoicesTotal,
           receiptsTotal: receiptsTotal,
+          movementsNetTotal: movementsNetTotal,
           grandTotal: grandTotal,
         ),
         if (!isWide) ...[
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 6.0),
+            padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 8.0),
             child: SegmentedButton<int>(
               segments: [
                 ButtonSegment<int>(
@@ -53,6 +65,11 @@ class _DailyCashFlowArqueoViewState extends State<DailyCashFlowArqueoView> {
                   value: 1,
                   label: Text("Facturas (${validInvoices.length})"),
                   icon: const Icon(Icons.point_of_sale, size: 18),
+                ),
+                ButtonSegment<int>(
+                  value: 2,
+                  label: Text("Movimientos (${activeMovements.length})"),
+                  icon: const Icon(Icons.swap_vert_rounded, size: 18),
                 ),
               ],
               selected: {_tabIndex},
@@ -66,13 +83,15 @@ class _DailyCashFlowArqueoViewState extends State<DailyCashFlowArqueoView> {
           Expanded(
             child: Card(
               margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              child: _tabIndex == 0
-                  ? _ReceiptsTable(receipts: validReceipts)
-                  : _InvoicesTable(invoices: validInvoices),
+              child: switch (_tabIndex) {
+                0 => _ReceiptsTable(receipts: validReceipts),
+                1 => _InvoicesTable(invoices: validInvoices),
+                _ => _CashMovementsTable(movements: activeMovements),
+              },
             ),
           ),
         ] else ...[
-          // En Tablet y Desktop mostramos ambos paneles en paralelo para arqueo inmediato
+          // En Tablet y Desktop mostramos los paneles en paralelo para arqueo inmediato
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -80,7 +99,7 @@ class _DailyCashFlowArqueoViewState extends State<DailyCashFlowArqueoView> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Expanded(
-                    flex: 5,
+                    flex: 4,
                     child: Card(
                       elevation: 2,
                       child: Column(
@@ -96,12 +115,15 @@ class _DailyCashFlowArqueoViewState extends State<DailyCashFlowArqueoView> {
                               children: [
                                 Icon(Icons.receipt_long, color: Colors.green.shade700, size: 22),
                                 const SizedBox(width: 10),
-                                Text(
-                                  "Recibos / Abonos (${validReceipts.length})",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.green.shade800,
+                                Expanded(
+                                  child: Text(
+                                    "Recibos / Abonos (${validReceipts.length})",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.green.shade800,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ],
@@ -114,9 +136,9 @@ class _DailyCashFlowArqueoViewState extends State<DailyCashFlowArqueoView> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 12),
                   Expanded(
-                    flex: 5,
+                    flex: 4,
                     child: Card(
                       elevation: 2,
                       child: Column(
@@ -132,12 +154,15 @@ class _DailyCashFlowArqueoViewState extends State<DailyCashFlowArqueoView> {
                               children: [
                                 Icon(Icons.point_of_sale, color: Colors.blue.shade700, size: 22),
                                 const SizedBox(width: 10),
-                                Text(
-                                  "Facturas de Contado (${validInvoices.length})",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.blue.shade800,
+                                Expanded(
+                                  child: Text(
+                                    "Facturas de Contado (${validInvoices.length})",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.blue.shade800,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ],
@@ -145,6 +170,45 @@ class _DailyCashFlowArqueoViewState extends State<DailyCashFlowArqueoView> {
                           ),
                           Expanded(
                             child: _InvoicesTable(invoices: validInvoices),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    flex: 4,
+                    child: Card(
+                      elevation: 2,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: Colors.teal.withValues(alpha: 0.1),
+                              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.swap_vert_rounded, color: Colors.teal.shade700, size: 22),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    "Movimientos de Caja (${activeMovements.length})",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.teal.shade800,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            child: _CashMovementsTable(movements: activeMovements),
                           ),
                         ],
                       ),
@@ -163,16 +227,19 @@ class _DailyCashFlowArqueoViewState extends State<DailyCashFlowArqueoView> {
 class _TotalsHeader extends StatelessWidget {
   final int invoicesTotal;
   final int receiptsTotal;
+  final int movementsNetTotal;
   final int grandTotal;
 
   const _TotalsHeader({
     required this.invoicesTotal,
     required this.receiptsTotal,
+    required this.movementsNetTotal,
     required this.grandTotal,
   });
 
   @override
   Widget build(BuildContext context) {
+    final movSign = movementsNetTotal > 0 ? '+' : '';
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       elevation: 0,
@@ -183,8 +250,11 @@ class _TotalsHeader extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        child: Wrap(
+          alignment: WrapAlignment.spaceEvenly,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 16,
+          runSpacing: 8,
           children: [
             TitleLabel(
               title: "Recibos",
@@ -198,6 +268,12 @@ class _TotalsHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
             ),
             const SizedBox(height: 36, child: VerticalDivider()),
+            TitleLabel(
+              title: "Mov. Caja (Neto)",
+              bigTitle: "$movSign${NumberFormatter.convertToMoneyLike(movementsNetTotal)}",
+              crossAxisAlignment: CrossAxisAlignment.center,
+            ),
+            const SizedBox(height: 36, child: VerticalDivider()),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
@@ -208,7 +284,7 @@ class _TotalsHeader extends StatelessWidget {
               child: DefaultTextStyle.merge(
                 style: TextStyle(color: Colors.green.shade800),
                 child: TitleLabel(
-                  title: "Ingreso Total de Caja",
+                  title: "Total Neto de Caja",
                   bigTitle: NumberFormatter.convertToMoneyLike(grandTotal),
                   crossAxisAlignment: CrossAxisAlignment.center,
                 ),
@@ -281,6 +357,72 @@ class _InvoicesTable extends StatelessWidget {
           onTap: () {
             showInvoiceInspector(context, item);
           },
+        );
+      },
+    );
+  }
+}
+
+class _CashMovementsTable extends StatelessWidget {
+  final List<ShiftCashMovementInDb> movements;
+
+  const _CashMovementsTable({required this.movements});
+
+  @override
+  Widget build(BuildContext context) {
+    if (movements.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(24.0),
+          child: Text(
+            "No hay movimientos de caja en este período",
+            style: TextStyle(color: Colors.grey),
+          ),
+        ),
+      );
+    }
+
+    final dateFormat = DateFormat('dd/MM/yyyy hh:mm a');
+    return ListView.separated(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      itemCount: movements.length,
+      separatorBuilder: (context, index) => const Divider(height: 1),
+      itemBuilder: (context, index) {
+        final m = movements[index];
+        final isIn = m.type == CashMovementType.inMovement;
+        final color = isIn ? Colors.green.shade700 : Colors.red.shade700;
+        final sign = isIn ? '+' : '-';
+
+        return ListTile(
+          dense: true,
+          leading: CircleAvatar(
+            radius: 16,
+            backgroundColor: color.withValues(alpha: 0.12),
+            child: Icon(
+              isIn ? Icons.arrow_downward_rounded : Icons.arrow_upward_rounded,
+              color: color,
+              size: 18,
+            ),
+          ),
+          title: Text(
+            m.reason.isNotEmpty ? m.reason : m.type.display,
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          subtitle: Text(
+            '${m.docNumber.isNotEmpty ? '#${m.docNumber} • ' : ''}'
+            '${dateFormat.format(m.createdAt)} • ${m.createdBy.name}',
+            style: const TextStyle(fontSize: 11.5),
+          ),
+          trailing: Text(
+            '$sign${NumberFormatter.convertToMoneyLike(m.amount)}',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 13.5,
+              color: color,
+            ),
+          ),
         );
       },
     );

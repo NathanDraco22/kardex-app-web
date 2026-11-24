@@ -6,6 +6,7 @@ import 'package:kardex_app_front/cubits/shift/shift_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/shifts/cubit/shift_cash_movement_cubit/write_shift_cash_movements_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/shifts/cubit/shift_cash_movement_cubit/write_shift_cash_movements_state.dart';
 import 'package:kardex_app_front/src/tools/input_formatters.dart';
+import 'package:kardex_app_front/src/tools/printers/cash_movement_printer.dart';
 import 'package:kardex_app_front/widgets/design_system/app_theme_tokens.dart';
 import 'package:kardex_app_front/widgets/dropdown/expense_category_dropdown.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
@@ -111,7 +112,7 @@ class _CreateCashMovementDialogState extends State<CreateCashMovementDialog> {
     super.dispose();
   }
 
-  Future<void> _submit() async {
+  Future<void> _submit({bool printAfterCreate = false}) async {
     if (!_formKey.currentState!.validate()) return;
 
     final user = getIt<AuthCubit>().user;
@@ -141,6 +142,17 @@ class _CreateCashMovementDialogState extends State<CreateCashMovementDialog> {
       if (getIt.isRegistered<ShiftCubit>() &&
           getIt<ShiftCubit>().currentShift?.id == widget.shift.id) {
         await getIt<ShiftCubit>().loadActiveShift();
+      }
+      if (!mounted) return;
+      if (printAfterCreate) {
+        final branch = getIt<AuthCubit>().currentBranch;
+        if (branch != null) {
+          await printCashMovementTicket(
+            created,
+            branch,
+            shiftDocNumber: widget.shift.docNumber,
+          );
+        }
       }
       if (!mounted) return;
       toastification.show(
@@ -408,8 +420,13 @@ class _CreateCashMovementDialogState extends State<CreateCashMovementDialog> {
               onPressed: isLoading ? null : () => Navigator.of(context).pop(null),
               child: const Text('Cancelar'),
             ),
+            OutlinedButton.icon(
+              onPressed: isLoading ? null : () => _submit(printAfterCreate: false),
+              icon: const Icon(Icons.check_rounded),
+              label: Text(isLoading ? 'Guardando...' : 'Registrar'),
+            ),
             FilledButton.icon(
-              onPressed: isLoading ? null : _submit,
+              onPressed: isLoading ? null : () => _submit(printAfterCreate: true),
               style: FilledButton.styleFrom(
                 backgroundColor:
                     isOut ? AppThemeTokens.danger : AppThemeTokens.success,
@@ -423,8 +440,8 @@ class _CreateCashMovementDialogState extends State<CreateCashMovementDialog> {
                         color: Colors.white,
                       ),
                     )
-                  : const Icon(Icons.check_rounded),
-              label: Text(isLoading ? 'Guardando...' : 'Registrar'),
+                  : const Icon(Icons.print_rounded),
+              label: Text(isLoading ? 'Guardando...' : 'Registrar e Imprimir'),
             ),
           ],
         );
