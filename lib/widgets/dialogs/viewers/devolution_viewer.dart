@@ -133,14 +133,24 @@ class _DevolutionViewer extends StatelessWidget {
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             "Devolución No. ${devolution.docNumber}",
                             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                           ),
-                          Text(
-                            DateTimeTool.formatddMMyy(devolution.createdAt),
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                DateTimeTool.formatddMMyy(devolution.createdAt),
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                              ),
+                              Text(
+                                DateTimeTool.formatHHmm(devolution.createdAt),
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                              ),
+                            ],
                           ),
                         ],
                       ),

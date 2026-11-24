@@ -134,6 +134,7 @@ Future<Uint8List> generateTicketPdfFromOrder(
 
             pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
                 pw.Text(
                   'Pedido: ${order.docNumber}',
@@ -142,11 +143,22 @@ Future<Uint8List> generateTicketPdfFromOrder(
                   ),
                 ),
 
-                pw.Text(
-                  DateFormat('dd/MM/yyyy').format(order.createdAt),
-                  style: pw.TextStyle(
-                    fontSize: TicketSettings.contentFontSize(paperSize),
-                  ),
+                pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.end,
+                  children: [
+                    pw.Text(
+                      DateFormat('dd/MM/yyyy').format(order.createdAt),
+                      style: pw.TextStyle(
+                        fontSize: TicketSettings.contentFontSize(paperSize),
+                      ),
+                    ),
+                    pw.Text(
+                      DateFormat('hh:mm a').format(order.createdAt),
+                      style: pw.TextStyle(
+                        fontSize: TicketSettings.contentFontSize(paperSize),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -192,6 +204,17 @@ Future<Uint8List> generateTicketPdfFromOrder(
                 fontSize: TicketSettings.contentFontSize(paperSize),
               ),
             ),
+
+            if (order.description.trim().isNotEmpty) ...[
+              pw.SizedBox(height: 2),
+              pw.Text(
+                "Observación: ${order.description.trim()}",
+                style: pw.TextStyle(
+                  fontSize: TicketSettings.contentFontSize(paperSize),
+                  fontStyle: pw.FontStyle.italic,
+                ),
+              ),
+            ],
 
             pw.Divider(color: PdfColors.grey),
 

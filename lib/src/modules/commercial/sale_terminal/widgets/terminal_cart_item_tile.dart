@@ -180,6 +180,8 @@ class TerminalCartItemTile extends StatelessWidget {
                               ),
                             ),
                             const Spacer(),
+                            _PriceLevelBadge(priceLevel: item.selectedPriceLevel),
+                            const SizedBox(width: 6),
                             Text(
                               unitPrice,
                               style: TextStyle(
@@ -313,6 +315,41 @@ class TerminalCartItemTile extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PriceLevelBadge extends StatelessWidget {
+  const _PriceLevelBadge({required this.priceLevel});
+
+  final int priceLevel;
+
+  @override
+  Widget build(BuildContext context) {
+    final (String label, Color bg, Color border, Color fg) = switch (priceLevel) {
+      1 => ('P1', Colors.blueGrey.shade50, Colors.blueGrey.shade200, Colors.blueGrey.shade700),
+      2 => ('P2', Colors.blue.shade50, Colors.blue.shade200, Colors.blue.shade800),
+      3 => ('P3', Colors.purple.shade50, Colors.purple.shade200, Colors.purple.shade800),
+      4 => ('P4', Colors.teal.shade50, Colors.teal.shade200, Colors.teal.shade800),
+      _ => ('Manual', Colors.amber.shade50, Colors.amber.shade300, Colors.amber.shade900),
+    };
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: border, width: 0.8),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 10.5,
+          fontWeight: FontWeight.w700,
+          color: fg,
+          height: 1.1,
         ),
       ),
     );
