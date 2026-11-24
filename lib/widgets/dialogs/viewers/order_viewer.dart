@@ -10,6 +10,7 @@ import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 
 import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 import 'package:kardex_app_front/src/tools/row_color_tool.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/adaptive_viewer.dart';
 
 Future<void> showOrderViewerDialog(BuildContext context, OrderInDb order) async {
   FocusManager.instance.primaryFocus?.unfocus();
@@ -22,15 +23,17 @@ Future<void> showOrderViewerDialog(BuildContext context, OrderInDb order) async 
     context,
     MaterialPageRoute(
       builder: (context) {
-        return _OrderViewer(
-          order: order,
-          branch: currentBranch,
-          onShare: () => shareOrder(order, currentBranch, paperSize: paperSize),
-          onPrint: () => printOrder(order, currentBranch, paperSize: paperSize),
-          onExportPdf: () async {
-            final template = SingleOrderTemplate(order: order, branch: currentBranch);
-            await PdfExportTool.export(template, fileName: "pedido_${order.docNumber}.pdf");
-          },
+        return EscapeToCloseWrapper(
+          child: _OrderViewer(
+            order: order,
+            branch: currentBranch,
+            onShare: () => shareOrder(order, currentBranch, paperSize: paperSize),
+            onPrint: () => printOrder(order, currentBranch, paperSize: paperSize),
+            onExportPdf: () async {
+              final template = SingleOrderTemplate(order: order, branch: currentBranch);
+              await PdfExportTool.export(template, fileName: "pedido_${order.docNumber}.pdf");
+            },
+          ),
         );
       },
     ),
@@ -48,7 +51,8 @@ Future<void> showOrderViewerDialogFromId(BuildContext context, String orderId) a
     context,
     MaterialPageRoute(
       builder: (context) {
-        return FutureBuilder(
+        return EscapeToCloseWrapper(
+          child: FutureBuilder(
           future: context.read<OrdersRepository>().getOrderById(orderId),
           builder: (context, asyncSnapshot) {
             if (asyncSnapshot.connectionState != ConnectionState.done) {
@@ -82,6 +86,7 @@ Future<void> showOrderViewerDialogFromId(BuildContext context, String orderId) a
               },
             );
           },
+          ),
         );
       },
     ),

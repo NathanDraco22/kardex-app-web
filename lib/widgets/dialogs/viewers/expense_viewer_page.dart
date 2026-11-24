@@ -5,6 +5,7 @@ import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/modules/expenses/shared/expense_status_ui.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/adaptive_viewer.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 /// Abre el visor de un gasto usando la sucursal activa de la sesión.
@@ -19,7 +20,9 @@ Future<void> showExpenseViewer(BuildContext context, ExpenseInDb expense) async 
   await Navigator.push(
     context,
     MaterialPageRoute(
-      builder: (_) => ExpenseViewerPage(expense: expense, branchName: branchName),
+      builder: (_) => EscapeToCloseWrapper(
+        child: ExpenseViewerPage(expense: expense, branchName: branchName),
+      ),
     ),
   );
 }
@@ -39,7 +42,8 @@ Future<void> showExpenseViewerFromId(BuildContext context, String expenseId) asy
     context,
     MaterialPageRoute(
       builder: (_) {
-        return FutureBuilder<ExpenseInDb?>(
+        return EscapeToCloseWrapper(
+          child: FutureBuilder<ExpenseInDb?>(
           future: expensesRepository.getExpenseById(expenseId),
           builder: (context, asyncSnapshot) {
             if (asyncSnapshot.connectionState != ConnectionState.done) {
@@ -57,6 +61,7 @@ Future<void> showExpenseViewerFromId(BuildContext context, String expenseId) asy
               branchName: branchName,
             );
           },
+          ),
         );
       },
     ),

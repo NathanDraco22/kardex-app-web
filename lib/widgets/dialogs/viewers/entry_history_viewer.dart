@@ -7,6 +7,7 @@ import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_entry_history_template.dart';
 import 'package:kardex_app_front/src/tools/row_color_tool.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/adaptive_viewer.dart';
 
 // --- FUNCIÓN PARA NAVEGAR CON EL MODELO COMPLETO ---
 Future<void> showEntryHistoryViewerDialog(BuildContext context, EntryHistoryInDb entryHistory) async {
@@ -17,13 +18,15 @@ Future<void> showEntryHistoryViewerDialog(BuildContext context, EntryHistoryInDb
     context,
     MaterialPageRoute(
       builder: (context) {
-        return _EntryHistoryViewer(
-          entryHistory: entryHistory,
-          branch: currentBranch,
-          onExportPdf: () async {
-            final template = SingleEntryHistoryTemplate(entryHistory: entryHistory, branch: currentBranch);
-            await PdfExportTool.export(template, fileName: "entrada_inventario_${entryHistory.docNumber}.pdf");
-          },
+        return EscapeToCloseWrapper(
+          child: _EntryHistoryViewer(
+            entryHistory: entryHistory,
+            branch: currentBranch,
+            onExportPdf: () async {
+              final template = SingleEntryHistoryTemplate(entryHistory: entryHistory, branch: currentBranch);
+              await PdfExportTool.export(template, fileName: "entrada_inventario_${entryHistory.docNumber}.pdf");
+            },
+          ),
         );
       },
     ),
@@ -40,7 +43,8 @@ Future<void> showEntryHistoryViewerDialogFromId(BuildContext context, String ent
     context,
     MaterialPageRoute(
       builder: (context) {
-        return FutureBuilder<EntryHistoryInDb?>(
+        return EscapeToCloseWrapper(
+          child: FutureBuilder<EntryHistoryInDb?>(
           future: context.read<EntryHistoriesRepository>().getEntryHistoryById(entryHistoryId),
           builder: (context, asyncSnapshot) {
             if (asyncSnapshot.connectionState != ConnectionState.done) {
@@ -68,6 +72,7 @@ Future<void> showEntryHistoryViewerDialogFromId(BuildContext context, String ent
               },
             );
           },
+          ),
         );
       },
     ),

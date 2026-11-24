@@ -30,7 +30,9 @@ Future<T?> showAdaptiveViewer<T>({
           width: double.infinity,
           child: ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-            child: builder(sheetContext),
+            child: EscapeToCloseWrapper(
+              child: builder(sheetContext),
+            ),
           ),
         );
       },
@@ -39,6 +41,35 @@ Future<T?> showAdaptiveViewer<T>({
 
   return Navigator.push<T>(
     context,
-    MaterialPageRoute<T>(builder: builder),
+    MaterialPageRoute<T>(
+      builder: (routeContext) => EscapeToCloseWrapper(
+        child: builder(routeContext),
+      ),
+    ),
   );
+}
+
+/// Envuelve un visor para cerrarlo al presionar la tecla `Escape`.
+class EscapeToCloseWrapper extends StatelessWidget {
+  const EscapeToCloseWrapper({
+    super.key,
+    required this.child,
+  });
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return CallbackShortcuts(
+      bindings: <ShortcutActivator, VoidCallback>{
+        const SingleActivator(LogicalKeyboardKey.escape): () {
+          Navigator.of(context).maybePop();
+        },
+      },
+      child: Focus(
+        autofocus: true,
+        child: child,
+      ),
+    );
+  }
 }
