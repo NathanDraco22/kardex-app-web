@@ -7,6 +7,7 @@ import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_adjust_exit_template.dart';
 import 'package:kardex_app_front/src/tools/row_color_tool.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/adaptive_viewer.dart';
 
 Future<void> showAdjustExitViewerDialog(BuildContext context, AdjustExitInDb adjustExit) async {
   FocusManager.instance.primaryFocus?.unfocus();
@@ -16,13 +17,15 @@ Future<void> showAdjustExitViewerDialog(BuildContext context, AdjustExitInDb adj
     context,
     MaterialPageRoute(
       builder: (context) {
-        return _AdjustExitViewer(
-          adjustExit: adjustExit,
-          branch: currentBranch,
-          onExportPdf: () async {
-            final template = SingleAdjustExitTemplate(adjustExit: adjustExit, branch: currentBranch);
-            await PdfExportTool.export(template, fileName: "salida_ajuste_${adjustExit.docNumber}.pdf");
-          },
+        return EscapeToCloseWrapper(
+          child: _AdjustExitViewer(
+            adjustExit: adjustExit,
+            branch: currentBranch,
+            onExportPdf: () async {
+              final template = SingleAdjustExitTemplate(adjustExit: adjustExit, branch: currentBranch);
+              await PdfExportTool.export(template, fileName: "salida_ajuste_${adjustExit.docNumber}.pdf");
+            },
+          ),
         );
       },
     ),
@@ -38,7 +41,8 @@ Future<void> showAdjustExitViewerDialogFromId(BuildContext context, String adjus
     context,
     MaterialPageRoute(
       builder: (context) {
-        return FutureBuilder<AdjustExitInDb?>(
+        return EscapeToCloseWrapper(
+          child: FutureBuilder<AdjustExitInDb?>(
           future: context.read<AdjustExitsRepository>().getAdjustExitById(adjustExitId),
           builder: (context, asyncSnapshot) {
             if (asyncSnapshot.connectionState != ConnectionState.done) {
@@ -66,6 +70,7 @@ Future<void> showAdjustExitViewerDialogFromId(BuildContext context, String adjus
               },
             );
           },
+          ),
         );
       },
     ),

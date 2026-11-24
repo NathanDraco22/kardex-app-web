@@ -7,6 +7,7 @@ import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_adjust_entry_template.dart';
 import 'package:kardex_app_front/src/tools/row_color_tool.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/adaptive_viewer.dart';
 
 Future<void> showAdjustEntryViewerDialog(BuildContext context, AdjustEntryInDb adjustEntry) async {
   FocusManager.instance.primaryFocus?.unfocus();
@@ -16,13 +17,15 @@ Future<void> showAdjustEntryViewerDialog(BuildContext context, AdjustEntryInDb a
     context,
     MaterialPageRoute(
       builder: (context) {
-        return _AdjustEntryViewer(
-          adjustEntry: adjustEntry,
-          branch: currentBranch,
-          onExportPdf: () async {
-            final template = SingleAdjustEntryTemplate(adjustEntry: adjustEntry, branch: currentBranch);
-            await PdfExportTool.export(template, fileName: "entrada_ajuste_${adjustEntry.docNumber}.pdf");
-          },
+        return EscapeToCloseWrapper(
+          child: _AdjustEntryViewer(
+            adjustEntry: adjustEntry,
+            branch: currentBranch,
+            onExportPdf: () async {
+              final template = SingleAdjustEntryTemplate(adjustEntry: adjustEntry, branch: currentBranch);
+              await PdfExportTool.export(template, fileName: "entrada_ajuste_${adjustEntry.docNumber}.pdf");
+            },
+          ),
         );
       },
     ),
@@ -38,7 +41,8 @@ Future<void> showAdjustEntryViewerDialogFromId(BuildContext context, String adju
     context,
     MaterialPageRoute(
       builder: (context) {
-        return FutureBuilder<AdjustEntryInDb?>(
+        return EscapeToCloseWrapper(
+          child: FutureBuilder<AdjustEntryInDb?>(
           future: context.read<AdjustEntriesRepository>().getAdjustEntryById(adjustEntryId),
           builder: (context, asyncSnapshot) {
             if (asyncSnapshot.connectionState != ConnectionState.done) {
@@ -66,6 +70,7 @@ Future<void> showAdjustEntryViewerDialogFromId(BuildContext context, String adju
               },
             );
           },
+          ),
         );
       },
     ),

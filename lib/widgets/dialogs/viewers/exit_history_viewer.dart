@@ -7,6 +7,7 @@ import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_exit_history_template.dart';
 import 'package:kardex_app_front/src/tools/row_color_tool.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/adaptive_viewer.dart';
 
 // --- FUNCIÓN PARA NAVEGAR CON EL MODELO COMPLETO ---
 Future<void> showExitHistoryViewerDialog(BuildContext context, ExitHistoryInDb exitHistory) async {
@@ -17,13 +18,15 @@ Future<void> showExitHistoryViewerDialog(BuildContext context, ExitHistoryInDb e
     context,
     MaterialPageRoute(
       builder: (context) {
-        return _ExitHistoryViewer(
-          exitHistory: exitHistory,
-          branch: currentBranch,
-          onExportPdf: () async {
-            final template = SingleExitHistoryTemplate(exitHistory: exitHistory, branch: currentBranch);
-            await PdfExportTool.export(template, fileName: "salida_inventario_${exitHistory.docNumber}.pdf");
-          },
+        return EscapeToCloseWrapper(
+          child: _ExitHistoryViewer(
+            exitHistory: exitHistory,
+            branch: currentBranch,
+            onExportPdf: () async {
+              final template = SingleExitHistoryTemplate(exitHistory: exitHistory, branch: currentBranch);
+              await PdfExportTool.export(template, fileName: "salida_inventario_${exitHistory.docNumber}.pdf");
+            },
+          ),
         );
       },
     ),
@@ -40,7 +43,8 @@ Future<void> showExitHistoryViewerDialogFromId(BuildContext context, String exit
     context,
     MaterialPageRoute(
       builder: (context) {
-        return FutureBuilder<ExitHistoryInDb?>(
+        return EscapeToCloseWrapper(
+          child: FutureBuilder<ExitHistoryInDb?>(
           future: context.read<ExitHistoriesRepository>().getExitHistoryById(exitHistoryId),
           builder: (context, asyncSnapshot) {
             if (asyncSnapshot.connectionState != ConnectionState.done) {
@@ -68,6 +72,7 @@ Future<void> showExitHistoryViewerDialogFromId(BuildContext context, String exit
               },
             );
           },
+          ),
         );
       },
     ),

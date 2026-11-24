@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/row_color_tool.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/adaptive_viewer.dart';
 
 Future<void> showTransferViewerDialog(BuildContext context, TransferInDb transfer) async {
   FocusManager.instance.primaryFocus?.unfocus();
@@ -11,8 +12,10 @@ Future<void> showTransferViewerDialog(BuildContext context, TransferInDb transfe
     context,
     MaterialPageRoute(
       builder: (context) {
-        return _TransferViewer(
-          transfer: transfer,
+        return EscapeToCloseWrapper(
+          child: _TransferViewer(
+            transfer: transfer,
+          ),
         );
       },
     ),
@@ -26,7 +29,8 @@ Future<void> showTransferViewerDialogFromId(BuildContext context, String transfe
     context,
     MaterialPageRoute(
       builder: (context) {
-        return FutureBuilder(
+        return EscapeToCloseWrapper(
+          child: FutureBuilder(
           future: context.read<TransfersRepository>().getTransferById(transferId),
           builder: (context, asyncSnapshot) {
             if (asyncSnapshot.connectionState != ConnectionState.done) {
@@ -53,6 +57,7 @@ Future<void> showTransferViewerDialogFromId(BuildContext context, String transfe
               transfer: transfer,
             );
           },
+          ),
         );
       },
     ),

@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/adaptive_viewer.dart';
 
@@ -51,6 +52,11 @@ void main() {
       await tester.tapAt(const Offset(10, 10));
       await tester.pumpAndSettle();
       expect(find.text('Contenido Visor'), findsOneWidget);
+
+      // Presionar Escape sí debe cerrarlo.
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.text('Contenido Visor'), findsNothing);
     },
   );
 
@@ -89,6 +95,47 @@ void main() {
 
       final viewerSize = tester.getSize(find.text('Contenido Visor Móvil'));
       expect(viewerSize.width, lessThanOrEqualTo(400));
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.text('Contenido Visor Móvil'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'EscapeToCloseWrapper cierra una ruta MaterialPageRoute al presionar Escape',
+    (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) => Scaffold(
+              body: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (_) => const EscapeToCloseWrapper(
+                        child: Scaffold(
+                          body: Center(child: Text('Visor con Escape')),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+                child: const Text('Abrir'),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Abrir'));
+      await tester.pumpAndSettle();
+      expect(find.text('Visor con Escape'), findsOneWidget);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.text('Visor con Escape'), findsNothing);
     },
   );
 }
