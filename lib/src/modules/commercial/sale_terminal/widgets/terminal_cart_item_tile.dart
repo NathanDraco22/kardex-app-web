@@ -24,7 +24,11 @@ class TerminalCartItemTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final unitPrice = NumberFormatter.convertToMoneyLike(
-      item.newPrice * item.conversionFactor,
+      UnitConversionTool.toDisplayPriceOrCost(
+        item.newPrice,
+        item.conversionFactor,
+        priceUnitFactor: item.product.priceUnitFactor,
+      ),
     );
     final total = NumberFormatter.convertToMoneyLike(item.total);
     final hasDiscount = item.totalDiscount > 0;

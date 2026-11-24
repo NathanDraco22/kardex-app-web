@@ -53,7 +53,7 @@ class SingleAdjustExitTemplate implements PdfTemplate {
     final createdTime = DateTimeTool.formatHHmm(DateTime.fromMillisecondsSinceEpoch(createdAtMs));
 
     final total = adjustExit.items.fold<int>(0, (prev, item) {
-      return prev + (item.cost * item.quantity.abs());
+      return prev + item.lineTotal;
     });
 
     return pw.Column(
@@ -224,7 +224,7 @@ class SingleAdjustExitTemplate implements PdfTemplate {
                 pw.Expanded(
                   flex: 2,
                   child: pw.Text(
-                    NumberFormatter.convertToMoneyLike(item.cost * item.conversionFactor),
+                    NumberFormatter.convertToMoneyLike(item.displayUnitCost),
                     textAlign: pw.TextAlign.center,
                     style: const pw.TextStyle(fontSize: 10),
                   ),
@@ -232,7 +232,7 @@ class SingleAdjustExitTemplate implements PdfTemplate {
                 pw.Expanded(
                   flex: 2,
                   child: pw.Text(
-                    NumberFormatter.convertToMoneyLike(item.cost * item.quantity.abs()),
+                    NumberFormatter.convertToMoneyLike(item.lineTotal),
                     textAlign: pw.TextAlign.center,
                     style: const pw.TextStyle(fontSize: 10),
                   ),
@@ -247,7 +247,7 @@ class SingleAdjustExitTemplate implements PdfTemplate {
 
   pw.Widget _buildTotals() {
     final total = adjustExit.items.fold<int>(0, (prev, item) {
-      return prev + (item.cost * item.quantity.abs());
+      return prev + item.lineTotal;
     });
 
     return pw.Container(

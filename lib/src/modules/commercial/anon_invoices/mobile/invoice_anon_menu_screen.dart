@@ -259,7 +259,7 @@ class _SendButton extends StatelessWidget {
             if (!context.mounted) return;
             final totalCost = widget.saleItems.fold<int>(
               0,
-              (previousValue, element) => previousValue + (element.cost * element.quantity),
+              (previousValue, element) => previousValue + element.lineCost,
             );
 
             final itemsNet = widget.saleItems.fold<int>(

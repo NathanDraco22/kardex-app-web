@@ -68,9 +68,14 @@ class AdjustEntryViewController extends ChangeNotifier {
       return EntryItem(
         productId: e.product.id,
         productName: e.product.name,
-        cost: UnitConversionTool.toBaseCost(e.unitaryCost, e.conversionFactor),
+        cost: UnitConversionTool.toBaseCost(
+          e.unitaryCost,
+          e.conversionFactor,
+          priceUnitFactor: e.product.priceUnitFactor,
+        ),
         quantity: UnitConversionTool.toBaseQuantity(e.quantity, e.conversionFactor),
         conversionFactor: e.conversionFactor,
+        priceUnitFactor: e.product.priceUnitFactor,
         expirationDate: e.expirationDate?.millisecondsSinceEpoch,
         brandName: e.product.brandName,
         code: e.product.code,

@@ -189,7 +189,7 @@ class _Body extends StatelessWidget {
                                   ),
                                   BasicTableCell(
                                     content: Text(
-                                      NumberFormatter.convertToMoneyLike(item.cost * item.quantity),
+                                      NumberFormatter.convertToMoneyLike(item.lineTotal),
                                       style: const TextStyle(
                                         fontWeight: FontWeight.w500,
                                       ),

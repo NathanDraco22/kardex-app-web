@@ -14,7 +14,8 @@ class PriceLevelSyncController {
     required List<ExtraUnit> extraUnits,
     int defaultUnitIndex = 0,
     int wholesaleUnitIndex = 0,
-  }) {
+    int priceUnitFactor = 1,
+  }) : _priceUnitFactor = priceUnitFactor < 1 ? 1 : priceUnitFactor {
     assert(levelCount > 0, "levelCount debe ser mayor a 0");
 
     _prices = List<int>.generate(
@@ -43,6 +44,9 @@ class PriceLevelSyncController {
   }
 
   final int levelCount;
+  int _priceUnitFactor;
+
+  int get priceUnitFactor => _priceUnitFactor;
 
   late final List<TextEditingController> baseControllers;
   late final List<TextEditingController> extraControllers;
@@ -110,7 +114,13 @@ class PriceLevelSyncController {
       _prices[level] = cents;
 
       if (selectedUnit != null) {
-        extraControllers[level].text = centsToText(cents * factor);
+        extraControllers[level].text = centsToText(
+          UnitConversionTool.toDisplayPriceOrCost(
+            cents,
+            factor,
+            priceUnitFactor: _priceUnitFactor,
+          ),
+        );
       }
     } finally {
       _isSyncing = false;
@@ -123,7 +133,11 @@ class PriceLevelSyncController {
     _isSyncing = true;
     try {
       final extraCents = textToCents(value);
-      final baseCents = factor > 0 ? (extraCents / factor).round() : extraCents;
+      final baseCents = UnitConversionTool.toStoredPriceOrCost(
+        extraCents,
+        factor,
+        priceUnitFactor: _priceUnitFactor,
+      );
 
       _prices[level] = baseCents;
       baseControllers[level].text = centsToText(baseCents);
@@ -145,7 +159,13 @@ class PriceLevelSyncController {
       for (var index = 0; index < levelCount; index++) {
         extraControllers[index].text = selectedUnit == null
             ? ''
-            : centsToText(_prices[index] * factor);
+            : centsToText(
+                UnitConversionTool.toDisplayPriceOrCost(
+                  _prices[index],
+                  factor,
+                  priceUnitFactor: _priceUnitFactor,
+                ),
+              );
       }
     } finally {
       _isSyncing = false;
@@ -160,7 +180,13 @@ class PriceLevelSyncController {
       baseControllers[0].text = centsToText(baseCents);
 
       if (selectedUnit != null) {
-        extraControllers[0].text = centsToText(baseCents * factor);
+        extraControllers[0].text = centsToText(
+          UnitConversionTool.toDisplayPriceOrCost(
+            baseCents,
+            factor,
+            priceUnitFactor: _priceUnitFactor,
+          ),
+        );
       }
     } finally {
       _isSyncing = false;
@@ -173,7 +199,11 @@ class PriceLevelSyncController {
     List<ExtraUnit> units, {
     int defaultUnitIndex = 0,
     int wholesaleUnitIndex = 0,
+    int? priceUnitFactor,
   }) {
+    if (priceUnitFactor != null) {
+      _priceUnitFactor = priceUnitFactor < 1 ? 1 : priceUnitFactor;
+    }
     final previousUnit = selectedUnit;
 
     _extraUnits = List<ExtraUnit>.from(units);

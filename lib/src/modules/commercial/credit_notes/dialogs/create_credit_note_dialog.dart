@@ -331,6 +331,7 @@ class _CreateCreditNoteDialogState extends State<_CreateCreditNoteDialog> {
             totalDiscount: result.totalDiscount,
             total: result.total,
             conversionFactor: UnitConversionTool.ensureSafeFactor(item.conversionFactor),
+            priceUnitFactor: item.priceUnitFactor,
             selectedUnitName: item.selectedUnitName,
             standardUnitName: item.standardUnitName,
             standardUnitFactor: item.standardUnitFactor,
@@ -695,7 +696,7 @@ class _CreateCreditNoteDialogState extends State<_CreateCreditNoteDialog> {
                                     final previousBase = _previouslyReturnedFor(index);
                                     final maxDisplayQuantity = _maxDisplayQuantity(item, index);
                                     final isFullyReturned = maxDisplayQuantity <= 0;
-                                    final displayPrice = item.price * factor;
+                                    final displayPrice = item.displayUnitPrice;
                                     final details = StringBuffer(
                                       "Facturados: ${item.formattedDisplayQuantity} ${item.displayUnitName}"
                                       " | Precio: ${NumberFormatter.convertToMoneyLike(displayPrice)} / ${item.displayUnitName}",

@@ -279,7 +279,7 @@ class SingleOrderTemplate implements PdfTemplate {
                 pw.Expanded(
                   flex: 2,
                   child: pw.Text(
-                    NumberFormatter.convertFromCentsToDouble(saleItem.price * saleItem.conversionFactor).toString(),
+                    NumberFormatter.convertFromCentsToDouble(saleItem.displayUnitPrice).toString(),
                     textAlign: pw.TextAlign.center,
                     style: const pw.TextStyle(fontSize: 12),
                   ),

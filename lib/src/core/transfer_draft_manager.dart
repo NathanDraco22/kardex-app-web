@@ -73,6 +73,7 @@ class TransferDraft {
               )
               .toList(growable: false),
           averageCost: product.account.averageCost,
+          priceUnitFactor: product.priceUnitFactor,
         );
 
         if (resolution.needsReview) {
@@ -224,6 +225,7 @@ class TransferDraftUnitResolver {
     required int productDefaultUnitIndex,
     required List<TransferDraftUnitOption> productExtraUnits,
     required int averageCost,
+    int priceUnitFactor = 1,
   }) {
     final extras = productExtraUnits
         .map(
@@ -349,14 +351,22 @@ class TransferDraftUnitResolver {
     final hasAverageCost = averageCost > 0;
     final int resolvedUnitaryCost;
     if (hasAverageCost) {
-      resolvedUnitaryCost = averageCost * selection.factor;
+      resolvedUnitaryCost = UnitConversionTool.toDisplayPriceOrCost(
+        averageCost,
+        selection.factor,
+        priceUnitFactor: priceUnitFactor,
+      );
     } else {
       reasons.add(
         'No hay costo promedio disponible; se conservó el costo del borrador.',
       );
       if (!hasUnitData) {
         // v1 guardaba el costo en unidad base.
-        resolvedUnitaryCost = savedUnitaryCost * selection.factor;
+        resolvedUnitaryCost = UnitConversionTool.toDisplayPriceOrCost(
+          savedUnitaryCost,
+          selection.factor,
+          priceUnitFactor: priceUnitFactor,
+        );
       } else {
         // v2/v3 guardaban el costo comercial en la unidad seleccionada.
         resolvedUnitaryCost = (savedUnitaryCost * selection.factor / safeSavedFactor).round();

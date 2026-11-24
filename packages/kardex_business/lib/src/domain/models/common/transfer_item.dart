@@ -1,3 +1,4 @@
+import 'package:kardex_business/src/tools/unit_conversion_tool.dart';
 import 'package:kardex_business/src/tools/unit_display_formatter.dart';
 
 class TransferItem {
@@ -10,6 +11,7 @@ class TransferItem {
   final int quantity;
   final int cost;
   final int conversionFactor;
+  final int priceUnitFactor;
 
   /// Unidad comercial seleccionada al momento de la transferencia.
   final String? selectedUnitName;
@@ -36,6 +38,7 @@ class TransferItem {
     required this.quantity,
     required this.cost,
     this.conversionFactor = 1,
+    this.priceUnitFactor = 1,
     this.selectedUnitName,
     this.standardUnitName,
     this.standardUnitFactor,
@@ -63,28 +66,42 @@ class TransferItem {
       ? (standardUnitFactor ?? conversionFactor)
       : conversionFactor;
 
-  /// Costo comercial en la unidad que se muestra. `cost` está en unidad base.
-  int get displayUnitCost => cost * displayUnitFactor;
-
-  factory TransferItem.fromJson(Map<String, dynamic> json) => TransferItem(
-    id: json['id'] as String,
-    name: json['name'] as String,
-    unitName: json['unitName'] as String,
-    brandName: json['brandName'] as String,
-    code: json['code'] as String?,
-    categoryName: json['categoryName'] as String?,
-    quantity: json['quantity'] as int,
-    cost: (json['cost'] as num).toInt(),
-    conversionFactor: json['conversionFactor'] as int? ?? 1,
-    selectedUnitName: json['selectedUnitName'] as String?,
-    standardUnitName: json['standardUnitName'] as String?,
-    standardUnitFactor: (json['standardUnitFactor'] as num?)?.toInt(),
-    expirationDate: json['expirationDate'] as int?,
-    salePrice: (json['salePrice'] as num).toInt(),
-    salePrice2: (json['salePrice2'] as num).toInt(),
-    salePrice3: (json['salePrice3'] as num).toInt(),
-    salePrice4: (json['salePrice4'] as num? ?? 0).toInt(),
+  /// Costo comercial en la unidad que se muestra.
+  int get displayUnitCost => UnitConversionTool.toDisplayPriceOrCost(
+    cost,
+    displayUnitFactor,
+    priceUnitFactor: priceUnitFactor,
   );
+
+  int get lineTotal => UnitConversionTool.calculateLineTotal(
+    cost,
+    quantity.abs(),
+    priceUnitFactor: priceUnitFactor,
+  );
+
+  factory TransferItem.fromJson(Map<String, dynamic> json) {
+    final rawPriceFactor = (json['priceUnitFactor'] as num?)?.toInt() ?? 1;
+    return TransferItem(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      unitName: json['unitName'] as String,
+      brandName: json['brandName'] as String,
+      code: json['code'] as String?,
+      categoryName: json['categoryName'] as String?,
+      quantity: json['quantity'] as int,
+      cost: (json['cost'] as num).toInt(),
+      conversionFactor: json['conversionFactor'] as int? ?? 1,
+      priceUnitFactor: rawPriceFactor < 1 ? 1 : rawPriceFactor,
+      selectedUnitName: json['selectedUnitName'] as String?,
+      standardUnitName: json['standardUnitName'] as String?,
+      standardUnitFactor: (json['standardUnitFactor'] as num?)?.toInt(),
+      expirationDate: json['expirationDate'] as int?,
+      salePrice: (json['salePrice'] as num).toInt(),
+      salePrice2: (json['salePrice2'] as num).toInt(),
+      salePrice3: (json['salePrice3'] as num).toInt(),
+      salePrice4: (json['salePrice4'] as num? ?? 0).toInt(),
+    );
+  }
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{
@@ -97,6 +114,7 @@ class TransferItem {
       'quantity': quantity,
       'cost': cost,
       'conversionFactor': conversionFactor,
+      'priceUnitFactor': priceUnitFactor < 1 ? 1 : priceUnitFactor,
       'expirationDate': expirationDate,
       'salePrice': salePrice,
       'salePrice2': salePrice2,

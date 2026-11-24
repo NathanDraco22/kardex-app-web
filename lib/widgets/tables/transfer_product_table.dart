@@ -138,7 +138,13 @@ class _TransferProductTableState extends State<TransferProductTable> {
     );
     final newQuantity = convertedQuantity?.round();
     final averageCost = row.product.account.averageCost;
-    final oldCost = row.unitaryCost > 0 ? row.unitaryCost : averageCost * oldFactor;
+    final oldCost = row.unitaryCost > 0
+        ? row.unitaryCost
+        : UnitConversionTool.toDisplayPriceOrCost(
+            averageCost,
+            oldFactor,
+            priceUnitFactor: row.product.priceUnitFactor,
+          );
     final shouldClearQuantity = newQuantity == null;
 
     setState(() {
@@ -573,10 +579,10 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
                     NumberFormatter.convertToMoneyLike(widget.rowModel.unitaryCost),
                     style: const TextStyle(fontWeight: FontWeight.w500),
                   ),
-                  if (widget.rowModel.conversionFactor > 1) ...[
+                  if (widget.rowModel.conversionFactor != product.priceUnitFactor) ...[
                     const SizedBox(height: 2),
                     Text(
-                      "Base: ${NumberFormatter.convertToMoneyLike((widget.rowModel.unitaryCost / widget.rowModel.conversionFactor).round())}",
+                      "${product.priceUnitName}: ${NumberFormatter.convertToMoneyLike(UnitConversionTool.toStoredPriceOrCost(widget.rowModel.unitaryCost, widget.rowModel.conversionFactor, priceUnitFactor: product.priceUnitFactor))}",
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.blue.shade700,

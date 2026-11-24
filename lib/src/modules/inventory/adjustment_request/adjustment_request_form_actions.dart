@@ -40,7 +40,11 @@ Future<void> addAdjustmentRequestProductAction(BuildContext context) async {
     selectedUnitIndex: unit.unitIndex,
     conversionFactor: factor,
     selectedUnitName: unit.unitName,
-    unitaryCost: product.account.averageCost * factor,
+    unitaryCost: UnitConversionTool.toDisplayPriceOrCost(
+      product.account.averageCost,
+      factor,
+      priceUnitFactor: product.priceUnitFactor,
+    ),
   );
 
   final added = viewController.addRow(row);

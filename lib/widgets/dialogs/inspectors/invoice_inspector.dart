@@ -199,7 +199,7 @@ class _DetailsSegment extends StatelessWidget {
       itemBuilder: (context, index) {
         final item = saleItems[index];
 
-        final totalCost = item.cost * (item.quantity + item.bonQuantity);
+        final totalCost = item.lineCost;
         final totalPaid = item.total;
         final utility = totalPaid - totalCost;
 
@@ -309,7 +309,7 @@ class _TotalsSegment extends StatelessWidget {
     int totalVentas = 0;
 
     for (final item in saleItems) {
-      totalCosto += item.cost * (item.quantity + item.bonQuantity);
+      totalCosto += item.lineCost;
       totalVentas += item.total;
     }
 

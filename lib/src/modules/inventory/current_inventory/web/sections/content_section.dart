@@ -96,7 +96,13 @@ class _ContentSection extends StatelessWidget {
             ),
             BasicTableCell(
               content: Text(
-                NumberFormatter.convertToMoneyLike(inventory.averageCost * product.defaultUnitFactor),
+                NumberFormatter.convertToMoneyLike(
+                  UnitConversionTool.toDisplayPriceOrCost(
+                    inventory.averageCost,
+                    product.defaultUnitFactor,
+                    priceUnitFactor: product.priceUnitFactor,
+                  ),
+                ),
                 textAlign: TextAlign.center,
               ),
             ),

@@ -27,6 +27,7 @@ class UnitCostComparison extends StatelessWidget {
     required this.baseUnitName,
     required this.selectedUnitName,
     required this.selectedUnitFactor,
+    this.priceUnitFactor = 1,
     this.layout = UnitCostComparisonLayout.table,
   });
 
@@ -34,16 +35,19 @@ class UnitCostComparison extends StatelessWidget {
   final String baseUnitName;
   final String selectedUnitName;
   final int selectedUnitFactor;
+  final int priceUnitFactor;
   final UnitCostComparisonLayout layout;
 
   int get _factor => selectedUnitFactor <= 1 ? 1 : selectedUnitFactor;
+  int get _priceFactor => priceUnitFactor <= 1 ? 1 : priceUnitFactor;
 
   String get _selectedName {
     final name = selectedUnitName.trim();
     return name.isEmpty ? baseUnitName : name;
   }
 
-  bool get _hasConversion => _factor > 1 && _selectedName != baseUnitName;
+  bool get _hasConversion =>
+      _factor != _priceFactor && _selectedName != baseUnitName;
 
   @override
   Widget build(BuildContext context) {
@@ -199,7 +203,11 @@ class UnitCostComparison extends StatelessWidget {
                       alignment: Alignment.centerRight,
                       child: Text(
                         NumberFormatter.convertToMoneyLike(
-                          item.baseCostInCents * _factor,
+                          UnitConversionTool.toDisplayPriceOrCost(
+                            item.baseCostInCents,
+                            _factor,
+                            priceUnitFactor: _priceFactor,
+                          ),
                         ),
                         style: selectedValueStyle,
                       ),
@@ -229,7 +237,11 @@ class UnitCostComparison extends StatelessWidget {
   Widget _buildVerticalItem(UnitCostItem item) {
     final baseValue = NumberFormatter.convertToMoneyLike(item.baseCostInCents);
     final selectedValue = NumberFormatter.convertToMoneyLike(
-      item.baseCostInCents * _factor,
+      UnitConversionTool.toDisplayPriceOrCost(
+        item.baseCostInCents,
+        _factor,
+        priceUnitFactor: _priceFactor,
+      ),
     );
 
     return Column(

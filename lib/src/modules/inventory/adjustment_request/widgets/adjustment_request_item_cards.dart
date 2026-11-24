@@ -132,9 +132,13 @@ class AdjustmentRequestItemCard extends StatelessWidget {
               Expanded(
                 child: _InfoPill(
                   label: 'Costo unitario',
-                  value: NumberFormatter.convertToMoneyLike(item.cost),
-                  subValue: factor > 1
-                      ? 'Base: ${NumberFormatter.convertToMoneyLike((item.cost / factor).round())}'
+                  value: formatAdjustmentUnitCost(
+                    item.cost,
+                    factor,
+                    priceUnitFactor: item.priceUnitFactor,
+                  ),
+                  subValue: factor != item.priceUnitFactor
+                      ? 'Base: ${NumberFormatter.convertToMoneyLike(item.cost)}'
                       : null,
                 ),
               ),

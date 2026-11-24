@@ -143,7 +143,7 @@ class CurrentInventoryTemplate implements PdfTemplate {
                           pw.SizedBox(width: 4),
                           pw.Text(product.brandName, style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey700)),
                           pw.SizedBox(width: 4),
-                          pw.Text(product.unitName, style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey700)),
+                          pw.Text(product.defaultUnitName, style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey700)),
                         ],
                       ),
                     ],
@@ -152,7 +152,10 @@ class CurrentInventoryTemplate implements PdfTemplate {
                 pw.Expanded(
                   flex: 1,
                   child: pw.Text(
-                    item.currentStock.toString(),
+                    UnitConversionTool.formatDisplayStock(
+                      item.currentStock,
+                      product.defaultUnitFactor,
+                    ),
                     textAlign: pw.TextAlign.center,
                     style: const pw.TextStyle(fontSize: 10),
                   ),
@@ -160,7 +163,13 @@ class CurrentInventoryTemplate implements PdfTemplate {
                 pw.Expanded(
                   flex: 2,
                   child: pw.Text(
-                    NumberFormatter.convertToMoneyLike(item.averageCost),
+                    NumberFormatter.convertToMoneyLike(
+                      UnitConversionTool.toDisplayPriceOrCost(
+                        item.averageCost,
+                        product.defaultUnitFactor,
+                        priceUnitFactor: product.priceUnitFactor,
+                      ),
+                    ),
                     textAlign: pw.TextAlign.center,
                     style: const pw.TextStyle(fontSize: 10),
                   ),

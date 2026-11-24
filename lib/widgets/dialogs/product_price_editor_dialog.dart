@@ -93,6 +93,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
       extraUnits: widget.product.extraUnits,
       defaultUnitIndex: widget.product.defaultUnitIndex,
       wholesaleUnitIndex: widget.product.wholesaleUnitIndex,
+      priceUnitFactor: widget.product.priceUnitFactor,
     );
     final initialRefCost = widget.product.account.averageCost;
     _referenceCostController = TextEditingController(
@@ -303,9 +304,10 @@ class _RootScaffoldState extends State<_RootScaffold> {
                               baseCostInCents: widget.product.account.maximumCost,
                             ),
                           ],
-                          baseUnitName: widget.product.unitName,
+                          baseUnitName: widget.product.priceUnitName,
                           selectedUnitName: priceController.selectedUnit?.name ?? widget.product.unitName,
                           selectedUnitFactor: priceController.factor,
+                          priceUnitFactor: widget.product.priceUnitFactor,
                         )
                       else
                         TitleTextField(

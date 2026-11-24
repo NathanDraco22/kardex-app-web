@@ -240,7 +240,7 @@ class _DevolutionViewer extends StatelessWidget {
                                     ),
                                     Expanded(
                                       child: Text(
-                                        NumberFormatter.convertToMoneyLike(item.price * item.conversionFactor),
+                                        NumberFormatter.convertToMoneyLike(item.displayUnitPrice),
                                       ),
                                     ),
                                     Expanded(child: Text(NumberFormatter.convertToMoneyLike(item.subTotal))),

@@ -25,7 +25,13 @@ class ProductInvoiceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final priceFormatted = NumberFormatter.convertFromCentsToDouble(item.newPrice * item.conversionFactor);
+    final priceFormatted = NumberFormatter.convertFromCentsToDouble(
+      UnitConversionTool.toDisplayPriceOrCost(
+        item.newPrice,
+        item.conversionFactor,
+        priceUnitFactor: item.product.priceUnitFactor,
+      ),
+    );
     final discountFormatted = NumberFormatter.convertFromCentsToDouble(item.totalDiscount);
     final totalFormatted = NumberFormatter.convertToMoneyLike(item.total);
 

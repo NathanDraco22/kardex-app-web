@@ -345,7 +345,7 @@ class SingleCreditNoteTemplate implements PdfTemplate {
                 pw.Expanded(
                   flex: 2,
                   child: pw.Text(
-                    NumberFormatter.convertToMoneyLike(item.price * item.conversionFactor),
+                    NumberFormatter.convertToMoneyLike(item.displayUnitPrice),
                     textAlign: pw.TextAlign.center,
                     style: const pw.TextStyle(fontSize: 12),
                   ),

@@ -53,7 +53,11 @@ class CommercialProductResult {
   String get formattedQuantity => UnitConversionTool.formatQuantity(quantity);
 
   int get subTotal {
-    return baseQuantity * _newPrice;
+    return UnitConversionTool.calculateLineTotal(
+      _newPrice,
+      baseQuantity,
+      priceUnitFactor: product.priceUnitFactor,
+    );
   }
 
   int get newPrice => _newPrice;

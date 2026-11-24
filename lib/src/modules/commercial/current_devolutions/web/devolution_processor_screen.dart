@@ -244,7 +244,7 @@ class _Body extends StatelessWidget {
                             itemBuilder: (context, index) {
                               final item = returnedItems[index];
                               final unitPrice = NumberFormatter.convertToMoneyLike(
-                                item.price * item.conversionFactor,
+                                item.displayUnitPrice,
                               );
                               final brandName = item.product.brandName;
                               return ListTile(

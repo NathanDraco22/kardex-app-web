@@ -78,7 +78,7 @@ class _ContentSection extends StatelessWidget {
                       final entryTime = DateTimeTool.formatHHmm(DateTime.fromMillisecondsSinceEpoch(entry.createdAt));
 
                       // Calculate total since DB doesn't store it
-                      final totalVal = entry.items.fold<int>(0, (prev, item) => prev + (item.cost * item.quantity));
+                      final totalVal = entry.items.fold<int>(0, (prev, item) => prev + item.lineTotal);
                       final total = NumberFormatter.convertToMoneyLike(totalVal);
 
                       return BasicTableRow(

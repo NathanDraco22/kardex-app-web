@@ -13,6 +13,7 @@ class InventoryProduct {
   final bool isActive;
   final ProductType productType;
   final String image;
+  final int priceUnitFactor;
 
   InventoryProduct({
     required this.id,
@@ -26,9 +27,11 @@ class InventoryProduct {
     this.isActive = true,
     this.productType = ProductType.item,
     this.image = "",
+    this.priceUnitFactor = 1,
   });
 
   factory InventoryProduct.fromJson(Map<String, dynamic> json) {
+    final rawPriceFactor = (json['priceUnitFactor'] as num?)?.toInt() ?? 1;
     return InventoryProduct(
       id: json['id'] as String,
       name: json['name'] as String,
@@ -41,6 +44,7 @@ class InventoryProduct {
       isActive: json['isActive'] as bool? ?? true,
       productType: ProductType.fromJson(json['productType']),
       image: json['image'] as String? ?? "",
+      priceUnitFactor: rawPriceFactor < 1 ? 1 : rawPriceFactor,
     );
   }
 
@@ -57,6 +61,7 @@ class InventoryProduct {
       'isActive': isActive,
       'productType': productType.apiValue,
       'image': image,
+      'priceUnitFactor': priceUnitFactor < 1 ? 1 : priceUnitFactor,
     };
   }
 }

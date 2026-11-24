@@ -30,6 +30,7 @@ class BaseUnitScale {
   final List<ExtraUnit> units;
   final int defaultUnitIndex;
   final int wholesaleUnitIndex;
+  final int priceUnitFactor;
 
   const BaseUnitScale({
     required this.name,
@@ -38,9 +39,11 @@ class BaseUnitScale {
     this.units = const [],
     this.defaultUnitIndex = 0,
     this.wholesaleUnitIndex = 0,
+    this.priceUnitFactor = 1,
   });
 
   factory BaseUnitScale.fromJson(Map<String, dynamic> json) {
+    final rawPriceFactor = (json['priceUnitFactor'] as num?)?.toInt() ?? 1;
     return BaseUnitScale(
       name: json['name'] as String? ?? '',
       scaleType: UnitScaleType.fromJson(json['scaleType'] as String?),
@@ -54,6 +57,7 @@ class BaseUnitScale {
           [],
       defaultUnitIndex: (json['defaultUnitIndex'] as num?)?.toInt() ?? 0,
       wholesaleUnitIndex: (json['wholesaleUnitIndex'] as num?)?.toInt() ?? 0,
+      priceUnitFactor: rawPriceFactor < 1 ? 1 : rawPriceFactor,
     );
   }
 
@@ -65,6 +69,7 @@ class BaseUnitScale {
       'units': units.map((e) => e.toJson()).toList(),
       'defaultUnitIndex': defaultUnitIndex,
       'wholesaleUnitIndex': wholesaleUnitIndex,
+      'priceUnitFactor': priceUnitFactor < 1 ? 1 : priceUnitFactor,
     };
   }
 }
@@ -77,9 +82,11 @@ class CreateUnitScale extends BaseUnitScale {
     super.units = const [],
     super.defaultUnitIndex = 0,
     super.wholesaleUnitIndex = 0,
+    super.priceUnitFactor = 1,
   });
 
   factory CreateUnitScale.fromJson(Map<String, dynamic> json) {
+    final rawPriceFactor = (json['priceUnitFactor'] as num?)?.toInt() ?? 1;
     return CreateUnitScale(
       name: json['name'] as String? ?? '',
       scaleType: UnitScaleType.fromJson(json['scaleType'] as String?),
@@ -93,6 +100,7 @@ class CreateUnitScale extends BaseUnitScale {
           [],
       defaultUnitIndex: (json['defaultUnitIndex'] as num?)?.toInt() ?? 0,
       wholesaleUnitIndex: (json['wholesaleUnitIndex'] as num?)?.toInt() ?? 0,
+      priceUnitFactor: rawPriceFactor < 1 ? 1 : rawPriceFactor,
     );
   }
 }
@@ -104,6 +112,7 @@ class UpdateUnitScale {
   final List<ExtraUnit>? units;
   final int? defaultUnitIndex;
   final int? wholesaleUnitIndex;
+  final int? priceUnitFactor;
 
   const UpdateUnitScale({
     this.name,
@@ -112,6 +121,7 @@ class UpdateUnitScale {
     this.units,
     this.defaultUnitIndex,
     this.wholesaleUnitIndex,
+    this.priceUnitFactor,
   });
 
   factory UpdateUnitScale.fromJson(Map<String, dynamic> json) {
@@ -126,6 +136,7 @@ class UpdateUnitScale {
           .toList(),
       defaultUnitIndex: (json['defaultUnitIndex'] as num?)?.toInt(),
       wholesaleUnitIndex: (json['wholesaleUnitIndex'] as num?)?.toInt(),
+      priceUnitFactor: (json['priceUnitFactor'] as num?)?.toInt(),
     );
   }
 
@@ -138,6 +149,9 @@ class UpdateUnitScale {
     if (defaultUnitIndex != null) data['defaultUnitIndex'] = defaultUnitIndex;
     if (wholesaleUnitIndex != null) {
       data['wholesaleUnitIndex'] = wholesaleUnitIndex;
+    }
+    if (priceUnitFactor != null) {
+      data['priceUnitFactor'] = priceUnitFactor! < 1 ? 1 : priceUnitFactor;
     }
     return data;
   }
@@ -156,11 +170,13 @@ class UnitScaleInDb extends BaseUnitScale {
     super.units = const [],
     super.defaultUnitIndex = 0,
     super.wholesaleUnitIndex = 0,
+    super.priceUnitFactor = 1,
     required this.createdAt,
     this.updatedAt,
   });
 
   factory UnitScaleInDb.fromJson(Map<String, dynamic> json) {
+    final rawPriceFactor = (json['priceUnitFactor'] as num?)?.toInt() ?? 1;
     return UnitScaleInDb(
       id: json['id'] as String? ?? '',
       name: json['name'] as String? ?? '',
@@ -175,6 +191,7 @@ class UnitScaleInDb extends BaseUnitScale {
           [],
       defaultUnitIndex: (json['defaultUnitIndex'] as num?)?.toInt() ?? 0,
       wholesaleUnitIndex: (json['wholesaleUnitIndex'] as num?)?.toInt() ?? 0,
+      priceUnitFactor: rawPriceFactor < 1 ? 1 : rawPriceFactor,
       createdAt: json['createdAt'] != null
           ? DateTime.fromMillisecondsSinceEpoch(
               (json['createdAt'] as num).toInt(),

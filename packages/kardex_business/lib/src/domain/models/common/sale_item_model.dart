@@ -1,5 +1,6 @@
 import 'package:kardex_business/src/domain/models/common/discount_type.dart';
 import 'package:kardex_business/src/domain/models/product/product_type.dart';
+import 'package:kardex_business/src/tools/unit_conversion_tool.dart';
 import 'package:kardex_business/src/tools/unit_display_formatter.dart';
 
 enum PaymentType {
@@ -37,6 +38,7 @@ class ProductItem {
   final String? categoryName;
   final List<String> tags;
   final ProductType productType;
+  final int priceUnitFactor;
 
   ProductItem({
     required this.id,
@@ -47,18 +49,23 @@ class ProductItem {
     this.categoryName,
     this.tags = const [],
     this.productType = ProductType.item,
+    this.priceUnitFactor = 1,
   });
 
-  factory ProductItem.fromJson(Map<String, dynamic> json) => ProductItem(
-    id: json['id'],
-    name: json['name'],
-    unitName: json['unitName'],
-    brandName: json['brandName'] as String? ?? "",
-    code: json['code'],
-    categoryName: json['categoryName'],
-    tags: List<String>.from(json['tags'] ?? []),
-    productType: ProductType.fromJson(json['productType']),
-  );
+  factory ProductItem.fromJson(Map<String, dynamic> json) {
+    final rawPriceFactor = (json['priceUnitFactor'] as num?)?.toInt() ?? 1;
+    return ProductItem(
+      id: json['id'],
+      name: json['name'],
+      unitName: json['unitName'],
+      brandName: json['brandName'] as String? ?? "",
+      code: json['code'],
+      categoryName: json['categoryName'],
+      tags: List<String>.from(json['tags'] ?? []),
+      productType: ProductType.fromJson(json['productType']),
+      priceUnitFactor: rawPriceFactor < 1 ? 1 : rawPriceFactor,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -69,6 +76,7 @@ class ProductItem {
     'categoryName': categoryName,
     'tags': tags,
     'productType': productType.apiValue,
+    'priceUnitFactor': priceUnitFactor < 1 ? 1 : priceUnitFactor,
   };
 }
 
@@ -85,6 +93,7 @@ class SaleItem {
   final int totalDiscount;
   final int total;
   final int conversionFactor;
+  final int priceUnitFactor;
 
   /// Unidad comercial seleccionada al momento de la venta.
   final String? selectedUnitName;
@@ -112,6 +121,7 @@ class SaleItem {
     this.totalDiscount = 0,
     required this.total,
     this.conversionFactor = 1,
+    this.priceUnitFactor = 1,
     this.selectedUnitName,
     this.standardUnitName,
     this.standardUnitFactor,
@@ -147,6 +157,18 @@ class SaleItem {
       ? (standardUnitFactor ?? conversionFactor)
       : conversionFactor;
 
+  int get displayUnitPrice => UnitConversionTool.toDisplayPriceOrCost(
+    price,
+    displayUnitFactor,
+    priceUnitFactor: priceUnitFactor,
+  );
+
+  int get lineCost => UnitConversionTool.calculateLineTotal(
+    cost,
+    quantity + bonQuantity,
+    priceUnitFactor: priceUnitFactor,
+  );
+
   double get displayBonQuantity => conversionFactor <= 1
       ? bonQuantity.toDouble()
       : bonQuantity / conversionFactor;
@@ -175,6 +197,8 @@ class SaleItem {
       totalDiscount: totalDisc,
       total: json['total'],
       conversionFactor: json['conversionFactor'] ?? 1,
+      priceUnitFactor:
+          ((json['priceUnitFactor'] as num?)?.toInt() ?? 1).clamp(1, 1 << 30),
       selectedUnitName: json['selectedUnitName'] as String?,
       standardUnitName: json['standardUnitName'] as String?,
       standardUnitFactor: json['standardUnitFactor'] as int?,
@@ -196,6 +220,7 @@ class SaleItem {
       'totalDiscount': totalDiscount,
       'total': total,
       'conversionFactor': conversionFactor,
+      'priceUnitFactor': priceUnitFactor < 1 ? 1 : priceUnitFactor,
     };
     if (selectedUnitName != null) {
       data['selectedUnitName'] = selectedUnitName;

@@ -275,6 +275,7 @@ class SaleTerminalViewController extends ChangeNotifier {
         subTotal: commercial.subTotal,
         total: commercial.total,
         conversionFactor: commercial.conversionFactor,
+        priceUnitFactor: product.priceUnitFactor,
         selectedUnitName: commercial.selectedUnitName.isNotEmpty ? commercial.selectedUnitName : product.unitName,
         standardUnitName: product.defaultUnitName,
         standardUnitFactor: product.defaultUnitFactor,
@@ -292,7 +293,7 @@ class SaleTerminalViewController extends ChangeNotifier {
     int itemsNet = 0;
     int itemsDisc = 0;
     for (final item in saleItems) {
-      totalCost += item.cost * (item.quantity + item.bonQuantity);
+      totalCost += item.lineCost;
       itemsNet += item.total;
       itemsDisc += item.totalDiscount;
     }

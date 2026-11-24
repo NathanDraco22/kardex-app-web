@@ -383,7 +383,11 @@ class ProductResultRow extends StatelessWidget {
                   child: Builder(
                     builder: (context) {
                       final price = NumberFormatter.convertToMoneyLike(
-                        product.saleProfile.salePrice * product.defaultUnitFactor,
+                        UnitConversionTool.toDisplayPriceOrCost(
+                          product.saleProfile.salePrice,
+                          product.defaultUnitFactor,
+                          priceUnitFactor: product.priceUnitFactor,
+                        ),
                       );
 
                       return Text(

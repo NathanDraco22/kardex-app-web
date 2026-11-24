@@ -209,7 +209,7 @@ class CreateInvoice extends BaseInvoice {
     int newItemsNet = 0;
     int newItemDiscounts = 0;
     for (var item in saleItems) {
-      newTotalCost += item.cost * (item.quantity + item.bonQuantity);
+      newTotalCost += item.lineCost;
       newItemsNet += item.total;
       newItemDiscounts += item.totalDiscount;
     }

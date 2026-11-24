@@ -184,7 +184,11 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
     final isUserAdmin = authState.session.user.role == "Admin";
     final product = commercialProductResult.product;
     double price = NumberFormatter.convertFromCentsToDouble(
-      commercialProductResult.newPrice * commercialProductResult.conversionFactor,
+      UnitConversionTool.toDisplayPriceOrCost(
+        commercialProductResult.newPrice,
+        commercialProductResult.conversionFactor,
+        priceUnitFactor: commercialProductResult.product.priceUnitFactor,
+      ),
     );
     final subtotal = NumberFormatter.convertToMoneyLike(commercialProductResult.subTotal);
     final totalDiscount = NumberFormatter.convertToMoneyLike(commercialProductResult.totalDiscount);
@@ -275,9 +279,10 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                                   baseCostInCents: widget.product.account.lastCost,
                                 ),
                               ],
-                              baseUnitName: baseUnitName,
+                              baseUnitName: commercialProductResult.product.priceUnitName,
                               selectedUnitName: unitName,
                               selectedUnitFactor: factor,
+                              priceUnitFactor: commercialProductResult.product.priceUnitFactor,
                             ),
                           ],
                           const Divider(),
@@ -353,9 +358,12 @@ class _CommercialProductModalState extends State<CommercialProductModal> {
                                       final rowDecimal = double.tryParse(value) ?? 0.0;
                                       final rowInteger = NumberFormatter.convertFromDoubleToCents(rowDecimal);
 
-                                      // Guardar el precio convertido a unidad base
-                                      commercialProductResult.newPrice =
-                                          (rowInteger / commercialProductResult.conversionFactor).round();
+                                      // Guardar el precio convertido a la unidad de referencia de precio
+                                      commercialProductResult.newPrice = UnitConversionTool.toStoredPriceOrCost(
+                                        rowInteger,
+                                        commercialProductResult.conversionFactor,
+                                        priceUnitFactor: commercialProductResult.product.priceUnitFactor,
+                                      );
                                       commercialProductResult.selectedPriceLevel = 0;
                                       setState(() {});
                                     },

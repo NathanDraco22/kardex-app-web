@@ -213,7 +213,11 @@ class _InvoiceTableRowState extends State<InvoiceTableRow> with AutomaticKeepAli
             : product.account.availableStock / widget.item.conversionFactor;
 
     final price = NumberFormatter.convertToMoneyLike(
-      widget.item.newPrice * widget.item.conversionFactor,
+      UnitConversionTool.toDisplayPriceOrCost(
+        widget.item.newPrice,
+        widget.item.conversionFactor,
+        priceUnitFactor: widget.item.product.priceUnitFactor,
+      ),
     );
     final totalDiscount = NumberFormatter.convertToMoneyLike(widget.item.totalDiscount);
     final percenValue = widget.item.discountPercent;

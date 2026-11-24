@@ -24,7 +24,7 @@ class _ContentSection extends StatelessWidget {
               separatorBuilder: (context, index) => const Divider(height: 1),
               itemBuilder: (context, index) {
                 final item = items[index];
-                final priceFormatted = NumberFormatter.convertToMoneyLike(item.price * item.conversionFactor);
+                final priceFormatted = NumberFormatter.convertToMoneyLike(item.displayUnitPrice);
                 final subtotalFormatted = NumberFormatter.convertToMoneyLike(item.total);
 
                 return ListTile(

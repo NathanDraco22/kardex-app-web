@@ -480,7 +480,7 @@ class InvoiceViewerContent extends StatelessWidget {
                             flex: 2,
                             child: Text(
                               NumberFormatter.convertFromCentsToDouble(
-                                saleItem.price * saleItem.conversionFactor,
+                                saleItem.displayUnitPrice,
                               ).toString(),
                               textAlign: TextAlign.center,
                             ),

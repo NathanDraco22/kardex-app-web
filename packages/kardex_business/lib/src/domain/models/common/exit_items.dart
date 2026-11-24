@@ -1,3 +1,4 @@
+import 'package:kardex_business/src/tools/unit_conversion_tool.dart';
 import 'package:kardex_business/src/tools/unit_display_formatter.dart';
 
 class AdjustExitItem {
@@ -9,6 +10,7 @@ class AdjustExitItem {
   final int cost; // Historical cost at the time of exit
   final int quantity;
   final int conversionFactor;
+  final int priceUnitFactor;
   final String? standardUnitName;
   final int? standardUnitFactor;
 
@@ -18,6 +20,7 @@ class AdjustExitItem {
     required this.cost,
     required this.quantity,
     this.conversionFactor = 1,
+    this.priceUnitFactor = 1,
     this.standardUnitName,
     this.standardUnitFactor,
     this.code,
@@ -38,7 +41,24 @@ class AdjustExitItem {
 
   String get displayUnitName => displayQuantity.unitName;
 
+  int get displayUnitFactor => displayQuantity.usedStandardFallback
+      ? (standardUnitFactor ?? conversionFactor)
+      : conversionFactor;
+
+  int get displayUnitCost => UnitConversionTool.toDisplayPriceOrCost(
+    cost,
+    displayUnitFactor,
+    priceUnitFactor: priceUnitFactor,
+  );
+
+  int get lineTotal => UnitConversionTool.calculateLineTotal(
+    cost,
+    quantity.abs(),
+    priceUnitFactor: priceUnitFactor,
+  );
+
   factory AdjustExitItem.fromJson(Map<String, dynamic> json) {
+    final rawPriceFactor = (json['priceUnitFactor'] as num?)?.toInt() ?? 1;
     return AdjustExitItem(
       productId: json['productId'] as String,
       productName: json['productName'] as String,
@@ -48,6 +68,7 @@ class AdjustExitItem {
       cost: json['cost'] as int,
       quantity: json['quantity'] as int,
       conversionFactor: json['conversionFactor'] as int? ?? 1,
+      priceUnitFactor: rawPriceFactor < 1 ? 1 : rawPriceFactor,
       standardUnitName: json['standardUnitName'] as String?,
       standardUnitFactor: json['standardUnitFactor'] as int?,
     );
@@ -60,6 +81,7 @@ class AdjustExitItem {
       'cost': cost,
       'quantity': quantity,
       'conversionFactor': conversionFactor,
+      'priceUnitFactor': priceUnitFactor < 1 ? 1 : priceUnitFactor,
       'code': code,
       'brandName': brandName,
       'unitName': unitName,

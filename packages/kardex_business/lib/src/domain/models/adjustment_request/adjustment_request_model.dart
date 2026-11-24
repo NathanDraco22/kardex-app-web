@@ -12,6 +12,7 @@ class AdjustmentRequestItem {
   final String? standardUnitName;
   final int? standardUnitFactor;
   final int conversionFactor;
+  final int priceUnitFactor;
   final int systemStock;
   final int countedQuantity;
   final int difference;
@@ -28,6 +29,7 @@ class AdjustmentRequestItem {
     this.standardUnitName,
     this.standardUnitFactor,
     this.conversionFactor = 1,
+    this.priceUnitFactor = 1,
     this.systemStock = 0,
     this.countedQuantity = 0,
     this.difference = 0,
@@ -36,6 +38,7 @@ class AdjustmentRequestItem {
   });
 
   factory AdjustmentRequestItem.fromJson(Map<String, dynamic> json) {
+    final rawPriceFactor = (json['priceUnitFactor'] as num?)?.toInt() ?? 1;
     return AdjustmentRequestItem(
       productId: json['productId'] as String? ?? "",
       productName: json['productName'] as String? ?? "",
@@ -46,6 +49,7 @@ class AdjustmentRequestItem {
       standardUnitName: json['standardUnitName'] as String?,
       standardUnitFactor: json['standardUnitFactor'] as int?,
       conversionFactor: json['conversionFactor'] as int? ?? 1,
+      priceUnitFactor: rawPriceFactor < 1 ? 1 : rawPriceFactor,
       systemStock: json['systemStock'] as int? ?? 0,
       countedQuantity: json['countedQuantity'] as int? ?? 0,
       difference: json['difference'] as int? ?? 0,
@@ -65,6 +69,7 @@ class AdjustmentRequestItem {
       'standardUnitName': standardUnitName,
       'standardUnitFactor': standardUnitFactor,
       'conversionFactor': conversionFactor,
+      'priceUnitFactor': priceUnitFactor < 1 ? 1 : priceUnitFactor,
       'systemStock': systemStock,
       'countedQuantity': countedQuantity,
       'difference': difference,

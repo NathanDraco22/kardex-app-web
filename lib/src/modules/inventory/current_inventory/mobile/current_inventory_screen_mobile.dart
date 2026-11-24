@@ -180,7 +180,13 @@ class _Body extends StatelessWidget {
                         standardUnitName: product.defaultUnitName,
                         standardUnitFactor: product.defaultUnitFactor,
                       ),
-                      unitCost: NumberFormatter.convertToMoneyLike(inventory.averageCost * product.defaultUnitFactor),
+                      unitCost: NumberFormatter.convertToMoneyLike(
+                        UnitConversionTool.toDisplayPriceOrCost(
+                          inventory.averageCost,
+                          product.defaultUnitFactor,
+                          priceUnitFactor: product.priceUnitFactor,
+                        ),
+                      ),
                       totalValue: NumberFormatter.convertToMoneyLike(inventory.total),
                       image: product.image,
                     );
