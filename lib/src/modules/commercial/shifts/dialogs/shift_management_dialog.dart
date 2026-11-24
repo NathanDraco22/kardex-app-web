@@ -3,6 +3,7 @@ import 'package:kardex_app_front/src/modules/commercial/shifts/dialogs/cash_move
 import 'package:kardex_app_front/src/modules/commercial/shifts/dialogs/close_shift_dialog.dart';
 import 'package:kardex_app_front/src/modules/commercial/shifts/dialogs/shift_viewer_dialog.dart';
 import 'package:kardex_app_front/widgets/design_system/app_theme_tokens.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/shift_viewer.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 class ShiftManagementDialog extends StatelessWidget {
@@ -85,8 +86,15 @@ class ShiftManagementDialog extends StatelessWidget {
               title: 'Cerrar / Arquear Turno',
               subtitle: 'Realiza el conteo de efectivo y cierra tu turno',
               onTap: () async {
+                final navContext = Navigator.of(context).context;
                 Navigator.of(context).pop();
-                await CloseShiftDialog.show(context, shift: shift);
+                final closed = await CloseShiftDialog.show(
+                  navContext,
+                  shift: shift,
+                );
+                if (closed != null && navContext.mounted) {
+                  await showShiftViewerDialog(navContext, closed);
+                }
               },
             ),
           ],
