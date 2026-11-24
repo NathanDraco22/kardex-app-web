@@ -498,6 +498,16 @@ class _InnerContent extends StatelessWidget {
               ),
             ],
           ),
+          if (!selectedType.isService) ...[
+            const SizedBox(height: 12),
+            _ExtraUnitsSection(
+              creationMap: creationMap,
+              onPresetApplied: (preset) {
+                unitController.text = preset.baseUnit;
+                creationMap['unitName'] = preset.baseUnit;
+              },
+            ),
+          ],
           const SizedBox(height: 12),
           Row(
             children: [
@@ -601,16 +611,6 @@ class _InnerContent extends StatelessWidget {
               return null;
             },
           ),
-          if (!selectedType.isService) ...[
-            const SizedBox(height: 16),
-            _ExtraUnitsSection(
-              creationMap: creationMap,
-              onPresetApplied: (preset) {
-                unitController.text = preset.baseUnit;
-                creationMap['unitName'] = preset.baseUnit;
-              },
-            ),
-          ],
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(12),
@@ -815,10 +815,13 @@ class _ExtraUnitsSectionState extends State<_ExtraUnitsSection> {
   final List<ExtraUnit> _extraUnits = [];
   int _defaultUnitIndex = 0;
   int _wholesaleUnitIndex = 0;
+  int _priceUnitFactor = 1;
 
   @override
   void initState() {
     super.initState();
+    final rawFactor = (widget.creationMap['priceUnitFactor'] as num?)?.toInt() ?? 1;
+    _priceUnitFactor = rawFactor < 1 ? 1 : rawFactor;
     _syncToMap();
   }
 
@@ -833,6 +836,7 @@ class _ExtraUnitsSectionState extends State<_ExtraUnitsSection> {
       _wholesaleUnitIndex = 0;
     }
     widget.creationMap['wholesaleUnitIndex'] = _wholesaleUnitIndex;
+    widget.creationMap['priceUnitFactor'] = _priceUnitFactor < 1 ? 1 : _priceUnitFactor;
   }
 
   Future<bool> _confirmBaseUnitChange(String currentBaseUnit, String newBaseUnit) {
@@ -861,6 +865,7 @@ class _ExtraUnitsSectionState extends State<_ExtraUnitsSection> {
       _extraUnits.addAll(preset.units);
       _defaultUnitIndex = preset.defaultUnitIndex;
       _wholesaleUnitIndex = preset.wholesaleUnitIndex;
+      _priceUnitFactor = preset.priceUnitFactor;
       _syncToMap();
     });
 
@@ -871,7 +876,7 @@ class _ExtraUnitsSectionState extends State<_ExtraUnitsSection> {
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Preset "${preset.name}" aplicado correctamente'),
+          content: Text('Medidas "${preset.name}" aplicadas correctamente'),
           duration: const Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
         ),
@@ -892,6 +897,12 @@ class _ExtraUnitsSectionState extends State<_ExtraUnitsSection> {
           alignment: WrapAlignment.spaceBetween,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
+            if (FeatureFlags.showUnitScales)
+              FilledButton.tonalIcon(
+                onPressed: _applyPreset,
+                icon: const Icon(Icons.straighten, size: 18),
+                label: const Text("Usar Medidas"),
+              ),
             OutlinedButton.icon(
               style: OutlinedButton.styleFrom(
                 foregroundColor: Theme.of(context).colorScheme.primary,
@@ -903,6 +914,7 @@ class _ExtraUnitsSectionState extends State<_ExtraUnitsSection> {
                   initialExtraUnits: _extraUnits,
                   initialDefaultUnitIndex: _defaultUnitIndex,
                   initialWholesaleUnitIndex: _wholesaleUnitIndex,
+                  initialPriceUnitFactor: _priceUnitFactor,
                   baseUnitName: currentBaseUnit,
                 );
 
@@ -917,6 +929,7 @@ class _ExtraUnitsSectionState extends State<_ExtraUnitsSection> {
                     _extraUnits.addAll(result.extraUnits);
                     _defaultUnitIndex = result.defaultUnitIndex;
                     _wholesaleUnitIndex = result.wholesaleUnitIndex;
+                    _priceUnitFactor = result.priceUnitFactor;
                     if (effectiveBaseUnit.isNotEmpty) {
                       widget.creationMap['unitName'] = effectiveBaseUnit;
                     }
@@ -926,11 +939,12 @@ class _ExtraUnitsSectionState extends State<_ExtraUnitsSection> {
                   if (effectiveBaseUnit.isNotEmpty) {
                     widget.onPresetApplied?.call(
                       BaseUnitScale(
-                        name: 'Preset aplicado',
+                        name: 'Medidas aplicadas',
                         baseUnit: effectiveBaseUnit,
                         units: result.extraUnits,
                         defaultUnitIndex: result.defaultUnitIndex,
                         wholesaleUnitIndex: result.wholesaleUnitIndex,
+                        priceUnitFactor: result.priceUnitFactor,
                       ),
                     );
                   }
@@ -939,12 +953,6 @@ class _ExtraUnitsSectionState extends State<_ExtraUnitsSection> {
               icon: const Icon(Icons.scale),
               label: Text("Unidades Extra (${_extraUnits.length})"),
             ),
-            if (FeatureFlags.showUnitScales)
-              FilledButton.tonalIcon(
-                onPressed: _applyPreset,
-                icon: const Icon(Icons.auto_awesome, size: 18),
-                label: const Text("Usar Preset"),
-              ),
           ],
         ),
       ],

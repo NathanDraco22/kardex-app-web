@@ -88,7 +88,7 @@ class _ExtraUnitsSectionState extends State<ExtraUnitsSection> {
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Preset "${preset.name}" aplicado correctamente'),
+          content: Text('Medidas "${preset.name}" aplicadas correctamente'),
           duration: const Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
         ),
@@ -111,6 +111,12 @@ class _ExtraUnitsSectionState extends State<ExtraUnitsSection> {
           alignment: WrapAlignment.spaceBetween,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
+            if (FeatureFlags.showUnitScales)
+              FilledButton.tonalIcon(
+                onPressed: _applyPreset,
+                icon: const Icon(Icons.straighten, size: 18),
+                label: const Text("Usar Medidas"),
+              ),
             OutlinedButton.icon(
               style: OutlinedButton.styleFrom(
                 foregroundColor: Theme.of(context).colorScheme.primary,
@@ -146,7 +152,7 @@ class _ExtraUnitsSectionState extends State<ExtraUnitsSection> {
                   if (effectiveBaseUnit.isNotEmpty) {
                     widget.onPresetApplied?.call(
                       BaseUnitScale(
-                        name: 'Preset aplicado',
+                        name: 'Medidas aplicadas',
                         baseUnit: effectiveBaseUnit,
                         units: result.extraUnits,
                         defaultUnitIndex: result.defaultUnitIndex,
@@ -160,12 +166,6 @@ class _ExtraUnitsSectionState extends State<ExtraUnitsSection> {
               icon: const Icon(Icons.scale),
               label: Text("Unidades Extra (${_extraUnits.length})"),
             ),
-            if (FeatureFlags.showUnitScales)
-              FilledButton.tonalIcon(
-                onPressed: _applyPreset,
-                icon: const Icon(Icons.auto_awesome, size: 18),
-                label: const Text("Usar Preset"),
-              ),
           ],
         ),
       ],
