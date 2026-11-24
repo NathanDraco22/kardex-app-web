@@ -62,9 +62,17 @@ class _RootScaffold extends StatelessWidget {
                     .where((inv) => inv.paymentType == PaymentType.cash);
                 final cashReceipts = cubitState.result.detailReceipts
                     .where((rec) => rec.paymentMethod == PaymentMethod.cash);
+                final activeMovements = cubitState.result.shiftCashMovements
+                    .where((m) => !m.isDeleted);
+                final cashIn = activeMovements
+                    .where((m) => m.type == CashMovementType.inMovement)
+                    .fold<int>(0, (prev, m) => prev + m.amount);
+                final cashOut = activeMovements
+                    .where((m) => m.type == CashMovementType.outMovement)
+                    .fold<int>(0, (prev, m) => prev + m.amount);
                 final totalFacturasEfectivo = cashInvoices.fold<int>(0, (prev, inv) => prev + inv.total);
                 final totalAbonosEfectivo = cashReceipts.fold<int>(0, (prev, rec) => prev + rec.total);
-                expectedCash = (totalFacturasEfectivo + totalAbonosEfectivo) / 100.0;
+                expectedCash = (totalFacturasEfectivo + totalAbonosEfectivo + cashIn - cashOut) / 100.0;
               }
 
               CashCounterDialog.show(

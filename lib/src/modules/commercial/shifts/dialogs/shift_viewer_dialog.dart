@@ -7,6 +7,7 @@ import 'package:kardex_app_front/src/modules/commercial/shifts/cubit/shift_cash_
 import 'package:kardex_app_front/src/modules/commercial/shifts/dialogs/close_shift_dialog.dart';
 import 'package:kardex_app_front/src/modules/commercial/shifts/dialogs/create_cash_movement_dialog.dart';
 import 'package:kardex_app_front/src/tools/bank_breakdown_helper.dart';
+import 'package:kardex_app_front/src/tools/printers/cash_movement_printer.dart';
 import 'package:kardex_app_front/src/tools/printers/shift_printer.dart';
 import 'package:kardex_app_front/widgets/design_system/app_theme_tokens.dart';
 import 'package:kardex_app_front/widgets/pdf/shift_close_pdf_template.dart';
@@ -592,6 +593,22 @@ class _ShiftViewerDialogState extends State<ShiftViewerDialog> {
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
                               color: color,
+                            ),
+                          ),
+                          IconButton(
+                            tooltip: 'Imprimir movimiento',
+                            onPressed: () {
+                              final branch = getIt<AuthCubit>().currentBranch;
+                              if (branch == null) return;
+                              printCashMovementTicket(
+                                m,
+                                branch,
+                                shiftDocNumber: _shift.docNumber,
+                              );
+                            },
+                            icon: const Icon(
+                              Icons.print_rounded,
+                              size: 20,
                             ),
                           ),
                           if (isOpen)

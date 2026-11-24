@@ -45,8 +45,20 @@ class DailyCashFlowTotalsCard extends StatelessWidget {
     final totalAbonosContado = cashReceipts.fold<int>(0, (prev, rec) => prev + rec.total);
     final countAbonosContado = cashReceipts.length;
 
-    // Total General de Ingresos
-    final totalIngresos = totalTarjetas + totalTransferencias + totalFacturasContado + totalAbonosContado;
+    // 5. Movimientos de Caja en Turnos (Entradas y Salidas de Efectivo)
+    final activeMovements = result.shiftCashMovements.where((m) => !m.isDeleted).toList();
+    final cashInMovements = activeMovements.where((m) => m.type == CashMovementType.inMovement);
+    final cashOutMovements = activeMovements.where((m) => m.type == CashMovementType.outMovement);
+    final totalCashIn = cashInMovements.fold<int>(0, (prev, m) => prev + m.amount);
+    final totalCashOut = cashOutMovements.fold<int>(0, (prev, m) => prev + m.amount);
+
+    // Total General de Ingresos (neto con movimientos de caja)
+    final totalIngresos = totalTarjetas +
+        totalTransferencias +
+        totalFacturasContado +
+        totalAbonosContado +
+        totalCashIn -
+        totalCashOut;
 
     return SectionCard(
       title: "Ingresos (Flujo de Caja)",
@@ -87,9 +99,23 @@ class DailyCashFlowTotalsCard extends StatelessWidget {
             totalColor: Colors.black87,
           ),
           SummaryRowItem(
+            icon: Icons.move_to_inbox_rounded,
+            title: "Entradas de Caja (Turnos)",
+            subtitle: "${cashInMovements.length} movimientos",
+            total: totalCashIn,
+            totalColor: Colors.green.shade700,
+          ),
+          SummaryRowItem(
+            icon: Icons.outbox_rounded,
+            title: "Salidas de Caja (Turnos)",
+            subtitle: "${cashOutMovements.length} movimientos",
+            total: -totalCashOut,
+            totalColor: totalCashOut > 0 ? Colors.red.shade700 : Colors.black87,
+          ),
+          SummaryRowItem(
             icon: Icons.savings_rounded,
             title: "Total General",
-            subtitle: "Total ingresos reales de caja",
+            subtitle: "Total ingresos netos de caja",
             total: totalIngresos,
             totalColor: Colors.purple.shade800,
             isDestacado: true,

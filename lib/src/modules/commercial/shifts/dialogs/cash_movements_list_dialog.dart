@@ -9,6 +9,7 @@ import 'package:kardex_app_front/src/modules/commercial/shifts/cubit/shift_cash_
 import 'package:kardex_app_front/src/modules/commercial/shifts/cubit/shift_cash_movement_cubit/write_shift_cash_movements_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/shifts/cubit/shift_cash_movement_cubit/write_shift_cash_movements_state.dart';
 import 'package:kardex_app_front/src/modules/commercial/shifts/dialogs/create_cash_movement_dialog.dart';
+import 'package:kardex_app_front/src/tools/printers/cash_movement_printer.dart';
 import 'package:kardex_app_front/widgets/design_system/app_theme_tokens.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:toastification/toastification.dart';
@@ -237,6 +238,16 @@ class _CashMovementsListDialogState extends State<CashMovementsListDialog> {
       await _syncActiveShiftIfNeeded();
       _loadMovements();
     }
+  }
+
+  Future<void> _printMovement(ShiftCashMovementInDb movement) async {
+    final branch = getIt<AuthCubit>().currentBranch;
+    if (branch == null) return;
+    await printCashMovementTicket(
+      movement,
+      branch,
+      shiftDocNumber: _currentShiftContext.docNumber,
+    );
   }
 
   @override
@@ -573,6 +584,8 @@ class _CashMovementsListDialogState extends State<CashMovementsListDialog> {
                                                       !_isProcessing,
                                                   formattedTime: _dateFormat
                                                       .format(movement.createdAt),
+                                                  onPrint: () =>
+                                                      _printMovement(movement),
                                                   onDelete: () =>
                                                       _confirmDeleteMovement(
                                                     movement,
@@ -713,12 +726,14 @@ class _MovementTile extends StatelessWidget {
   final ShiftCashMovementInDb movement;
   final bool canDelete;
   final String formattedTime;
+  final VoidCallback onPrint;
   final VoidCallback onDelete;
 
   const _MovementTile({
     required this.movement,
     required this.canDelete,
     required this.formattedTime,
+    required this.onPrint,
     required this.onDelete,
   });
 
@@ -868,19 +883,32 @@ class _MovementTile extends StatelessWidget {
                   color: color,
                 ),
               ),
-              if (canDelete) ...[
-                const SizedBox(height: 4),
-                IconButton(
-                  tooltip: 'Anular movimiento',
-                  visualDensity: VisualDensity.compact,
-                  onPressed: onDelete,
-                  icon: const Icon(
-                    Icons.delete_outline_rounded,
-                    color: AppThemeTokens.danger,
-                    size: 20,
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    tooltip: 'Imprimir movimiento',
+                    visualDensity: VisualDensity.compact,
+                    onPressed: onPrint,
+                    icon: const Icon(
+                      Icons.print_rounded,
+                      color: AppThemeTokens.neutral,
+                      size: 20,
+                    ),
                   ),
-                ),
-              ],
+                  if (canDelete)
+                    IconButton(
+                      tooltip: 'Anular movimiento',
+                      visualDensity: VisualDensity.compact,
+                      onPressed: onDelete,
+                      icon: const Icon(
+                        Icons.delete_outline_rounded,
+                        color: AppThemeTokens.danger,
+                        size: 20,
+                      ),
+                    ),
+                ],
+              ),
             ],
           ),
         ],

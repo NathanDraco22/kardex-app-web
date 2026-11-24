@@ -27,11 +27,18 @@ class UserOperationsArqueoPdfTemplate implements PdfTemplate {
     final validInvoices = result.detailInvoices.where((e) => e.paymentType != PaymentType.credit).toList();
     final creditInvoices = result.detailInvoices.where((e) => e.paymentType == PaymentType.credit).toList();
     final validReceipts = result.detailReceipts;
+    final activeMovements = result.shiftCashMovements.where((m) => !m.isDeleted).toList();
 
     final invoicesTotal = validInvoices.fold<int>(0, (prev, e) => prev + e.total);
     final creditInvoicesTotal = creditInvoices.fold<int>(0, (prev, e) => prev + e.total);
     final receiptsTotal = validReceipts.fold<int>(0, (prev, e) => prev + e.total);
-    final grandTotal = invoicesTotal + receiptsTotal;
+    final cashInTotal = activeMovements
+        .where((m) => m.type == CashMovementType.inMovement)
+        .fold<int>(0, (prev, m) => prev + m.amount);
+    final cashOutTotal = activeMovements
+        .where((m) => m.type == CashMovementType.outMovement)
+        .fold<int>(0, (prev, m) => prev + m.amount);
+    final grandTotal = invoicesTotal + receiptsTotal + cashInTotal - cashOutTotal;
 
     // Resumen de flujo por tipo
     final cardInvoices = result.detailInvoices.where((inv) => inv.paymentType == PaymentType.card);
@@ -79,10 +86,12 @@ class UserOperationsArqueoPdfTemplate implements PdfTemplate {
               invoicesTotal: invoicesTotal,
               receiptsTotal: receiptsTotal,
               grandTotal: grandTotal,
-              totalEfectivo: totalFacturasEfectivo + totalAbonosEfectivo,
+              totalEfectivo: totalFacturasEfectivo + totalAbonosEfectivo + cashInTotal - cashOutTotal,
               totalTarjetas: totalTarjetas,
               totalTransferencias: totalTransferencias,
               totalCreditos: creditInvoicesTotal,
+              cashInTotal: cashInTotal,
+              cashOutTotal: cashOutTotal,
               cardByBank: cardByBank,
               transferByBank: transferByBank,
             ),
@@ -92,6 +101,15 @@ class UserOperationsArqueoPdfTemplate implements PdfTemplate {
             pw.SizedBox(height: 18),
             _sectionTitle("Detalle de Facturas de Contado (${validInvoices.length})"),
             _buildInvoicesTable(validInvoices),
+            if (activeMovements.isNotEmpty) ...[
+              pw.SizedBox(height: 18),
+              _sectionTitle(
+                "Movimientos de Caja en Turnos (${activeMovements.length})",
+                trailing:
+                    "Entradas: ${NumberFormatter.convertToMoneyLike(cashInTotal)} | Salidas: ${NumberFormatter.convertToMoneyLike(cashOutTotal)}",
+              ),
+              _buildCashMovementsTable(activeMovements),
+            ],
             if (creditInvoices.isNotEmpty) ...[
               pw.SizedBox(height: 18),
               _sectionTitle(
@@ -214,6 +232,8 @@ class UserOperationsArqueoPdfTemplate implements PdfTemplate {
     required int totalTarjetas,
     required int totalTransferencias,
     required int totalCreditos,
+    required int cashInTotal,
+    required int cashOutTotal,
     required List<BankBreakdownEntry> cardByBank,
     required List<BankBreakdownEntry> transferByBank,
   }) {
@@ -302,6 +322,23 @@ class UserOperationsArqueoPdfTemplate implements PdfTemplate {
                   pw.SizedBox(width: 80),
                 ],
               ),
+              if (cashInTotal > 0 || cashOutTotal > 0) ...[
+                pw.SizedBox(height: 5),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Text(
+                      "Entradas de Caja: +${NumberFormatter.convertToMoneyLike(cashInTotal)}",
+                      style: const pw.TextStyle(fontSize: 9, color: PdfColors.black),
+                    ),
+                    pw.Text(
+                      "Salidas de Caja: -${NumberFormatter.convertToMoneyLike(cashOutTotal)}",
+                      style: const pw.TextStyle(fontSize: 9, color: PdfColors.black),
+                    ),
+                    pw.SizedBox(width: 80),
+                  ],
+                ),
+              ],
               if (transferByBank.isNotEmpty || cardByBank.isNotEmpty) ...[
                 pw.Divider(color: PdfColors.grey300, height: 10),
                 pw.Row(
@@ -596,6 +633,67 @@ class UserOperationsArqueoPdfTemplate implements PdfTemplate {
             BasicPdfTableCell(
               content: pw.Text(
                 NumberFormatter.convertToMoneyLike(inv.total),
+                style: const pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold),
+                textAlign: pw.TextAlign.right,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  pw.Widget _buildCashMovementsTable(List<ShiftCashMovementInDb> movements) {
+    return BasicPdfTableListView(
+      itemCount: movements.length,
+      columns: [
+        BasicPdfTableColumn(
+          label: pw.Text("Hora", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 9)),
+          flex: 1,
+        ),
+        BasicPdfTableColumn(
+          label: pw.Text("Tipo", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 9)),
+          flex: 2,
+        ),
+        BasicPdfTableColumn(
+          label: pw.Text("Justificación", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 9)),
+          flex: 4,
+        ),
+        BasicPdfTableColumn(
+          label: pw.Text("Usuario", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 9)),
+          flex: 2,
+        ),
+        BasicPdfTableColumn(
+          label: pw.Text(
+            "Monto",
+            style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 9),
+            textAlign: pw.TextAlign.right,
+          ),
+          flex: 2,
+        ),
+      ],
+      rowBuilder: (context, index) {
+        final m = movements[index];
+        final rowColor = index.isOdd ? PdfColors.white : PdfColors.grey100;
+        final timeStr = DateTimeTool.formatHHmm(m.createdAt);
+        final isIn = m.type == CashMovementType.inMovement;
+        final sign = isIn ? '+' : '-';
+
+        return BasicPdfTableRow(
+          color: rowColor,
+          cells: [
+            BasicPdfTableCell(content: pw.Text(timeStr, style: const pw.TextStyle(fontSize: 9))),
+            BasicPdfTableCell(
+              content: pw.Text(
+                m.docNumber.isNotEmpty ? '${m.type.display} #${m.docNumber}' : m.type.display,
+                style: const pw.TextStyle(fontSize: 9),
+              ),
+            ),
+            BasicPdfTableCell(content: pw.Text(m.reason, style: const pw.TextStyle(fontSize: 9))),
+            BasicPdfTableCell(content: pw.Text(m.createdBy.name, style: const pw.TextStyle(fontSize: 9))),
+            BasicPdfTableCell(
+              content: pw.Text(
+                '$sign${NumberFormatter.convertToMoneyLike(m.amount)}',
                 style: const pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold),
                 textAlign: pw.TextAlign.right,
               ),
