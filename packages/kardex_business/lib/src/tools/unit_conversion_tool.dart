@@ -6,8 +6,8 @@ class UnitConversionTool {
   static double minimumStep(int conversionFactor) =>
       1 / ensureSafeFactor(conversionFactor);
 
-  static int toBaseQuantity(int displayQuantity, int conversionFactor) {
-    return displayQuantity * ensureSafeFactor(conversionFactor);
+  static int toBaseQuantity(num displayQuantity, int conversionFactor) {
+    return (displayQuantity * ensureSafeFactor(conversionFactor)).round();
   }
 
   static int _divRoundHalfUp(int numerator, int denominator) {

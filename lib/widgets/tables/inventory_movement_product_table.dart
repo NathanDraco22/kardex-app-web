@@ -7,6 +7,7 @@ import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/tools/input_formatter/input_formatter.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/widgets/display_product_code.dart';
+import 'package:kardex_app_front/widgets/elements/quantity_field.dart';
 import 'package:kardex_app_front/widgets/elements/quantity_unit_rules.dart';
 import 'package:kardex_app_front/widgets/gates/gates.dart';
 import 'package:kardex_app_front/widgets/dialogs/inventory_unit_picker.dart';
@@ -25,7 +26,7 @@ class ProductRow {
   });
 
   ProductInDb product;
-  int quantity = 0;
+  double quantity = 0;
   int unitaryCost = 0;
   DateTime? expirationDate;
 
@@ -36,7 +37,9 @@ class ProductRow {
   int conversionFactor;
   String selectedUnitName;
 
-  int get subTotal => (quantity * unitaryCost);
+  int get baseQuantity => UnitConversionTool.toBaseQuantity(quantity, conversionFactor);
+
+  int get subTotal => (quantity * unitaryCost).round();
 }
 
 class ProductTableController extends ChangeNotifier {
@@ -138,7 +141,7 @@ class _InventoryMovementProductTableState extends State<InventoryMovementProduct
     final oldFactor = UnitConversionTool.ensureSafeFactor(row.conversionFactor);
     final newFactor = UnitConversionTool.ensureSafeFactor(unit.conversionFactor);
     final previousQuantity = row.quantity;
-    final baseQuantity = previousQuantity * oldFactor;
+    final baseQuantity = UnitConversionTool.toBaseQuantity(previousQuantity, oldFactor);
     final isNewUnitSuperior = QuantityUnitRules.isSuperiorUnit(
       selectedUnitIndex: unit.unitIndex,
       defaultUnitIndex: row.product.defaultUnitIndex,
@@ -148,10 +151,9 @@ class _InventoryMovementProductTableState extends State<InventoryMovementProduct
       oldFactor: oldFactor,
       newFactor: newFactor,
       newUnitIsSuperior: isNewUnitSuperior,
-      // La fila guarda enteros en la unidad mostrada.
-      requireIntegerDisplay: true,
+      requireIntegerDisplay: false,
     );
-    final newQuantity = convertedQuantity?.round();
+    final newQuantity = convertedQuantity;
     final averageCost = row.product is ProductInDbInBranch
         ? (row.product as ProductInDbInBranch).account.averageCost
         : 0;
@@ -410,7 +412,7 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
       text: widget.rowModel.expirationDate != null ? DateFormat('MM/yy').format(widget.rowModel.expirationDate!) : '',
     );
     quantityController = TextEditingController(
-      text: widget.rowModel.quantity > 0 ? widget.rowModel.quantity.toString() : '',
+      text: widget.rowModel.quantity > 0 ? UnitConversionTool.formatQuantity(widget.rowModel.quantity) : '',
     );
     costController = TextEditingController(
       text: (widget.rowModel.unitaryCost / 100).toStringAsFixed(2),
@@ -435,7 +437,9 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
     super.didUpdateWidget(oldWidget);
     if (_lastUnitIndex != widget.rowModel.selectedUnitIndex) {
       _lastUnitIndex = widget.rowModel.selectedUnitIndex;
-      quantityController.text = widget.rowModel.quantity > 0 ? widget.rowModel.quantity.toString() : '';
+      quantityController.text = widget.rowModel.quantity > 0
+          ? UnitConversionTool.formatQuantity(widget.rowModel.quantity)
+          : '';
       costController.text = (widget.rowModel.unitaryCost / 100).toStringAsFixed(2);
     }
   }
@@ -459,7 +463,7 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
 
     final product = widget.rowModel.product;
 
-    final subtotal = (widget.rowModel.quantity * widget.rowModel.unitaryCost);
+    final subtotal = widget.rowModel.subTotal;
     return Ink(
       color: widget.color,
       padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -549,23 +553,20 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  TextField(
+                  QuantityField(
+                    key: ValueKey('${product.id}_${widget.rowModel.selectedUnitIndex}_${widget.rowModel.conversionFactor}'),
                     controller: quantityController,
                     focusNode: focusNode,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: false),
-                    inputFormatters: [IntegerTextInputFormatter()],
-                    textAlign: TextAlign.center,
+                    conversionFactor: widget.rowModel.conversionFactor,
+                    allowDecimals: QuantityUnitRules.allowsDecimals(
+                      selectedUnitIndex: widget.rowModel.selectedUnitIndex,
+                      defaultUnitIndex: product.defaultUnitIndex,
+                    ),
+                    showButtons: false,
+                    min: 0.0,
                     onEditingComplete: () => FocusScope.of(context).nextFocus(),
                     onChanged: (value) {
-                      if (value.isEmpty) {
-                        widget.rowModel.quantity = 0;
-                        EntryRowSubtotalChangedNotification(widget.rowModel).dispatch(context);
-                        setState(() {});
-                        return;
-                      }
-                      final numValue = int.tryParse(value);
-                      if (numValue == null) return;
-                      widget.rowModel.quantity = numValue;
+                      widget.rowModel.quantity = value;
                       EntryRowSubtotalChangedNotification(widget.rowModel).dispatch(context);
                       setState(() {});
                     },
@@ -573,7 +574,7 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
                   if (widget.rowModel.conversionFactor > 1) ...[
                     const SizedBox(height: 2),
                     Text(
-                      "= ${widget.rowModel.quantity * widget.rowModel.conversionFactor} ${product.unitName}",
+                      "= ${widget.rowModel.baseQuantity} ${product.unitName}",
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.blue.shade300,

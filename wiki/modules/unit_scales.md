@@ -347,7 +347,7 @@ kardex_app_front/
 - **Import/export:** las columnas de unidad/factor siguen pendientes (M8/M15).
 - **Limpieza de BD de desarrollo:** eliminar `Peso`, `Volumen`, `Longitud`, `Tiempo` viejos.
 - **Producción:** la maneja el usuario; no se agrega migración ni guard de producción en este alcance.
-- **P1 — tablas/list views `int`:** inventario y transferencia no admiten fracciones en unidad estándar; límite estructural para un bloque futuro.
+- **Tablas/list views con decimales (resuelto):** entradas, salidas, ajustes y transferencias (Web/Desktop y Mobile/Tablet) admiten cantidades decimales en la unidad estándar cuando `QuantityUnitRules.allowsDecimals(...)` es `true`, manteniendo solo enteros en unidad base y unidades superiores.
 - **P1 — `defaultUnitIndex = 0`:** la regla considera “superiores” a todas las unidades extra; revisar en escalas personalizadas.
 - **P1 — verificación:** `flutter analyze` limpio y `flutter test` 83/83; sin hot reload ni prueba manual de UI.
 
@@ -486,7 +486,7 @@ Formato actual:
 
 ### 16.7. Limitaciones residuales
 
-- **Tablas/list views `int`:** las tablas y list views de inventario y transferencia guardan cantidad display `int`; no admiten fracciones en la unidad estándar. Es un límite estructural para un bloque futuro.
+- **Tablas/list views con decimales (resuelto):** las tablas y list views de entradas, salidas, ajustes y transferencias guardan `double quantity` en la unidad mostrada (con `QuantityField`) y convierten a `int` base con `UnitConversionTool.toBaseQuantity` al enviar al backend. Solo se permiten decimales en la unidad estándar con `factor > 1`; base y unidades superiores siguen siendo estrictamente enteras.
 - **`defaultUnitIndex = 0`:** si el producto usa la base como unidad por defecto, `standardUnitFactor = 1` y la regla considera “superiores” a **todas** las unidades extra. Revisar en escalas personalizadas.
 - **Documentos viejos:** sin `standardUnitName`/`standardUnitFactor`, el display conserva el fallback decimal en la unidad seleccionada; no se puede reconstruir la unidad estándar.
 - **Pruebas:** `flutter analyze` limpio y `flutter test` 83/83; no se ejecutó hot reload ni prueba manual de UI.

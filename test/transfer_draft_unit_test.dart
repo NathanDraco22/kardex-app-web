@@ -12,7 +12,7 @@ void main() {
 
   TransferDraftUnitResolution resolve({
     int version = 3,
-    int savedQuantity = 0,
+    num savedQuantity = 0,
     int savedUnitaryCost = 0,
     int? savedUnitIndex,
     int? savedFactor,
@@ -22,6 +22,7 @@ void main() {
     int productDefaultUnitIndex = 1,
     List<TransferDraftUnitOption> productExtraUnits = defaultExtras,
     int averageCost = 100,
+    int priceUnitFactor = 1,
   }) {
     return TransferDraftUnitResolver.resolve(
       version: version,
@@ -35,6 +36,7 @@ void main() {
       productDefaultUnitIndex: productDefaultUnitIndex,
       productExtraUnits: productExtraUnits,
       averageCost: averageCost,
+      priceUnitFactor: priceUnitFactor,
     );
   }
 
@@ -163,6 +165,49 @@ void main() {
 
       expect(result.quantity, 2);
       expect(result.unitaryCost, 400);
+      expect(result.needsReview, isTrue);
+    });
+
+    test('v3 con cantidad decimal en unidad estándar Libra (Decimal) preserva decimales sin review', () {
+      final result = resolve(
+        savedQuantity: 12.5,
+        savedUnitIndex: 1,
+        savedFactor: 100,
+        savedUnitName: 'Libra',
+        savedBaseUnitName: '0.01 Libra',
+        productBaseUnitName: '0.01 Libra',
+        productDefaultUnitIndex: 1,
+        productExtraUnits: const [
+          TransferDraftUnitOption(name: 'Libra', factor: 100),
+          TransferDraftUnitOption(name: 'Arroba (25 lb)', factor: 2500),
+        ],
+        averageCost: 1450,
+        priceUnitFactor: 100,
+      );
+
+      expect(result.selectedUnitIndex, 1);
+      expect(result.selectedUnitName, 'Libra');
+      expect(result.quantity, 12.5);
+      expect(result.baseQuantity, 1250);
+      expect(result.unitaryCost, 1450);
+      expect(result.needsReview, isFalse);
+    });
+
+    test('unidad superior con cantidad no divisible degrada a base y marca review', () {
+      final result = resolve(
+        savedQuantity: 1.5,
+        savedUnitIndex: 2,
+        savedFactor: 100,
+        savedUnitName: 'Arroba (25 lb)',
+        savedBaseUnitName: baseUnitName,
+        productBaseUnitName: baseUnitName,
+        productDefaultUnitIndex: 1,
+      );
+
+      expect(result.selectedUnitIndex, 0);
+      expect(result.selectedUnitName, baseUnitName);
+      expect(result.baseQuantity, 150);
+      expect(result.quantity, 150);
       expect(result.needsReview, isTrue);
     });
   });
