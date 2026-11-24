@@ -12,6 +12,7 @@ import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/cubits/shift/shift_cubit.dart';
 import 'package:kardex_app_front/src/core/shift_guard.dart';
+import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/global_stock_search_modal.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
@@ -62,6 +63,10 @@ class _AnonInvoicesScreenWebState extends State<AnonInvoicesScreenWeb> {
           LoadingDialogManager.closeLoadingDialog(context);
           String message = "Factura guardada con éxito";
           await DialogManager.showInfoDialog(context, message);
+          final authState = getIt<AuthCubit>().state;
+          if (authState is Authenticated) {
+            await PrintManager.autoPrintIfEnabled(state.invoice, authState.branch);
+          }
           if (!context.mounted) return;
           viewController.clear();
           rebuild = true;

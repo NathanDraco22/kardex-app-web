@@ -8,6 +8,7 @@ import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/core/shift_guard.dart';
+import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 
 import 'package:kardex_app_front/widgets/client_selector_card.dart';
 
@@ -95,6 +96,12 @@ class _ClientInvoicesScreenWebState extends State<ClientInvoicesScreenWeb> {
           if (cubit.documentType == CommercialDocumentType.quote) message = "Cotización guardada con éxito";
 
           await DialogManager.showInfoDialog(context, message);
+          if (state.createdInvoice != null) {
+            final authState = getIt<AuthCubit>().state;
+            if (authState is Authenticated) {
+              await PrintManager.autoPrintIfEnabled(state.createdInvoice!, authState.branch);
+            }
+          }
           if (!context.mounted) return;
           rebuild = true;
           setState(() {});

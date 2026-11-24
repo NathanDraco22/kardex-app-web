@@ -4,6 +4,7 @@ import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/cubits/shift/shift_cubit.dart';
 import 'package:kardex_app_front/src/core/shift_guard.dart';
+import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/cubit/read_pending_invoice_cubit.dart';
@@ -113,6 +114,10 @@ class _RootScaffoldState extends State<_RootScaffold> {
           LoadingDialogManager.closeLoadingDialog(context);
 
           await DialogManager.showInfoDialog(context, "Abono Rápido creado con éxito");
+          final authState = getIt<AuthCubit>().state;
+          if (authState is Authenticated) {
+            await PrintManager.autoPrintIfEnabled(state.receipt, authState.branch);
+          }
           if (!context.mounted) return;
           await showReceiptViewerDialog(context, state.receipt);
           if (!context.mounted) return;
