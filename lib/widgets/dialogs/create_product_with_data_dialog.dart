@@ -62,6 +62,46 @@ Future<ProductInDbInBranch?> showCreateProductWithDataDialog(
   return null;
 }
 
+/// Construye `InventoryInfo` convirtiendo la cantidad, costo y precio capturados
+/// en la unidad comercial por defecto del producto hacia unidad base y
+/// `priceUnitFactor`.
+InventoryInfo buildInitialInventoryInfo({
+  required CreateProduct createProduct,
+  required bool tracksInventory,
+  required String quantityText,
+  required String costText,
+  required String priceText,
+}) {
+  final defaultFactor = UnitConversionTool.ensureSafeFactor(
+    createProduct.defaultUnitFactor,
+  );
+  final priceUnitFactor = UnitConversionTool.ensureSafeFactor(
+    createProduct.priceUnitFactor,
+  );
+  final parsedQty = double.tryParse(quantityText.trim().replaceAll(',', '.')) ?? 0.0;
+  final baseQuantity = tracksInventory ? (parsedQty * defaultFactor).round() : 0;
+
+  final costDouble = double.tryParse(costText.trim().replaceAll(',', '')) ?? 0.0;
+  final priceDouble = double.tryParse(priceText.trim().replaceAll(',', '')) ?? 0.0;
+
+  final commercialCostCents = NumberFormatter.convertFromDoubleToCents(costDouble);
+  final commercialPriceCents = NumberFormatter.convertFromDoubleToCents(priceDouble);
+
+  return InventoryInfo(
+    quantity: baseQuantity,
+    cost: UnitConversionTool.toStoredPriceOrCost(
+      commercialCostCents,
+      defaultFactor,
+      priceUnitFactor: priceUnitFactor,
+    ),
+    price: UnitConversionTool.toStoredPriceOrCost(
+      commercialPriceCents,
+      defaultFactor,
+      priceUnitFactor: priceUnitFactor,
+    ),
+  );
+}
+
 class CreateProductWithDataDialog extends StatefulWidget {
   const CreateProductWithDataDialog({super.key, this.branchId});
 
@@ -167,8 +207,13 @@ class _FormContentState extends State<_FormContent> {
         widget.creationMap['extraUnits'] = const <ExtraUnit>[];
         widget.creationMap['defaultUnitIndex'] = 0;
         widget.creationMap['wholesaleUnitIndex'] = 0;
+        widget.creationMap['priceUnitFactor'] = 1;
       }
     });
+  }
+
+  void _onScaleChanged() {
+    setState(() {});
   }
 
   @override
@@ -221,14 +266,12 @@ class _FormContentState extends State<_FormContent> {
 
       final createProduct = CreateProduct.fromJson(widget.creationMap);
 
-      final quantity = _selectedType.tracksInventory ? (int.tryParse(_quantityController.text.trim()) ?? 0) : 0;
-      final costDouble = double.tryParse(_costController.text.trim().replaceAll(',', '')) ?? 0.0;
-      final priceDouble = double.tryParse(_priceController.text.trim().replaceAll(',', '')) ?? 0.0;
-
-      final inventoryInfo = InventoryInfo(
-        quantity: quantity,
-        cost: NumberFormatter.convertFromDoubleToCents(costDouble),
-        price: NumberFormatter.convertFromDoubleToCents(priceDouble),
+      final inventoryInfo = buildInitialInventoryInfo(
+        createProduct: createProduct,
+        tracksInventory: _selectedType.tracksInventory,
+        quantityText: _quantityController.text,
+        costText: _costController.text,
+        priceText: _priceController.text,
       );
 
       final createProductWithData = CreateProductWithData(
@@ -307,6 +350,7 @@ class _FormContentState extends State<_FormContent> {
               branchId: widget.branchId,
               selectedType: _selectedType,
               onTypeChanged: _onTypeChanged,
+              onScaleChanged: _onScaleChanged,
               unitsMenuEntries: unitsMenuEntries,
               productCategoriesEntries: productCateEntries,
               tagController: _tagController,
@@ -367,6 +411,7 @@ class _FormContentState extends State<_FormContent> {
               branchId: widget.branchId,
               selectedType: _selectedType,
               onTypeChanged: _onTypeChanged,
+              onScaleChanged: _onScaleChanged,
               unitsMenuEntries: unitsMenuEntries,
               productCategoriesEntries: productCateEntries,
               tagController: _tagController,
@@ -390,6 +435,7 @@ class _InnerContent extends StatelessWidget {
     this.branchId,
     required this.selectedType,
     required this.onTypeChanged,
+    required this.onScaleChanged,
     required this.unitsMenuEntries,
     required this.productCategoriesEntries,
     required this.tagController,
@@ -405,6 +451,7 @@ class _InnerContent extends StatelessWidget {
   final String? branchId;
   final ProductType selectedType;
   final ValueChanged<ProductType> onTypeChanged;
+  final VoidCallback onScaleChanged;
   final Iterable<DropdownMenuEntry<String>> unitsMenuEntries;
   final Iterable<DropdownMenuEntry<String>> productCategoriesEntries;
   final _WordChipTextController tagController;
@@ -415,10 +462,53 @@ class _InnerContent extends StatelessWidget {
   final ImageProvider? imageProvider;
   final void Function(ImageSelectorIntent intent) onImageIntent;
 
+  int _resolveDefaultUnitFactor() {
+    final rawExtras = creationMap['extraUnits'];
+    final defaultIdx = (creationMap['defaultUnitIndex'] as num?)?.toInt() ?? 0;
+    if (defaultIdx <= 0 || rawExtras is! List || rawExtras.isEmpty) {
+      return 1;
+    }
+    final idx = defaultIdx - 1;
+    if (idx < 0 || idx >= rawExtras.length) return 1;
+    final entry = rawExtras[idx];
+    if (entry is ExtraUnit) {
+      return UnitConversionTool.ensureSafeFactor(entry.conversionFactor);
+    }
+    if (entry is Map) {
+      final rawFactor = (entry['conversionFactor'] as num?)?.toInt() ?? 1;
+      return UnitConversionTool.ensureSafeFactor(rawFactor);
+    }
+    return 1;
+  }
+
+  String _resolveDefaultUnitName() {
+    final rawExtras = creationMap['extraUnits'];
+    final defaultIdx = (creationMap['defaultUnitIndex'] as num?)?.toInt() ?? 0;
+    if (defaultIdx > 0 && rawExtras is List && defaultIdx - 1 < rawExtras.length) {
+      final entry = rawExtras[defaultIdx - 1];
+      if (entry is ExtraUnit && entry.name.trim().isNotEmpty) {
+        return entry.name.trim();
+      }
+      if (entry is Map) {
+        final name = (entry['name'] as String?)?.trim() ?? '';
+        if (name.isNotEmpty) return name;
+      }
+    }
+    final baseName = unitController.text.trim();
+    if (baseName.isNotEmpty) return baseName;
+    return (creationMap['unitName'] as String?)?.trim() ?? '';
+  }
+
   @override
   Widget build(BuildContext context) {
     final authCubit = context.read<AuthCubit>();
     final branchName = authCubit.currentBranchName;
+    final defaultUnitFactor = _resolveDefaultUnitFactor();
+    final defaultUnitName = _resolveDefaultUnitName();
+    final unitSuffix = defaultUnitName.isNotEmpty ? " ($defaultUnitName)" : "";
+    final moneyUnitSuffix = defaultUnitName.isNotEmpty
+        ? "${NumberFormatter.currencySymbol} / $defaultUnitName"
+        : NumberFormatter.currencySymbol;
 
     return SizedBox(
       width: 350,
@@ -502,6 +592,7 @@ class _InnerContent extends StatelessWidget {
               onPresetApplied: (preset) {
                 unitController.text = preset.baseUnit;
                 creationMap['unitName'] = preset.baseUnit;
+                onScaleChanged();
               },
             ),
           ],
@@ -643,16 +734,23 @@ class _InnerContent extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 if (selectedType.tracksInventory) ...[
-                  TitleTextField(
-                    key: const ValueKey("initial_quantity"),
-                    title: "Cantidad Inicial*",
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [IntegerTextInputFormatter()],
+                  QuantityField(
+                    key: ValueKey("initial_quantity_$defaultUnitFactor"),
+                    title: "Cantidad Inicial$unitSuffix*",
+                    showTitle: true,
+                    showButtons: false,
+                    conversionFactor: defaultUnitFactor,
+                    allowDecimals: defaultUnitFactor > 1,
+                    min: 0.0,
                     controller: quantityController,
+                    onChanged: (_) {},
                     validator: (val) {
-                      if (val == null || val.trim().isEmpty) return "Campo requerido";
-                      final n = int.tryParse(val.trim());
-                      if (n == null || n < 0) return "Debe ser un número >= 0";
+                      final text = val?.trim() ?? "";
+                      if (text.isEmpty) return "Campo requerido";
+                      final parsed = double.tryParse(text.replaceAll(',', '.'));
+                      if (parsed == null || parsed < 0) {
+                        return "Debe ser un número >= 0";
+                      }
                       return null;
                     },
                   ),
@@ -664,7 +762,7 @@ class _InnerContent extends StatelessWidget {
                       child: TitleTextField(
                         key: const ValueKey("initial_cost"),
                         title: selectedType.tracksInventory
-                            ? "Costo Unitario (${NumberFormatter.currencySymbol})*"
+                            ? "Costo Unitario ($moneyUnitSuffix)*"
                             : "Costo Ref. (${NumberFormatter.currencySymbol})",
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
                         inputFormatters: [const DecimalTextInputFormatter()],
@@ -684,7 +782,7 @@ class _InnerContent extends StatelessWidget {
                     Flexible(
                       child: TitleTextField(
                         key: const ValueKey("initial_price"),
-                        title: "Precio Venta (${NumberFormatter.currencySymbol})*",
+                        title: "Precio Venta ($moneyUnitSuffix)*",
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
                         inputFormatters: [const DecimalTextInputFormatter()],
                         controller: priceController,
