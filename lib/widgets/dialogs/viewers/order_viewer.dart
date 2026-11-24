@@ -255,6 +255,11 @@ class OrderViewerContent extends StatelessWidget {
                 ),
               ],
             ),
+            if (order.description.trim().isNotEmpty)
+              Text(
+                "Observación: ${order.description.trim()}",
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
           ],
         ),
         const Divider(),
@@ -356,13 +361,10 @@ class OrderViewerContent extends StatelessWidget {
                 ),
               ),
               const Divider(),
-              SizedBox(
-                height: 65,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    const Spacer(),
-                    Row(
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         const Text(
@@ -396,28 +398,27 @@ class OrderViewerContent extends StatelessWidget {
                         ),
                       ],
                     ),
-                    DecoratedBox(
-                      decoration: BoxDecoration(color: Colors.grey.shade200),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          const Text(
-                            "Total:",
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.grey),
+                  DecoratedBox(
+                    decoration: BoxDecoration(color: Colors.grey.shade200),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        const Text(
+                          "Total:",
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.grey),
+                        ),
+                        SizedBox(
+                          width: 120,
+                          child: Text(
+                            NumberFormatter.convertToMoneyLike(order.total),
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            textAlign: TextAlign.end,
                           ),
-                          SizedBox(
-                            width: 120,
-                            child: Text(
-                              NumberFormatter.convertToMoneyLike(order.total),
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                              textAlign: TextAlign.end,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ],
           ),

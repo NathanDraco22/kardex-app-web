@@ -129,6 +129,7 @@ Future<Uint8List> generateTicketPdfFromDevolution(
 
             pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
                 pw.Text(
                   'Devolución: ${devolution.docNumber}',
@@ -137,11 +138,22 @@ Future<Uint8List> generateTicketPdfFromDevolution(
                   ),
                 ),
 
-                pw.Text(
-                  DateFormat('dd/MM/yyyy').format(devolution.createdAt),
-                  style: pw.TextStyle(
-                    fontSize: TicketSettings.contentFontSize(paperSize),
-                  ),
+                pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.end,
+                  children: [
+                    pw.Text(
+                      DateFormat('dd/MM/yyyy').format(devolution.createdAt),
+                      style: pw.TextStyle(
+                        fontSize: TicketSettings.contentFontSize(paperSize),
+                      ),
+                    ),
+                    pw.Text(
+                      DateFormat('hh:mm a').format(devolution.createdAt),
+                      style: pw.TextStyle(
+                        fontSize: TicketSettings.contentFontSize(paperSize),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -162,6 +174,17 @@ Future<Uint8List> generateTicketPdfFromDevolution(
                 fontSize: TicketSettings.contentFontSize(paperSize),
               ),
             ),
+
+            if (devolution.description.trim().isNotEmpty) ...[
+              pw.SizedBox(height: 2),
+              pw.Text(
+                "Observación: ${devolution.description.trim()}",
+                style: pw.TextStyle(
+                  fontSize: TicketSettings.contentFontSize(paperSize),
+                  fontStyle: pw.FontStyle.italic,
+                ),
+              ),
+            ],
 
             pw.Divider(color: PdfColors.grey),
 

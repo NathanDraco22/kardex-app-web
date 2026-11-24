@@ -135,6 +135,7 @@ Future<Uint8List> generateTicketPdfFromCreditNote(
 
             pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
                 pw.Text(
                   'Folio: #${creditNote.docNumber}',
@@ -143,11 +144,22 @@ Future<Uint8List> generateTicketPdfFromCreditNote(
                     fontSize: TicketSettings.contentFontSize(paperSize),
                   ),
                 ),
-                pw.Text(
-                  DateFormat('dd/MM/yyyy').format(creditNote.createdAt),
-                  style: pw.TextStyle(
-                    fontSize: TicketSettings.contentFontSize(paperSize),
-                  ),
+                pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.end,
+                  children: [
+                    pw.Text(
+                      DateFormat('dd/MM/yyyy').format(creditNote.createdAt),
+                      style: pw.TextStyle(
+                        fontSize: TicketSettings.contentFontSize(paperSize),
+                      ),
+                    ),
+                    pw.Text(
+                      DateFormat('hh:mm a').format(creditNote.createdAt),
+                      style: pw.TextStyle(
+                        fontSize: TicketSettings.contentFontSize(paperSize),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

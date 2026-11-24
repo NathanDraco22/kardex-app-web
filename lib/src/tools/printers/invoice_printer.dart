@@ -34,7 +34,11 @@ Future<Uint8List> generateTicketPdfFromInvoice(
 
   final branchImage = await branch.resolveLogoBytes();
 
-  String paymentType = invoice.paymentType == PaymentType.credit ? "CREDITO" : "CONTADO";
+  String paymentType = invoice.paymentType.typeLabel;
+  if ((invoice.paymentType == PaymentType.card || invoice.paymentType == PaymentType.transfer) &&
+      invoice.bankReference.trim().isNotEmpty) {
+    paymentType = "$paymentType - Ref: ${invoice.bankReference.trim()}";
+  }
 
   final itemDiscounts = invoice.effectiveItemDiscounts;
   final invoiceDiscount = invoice.invoiceDiscount;
@@ -142,6 +146,7 @@ Future<Uint8List> generateTicketPdfFromInvoice(
 
             pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
                 pw.Text(
                   'F# ${invoice.docNumber}',
@@ -150,11 +155,22 @@ Future<Uint8List> generateTicketPdfFromInvoice(
                   ),
                 ),
 
-                pw.Text(
-                  DateFormat('dd/MM/yyyy').format(invoice.createdAt),
-                  style: pw.TextStyle(
-                    fontSize: TicketSettings.contentFontSize(paperSize),
-                  ),
+                pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.end,
+                  children: [
+                    pw.Text(
+                      DateFormat('dd/MM/yyyy').format(invoice.createdAt),
+                      style: pw.TextStyle(
+                        fontSize: TicketSettings.contentFontSize(paperSize),
+                      ),
+                    ),
+                    pw.Text(
+                      DateFormat('hh:mm a').format(invoice.createdAt),
+                      style: pw.TextStyle(
+                        fontSize: TicketSettings.contentFontSize(paperSize),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -162,6 +178,7 @@ Future<Uint8List> generateTicketPdfFromInvoice(
             if (invoice.orderInfo != null)
               pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: [
                   pw.Text(
                     'Pedido: ${invoice.orderInfo!.docNumber}',
@@ -169,11 +186,22 @@ Future<Uint8List> generateTicketPdfFromInvoice(
                       fontSize: TicketSettings.contentFontSize(paperSize),
                     ),
                   ),
-                  pw.Text(
-                    'Ped: ${DateFormat('dd/MM/yyyy').format(invoice.orderInfo!.createdAt)}',
-                    style: pw.TextStyle(
-                      fontSize: TicketSettings.contentFontSize(paperSize),
-                    ),
+                  pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.end,
+                    children: [
+                      pw.Text(
+                        'Ped: ${DateFormat('dd/MM/yyyy').format(invoice.orderInfo!.createdAt)}',
+                        style: pw.TextStyle(
+                          fontSize: TicketSettings.contentFontSize(paperSize),
+                        ),
+                      ),
+                      pw.Text(
+                        DateFormat('hh:mm a').format(invoice.orderInfo!.createdAt),
+                        style: pw.TextStyle(
+                          fontSize: TicketSettings.contentFontSize(paperSize),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -223,6 +251,17 @@ Future<Uint8List> generateTicketPdfFromInvoice(
                 fontSize: TicketSettings.contentFontSize(paperSize),
               ),
             ),
+
+            if (invoice.description.trim().isNotEmpty) ...[
+              pw.SizedBox(height: 2),
+              pw.Text(
+                "Observación: ${invoice.description.trim()}",
+                style: pw.TextStyle(
+                  fontSize: TicketSettings.contentFontSize(paperSize),
+                  fontStyle: pw.FontStyle.italic,
+                ),
+              ),
+            ],
 
             pw.Divider(color: PdfColors.grey),
 

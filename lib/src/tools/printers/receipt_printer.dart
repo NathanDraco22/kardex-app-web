@@ -122,6 +122,7 @@ Future<Uint8List> generateTicketPdfFromReceipt(
 
             pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
                 pw.Text(
                   'Recibo: ${receipt.docNumber}',
@@ -129,9 +130,18 @@ Future<Uint8List> generateTicketPdfFromReceipt(
                     fontSize: TicketSettings.contentFontSize(paperSize),
                   ),
                 ),
-                pw.Text(
-                  DateFormat('dd/MM/yyyy').format(receipt.createdAt),
-                  style: pw.TextStyle(fontSize: TicketSettings.contentFontSize(paperSize)),
+                pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.end,
+                  children: [
+                    pw.Text(
+                      DateFormat('dd/MM/yyyy').format(receipt.createdAt),
+                      style: pw.TextStyle(fontSize: TicketSettings.contentFontSize(paperSize)),
+                    ),
+                    pw.Text(
+                      DateFormat('hh:mm a').format(receipt.createdAt),
+                      style: pw.TextStyle(fontSize: TicketSettings.contentFontSize(paperSize)),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -143,6 +153,12 @@ Future<Uint8List> generateTicketPdfFromReceipt(
               ),
             pw.Text(
               'Vendedor: ${receipt.createdBy.name}',
+              style: pw.TextStyle(fontSize: TicketSettings.contentFontSize(paperSize)),
+            ),
+            pw.Text(
+              receipt.bankReference.trim().isNotEmpty
+                  ? 'Método: ${receipt.paymentMethod.display} - Ref: ${receipt.bankReference.trim()}'
+                  : 'Método: ${receipt.paymentMethod.display}',
               style: pw.TextStyle(fontSize: TicketSettings.contentFontSize(paperSize)),
             ),
             pw.Divider(color: PdfColors.grey),
