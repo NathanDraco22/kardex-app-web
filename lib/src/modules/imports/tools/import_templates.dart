@@ -21,6 +21,7 @@ class ImportTemplates {
     "code",
     "brandName",
     "unitName",
+    "unitScale",
     "categoryName",
     "tags",
     "hasIva",
