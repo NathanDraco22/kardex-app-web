@@ -70,7 +70,7 @@ class _CreateTransferScreenState extends State<CreateTransferScreen> {
   Future<void> _showUnitReviewDialog(TransferDraft draft) async {
     final details = draft.reviews
         .map((review) {
-          final quantity = '${review.quantity} ${review.unitName}';
+          final quantity = '${UnitConversionTool.formatQuantity(review.quantity)} ${review.unitName}';
           final base = '= ${review.baseQuantity} ${review.baseUnitName}';
           final cost = NumberFormatter.convertToMoneyLike(review.unitaryCost);
           return '• ${review.productName}: $quantity ($base), costo $cost c/u.\n'

@@ -112,7 +112,7 @@ class _Content extends StatelessWidget {
           final oldFactor = UnitConversionTool.ensureSafeFactor(currentRowCardModel.conversionFactor);
           final newFactor = UnitConversionTool.ensureSafeFactor(unit.conversionFactor);
           final previousQuantity = currentRowCardModel.quantity;
-          final baseQuantity = previousQuantity * oldFactor;
+          final baseQuantity = UnitConversionTool.toBaseQuantity(previousQuantity, oldFactor);
           final isNewUnitSuperior = QuantityUnitRules.isSuperiorUnit(
             selectedUnitIndex: unit.unitIndex,
             defaultUnitIndex: currentRowCardModel.product.defaultUnitIndex,
@@ -122,10 +122,9 @@ class _Content extends StatelessWidget {
             oldFactor: oldFactor,
             newFactor: newFactor,
             newUnitIsSuperior: isNewUnitSuperior,
-            // La fila guarda enteros en la unidad mostrada.
-            requireIntegerDisplay: true,
+            requireIntegerDisplay: false,
           );
-          final newQuantity = convertedQuantity?.round();
+          final newQuantity = convertedQuantity;
           final averageCost = currentRowCardModel.product is ProductInDbInBranch
               ? (currentRowCardModel.product as ProductInDbInBranch).account.averageCost
               : 0;
@@ -203,7 +202,9 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
           : '',
     );
     quantityController = TextEditingController(
-      text: widget.rowCardModel.quantity > 0 ? widget.rowCardModel.quantity.toString() : '',
+      text: widget.rowCardModel.quantity > 0
+          ? UnitConversionTool.formatQuantity(widget.rowCardModel.quantity)
+          : '',
     );
 
     if (widget.rowCardModel.quantity == 0) {
@@ -223,7 +224,9 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
     super.didUpdateWidget(oldWidget);
     if (_lastUnitIndex != widget.rowCardModel.selectedUnitIndex) {
       _lastUnitIndex = widget.rowCardModel.selectedUnitIndex;
-      quantityController.text = widget.rowCardModel.quantity > 0 ? widget.rowCardModel.quantity.toString() : '';
+      quantityController.text = widget.rowCardModel.quantity > 0
+          ? UnitConversionTool.formatQuantity(widget.rowCardModel.quantity)
+          : '';
     }
   }
 
@@ -245,7 +248,7 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
     final product = widget.rowCardModel.product;
     final rowCard = widget.rowCardModel;
 
-    final subtotal = (widget.rowCardModel.quantity * widget.rowCardModel.unitaryCost);
+    final subtotal = widget.rowCardModel.subTotal;
 
     BoxBorder? border;
     if (parentFocus.hasFocus) {
@@ -400,30 +403,30 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            TitleTextField(
+                            QuantityField(
+                              key: ValueKey('${product.id}_${rowCard.selectedUnitIndex}_${rowCard.conversionFactor}'),
                               controller: quantityController,
                               focusNode: focusNode,
-                              inputFormatters: [IntegerTextInputFormatter()],
-                              titleTextAlign: TextAlign.center,
-                              keyboardType: TextInputType.number,
-                              onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                              conversionFactor: rowCard.conversionFactor,
+                              allowDecimals: QuantityUnitRules.allowsDecimals(
+                                selectedUnitIndex: rowCard.selectedUnitIndex,
+                                defaultUnitIndex: product.defaultUnitIndex,
+                              ),
+                              showTitle: true,
                               title: "Cantidad",
+                              titleTextAlign: TextAlign.center,
+                              showButtons: false,
+                              min: 0.0,
+                              onEditingComplete: () => FocusScope.of(context).nextFocus(),
                               onChanged: (value) {
-                                if (value.isEmpty) {
-                                  rowCard.quantity = 0;
-                                  setState(() {});
-                                  return;
-                                }
-                                final numValue = int.tryParse(value);
-                                if (numValue == null) return;
-                                rowCard.quantity = numValue;
+                                rowCard.quantity = value;
                                 setState(() {});
                               },
                             ),
                             if (rowCard.conversionFactor > 1) ...[
                               const SizedBox(height: 6),
                               Text(
-                                "= ${rowCard.quantity * rowCard.conversionFactor} ${product.unitName}",
+                                "= ${rowCard.baseQuantity} ${product.unitName}",
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Colors.blue.shade300,

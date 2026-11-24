@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/widgets/elements/quantity_unit_rules.dart';
 import 'package:kardex_app_front/widgets/tables/transfer_product_table.dart';
 
 /// Borrador de transferencia entre sucursales.
@@ -56,7 +57,7 @@ class TransferDraft {
 
         final resolution = TransferDraftUnitResolver.resolve(
           version: version,
-          savedQuantity: (rowJson['quantity'] as num?)?.toInt() ?? 0,
+          savedQuantity: (rowJson['quantity'] as num?)?.toDouble() ?? 0.0,
           savedUnitaryCost: (rowJson['unitaryCost'] as num?)?.toInt() ?? 0,
           savedUnitIndex: (rowJson['selectedUnitIndex'] as num?)?.toInt(),
           savedFactor: (rowJson['conversionFactor'] as num?)?.toInt(),
@@ -153,7 +154,7 @@ class TransferDraftUnitReview {
   });
 
   final String productName;
-  final int quantity;
+  final double quantity;
   final int baseQuantity;
   final String unitName;
   final String baseUnitName;
@@ -191,7 +192,7 @@ class TransferDraftUnitResolution {
   });
 
   /// Cantidad en la unidad comercial restaurada (display).
-  final int quantity;
+  final double quantity;
 
   /// Cantidad en unidad base.
   final int baseQuantity;
@@ -215,7 +216,7 @@ class TransferDraftUnitResolver {
 
   static TransferDraftUnitResolution resolve({
     required int version,
-    required int savedQuantity,
+    required num savedQuantity,
     required int savedUnitaryCost,
     required int? savedUnitIndex,
     required int? savedFactor,
@@ -267,7 +268,7 @@ class TransferDraftUnitResolver {
     }
 
     var selection = baseOption;
-    var baseQuantity = max(savedQuantity, 0);
+    var baseQuantity = max(savedQuantity, 0).round();
 
     if (!hasUnitData) {
       reasons.add(
@@ -276,7 +277,7 @@ class TransferDraftUnitResolver {
       selection = defaultOption;
     } else {
       // En v2/v3 la cantidad guardada es display de la unidad comercial.
-      baseQuantity = max(savedQuantity, 0) * safeSavedFactor;
+      baseQuantity = UnitConversionTool.toBaseQuantity(max(savedQuantity, 0), safeSavedFactor);
 
       if (baseChanged) {
         reasons.add(
@@ -334,17 +335,24 @@ class TransferDraftUnitResolver {
       }
     }
 
-    var resolvedQuantity = baseQuantity;
+    final resolvedIndex = _indexOf(selection, extras, baseOption);
+    final isSuperior = QuantityUnitRules.isSuperiorUnit(
+      selectedUnitIndex: resolvedIndex,
+      defaultUnitIndex: productDefaultUnitIndex,
+    );
+    var resolvedQuantity = baseQuantity.toDouble();
     if (selection.factor > 1) {
-      if (baseQuantity % selection.factor == 0) {
-        resolvedQuantity = baseQuantity ~/ selection.factor;
+      if (!isSuperior) {
+        resolvedQuantity = baseQuantity / selection.factor;
+      } else if (baseQuantity % selection.factor == 0) {
+        resolvedQuantity = (baseQuantity ~/ selection.factor).toDouble();
       } else {
         reasons.add(
           'La cantidad no es divisible por la unidad "${selection.name}"; '
           'se muestra en "${baseOption.name}".',
         );
         selection = baseOption;
-        resolvedQuantity = baseQuantity;
+        resolvedQuantity = baseQuantity.toDouble();
       }
     }
 

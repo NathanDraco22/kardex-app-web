@@ -2,12 +2,12 @@ import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/modules/inventory/create_transfer/mediator.dart';
+import 'package:kardex_app_front/widgets/elements/quantity_unit_rules.dart';
 import 'package:kardex_app_front/widgets/tables/transfer_product_table.dart';
 import 'package:kardex_app_front/src/tools/input_formatter/input_formatter.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/src/cubits/transfers/write_transfer_cubit.dart';
 import 'package:kardex_business/kardex_business.dart';
-import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 
@@ -43,7 +43,7 @@ class MobileProductCardState extends State<MobileProductCard> with AutomaticKeep
   void initState() {
     super.initState();
     quantityController = TextEditingController(
-      text: widget.row.quantity > 0 ? widget.row.quantity.toString() : "",
+      text: widget.row.quantity > 0 ? UnitConversionTool.formatQuantity(widget.row.quantity) : "",
     );
     expirationController = TextEditingController(
       text: widget.row.expirationDate != null ? DateFormat('MM/yy').format(widget.row.expirationDate!) : "",
@@ -217,26 +217,21 @@ class MobileProductCardState extends State<MobileProductCard> with AutomaticKeep
                       const SizedBox(
                         height: 6,
                       ),
-                      TextField(
+                      QuantityField(
                         focusNode: quantityFocusNode,
                         controller: quantityController,
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                        inputFormatters: [IntegerTextInputFormatter()],
-                        textAlign: TextAlign.center,
-                        textInputAction: .next,
-                        decoration: const InputDecoration(
-                          isDense: true,
+                        conversionFactor: widget.row.conversionFactor,
+                        allowDecimals: QuantityUnitRules.allowsDecimals(
+                          selectedUnitIndex: widget.row.selectedUnitIndex,
+                          defaultUnitIndex: widget.row.product.defaultUnitIndex,
                         ),
+                        showButtons: false,
+                        min: 0.0,
                         onChanged: (value) {
-                          if (value.isEmpty) {
-                            widget.row.quantity = 0;
-                          } else {
-                            widget.row.quantity = int.tryParse(value) ?? 0;
-                            if (widget.row.quantity > 0) {
-                              unSetCardColor();
-                            }
+                          widget.row.quantity = value;
+                          if (widget.row.quantity > 0) {
+                            unSetCardColor();
                           }
-
                           mediator.refresh();
                         },
                       ),

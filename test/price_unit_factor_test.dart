@@ -2,6 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:kardex_app_front/widgets/dialogs/create_product_with_data_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 import 'package:kardex_app_front/widgets/elements/price_level_sync_controller.dart';
+import 'package:kardex_app_front/widgets/tables/inventory_movement_product_table.dart';
+import 'package:kardex_app_front/widgets/tables/transfer_product_table.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 ProductInDbInBranch _buildLibraCentesimalProduct({
@@ -314,6 +316,44 @@ void main() {
       expect(info.quantity, 10);
       expect(info.cost, 1200);
       expect(info.price, 1500);
+    });
+  });
+
+  group('Filas de inventario y transferencia con cantidades decimales', () {
+    test('ProductRow calcula baseQuantity y subTotal exactos con decimales', () {
+      final product = _buildLibraCentesimalProduct(averageCost: 1450);
+      final row = ProductRow(
+        product: product,
+        quantity: 12.5,
+        unitaryCost: 1450,
+        selectedUnitIndex: 1,
+        conversionFactor: 100,
+        selectedUnitName: 'Libra',
+      );
+
+      expect(row.baseQuantity, 1250);
+      expect(row.subTotal, 18125);
+      expect(UnitConversionTool.toBaseQuantity(row.quantity, row.conversionFactor), 1250);
+
+      row.quantity = 1.35;
+      expect(row.baseQuantity, 135);
+      expect(row.subTotal, 1958);
+    });
+
+    test('TransferProductRow calcula baseQuantity y subTotal exactos con decimales', () {
+      final product = _buildLibraCentesimalProduct(averageCost: 1450);
+      final row = TransferProductRow(
+        product: product,
+        quantity: 2.75,
+        unitaryCost: 1450,
+        selectedUnitIndex: 1,
+        conversionFactor: 100,
+        selectedUnitName: 'Libra',
+      );
+
+      expect(row.baseQuantity, 275);
+      expect(row.subTotal, 3988);
+      expect(UnitConversionTool.toBaseQuantity(row.quantity, row.conversionFactor), 275);
     });
   });
 }

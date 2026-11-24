@@ -3,7 +3,7 @@ import 'package:kardex_business/kardex_business.dart';
 
 class ConfirmationListItem {
   final String title;
-  final int quantity;
+  final num quantity;
   final int unitPrice;
   final int subtotal;
 
@@ -44,7 +44,7 @@ class ConfirmationProductListView extends StatelessWidget {
                 title: Text(item.title),
                 subtitle: Row(
                   children: [
-                    Expanded(child: Text(item.quantity.toString())),
+                    Expanded(child: Text(UnitConversionTool.formatQuantity(item.quantity))),
                     Expanded(child: Text(NumberFormatter.convertToMoneyLike(item.unitPrice))),
                     Expanded(
                       child: Text(
