@@ -114,8 +114,8 @@ class _ExtraUnitsSectionState extends State<ExtraUnitsSection> {
             if (FeatureFlags.showUnitScales)
               FilledButton.tonalIcon(
                 onPressed: _applyPreset,
-                icon: const Icon(Icons.straighten, size: 18),
-                label: const Text("Usar Medidas"),
+                icon: const Icon(Icons.straighten, size: 18, color: Colors.white),
+                label: const Text("Usar Medidas", style: TextStyle(color: Colors.white)),
               ),
             OutlinedButton.icon(
               style: OutlinedButton.styleFrom(
