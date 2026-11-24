@@ -63,8 +63,13 @@ Las plantillas se generan en el cliente con BOM UTF-8 para compatibilidad con Ex
 ### Inventario inicial / inventario
 
 ```text
-name,description,code,brandName,unitName,categoryName,tags,hasIva,isActive,quantity,cost,price,price2,price3,price4
+name,description,code,brandName,unitName,unitScale,categoryName,tags,hasIva,isActive,quantity,cost,price,price2,price3,price4
 ```
+
+- **`unitScale` (opcional):** acepta el **nombre** de una escala registrada (sin distinguir mayúsculas/minúsculas, p. ej. `Libra (Decimal)`, `Kilo (Decimal)`, `Libra`, `Caja x12 - Fracción`) o su **`id`**.
+  - Si la fila trae `unitScale`, `unitName` puede quedar vacío y el backend autoasigna `baseUnit`, `extraUnits`, `defaultUnitIndex`, `wholesaleUnitIndex` y `priceUnitFactor`.
+  - En filas con `unitScale`, `quantity` acepta decimales exactos en la unidad comercial principal (p. ej. `12.5` libras → `1250` unidades base) y `cost`/`price..price4` se interpretan en esa misma unidad comercial.
+  - Si `unitScale` viene vacío (o la columna no existe en el CSV), la fila funciona en modo estándar (`unitName` obligatorio y `quantity` entero).
 
 ### Clientes
 
