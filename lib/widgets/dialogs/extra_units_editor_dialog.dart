@@ -178,8 +178,8 @@ class _ExtraUnitsEditorDialogState extends State<ExtraUnitsEditorDialog> {
                     _validateWholesaleUnitIndex();
                   });
                 },
-                icon: const Icon(Icons.auto_awesome, size: 18),
-                label: const Text("Cargar Preset"),
+                icon: const Icon(Icons.straighten, size: 18),
+                label: const Text("Usar Medidas"),
               ),
           ],
         ),

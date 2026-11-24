@@ -508,6 +508,17 @@ class _InnerContent extends StatelessWidget {
               ),
             ],
           ),
+          if (!selectedType.isService) ...[
+            const SizedBox(height: 12),
+            ExtraUnitsSection(
+              creationMap: widget.creationMap,
+              currentProduct: widget.currentProduct,
+              onPresetApplied: (preset) {
+                unitController.text = preset.baseUnit;
+                widget.creationMap['unitName'] = preset.baseUnit;
+              },
+            ),
+          ],
           const SizedBox(height: 12),
           Row(
             children: [
@@ -622,18 +633,6 @@ class _InnerContent extends StatelessWidget {
               return null;
             },
           ),
-
-          if (!selectedType.isService) ...[
-            const SizedBox(height: 16),
-            ExtraUnitsSection(
-              creationMap: widget.creationMap,
-              currentProduct: widget.currentProduct,
-              onPresetApplied: (preset) {
-                unitController.text = preset.baseUnit;
-                widget.creationMap['unitName'] = preset.baseUnit;
-              },
-            ),
-          ],
 
           if (widget.currentProduct == null && !selectedType.tracksInventory) ...[
             const SizedBox(height: 16),
