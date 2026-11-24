@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kardex_app_front/widgets/dialogs/create_product_with_data_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 import 'package:kardex_app_front/widgets/elements/price_level_sync_controller.dart';
 import 'package:kardex_business/kardex_business.dart';
@@ -235,6 +236,84 @@ void main() {
         'baseUnit': 'Unidad',
       });
       expect(scale.priceUnitFactor, 1);
+    });
+  });
+
+  group('buildInitialInventoryInfo (CreateProductWithDataDialog)', () {
+    test('convierte cantidad decimal y conserva precio/costo exacto en Libra (Decimal)', () {
+      final product = CreateProduct(
+        name: 'Lomo de Res',
+        unitName: '0.01 Libra',
+        categoryName: 'Carnes',
+        tags: const [],
+        hasIva: false,
+        extraUnits: const [
+          ExtraUnit(name: 'Libra', conversionFactor: 100),
+        ],
+        defaultUnitIndex: 1,
+        priceUnitFactor: 100,
+      );
+
+      final info = buildInitialInventoryInfo(
+        createProduct: product,
+        tracksInventory: true,
+        quantityText: '12.5',
+        costText: '14.50',
+        priceText: '18.50',
+      );
+
+      expect(info.quantity, 1250);
+      expect(info.cost, 1450);
+      expect(info.price, 1850);
+    });
+
+    test('convierte cantidad, costo y precio en escala de cuartos (1/4 Libra)', () {
+      final product = CreateProduct(
+        name: 'Queso',
+        unitName: '1/4 Libra',
+        categoryName: 'Lácteos',
+        tags: const [],
+        hasIva: false,
+        extraUnits: const [
+          ExtraUnit(name: 'Libra', conversionFactor: 4),
+        ],
+        defaultUnitIndex: 1,
+        priceUnitFactor: 1,
+      );
+
+      final info = buildInitialInventoryInfo(
+        createProduct: product,
+        tracksInventory: true,
+        quantityText: '1.25',
+        costText: '16.00',
+        priceText: '20.00',
+      );
+
+      expect(info.quantity, 5);
+      expect(info.cost, 400);
+      expect(info.price, 500);
+    });
+
+    test('mantiene enteros y montos directos en unidad simple (factor 1)', () {
+      final product = CreateProduct(
+        name: 'Refresco',
+        unitName: 'Unidad',
+        categoryName: 'Bebidas',
+        tags: const [],
+        hasIva: false,
+      );
+
+      final info = buildInitialInventoryInfo(
+        createProduct: product,
+        tracksInventory: true,
+        quantityText: '10',
+        costText: '12.00',
+        priceText: '15.00',
+      );
+
+      expect(info.quantity, 10);
+      expect(info.cost, 1200);
+      expect(info.price, 1500);
     });
   });
 }
