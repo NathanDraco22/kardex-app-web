@@ -110,6 +110,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
       extraUnits: currentProduct.extraUnits,
       defaultUnitIndex: currentProduct.defaultUnitIndex,
       wholesaleUnitIndex: currentProduct.wholesaleUnitIndex,
+      priceUnitFactor: currentProduct.priceUnitFactor,
     );
     currentDiscounts = [...saleProfile.discounts];
 
@@ -296,6 +297,7 @@ class _RootScaffoldState extends State<_RootScaffold> {
                           currentProduct.extraUnits,
                           defaultUnitIndex: currentProduct.defaultUnitIndex,
                           wholesaleUnitIndex: currentProduct.wholesaleUnitIndex,
+                          priceUnitFactor: currentProduct.priceUnitFactor,
                         );
                         productWasModified = true;
                       });
@@ -410,9 +412,10 @@ class _RootScaffoldState extends State<_RootScaffold> {
                                 baseCostInCents: currentProduct.account.maximumCost,
                               ),
                             ],
-                            baseUnitName: currentProduct.unitName,
+                            baseUnitName: currentProduct.priceUnitName,
                             selectedUnitName: priceController.selectedUnit?.name ?? currentProduct.unitName,
                             selectedUnitFactor: priceController.factor,
+                            priceUnitFactor: currentProduct.priceUnitFactor,
                           ),
                           const SizedBox(height: 16),
                           Row(

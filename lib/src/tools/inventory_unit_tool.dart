@@ -66,12 +66,28 @@ class InventoryUnitTool {
     return (displayQuantity * UnitConversionTool.ensureSafeFactor(factor)).round();
   }
 
-  static int toBaseCost(int displayCostCents, int factor) {
-    return UnitConversionTool.toBaseCost(displayCostCents, factor);
+  static int toBaseCost(
+    int displayCostCents,
+    int factor, {
+    int priceUnitFactor = 1,
+  }) {
+    return UnitConversionTool.toBaseCost(
+      displayCostCents,
+      factor,
+      priceUnitFactor: priceUnitFactor,
+    );
   }
 
-  static int toDisplayCost(int baseCostCents, int factor) {
-    return baseCostCents * UnitConversionTool.ensureSafeFactor(factor);
+  static int toDisplayCost(
+    int baseCostCents,
+    int factor, {
+    int priceUnitFactor = 1,
+  }) {
+    return UnitConversionTool.toDisplayPriceOrCost(
+      baseCostCents,
+      factor,
+      priceUnitFactor: priceUnitFactor,
+    );
   }
 
   /// Convierte una cantidad mostrada entre dos unidades conservando la

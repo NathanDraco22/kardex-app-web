@@ -53,6 +53,7 @@ class _AddInventoryDialogState extends State<_AddInventoryDialog> {
     _displayCostCents = InventoryUnitTool.toDisplayCost(
       widget.product.account.averageCost,
       _selectedUnit.factor,
+      priceUnitFactor: widget.product.priceUnitFactor,
     );
     _quantityController = TextEditingController();
     _costController = TextEditingController(
@@ -121,7 +122,11 @@ class _AddInventoryDialogState extends State<_AddInventoryDialog> {
       return;
     }
 
-    final baseCost = InventoryUnitTool.toBaseCost(_displayCostCents, _selectedUnit.factor);
+    final baseCost = InventoryUnitTool.toBaseCost(
+      _displayCostCents,
+      _selectedUnit.factor,
+      priceUnitFactor: widget.product.priceUnitFactor,
+    );
     if (baseCost <= 0) {
       await DialogManager.showErrorDialog(
         context,
@@ -155,7 +160,11 @@ class _AddInventoryDialogState extends State<_AddInventoryDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final baseCostCents = InventoryUnitTool.toBaseCost(_displayCostCents, _selectedUnit.factor);
+    final baseCostCents = InventoryUnitTool.toBaseCost(
+      _displayCostCents,
+      _selectedUnit.factor,
+      priceUnitFactor: widget.product.priceUnitFactor,
+    );
     final allowsDecimals = InventoryUnitTool.allowsDecimals(
       option: _selectedUnit,
       defaultUnitIndex: widget.product.defaultUnitIndex,
@@ -241,14 +250,16 @@ class _AddInventoryDialogState extends State<_AddInventoryDialog> {
                   },
                   onChanged: _onCostChanged,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  "Costo base: ${NumberFormatter.convertToMoneyLike(baseCostCents)} / ${widget.product.unitName}",
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.blue.shade700,
+                if (_selectedUnit.factor != widget.product.priceUnitFactor) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    "Costo (${widget.product.priceUnitName}): ${NumberFormatter.convertToMoneyLike(baseCostCents)} / ${widget.product.priceUnitName}",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.blue.shade700,
+                    ),
                   ),
-                ),
+                ],
                 Gate(
                   filters: const [ExpirationDateGateFilter()],
                   child: Padding(

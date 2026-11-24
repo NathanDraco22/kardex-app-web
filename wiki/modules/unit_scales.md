@@ -496,7 +496,7 @@ Formato actual:
 
 ## 17. `priceUnitFactor` y Escalas Continuas `(Decimal)` (noviembre 2026)
 
-> **Estado de ramas:** implementado y verificado en **`main`**. Pendiente sincronizar hacia **`lite`** (y adaptar sus 4 archivos exclusivos) tras finalizar las pruebas manuales en `main`.
+> **Estado de ramas:** implementado y verificado en **`main`** y sincronizado en **`lite`** (incluyendo adaptación de `InventoryUnitTool`, `AddProductInventoryDialog`, `ProductInventoryEditorDialog` y `productInBranchFromProduct`).
 
 Para permitir decimales arbitrarios de hasta 2 cifras (`0.1`, `0.25`, `0.5`, `1.35`, `0.01`, etc.) manteniendo el stock `int` y eliminando el redondeo de precios/costos (`C1`) de los factores grandes, se introduce **`priceUnitFactor: int = 1`**.
 

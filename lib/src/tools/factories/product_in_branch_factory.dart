@@ -23,6 +23,7 @@ ProductInDbInBranch productInBranchFromProduct({
     extraUnits: product.extraUnits,
     defaultUnitIndex: product.defaultUnitIndex,
     wholesaleUnitIndex: product.wholesaleUnitIndex,
+    priceUnitFactor: product.priceUnitFactor,
     isDeleted: product.isDeleted,
     createdAt: product.createdAt,
     updatedAt: product.updatedAt,
