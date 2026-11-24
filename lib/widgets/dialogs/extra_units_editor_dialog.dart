@@ -131,8 +131,7 @@ class _ExtraUnitsEditorDialogState extends State<ExtraUnitsEditorDialog> {
           wholesaleUnitIndex--;
         }
 
-        if (_priceUnitFactor > 1 &&
-            !extraUnits.any((u) => u.conversionFactor == _priceUnitFactor)) {
+        if (_priceUnitFactor > 1 && !extraUnits.any((u) => u.conversionFactor == _priceUnitFactor)) {
           _priceUnitFactor = 1;
         }
       });
@@ -178,8 +177,8 @@ class _ExtraUnitsEditorDialogState extends State<ExtraUnitsEditorDialog> {
                     _validateWholesaleUnitIndex();
                   });
                 },
-                icon: const Icon(Icons.straighten, size: 18),
-                label: const Text("Usar Medidas"),
+                icon: const Icon(Icons.straighten, size: 18, color: Colors.white),
+                label: const Text("Usar Medidas", style: TextStyle(color: Colors.white)),
               ),
           ],
         ),

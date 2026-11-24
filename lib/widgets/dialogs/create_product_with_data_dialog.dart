@@ -93,7 +93,6 @@ class _CreateProductWithDataDialogState extends State<CreateProductWithDataDialo
 
   @override
   Widget build(BuildContext context) {
-
     return BlocListener<WriteProductCubit, WriteProductState>(
       listener: (context, state) async {
         if (state is WriteProductInProgress) {
@@ -229,9 +228,7 @@ class _FormContentState extends State<_FormContent> {
 
       final createProduct = CreateProduct.fromJson(widget.creationMap);
 
-      final quantity = _selectedType.tracksInventory
-          ? (int.tryParse(_quantityController.text.trim()) ?? 0)
-          : 0;
+      final quantity = _selectedType.tracksInventory ? (int.tryParse(_quantityController.text.trim()) ?? 0) : 0;
       final costDouble = double.tryParse(_costController.text.trim().replaceAll(',', '')) ?? 0.0;
       final priceDouble = double.tryParse(_priceController.text.trim().replaceAll(',', '')) ?? 0.0;
 
@@ -907,8 +904,8 @@ class _ExtraUnitsSectionState extends State<_ExtraUnitsSection> {
             if (FeatureFlags.showUnitScales)
               FilledButton.tonalIcon(
                 onPressed: _applyPreset,
-                icon: const Icon(Icons.straighten, size: 18),
-                label: const Text("Usar Medidas"),
+                icon: const Icon(Icons.straighten, size: 18, color: Colors.white),
+                label: const Text("Usar Medidas", style: TextStyle(color: Colors.white)),
               ),
             OutlinedButton.icon(
               style: OutlinedButton.styleFrom(
