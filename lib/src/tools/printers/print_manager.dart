@@ -22,6 +22,7 @@ class PrintManager with HiveService {
   static const String _invertColorKey = "invertColorEnabled";
   static const String _ditheringKey = "ditheringEnabled";
   static const String _extraRightMargin80mmKey = "extraRightMargin80mm";
+  static const String _autoPrintOnBillingKey = "autoPrintOnBillingEnabled";
 
   /// Obtiene el tamaño de papel configurado localmente. Si no existe, retorna 80mm por defecto.
   static Future<PaperSize> getLocalPaperSize() async {
@@ -108,6 +109,34 @@ class PrintManager with HiveService {
     final hiveService = PrintManager();
     final box = await hiveService.getBox(_boxName);
     await box.put(_extraRightMargin80mmKey, marginMm.clamp(0.0, 15.0).toDouble());
+  }
+
+  /// Consulta si la impresión automática al facturar/abonar está habilitada.
+  static Future<bool> getAutoPrintOnBillingEnabled() async {
+    final hiveService = PrintManager();
+    final box = await hiveService.getBox(_boxName);
+    return box.get(_autoPrintOnBillingKey, defaultValue: false) as bool;
+  }
+
+  /// Guarda si la impresión automática al facturar/abonar debe estar activa.
+  static Future<void> saveAutoPrintOnBillingEnabled(bool enabled) async {
+    final hiveService = PrintManager();
+    final box = await hiveService.getBox(_boxName);
+    await box.put(_autoPrintOnBillingKey, enabled);
+  }
+
+  /// Imprime automáticamente [document] si "Impresión automática al Facturar"
+  /// está habilitada. Captura cualquier error para no interrumpir el flujo de
+  /// venta o cobro.
+  static Future<bool> autoPrintIfEnabled(dynamic document, BranchInDb branch) async {
+    if (!(await getAutoPrintOnBillingEnabled())) return false;
+    try {
+      final paperSize = await getLocalPaperSize();
+      return await printDocument(document, branch, paperSize: paperSize);
+    } catch (e) {
+      debugPrint('[PrintManager] Error en impresión automática: $e');
+      return false;
+    }
   }
 
   /// Construye el [PdfPageFormat] para un ticket aplicando la configuración local de márgenes.

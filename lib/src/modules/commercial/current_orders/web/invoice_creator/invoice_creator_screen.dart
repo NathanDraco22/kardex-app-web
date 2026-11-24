@@ -123,6 +123,11 @@ class _RootScaffold extends StatelessWidget {
           await readCubit.updateOrderCache(state.order);
 
           if (!context.mounted) return;
+          final authState = getIt<AuthCubit>().state;
+          if (authState is Authenticated) {
+            await PrintManager.autoPrintIfEnabled(state.invoice, authState.branch);
+          }
+          if (!context.mounted) return;
           await showInvoiceViewerDialog(context, state.invoice);
           if (!context.mounted) return;
           Navigator.pop(context, state.order);

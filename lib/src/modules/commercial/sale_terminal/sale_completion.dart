@@ -5,6 +5,7 @@ import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/core/terminal_draft_manager.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/cubit/read_terminal_product_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/cubit/write_terminal_invoice_cubit.dart';
+import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
 import 'package:kardex_business/kardex_business.dart';
 
@@ -24,6 +25,10 @@ Future<void> handleTerminalSaleCompletion(BuildContext context, InvoiceInDb invo
     }
   }
 
+  if (!context.mounted) return;
+  if (authState is Authenticated) {
+    await PrintManager.autoPrintIfEnabled(invoice, authState.branch);
+  }
   if (!context.mounted) return;
   await showInvoiceViewerDialog(context, invoice);
 

@@ -4,6 +4,7 @@ import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/cubits/shift/shift_cubit.dart';
 import 'package:kardex_app_front/src/core/shift_guard.dart';
+import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/commercial/anon_invoices/cubits/write_invoice_cubit.dart';
@@ -90,6 +91,10 @@ class _RootScaffold extends StatelessWidget {
           LoadingDialogManager.closeLoadingDialog(context);
           String message = "Factura guardada con éxito";
           await DialogManager.showInfoDialog(context, message);
+          final authState = getIt<AuthCubit>().state;
+          if (authState is Authenticated) {
+            await PrintManager.autoPrintIfEnabled(state.invoice, authState.branch);
+          }
           if (!context.mounted) return;
           await showInvoiceViewerDialog(context, state.invoice);
 

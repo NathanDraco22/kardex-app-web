@@ -17,6 +17,7 @@ Future<void> showLocalPrinterSettingsDialog(BuildContext context) async {
   final invertColor = await PrintManager.getInvertColorEnabled();
   final dithering = await PrintManager.getDitheringEnabled();
   final extraRightMargin80mm = await PrintManager.getExtraRightMargin80mm();
+  final autoPrintOnBilling = await PrintManager.getAutoPrintOnBillingEnabled();
 
   if (!context.mounted) return;
 
@@ -31,6 +32,7 @@ Future<void> showLocalPrinterSettingsDialog(BuildContext context) async {
         initialInvertColor: invertColor,
         initialDithering: dithering,
         initialExtraRightMargin80mm: extraRightMargin80mm,
+        initialAutoPrintOnBilling: autoPrintOnBilling,
       );
     },
   );
@@ -44,6 +46,7 @@ class _LocalPrinterSettingsDialog extends StatefulWidget {
   final bool initialInvertColor;
   final bool initialDithering;
   final double initialExtraRightMargin80mm;
+  final bool initialAutoPrintOnBilling;
 
   const _LocalPrinterSettingsDialog({
     required this.initialSize,
@@ -53,6 +56,7 @@ class _LocalPrinterSettingsDialog extends StatefulWidget {
     required this.initialInvertColor,
     required this.initialDithering,
     required this.initialExtraRightMargin80mm,
+    required this.initialAutoPrintOnBilling,
   });
 
   @override
@@ -66,6 +70,7 @@ class _LocalPrinterSettingsDialogState extends State<_LocalPrinterSettingsDialog
   late bool _invertColor;
   late bool _dithering;
   late double _extraRightMargin80mm;
+  late bool _autoPrintOnBilling;
   Printer? _selectedPrinter;
 
   final ThermalPrinterService _printerService = getIt<ThermalPrinterService>();
@@ -84,6 +89,7 @@ class _LocalPrinterSettingsDialogState extends State<_LocalPrinterSettingsDialog
     _invertColor = widget.initialInvertColor;
     _dithering = widget.initialDithering;
     _extraRightMargin80mm = widget.initialExtraRightMargin80mm.clamp(0.0, 10.0).toDouble();
+    _autoPrintOnBilling = widget.initialAutoPrintOnBilling;
 
     _devicesSubscription = _printerService.devicesStream.listen((printers) {
       if (mounted) {
@@ -150,6 +156,7 @@ class _LocalPrinterSettingsDialogState extends State<_LocalPrinterSettingsDialog
   Future<void> _saveSettings() async {
     await PrintManager.saveLocalPaperSize(_selectedSize);
     await PrintManager.saveExtraRightMargin80mm(_extraRightMargin80mm);
+    await PrintManager.saveAutoPrintOnBillingEnabled(_autoPrintOnBilling);
 
     if (kIsWeb) {
       await PrintManager.saveIsDirectPrintEnabled(false);
@@ -251,6 +258,20 @@ class _LocalPrinterSettingsDialogState extends State<_LocalPrinterSettingsDialog
               const SizedBox(height: 20),
               const Divider(),
               const SizedBox(height: 12),
+
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Impresión automática al Facturar'),
+                subtitle: const Text(
+                  'Imprime automáticamente al emitir una factura o registrar un abono/recibo.',
+                ),
+                value: _autoPrintOnBilling,
+                onChanged: (value) {
+                  setState(() {
+                    _autoPrintOnBilling = value;
+                  });
+                },
+              ),
 
               if (kIsWeb) ...[
                 const SizedBox(height: 8),

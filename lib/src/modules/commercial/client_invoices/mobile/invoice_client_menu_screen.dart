@@ -1,6 +1,9 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/core/shift_guard.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/view_controller.dart';
@@ -77,6 +80,11 @@ class _RootScaffold extends StatelessWidget {
           await DialogManager.showInfoDialog(context, message);
           if (!context.mounted) return;
           if (state.createdInvoice != null) {
+            final authState = getIt<AuthCubit>().state;
+            if (authState is Authenticated) {
+              await PrintManager.autoPrintIfEnabled(state.createdInvoice!, authState.branch);
+            }
+            if (!context.mounted) return;
             await showInvoiceViewerDialog(context, state.createdInvoice!);
           }
 
