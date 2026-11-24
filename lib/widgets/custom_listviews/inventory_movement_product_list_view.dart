@@ -89,7 +89,13 @@ class _Content extends StatelessWidget {
           final newRow = ProductRowCard(
             product: res,
             quantity: 0,
-            unitaryCost: (res is ProductInDbInBranch) ? (res.account.averageCost * unit.conversionFactor).round() : 0,
+            unitaryCost: (res is ProductInDbInBranch)
+                ? UnitConversionTool.toDisplayPriceOrCost(
+                    res.account.averageCost,
+                    unit.conversionFactor,
+                    priceUnitFactor: res.priceUnitFactor,
+                  )
+                : 0,
             editableCost: true,
             selectedUnitIndex: unit.unitIndex,
             conversionFactor: unit.conversionFactor,
@@ -125,7 +131,11 @@ class _Content extends StatelessWidget {
               : 0;
           final oldCost = currentRowCardModel.unitaryCost > 0
               ? currentRowCardModel.unitaryCost
-              : averageCost * oldFactor;
+              : UnitConversionTool.toDisplayPriceOrCost(
+                  averageCost,
+                  oldFactor,
+                  priceUnitFactor: currentRowCardModel.product.priceUnitFactor,
+                );
           final shouldClearQuantity = newQuantity == null;
 
           currentRowCardModel.quantity = newQuantity ?? 0;
@@ -443,9 +453,9 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
                                         fontSize: 16,
                                       ),
                                     ),
-                                    if (rowCard.conversionFactor > 1) ...[
+                                    if (rowCard.conversionFactor != product.priceUnitFactor) ...[
                                       Text(
-                                        "Base: ${NumberFormatter.convertToMoneyLike((rowCard.unitaryCost / rowCard.conversionFactor).round())}",
+                                        "${product.priceUnitName}: ${NumberFormatter.convertToMoneyLike(UnitConversionTool.toStoredPriceOrCost(rowCard.unitaryCost, rowCard.conversionFactor, priceUnitFactor: product.priceUnitFactor))}",
                                         style: TextStyle(
                                           fontSize: 12,
                                           color: Colors.blue.shade700,
@@ -477,9 +487,9 @@ class _EntryRowCardState extends State<EntryRowCard> with AutomaticKeepAliveClie
                                     setState(() {});
                                   },
                                 ),
-                                if (rowCard.conversionFactor > 1) ...[
+                                if (rowCard.conversionFactor != product.priceUnitFactor) ...[
                                   Text(
-                                    "Base: ${NumberFormatter.convertFromCentsToUnitsCurrency((rowCard.unitaryCost / rowCard.conversionFactor).round())}",
+                                    "${product.priceUnitName}: ${NumberFormatter.convertFromCentsToUnitsCurrency(UnitConversionTool.toStoredPriceOrCost(rowCard.unitaryCost, rowCard.conversionFactor, priceUnitFactor: product.priceUnitFactor))}",
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: Colors.blue.shade700,

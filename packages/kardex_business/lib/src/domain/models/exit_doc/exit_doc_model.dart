@@ -1,4 +1,5 @@
 import 'package:kardex_business/src/domain/models/common/user_info.dart';
+import 'package:kardex_business/src/tools/unit_conversion_tool.dart';
 import 'package:kardex_business/src/tools/unit_display_formatter.dart';
 
 class ExitItem {
@@ -10,6 +11,7 @@ class ExitItem {
   final int? cost;
   final int quantity;
   final int conversionFactor;
+  final int priceUnitFactor;
   final String? standardUnitName;
   final int? standardUnitFactor;
 
@@ -22,6 +24,7 @@ class ExitItem {
     this.cost,
     required this.quantity,
     this.conversionFactor = 1,
+    this.priceUnitFactor = 1,
     this.standardUnitName,
     this.standardUnitFactor,
   }) : assert(quantity < 0, 'La cantidad en una salida debe ser negativa.');
@@ -39,7 +42,24 @@ class ExitItem {
 
   String get displayUnitName => displayQuantity.unitName;
 
+  int get displayUnitFactor => displayQuantity.usedStandardFallback
+      ? (standardUnitFactor ?? conversionFactor)
+      : conversionFactor;
+
+  int get displayUnitCost => UnitConversionTool.toDisplayPriceOrCost(
+    cost ?? 0,
+    displayUnitFactor,
+    priceUnitFactor: priceUnitFactor,
+  );
+
+  int get lineTotal => UnitConversionTool.calculateLineTotal(
+    cost ?? 0,
+    quantity.abs(),
+    priceUnitFactor: priceUnitFactor,
+  );
+
   factory ExitItem.fromJson(Map<String, dynamic> json) {
+    final rawPriceFactor = (json['priceUnitFactor'] as num?)?.toInt() ?? 1;
     return ExitItem(
       productId: json['productId'] as String,
       productName: json['productName'] as String,
@@ -49,6 +69,7 @@ class ExitItem {
       cost: json['cost'] as int?,
       quantity: json['quantity'] as int,
       conversionFactor: json['conversionFactor'] as int? ?? 1,
+      priceUnitFactor: rawPriceFactor < 1 ? 1 : rawPriceFactor,
       standardUnitName: json['standardUnitName'] as String?,
       standardUnitFactor: json['standardUnitFactor'] as int?,
     );
@@ -64,6 +85,7 @@ class ExitItem {
       'cost': cost,
       'quantity': quantity,
       'conversionFactor': conversionFactor,
+      'priceUnitFactor': priceUnitFactor < 1 ? 1 : priceUnitFactor,
     };
     if (standardUnitName != null) {
       data['standardUnitName'] = standardUnitName;

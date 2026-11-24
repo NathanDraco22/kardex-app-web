@@ -272,7 +272,7 @@ Future<Uint8List> generateTicketPdfFromDevolution(
                         pw.Expanded(
                           flex: 2,
                           child: pw.Text(
-                            NumberFormatter.convertFromCentsToDouble(item.price * item.conversionFactor).toString(),
+                            NumberFormatter.convertFromCentsToDouble(item.displayUnitPrice).toString(),
                             textAlign: pw.TextAlign.right,
                             style: pw.TextStyle(
                               fontSize: TicketSettings.contentFontSize(paperSize),

@@ -206,7 +206,11 @@ class HoldSaleInDb extends BaseHoldSale {
   int get computedTotalAmount {
     if (totalAmount > 0) return totalAmount;
     return items.fold<int>(0, (sum, i) {
-      final subTotal = (i.displayQuantity * i.newPrice * i.conversionFactor).round();
+      final subTotal = UnitConversionTool.calculateLineTotal(
+        i.newPrice,
+        i.quantity,
+        priceUnitFactor: i.product.priceUnitFactor,
+      );
       final discountPercent = i.selectedDiscount?.percentValue ?? 0;
       final discount = (subTotal * (discountPercent / 100)).round();
       return sum + (subTotal - discount);

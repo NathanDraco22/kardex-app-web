@@ -15,9 +15,18 @@ String formatAdjustmentSignedQuantity(int difference, int conversionFactor) {
   return display > 0 ? '+$formatted' : '-$formatted';
 }
 
-String formatAdjustmentUnitCost(int baseCost, int conversionFactor) {
-  final factor = UnitConversionTool.ensureSafeFactor(conversionFactor);
-  return NumberFormatter.convertToMoneyLike(baseCost * factor);
+String formatAdjustmentUnitCost(
+  int baseCost,
+  int conversionFactor, {
+  int priceUnitFactor = 1,
+}) {
+  return NumberFormatter.convertToMoneyLike(
+    UnitConversionTool.toDisplayPriceOrCost(
+      baseCost,
+      conversionFactor,
+      priceUnitFactor: priceUnitFactor,
+    ),
+  );
 }
 
 Color adjustmentDifferenceColor(int difference) {

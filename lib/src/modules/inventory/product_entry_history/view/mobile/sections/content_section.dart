@@ -137,7 +137,7 @@ class _ContentSection extends StatelessWidget {
                         final dateStr = DateTimeTool.formatddMMyy(entryHistory.docDate);
                         final unitLabel = entryItem.unitName ?? '';
                         final costStr = NumberFormatter.convertFromCentsToUnitsCurrency(
-                          entryItem.cost * entryItem.conversionFactor,
+                          entryItem.displayUnitCost,
                         );
 
                         return Material(

@@ -87,7 +87,7 @@ class _AdjustEntryViewer extends StatelessWidget {
   Widget build(BuildContext context) {
     // Calculate total on the fly
     final total = adjustEntry.items.fold<int>(0, (prev, item) {
-      return prev + (item.cost * item.quantity);
+      return prev + item.lineTotal;
     });
 
     return Scaffold(
@@ -267,13 +267,13 @@ class _AdjustEntryViewer extends StatelessWidget {
                                     ),
                                     Expanded(
                                       child: Text(
-                                        NumberFormatter.convertToMoneyLike(item.cost * item.conversionFactor),
+                                        NumberFormatter.convertToMoneyLike(item.displayUnitCost),
                                         textAlign: TextAlign.center,
                                       ),
                                     ),
                                     Expanded(
                                       child: Text(
-                                        NumberFormatter.convertToMoneyLike(item.cost * item.quantity),
+                                        NumberFormatter.convertToMoneyLike(item.lineTotal),
                                         textAlign: TextAlign.center,
                                       ),
                                     ),

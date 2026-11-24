@@ -20,6 +20,7 @@ class _ExtraUnitsSectionState extends State<ExtraUnitsSection> {
   final List<ExtraUnit> _extraUnits = [];
   int _defaultUnitIndex = 0;
   int _wholesaleUnitIndex = 0;
+  int _priceUnitFactor = 1;
 
   @override
   void initState() {
@@ -28,6 +29,10 @@ class _ExtraUnitsSectionState extends State<ExtraUnitsSection> {
       _extraUnits.addAll(widget.currentProduct!.extraUnits);
       _defaultUnitIndex = widget.currentProduct!.defaultUnitIndex;
       _wholesaleUnitIndex = widget.currentProduct!.wholesaleUnitIndex;
+      _priceUnitFactor = widget.currentProduct!.priceUnitFactor;
+    } else {
+      final rawFactor = (widget.creationMap['priceUnitFactor'] as num?)?.toInt() ?? 1;
+      _priceUnitFactor = rawFactor < 1 ? 1 : rawFactor;
     }
     _syncToMap();
   }
@@ -43,6 +48,7 @@ class _ExtraUnitsSectionState extends State<ExtraUnitsSection> {
       _wholesaleUnitIndex = 0;
     }
     widget.creationMap['wholesaleUnitIndex'] = _wholesaleUnitIndex;
+    widget.creationMap['priceUnitFactor'] = _priceUnitFactor < 1 ? 1 : _priceUnitFactor;
   }
 
   Future<bool> _confirmBaseUnitChange(String currentBaseUnit, String newBaseUnit) {
@@ -71,6 +77,7 @@ class _ExtraUnitsSectionState extends State<ExtraUnitsSection> {
       _extraUnits.addAll(preset.units);
       _defaultUnitIndex = preset.defaultUnitIndex;
       _wholesaleUnitIndex = preset.wholesaleUnitIndex;
+      _priceUnitFactor = preset.priceUnitFactor;
       _syncToMap();
     });
 
@@ -114,6 +121,7 @@ class _ExtraUnitsSectionState extends State<ExtraUnitsSection> {
                   initialExtraUnits: _extraUnits,
                   initialDefaultUnitIndex: _defaultUnitIndex,
                   initialWholesaleUnitIndex: _wholesaleUnitIndex,
+                  initialPriceUnitFactor: _priceUnitFactor,
                   baseUnitName: baseUnitName,
                 );
 
@@ -128,6 +136,7 @@ class _ExtraUnitsSectionState extends State<ExtraUnitsSection> {
                     _extraUnits.addAll(result.extraUnits);
                     _defaultUnitIndex = result.defaultUnitIndex;
                     _wholesaleUnitIndex = result.wholesaleUnitIndex;
+                    _priceUnitFactor = result.priceUnitFactor;
                     if (effectiveBaseUnit.isNotEmpty) {
                       widget.creationMap['unitName'] = effectiveBaseUnit;
                     }
@@ -142,6 +151,7 @@ class _ExtraUnitsSectionState extends State<ExtraUnitsSection> {
                         units: result.extraUnits,
                         defaultUnitIndex: result.defaultUnitIndex,
                         wholesaleUnitIndex: result.wholesaleUnitIndex,
+                        priceUnitFactor: result.priceUnitFactor,
                       ),
                     );
                   }

@@ -610,6 +610,7 @@ class _BodyState extends State<_Body> {
             subTotal: commercial.subTotal,
             total: commercial.total,
             conversionFactor: commercial.conversionFactor,
+            priceUnitFactor: commercial.product.priceUnitFactor,
             selectedUnitName: commercial.selectedUnitName.isNotEmpty
                 ? commercial.selectedUnitName
                 : commercial.product.unitName,
@@ -625,7 +626,7 @@ class _BodyState extends State<_Body> {
 
           for (var item in newItems) {
             newTotal += item.total;
-            newTotalCost += (item.cost * (item.quantity + item.bonQuantity));
+            newTotalCost += item.lineCost;
           }
 
           final updateOrder = UpdateOrder(
@@ -653,7 +654,7 @@ class _BodyState extends State<_Body> {
 
           for (var item in newItems) {
             newTotal += item.total;
-            newTotalCost += (item.cost * (item.quantity + item.bonQuantity));
+            newTotalCost += item.lineCost;
           }
 
           final updateOrder = UpdateOrder(
@@ -717,6 +718,7 @@ class _BodyState extends State<_Body> {
                 subTotal: commercial.subTotal,
                 total: commercial.total,
                 conversionFactor: commercial.conversionFactor,
+                priceUnitFactor: commercial.product.priceUnitFactor,
                 selectedUnitName: commercial.selectedUnitName.isNotEmpty
                     ? commercial.selectedUnitName
                     : commercial.product.unitName,
@@ -730,7 +732,7 @@ class _BodyState extends State<_Body> {
 
             for (var item in newItems) {
               newTotal += item.total;
-              newTotalCost += (item.cost * (item.quantity + item.bonQuantity));
+              newTotalCost += item.lineCost;
             }
 
             final updateOrder = UpdateOrder(

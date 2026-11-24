@@ -328,7 +328,7 @@ class _SendButton extends StatelessWidget {
                                         ),
                                         Text(
                                           NumberFormatter.convertFromCentsToUnitsCurrency(
-                                            item.price * item.conversionFactor,
+                                            item.displayUnitPrice,
                                           ).toString(),
                                         ),
                                         Text(

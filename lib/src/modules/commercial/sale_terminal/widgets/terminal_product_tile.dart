@@ -58,7 +58,11 @@ class TerminalProductTile extends StatelessWidget {
       builder: (context, _) {
         final isWholesale = priceLevelListenable.isWholesale;
         final unitFactor = _unitFactor(isWholesale);
-        final price = _priceForLevel(priceLevelListenable.selectedPriceLevel) * unitFactor;
+        final price = UnitConversionTool.toDisplayPriceOrCost(
+          _priceForLevel(priceLevelListenable.selectedPriceLevel),
+          unitFactor,
+          priceUnitFactor: product.priceUnitFactor,
+        );
         final convertedStock = unitFactor > 1 ? stock ~/ unitFactor : stock;
         final cartItem = priceLevelListenable.items.where((i) => i.product.id == product.id).firstOrNull;
         final inCartQuantity = cartItem?.quantity ?? 0;

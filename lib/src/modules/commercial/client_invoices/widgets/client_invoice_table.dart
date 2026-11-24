@@ -321,8 +321,20 @@ class InvoiceTableRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final product = item.product;
-    final price = NumberFormatter.convertToMoneyLike(product.saleProfile.salePrice * item.conversionFactor);
-    final edittedPrice = NumberFormatter.convertToMoneyLike(item.newPrice * item.conversionFactor);
+    final price = NumberFormatter.convertToMoneyLike(
+      UnitConversionTool.toDisplayPriceOrCost(
+        product.saleProfile.salePrice,
+        item.conversionFactor,
+        priceUnitFactor: product.priceUnitFactor,
+      ),
+    );
+    final edittedPrice = NumberFormatter.convertToMoneyLike(
+      UnitConversionTool.toDisplayPriceOrCost(
+        item.newPrice,
+        item.conversionFactor,
+        priceUnitFactor: product.priceUnitFactor,
+      ),
+    );
     final subTotal = NumberFormatter.convertToMoneyLike(item.subTotal);
     final totalDiscount = NumberFormatter.convertToMoneyLike(item.totalDiscount);
     final percenValue = item.discountPercent;

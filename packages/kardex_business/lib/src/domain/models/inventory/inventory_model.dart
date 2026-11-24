@@ -1,3 +1,5 @@
+import 'package:kardex_business/src/tools/unit_conversion_tool.dart';
+
 import '../product/product_model.dart';
 import '../product/product_type.dart';
 
@@ -16,6 +18,7 @@ class InventoryProduct {
   final List<ExtraUnit> extraUnits;
   final int defaultUnitIndex;
   final int wholesaleUnitIndex;
+  final int priceUnitFactor;
 
   InventoryProduct({
     required this.id,
@@ -32,6 +35,7 @@ class InventoryProduct {
     this.extraUnits = const [],
     this.defaultUnitIndex = 0,
     this.wholesaleUnitIndex = 0,
+    this.priceUnitFactor = 1,
   });
 
   String get defaultUnitName {
@@ -49,6 +53,7 @@ class InventoryProduct {
   }
 
   factory InventoryProduct.fromJson(Map<String, dynamic> json) {
+    final rawPriceFactor = (json['priceUnitFactor'] as num?)?.toInt() ?? 1;
     return InventoryProduct(
       id: json['id'] as String,
       name: json['name'] as String,
@@ -66,6 +71,7 @@ class InventoryProduct {
           : const [],
       defaultUnitIndex: json['defaultUnitIndex'] as int? ?? 0,
       wholesaleUnitIndex: json['wholesaleUnitIndex'] as int? ?? 0,
+      priceUnitFactor: rawPriceFactor < 1 ? 1 : rawPriceFactor,
     );
   }
 
@@ -85,6 +91,7 @@ class InventoryProduct {
       'extraUnits': extraUnits.map((e) => e.toJson()).toList(),
       'defaultUnitIndex': defaultUnitIndex,
       'wholesaleUnitIndex': wholesaleUnitIndex,
+      'priceUnitFactor': priceUnitFactor < 1 ? 1 : priceUnitFactor,
     };
   }
 }
@@ -109,7 +116,11 @@ class InventoryInDb {
     this.updatedAt,
   });
 
-  int get total => currentStock * averageCost;
+  int get total => UnitConversionTool.calculateLineTotal(
+    averageCost,
+    currentStock,
+    priceUnitFactor: product.priceUnitFactor,
+  );
 
   factory InventoryInDb.fromJson(Map<String, dynamic> json) {
     return InventoryInDb(

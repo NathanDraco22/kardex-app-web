@@ -56,6 +56,7 @@ class _CreateUnitScaleDialogState extends State<CreateUnitScaleDialog> {
   late List<ExtraUnit> _units;
   late int _defaultUnitIndex;
   late int _wholesaleUnitIndex;
+  late int _priceUnitFactor;
   late UnitScaleType _scaleType;
 
   bool get isEditing => widget.scaleToEdit != null;
@@ -73,6 +74,7 @@ class _CreateUnitScaleDialogState extends State<CreateUnitScaleDialog> {
     _units = List<ExtraUnit>.from(edit?.units ?? []);
     _defaultUnitIndex = edit?.defaultUnitIndex ?? 0;
     _wholesaleUnitIndex = edit?.wholesaleUnitIndex ?? 0;
+    _priceUnitFactor = edit?.priceUnitFactor ?? 1;
     _scaleType = edit?.scaleType ?? UnitScaleType.custom;
     _validateIndexes();
   }
@@ -134,6 +136,7 @@ class _CreateUnitScaleDialogState extends State<CreateUnitScaleDialog> {
       _units = List<ExtraUnit>.from(generated.units);
       _defaultUnitIndex = generated.defaultUnitIndex;
       _wholesaleUnitIndex = generated.wholesaleUnitIndex;
+      _priceUnitFactor = generated.priceUnitFactor;
       _validateIndexes();
     });
   }
@@ -344,6 +347,7 @@ class _CreateUnitScaleDialogState extends State<CreateUnitScaleDialog> {
         units: _units,
         defaultUnitIndex: _defaultUnitIndex,
         wholesaleUnitIndex: _wholesaleUnitIndex,
+        priceUnitFactor: _priceUnitFactor,
       );
       await cubit.updateUnitScale(widget.scaleToEdit!.id, update);
     } else {
@@ -354,6 +358,7 @@ class _CreateUnitScaleDialogState extends State<CreateUnitScaleDialog> {
         units: _units,
         defaultUnitIndex: _defaultUnitIndex,
         wholesaleUnitIndex: _wholesaleUnitIndex,
+        priceUnitFactor: _priceUnitFactor,
       );
       await cubit.createNewUnitScale(create);
     }

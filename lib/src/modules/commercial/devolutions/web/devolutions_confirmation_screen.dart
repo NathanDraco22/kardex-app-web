@@ -118,7 +118,13 @@ class _RootScaffold extends StatelessWidget {
 
             final totalCost = selectedItems.fold<int>(
               0,
-              (previousValue, element) => previousValue + (element.cost * element.quantity),
+              (previousValue, element) =>
+                  previousValue +
+                  UnitConversionTool.calculateLineTotal(
+                    element.cost,
+                    element.quantity,
+                    priceUnitFactor: element.priceUnitFactor,
+                  ),
             );
 
             final userInfo = UserInfo(id: user.id, name: user.username);

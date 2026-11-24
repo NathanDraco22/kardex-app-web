@@ -30,7 +30,7 @@ class EntryHistoryInDb {
   final DateTime createdAt;
 
   int get total {
-    return items.fold(0, (total, item) => total + item.cost * item.quantity);
+    return items.fold(0, (total, item) => total + item.lineTotal);
   }
 
   EntryHistoryInDb({

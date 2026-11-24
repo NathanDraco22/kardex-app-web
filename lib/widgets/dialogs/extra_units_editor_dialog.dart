@@ -8,12 +8,14 @@ class ExtraUnitsEditorResult {
   final List<ExtraUnit> extraUnits;
   final int defaultUnitIndex;
   final int wholesaleUnitIndex;
+  final int priceUnitFactor;
   final String baseUnitName;
 
   ExtraUnitsEditorResult({
     required this.extraUnits,
     required this.defaultUnitIndex,
     required this.wholesaleUnitIndex,
+    this.priceUnitFactor = 1,
     required this.baseUnitName,
   });
 }
@@ -23,6 +25,7 @@ Future<ExtraUnitsEditorResult?> showProductExtraUnitsEditor(
   required List<ExtraUnit> initialExtraUnits,
   required int initialDefaultUnitIndex,
   required int initialWholesaleUnitIndex,
+  int initialPriceUnitFactor = 1,
   required String baseUnitName,
 }) async {
   return await showDialog<ExtraUnitsEditorResult?>(
@@ -32,6 +35,7 @@ Future<ExtraUnitsEditorResult?> showProductExtraUnitsEditor(
         initialExtraUnits: initialExtraUnits,
         initialDefaultUnitIndex: initialDefaultUnitIndex,
         initialWholesaleUnitIndex: initialWholesaleUnitIndex,
+        initialPriceUnitFactor: initialPriceUnitFactor,
         baseUnitName: baseUnitName,
       );
     },
@@ -44,12 +48,14 @@ class ExtraUnitsEditorDialog extends StatefulWidget {
     required this.initialExtraUnits,
     required this.initialDefaultUnitIndex,
     required this.initialWholesaleUnitIndex,
+    this.initialPriceUnitFactor = 1,
     required this.baseUnitName,
   });
 
   final List<ExtraUnit> initialExtraUnits;
   final int initialDefaultUnitIndex;
   final int initialWholesaleUnitIndex;
+  final int initialPriceUnitFactor;
   final String baseUnitName;
 
   @override
@@ -60,6 +66,7 @@ class _ExtraUnitsEditorDialogState extends State<ExtraUnitsEditorDialog> {
   late List<ExtraUnit> extraUnits;
   late int defaultUnitIndex;
   late int wholesaleUnitIndex;
+  late int _priceUnitFactor;
   late String _baseUnitName;
 
   @override
@@ -68,6 +75,7 @@ class _ExtraUnitsEditorDialogState extends State<ExtraUnitsEditorDialog> {
     extraUnits = List.from(widget.initialExtraUnits);
     defaultUnitIndex = widget.initialDefaultUnitIndex;
     wholesaleUnitIndex = widget.initialWholesaleUnitIndex;
+    _priceUnitFactor = widget.initialPriceUnitFactor < 1 ? 1 : widget.initialPriceUnitFactor;
     _baseUnitName = widget.baseUnitName.trim();
     _validateDefaultUnitIndex();
     _validateWholesaleUnitIndex();
@@ -122,6 +130,11 @@ class _ExtraUnitsEditorDialogState extends State<ExtraUnitsEditorDialog> {
         } else if (wholesaleUnitIndex > index + 1) {
           wholesaleUnitIndex--;
         }
+
+        if (_priceUnitFactor > 1 &&
+            !extraUnits.any((u) => u.conversionFactor == _priceUnitFactor)) {
+          _priceUnitFactor = 1;
+        }
       });
     }
   }
@@ -159,6 +172,7 @@ class _ExtraUnitsEditorDialogState extends State<ExtraUnitsEditorDialog> {
                     extraUnits.addAll(preset.units);
                     defaultUnitIndex = preset.defaultUnitIndex;
                     wholesaleUnitIndex = preset.wholesaleUnitIndex;
+                    _priceUnitFactor = preset.priceUnitFactor;
                     _baseUnitName = preset.baseUnit;
                     _validateDefaultUnitIndex();
                     _validateWholesaleUnitIndex();
@@ -325,6 +339,7 @@ class _ExtraUnitsEditorDialogState extends State<ExtraUnitsEditorDialog> {
                 extraUnits: extraUnits,
                 defaultUnitIndex: defaultUnitIndex,
                 wholesaleUnitIndex: wholesaleUnitIndex,
+                priceUnitFactor: _priceUnitFactor,
                 baseUnitName: _baseUnitName.trim(),
               ),
             ),

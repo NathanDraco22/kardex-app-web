@@ -155,7 +155,7 @@ class TransferInDb extends BaseTransfer {
   int get costTotal {
     final total = items.fold(
       0,
-      (previousValue, element) => previousValue + (element.cost * element.quantity),
+      (previousValue, element) => previousValue + element.lineTotal,
     );
     return total;
   }

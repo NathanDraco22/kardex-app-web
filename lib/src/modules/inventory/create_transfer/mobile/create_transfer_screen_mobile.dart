@@ -5,7 +5,6 @@ import 'package:kardex_app_front/src/cubits/transfers/write_transfer_cubit.dart'
 import 'package:kardex_app_front/src/modules/inventory/create_transfer/mediator.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
-import 'package:kardex_app_front/src/tools/loading_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/selectors/branch_selection_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/basic_search/search_product_in_branch_delegate.dart';
 
@@ -71,7 +70,11 @@ class _MobileScaffold extends StatelessWidget {
               final newRow = TransferProductRow(
                 product: res,
                 quantity: 0,
-                unitaryCost: (res.account.averageCost * unit.conversionFactor).round(),
+                unitaryCost: UnitConversionTool.toDisplayPriceOrCost(
+                  res.account.averageCost,
+                  unit.conversionFactor,
+                  priceUnitFactor: res.priceUnitFactor,
+                ),
                 selectedUnitIndex: unit.unitIndex,
                 conversionFactor: unit.conversionFactor,
                 selectedUnitName: unit.unitName,

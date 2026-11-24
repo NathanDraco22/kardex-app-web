@@ -134,7 +134,11 @@ class _ProductInBranchResultRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int value = product.saleProfile.salePrice * product.defaultUnitFactor;
+    int value = UnitConversionTool.toDisplayPriceOrCost(
+      product.saleProfile.salePrice,
+      product.defaultUnitFactor,
+      priceUnitFactor: product.priceUnitFactor,
+    );
 
     String valueToDisplay = NumberFormatter.convertToMoneyLike(value);
 

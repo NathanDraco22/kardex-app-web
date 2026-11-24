@@ -20,7 +20,12 @@ class SaleProjectionCsv {
       final daily = item.unitsPerDay;
       final needed = (daily * projectionDays) - stock;
       final isDeficit = needed > 0;
-      final totalCost = isDeficit ? (needed * item.account.averageCostMoney) : 0;
+      final priceUnitFactor = UnitConversionTool.ensureSafeFactor(
+        item.product.priceUnitFactor,
+      );
+      final totalCost = isDeficit
+          ? (needed * item.account.averageCostMoney / priceUnitFactor)
+          : 0.0;
       final estado = isDeficit ? "FALTA" : "SOBRA";
 
       // Sanitize fields designed to avoid CSV breaking

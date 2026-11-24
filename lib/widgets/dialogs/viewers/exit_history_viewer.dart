@@ -290,7 +290,7 @@ class _ExitHistoryViewer extends StatelessWidget {
                                     Expanded(
                                       child: Text(
                                         NumberFormatter.convertToMoneyLike(
-                                          ((item.cost ?? 0) * item.conversionFactor).round(),
+                                          item.displayUnitCost,
                                         ),
                                         textAlign: TextAlign.center,
                                       ),
@@ -298,7 +298,7 @@ class _ExitHistoryViewer extends StatelessWidget {
                                     Expanded(
                                       child: Text(
                                         NumberFormatter.convertToMoneyLike(
-                                          (item.cost ?? 0) * item.quantity.abs(),
+                                          item.lineTotal,
                                         ),
                                         textAlign: TextAlign.center,
                                       ),

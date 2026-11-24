@@ -353,7 +353,11 @@ class _ProductInBranchQuickResultRowState extends State<_ProductInBranchQuickRes
 
   @override
   Widget build(BuildContext context) {
-    int value = _displayPrice * _displayConversionFactor;
+    int value = UnitConversionTool.toDisplayPriceOrCost(
+      _displayPrice,
+      _displayConversionFactor,
+      priceUnitFactor: widget.product.priceUnitFactor,
+    );
     String valueToDisplay = NumberFormatter.convertToMoneyLike(value);
     final canUseDecimals = _displayConversionFactor > 1;
     final stockDisplay = UnitDisplayFormatter.formatUnitQuantity(

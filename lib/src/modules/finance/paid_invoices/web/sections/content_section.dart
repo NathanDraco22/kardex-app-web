@@ -60,7 +60,7 @@ class _ContentSection extends StatelessWidget {
                     int totalSales = 0;
 
                     for (final item in currentInvoice.saleItems) {
-                      totalCost += item.cost * (item.quantity + item.bonQuantity);
+                      totalCost += item.lineCost;
                       totalSales += item.total;
                     }
                     final totalPaidFormatted = NumberFormatter.convertToMoneyLike(totalSales);

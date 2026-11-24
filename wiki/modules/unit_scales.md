@@ -491,3 +491,53 @@ Formato actual:
 - **Documentos viejos:** sin `standardUnitName`/`standardUnitFactor`, el display conserva el fallback decimal en la unidad seleccionada; no se puede reconstruir la unidad estándar.
 - **Pruebas:** `flutter analyze` limpio y `flutter test` 83/83; no se ejecutó hot reload ni prueba manual de UI.
 - **Commit:** no se realizó.
+
+---
+
+## 17. `priceUnitFactor` y Escalas Continuas `(Decimal)` (noviembre 2026)
+
+> **Estado de ramas:** implementado y verificado en **`main`**. Pendiente sincronizar hacia **`lite`** (y adaptar sus 4 archivos exclusivos) tras finalizar las pruebas manuales en `main`.
+
+Para permitir decimales arbitrarios de hasta 2 cifras (`0.1`, `0.25`, `0.5`, `1.35`, `0.01`, etc.) manteniendo el stock `int` y eliminando el redondeo de precios/costos (`C1`) de los factores grandes, se introduce **`priceUnitFactor: int = 1`**.
+
+### 17.1. Concepto y retrocompatibilidad
+
+- **Unidad base (`unitName`, factor `1`):** unidad indivisible en la que se guarda el stock y las cantidades de líneas (`0.01 Libra` → `1.35 lb = 135`).
+- **Unidad de precio (`priceUnitFactor`, `product.priceUnitName`):** indica a cuántas unidades base corresponde el `salePrice` y el `averageCost` guardados en BD (`1` en todos los productos históricos/cuartos; `100` en las escalas `(Decimal)`).
+- **Retrocompatibilidad 100%:** cualquier JSON sin `priceUnitFactor` se deserializa con `1`, por lo que ningún producto o documento existente cambia de comportamiento.
+
+### 17.2. Helpers canónicos en `UnitConversionTool`
+
+**Regla obligatoria:** nunca multiplicar/dividir precios o costos a mano por `conversionFactor`. Usar siempre los métodos de `UnitConversionTool` (`packages/kardex_business/lib/src/tools/unit_conversion_tool.dart`), que emplean aritmética entera **half-up** (`_divRoundHalfUp`) idéntica a `calculate_line_amount` del backend:
+
+| Operación | Helper | Fórmula |
+| :--- | :--- | :--- |
+| **Guardar precio/costo desde unidad `F`** | `UnitConversionTool.toStoredPriceOrCost(displayCents, F, priceUnitFactor: P)` | `roundHalfUp((displayCents * P) / F)` |
+| **Mostrar precio/costo en unidad `F`** | `UnitConversionTool.toDisplayPriceOrCost(storedCents, F, priceUnitFactor: P)` | `roundHalfUp((storedCents * F) / P)` |
+| **Total monetario de línea / valorización** | `UnitConversionTool.calculateLineTotal(storedCents, baseQty, priceUnitFactor: P)` | `roundHalfUp((storedCents * baseQty) / P)` |
+
+*(Nota: `UnitConversionTool.toBaseCost` delega a `toStoredPriceOrCost` y acepta `priceUnitFactor` opcional.)*
+
+### 17.3. Getters canónicos en modelos (`packages/kardex_business`)
+
+Para visores, impresoras térmicas, templates PDF y totales de pantalla, consumir directamente los getters de los modelos en lugar de multiplicar `price * conversionFactor` o `cost * quantity`:
+
+| Modelo | Getters |
+| :--- | :--- |
+| `BaseProduct` | `priceUnitFactor`, `priceUnitName` |
+| `SaleItem` | `priceUnitFactor`, `displayUnitPrice`, `lineCost` |
+| `EntryItem`, `ExitItem`, `AdjustExitItem`, `TransferItem` | `priceUnitFactor`, `displayUnitCost`, `lineTotal` |
+| `InventoryInDb` | `total` (usa `calculateLineTotal` con `product.priceUnitFactor`) |
+| `EntryHistoryInDb`, `ExitHistoryInDb`, `TransferInDb` | `total` / `costTotal` (suman `lineTotal`) |
+| `CreateInvoice` | `ensureCostAndTotal()` suma `item.lineCost` |
+| `HoldSaleInDb` | `computedTotalAmount` usa `calculateLineTotal` |
+| `CommercialProductResult` | `subTotal` usa `calculateLineTotal` |
+
+### 17.4. Reglas de UI y edición
+
+- **`QuantityField` con factor `100`:** acepta automáticamente hasta 2 decimales (`0.1`, `0.25`, `1.35`, `0.01`) con paso mínimo `0.01`.
+- **`PriceLevelSyncController` y `UnitCostComparison`:** reciben `priceUnitFactor` (y `baseUnitName: product.priceUnitName`). Cuando `selectedUnitFactor == priceUnitFactor` (caso común `Libra` en `Libra (Decimal)`), no hay conversión ni pérdida de centavos.
+- **Tablas de inventario y transferencias:** el subtítulo de costo de referencia solo se muestra cuando `conversionFactor != priceUnitFactor`, evitando duplicar el mismo valor cuando la unidad seleccionada ya es la unidad de precio.
+- **`ExtraUnitsEditorDialog`:** preserva `priceUnitFactor` al aplicar presets y lo resetea a `1` si el usuario elimina la unidad cuyo factor coincidía con `priceUnitFactor`.
+- **`FormSection`:** al cambiar un producto a `service`, resetea `priceUnitFactor = 1` (el backend permite ese reset en la transición `item → service` cuando el stock es `0`).
+- **Escalas continuas sembradas por el backend:** conviven `Libra`, `Kilo`, `Litro`, `Metro` (cuartos `1/4`, `priceUnitFactor = 1`) con `Libra (Decimal)`, `Kilo (Decimal)`, `Litro (Decimal)`, `Metro (Decimal)` (`0.01`, `priceUnitFactor = 100`).

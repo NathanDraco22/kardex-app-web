@@ -69,9 +69,14 @@ class AdjustExitViewController extends ChangeNotifier {
       return AdjustExitItem(
         productId: e.product.id,
         productName: e.product.name,
-        cost: UnitConversionTool.toBaseCost(e.unitaryCost, e.conversionFactor),
+        cost: UnitConversionTool.toBaseCost(
+          e.unitaryCost,
+          e.conversionFactor,
+          priceUnitFactor: e.product.priceUnitFactor,
+        ),
         quantity: UnitConversionTool.toBaseQuantity(e.quantity, e.conversionFactor) * -1,
         conversionFactor: e.conversionFactor,
+        priceUnitFactor: e.product.priceUnitFactor,
         brandName: e.product.brandName,
         code: e.product.code,
         unitName: UnitConversionTool.resolveUnitName(e.selectedUnitName, e.product.unitName),

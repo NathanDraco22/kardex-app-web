@@ -10,8 +10,57 @@ class UnitConversionTool {
     return displayQuantity * ensureSafeFactor(conversionFactor);
   }
 
-  static int toBaseCost(int unitaryCost, int conversionFactor) {
-    return (unitaryCost / ensureSafeFactor(conversionFactor)).round();
+  static int _divRoundHalfUp(int numerator, int denominator) {
+    final safeDen = ensureSafeFactor(denominator);
+    if (safeDen == 1) return numerator;
+    if (numerator >= 0) {
+      return (numerator + (safeDen ~/ 2)) ~/ safeDen;
+    }
+    return -((numerator.abs() + (safeDen ~/ 2)) ~/ safeDen);
+  }
+
+  static int toStoredPriceOrCost(
+    int displayCents,
+    int conversionFactor, {
+    int priceUnitFactor = 1,
+  }) {
+    final safeFactor = ensureSafeFactor(conversionFactor);
+    final safePriceFactor = ensureSafeFactor(priceUnitFactor);
+    if (safeFactor == safePriceFactor) return displayCents;
+    return _divRoundHalfUp(displayCents * safePriceFactor, safeFactor);
+  }
+
+  static int toDisplayPriceOrCost(
+    int storedCents,
+    int conversionFactor, {
+    int priceUnitFactor = 1,
+  }) {
+    final safeFactor = ensureSafeFactor(conversionFactor);
+    final safePriceFactor = ensureSafeFactor(priceUnitFactor);
+    if (safeFactor == safePriceFactor) return storedCents;
+    return _divRoundHalfUp(storedCents * safeFactor, safePriceFactor);
+  }
+
+  static int calculateLineTotal(
+    int storedCents,
+    int baseQuantity, {
+    int priceUnitFactor = 1,
+  }) {
+    final safePriceFactor = ensureSafeFactor(priceUnitFactor);
+    if (safePriceFactor == 1) return storedCents * baseQuantity;
+    return _divRoundHalfUp(storedCents * baseQuantity, safePriceFactor);
+  }
+
+  static int toBaseCost(
+    int unitaryCost,
+    int conversionFactor, {
+    int priceUnitFactor = 1,
+  }) {
+    return toStoredPriceOrCost(
+      unitaryCost,
+      conversionFactor,
+      priceUnitFactor: priceUnitFactor,
+    );
   }
 
   static num toDisplayQuantity(int baseQuantity, int conversionFactor) {

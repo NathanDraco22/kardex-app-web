@@ -80,6 +80,7 @@ class _FormContentState extends State<_FormContent> {
         widget.creationMap['extraUnits'] = const <ExtraUnit>[];
         widget.creationMap['defaultUnitIndex'] = 0;
         widget.creationMap['wholesaleUnitIndex'] = 0;
+        widget.creationMap['priceUnitFactor'] = 1;
       }
     });
   }

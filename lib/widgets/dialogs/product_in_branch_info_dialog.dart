@@ -125,10 +125,38 @@ class ProductInBranchInfoDialog extends StatelessWidget {
               Row(
                 spacing: 8,
                 children: [
-                  buildPriceCopyable("Precio 1", product.saleProfile.salePrice * product.defaultUnitFactor),
-                  buildPriceCopyable("Precio 2", product.saleProfile.salePrice2 * product.defaultUnitFactor),
-                  buildPriceCopyable("Precio 3", product.saleProfile.salePrice3 * product.defaultUnitFactor),
-                  buildPriceCopyable("Precio 4", product.saleProfile.salePrice4 * product.defaultUnitFactor),
+                  buildPriceCopyable(
+                    "Precio 1",
+                    UnitConversionTool.toDisplayPriceOrCost(
+                      product.saleProfile.salePrice,
+                      product.defaultUnitFactor,
+                      priceUnitFactor: product.priceUnitFactor,
+                    ),
+                  ),
+                  buildPriceCopyable(
+                    "Precio 2",
+                    UnitConversionTool.toDisplayPriceOrCost(
+                      product.saleProfile.salePrice2,
+                      product.defaultUnitFactor,
+                      priceUnitFactor: product.priceUnitFactor,
+                    ),
+                  ),
+                  buildPriceCopyable(
+                    "Precio 3",
+                    UnitConversionTool.toDisplayPriceOrCost(
+                      product.saleProfile.salePrice3,
+                      product.defaultUnitFactor,
+                      priceUnitFactor: product.priceUnitFactor,
+                    ),
+                  ),
+                  buildPriceCopyable(
+                    "Precio 4",
+                    UnitConversionTool.toDisplayPriceOrCost(
+                      product.saleProfile.salePrice4,
+                      product.defaultUnitFactor,
+                      priceUnitFactor: product.priceUnitFactor,
+                    ),
+                  ),
                 ],
               ),
 
@@ -155,9 +183,10 @@ class ProductInBranchInfoDialog extends StatelessWidget {
                       baseCostInCents: product.account.maximumCost,
                     ),
                   ],
-                  baseUnitName: product.unitName,
+                  baseUnitName: product.priceUnitName,
                   selectedUnitName: product.defaultUnitName,
                   selectedUnitFactor: product.defaultUnitFactor,
+                  priceUnitFactor: product.priceUnitFactor,
                 ),
               ],
 

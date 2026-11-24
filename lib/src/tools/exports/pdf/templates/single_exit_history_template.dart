@@ -228,7 +228,7 @@ class SingleExitHistoryTemplate implements PdfTemplate {
                 pw.Expanded(
                   flex: 2,
                   child: pw.Text(
-                    NumberFormatter.convertToMoneyLike((item.cost ?? 0) * item.conversionFactor),
+                    NumberFormatter.convertToMoneyLike(item.displayUnitCost),
                     textAlign: pw.TextAlign.center,
                     style: const pw.TextStyle(fontSize: 10),
                   ),
@@ -236,7 +236,7 @@ class SingleExitHistoryTemplate implements PdfTemplate {
                 pw.Expanded(
                   flex: 2,
                   child: pw.Text(
-                    NumberFormatter.convertToMoneyLike((item.cost ?? 0) * item.quantity.abs()),
+                    NumberFormatter.convertToMoneyLike(item.lineTotal),
                     textAlign: pw.TextAlign.center,
                     style: const pw.TextStyle(fontSize: 10),
                   ),

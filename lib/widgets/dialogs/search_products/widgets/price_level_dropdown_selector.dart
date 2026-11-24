@@ -34,25 +34,25 @@ class PriceLevelDropdownSelector extends StatelessWidget {
             DropdownMenuItem(
               value: 1,
               child: Text(
-                "Precio 1 (${NumberFormatter.convertToMoneyLike(product.saleProfile.salePrice * result.conversionFactor)})",
+                "Precio 1 (${NumberFormatter.convertToMoneyLike(UnitConversionTool.toDisplayPriceOrCost(product.saleProfile.salePrice, result.conversionFactor, priceUnitFactor: product.priceUnitFactor))})",
               ),
             ),
             DropdownMenuItem(
               value: 2,
               child: Text(
-                "Precio 2 (${NumberFormatter.convertToMoneyLike(product.saleProfile.salePrice2 * result.conversionFactor)})",
+                "Precio 2 (${NumberFormatter.convertToMoneyLike(UnitConversionTool.toDisplayPriceOrCost(product.saleProfile.salePrice2, result.conversionFactor, priceUnitFactor: product.priceUnitFactor))})",
               ),
             ),
             DropdownMenuItem(
               value: 3,
               child: Text(
-                "Precio 3 (${NumberFormatter.convertToMoneyLike(product.saleProfile.salePrice3 * result.conversionFactor)})",
+                "Precio 3 (${NumberFormatter.convertToMoneyLike(UnitConversionTool.toDisplayPriceOrCost(product.saleProfile.salePrice3, result.conversionFactor, priceUnitFactor: product.priceUnitFactor))})",
               ),
             ),
             DropdownMenuItem(
               value: 4,
               child: Text(
-                "Precio 4 (${NumberFormatter.convertToMoneyLike(product.saleProfile.salePrice4 * result.conversionFactor)})",
+                "Precio 4 (${NumberFormatter.convertToMoneyLike(UnitConversionTool.toDisplayPriceOrCost(product.saleProfile.salePrice4, result.conversionFactor, priceUnitFactor: product.priceUnitFactor))})",
               ),
             ),
             if (isUserAdmin)

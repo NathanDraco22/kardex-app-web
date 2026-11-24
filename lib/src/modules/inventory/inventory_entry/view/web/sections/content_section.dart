@@ -23,7 +23,13 @@ class _ContentSection extends StatelessWidget {
         final productRow = ProductRow(
           product: res,
           quantity: 0,
-          unitaryCost: (res is ProductInDbInBranch) ? (res.account.averageCost * unit.conversionFactor).round() : 0,
+          unitaryCost: (res is ProductInDbInBranch)
+              ? UnitConversionTool.toDisplayPriceOrCost(
+                  res.account.averageCost,
+                  unit.conversionFactor,
+                  priceUnitFactor: res.priceUnitFactor,
+                )
+              : 0,
           editableCost: true,
           selectedUnitIndex: unit.unitIndex,
           conversionFactor: unit.conversionFactor,
@@ -47,7 +53,13 @@ class _ContentSection extends StatelessWidget {
         final newProductRow = ProductRow(
           product: res,
           quantity: 0,
-          unitaryCost: (res is ProductInDbInBranch) ? (res.account.averageCost * unit.conversionFactor).round() : 0,
+          unitaryCost: (res is ProductInDbInBranch)
+              ? UnitConversionTool.toDisplayPriceOrCost(
+                  res.account.averageCost,
+                  unit.conversionFactor,
+                  priceUnitFactor: res.priceUnitFactor,
+                )
+              : 0,
           editableCost: true,
           selectedUnitIndex: unit.unitIndex,
           conversionFactor: unit.conversionFactor,

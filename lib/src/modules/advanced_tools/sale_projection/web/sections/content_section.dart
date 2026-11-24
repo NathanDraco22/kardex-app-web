@@ -117,7 +117,11 @@ class _ContentSectionState extends State<_ContentSection> {
                         // Si needed <= 0, hay exceso.
                         final isDeficit = needed > 0;
                         final displayNeeded = needed;
-                        final totalCost = displayNeeded * item.account.averageCostMoney;
+                        final priceUnitFactor = UnitConversionTool.ensureSafeFactor(
+                          item.product.priceUnitFactor,
+                        );
+                        final totalCost =
+                            displayNeeded * item.account.averageCostMoney / priceUnitFactor;
 
                         // Estilo para la columna Proyección
                         final projectionColor = isDeficit ? Colors.green : Colors.red;

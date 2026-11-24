@@ -1,3 +1,4 @@
+import 'package:kardex_business/src/tools/unit_conversion_tool.dart';
 import 'package:kardex_business/src/tools/unit_display_formatter.dart';
 
 class EntryItem {
@@ -9,6 +10,7 @@ class EntryItem {
   final int cost;
   final int quantity;
   final int conversionFactor;
+  final int priceUnitFactor;
   final String? standardUnitName;
   final int? standardUnitFactor;
   final int? expirationDate;
@@ -19,6 +21,7 @@ class EntryItem {
     required this.cost,
     required this.quantity,
     this.conversionFactor = 1,
+    this.priceUnitFactor = 1,
     this.standardUnitName,
     this.standardUnitFactor,
     this.expirationDate,
@@ -40,7 +43,24 @@ class EntryItem {
 
   String get displayUnitName => displayQuantity.unitName;
 
+  int get displayUnitFactor => displayQuantity.usedStandardFallback
+      ? (standardUnitFactor ?? conversionFactor)
+      : conversionFactor;
+
+  int get displayUnitCost => UnitConversionTool.toDisplayPriceOrCost(
+    cost,
+    displayUnitFactor,
+    priceUnitFactor: priceUnitFactor,
+  );
+
+  int get lineTotal => UnitConversionTool.calculateLineTotal(
+    cost,
+    quantity.abs(),
+    priceUnitFactor: priceUnitFactor,
+  );
+
   factory EntryItem.fromJson(Map<String, dynamic> json) {
+    final rawPriceFactor = (json['priceUnitFactor'] as num?)?.toInt() ?? 1;
     return EntryItem(
       productId: json['productId'] as String,
       productName: json['productName'] as String,
@@ -50,6 +70,7 @@ class EntryItem {
       cost: json['cost'] as int,
       quantity: json['quantity'] as int,
       conversionFactor: json['conversionFactor'] as int? ?? 1,
+      priceUnitFactor: rawPriceFactor < 1 ? 1 : rawPriceFactor,
       standardUnitName: json['standardUnitName'] as String?,
       standardUnitFactor: json['standardUnitFactor'] as int?,
       expirationDate: json['expirationDate'] as int?,
@@ -63,6 +84,7 @@ class EntryItem {
       'cost': cost,
       'quantity': quantity,
       'conversionFactor': conversionFactor,
+      'priceUnitFactor': priceUnitFactor < 1 ? 1 : priceUnitFactor,
       'expirationDate': expirationDate,
       'code': code,
       'brandName': brandName,

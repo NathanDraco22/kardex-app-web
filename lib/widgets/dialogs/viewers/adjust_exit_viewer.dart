@@ -98,7 +98,7 @@ class _AdjustExitViewer extends StatelessWidget {
   Widget build(BuildContext context) {
     // Calculate total on the fly
     final total = adjustExit.items.fold<int>(0, (prev, item) {
-      return prev + (item.cost * item.quantity);
+      return prev + item.lineTotal;
     });
 
     final typeLabel = _getTypeLabel(adjustExit.type);
@@ -277,13 +277,13 @@ class _AdjustExitViewer extends StatelessWidget {
                                     ),
                                     Expanded(
                                       child: Text(
-                                        NumberFormatter.convertToMoneyLike(item.cost * item.conversionFactor),
+                                        NumberFormatter.convertToMoneyLike(item.displayUnitCost),
                                         textAlign: TextAlign.center,
                                       ),
                                     ),
                                     Expanded(
                                       child: Text(
-                                        NumberFormatter.convertToMoneyLike(item.cost * item.quantity.abs()),
+                                        NumberFormatter.convertToMoneyLike(item.lineTotal),
                                         textAlign: TextAlign.center,
                                       ),
                                     ),

@@ -39,6 +39,7 @@ class BaseProduct {
   final List<ExtraUnit> extraUnits;
   final int defaultUnitIndex;
   final int wholesaleUnitIndex;
+  final int priceUnitFactor;
 
   bool get tracksInventory => productType.tracksInventory;
   bool get isService => productType.isService;
@@ -59,6 +60,16 @@ class BaseProduct {
     return 1;
   }
 
+  String get priceUnitName {
+    if (priceUnitFactor <= 1) return unitName;
+    for (final extra in extraUnits) {
+      if (extra.conversionFactor == priceUnitFactor) {
+        return extra.name;
+      }
+    }
+    return defaultUnitFactor == priceUnitFactor ? defaultUnitName : unitName;
+  }
+
   BaseProduct({
     required this.name,
     this.description,
@@ -76,9 +87,11 @@ class BaseProduct {
     this.extraUnits = const [],
     this.defaultUnitIndex = 0,
     this.wholesaleUnitIndex = 0,
+    this.priceUnitFactor = 1,
   });
 
   factory BaseProduct.fromJson(Map<String, dynamic> json) {
+    final rawPriceFactor = (json['priceUnitFactor'] as num?)?.toInt() ?? 1;
     return BaseProduct(
       name: json['name'] as String,
       description: json['description'] as String?,
@@ -99,6 +112,7 @@ class BaseProduct {
           const [],
       defaultUnitIndex: (json['defaultUnitIndex'] as num?)?.toInt() ?? 0,
       wholesaleUnitIndex: (json['wholesaleUnitIndex'] as num?)?.toInt() ?? 0,
+      priceUnitFactor: rawPriceFactor < 1 ? 1 : rawPriceFactor,
     );
   }
 
@@ -120,6 +134,7 @@ class BaseProduct {
       'extraUnits': extraUnits.map((e) => e.toJson()).toList(),
       'defaultUnitIndex': defaultUnitIndex,
       'wholesaleUnitIndex': wholesaleUnitIndex,
+      'priceUnitFactor': priceUnitFactor < 1 ? 1 : priceUnitFactor,
     };
   }
 }
@@ -142,9 +157,11 @@ class CreateProduct extends BaseProduct {
     super.extraUnits,
     super.defaultUnitIndex,
     super.wholesaleUnitIndex,
+    super.priceUnitFactor,
   });
 
   factory CreateProduct.fromJson(Map json) {
+    final rawPriceFactor = (json['priceUnitFactor'] as num?)?.toInt() ?? 1;
     return CreateProduct(
       name: json['name'] as String,
       description: json['description'] as String?,
@@ -165,6 +182,7 @@ class CreateProduct extends BaseProduct {
           const [],
       defaultUnitIndex: (json['defaultUnitIndex'] as num?)?.toInt() ?? 0,
       wholesaleUnitIndex: (json['wholesaleUnitIndex'] as num?)?.toInt() ?? 0,
+      priceUnitFactor: rawPriceFactor < 1 ? 1 : rawPriceFactor,
     );
   }
 
@@ -186,6 +204,7 @@ class CreateProduct extends BaseProduct {
       extraUnits: extraUnits,
       defaultUnitIndex: defaultUnitIndex,
       wholesaleUnitIndex: wholesaleUnitIndex,
+      priceUnitFactor: priceUnitFactor,
     );
   }
 }
@@ -208,6 +227,7 @@ class UpdateProduct {
   final List<ExtraUnit>? extraUnits;
   final int? defaultUnitIndex;
   final int? wholesaleUnitIndex;
+  final int? priceUnitFactor;
 
   UpdateProduct({
     this.name,
@@ -226,6 +246,7 @@ class UpdateProduct {
     this.extraUnits,
     this.defaultUnitIndex,
     this.wholesaleUnitIndex,
+    this.priceUnitFactor,
   });
 
   factory UpdateProduct.fromJson(Map json) {
@@ -250,6 +271,7 @@ class UpdateProduct {
           : null,
       defaultUnitIndex: (json['defaultUnitIndex'] as num?)?.toInt(),
       wholesaleUnitIndex: (json['wholesaleUnitIndex'] as num?)?.toInt(),
+      priceUnitFactor: (json['priceUnitFactor'] as num?)?.toInt(),
     );
   }
 
@@ -271,6 +293,7 @@ class UpdateProduct {
       'extraUnits': extraUnits?.map((e) => e.toJson()).toList(),
       'defaultUnitIndex': defaultUnitIndex,
       'wholesaleUnitIndex': wholesaleUnitIndex,
+      'priceUnitFactor': priceUnitFactor,
     };
     data.removeWhere((key, value) => value == null);
     return data;
@@ -301,12 +324,14 @@ class ProductInDb extends BaseProduct {
     super.extraUnits,
     super.defaultUnitIndex,
     super.wholesaleUnitIndex,
+    super.priceUnitFactor,
     this.isDeleted = false,
     required this.createdAt,
     this.updatedAt,
   });
 
   factory ProductInDb.fromJson(Map<String, dynamic> json) {
+    final rawPriceFactor = (json['priceUnitFactor'] as num?)?.toInt() ?? 1;
     return ProductInDb(
       id: json['id'] as String,
       name: json['name'] as String,
@@ -328,6 +353,7 @@ class ProductInDb extends BaseProduct {
           const [],
       defaultUnitIndex: (json['defaultUnitIndex'] as num?)?.toInt() ?? 0,
       wholesaleUnitIndex: (json['wholesaleUnitIndex'] as num?)?.toInt() ?? 0,
+      priceUnitFactor: rawPriceFactor < 1 ? 1 : rawPriceFactor,
       isDeleted: json['isDeleted'] as bool? ?? false,
       createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
       updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt'] as int) : null,
@@ -369,6 +395,7 @@ class ProductInDbInBranch extends ProductInDb {
     super.extraUnits,
     super.defaultUnitIndex,
     super.wholesaleUnitIndex,
+    super.priceUnitFactor,
     super.isDeleted,
     required super.createdAt,
     super.updatedAt,
@@ -377,6 +404,7 @@ class ProductInDbInBranch extends ProductInDb {
   });
 
   factory ProductInDbInBranch.fromJson(Map<String, dynamic> json) {
+    final rawPriceFactor = (json['priceUnitFactor'] as num?)?.toInt() ?? 1;
     return ProductInDbInBranch(
       id: json['id'],
       name: json['name'],
@@ -398,6 +426,7 @@ class ProductInDbInBranch extends ProductInDb {
           const [],
       defaultUnitIndex: (json['defaultUnitIndex'] as num?)?.toInt() ?? 0,
       wholesaleUnitIndex: (json['wholesaleUnitIndex'] as num?)?.toInt() ?? 0,
+      priceUnitFactor: rawPriceFactor < 1 ? 1 : rawPriceFactor,
       isDeleted: json['isDeleted'] ?? false,
       createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt']),
       updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt']) : null,
@@ -437,6 +466,7 @@ class ProductInDbInBranch extends ProductInDb {
     List<ExtraUnit>? extraUnits,
     int? defaultUnitIndex,
     int? wholesaleUnitIndex,
+    int? priceUnitFactor,
   }) {
     return ProductInDbInBranch(
       id: id ?? this.id,
@@ -461,6 +491,7 @@ class ProductInDbInBranch extends ProductInDb {
       extraUnits: extraUnits ?? this.extraUnits,
       defaultUnitIndex: defaultUnitIndex ?? this.defaultUnitIndex,
       wholesaleUnitIndex: wholesaleUnitIndex ?? this.wholesaleUnitIndex,
+      priceUnitFactor: priceUnitFactor ?? this.priceUnitFactor,
     );
   }
 }

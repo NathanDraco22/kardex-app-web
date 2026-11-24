@@ -107,6 +107,7 @@ class AnonInvoiceViewController extends ChangeNotifier {
         subTotal: commercial.subTotal,
         total: commercial.total,
         conversionFactor: commercial.conversionFactor,
+        priceUnitFactor: product.priceUnitFactor,
         selectedUnitName: commercial.selectedUnitName.isNotEmpty ? commercial.selectedUnitName : product.unitName,
         standardUnitName: product.defaultUnitName,
         standardUnitFactor: product.defaultUnitFactor,

@@ -81,7 +81,7 @@ class _ContentSection extends StatelessWidget {
                       // Using fold<int> since AdjustExitItem has int cost and quantity
                       final totalVal = exit.items.fold<int>(
                         0,
-                        (prev, item) => prev + (item.cost * item.quantity.abs()),
+                        (prev, item) => prev + item.lineTotal,
                       );
                       final total = NumberFormatter.convertToMoneyLike(totalVal);
 

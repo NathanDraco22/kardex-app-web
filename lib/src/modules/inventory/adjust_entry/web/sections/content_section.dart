@@ -29,7 +29,11 @@ class _ContentSection extends StatelessWidget {
         final productRow = ProductRow(
           product: res,
           quantity: 0,
-          unitaryCost: (res.account.averageCost * unit.conversionFactor).round(),
+          unitaryCost: UnitConversionTool.toDisplayPriceOrCost(
+            res.account.averageCost,
+            unit.conversionFactor,
+            priceUnitFactor: res.priceUnitFactor,
+          ),
           editableCost: false,
           haveExpirationDate: false,
           selectedUnitIndex: unit.unitIndex,
@@ -50,7 +54,11 @@ class _ContentSection extends StatelessWidget {
         final newProductRow = ProductRow(
           product: res,
           quantity: 0,
-          unitaryCost: (res.account.averageCost * unit.conversionFactor).round(),
+          unitaryCost: UnitConversionTool.toDisplayPriceOrCost(
+            res.account.averageCost,
+            unit.conversionFactor,
+            priceUnitFactor: res.priceUnitFactor,
+          ),
           editableCost: true,
           haveExpirationDate: false,
           selectedUnitIndex: unit.unitIndex,

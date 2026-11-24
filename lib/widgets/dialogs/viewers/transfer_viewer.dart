@@ -234,7 +234,7 @@ class TransferViewerContent extends StatelessWidget {
                           ),
                           Expanded(
                             child: Text(
-                              NumberFormatter.convertToMoneyLike(item.cost * item.quantity),
+                              NumberFormatter.convertToMoneyLike(item.lineTotal),
                             ),
                           ),
                         ],

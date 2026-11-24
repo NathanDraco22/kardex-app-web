@@ -210,7 +210,7 @@ CreateInvoice createAnonInvoiceFromControllers(
 
   final totalCost = salesItems.fold<int>(
     0,
-    (previousValue, element) => previousValue + (element.cost * element.quantity),
+    (previousValue, element) => previousValue + element.lineCost,
   );
 
   final total = viewController.totalAmount;

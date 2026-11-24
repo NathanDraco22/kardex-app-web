@@ -48,7 +48,7 @@ class _ContentSection extends StatelessWidget {
                       Expanded(
                         flex: 2,
                         child: Text(
-                          NumberFormatter.convertToMoneyLike(item.price * item.conversionFactor),
+                          NumberFormatter.convertToMoneyLike(item.displayUnitPrice),
                           textAlign: TextAlign.right,
                         ),
                       ),

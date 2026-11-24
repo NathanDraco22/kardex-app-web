@@ -155,7 +155,13 @@ class _InventoryMovementProductTableState extends State<InventoryMovementProduct
     final averageCost = row.product is ProductInDbInBranch
         ? (row.product as ProductInDbInBranch).account.averageCost
         : 0;
-    final oldCost = row.unitaryCost > 0 ? row.unitaryCost : averageCost * oldFactor;
+    final oldCost = row.unitaryCost > 0
+        ? row.unitaryCost
+        : UnitConversionTool.toDisplayPriceOrCost(
+            averageCost,
+            oldFactor,
+            priceUnitFactor: row.product.priceUnitFactor,
+          );
     final shouldClearQuantity = newQuantity == null;
 
     setState(() {
@@ -616,10 +622,10 @@ class _EntryRowState extends State<EntryRow> with AutomaticKeepAliveClientMixin 
                       );
                     },
                   ),
-                  if (widget.rowModel.conversionFactor > 1) ...[
+                  if (widget.rowModel.conversionFactor != product.priceUnitFactor) ...[
                     const SizedBox(height: 2),
                     Text(
-                      "Base: ${NumberFormatter.convertToMoneyLike((widget.rowModel.unitaryCost / widget.rowModel.conversionFactor).round())}",
+                      "${product.priceUnitName}: ${NumberFormatter.convertToMoneyLike(UnitConversionTool.toStoredPriceOrCost(widget.rowModel.unitaryCost, widget.rowModel.conversionFactor, priceUnitFactor: product.priceUnitFactor))}",
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.blue.shade700,

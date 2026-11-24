@@ -46,7 +46,11 @@ class _MobileScaffold extends StatelessWidget {
             final newRow = ProductRow(
               product: res,
               quantity: 0,
-              unitaryCost: (res.account.averageCost * unit.conversionFactor).round(),
+              unitaryCost: UnitConversionTool.toDisplayPriceOrCost(
+                res.account.averageCost,
+                unit.conversionFactor,
+                priceUnitFactor: res.priceUnitFactor,
+              ),
               editableCost: false,
               haveExpirationDate: false,
               selectedUnitIndex: unit.unitIndex,

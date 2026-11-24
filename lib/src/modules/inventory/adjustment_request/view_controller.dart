@@ -19,7 +19,13 @@ class AdjustmentRequestRow {
     String? selectedUnitName,
     int? unitaryCost,
   }) : selectedUnitName = selectedUnitName ?? product.unitName,
-       unitaryCost = unitaryCost ?? (product.account.averageCost * conversionFactor);
+       unitaryCost =
+           unitaryCost ??
+           UnitConversionTool.toDisplayPriceOrCost(
+             product.account.averageCost,
+             conversionFactor,
+             priceUnitFactor: product.priceUnitFactor,
+           );
 
   final ProductInDbInBranch product;
 
@@ -52,13 +58,21 @@ class AdjustmentRequestRow {
 
   int get averageBaseCost => product.account.averageCost;
 
-  int get baseUnitCost => UnitConversionTool.toBaseCost(unitaryCost, conversionFactor);
+  int get baseUnitCost => UnitConversionTool.toBaseCost(
+    unitaryCost,
+    conversionFactor,
+    priceUnitFactor: product.priceUnitFactor,
+  );
 
   /// Para faltantes el backend recalcula el costo de salida, por eso se
   /// muestra el costo promedio como referencia.
   int get effectiveBaseCost => difference > 0 ? baseUnitCost : averageBaseCost;
 
-  int get subtotal => difference.abs() * effectiveBaseCost;
+  int get subtotal => UnitConversionTool.calculateLineTotal(
+    effectiveBaseCost,
+    difference.abs(),
+    priceUnitFactor: product.priceUnitFactor,
+  );
 
   num get systemStockInDisplayUnit => UnitConversionTool.toDisplayQuantity(systemStock, conversionFactor);
 
@@ -148,7 +162,11 @@ class AdjustmentRequestViewController extends ChangeNotifier {
     row.conversionFactor = factor;
     row.selectedUnitName = unit.unitName;
     row.countedQuantity = UnitConversionTool.toDisplayQuantity(baseCount, factor).toDouble();
-    row.unitaryCost = row.product.account.averageCost * factor;
+    row.unitaryCost = UnitConversionTool.toDisplayPriceOrCost(
+      row.product.account.averageCost,
+      factor,
+      priceUnitFactor: row.product.priceUnitFactor,
+    );
     notifyListeners();
   }
 
@@ -178,7 +196,17 @@ class AdjustmentRequestViewController extends ChangeNotifier {
       final factor = UnitConversionTool.ensureSafeFactor(item.conversionFactor);
       final unitIndex = _resolveUnitIndex(product, item.unitName, factor);
       final selectedUnitName = item.unitName ?? product.unitName;
-      final displayCost = item.difference > 0 ? item.cost * factor : product.account.averageCost * factor;
+      final displayCost = item.difference > 0
+          ? UnitConversionTool.toDisplayPriceOrCost(
+              item.cost,
+              factor,
+              priceUnitFactor: item.priceUnitFactor,
+            )
+          : UnitConversionTool.toDisplayPriceOrCost(
+              product.account.averageCost,
+              factor,
+              priceUnitFactor: product.priceUnitFactor,
+            );
 
       _rows.add(
         AdjustmentRequestRow(
@@ -245,6 +273,7 @@ class AdjustmentRequestViewController extends ChangeNotifier {
       standardUnitName: row.product.defaultUnitName,
       standardUnitFactor: row.product.defaultUnitFactor,
       conversionFactor: row.conversionFactor,
+      priceUnitFactor: row.product.priceUnitFactor,
       systemStock: row.systemStock,
       countedQuantity: row.countedBaseQuantity,
       difference: row.difference,

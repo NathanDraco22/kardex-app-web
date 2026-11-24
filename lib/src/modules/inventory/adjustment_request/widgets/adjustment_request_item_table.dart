@@ -310,13 +310,17 @@ class _ItemTableRow extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    NumberFormatter.convertToMoneyLike(item.cost),
+                    formatAdjustmentUnitCost(
+                      item.cost,
+                      factor,
+                      priceUnitFactor: item.priceUnitFactor,
+                    ),
                     style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
                   ),
-                  if (factor > 1) ...[
+                  if (factor != item.priceUnitFactor) ...[
                     const SizedBox(height: 2),
                     Text(
-                      'Base: ${NumberFormatter.convertToMoneyLike((item.cost / factor).round())}',
+                      'Base: ${NumberFormatter.convertToMoneyLike(item.cost)}',
                       style: TextStyle(
                         fontSize: 10,
                         color: Colors.grey.shade600,
