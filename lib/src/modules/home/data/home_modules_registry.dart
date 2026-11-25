@@ -527,20 +527,6 @@ List<HomeModuleCategory> getHomeModuleCategories(
           ),
           const HomeSubmoduleItem(
             section: "Órdenes de Compra y Recibos",
-            title: "Crear Orden de Compra",
-            subtitle: "Ingreso de nuevo pedido para despacho",
-            icon: FluentIcons.receipt_add_24_filled,
-            accentColor: Color(0xFF0284C7),
-            routeName: "sale-order",
-            gates: [
-              OrdersGateFilter(),
-              RolePermissionGateFilter(
-                permissions: [CommercialSubModules.createOrder],
-              ),
-            ],
-          ),
-          const HomeSubmoduleItem(
-            section: "Órdenes de Compra y Recibos",
             title: "Crear Orden (Mayorista)",
             subtitle: "Pedido formal con lista mayorista",
             icon: FluentIcons.receipt_add_24_filled,
