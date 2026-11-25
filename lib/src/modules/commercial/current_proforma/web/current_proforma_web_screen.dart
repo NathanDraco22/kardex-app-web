@@ -70,6 +70,4 @@ class CurrentProformaWebScreen extends StatelessWidget {
 
 Future<void> _openCreateProforma(BuildContext context) async {
   await context.pushNamed(RouteNames.proforma);
-  if (!context.mounted) return;
-  await context.read<ReadProformaCubit>().loadPaginatedOrders(getIt<AuthCubit>().currentBranchId);
 }

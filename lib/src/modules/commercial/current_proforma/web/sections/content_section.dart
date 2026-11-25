@@ -70,8 +70,13 @@ class _ContentSection extends StatelessWidget {
                 color: Color(0xFFE2E8F0),
               ),
               itemBuilder: (context, index) {
-                final tileColor = RowColorTool.getRowColor(index);
                 final currentOrder = orders[index];
+                Color tileColor = RowColorTool.getRowColor(index);
+                if (state.updatedOrderIds.contains(currentOrder.id)) {
+                  tileColor = Colors.blue.shade100;
+                } else if (state.newOrderIds.contains(currentOrder.id)) {
+                  tileColor = Colors.yellow.shade200;
+                }
                 return CustomOrderListTile(
                   order: currentOrder,
                   backgroundColor: tileColor,

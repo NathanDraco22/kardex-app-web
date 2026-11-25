@@ -10,12 +10,26 @@ class ReadQuotationOrderSearchSuccess extends ReadQuotationOrderSearchState {
   final List<OrderInDb> orders;
   final int totalCount;
   final int totalAmount;
+  final Set<String> newOrderIds;
+  final Set<String> updatedOrderIds;
 
-  ReadQuotationOrderSearchSuccess(this.orders, this.totalCount, this.totalAmount);
+  ReadQuotationOrderSearchSuccess(
+    this.orders,
+    this.totalCount,
+    this.totalAmount, {
+    this.newOrderIds = const {},
+    this.updatedOrderIds = const {},
+  });
 }
 
 class ReadQuotationOrderSearchLoadingMore extends ReadQuotationOrderSearchSuccess {
-  ReadQuotationOrderSearchLoadingMore(super.orders, super.totalCount, super.totalAmount);
+  ReadQuotationOrderSearchLoadingMore(
+    super.orders,
+    super.totalCount,
+    super.totalAmount, {
+    super.newOrderIds,
+    super.updatedOrderIds,
+  });
 }
 
 final class ReadQuotationOrderSearchError extends ReadQuotationOrderSearchState {

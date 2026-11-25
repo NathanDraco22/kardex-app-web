@@ -62,8 +62,6 @@ class CurrentProformaMobileScreen extends StatelessWidget {
 
 Future<void> _openCreateProforma(BuildContext context) async {
   await context.pushNamed(RouteNames.proforma);
-  if (!context.mounted) return;
-  await context.read<ReadProformaCubit>().loadPaginatedOrders(getIt<AuthCubit>().currentBranchId);
 }
 
 class _MobileBody extends StatelessWidget {
@@ -136,13 +134,24 @@ class _MobileBody extends StatelessWidget {
                     child: Column(
                       children: [
                         for (var index = 0; index < state.orders.length; index++) ...[
-                          CustomOrderListTile(
-                            order: state.orders[index],
-                            backgroundColor: RowColorTool.getRowColor(index),
-                            onTap: () async {
-                              await showProformaInvoiceCreatorDialog(
-                                context,
-                                state.orders[index],
+                          Builder(
+                            builder: (context) {
+                              final currentOrder = state.orders[index];
+                              Color tileColor = RowColorTool.getRowColor(index);
+                              if (state.updatedOrderIds.contains(currentOrder.id)) {
+                                tileColor = Colors.blue.shade100;
+                              } else if (state.newOrderIds.contains(currentOrder.id)) {
+                                tileColor = Colors.yellow.shade200;
+                              }
+                              return CustomOrderListTile(
+                                order: currentOrder,
+                                backgroundColor: tileColor,
+                                onTap: () async {
+                                  await showProformaInvoiceCreatorDialog(
+                                    context,
+                                    currentOrder,
+                                  );
+                                },
                               );
                             },
                           ),
