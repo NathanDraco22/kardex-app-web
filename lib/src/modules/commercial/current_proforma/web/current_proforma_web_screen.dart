@@ -6,6 +6,8 @@ import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/current_proforma/cubit/read_proforma_cubit.dart';
 import 'package:kardex_app_front/src/tools/role_tools.dart';
 import 'package:kardex_app_front/src/tools/row_color_tool.dart';
+// Requerido en lite donde widgets.dart no re-exporta CustomOrderListTile.
+// ignore: unnecessary_import
 import 'package:kardex_app_front/widgets/custom_order_list_tile.dart';
 import 'package:kardex_app_front/widgets/dialogs/selectors/client_selection_dialog.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
