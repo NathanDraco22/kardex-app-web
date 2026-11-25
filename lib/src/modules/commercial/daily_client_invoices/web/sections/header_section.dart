@@ -9,6 +9,7 @@ class _HeaderSection extends StatefulWidget {
 
 class _HeaderSectionState extends State<_HeaderSection> {
   UserInDb? currentSelectedUser;
+  ClientInDb? currentSelectedClient;
 
   @override
   Widget build(BuildContext context) {
@@ -57,21 +58,40 @@ class _HeaderSectionState extends State<_HeaderSection> {
                 ],
               ),
             ),
-            if (!isSellerRole) ...[
-              const SizedBox(height: 8),
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 600),
-                child: UserDropdownSelector(
-                  width: 280,
-                  selectedUser: currentSelectedUser,
-                  onChanged: (user) {
-                    readCubit.userCreatorId = user?.id;
-                    currentSelectedUser = user;
-                    setState(() {});
-                  },
-                ),
+            const SizedBox(height: 8),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 600),
+              child: Wrap(
+                spacing: 12,
+                runSpacing: 8,
+                children: [
+                  ClientDropdownSelector(
+                    width: 280,
+                    allowNoClient: true,
+                    selectedClient: currentSelectedClient,
+                    selectedClientId: readCubit.clientId,
+                    onChanged: (client) {
+                      currentSelectedClient = client;
+                      setState(() {});
+                    },
+                    onIdChanged: (clientId) {
+                      readCubit.clientId = clientId;
+                      setState(() {});
+                    },
+                  ),
+                  if (!isSellerRole)
+                    UserDropdownSelector(
+                      width: 280,
+                      selectedUser: currentSelectedUser,
+                      onChanged: (user) {
+                        readCubit.userCreatorId = user?.id;
+                        currentSelectedUser = user;
+                        setState(() {});
+                      },
+                    ),
+                ],
               ),
-            ],
+            ),
             const SizedBox(height: 12),
             ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 600),
@@ -87,11 +107,16 @@ class _HeaderSectionState extends State<_HeaderSection> {
                           onPressed: () async {
                             final state = readCubit.state as ReadDailyClientInvoicesSuccess;
 
+                            final clientLabel = readCubit.clientId == kSaleClientId
+                                ? "Sin cliente (Venta libre)"
+                                : currentSelectedClient?.name;
+
                             final template = InvoiceByUserTemplate(
                               title: "Ventas por Factura",
                               userInfo: currentSelectedUser != null
                                   ? UserInfo(id: currentSelectedUser!.id, name: currentSelectedUser!.username)
                                   : null,
+                              clientLabel: clientLabel,
                               startDate: readCubit.startDate,
                               endDate: readCubit.endDate,
                               count: state.totalCount,
@@ -124,6 +149,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                       if (!isSellerRole) {
                         currentSelectedUser = null;
                       }
+                      currentSelectedClient = null;
                       setState(() {});
                     },
                     icon: const Icon(Icons.clear),

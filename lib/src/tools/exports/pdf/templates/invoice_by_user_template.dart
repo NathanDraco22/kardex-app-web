@@ -7,6 +7,7 @@ import 'package:pdf/widgets.dart' as pw;
 class InvoiceByUserTemplate implements PdfTemplate {
   final String title;
   final UserInfo? userInfo;
+  final String? clientLabel;
   final DateTime? startDate;
   final DateTime? endDate;
   final int count;
@@ -16,6 +17,7 @@ class InvoiceByUserTemplate implements PdfTemplate {
   InvoiceByUserTemplate({
     required this.title,
     this.userInfo,
+    this.clientLabel,
     this.startDate,
     this.endDate,
     required this.count,
@@ -91,6 +93,10 @@ class InvoiceByUserTemplate implements PdfTemplate {
                 "Usuario: ${userInfo?.name ?? 'Todos'}",
                 style: const pw.TextStyle(fontWeight: pw.FontWeight.bold),
               ),
+              if (clientLabel != null && clientLabel!.isNotEmpty) ...[
+                pw.SizedBox(height: 4),
+                pw.Text("Cliente: $clientLabel"),
+              ],
               pw.SizedBox(height: 4),
               pw.Text("Periodo: $dateRangeStr"),
             ],
