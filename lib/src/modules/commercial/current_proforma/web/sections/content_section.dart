@@ -6,6 +6,8 @@ class _ContentSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      margin: EdgeInsets.zero,
+      clipBehavior: Clip.antiAlias,
       child: BlocBuilder<ReadProformaCubit, ReadProformaState>(
         builder: (context, state) {
           if (state is ReadProformaLoading || state is ReadProformaInitial) {
@@ -15,17 +17,44 @@ class _ContentSection extends StatelessWidget {
           }
 
           if (state is ReadProformaError) {
-            return Center(
-              child: Text(state.message),
+            return AppEmptyState(
+              icon: Icons.error_outline_rounded,
+              title: 'No se pudieron cargar las cotizaciones',
+              subtitle: state.message,
+              accentColor: AppThemeTokens.danger,
+              actionLabel: 'Reintentar',
+              actionIcon: Icons.refresh_rounded,
+              onAction: () => context
+                  .read<ReadProformaCubit>()
+                  .loadPaginatedOrders(getIt<AuthCubit>().currentBranchId),
             );
           }
 
-          state as ReadProformaSuccess;
-
-          final orders = state.orders;
+          final orders = (state as ReadProformaSuccess).orders;
 
           if (orders.isEmpty) {
-            return const Center(child: Text("No hay cotizaciones"));
+            return Gate(
+              filters: const [
+                RolePermissionGateFilter(
+                  permissions: [CommercialSubModules.createOrder],
+                ),
+              ],
+              fallback: const AppEmptyState(
+                icon: Icons.description_outlined,
+                title: 'Sin cotizaciones',
+                subtitle: 'No hay cotizaciones registradas para los filtros seleccionados.',
+                accentColor: AppThemeTokens.indigo,
+              ),
+              child: AppEmptyState(
+                icon: Icons.description_outlined,
+                title: 'Sin cotizaciones',
+                subtitle: 'No hay cotizaciones registradas para los filtros seleccionados.',
+                accentColor: AppThemeTokens.indigo,
+                actionLabel: 'Nueva Cotización',
+                actionIcon: Icons.add_rounded,
+                onAction: () => _openCreateProforma(context),
+              ),
+            );
           }
 
           return RefreshIndicator(
@@ -33,8 +62,13 @@ class _ContentSection extends StatelessWidget {
               final cubit = context.read<ReadProformaCubit>();
               return cubit.loadPaginatedOrders(getIt<AuthCubit>().currentBranchId);
             },
-            child: ListView.builder(
+            child: ListView.separated(
               itemCount: orders.length,
+              separatorBuilder: (_, _) => const Divider(
+                height: 1,
+                thickness: 1,
+                color: Color(0xFFE2E8F0),
+              ),
               itemBuilder: (context, index) {
                 final tileColor = RowColorTool.getRowColor(index);
                 final currentOrder = orders[index];

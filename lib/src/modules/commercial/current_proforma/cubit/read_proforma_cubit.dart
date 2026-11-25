@@ -6,9 +6,12 @@ part 'read_proforma_state.dart';
 class ReadProformaCubit extends Cubit<ReadProformaState> {
   ReadProformaCubit({
     required this.ordersRepository,
-  }) : super(ReadProformaInitial());
+    this.defaultCreatorId,
+  }) : createdBy = defaultCreatorId,
+       super(ReadProformaInitial());
 
   final OrdersRepository ordersRepository;
+  final String? defaultCreatorId;
 
   bool isLastPage = false;
   List<OrderInDb> _ordersCache = [];
@@ -26,7 +29,7 @@ class ReadProformaCubit extends Cubit<ReadProformaState> {
           branchId: branchId,
           clientId: clientId,
           status: OrderStatus.draft,
-          createdBy: createdBy,
+          createdBy: defaultCreatorId ?? createdBy,
         ),
       );
 
@@ -49,14 +52,14 @@ class ReadProformaCubit extends Cubit<ReadProformaState> {
     String? createdBy,
   }) async {
     this.clientId = clientId;
-    this.createdBy = createdBy;
+    this.createdBy = defaultCreatorId ?? createdBy;
     _ordersCache = [];
     isLastPage = false;
   }
 
   Future<void> clearFilterParams() async {
     clientId = null;
-    createdBy = null;
+    createdBy = defaultCreatorId;
     _ordersCache = [];
     isLastPage = false;
   }
