@@ -19,6 +19,7 @@ class ReadDailyClientInvoicesCubit extends Cubit<ReadDailyClientInvoicesState> {
   DateTime? endDate;
   int offset = 0;
   String? userCreatorId;
+  String? clientId;
 
   bool isLastPage = false;
 
@@ -36,7 +37,7 @@ class ReadDailyClientInvoicesCubit extends Cubit<ReadDailyClientInvoicesState> {
 
       params = InvoiceQueryParams()
         ..branchId = branchId
-        ..clientId = null
+        ..clientId = clientId
         ..startDate = DateTime.fromMillisecondsSinceEpoch(startDate?.millisecondsSinceEpoch ?? 0)
         ..endDate = DateTime.fromMillisecondsSinceEpoch(topEndDate?.millisecondsSinceEpoch ?? 0)
         ..limit = 1000
@@ -76,7 +77,7 @@ class ReadDailyClientInvoicesCubit extends Cubit<ReadDailyClientInvoicesState> {
       final result = await invoicesRepository.getAllInvoices(
         InvoiceQueryParams()
           ..branchId = branchId
-          ..clientId = null
+          ..clientId = clientId
           ..startDate = DateTime.fromMillisecondsSinceEpoch(startDate?.millisecondsSinceEpoch ?? 0)
           ..endDate = DateTime.fromMillisecondsSinceEpoch(topEndDate?.millisecondsSinceEpoch ?? 0)
           ..createdBy = effectiveUserCreatorId
@@ -103,6 +104,7 @@ class ReadDailyClientInvoicesCubit extends Cubit<ReadDailyClientInvoicesState> {
     endDate = startDate;
     offset = 0;
     userCreatorId = defaultCreatorId;
+    clientId = null;
     loadPaidInvoices(branchId);
   }
 }

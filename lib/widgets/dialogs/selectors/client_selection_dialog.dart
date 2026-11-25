@@ -3,6 +3,22 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 
+enum ClientFilterOptionType { all, noClient, client }
+
+class ClientFilterSelection {
+  const ClientFilterSelection._({required this.type, this.client});
+
+  const ClientFilterSelection.all() : this._(type: ClientFilterOptionType.all);
+
+  const ClientFilterSelection.noClient() : this._(type: ClientFilterOptionType.noClient);
+
+  const ClientFilterSelection.client(ClientInDb client)
+      : this._(type: ClientFilterOptionType.client, client: client);
+
+  final ClientFilterOptionType type;
+  final ClientInDb? client;
+}
+
 Future<ClientInDb?> showClientSelectionDialog(BuildContext context) async {
   return await showDialog<ClientInDb?>(
     context: context,
@@ -10,8 +26,40 @@ Future<ClientInDb?> showClientSelectionDialog(BuildContext context) async {
   );
 }
 
+Future<ClientFilterSelection?> showClientFilterDialog(
+  BuildContext context, {
+  bool showAllOption = true,
+  bool showNoClientOption = true,
+  String allOptionLabel = "Todos los clientes",
+  String noClientOptionLabel = "Sin cliente (Venta libre)",
+}) async {
+  return await showDialog<ClientFilterSelection?>(
+    context: context,
+    builder: (context) => ClientSelectionDialog(
+      returnFilterSelection: true,
+      showAllOption: showAllOption,
+      showNoClientOption: showNoClientOption,
+      allOptionLabel: allOptionLabel,
+      noClientOptionLabel: noClientOptionLabel,
+    ),
+  );
+}
+
 class ClientSelectionDialog extends StatefulWidget {
-  const ClientSelectionDialog({super.key});
+  const ClientSelectionDialog({
+    super.key,
+    this.returnFilterSelection = false,
+    this.showAllOption = false,
+    this.showNoClientOption = false,
+    this.allOptionLabel = "Todos los clientes",
+    this.noClientOptionLabel = "Sin cliente (Venta libre)",
+  });
+
+  final bool returnFilterSelection;
+  final bool showAllOption;
+  final bool showNoClientOption;
+  final String allOptionLabel;
+  final String noClientOptionLabel;
 
   @override
   State<ClientSelectionDialog> createState() => _ClientSelectionDialogState();
@@ -92,6 +140,27 @@ class _ClientSelectionDialogState extends State<ClientSelectionDialog> {
               hintText: "Nombre, cédula, teléfono o código",
               onSearch: _searchClients,
             ),
+            if (widget.returnFilterSelection && (widget.showAllOption || widget.showNoClientOption)) ...[
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  if (widget.showAllOption)
+                    ActionChip(
+                      avatar: const Icon(Icons.groups_outlined, size: 18),
+                      label: Text(widget.allOptionLabel),
+                      onPressed: () => Navigator.pop(context, const ClientFilterSelection.all()),
+                    ),
+                  if (widget.showNoClientOption)
+                    ActionChip(
+                      avatar: const Icon(Icons.person_off_outlined, size: 18),
+                      label: Text(widget.noClientOptionLabel),
+                      onPressed: () => Navigator.pop(context, const ClientFilterSelection.noClient()),
+                    ),
+                ],
+              ),
+            ],
             const SizedBox(height: 10),
             Expanded(
               child: _buildContent(),
@@ -134,7 +203,13 @@ class _ClientSelectionDialogState extends State<ClientSelectionDialog> {
         final client = _clients[index];
         return _ClientResultTile(
           client: client,
-          onTap: () => Navigator.pop(context, client),
+          onTap: () {
+            if (widget.returnFilterSelection) {
+              Navigator.pop(context, ClientFilterSelection.client(client));
+            } else {
+              Navigator.pop(context, client);
+            }
+          },
         );
       },
     );

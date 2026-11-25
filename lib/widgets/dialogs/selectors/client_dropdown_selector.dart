@@ -16,6 +16,8 @@ class ClientDropdownSelector extends StatelessWidget {
     this.onChanged,
     this.onIdChanged,
     this.allOptionText = "Todos los Clientes",
+    this.noClientOptionText = "Sin cliente (Venta libre)",
+    this.allowNoClient = false,
     this.width,
     this.isExpanded = false,
   });
@@ -44,6 +46,12 @@ class ClientDropdownSelector extends StatelessWidget {
   /// Texto mostrado cuando no hay cliente seleccionado.
   final String allOptionText;
 
+  /// Texto mostrado cuando se selecciona el filtro "sin cliente / venta libre".
+  final String noClientOptionText;
+
+  /// Si es `true`, permite elegir también "Todos" y "Sin cliente" ([kSaleClientId]).
+  final bool allowNoClient;
+
   /// Ancho fijo opcional del botón.
   final double? width;
 
@@ -51,6 +59,30 @@ class ClientDropdownSelector extends StatelessWidget {
   final bool isExpanded;
 
   Future<void> _pickClient(BuildContext context) async {
+    if (allowNoClient) {
+      final selection = await showClientFilterDialog(
+        context,
+        allOptionLabel: allOptionText,
+        noClientOptionLabel: noClientOptionText,
+      );
+      if (selection == null) return;
+      switch (selection.type) {
+        case ClientFilterOptionType.all:
+          onChanged?.call(null);
+          onIdChanged?.call(null);
+        case ClientFilterOptionType.noClient:
+          onChanged?.call(null);
+          onIdChanged?.call(kSaleClientId);
+        case ClientFilterOptionType.client:
+          final client = selection.client;
+          if (client != null) {
+            onChanged?.call(client);
+            onIdChanged?.call(client.id);
+          }
+      }
+      return;
+    }
+
     final selected = await showClientSelectionDialog(context);
     if (selected != null) {
       onChanged?.call(selected);
@@ -63,8 +95,13 @@ class ClientDropdownSelector extends StatelessWidget {
     // Determinar el nombre a mostrar y si hay un cliente seleccionado
     String displayName;
     bool isClientSelected = false;
+    bool isNoClientSelected = false;
 
-    if (selectedClient != null) {
+    if (allowNoClient && selectedClientId == kSaleClientId) {
+      displayName = noClientOptionText;
+      isClientSelected = true;
+      isNoClientSelected = true;
+    } else if (selectedClient != null) {
       displayName = selectedClient!.name;
       isClientSelected = true;
     } else if (selectedClientName != null && selectedClientName!.isNotEmpty) {
@@ -91,7 +128,9 @@ class ClientDropdownSelector extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
       icon: Icon(
-        isClientSelected ? Icons.business : Icons.business_outlined,
+        isNoClientSelected
+            ? Icons.person_off_outlined
+            : (isClientSelected ? Icons.business : Icons.business_outlined),
         color: Theme.of(context).colorScheme.primary,
         size: 20,
       ),
