@@ -144,16 +144,7 @@ class _MobileCartSectionState extends State<_MobileCartSection> {
                                         viewController.refresh();
                                       }
                                     : null,
-                                onQuantityDecrement: item.quantity > 0.0
-                                    ? () {
-                                        if (item.quantity > 1.0) {
-                                          item.quantity -= 1.0;
-                                        } else {
-                                          item.quantity = 0.0;
-                                        }
-                                        viewController.refresh();
-                                      }
-                                    : null,
+                                onQuantityDecrement: () => viewController.decrementItemQuantity(item),
                               );
                             },
                           ),
