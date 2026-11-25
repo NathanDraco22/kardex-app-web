@@ -192,6 +192,22 @@ class SaleTerminalViewController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Decrementa la cantidad de [item] en 1.0 hasta llegar a 0.0; si ya estaba
+  /// en 0.0 (o menor), elimina el ítem del carrito.
+  void decrementItemQuantity(CommercialProductResult item) {
+    if (item.quantity > 1.0) {
+      item.quantity -= 1.0;
+      notifyListeners();
+      return;
+    }
+    if (item.quantity > 0.0) {
+      item.quantity = 0.0;
+      notifyListeners();
+      return;
+    }
+    removeItem(item);
+  }
+
   void refresh() => notifyListeners();
 
   void requestSearchFocus({bool force = false}) {

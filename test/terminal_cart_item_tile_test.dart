@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kardex_app_front/src/modules/commercial/sale_terminal/view_controller.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/terminal_cart_item_tile.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/order_viewer.dart';
@@ -148,6 +149,90 @@ void main() {
       );
 
       expect(find.textContaining('Observación:'), findsNothing);
+    });
+  });
+
+  group('SaleTerminalViewController.decrementItemQuantity', () {
+    test('baja 2 -> 1 -> 0 y elimina el ítem al volver a decrementar en 0', () {
+      final controller = SaleTerminalViewController();
+      addTearDown(controller.dispose);
+      final item = CommercialProductResult(product: _buildTestProduct())..quantity = 2.0;
+      controller.addItem(item);
+
+      controller.decrementItemQuantity(item);
+      expect(item.quantity, 1.0);
+      expect(controller.items, contains(item));
+
+      controller.decrementItemQuantity(item);
+      expect(item.quantity, 0.0);
+      expect(controller.items, contains(item));
+
+      controller.decrementItemQuantity(item);
+      expect(controller.items, isEmpty);
+    });
+
+    test('baja cantidades fraccionarias 1.5 -> 0.5 -> 0 y elimina en el siguiente decremento', () {
+      final controller = SaleTerminalViewController();
+      addTearDown(controller.dispose);
+      final item = CommercialProductResult(product: _buildTestProduct())..quantity = 1.5;
+      controller.addItem(item);
+
+      controller.decrementItemQuantity(item);
+      expect(item.quantity, 0.5);
+      expect(controller.items, contains(item));
+
+      controller.decrementItemQuantity(item);
+      expect(item.quantity, 0.0);
+      expect(controller.items, contains(item));
+
+      controller.decrementItemQuantity(item);
+      expect(controller.items, isEmpty);
+    });
+
+    testWidgets('presionar "-" en TerminalCartItemTile pasa de 0.5 a 0 y luego elimina el ítem', (tester) async {
+      final controller = SaleTerminalViewController();
+      addTearDown(controller.dispose);
+      final item = CommercialProductResult(product: _buildTestProduct())..quantity = 0.5;
+      controller.addItem(item);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: ListenableBuilder(
+              listenable: controller,
+              builder: (context, _) {
+                return Column(
+                  children: [
+                    for (final cartItem in controller.items)
+                      TerminalCartItemTile(
+                        key: ValueKey(cartItem),
+                        item: cartItem,
+                        backgroundColor: Colors.white,
+                        onRemove: () => controller.removeItem(cartItem),
+                        onEdit: () {},
+                        onQuantityIncrement: () {},
+                        onQuantityDecrement: () => controller.decrementItemQuantity(cartItem),
+                      ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('0.5'), findsOneWidget);
+
+      await tester.tap(find.byIcon(Icons.remove));
+      await tester.pump();
+      expect(item.quantity, 0.0);
+      expect(controller.items, hasLength(1));
+      expect(find.byType(TerminalCartItemTile), findsOneWidget);
+
+      await tester.tap(find.byIcon(Icons.remove));
+      await tester.pump();
+      expect(controller.items, isEmpty);
+      expect(find.byType(TerminalCartItemTile), findsNothing);
     });
   });
 }
