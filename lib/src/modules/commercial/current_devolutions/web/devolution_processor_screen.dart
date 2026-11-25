@@ -97,7 +97,7 @@ class _RootScaffold extends StatelessWidget {
           final readCubit = context.read<ReadDevolutionCubit>();
           await readCubit.markDevolutionUpdated(state.devolution);
           if (!context.mounted) return;
-          await showDevolutionViewerDialog(context, devolution);
+          await showDevolutionViewerDialog(context, resultDevolution);
           if (!context.mounted) return;
           Navigator.pop(context, state.devolution);
         }
