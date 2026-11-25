@@ -4,7 +4,6 @@ import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/commercial/daily_product_in_orders/cubit/read_daily_product_in_orders_cubit.dart';
 import 'package:kardex_app_front/src/tools/role_tools.dart';
 import 'package:kardex_app_front/widgets/dialogs/export_options_dialog.dart';
-import 'package:kardex_app_front/widgets/dialogs/selectors/client_selection_dialog.dart';
 import 'package:kardex_app_front/widgets/title_label.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/src/tools/exports/csv_export_tool.dart';
