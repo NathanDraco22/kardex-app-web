@@ -8,6 +8,7 @@ class ProductByUserTemplate implements PdfTemplate {
   final String title;
   final String branchName;
   final UserInfo? userInfo;
+  final String? clientLabel;
   final DateTime? startDate;
   final DateTime? endDate;
   final int count;
@@ -18,6 +19,7 @@ class ProductByUserTemplate implements PdfTemplate {
     required this.title,
     required this.branchName,
     this.userInfo,
+    this.clientLabel,
     this.startDate,
     this.endDate,
     required this.count,
@@ -95,6 +97,10 @@ class ProductByUserTemplate implements PdfTemplate {
                 "Usuario: ${userInfo?.name ?? 'Todos'}",
                 style: const pw.TextStyle(fontWeight: pw.FontWeight.bold),
               ),
+              if (clientLabel != null && clientLabel!.isNotEmpty) ...[
+                pw.SizedBox(height: 4),
+                pw.Text("Cliente: $clientLabel"),
+              ],
               pw.SizedBox(height: 4),
               pw.Text("Periodo: $dateRangeStr"),
             ],

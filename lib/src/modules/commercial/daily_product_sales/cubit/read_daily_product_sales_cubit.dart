@@ -8,33 +8,61 @@ class ReadDailyProductSalesCubit extends Cubit<ReadDailyProductSalesState> {
     : super(ReadDailyProductSalesInitial()) {
     final todayMidnight = DateTimeTool.getTodayMidnight();
     startDate = todayMidnight;
+    endDate = todayMidnight;
     userCreatorId = defaultCreatorId;
   }
 
   String? defaultCreatorId;
 
   DateTime? startDate;
+  DateTime? endDate;
   String? userCreatorId;
+  String? clientId;
 
   final InvoicesRepository invoicesRepository;
 
-  Future<void> loadDailyProductSales({required String branchId, DateTime? startDate, String? userCreatorId}) async {
+  Future<void> loadDailyProductSales({
+    required String branchId,
+    DateTime? startDate,
+    DateTime? endDate,
+    String? userCreatorId,
+    String? clientId,
+    bool clearUserCreator = false,
+    bool clearClient = false,
+  }) async {
     emit(ReadDailyProductSalesLoading());
     if (startDate != null) {
       this.startDate = startDate;
     }
-    if (userCreatorId != null && defaultCreatorId == null) {
-      this.userCreatorId = userCreatorId;
+    if (endDate != null) {
+      this.endDate = endDate;
+    }
+    if (defaultCreatorId == null) {
+      if (clearUserCreator) {
+        this.userCreatorId = null;
+      } else if (userCreatorId != null) {
+        this.userCreatorId = userCreatorId;
+      }
+    } else {
+      this.userCreatorId = defaultCreatorId;
+    }
+
+    if (clearClient) {
+      this.clientId = null;
+    } else if (clientId != null) {
+      this.clientId = clientId;
     }
 
     try {
-      final topEndDate = this.startDate?.add(const Duration(days: 1));
+      final topEndDate = this.endDate?.add(const Duration(days: 1));
+      final effectiveUserCreatorId = defaultCreatorId ?? this.userCreatorId;
 
       final params = InvoiceQueryParams()
         ..branchId = branchId
+        ..clientId = this.clientId
         ..startDate = this.startDate
         ..endDate = topEndDate
-        ..createdBy = this.userCreatorId
+        ..createdBy = effectiveUserCreatorId
         ..limit = 10000;
 
       final result = await invoicesRepository.getAllProductSales(params);
@@ -51,8 +79,17 @@ class ReadDailyProductSalesCubit extends Cubit<ReadDailyProductSalesState> {
   }
 
   void clearFilters(String branchId) {
-    startDate = DateTimeTool.getTodayMidnight();
+    final todayMidnight = DateTimeTool.getTodayMidnight();
+    startDate = todayMidnight;
+    endDate = todayMidnight;
     userCreatorId = defaultCreatorId;
-    loadDailyProductSales(branchId: branchId, startDate: startDate);
+    clientId = null;
+    loadDailyProductSales(
+      branchId: branchId,
+      startDate: startDate,
+      endDate: endDate,
+      clearUserCreator: defaultCreatorId == null,
+      clearClient: true,
+    );
   }
 }
