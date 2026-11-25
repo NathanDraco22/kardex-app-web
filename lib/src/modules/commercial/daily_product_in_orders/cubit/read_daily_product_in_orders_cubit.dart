@@ -18,6 +18,7 @@ class ReadDailyProductInOrdersCubit extends Cubit<ReadDailyProductInOrdersState>
   DateTime? endDate;
   String? userCreatorId;
   String? clientId;
+  OrderStatus? status;
 
   final OrdersRepository ordersRepository;
 
@@ -29,6 +30,8 @@ class ReadDailyProductInOrdersCubit extends Cubit<ReadDailyProductInOrdersState>
     bool clearUserCreator = false,
     String? clientId,
     bool clearClient = false,
+    OrderStatus? status,
+    bool clearStatus = false,
   }) async {
     emit(ReadDailyProductInOrdersLoading());
     if (startDate != null) {
@@ -60,6 +63,12 @@ class ReadDailyProductInOrdersCubit extends Cubit<ReadDailyProductInOrdersState>
       this.clientId = clientId;
     }
 
+    if (clearStatus) {
+      this.status = null;
+    } else if (status != null) {
+      this.status = status;
+    }
+
     try {
       final effectiveStartDate = this.startDate?.startOfDay();
       final effectiveEndDate = (this.endDate ?? this.startDate)?.endOfDay();
@@ -67,7 +76,8 @@ class ReadDailyProductInOrdersCubit extends Cubit<ReadDailyProductInOrdersState>
       final params = OrderQueryParams(
         startDate: effectiveStartDate?.millisecondsSinceEpoch,
         endDate: effectiveEndDate?.millisecondsSinceEpoch,
-        neStatus: .cancelled,
+        status: this.status,
+        neStatus: this.status == null ? .cancelled : null,
         branchId: branchId,
         clientId: this.clientId,
         createdBy: this.userCreatorId,
@@ -91,12 +101,14 @@ class ReadDailyProductInOrdersCubit extends Cubit<ReadDailyProductInOrdersState>
     startDate = today;
     endDate = today.endOfDay();
     clientId = null;
+    status = null;
     userCreatorId = defaultCreatorId;
     loadDailyProductInOrders(
       branchId: branchId,
       startDate: startDate,
       endDate: endDate,
       clearClient: true,
+      clearStatus: true,
       clearUserCreator: defaultCreatorId == null,
     );
   }

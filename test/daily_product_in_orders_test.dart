@@ -65,16 +65,34 @@ void main() {
 
       await cubit.loadDailyProductInOrders(
         branchId: 'branch-1',
+        status: OrderStatus.completed,
+      );
+      expect(ds.lastQueryParams?['status'], OrderStatus.completed.name);
+      expect(ds.lastQueryParams?.containsKey('neStatus'), isFalse);
+
+      await cubit.loadDailyProductInOrders(
+        branchId: 'branch-1',
+        status: OrderStatus.open,
+      );
+      expect(ds.lastQueryParams?['status'], OrderStatus.open.name);
+      expect(ds.lastQueryParams?.containsKey('neStatus'), isFalse);
+
+      await cubit.loadDailyProductInOrders(
+        branchId: 'branch-1',
         clearClient: true,
         clearUserCreator: true,
+        clearStatus: true,
       );
       expect(ds.lastQueryParams?.containsKey('clientId'), isFalse);
       expect(ds.lastQueryParams?.containsKey('createdBy'), isFalse);
+      expect(ds.lastQueryParams?.containsKey('status'), isFalse);
+      expect(ds.lastQueryParams?['neStatus'], OrderStatus.cancelled.name);
 
       cubit.clearFilters('branch-1');
       await Future<void>.delayed(Duration.zero);
       expect(cubit.clientId, isNull);
       expect(cubit.userCreatorId, isNull);
+      expect(cubit.status, isNull);
     });
 
     test('blinda defaultCreatorId para Vendedor y Pre-Venta incluso al limpiar', () async {

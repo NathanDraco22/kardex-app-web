@@ -69,6 +69,31 @@ class _HeaderSectionState extends State<_HeaderSection> {
             const SizedBox(height: 8),
             ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 600),
+              child: SegmentedButton<OrderStatus?>(
+                segments: const [
+                  ButtonSegment<OrderStatus?>(
+                    value: null,
+                    label: Text("Todos"),
+                  ),
+                  ButtonSegment<OrderStatus?>(
+                    value: OrderStatus.completed,
+                    label: Text("Facturados"),
+                  ),
+                  ButtonSegment<OrderStatus?>(
+                    value: OrderStatus.open,
+                    label: Text("Sin Facturar"),
+                  ),
+                ],
+                selected: {readCubit.status},
+                onSelectionChanged: (selection) {
+                  readCubit.status = selection.first;
+                  setState(() {});
+                },
+              ),
+            ),
+            const SizedBox(height: 8),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 600),
               child: Wrap(
                 spacing: 12,
                 runSpacing: 8,
@@ -153,6 +178,8 @@ class _HeaderSectionState extends State<_HeaderSection> {
                             endDate: readCubit.endDate,
                             clientId: readCubit.clientId,
                             clearClient: readCubit.clientId == null,
+                            status: readCubit.status,
+                            clearStatus: readCubit.status == null,
                             userCreatorId: readCubit.userCreatorId,
                             clearUserCreator: !isSellerRole && readCubit.userCreatorId == null,
                           );
