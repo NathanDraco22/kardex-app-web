@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'devolutions_confirmation_screen.dart';
@@ -48,6 +49,16 @@ class _RootScaffold extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Seleccionar para Devolución"),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: FilledButton.tonalIcon(
+              onPressed: () => showInvoiceViewerDialog(context, invoice),
+              icon: const Icon(Icons.receipt_long_outlined, size: 18),
+              label: const Text("Ver Factura"),
+            ),
+          ),
+        ],
       ),
       body: _Body(
         invoice: invoice,
@@ -136,13 +147,16 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 600),
+        constraints: const BoxConstraints(maxWidth: 780),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _HeaderSection(invoice: invoice),
+              _HeaderSection(
+                invoice: invoice,
+                devolutions: devolutions,
+              ),
               const SizedBox(height: 8),
               const Expanded(
                 child: _ContentSection(),
