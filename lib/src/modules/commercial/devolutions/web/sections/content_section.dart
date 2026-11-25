@@ -94,15 +94,6 @@ class _ContentSection extends StatelessWidget {
           ),
           flex: 1,
         ),
-        BasicTableColumn(
-          label: const Text(
-            "Acciones",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          flex: 1,
-        ),
       ],
       rowBuilder: (context, index) {
         final rowColor = RowColorTool.getRowColor(index);
@@ -114,9 +105,7 @@ class _ContentSection extends StatelessWidget {
         final clientName = currentInvoice.clientInfo.name;
 
         return BasicTableRow(
-          onTap: () {
-            showInvoiceViewerDialog(context, currentInvoice);
-          },
+          onTap: () => _openDevolutionSelection(context, currentInvoice),
           color: rowColor,
           cells: [
             BasicTableCell(
@@ -156,45 +145,49 @@ class _ContentSection extends StatelessWidget {
                 ],
               ),
             ),
-            BasicTableCell(
-              content: SecondaryMenuButton(
-                onPressed: () async {
-                  if (currentInvoice.status == InvoiceStatus.cancelled) {
-                    DialogManager.showInfoDialog(
-                      context,
-                      "No se pueden realizar devoluciones sobre facturas canceladas.",
-                    );
-                    return;
-                  }
-                  if (currentInvoice.paymentType == PaymentType.credit) {
-                    DialogManager.showInfoDialog(
-                      context,
-                      "Las facturas a crédito deben procesarse desde el módulo de Notas de Crédito.",
-                    );
-                    return;
-                  }
-                  final result = await context
-                      .read<InvoicesRepository>()
-                      .getInvoiceDevolutionById(currentInvoice.id);
-                  if (!context.mounted) return;
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => DevolutionsSelectionScreen(
-                        invoice: result.invoice,
-                        devolutions: result.devolutions,
-                      ),
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.file_open_rounded),
-                label: const Text("Devolver"),
-              ),
-            ),
           ],
         );
       },
     );
+  }
+
+  Future<void> _openDevolutionSelection(BuildContext context, InvoiceInDb currentInvoice) async {
+    if (currentInvoice.status == InvoiceStatus.cancelled) {
+      DialogManager.showInfoDialog(
+        context,
+        "No se pueden realizar devoluciones sobre facturas canceladas.",
+      );
+      return;
+    }
+    if (currentInvoice.paymentType == PaymentType.credit) {
+      DialogManager.showInfoDialog(
+        context,
+        "Las facturas a crédito deben procesarse desde el módulo de Notas de Crédito.",
+      );
+      return;
+    }
+
+    LoadingDialogManager.showLoadingDialog(context);
+    try {
+      final result = await context
+          .read<InvoicesRepository>()
+          .getInvoiceDevolutionById(currentInvoice.id);
+      if (!context.mounted) return;
+      LoadingDialogManager.closeLoadingDialog(context);
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DevolutionsSelectionScreen(
+            invoice: result.invoice,
+            devolutions: result.devolutions,
+          ),
+        ),
+      );
+    } catch (error) {
+      if (!context.mounted) return;
+      LoadingDialogManager.closeLoadingDialog(context);
+      DialogManager.showErrorDialog(context, error.toString());
+    }
   }
 
   String _invoiceStatusLabel(InvoiceStatus status) {
