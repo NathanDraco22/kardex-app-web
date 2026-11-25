@@ -271,8 +271,8 @@ class _Body extends StatelessWidget {
               child: MenuOptionCard(
                 icon: FluentIcons.building_retail_money_24_filled,
                 accentColor: Colors.orange.shade700,
-                title: "Ventas diarias por Producto",
-                subtitle: "Unidades facturadas en la jornada",
+                title: "Ventas por Producto",
+                subtitle: "Unidades e importes facturados por artículo",
                 onTap: () => context.pushNamed("daily-product-sales"),
               ),
             ),

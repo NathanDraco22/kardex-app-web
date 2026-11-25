@@ -338,7 +338,7 @@ List<HomeModuleCategory> getHomeModuleCategories(
           ),
           const HomeSubmoduleItem(
             section: "Punto de Venta y Facturación",
-            title: "Ventas Diarias por Producto",
+            title: "Ventas por Producto",
             subtitle: "Cantidades e importes acumulados por ítem",
             icon: FluentIcons.building_retail_money_24_filled,
             accentColor: Color(0xFFF59E0B),

@@ -35,7 +35,7 @@ class _RootScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Ventas Diarias por Producto")),
+      appBar: AppBar(title: const Text("Ventas por Producto")),
       body: const _Body(),
     );
   }
