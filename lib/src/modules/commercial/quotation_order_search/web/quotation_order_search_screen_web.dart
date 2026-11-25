@@ -1,39 +1,61 @@
-import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_business/kardex_business.dart';
-import 'package:kardex_app_front/src/modules/commercial/quotation_order_search/cubit/read_quotation_order_search_cubit.dart';
-import 'package:kardex_app_front/src/modules/commercial/current_proforma/web/invoice_creator/invoice_creator_screen.dart';
-import 'package:kardex_app_front/src/modules/commercial/current_orders/web/invoice_creator/invoice_creator_screen.dart';
-import 'package:kardex_app_front/src/tools/role_tools.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/constants/route_names.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/src/modules/commercial/current_orders/web/invoice_creator/invoice_creator_screen.dart';
+import 'package:kardex_app_front/src/modules/commercial/current_proforma/web/invoice_creator/invoice_creator_screen.dart';
+import 'package:kardex_app_front/src/modules/commercial/quotation_order_search/cubit/read_quotation_order_search_cubit.dart';
+import 'package:kardex_app_front/src/tools/exports/pdf/templates/orders_by_user_template.dart';
+import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
+import 'package:kardex_app_front/src/tools/role_tools.dart';
+import 'package:kardex_app_front/src/tools/row_color_tool.dart';
+// Requerido en lite donde widgets.dart no re-exporta CustomOrderListTile.
+// ignore: unnecessary_import
+import 'package:kardex_app_front/widgets/custom_order_list_tile.dart';
 import 'package:kardex_app_front/widgets/dialogs/selectors/client_selection_dialog.dart';
 import 'package:kardex_app_front/widgets/title_label.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
-import 'package:kardex_app_front/src/tools/exports/pdf/templates/orders_by_user_template.dart';
-import 'package:kardex_app_front/src/tools/exports/pdf_export_tool.dart';
-import 'package:kardex_app_front/src/tools/row_color_tool.dart';
+import 'package:kardex_business/kardex_business.dart';
+import 'package:material_ui/material_ui.dart';
 
-part 'sections/header_section.dart';
 part 'sections/content_section.dart';
+part 'sections/header_section.dart';
 
 class QuotationOrderSearchScreenWeb extends StatelessWidget {
   const QuotationOrderSearchScreenWeb({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const _RootScaffold();
-  }
-}
-
-class _RootScaffold extends StatelessWidget {
-  const _RootScaffold();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: _Body(),
-      bottomNavigationBar: _BottomAppBar(),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Buscador de Cotizaciones/Órdenes'),
+        actions: [
+          BlocBuilder<ReadQuotationOrderSearchCubit, ReadQuotationOrderSearchState>(
+            builder: (context, state) {
+              final isLoading = state is ReadQuotationOrderSearchLoading;
+              return IconButton(
+                tooltip: 'Actualizar',
+                onPressed: isLoading
+                    ? null
+                    : () => context
+                        .read<ReadQuotationOrderSearchCubit>()
+                        .loadDocuments(getIt<AuthCubit>().currentBranchId),
+                icon: isLoading
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.refresh_rounded),
+              );
+            },
+          ),
+          const SizedBox(width: 4),
+        ],
+      ),
+      body: const _Body(),
+      bottomNavigationBar: const _BottomAppBar(),
     );
   }
 }
@@ -58,7 +80,7 @@ class _BottomAppBar extends StatelessWidget {
             children: [
               TitleLabel(
                 crossAxisAlignment: CrossAxisAlignment.center,
-                title: "Monto Total",
+                title: 'Monto Total',
                 bigTitle: formattedTotal,
               ),
             ],
@@ -74,12 +96,10 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    EdgeInsets mainPadding = const EdgeInsets.all(4.0);
-
-    return Center(
+    return const Center(
       child: Padding(
-        padding: mainPadding,
-        child: const Column(
+        padding: EdgeInsets.all(8.0),
+        child: Column(
           spacing: 8,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [

@@ -15,6 +15,13 @@ final class ReadProformaError extends ReadProformaState {
 final class ReadProformaSuccess extends ReadProformaState {
   final List<OrderInDb> orders;
   final int count;
+  final Set<String> newOrderIds;
+  final Set<String> updatedOrderIds;
 
-  ReadProformaSuccess(this.orders, this.count);
+  ReadProformaSuccess(
+    this.orders,
+    this.count, {
+    this.newOrderIds = const {},
+    this.updatedOrderIds = const {},
+  });
 }

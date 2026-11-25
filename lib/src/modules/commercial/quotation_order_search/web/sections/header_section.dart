@@ -10,147 +10,163 @@ class _HeaderSection extends StatefulWidget {
 class _HeaderSectionState extends State<_HeaderSection> {
   ClientInDb? currentSelectedClient;
   UserInDb? currentSelectedUser;
+  int _clearGeneration = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    final (isSellerRole, userInDb) = RoleTools.isSeller();
+    if (isSellerRole) {
+      currentSelectedUser = userInDb;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final readCubit = context.watch<ReadQuotationOrderSearchCubit>();
     final (isSellerRole, userInDb) = RoleTools.isSeller();
 
-    if (isSellerRole) {
+    if (isSellerRole && currentSelectedUser == null) {
       currentSelectedUser = userInDb;
     }
 
     return Card(
-      key: ValueKey(readCubit.state),
+      margin: EdgeInsets.zero,
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(10.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: 8,
           children: [
-            ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 600),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  SecondaryMenuButton(
-                    onPressed: () {
-                      readCubit.clearFilters(getIt<AuthCubit>().currentBranchId);
-                      if (!isSellerRole) {
-                        currentSelectedUser = null;
-                      }
-                      setState(() {});
-                    },
-                    icon: const Icon(Icons.clear),
-                    label: const Text("Limpiar"),
-                  ),
-                ],
-              ),
-            ),
-            ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 600),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: DatePickerListTile(
-                      key: ValueKey("start_date_${readCubit.startDate.hashCode}"),
-                      defaultDate: readCubit.startDate,
-                      title: "Fecha Inicio",
-                      onSelected: (value) {
-                        readCubit.startDate = value;
-                        setState(() {});
-                      },
-                    ),
-                  ),
-                  const VerticalDivider(),
-                  Expanded(
-                    child: DatePickerListTile(
-                      key: ValueKey("end_date_${readCubit.endDate.hashCode}"),
-                      defaultDate: readCubit.endDate,
-                      title: "Fecha Fin",
-                      onSelected: (value) {
-                        readCubit.endDate = value;
-                        setState(() {});
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                ],
-              ),
-            ),
-            const SizedBox(height: 8),
-            ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 600),
-              child: Wrap(
-                spacing: 8,
-                runSpacing: 4,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  SecondaryMenuButton(
-                    onPressed: () async {
-                      final client = await showClientSelectionDialog(context);
-                      if (client == null) return;
-                      readCubit.clientId = client.id;
-                      currentSelectedClient = client;
-                      setState(() {});
-                    },
-                    icon: const Icon(Icons.business),
-                    label: currentSelectedClient == null
-                        ? const Text("Seleccionar Cliente")
-                        : Text(currentSelectedClient!.name),
-                  ),
-                  if (!isSellerRole)
-                    UserDropdownSelector(
-                      width: 250,
-                      selectedUser: currentSelectedUser,
-                      onChanged: (user) {
-                        readCubit.userCreatorId = user?.id;
-                        currentSelectedUser = user;
-                        setState(() {});
-                      },
-                    ),
-                  const SizedBox(width: 8),
-                  if (readCubit.state is ReadQuotationOrderSearchSuccess) ...[
-                    PrimaryMenuButton(
-                      backgroundColor: Theme.of(context).colorScheme.tertiary,
-                      foregroundColor: Colors.white,
-                      onPressed: () async {
-                        final state = readCubit.state as ReadQuotationOrderSearchSuccess;
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Wrap(
+                    spacing: 10,
+                    runSpacing: 8,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: 210,
+                        child: DatePickerListTile(
+                          key: ValueKey(
+                            'start_date_${readCubit.startDate?.millisecondsSinceEpoch}_$_clearGeneration',
+                          ),
+                          defaultDate: readCubit.startDate,
+                          title: 'Fecha Inicio',
+                          onSelected: (value) {
+                            readCubit.startDate = value;
+                            setState(() {});
+                          },
+                        ),
+                      ),
+                      SizedBox(
+                        width: 210,
+                        child: DatePickerListTile(
+                          key: ValueKey(
+                            'end_date_${readCubit.endDate?.millisecondsSinceEpoch}_$_clearGeneration',
+                          ),
+                          defaultDate: readCubit.endDate,
+                          title: 'Fecha Fin',
+                          onSelected: (value) {
+                            readCubit.endDate = value;
+                            setState(() {});
+                          },
+                        ),
+                      ),
+                      SecondaryMenuButton(
+                        onPressed: () async {
+                          final client = await showClientSelectionDialog(context);
+                          if (client == null) return;
+                          readCubit.clientId = client.id;
+                          setState(() {
+                            currentSelectedClient = client;
+                          });
+                        },
+                        icon: const Icon(Icons.business),
+                        label: Text(currentSelectedClient?.name ?? 'Seleccionar Cliente'),
+                      ),
+                      if (!isSellerRole)
+                        UserDropdownSelector(
+                          width: 240,
+                          selectedUser: currentSelectedUser,
+                          onChanged: (user) {
+                            readCubit.userCreatorId = user?.id;
+                            setState(() {
+                              currentSelectedUser = user;
+                            });
+                          },
+                        ),
+                      SecondaryMenuButton(
+                        onPressed: () {
+                          setState(() {
+                            currentSelectedClient = null;
+                            currentSelectedUser = isSellerRole ? userInDb : null;
+                            _clearGeneration++;
+                          });
+                          readCubit.clearFilters(getIt<AuthCubit>().currentBranchId);
+                        },
+                        icon: const Icon(Icons.clear),
+                        label: const Text('Limpiar'),
+                      ),
+                      PrimaryMenuButton(
+                        onPressed: () {
+                          readCubit.loadDocuments(getIt<AuthCubit>().currentBranchId);
+                        },
+                        label: const Text('Filtrar'),
+                        icon: const Icon(Icons.filter_alt_rounded),
+                      ),
+                      if (readCubit.state is ReadQuotationOrderSearchSuccess)
+                        PrimaryMenuButton(
+                          backgroundColor: Theme.of(context).colorScheme.tertiary,
+                          foregroundColor: Colors.white,
+                          onPressed: () async {
+                            final state = readCubit.state as ReadQuotationOrderSearchSuccess;
 
-                        final template = OrdersByUserTemplate(
-                          title: "Buscador de Cotizaciones/Órdenes",
-                          userInfo: currentSelectedUser != null
-                              ? UserInfo(id: currentSelectedUser!.id, name: currentSelectedUser!.username)
-                              : null,
-                          clientInfo: currentSelectedClient != null
-                              ? ClientInfo(name: currentSelectedClient!.name, group: "")
-                              : null,
-                          startDate: readCubit.startDate,
-                          endDate: readCubit.endDate,
-                          count: state.totalCount,
-                          total: state.totalAmount,
-                          items: state.orders,
-                        );
+                            final template = OrdersByUserTemplate(
+                              title: 'Buscador de Cotizaciones/Órdenes',
+                              userInfo: currentSelectedUser != null
+                                  ? UserInfo(
+                                      id: currentSelectedUser!.id,
+                                      name: currentSelectedUser!.username,
+                                    )
+                                  : null,
+                              clientInfo: currentSelectedClient != null
+                                  ? ClientInfo(name: currentSelectedClient!.name, group: '')
+                                  : null,
+                              startDate: readCubit.startDate,
+                              endDate: readCubit.endDate,
+                              count: state.totalCount,
+                              total: state.totalAmount,
+                              items: state.orders,
+                            );
 
-                        await PdfExportTool.export(
-                          template,
-                          fileName: "cotizaciones_ordenes.pdf",
-                        );
-                      },
-                      label: const Text("Exportar"),
-                      icon: const Icon(Icons.picture_as_pdf),
+                            await PdfExportTool.export(
+                              template,
+                              fileName: 'cotizaciones_ordenes.pdf',
+                            );
+                          },
+                          label: const Text('Exportar'),
+                          icon: const Icon(Icons.picture_as_pdf),
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Gate(
+                  filters: const [
+                    RolePermissionGateFilter(
+                      permissions: [CommercialSubModules.createOrder],
                     ),
-                    const SizedBox(width: 8),
                   ],
-                  PrimaryMenuButton(
-                    onPressed: () {
-                      readCubit.loadDocuments(getIt<AuthCubit>().currentBranchId);
-                    },
-                    label: const Text("Filtrar"),
-                    icon: const Icon(Icons.filter_alt_rounded),
+                  child: FilledButton.icon(
+                    onPressed: () => context.pushNamed(RouteNames.proforma),
+                    icon: const Icon(Icons.add_rounded),
+                    label: const Text('Nueva Cotización'),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ],
         ),
