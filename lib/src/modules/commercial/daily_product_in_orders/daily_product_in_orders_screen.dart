@@ -23,6 +23,7 @@ class DailyProductInOrdersScreen extends StatelessWidget {
           )..loadDailyProductInOrders(
             branchId: getIt<AuthCubit>().currentBranchId,
             startDate: DateTimeTool.getTodayMidnight(),
+            endDate: DateTimeTool.getTodayMidnight().endOfDay(),
           ),
       child: const _RootScaffold(),
     );
@@ -35,7 +36,7 @@ class _RootScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Productos en Pedidos (Diario)")),
+      appBar: AppBar(title: const Text("Productos en Órdenes de Compra")),
       body: const _Body(),
     );
   }
