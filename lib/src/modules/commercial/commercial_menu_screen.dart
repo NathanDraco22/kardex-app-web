@@ -437,24 +437,6 @@ class _Body extends StatelessWidget {
               ),
             ],
             child: ShortcutAddableListTile(
-              routeName: RouteNames.saleOrder,
-              child: MenuOptionCard(
-                icon: FluentIcons.receipt_add_24_filled,
-                accentColor: Colors.lightBlue.shade600,
-                title: "Crear Órden de Compra",
-                subtitle: "Nuevo pedido formal de compra",
-                onTap: () => context.pushNamed("sale-order"),
-              ),
-            ),
-          ),
-          Gate(
-            filters: const [
-              OrdersGateFilter(),
-              RolePermissionGateFilter(
-                permissions: [CommercialSubModules.createOrder],
-              ),
-            ],
-            child: ShortcutAddableListTile(
               routeName: RouteNames.saleOrderWholesale,
               child: MenuOptionCard(
                 icon: FluentIcons.receipt_add_24_filled,
