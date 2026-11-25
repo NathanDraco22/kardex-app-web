@@ -8,34 +8,70 @@ class ReadDailyProductInOrdersCubit extends Cubit<ReadDailyProductInOrdersState>
     : super(ReadDailyProductInOrdersInitial()) {
     final todayMidnight = DateTimeTool.getTodayMidnight();
     startDate = todayMidnight;
+    endDate = todayMidnight.endOfDay();
     userCreatorId = defaultCreatorId;
   }
 
-  String? defaultCreatorId;
+  final String? defaultCreatorId;
 
   DateTime? startDate;
+  DateTime? endDate;
   String? userCreatorId;
+  String? clientId;
 
   final OrdersRepository ordersRepository;
 
-  Future<void> loadDailyProductInOrders({required String branchId, DateTime? startDate, String? userCreatorId}) async {
+  Future<void> loadDailyProductInOrders({
+    required String branchId,
+    DateTime? startDate,
+    DateTime? endDate,
+    String? userCreatorId,
+    bool clearUserCreator = false,
+    String? clientId,
+    bool clearClient = false,
+  }) async {
     emit(ReadDailyProductInOrdersLoading());
     if (startDate != null) {
       this.startDate = startDate;
     }
-    if (userCreatorId != null && defaultCreatorId == null) {
+    if (endDate != null) {
+      this.endDate = endDate;
+    }
+
+    if (this.startDate != null && this.endDate != null && this.startDate!.startOfDay().isAfter(this.endDate!.startOfDay())) {
+      if (startDate != null && endDate == null) {
+        this.endDate = this.startDate!.endOfDay();
+      } else {
+        this.startDate = this.endDate!.startOfDay();
+      }
+    }
+
+    if (defaultCreatorId != null) {
+      this.userCreatorId = defaultCreatorId;
+    } else if (clearUserCreator) {
+      this.userCreatorId = null;
+    } else if (userCreatorId != null) {
       this.userCreatorId = userCreatorId;
     }
 
+    if (clearClient) {
+      this.clientId = null;
+    } else if (clientId != null) {
+      this.clientId = clientId;
+    }
+
     try {
-      final topEndDate = this.startDate?.endOfDay();
+      final effectiveStartDate = this.startDate?.startOfDay();
+      final effectiveEndDate = (this.endDate ?? this.startDate)?.endOfDay();
 
       final params = OrderQueryParams(
-        startDate: this.startDate?.millisecondsSinceEpoch,
-        endDate: topEndDate?.millisecondsSinceEpoch,
+        startDate: effectiveStartDate?.millisecondsSinceEpoch,
+        endDate: effectiveEndDate?.millisecondsSinceEpoch,
         neStatus: .cancelled,
         branchId: branchId,
-      )..createdBy = this.userCreatorId;
+        clientId: this.clientId,
+        createdBy: this.userCreatorId,
+      );
 
       final result = await ordersRepository.getProductsInOrders(queryParams: params);
 
@@ -51,8 +87,17 @@ class ReadDailyProductInOrdersCubit extends Cubit<ReadDailyProductInOrdersState>
   }
 
   void clearFilters(String branchId) {
-    startDate = DateTimeTool.getTodayMidnight();
+    final today = DateTimeTool.getTodayMidnight();
+    startDate = today;
+    endDate = today.endOfDay();
+    clientId = null;
     userCreatorId = defaultCreatorId;
-    loadDailyProductInOrders(branchId: branchId, startDate: startDate);
+    loadDailyProductInOrders(
+      branchId: branchId,
+      startDate: startDate,
+      endDate: endDate,
+      clearClient: true,
+      clearUserCreator: defaultCreatorId == null,
+    );
   }
 }

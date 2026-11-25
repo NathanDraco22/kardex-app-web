@@ -29,7 +29,7 @@ class _ContentSection extends StatelessWidget {
               if (products.isEmpty) {
                 return const Expanded(
                   child: Center(
-                    child: Text("No hay productos en pedidos para esta fecha"),
+                    child: Text("No hay productos en órdenes para los filtros seleccionados"),
                   ),
                 );
               }
