@@ -3,15 +3,18 @@ import 'package:kardex_business/src/domain/models/devolution/devolution.dart';
 import 'package:kardex_business/src/domain/query_params/devolution_query_params.dart';
 import 'package:kardex_business/src/domain/query_params/history_params.dart';
 import 'package:kardex_business/src/domain/responses/list_responses.dart';
+import 'package:kardex_business/src/tools/reactive_repo/reactive_repository.dart';
 
-class DevolutionsRepository {
+class DevolutionsRepository with ReactiveRepository<DevolutionInDb> {
   final DevolutionsDataSource devolutionsDataSource;
 
   DevolutionsRepository(this.devolutionsDataSource);
 
   Future<DevolutionInDb> createDevolution(CreateDevolution createDevolution) async {
     final result = await devolutionsDataSource.createDevolution(createDevolution.toJson());
-    return DevolutionInDb.fromJson(result);
+    final created = DevolutionInDb.fromJson(result);
+    notifyItemCreated(created);
+    return created;
   }
 
   Future<List<DevolutionInDb>> getAllDevolutions(DevolutionQueryParams params) async {
@@ -52,25 +55,33 @@ class DevolutionsRepository {
   Future<DevolutionInDb?> confirmDevolutionById(String devolutionId) async {
     final result = await devolutionsDataSource.confirmDevolutionById(devolutionId);
     if (result == null) return null;
-    return DevolutionInDb.fromJson(result);
+    final updated = DevolutionInDb.fromJson(result);
+    notifyItemUpdated(updated);
+    return updated;
   }
 
   Future<DevolutionInDb?> confirmAnonDevolutionById(String devolutionId) async {
     final result = await devolutionsDataSource.confirmAnonDevolutionById(devolutionId);
     if (result == null) return null;
-    return DevolutionInDb.fromJson(result);
+    final updated = DevolutionInDb.fromJson(result);
+    notifyItemUpdated(updated);
+    return updated;
   }
 
   Future<DevolutionInDb?> cancelDevolutionById(String devolutionId) async {
     final result = await devolutionsDataSource.cancelDevolutionById(devolutionId);
     if (result == null) return null;
-    return DevolutionInDb.fromJson(result);
+    final cancelled = DevolutionInDb.fromJson(result);
+    notifyItemUpdated(cancelled);
+    return cancelled;
   }
 
   Future<DevolutionInDb?> deleteDevolutionById(String devolutionId) async {
     final result = await devolutionsDataSource.deleteDevolutionById(devolutionId);
     if (result == null) return null;
-    return DevolutionInDb.fromJson(result);
+    final deleted = DevolutionInDb.fromJson(result);
+    notifyItemDeleted(deleted);
+    return deleted;
   }
 
   Future<List<DevolutionInDb>> getDevolutionHistory(InvoiceQueryParams params) async {
