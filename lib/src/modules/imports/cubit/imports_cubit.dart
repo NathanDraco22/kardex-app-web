@@ -72,6 +72,7 @@ class ImportsCubit extends Cubit<ImportsState> {
           await clientsRepository.getAllClients();
           break;
         case ImportType.suppliers:
+        case ImportType.accountsPayable:
           await suppliersRepository.getAllSuppliers();
           break;
         case ImportType.initialInventory:

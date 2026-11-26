@@ -1,1 +1,1 @@
-enum ImportType { initialInventory, inventory, clients, suppliers }
+enum ImportType { initialInventory, inventory, clients, suppliers, accountsPayable }

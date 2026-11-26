@@ -58,6 +58,19 @@ class ImportsDataSource with HttpService {
     return _importFile("/suppliers", bytes: bytes, fileName: fileName);
   }
 
+  Future<Map<String, dynamic>> importAccountsPayable({
+    required Uint8List bytes,
+    required String fileName,
+    required String branchId,
+  }) {
+    return _importFile(
+      "/accounts-payable",
+      bytes: bytes,
+      fileName: fileName,
+      branchId: branchId,
+    );
+  }
+
   Future<Map<String, dynamic>> previewImport({
     required String type,
     required Uint8List bytes,
