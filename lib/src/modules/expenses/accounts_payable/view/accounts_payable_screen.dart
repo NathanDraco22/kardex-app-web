@@ -139,6 +139,44 @@ class _AccountsPayableViewState extends State<AccountsPayableView> {
                                 ),
                               ),
                             ),
+                            if (loaded.refreshError != null)
+                              SliverPadding(
+                                padding: EdgeInsets.fromLTRB(horizontalPadding, 10, horizontalPadding, 0),
+                                sliver: SliverToBoxAdapter(
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                    decoration: BoxDecoration(
+                                      color: AppThemeTokens.danger.withValues(alpha: 0.08),
+                                      borderRadius: AppThemeTokens.borderRadiusMd,
+                                      border: Border.all(
+                                        color: AppThemeTokens.danger.withValues(alpha: 0.25),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.error_outline_rounded,
+                                          size: 18,
+                                          color: AppThemeTokens.danger,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        const Expanded(
+                                          child: Text(
+                                            'No se pudo actualizar el resumen. Se muestran los datos anteriores.',
+                                            style: TextStyle(fontSize: 12, color: Color(0xFFB91C1C)),
+                                          ),
+                                        ),
+                                        TextButton(
+                                          onPressed: isRefreshing
+                                              ? null
+                                              : () => context.read<AccountsPayableCubit>().refresh(),
+                                          child: const Text('Reintentar'),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
                           ],
                           ..._buildContent(
                             context: context,

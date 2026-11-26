@@ -39,6 +39,7 @@ Future<ExpenseInDb?> showRegisterExpensePaymentDialog(
 
   return showDialog<ExpenseInDb>(
     context: context,
+    barrierDismissible: false,
     builder: (_) => BlocProvider.value(
       value: resolvedWriteCubit,
       child: Dialog(
@@ -313,40 +314,48 @@ class _RegisterExpensePaymentViewState extends State<RegisterExpensePaymentView>
     );
 
     if (widget.isFullScreen) {
-      return Scaffold(
-        backgroundColor: const Color(0xFFF8FAFC),
-        appBar: AppBar(title: const Text('Registrar Abono')),
-        bottomNavigationBar: SafeArea(top: false, child: footer),
-        body: SafeArea(
-          top: false,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(14),
-            child: formBody,
+      return PopScope(
+        canPop: !_submitting,
+        child: Scaffold(
+          backgroundColor: const Color(0xFFF8FAFC),
+          appBar: AppBar(title: const Text('Registrar Abono')),
+          bottomNavigationBar: SafeArea(top: false, child: footer),
+          body: SafeArea(
+            top: false,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(14),
+              child: formBody,
+            ),
           ),
         ),
       );
     }
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        AppDialogHeader(
-          icon: Icons.payments_rounded,
-          title: 'Registrar Abono',
-          subtitle: widget.expense.supplierName.isNotEmpty
-              ? widget.expense.supplierName
-              : widget.expense.category,
-          accentColor: _accentColor,
-          onClose: () => Navigator.of(context).pop(),
-        ),
-        Flexible(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: formBody,
+    return PopScope(
+      canPop: !_submitting,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AppDialogHeader(
+            icon: Icons.payments_rounded,
+            title: 'Registrar Abono',
+            subtitle: widget.expense.supplierName.isNotEmpty
+                ? widget.expense.supplierName
+                : widget.expense.category,
+            accentColor: _accentColor,
+            onClose: () {
+              if (!_submitting) Navigator.of(context).pop();
+            },
           ),
-        ),
-        footer,
-      ],
+          Flexible(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: formBody,
+            ),
+          ),
+          footer,
+        ],
+      ),
     );
   }
 
@@ -402,7 +411,10 @@ class _RegisterExpensePaymentViewState extends State<RegisterExpensePaymentView>
     final state = writeCubit.state;
     setState(() {
       _submitting = false;
-      _errorMessage = state is WriteExpenseError ? state.message : 'No se pudo registrar el abono.';
+      final rawMessage = state is WriteExpenseError ? state.message : 'No se pudo registrar el abono.';
+      _errorMessage = rawMessage
+          .replaceFirst('HttpServiceException: ', '')
+          .replaceFirst('Exception: ', '');
     });
   }
 }

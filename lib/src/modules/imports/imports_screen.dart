@@ -7,6 +7,7 @@ import 'package:kardex_app_front/src/modules/imports/cubit/imports_cubit.dart';
 import 'package:kardex_app_front/src/modules/imports/cubit/imports_state.dart';
 import 'package:kardex_app_front/src/modules/imports/dialogs/import_preview_dialog.dart';
 import 'package:kardex_app_front/src/modules/imports/dialogs/import_result_dialog.dart';
+import 'package:kardex_app_front/src/modules/imports/tools/csv_date_normalizer.dart';
 import 'package:kardex_app_front/src/modules/imports/tools/import_templates.dart';
 import 'package:kardex_app_front/src/modules/imports/widgets/import_option_card.dart';
 import 'package:kardex_app_front/src/tools/exports/csv_export_tool.dart';
@@ -197,27 +198,34 @@ class _ImportsView extends StatelessWidget {
 
     if (!context.mounted) return;
 
+    final effectiveBytes = type == ImportType.accountsPayable
+        ? normalizeAccountsPayableCsvDates(bytes)
+        : bytes;
+
     showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const Center(
-        child: Card(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2.5),
-                ),
-                SizedBox(width: 16),
-                Text(
-                  "Analizando archivo...",
-                  style: TextStyle(fontWeight: FontWeight.w600),
-                ),
-              ],
+      builder: (_) => const PopScope(
+        canPop: false,
+        child: Center(
+          child: Card(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2.5),
+                  ),
+                  SizedBox(width: 16),
+                  Text(
+                    "Analizando archivo...",
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -226,7 +234,7 @@ class _ImportsView extends StatelessWidget {
 
     final preview = await cubit.previewFile(
       type: type,
-      bytes: bytes,
+      bytes: effectiveBytes,
       fileName: file.name,
       branchId: branchId,
     );
@@ -264,7 +272,7 @@ class _ImportsView extends StatelessWidget {
 
     final result = await cubit.importFile(
       type: type,
-      bytes: bytes,
+      bytes: effectiveBytes,
       fileName: file.name,
       branchId: branchId,
     );

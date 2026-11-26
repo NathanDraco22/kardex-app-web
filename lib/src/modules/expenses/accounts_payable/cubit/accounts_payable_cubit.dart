@@ -26,12 +26,18 @@ class AccountsPayableCubit extends Cubit<AccountsPayableState> {
     return '';
   }
 
+  int _localTodayCutoffMs() {
+    final now = DateTime.now();
+    return DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
+  }
+
   Future<void> load({String? branchId}) async {
     _lastBranchId = branchId ?? _effectiveBranchId;
     emit(AccountsPayableLoading());
     try {
       final summary = await expensesRepository.getAccountsPayableSummary(
         branchId: _lastBranchId?.isEmpty == true ? null : _lastBranchId,
+        overdueCutoffMs: _localTodayCutoffMs(),
       );
       if (isClosed) return;
       emit(AccountsPayableLoaded(summary: summary));
@@ -43,16 +49,18 @@ class AccountsPayableCubit extends Cubit<AccountsPayableState> {
 
   Future<void> refresh() async {
     final current = state;
+    final activeBranch = _effectiveBranchId;
     if (current is! AccountsPayableLoaded) {
-      await load(branchId: _lastBranchId);
+      await load(branchId: activeBranch);
       return;
     }
 
+    _lastBranchId = activeBranch;
     emit(current.copyWith(isRefreshing: true, clearRefreshError: true));
     try {
-      final branch = _lastBranchId ?? _effectiveBranchId;
       final summary = await expensesRepository.getAccountsPayableSummary(
-        branchId: branch.isEmpty ? null : branch,
+        branchId: activeBranch.isEmpty ? null : activeBranch,
+        overdueCutoffMs: _localTodayCutoffMs(),
       );
       if (isClosed) return;
       emit(AccountsPayableLoaded(summary: summary));

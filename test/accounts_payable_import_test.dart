@@ -1,5 +1,9 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kardex_app_front/src/modules/imports/dialogs/import_preview_dialog.dart';
+import 'package:kardex_app_front/src/modules/imports/tools/csv_date_normalizer.dart';
 import 'package:kardex_app_front/src/modules/imports/tools/import_templates.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:material_ui/material_ui.dart';
@@ -91,5 +95,21 @@ void main() {
     expect(find.text('PROVEEDORES NUEVOS A CREAR'), findsOneWidget);
     expect(find.text('3'), findsOneWidget);
     expect(find.text('1'), findsOneWidget);
+  });
+
+  test('normalizeAccountsPayableCsvDates convierte fechas a Unix ms locales y preserva enteros/inválidas', () {
+    const csv = 'supplierName,docNumber,date,expirationDate,amount\n'
+        'Proveedor A,F-1,2026-11-10,20/11/2026,100.00\n'
+        'Proveedor B,F-2,1732622400000,fecha-mala,50.00\n';
+
+    final normalizedBytes = normalizeAccountsPayableCsvDates(
+      Uint8List.fromList(utf8.encode(csv)),
+    );
+    final out = utf8.decode(normalizedBytes);
+    final expectedDate = DateTime(2026, 11, 10).millisecondsSinceEpoch.toString();
+    final expectedExp = DateTime(2026, 11, 20).millisecondsSinceEpoch.toString();
+
+    expect(out, contains('Proveedor A,F-1,$expectedDate,$expectedExp,100.00'));
+    expect(out, contains('Proveedor B,F-2,1732622400000,fecha-mala,50.00'));
   });
 }

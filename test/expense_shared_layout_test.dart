@@ -766,6 +766,7 @@ class _FakeReadExpenseCubit extends ReadExpenseCubit {
   @override
   Future<void> applyFilters({
     String? status,
+    bool? onlyPending,
     String? category,
     String? supplierId,
     int? startDate,
