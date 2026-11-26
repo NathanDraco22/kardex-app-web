@@ -13,6 +13,7 @@ class ExpenseQueryParams {
   String? type;
   String? supplierId;
   String? shiftId;
+  bool? onlyPending;
 
   Map<String, String> toMap() {
     final data = <String, dynamic>{
@@ -30,6 +31,7 @@ class ExpenseQueryParams {
       'type': type,
       'supplierId': supplierId,
       'shiftId': shiftId,
+      'onlyPending': onlyPending?.toString(),
     };
 
     data.removeWhere((_, v) => v == null);

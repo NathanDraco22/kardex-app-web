@@ -88,6 +88,17 @@ class ExpensesHubBody extends StatelessWidget {
                       onTap: () => context.pushNamed('supplier-expenses'),
                     ),
                   ),
+                  const SizedBox(height: 10),
+                  _wrapShortcut(
+                    RouteNames.accountsPayable,
+                    AppActionTile(
+                      icon: Icons.request_quote_rounded,
+                      accentColor: const Color(0xFFD97706),
+                      title: 'Cuentas por Pagar',
+                      subtitle: 'Saldos pendientes, facturas vencidas y abonos a proveedores.',
+                      onTap: () => context.pushNamed(RouteNames.accountsPayable),
+                    ),
+                  ),
                   const _HubSectionHeader(title: 'Análisis y configuración'),
                   _wrapShortcut(
                     RouteNames.expenseCategories,

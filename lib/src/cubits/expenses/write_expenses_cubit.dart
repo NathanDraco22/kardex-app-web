@@ -37,6 +37,19 @@ class WriteExpenseCubit extends Cubit<WriteExpenseState> {
     }
   }
 
+  Future<ExpenseInDb?> addPayment(AddToAmountRequest request) async {
+    emit(WritingExpense());
+    try {
+      final updated = await expensesRepository.addToAmountPaid(request);
+      emit(ExpenseUpdated(updated));
+      emit(WriteExpenseInitial());
+      return updated;
+    } catch (error) {
+      emit(WriteExpenseError(error.toString()));
+      return null;
+    }
+  }
+
   Future<bool> delete(String expenseId) async {
     emit(WritingExpense());
     try {

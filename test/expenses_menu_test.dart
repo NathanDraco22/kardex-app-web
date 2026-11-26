@@ -33,10 +33,11 @@ void main() {
       expect(find.text('Análisis y configuración'), findsOneWidget);
       expect(find.text('Gastos Operativos'), findsOneWidget);
       expect(find.text('Gastos de Proveedores'), findsOneWidget);
+      expect(find.text('Cuentas por Pagar'), findsOneWidget);
       expect(find.text('Categorías de Gastos'), findsOneWidget);
       expect(find.text('Reporte de Gastos'), findsOneWidget);
       expect(find.text('Clasifica tus gastos para mejorar los reportes.'), findsOneWidget);
-      expect(find.byType(AppActionTile), findsNWidgets(4));
+      expect(find.byType(AppActionTile), findsNWidgets(5));
     });
   }
 }

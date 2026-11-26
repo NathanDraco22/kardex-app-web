@@ -48,6 +48,19 @@ class ExpensesDataSource with HttpService {
     return res;
   }
 
+  Future<Map<String, dynamic>> getAccountsPayableSummary({String? branchId}) async {
+    final params = <String, String>{
+      if (branchId != null && branchId.isNotEmpty) 'branchId': branchId,
+    };
+    final uri = HttpTools.generateUri(
+      "$_endpoint/accounts-payable/summary",
+      queryParameters: params.isEmpty ? null : params,
+    );
+    final headers = HttpTools.generateAuthHeaders();
+    final res = await getQuery(uri, headers: headers);
+    return res;
+  }
+
   Future<Map<String, dynamic>?> deleteExpenseById(String expenseId) async {
     final uri = HttpTools.generateUri("$_endpoint/$expenseId");
     final headers = HttpTools.generateAuthHeaders();

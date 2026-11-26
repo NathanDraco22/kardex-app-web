@@ -63,6 +63,11 @@ class ExpensesRepository {
     return updatedExpense;
   }
 
+  Future<AccountsPayableSummary> getAccountsPayableSummary({String? branchId}) async {
+    final result = await expensesDataSource.getAccountsPayableSummary(branchId: branchId);
+    return AccountsPayableSummary.fromJson(result);
+  }
+
   Future<ExpenseInDb?> deleteExpenseById(String expenseId) async {
     final result = await expensesDataSource.deleteExpenseById(expenseId);
     if (result == null) return null;

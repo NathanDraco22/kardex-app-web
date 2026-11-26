@@ -860,6 +860,13 @@ List<HomeModuleCategory> getHomeModuleCategories(
           routeName: "supplier-expenses",
         ),
         HomeSubmoduleItem(
+          title: "Cuentas por Pagar",
+          subtitle: "Saldos pendientes, vencimientos y abonos a proveedores",
+          icon: Icons.request_quote_rounded,
+          accentColor: Color(0xFFD97706),
+          routeName: RouteNames.accountsPayable,
+        ),
+        HomeSubmoduleItem(
           title: "Categorías de Gastos",
           subtitle: "Clasificación por centros de costos",
           icon: Icons.category,

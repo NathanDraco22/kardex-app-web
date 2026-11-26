@@ -64,17 +64,20 @@ class ExpenseMetrics {
         case ExpenseStatus.paid:
           paid += expense.amount;
           paidCount++;
+        case ExpenseStatus.partiallyPaid:
+          paid += expense.effectiveAmountPaid;
+          pending += expense.remainingAmount;
+          pendingCount++;
         case ExpenseStatus.draft:
         case ExpenseStatus.open:
-        case ExpenseStatus.partiallyPaid:
-          pending += expense.amount;
+          pending += expense.remainingAmount;
           pendingCount++;
         case ExpenseStatus.cancelled:
           break;
       }
 
       if (isExpenseOverdue(expense, now: now)) {
-        overdueAmount += expense.amount;
+        overdueAmount += expense.remainingAmount;
         overdueCount++;
       }
     }

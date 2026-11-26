@@ -101,6 +101,7 @@ import 'package:kardex_app_front/src/modules/splash/splash_screen.dart';
 
 import 'package:kardex_app_front/src/modules/settings/view/integrations/integrations_screen.dart';
 import 'package:kardex_app_front/src/modules/imports/imports_screen.dart';
+import 'package:kardex_app_front/src/modules/expenses/accounts_payable/view/accounts_payable_screen.dart';
 import 'package:kardex_app_front/src/modules/expenses/expenses_menu_screen.dart';
 import 'package:kardex_app_front/src/modules/expenses/operative_expenses/view/operative_expenses_screen.dart';
 import 'package:kardex_app_front/src/modules/expenses/supplier_expenses/view/supplier_expenses_view.dart';
@@ -783,6 +784,11 @@ class AppRouter {
             path: 'supplier-expenses',
             name: 'supplier-expenses',
             builder: (context, state) => const SupplierExpenseScreen(),
+          ),
+          GoRoute(
+            path: 'accounts-payable',
+            name: RouteNames.accountsPayable,
+            builder: (context, state) => const AccountsPayableScreen(),
           ),
           GoRoute(
             path: 'expenses-report',
