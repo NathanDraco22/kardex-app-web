@@ -509,7 +509,16 @@ class _CreateUnitScaleDialogState extends State<CreateUnitScaleDialog> {
                             );
                           }).toList(),
                           onChanged: (value) {
-                            if (value != null) setState(() => _scaleType = value);
+                            if (value != null) {
+                              setState(() {
+                                _scaleType = value;
+                                if (!isEditing) {
+                                  _showBasicUnit = value != UnitScaleType.weight &&
+                                      value != UnitScaleType.volume &&
+                                      value != UnitScaleType.length;
+                                }
+                              });
+                            }
                           },
                         ),
 
