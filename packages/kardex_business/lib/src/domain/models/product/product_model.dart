@@ -40,6 +40,7 @@ class BaseProduct {
   final int defaultUnitIndex;
   final int wholesaleUnitIndex;
   final int priceUnitFactor;
+  final bool showBasicUnit;
 
   bool get tracksInventory => productType.tracksInventory;
   bool get isService => productType.isService;
@@ -88,6 +89,7 @@ class BaseProduct {
     this.defaultUnitIndex = 0,
     this.wholesaleUnitIndex = 0,
     this.priceUnitFactor = 1,
+    this.showBasicUnit = true,
   });
 
   factory BaseProduct.fromJson(Map<String, dynamic> json) {
@@ -113,6 +115,7 @@ class BaseProduct {
       defaultUnitIndex: (json['defaultUnitIndex'] as num?)?.toInt() ?? 0,
       wholesaleUnitIndex: (json['wholesaleUnitIndex'] as num?)?.toInt() ?? 0,
       priceUnitFactor: rawPriceFactor < 1 ? 1 : rawPriceFactor,
+      showBasicUnit: json['showBasicUnit'] as bool? ?? true,
     );
   }
 
@@ -135,6 +138,7 @@ class BaseProduct {
       'defaultUnitIndex': defaultUnitIndex,
       'wholesaleUnitIndex': wholesaleUnitIndex,
       'priceUnitFactor': priceUnitFactor < 1 ? 1 : priceUnitFactor,
+      'showBasicUnit': showBasicUnit,
     };
   }
 }
@@ -158,6 +162,7 @@ class CreateProduct extends BaseProduct {
     super.defaultUnitIndex,
     super.wholesaleUnitIndex,
     super.priceUnitFactor,
+    super.showBasicUnit,
   });
 
   factory CreateProduct.fromJson(Map json) {
@@ -183,6 +188,7 @@ class CreateProduct extends BaseProduct {
       defaultUnitIndex: (json['defaultUnitIndex'] as num?)?.toInt() ?? 0,
       wholesaleUnitIndex: (json['wholesaleUnitIndex'] as num?)?.toInt() ?? 0,
       priceUnitFactor: rawPriceFactor < 1 ? 1 : rawPriceFactor,
+      showBasicUnit: json['showBasicUnit'] as bool? ?? true,
     );
   }
 
@@ -205,6 +211,7 @@ class CreateProduct extends BaseProduct {
       defaultUnitIndex: defaultUnitIndex,
       wholesaleUnitIndex: wholesaleUnitIndex,
       priceUnitFactor: priceUnitFactor,
+      showBasicUnit: showBasicUnit,
     );
   }
 }
@@ -228,6 +235,7 @@ class UpdateProduct {
   final int? defaultUnitIndex;
   final int? wholesaleUnitIndex;
   final int? priceUnitFactor;
+  final bool? showBasicUnit;
 
   UpdateProduct({
     this.name,
@@ -247,6 +255,7 @@ class UpdateProduct {
     this.defaultUnitIndex,
     this.wholesaleUnitIndex,
     this.priceUnitFactor,
+    this.showBasicUnit,
   });
 
   factory UpdateProduct.fromJson(Map json) {
@@ -272,6 +281,7 @@ class UpdateProduct {
       defaultUnitIndex: (json['defaultUnitIndex'] as num?)?.toInt(),
       wholesaleUnitIndex: (json['wholesaleUnitIndex'] as num?)?.toInt(),
       priceUnitFactor: (json['priceUnitFactor'] as num?)?.toInt(),
+      showBasicUnit: json['showBasicUnit'] as bool?,
     );
   }
 
@@ -294,6 +304,7 @@ class UpdateProduct {
       'defaultUnitIndex': defaultUnitIndex,
       'wholesaleUnitIndex': wholesaleUnitIndex,
       'priceUnitFactor': priceUnitFactor,
+      'showBasicUnit': showBasicUnit,
     };
     data.removeWhere((key, value) => value == null);
     return data;
@@ -325,6 +336,7 @@ class ProductInDb extends BaseProduct {
     super.defaultUnitIndex,
     super.wholesaleUnitIndex,
     super.priceUnitFactor,
+    super.showBasicUnit,
     this.isDeleted = false,
     required this.createdAt,
     this.updatedAt,
@@ -354,6 +366,7 @@ class ProductInDb extends BaseProduct {
       defaultUnitIndex: (json['defaultUnitIndex'] as num?)?.toInt() ?? 0,
       wholesaleUnitIndex: (json['wholesaleUnitIndex'] as num?)?.toInt() ?? 0,
       priceUnitFactor: rawPriceFactor < 1 ? 1 : rawPriceFactor,
+      showBasicUnit: json['showBasicUnit'] as bool? ?? true,
       isDeleted: json['isDeleted'] as bool? ?? false,
       createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
       updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt'] as int) : null,
@@ -396,6 +409,7 @@ class ProductInDbInBranch extends ProductInDb {
     super.defaultUnitIndex,
     super.wholesaleUnitIndex,
     super.priceUnitFactor,
+    super.showBasicUnit,
     super.isDeleted,
     required super.createdAt,
     super.updatedAt,
@@ -427,6 +441,7 @@ class ProductInDbInBranch extends ProductInDb {
       defaultUnitIndex: (json['defaultUnitIndex'] as num?)?.toInt() ?? 0,
       wholesaleUnitIndex: (json['wholesaleUnitIndex'] as num?)?.toInt() ?? 0,
       priceUnitFactor: rawPriceFactor < 1 ? 1 : rawPriceFactor,
+      showBasicUnit: json['showBasicUnit'] as bool? ?? true,
       isDeleted: json['isDeleted'] ?? false,
       createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt']),
       updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt']) : null,
@@ -467,6 +482,7 @@ class ProductInDbInBranch extends ProductInDb {
     int? defaultUnitIndex,
     int? wholesaleUnitIndex,
     int? priceUnitFactor,
+    bool? showBasicUnit,
   }) {
     return ProductInDbInBranch(
       id: id ?? this.id,
@@ -492,6 +508,7 @@ class ProductInDbInBranch extends ProductInDb {
       defaultUnitIndex: defaultUnitIndex ?? this.defaultUnitIndex,
       wholesaleUnitIndex: wholesaleUnitIndex ?? this.wholesaleUnitIndex,
       priceUnitFactor: priceUnitFactor ?? this.priceUnitFactor,
+      showBasicUnit: showBasicUnit ?? this.showBasicUnit,
     );
   }
 }

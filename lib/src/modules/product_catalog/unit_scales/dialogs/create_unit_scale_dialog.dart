@@ -58,6 +58,7 @@ class _CreateUnitScaleDialogState extends State<CreateUnitScaleDialog> {
   late int _wholesaleUnitIndex;
   late int _priceUnitFactor;
   late UnitScaleType _scaleType;
+  late bool _showBasicUnit;
 
   bool get isEditing => widget.scaleToEdit != null;
 
@@ -76,6 +77,7 @@ class _CreateUnitScaleDialogState extends State<CreateUnitScaleDialog> {
     _wholesaleUnitIndex = edit?.wholesaleUnitIndex ?? 0;
     _priceUnitFactor = edit?.priceUnitFactor ?? 1;
     _scaleType = edit?.scaleType ?? UnitScaleType.custom;
+    _showBasicUnit = edit?.showBasicUnit ?? true;
     _validateIndexes();
   }
 
@@ -339,6 +341,8 @@ class _CreateUnitScaleDialogState extends State<CreateUnitScaleDialog> {
 
     final cubit = context.read<WriteUnitScaleCubit>();
 
+    final effectiveShowBasicUnit = _units.isEmpty ? true : _showBasicUnit;
+
     if (isEditing) {
       final update = UpdateUnitScale(
         name: name,
@@ -348,6 +352,7 @@ class _CreateUnitScaleDialogState extends State<CreateUnitScaleDialog> {
         defaultUnitIndex: _defaultUnitIndex,
         wholesaleUnitIndex: _wholesaleUnitIndex,
         priceUnitFactor: _priceUnitFactor,
+        showBasicUnit: effectiveShowBasicUnit,
       );
       await cubit.updateUnitScale(widget.scaleToEdit!.id, update);
     } else {
@@ -359,6 +364,7 @@ class _CreateUnitScaleDialogState extends State<CreateUnitScaleDialog> {
         defaultUnitIndex: _defaultUnitIndex,
         wholesaleUnitIndex: _wholesaleUnitIndex,
         priceUnitFactor: _priceUnitFactor,
+        showBasicUnit: effectiveShowBasicUnit,
       );
       await cubit.createNewUnitScale(create);
     }
@@ -767,6 +773,22 @@ class _CreateUnitScaleDialogState extends State<CreateUnitScaleDialog> {
                               ],
                             );
                           },
+                        ),
+                        const SizedBox(height: 12),
+                        SwitchListTile.adaptive(
+                          contentPadding: EdgeInsets.zero,
+                          title: const Text(
+                            "Mostrar unidad base en selectores",
+                            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                          ),
+                          subtitle: const Text(
+                            "Desactívalo si la unidad mínima no es práctica para vender o mover inventario.",
+                            style: TextStyle(fontSize: 12),
+                          ),
+                          value: _units.isEmpty ? true : _showBasicUnit,
+                          onChanged: _units.isEmpty
+                              ? null
+                              : (val) => setState(() => _showBasicUnit = val),
                         ),
                       ],
                     ),

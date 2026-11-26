@@ -10,6 +10,7 @@ class ExtraUnitsEditorResult {
   final int wholesaleUnitIndex;
   final int priceUnitFactor;
   final String baseUnitName;
+  final bool showBasicUnit;
 
   ExtraUnitsEditorResult({
     required this.extraUnits,
@@ -17,6 +18,7 @@ class ExtraUnitsEditorResult {
     required this.wholesaleUnitIndex,
     this.priceUnitFactor = 1,
     required this.baseUnitName,
+    this.showBasicUnit = true,
   });
 }
 
@@ -27,6 +29,7 @@ Future<ExtraUnitsEditorResult?> showProductExtraUnitsEditor(
   required int initialWholesaleUnitIndex,
   int initialPriceUnitFactor = 1,
   required String baseUnitName,
+  bool initialShowBasicUnit = true,
 }) async {
   return await showDialog<ExtraUnitsEditorResult?>(
     context: context,
@@ -37,6 +40,7 @@ Future<ExtraUnitsEditorResult?> showProductExtraUnitsEditor(
         initialWholesaleUnitIndex: initialWholesaleUnitIndex,
         initialPriceUnitFactor: initialPriceUnitFactor,
         baseUnitName: baseUnitName,
+        initialShowBasicUnit: initialShowBasicUnit,
       );
     },
   );
@@ -50,6 +54,7 @@ class ExtraUnitsEditorDialog extends StatefulWidget {
     required this.initialWholesaleUnitIndex,
     this.initialPriceUnitFactor = 1,
     required this.baseUnitName,
+    this.initialShowBasicUnit = true,
   });
 
   final List<ExtraUnit> initialExtraUnits;
@@ -57,6 +62,7 @@ class ExtraUnitsEditorDialog extends StatefulWidget {
   final int initialWholesaleUnitIndex;
   final int initialPriceUnitFactor;
   final String baseUnitName;
+  final bool initialShowBasicUnit;
 
   @override
   State<ExtraUnitsEditorDialog> createState() => _ExtraUnitsEditorDialogState();
@@ -68,6 +74,7 @@ class _ExtraUnitsEditorDialogState extends State<ExtraUnitsEditorDialog> {
   late int wholesaleUnitIndex;
   late int _priceUnitFactor;
   late String _baseUnitName;
+  late bool _showBasicUnit;
 
   @override
   void initState() {
@@ -77,6 +84,7 @@ class _ExtraUnitsEditorDialogState extends State<ExtraUnitsEditorDialog> {
     wholesaleUnitIndex = widget.initialWholesaleUnitIndex;
     _priceUnitFactor = widget.initialPriceUnitFactor < 1 ? 1 : widget.initialPriceUnitFactor;
     _baseUnitName = widget.baseUnitName.trim();
+    _showBasicUnit = widget.initialShowBasicUnit;
     _validateDefaultUnitIndex();
     _validateWholesaleUnitIndex();
   }
@@ -311,7 +319,21 @@ class _ExtraUnitsEditorDialogState extends State<ExtraUnitsEditorDialog> {
                     }
                   },
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
+                SwitchListTile.adaptive(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text(
+                    'Mostrar unidad base en selectores',
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                  ),
+                  subtitle: const Text(
+                    'Desactívalo si la unidad mínima no es práctica para vender o mover inventario.',
+                    style: TextStyle(fontSize: 12),
+                  ),
+                  value: _showBasicUnit,
+                  onChanged: (val) => setState(() => _showBasicUnit = val),
+                ),
+                const SizedBox(height: 12),
               ],
               Builder(
                 builder: (context) {
@@ -340,6 +362,7 @@ class _ExtraUnitsEditorDialogState extends State<ExtraUnitsEditorDialog> {
                 wholesaleUnitIndex: wholesaleUnitIndex,
                 priceUnitFactor: _priceUnitFactor,
                 baseUnitName: _baseUnitName.trim(),
+                showBasicUnit: extraUnits.isEmpty ? true : _showBasicUnit,
               ),
             ),
             label: const Text('Guardar'),
