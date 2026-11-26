@@ -35,6 +35,10 @@ class ImportPreviewResult {
     this.totalPrice = 0,
     this.totalCreditLimit = 0,
     this.totalInitialBalance = 0,
+    this.totalPayableAmount = 0,
+    this.totalPayablePaid = 0,
+    this.totalPayablePending = 0,
+    this.newSuppliersCount = 0,
     this.errors = const [],
   });
 
@@ -47,6 +51,10 @@ class ImportPreviewResult {
   final int totalPrice; // en centavos
   final int totalCreditLimit; // en centavos
   final int totalInitialBalance; // en centavos
+  final int totalPayableAmount; // en centavos
+  final int totalPayablePaid; // en centavos
+  final int totalPayablePending; // en centavos
+  final int newSuppliersCount;
   final List<ImportPreviewError> errors;
 
   factory ImportPreviewResult.fromJson(Map<String, dynamic> json) {
@@ -61,6 +69,10 @@ class ImportPreviewResult {
       totalPrice: (json['totalPrice'] as num?)?.toInt() ?? 0,
       totalCreditLimit: (json['totalCreditLimit'] as num?)?.toInt() ?? 0,
       totalInitialBalance: (json['totalInitialBalance'] as num?)?.toInt() ?? 0,
+      totalPayableAmount: (json['totalPayableAmount'] as num?)?.toInt() ?? 0,
+      totalPayablePaid: (json['totalPayablePaid'] as num?)?.toInt() ?? 0,
+      totalPayablePending: (json['totalPayablePending'] as num?)?.toInt() ?? 0,
+      newSuppliersCount: (json['newSuppliersCount'] as num?)?.toInt() ?? 0,
       errors: rawErrors
           .whereType<Map<String, dynamic>>()
           .map(ImportPreviewError.fromJson)

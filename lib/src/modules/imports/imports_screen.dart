@@ -84,6 +84,8 @@ class _ImportsView extends StatelessWidget {
                       const MenuSectionDivider(title: "Catálogos"),
                       _buildCard(context, ImportType.clients, loadingState),
                       _buildCard(context, ImportType.suppliers, loadingState),
+                      const MenuSectionDivider(title: "Cuentas por Pagar"),
+                      _buildCard(context, ImportType.accountsPayable, loadingState),
                     ],
                   ),
                 ),
@@ -373,6 +375,16 @@ class _ImportCardConfig {
         warning:
             "Crea proveedores nuevos. Verifica que no estén duplicados antes "
             "de importar.",
+      ),
+      ImportType.accountsPayable => const _ImportCardConfig(
+        title: "Importar cuentas por pagar",
+        description:
+            "Carga facturas y saldos pendientes a proveedores. Crea proveedores nuevos automáticamente si no existen.",
+        badgeLabel: "Proveedores",
+        icon: Icons.request_quote_rounded,
+        accentColor: Color(0xFFD97706),
+        warning:
+            "Los documentos se registrarán en la sucursal activa como gastos de proveedor. Usa fechas YYYY-MM-DD o DD/MM/YYYY.",
       ),
     };
   }

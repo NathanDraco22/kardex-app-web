@@ -61,6 +61,7 @@ class ImportPreviewDialog extends StatelessWidget {
     final isInventory = preview.importType == "initialInventory" ||
         preview.importType == "inventory";
     final isClients = preview.importType == "clients";
+    final isAccountsPayable = preview.importType == "accountsPayable";
 
     return Dialog(
       insetPadding: const EdgeInsets.all(20),
@@ -122,6 +123,8 @@ class ImportPreviewDialog extends StatelessWidget {
                       _buildInventoryTotals()
                     else if (isClients)
                       _buildClientsTotals()
+                    else if (isAccountsPayable)
+                      _buildAccountsPayableTotals()
                     else
                       _buildSuppliersTotals(),
                     const SizedBox(height: 18),
@@ -288,6 +291,77 @@ class ImportPreviewDialog extends StatelessWidget {
             color: const Color(0xFF0F172A),
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildAccountsPayableTotals() {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: _MetricTile(
+                label: "Documentos",
+                value: "${preview.totalRows}",
+                icon: Icons.receipt_long_outlined,
+                color: const Color(0xFF0F172A),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _MetricTile(
+                label: "Monto total",
+                value: NumberFormatter.convertToMoneyLike(
+                  preview.totalPayableAmount,
+                ),
+                icon: Icons.payments_outlined,
+                color: const Color(0xFF2563EB),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Expanded(
+              child: _MetricTile(
+                label: "Abonado",
+                value: NumberFormatter.convertToMoneyLike(
+                  preview.totalPayablePaid,
+                ),
+                icon: Icons.check_circle_outline_rounded,
+                color: const Color(0xFF059669),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _MetricTile(
+                label: "Saldo por pagar",
+                value: NumberFormatter.convertToMoneyLike(
+                  preview.totalPayablePending,
+                ),
+                icon: Icons.account_balance_wallet_outlined,
+                color: const Color(0xFFD97706),
+              ),
+            ),
+          ],
+        ),
+        if (preview.newSuppliersCount > 0) ...[
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: _MetricTile(
+                  label: "Proveedores nuevos a crear",
+                  value: "${preview.newSuppliersCount}",
+                  icon: Icons.storefront_outlined,
+                  color: const Color(0xFF4F46E5),
+                ),
+              ),
+            ],
+          ),
+        ],
       ],
     );
   }

@@ -53,6 +53,16 @@ class ImportTemplates {
     "phone",
   ];
 
+  static const _accountsPayableColumns = [
+    "supplierName",
+    "docNumber",
+    "date",
+    "expirationDate",
+    "amount",
+    "amountPaid",
+    "description",
+  ];
+
   static ImportTemplate forType(ImportType type) {
     return switch (type) {
       ImportType.initialInventory => _productTemplate(
@@ -70,6 +80,11 @@ class ImportTemplates {
         fileName: "plantilla_proveedores.csv",
         content: "${_supplierColumns.join(",")}\n",
         columns: _supplierColumns,
+      ),
+      ImportType.accountsPayable => ImportTemplate(
+        fileName: "plantilla_cuentas_por_pagar.csv",
+        content: "${_accountsPayableColumns.join(",")}\n",
+        columns: _accountsPayableColumns,
       ),
     };
   }

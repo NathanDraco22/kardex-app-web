@@ -53,6 +53,12 @@ class ImportsRepository {
         bytes: bytes,
         fileName: fileName,
       ),
+      ImportType.accountsPayable =>
+        await importsDataSource.importAccountsPayable(
+          bytes: bytes,
+          fileName: fileName,
+          branchId: branchId,
+        ),
     };
 
     return ImportResult.fromJson(response);
