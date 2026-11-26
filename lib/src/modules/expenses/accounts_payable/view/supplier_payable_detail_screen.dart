@@ -49,8 +49,12 @@ class _SupplierPayableDetailBody extends StatefulWidget {
 
 class _SupplierPayableDetailBodyState extends State<_SupplierPayableDetailBody> {
   static const Color _accentColor = Color(0xFFD97706);
+  static const int _pageSize = 200;
 
   bool _loading = true;
+  bool _loadingMore = false;
+  bool _hasMore = false;
+  int _offset = 0;
   String? _error;
   List<ExpenseInDb> _items = const [];
   bool _hasChanges = false;
@@ -78,10 +82,26 @@ class _SupplierPayableDetailBodyState extends State<_SupplierPayableDetailBody> 
     _loadDocuments();
   }
 
+  bool _matchesSupplier(ExpenseInDb e) {
+    if (e.isDeleted || e.remainingAmount <= 0) return false;
+    if (widget.supplier.supplierId.isNotEmpty) {
+      return e.supplierId == widget.supplier.supplierId;
+    }
+    if (e.supplierId.isNotEmpty) return false;
+    final targetName = widget.supplier.supplierName.trim();
+    final expenseName = e.supplierName.trim();
+    if (targetName == 'Proveedor sin nombre') {
+      return expenseName.isEmpty || expenseName == 'Proveedor sin nombre';
+    }
+    return expenseName == targetName;
+  }
+
   Future<void> _loadDocuments() async {
     setState(() {
       _loading = true;
       _error = null;
+      _offset = 0;
+      _hasMore = false;
     });
 
     try {
@@ -89,7 +109,8 @@ class _SupplierPayableDetailBodyState extends State<_SupplierPayableDetailBody> 
       final params = ExpenseQueryParams()
         ..type = ExpenseType.supplier.name
         ..onlyPending = true
-        ..limit = 200;
+        ..offset = 0
+        ..limit = _pageSize;
 
       if (widget.supplier.supplierId.isNotEmpty) {
         params.supplierId = widget.supplier.supplierId;
@@ -99,18 +120,14 @@ class _SupplierPayableDetailBodyState extends State<_SupplierPayableDetailBody> 
       }
 
       final fetched = await repo.getAllExpenses(params);
-      final filtered = fetched.where((e) {
-        if (e.isDeleted || e.remainingAmount <= 0) return false;
-        if (widget.supplier.supplierId.isNotEmpty) {
-          return e.supplierId == widget.supplier.supplierId;
-        }
-        return e.supplierName.trim() == widget.supplier.supplierName.trim();
-      }).toList()
+      final filtered = fetched.where(_matchesSupplier).toList()
         ..sort(_compareByDueUrgency);
 
       if (!mounted) return;
       setState(() {
         _items = filtered;
+        _offset = fetched.length;
+        _hasMore = fetched.length >= _pageSize;
         _loading = false;
       });
     } catch (error) {
@@ -119,6 +136,45 @@ class _SupplierPayableDetailBodyState extends State<_SupplierPayableDetailBody> 
         _error = error.toString();
         _loading = false;
       });
+    }
+  }
+
+  Future<void> _loadMoreDocuments() async {
+    if (_loadingMore || !_hasMore) return;
+    setState(() => _loadingMore = true);
+
+    try {
+      final repo = context.read<ExpensesRepository>();
+      final params = ExpenseQueryParams()
+        ..type = ExpenseType.supplier.name
+        ..onlyPending = true
+        ..offset = _offset
+        ..limit = _pageSize;
+
+      if (widget.supplier.supplierId.isNotEmpty) {
+        params.supplierId = widget.supplier.supplierId;
+      }
+      if (_resolvedBranchId.isNotEmpty) {
+        params.branchId = _resolvedBranchId;
+      }
+
+      final fetched = await repo.getAllExpenses(params);
+      final existingIds = _items.map((e) => e.id).toSet();
+      final next = fetched
+          .where((e) => !existingIds.contains(e.id) && _matchesSupplier(e))
+          .toList();
+      final merged = [..._items, ...next]..sort(_compareByDueUrgency);
+
+      if (!mounted) return;
+      setState(() {
+        _items = merged;
+        _offset += fetched.length;
+        _hasMore = fetched.length >= _pageSize;
+        _loadingMore = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _loadingMore = false);
     }
   }
 
@@ -294,6 +350,22 @@ class _SupplierPayableDetailBodyState extends State<_SupplierPayableDetailBody> 
               onPay: () => _registerPayment(_items[i]),
             ),
             if (i < _items.length - 1) const SizedBox(height: 10),
+          ],
+          if (_hasMore) ...[
+            const SizedBox(height: 14),
+            Center(
+              child: OutlinedButton.icon(
+                onPressed: _loadingMore ? null : _loadMoreDocuments,
+                icon: _loadingMore
+                    ? const SizedBox(
+                        width: 15,
+                        height: 15,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.expand_more_rounded, size: 18),
+                label: Text(_loadingMore ? 'Cargando...' : 'Cargar más documentos'),
+              ),
+            ),
           ],
         ],
       ),

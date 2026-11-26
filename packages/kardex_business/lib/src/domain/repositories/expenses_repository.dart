@@ -63,8 +63,14 @@ class ExpensesRepository {
     return updatedExpense;
   }
 
-  Future<AccountsPayableSummary> getAccountsPayableSummary({String? branchId}) async {
-    final result = await expensesDataSource.getAccountsPayableSummary(branchId: branchId);
+  Future<AccountsPayableSummary> getAccountsPayableSummary({
+    String? branchId,
+    int? overdueCutoffMs,
+  }) async {
+    final result = await expensesDataSource.getAccountsPayableSummary(
+      branchId: branchId,
+      overdueCutoffMs: overdueCutoffMs,
+    );
     return AccountsPayableSummary.fromJson(result);
   }
 

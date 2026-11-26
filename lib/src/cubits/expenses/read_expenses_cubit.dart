@@ -122,6 +122,7 @@ class ReadExpenseCubit extends Cubit<ReadExpenseState> {
   /// Aplica filtros de servidor conservando el tipo de gasto y la paginación.
   Future<void> applyFilters({
     String? status,
+    bool? onlyPending,
     String? category,
     String? supplierId,
     int? startDate,
@@ -129,6 +130,7 @@ class ReadExpenseCubit extends Cubit<ReadExpenseState> {
   }) {
     final params = _copyQueryParams(queryParams)
       ..status = status
+      ..onlyPending = onlyPending
       ..category = category
       ..supplierId = supplierId
       ..startDate = startDate
@@ -296,8 +298,15 @@ class ReadExpenseCubit extends Cubit<ReadExpenseState> {
     final params = queryParams;
     if (params.type != null && item.type.name != params.type) return false;
     if (params.status != null && item.status.name != params.status) return false;
+    if (params.onlyPending == true &&
+        item.status != ExpenseStatus.draft &&
+        item.status != ExpenseStatus.open &&
+        item.status != ExpenseStatus.partiallyPaid) {
+      return false;
+    }
     if (params.category != null && item.category != params.category) return false;
     if (params.supplierId != null && item.supplierId != params.supplierId) return false;
+    if (params.shiftId != null && item.shiftId != params.shiftId) return false;
     if (params.createdBy != null && item.createdBy.id != params.createdBy) return false;
     if (params.branchId != null && item.branchId != params.branchId) return false;
     if (params.docNumber != null && item.docNumber != params.docNumber) return false;
@@ -316,6 +325,7 @@ class ReadExpenseCubit extends Cubit<ReadExpenseState> {
       ..offset = source.offset
       ..limit = source.limit
       ..status = source.status
+      ..onlyPending = source.onlyPending
       ..startDate = source.startDate
       ..endDate = source.endDate
       ..createdBy = source.createdBy
@@ -325,6 +335,7 @@ class ReadExpenseCubit extends Cubit<ReadExpenseState> {
       ..minAmount = source.minAmount
       ..maxAmount = source.maxAmount
       ..type = source.type
-      ..supplierId = source.supplierId;
+      ..supplierId = source.supplierId
+      ..shiftId = source.shiftId;
   }
 }

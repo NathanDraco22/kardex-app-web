@@ -510,8 +510,11 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
   }
 
   void _applyFilters() {
+    final isPendingFilter =
+        _statusFilter == ExpenseStatusFilter.pending || _statusFilter == ExpenseStatusFilter.overdue;
     context.read<ReadExpenseCubit>().applyFilters(
       status: _statusFilter.apiStatus,
+      onlyPending: isPendingFilter ? true : null,
       category: widget.config.supportsCategoryFilter ? _selectedCategory : null,
       supplierId: widget.config.supportsSupplierFilter ? _selectedSupplier?.id : null,
       startDate: _startDate?.startOfDay().millisecondsSinceEpoch,

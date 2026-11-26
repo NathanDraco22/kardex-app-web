@@ -15,8 +15,14 @@ enum ExpenseRowAction { edit, registerPayment, markAsPaid, delete }
 class ExpenseActionPermissions {
   const ExpenseActionPermissions._();
 
-  /// La edición/eliminación sigue la regla existente de 4 horas.
+  static bool hasPayments(ExpenseInDb expense) {
+    return expense.payments.isNotEmpty || expense.status == ExpenseStatus.partiallyPaid;
+  }
+
+  /// La edición/eliminación sigue la regla existente de 4 horas y bloquea
+  /// gastos que ya tienen abonos registrados.
   static bool canEditOrDelete(ExpenseInDb expense) {
+    if (hasPayments(expense)) return false;
     return DateTime.now().difference(expense.createdAt).inHours < 4;
   }
 

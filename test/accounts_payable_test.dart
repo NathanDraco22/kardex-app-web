@@ -4,6 +4,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:kardex_app_front/src/cubits/expenses/write_expenses_cubit.dart';
 import 'package:kardex_app_front/src/modules/expenses/accounts_payable/view/accounts_payable_screen.dart';
 import 'package:kardex_app_front/src/modules/expenses/shared/dialogs/register_expense_payment_dialog.dart';
+import 'package:kardex_app_front/src/modules/expenses/shared/expense_actions.dart';
 import 'package:kardex_app_front/src/modules/expenses/shared/expense_status_ui.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:material_ui/material_ui.dart';
@@ -17,7 +18,10 @@ class _FakeExpensesRepository extends ExpensesRepository {
   AddToAmountRequest? lastPaymentRequest;
 
   @override
-  Future<AccountsPayableSummary> getAccountsPayableSummary({String? branchId}) async {
+  Future<AccountsPayableSummary> getAccountsPayableSummary({
+    String? branchId,
+    int? overdueCutoffMs,
+  }) async {
     return summary;
   }
 
@@ -243,6 +247,46 @@ void main() {
 
       expect(repo.lastPaymentRequest, isNotNull);
       expect(repo.lastPaymentRequest!.amountPaid, 7500);
+    });
+
+    test('ExpenseActionPermissions bloquea editar o eliminar gastos con abonos', () {
+      final now = DateTime.now();
+      final openRecent = ExpenseInDb(
+        id: 'e-open',
+        createdAt: now,
+        branchId: 'b-1',
+        amount: 10000,
+        category: '',
+        date: now.millisecondsSinceEpoch,
+        dateId: '2026-11-26',
+        status: ExpenseStatus.open,
+        type: ExpenseType.supplier,
+        createdBy: const UserInfo(id: 'u-1', name: 'Admin'),
+      );
+      expect(ExpenseActionPermissions.canEditOrDelete(openRecent), isTrue);
+
+      final withPayments = ExpenseInDb(
+        id: 'e-partial',
+        createdAt: now,
+        branchId: 'b-1',
+        amount: 10000,
+        amountPaid: 2000,
+        payments: [
+          ExpensePayment(
+            id: 'p-1',
+            amount: 2000,
+            paidAt: now.millisecondsSinceEpoch,
+            createdAt: now.millisecondsSinceEpoch,
+          ),
+        ],
+        category: '',
+        date: now.millisecondsSinceEpoch,
+        dateId: '2026-11-26',
+        status: ExpenseStatus.partiallyPaid,
+        type: ExpenseType.supplier,
+        createdBy: const UserInfo(id: 'u-1', name: 'Admin'),
+      );
+      expect(ExpenseActionPermissions.canEditOrDelete(withPayments), isFalse);
     });
   });
 }
