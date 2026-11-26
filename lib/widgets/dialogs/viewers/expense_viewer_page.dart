@@ -163,6 +163,13 @@ class ExpenseViewerPage extends StatelessWidget {
                         branchName: branchName,
                         isOverdue: isOverdue,
                       ),
+                      if (expense.payments.isNotEmpty) ...[
+                        const SizedBox(height: 10),
+                        _ExpensePaymentsHistoryCard(
+                          payments: expense.payments,
+                          accent: accent,
+                        ),
+                      ],
                       const SizedBox(height: 10),
                       _ExpenseDescriptionCard(description: expense.description),
                     ],
@@ -277,6 +284,13 @@ class _ExpenseAmountCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final showProgress = expense.status == ExpenseStatus.partiallyPaid ||
+        expense.payments.isNotEmpty ||
+        (expense.amountPaid > 0 && expense.amountPaid < expense.amount);
+    final progress = expense.amount > 0
+        ? (expense.effectiveAmountPaid / expense.amount).clamp(0.0, 1.0)
+        : 0.0;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       decoration: BoxDecoration(
@@ -284,48 +298,108 @@ class _ExpenseAmountCard extends StatelessWidget {
         borderRadius: AppThemeTokens.borderRadiusXl,
         border: Border.all(color: accent.withValues(alpha: 0.22)),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Monto del gasto',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF64748B),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        NumberFormatter.convertToMoneyLike(expense.amount),
+                        style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.w900,
+                          color: accent,
+                          letterSpacing: -0.8,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  color: accent.withValues(alpha: 0.12),
+                  borderRadius: AppThemeTokens.borderRadiusMd,
+                  border: Border.all(color: accent.withValues(alpha: 0.20)),
+                ),
+                child: Icon(Icons.payments_rounded, color: accent, size: 23),
+              ),
+            ],
+          ),
+          if (showProgress) ...[
+            const SizedBox(height: 12),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(999),
+              child: LinearProgressIndicator(
+                value: progress,
+                minHeight: 7,
+                backgroundColor: Colors.white.withValues(alpha: 0.7),
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  expense.remainingAmount == 0 ? AppThemeTokens.success : accent,
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Row(
               children: [
-                const Text(
-                  'Monto del gasto',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF64748B),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Abonado',
+                        style: TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                      ),
+                      Text(
+                        NumberFormatter.convertToMoneyLike(expense.effectiveAmountPaid),
+                        style: const TextStyle(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w700,
+                          color: AppThemeTokens.success,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 4),
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    NumberFormatter.convertToMoneyLike(expense.amount),
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w900,
-                      color: accent,
-                      letterSpacing: -0.8,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    const Text(
+                      'Saldo pendiente',
+                      style: TextStyle(fontSize: 11, color: Color(0xFF64748B)),
                     ),
-                  ),
+                    Text(
+                      NumberFormatter.convertToMoneyLike(expense.remainingAmount),
+                      style: TextStyle(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w800,
+                        color: expense.remainingAmount > 0 ? AppThemeTokens.danger : AppThemeTokens.success,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ),
-          const SizedBox(width: 12),
-          Container(
-            width: 46,
-            height: 46,
-            decoration: BoxDecoration(
-              color: accent.withValues(alpha: 0.12),
-              borderRadius: AppThemeTokens.borderRadiusMd,
-              border: Border.all(color: accent.withValues(alpha: 0.20)),
-            ),
-            child: Icon(Icons.payments_rounded, color: accent, size: 23),
-          ),
+          ],
         ],
       ),
     );
@@ -495,6 +569,126 @@ class _ExpenseDetailCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _ExpensePaymentsHistoryCard extends StatelessWidget {
+  const _ExpensePaymentsHistoryCard({
+    required this.payments,
+    required this.accent,
+  });
+
+  final List<ExpensePayment> payments;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    final ordered = payments.toList()..sort((a, b) => b.paidAt.compareTo(a.paidAt));
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: AppThemeTokens.borderRadiusXl,
+        border: Border.all(color: AppThemeTokens.borderLight),
+        boxShadow: AppThemeTokens.subtleCardShadow(),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.history_rounded, size: 17, color: accent),
+              const SizedBox(width: 6),
+              Text(
+                'Historial de Abonos (${ordered.length})',
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF334155),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          for (var i = 0; i < ordered.length; i++) ...[
+            if (i > 0) const Divider(height: 16, color: Color(0xFFF1F5F9)),
+            _PaymentHistoryItem(payment: ordered[i]),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _PaymentHistoryItem extends StatelessWidget {
+  const _PaymentHistoryItem({required this.payment});
+
+  final ExpensePayment payment;
+
+  @override
+  Widget build(BuildContext context) {
+    final paidAtDate = DateTime.fromMillisecondsSinceEpoch(payment.paidAt);
+    final ref = payment.reference?.trim() ?? '';
+    final note = payment.note?.trim() ?? '';
+    final userName = payment.createdBy?.name.trim() ?? '';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 4,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  AppStatusBadge(
+                    label: payment.paymentMethod.displayLabel,
+                    variant: AppBadgeVariant.info,
+                    fontSize: 10.5,
+                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                  ),
+                  Text(
+                    DateTimeTool.formatddMMyyEs(paidAtDate),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF475569),
+                    ),
+                  ),
+                  if (ref.isNotEmpty)
+                    Text(
+                      'Ref. $ref',
+                      style: const TextStyle(fontSize: 11.5, color: Color(0xFF64748B)),
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              NumberFormatter.convertToMoneyLike(payment.amount),
+              style: const TextStyle(
+                fontSize: 13.5,
+                fontWeight: FontWeight.w800,
+                color: AppThemeTokens.success,
+              ),
+            ),
+          ],
+        ),
+        if (note.isNotEmpty || userName.isNotEmpty) ...[
+          const SizedBox(height: 4),
+          Text(
+            [
+              if (note.isNotEmpty) note,
+              if (userName.isNotEmpty) 'Por: $userName',
+            ].join(' • '),
+            style: const TextStyle(fontSize: 11.5, color: Color(0xFF64748B)),
+          ),
+        ],
+      ],
     );
   }
 }

@@ -116,6 +116,7 @@ class RouteNames {
   static const expenses = 'expenses';
   static const operativeExpenses = 'operative-expenses';
   static const supplierExpenses = 'supplier-expenses';
+  static const accountsPayable = 'accounts-payable';
   static const expensesReport = 'expenses-report';
   static const expenseCategories = 'expense-categories';
 }

@@ -53,19 +53,24 @@ void main() {
       expect(metrics.overdueCount, 1);
     });
 
-    test('incluye borradores y pagos parciales en el monto pendiente', () {
+    test('incluye borradores y pagos parciales descontando amountPaid', () {
       final expenses = [
         _expense(id: 'draft', amount: 1000, status: ExpenseStatus.draft),
         _expense(id: 'open', amount: 2000, status: ExpenseStatus.open),
-        _expense(id: 'partial', amount: 3000, status: ExpenseStatus.partiallyPaid),
+        _expense(
+          id: 'partial',
+          amount: 3000,
+          amountPaid: 1200,
+          status: ExpenseStatus.partiallyPaid,
+        ),
         _expense(id: 'paid', amount: 4000, status: ExpenseStatus.paid),
       ];
 
       final metrics = ExpenseMetrics.fromExpenses(expenses, now: now);
 
-      expect(metrics.pending, 6000);
+      expect(metrics.pending, 4800);
       expect(metrics.pendingCount, 3);
-      expect(metrics.paid, 4000);
+      expect(metrics.paid, 5200);
       expect(metrics.total, 10000);
     });
 
@@ -103,6 +108,7 @@ void main() {
 ExpenseInDb _expense({
   required String id,
   required int amount,
+  int amountPaid = 0,
   required ExpenseStatus status,
   DateTime? expirationDate,
   bool isDeleted = false,
@@ -113,6 +119,7 @@ ExpenseInDb _expense({
     createdAt: DateTime(2026, 11, 10, 8),
     branchId: 'branch-1',
     amount: amount,
+    amountPaid: amountPaid,
     category: 'Servicios',
     date: DateTime(2026, 11, 10).millisecondsSinceEpoch,
     dateId: '2026-11-10',

@@ -144,3 +144,109 @@ class ExpenseActivityBadge extends StatelessWidget {
     );
   }
 }
+
+enum ExpenseDueUrgency { overdue, soon, normal, none }
+
+class ExpenseDueStatus {
+  const ExpenseDueStatus({
+    required this.label,
+    required this.urgency,
+    this.daysDelta,
+  });
+
+  final String label;
+  final ExpenseDueUrgency urgency;
+  final int? daysDelta;
+}
+
+/// Describe el estado relativo de vencimiento respecto al día actual:
+/// - `Venció hace X días` (rojo)
+/// - `Vence hoy` / `Vence mañana` (ámbar)
+/// - `Vence en X días` (ámbar si <= 5 días, neutro si > 5 días)
+ExpenseDueStatus describeExpenseDueDate(
+  int? expirationDate, {
+  ExpenseStatus? status,
+  DateTime? now,
+}) {
+  if (expirationDate == null || status == ExpenseStatus.paid || status == ExpenseStatus.cancelled) {
+    return const ExpenseDueStatus(
+      label: 'Sin vencimiento',
+      urgency: ExpenseDueUrgency.none,
+    );
+  }
+
+  final current = now ?? DateTime.now();
+  final today = DateTime(current.year, current.month, current.day);
+  final due = DateTime.fromMillisecondsSinceEpoch(expirationDate);
+  final dueDay = DateTime(due.year, due.month, due.day);
+  final diffDays = dueDay.difference(today).inDays;
+
+  if (diffDays < 0) {
+    final overdueDays = -diffDays;
+    return ExpenseDueStatus(
+      label: overdueDays == 1 ? 'Venció hace 1 día' : 'Venció hace $overdueDays días',
+      urgency: ExpenseDueUrgency.overdue,
+      daysDelta: diffDays,
+    );
+  }
+  if (diffDays == 0) {
+    return const ExpenseDueStatus(
+      label: 'Vence hoy',
+      urgency: ExpenseDueUrgency.soon,
+      daysDelta: 0,
+    );
+  }
+  if (diffDays == 1) {
+    return const ExpenseDueStatus(
+      label: 'Vence mañana',
+      urgency: ExpenseDueUrgency.soon,
+      daysDelta: 1,
+    );
+  }
+  return ExpenseDueStatus(
+    label: 'Vence en $diffDays días',
+    urgency: diffDays <= 5 ? ExpenseDueUrgency.soon : ExpenseDueUrgency.normal,
+    daysDelta: diffDays,
+  );
+}
+
+class ExpenseDueRelativeLabel extends StatelessWidget {
+  const ExpenseDueRelativeLabel({
+    super.key,
+    required this.expirationDate,
+    this.status,
+    this.now,
+    this.fontSize = 11,
+  });
+
+  final int? expirationDate;
+  final ExpenseStatus? status;
+  final DateTime? now;
+  final double fontSize;
+
+  @override
+  Widget build(BuildContext context) {
+    final dueStatus = describeExpenseDueDate(expirationDate, status: status, now: now);
+    if (dueStatus.urgency == ExpenseDueUrgency.none) {
+      return const SizedBox.shrink();
+    }
+
+    final color = switch (dueStatus.urgency) {
+      ExpenseDueUrgency.overdue => AppThemeTokens.danger,
+      ExpenseDueUrgency.soon => const Color(0xFFD97706),
+      ExpenseDueUrgency.normal => const Color(0xFF64748B),
+      ExpenseDueUrgency.none => const Color(0xFF94A3B8),
+    };
+
+    return Text(
+      dueStatus.label,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: TextStyle(
+        fontSize: fontSize,
+        fontWeight: dueStatus.urgency == ExpenseDueUrgency.normal ? FontWeight.w500 : FontWeight.w700,
+        color: color,
+      ),
+    );
+  }
+}

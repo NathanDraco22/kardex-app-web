@@ -155,17 +155,36 @@ class _ExpenseTableRowState extends State<ExpenseTableRow> {
                   ),
                   Expanded(
                     flex: ExpenseTableLayout.amountFlex,
-                    child: Text(
-                      NumberFormatter.convertToMoneyLike(expense.amount),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.right,
-                      style: TextStyle(
-                        fontSize: 13.5,
-                        fontWeight: FontWeight.w800,
-                        color: config.accentColor,
-                        letterSpacing: -0.2,
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          NumberFormatter.convertToMoneyLike(expense.amount),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.right,
+                          style: TextStyle(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w800,
+                            color: config.accentColor,
+                            letterSpacing: -0.2,
+                          ),
+                        ),
+                        if (expense.status == ExpenseStatus.partiallyPaid ||
+                            (expense.effectiveAmountPaid > 0 && expense.remainingAmount > 0))
+                          Text(
+                            'Saldo: ${NumberFormatter.convertToMoneyLike(expense.remainingAmount)}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.right,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: isOverdue ? AppThemeTokens.danger : const Color(0xFFD97706),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                   SizedBox(
@@ -294,11 +313,20 @@ class _ExpenseCardTileState extends State<ExpenseCardTile> {
                       ),
                     ),
                     const SizedBox(height: 2),
-                    const Text(
-                      'Monto',
+                    Text(
+                      (expense.status == ExpenseStatus.partiallyPaid ||
+                              (expense.effectiveAmountPaid > 0 && expense.remainingAmount > 0))
+                          ? 'Saldo ${NumberFormatter.convertToMoneyLike(expense.remainingAmount)}'
+                          : 'Monto',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.right,
                       style: TextStyle(
                         fontSize: 10.5,
-                        color: Color(0xFF94A3B8),
+                        fontWeight: expense.status == ExpenseStatus.partiallyPaid ? FontWeight.w700 : FontWeight.w400,
+                        color: expense.status == ExpenseStatus.partiallyPaid
+                            ? (isOverdue ? AppThemeTokens.danger : const Color(0xFFD97706))
+                            : const Color(0xFF94A3B8),
                       ),
                     ),
                   ],
@@ -446,9 +474,10 @@ class _ExpenseActionsMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final canEditOrDelete = ExpenseActionPermissions.canEditOrDelete(expense);
+    final canRegisterPayment = ExpenseActionPermissions.canRegisterPayment(expense);
     final canMarkAsPaid = ExpenseActionPermissions.canMarkAsPaid(expense);
 
-    if (!canEditOrDelete && !canMarkAsPaid) {
+    if (!canEditOrDelete && !canRegisterPayment && !canMarkAsPaid) {
       return const SizedBox(width: 34, height: 34);
     }
 
@@ -466,6 +495,15 @@ class _ExpenseActionsMenu extends StatelessWidget {
               icon: Icons.edit_outlined,
               label: 'Editar',
               color: const Color(0xFF334155),
+            ),
+          ),
+        if (canRegisterPayment)
+          PopupMenuItem(
+            value: ExpenseRowAction.registerPayment,
+            child: _menuItem(
+              icon: Icons.payments_outlined,
+              label: 'Registrar abono',
+              color: const Color(0xFFD97706),
             ),
           ),
         if (canMarkAsPaid)
@@ -519,6 +557,9 @@ class _ExpenseActionsMenu extends StatelessWidget {
           expense,
           openEditor: config.onEdit,
         );
+        break;
+      case ExpenseRowAction.registerPayment:
+        await ExpenseActions.registerPayment(context, expense);
         break;
       case ExpenseRowAction.markAsPaid:
         await ExpenseActions.markAsPaid(context, expense);

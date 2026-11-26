@@ -104,6 +104,57 @@ void main() {
     expect(find.text('Vencido'), findsNothing);
     expect(find.text('Cerrar'), findsOneWidget);
   });
+
+  testWidgets('la ficha muestra barra de progreso e historial de abonos cuando existen', (tester) async {
+    _useSurface(tester, const Size(768, 1600));
+
+    final expenseWithPayments = ExpenseInDb(
+      id: 'expense-partial',
+      createdAt: DateTime(2026, 11, 10, 8),
+      branchId: 'branch-1',
+      amount: 10000,
+      amountPaid: 4000,
+      payments: [
+        ExpensePayment(
+          id: 'pay-1',
+          amount: 4000,
+          paymentMethod: ExpensePaymentMethod.transfer,
+          reference: 'TRF-88',
+          note: 'Primer abono',
+          paidAt: DateTime(2026, 11, 12).millisecondsSinceEpoch,
+          createdBy: const UserInfo(id: 'u-1', name: 'Carlos'),
+          createdAt: DateTime(2026, 11, 12).millisecondsSinceEpoch,
+        ),
+      ],
+      category: '',
+      docNumber: 'PROV-900',
+      date: DateTime(2026, 11, 10).millisecondsSinceEpoch,
+      dateId: '2026-11-10',
+      status: ExpenseStatus.partiallyPaid,
+      type: ExpenseType.supplier,
+      supplierId: 'sup-1',
+      supplierName: 'Proveedor Demo',
+      expirationDate: DateTime(2026, 11, 20).millisecondsSinceEpoch,
+      createdBy: const UserInfo(id: 'u-1', name: 'Carlos'),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: ExpenseViewerPage(
+          expense: expenseWithPayments,
+          branchName: 'Sucursal Central',
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('Abonado'), findsOneWidget);
+    expect(find.text('Saldo pendiente'), findsOneWidget);
+    expect(find.text('Historial de Abonos (1)'), findsOneWidget);
+    expect(find.text('Transferencia'), findsOneWidget);
+    expect(find.textContaining('Ref. TRF-88'), findsOneWidget);
+  });
 }
 
 ExpenseInDb _expense({String? description = 'Pago de energía eléctrica de la sucursal central'}) {
