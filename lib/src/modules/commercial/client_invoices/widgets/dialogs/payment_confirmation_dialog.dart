@@ -68,7 +68,10 @@ class _PaymentDialogState extends State<_PaymentDialog> {
   @override
   void initState() {
     super.initState();
-    _selectedMethod = widget.initialMethod;
+    _selectedMethod =
+        (!widget.showCredit && widget.initialMethod == PaymentType.credit)
+            ? PaymentType.cash
+            : widget.initialMethod;
   }
 
   int _effectivePrimaryCents(PaymentCurrencySettings settings) {

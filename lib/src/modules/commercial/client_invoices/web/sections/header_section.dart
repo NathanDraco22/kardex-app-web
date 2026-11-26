@@ -53,9 +53,17 @@ class _HeaderSection extends StatelessWidget {
                           listenable: viewController,
                           builder: (context, _) {
                             final selectedClient = viewController.selectedClient;
+                            final canCredit = (selectedClient?.isCreditActive ?? false) &&
+                                AccessManager().hasCurrentCapability(
+                                  RoleCapability.allowCreditInvoicing,
+                                );
+                            final currentValue = (!canCredit &&
+                                    viewController.selectedPaymentType == PaymentType.credit)
+                                ? PaymentType.cash
+                                : viewController.selectedPaymentType;
                             final dropdown = DropdownButtonFormField(
                               key: ValueKey(selectedClient ?? 'select_payment_type'),
-                              initialValue: viewController.selectedPaymentType,
+                              initialValue: currentValue,
                               style: const TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.bold,
@@ -66,7 +74,7 @@ class _HeaderSection extends StatelessWidget {
                                   value: PaymentType.cash,
                                   child: Text("Contado"),
                                 ),
-                                if (selectedClient?.isCreditActive ?? false)
+                                if (canCredit)
                                   const DropdownMenuItem(
                                     value: PaymentType.credit,
                                     child: Text("Credito"),

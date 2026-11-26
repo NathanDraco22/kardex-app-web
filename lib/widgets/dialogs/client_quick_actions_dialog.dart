@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/src/tools/client_balance_display_helper.dart';
 
 enum ClientQuickAction {
   invoice,
@@ -109,7 +110,7 @@ class ClientQuickActionsDialog extends StatelessWidget {
                         _InfoLine(
                           icon: Icons.account_balance_wallet_outlined,
                           label: "Saldo",
-                          value: NumberFormatter.convertToMoneyLike(client.balance),
+                          value: ClientBalanceDisplayHelper.formatBalance(client.balance),
                           valueColor: client.balance > 0 ? Colors.red.shade700 : Colors.green.shade700,
                         ),
                         _InfoLine(
@@ -118,11 +119,12 @@ class ClientQuickActionsDialog extends StatelessWidget {
                           value: client.isCreditActive ? "Activo" : "Inactivo",
                           valueColor: client.isCreditActive ? Colors.green.shade700 : Colors.grey.shade700,
                         ),
-                        _InfoLine(
-                          icon: Icons.speed_outlined,
-                          label: "Límite de crédito",
-                          value: NumberFormatter.convertToMoneyLike(client.creditLimit),
-                        ),
+                        if (ClientBalanceDisplayHelper.canShowDetails())
+                          _InfoLine(
+                            icon: Icons.speed_outlined,
+                            label: "Límite de crédito",
+                            value: NumberFormatter.convertToMoneyLike(client.creditLimit),
+                          ),
                       ],
                     ),
                   ],

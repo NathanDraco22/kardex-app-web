@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/src/tools/client_balance_display_helper.dart';
 import 'package:kardex_app_front/widgets/map/launch_map_button.dart';
 
 Future<void> showClientDetailsDialog(BuildContext context, ClientInDb client) async {
@@ -39,16 +40,17 @@ class ClientDetailsDialog extends StatelessWidget {
             const Divider(),
             _DetailItem(
               label: 'Saldo Actual',
-              value: NumberFormatter.convertToMoneyLike(client.balance),
+              value: ClientBalanceDisplayHelper.formatBalance(client.balance),
               valueStyle: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: client.balance > 0 ? Colors.red : Colors.green,
               ),
             ),
-            _DetailItem(
-              label: 'Límite de Crédito',
-              value: NumberFormatter.convertToMoneyLike(client.creditLimit),
-            ),
+            if (ClientBalanceDisplayHelper.canShowDetails())
+              _DetailItem(
+                label: 'Límite de Crédito',
+                value: NumberFormatter.convertToMoneyLike(client.creditLimit),
+              ),
             _DetailItem(
               label: 'Estado de Crédito',
               value: client.isCreditActive ? 'Activo' : 'Inactivo',

@@ -1,16 +1,23 @@
+import '../user_role/user_role_model.dart';
+
 class UserRole {
   final String name;
   final List<String> access;
+  final RoleCapabilities capabilities;
 
   UserRole({
     required this.name,
     required this.access,
+    this.capabilities = const RoleCapabilities(),
   });
 
   factory UserRole.fromJson(Map<String, dynamic> json) {
     return UserRole(
       name: json['name'] as String,
       access: List<String>.from(json['access'] as List),
+      capabilities: RoleCapabilities.fromJson(
+        json['capabilities'] as Map<String, dynamic>?,
+      ),
     );
   }
 
@@ -18,6 +25,7 @@ class UserRole {
     return {
       'name': name,
       'access': access,
+      'capabilities': capabilities.toJson(),
     };
   }
 }

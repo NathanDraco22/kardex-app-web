@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/cubits/shift/shift_cubit.dart';
+import 'package:kardex_app_front/src/core/access_manager.dart';
 import 'package:kardex_app_front/src/core/terminal_draft_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
@@ -41,7 +42,10 @@ class SaleTerminalViewController extends ChangeNotifier {
   }
 
   set selectedClient(ClientInDb? value) {
-    final hasCredit = value?.isCreditActive ?? false;
+    final canCredit = AccessManager().hasCurrentCapability(
+      RoleCapability.allowCreditInvoicing,
+    );
+    final hasCredit = (value?.isCreditActive ?? false) && canCredit;
     selectedPaymentType = hasCredit ? PaymentType.credit : PaymentType.cash;
     _selectedClient = value;
     if (value != null) {
@@ -259,7 +263,12 @@ class SaleTerminalViewController extends ChangeNotifier {
     _selectedPriceLevel = draft.selectedPriceLevel;
     _isWholesale = draft.isWholesale;
     description = draft.description;
-    selectedPaymentType = draft.selectedPaymentType;
+    final canCredit = AccessManager().hasCurrentCapability(
+      RoleCapability.allowCreditInvoicing,
+    );
+    selectedPaymentType = (!canCredit && draft.selectedPaymentType == PaymentType.credit)
+        ? PaymentType.cash
+        : draft.selectedPaymentType;
     items = draft.items.map((i) => i.toCommercialProductResult()).toList();
     invoiceDiscountType = draft.discountType;
     invoiceDiscountValue = draft.discountValue;

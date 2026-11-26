@@ -5,6 +5,7 @@ import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/constants/feature_flags.dart';
 import 'package:kardex_app_front/constants/route_names.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/src/core/access_manager.dart';
 import 'package:kardex_app_front/src/modules/inventory/adjust_exit/adjust_exit_screen.dart';
 import 'package:kardex_app_front/src/modules/settings/view/local_printer_settings_dialog.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/clients_catalog_template.dart';
@@ -247,6 +248,9 @@ List<HomeModuleCategory> getHomeModuleCategories(
               RolePermissionGateFilter(
                 permissions: [CommercialSubModules.createInvoice],
               ),
+              RoleCapabilityGateFilter(
+                capability: RoleCapability.allowInvoicing,
+              ),
             ],
           ),
           const HomeSubmoduleItem(
@@ -259,6 +263,9 @@ List<HomeModuleCategory> getHomeModuleCategories(
             gates: [
               RolePermissionGateFilter(
                 permissions: [CommercialSubModules.createInvoice],
+              ),
+              RoleCapabilityGateFilter(
+                capability: RoleCapability.allowInvoicing,
               ),
             ],
           ),
@@ -308,6 +315,9 @@ List<HomeModuleCategory> getHomeModuleCategories(
               RolePermissionGateFilter(
                 permissions: [CommercialSubModules.createInvoice],
               ),
+              RoleCapabilityGateFilter(
+                capability: RoleCapability.allowInvoicing,
+              ),
             ],
           ),
           const HomeSubmoduleItem(
@@ -320,6 +330,9 @@ List<HomeModuleCategory> getHomeModuleCategories(
             gates: [
               RolePermissionGateFilter(
                 permissions: [CommercialSubModules.createInvoice],
+              ),
+              RoleCapabilityGateFilter(
+                capability: RoleCapability.allowInvoicing,
               ),
             ],
           ),

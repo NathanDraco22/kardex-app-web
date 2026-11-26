@@ -1,6 +1,6 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/view_controller.dart';
+import 'package:kardex_app_front/src/tools/client_balance_display_helper.dart';
 import 'package:kardex_app_front/widgets/dialogs/client_full_details_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/selectors/client_selection_dialog.dart';
 
@@ -108,7 +108,7 @@ class InvoiceClientBar extends StatelessWidget {
                       if (client.balance > 0) ...[
                         const SizedBox(width: 6),
                         Text(
-                          NumberFormatter.convertToMoneyLike(client.balance),
+                          ClientBalanceDisplayHelper.formatBalance(client.balance),
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,

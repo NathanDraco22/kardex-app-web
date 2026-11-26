@@ -2,9 +2,9 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/cubit/read_pending_client_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/web/pending_invoice_web_screen.dart';
-import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/widgets/dialogs/show_client_with_balance_search_dialog.dart';
+import 'package:kardex_app_front/src/tools/client_balance_display_helper.dart';
 import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 class PendingClientScreenWeb extends StatelessWidget {
@@ -134,7 +134,7 @@ class _Content extends StatelessWidget {
             itemCount: state.clients.length,
             itemBuilder: (context, index) {
               final currentClient = state.clients[index];
-              final balanceFormatted = NumberFormatter.convertToMoneyLike(currentClient.balance);
+              final balanceFormatted = ClientBalanceDisplayHelper.formatBalance(currentClient.balance);
               final tileColor = RowColorTool.getRowColor(index);
               return CustomClientListTile(
                 client: currentClient,

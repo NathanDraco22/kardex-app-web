@@ -7,6 +7,7 @@ import 'package:kardex_app_front/src/tools/tools.dart';
 
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/src/core/access_manager.dart';
 import 'package:kardex_app_front/src/core/shift_guard.dart';
 import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 

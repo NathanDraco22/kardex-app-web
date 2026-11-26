@@ -842,7 +842,9 @@ class _CreateCreditNoteDialogState extends State<_CreateCreditNoteDialog> {
                                           const SizedBox(height: 2),
                                           Text(
                                             _selectedClient != null
-                                                ? "Saldo actual de deuda: ${NumberFormatter.convertToMoneyLike(_selectedClient!.balance)}"
+                                                ? (ClientBalanceDisplayHelper.canShowDetails()
+                                                    ? "Saldo actual de deuda: ${NumberFormatter.convertToMoneyLike(_selectedClient!.balance)}"
+                                                    : ClientBalanceDisplayHelper.formatBalance(_selectedClient!.balance, showDetails: false))
                                                 : "Toca para abrir el catálogo de clientes",
                                             style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                                           ),

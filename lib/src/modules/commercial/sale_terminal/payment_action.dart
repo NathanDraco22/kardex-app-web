@@ -1,9 +1,11 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/src/core/access_manager.dart';
 import 'package:kardex_app_front/src/core/shift_guard.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/cubit/write_terminal_invoice_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/terminal_payment_confirmation_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
+import 'package:kardex_business/kardex_business.dart';
 
 Future<void> startTerminalPayment(BuildContext context) async {
   final viewController = context.read<WriteTerminalInvoiceCubit>().viewController;
@@ -39,12 +41,18 @@ Future<void> startTerminalPayment(BuildContext context) async {
   }
   if (!context.mounted) return;
 
-  final hasCredit = viewController.selectedClient?.isCreditActive ?? false;
+  final canCredit = AccessManager().hasCurrentCapability(
+    RoleCapability.allowCreditInvoicing,
+  );
+  final hasCredit = (viewController.selectedClient?.isCreditActive ?? false) && canCredit;
+  final initialMethod = (!hasCredit && viewController.selectedPaymentType == PaymentType.credit)
+      ? PaymentType.cash
+      : viewController.selectedPaymentType;
   final paymentResult = await showTerminalPaymentConfirmationDialog(
     context,
     createInvoice.total,
     showCredit: hasCredit,
-    initialMethod: viewController.selectedPaymentType,
+    initialMethod: initialMethod,
     initialObservations: viewController.description,
   );
   if (paymentResult == null) {

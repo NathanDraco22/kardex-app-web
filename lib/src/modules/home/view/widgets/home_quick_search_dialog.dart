@@ -24,7 +24,8 @@ bool canShowClientQuickSearch(BuildContext context) {
   final isCommerce = getIt<AuthCubit>().currentBranch?.isCommerce ?? true;
   if (!isCommerce) return false;
 
-  final canCreateInvoice = _hasAccess(context, CommercialSubModules.createInvoice);
+  final canCreateInvoice = _hasAccess(context, CommercialSubModules.createInvoice) &&
+      AccessManager().hasCurrentCapability(RoleCapability.allowInvoicing);
   final canSeePendingInvoices =
       _hasAccess(context, Modules.pendingInvoices) || _hasAccess(context, CommercialSubModules.pendingInvoices);
   final canCreateOrder = _hasAccess(context, CommercialSubModules.createOrder);
@@ -77,7 +78,8 @@ Future<void> showHomeQuickSearchDialog(BuildContext context) async {
   final action = await showClientQuickActionsDialog(
     context,
     client: client,
-    showInvoiceAction: _hasAccess(context, CommercialSubModules.createInvoice),
+    showInvoiceAction: _hasAccess(context, CommercialSubModules.createInvoice) &&
+        AccessManager().hasCurrentCapability(RoleCapability.allowInvoicing),
     showQuoteAction: canCreateOrder && settingsAvailable && settings.useQuotations,
     showOrderAction: canCreateOrder && settingsAvailable && settings.useOrders,
     showPendingInvoicesAction:

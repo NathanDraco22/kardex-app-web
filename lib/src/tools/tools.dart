@@ -5,6 +5,7 @@ export 'package:kardex_business/src/tools/number_formatter.dart';
 export 'package:kardex_business/src/tools/unit_conversion_tool.dart';
 export 'cache/app_image_cache_manager.dart';
 export 'cache/image_bytes_resolver.dart';
+export 'client_balance_display_helper.dart';
 export 'extensiones.dart';
 export 'input_formatters.dart';
 export 'loading_dialog.dart';

@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kardex_app_front/src/tools/client_balance_display_helper.dart';
 import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 import 'package:kardex_app_front/widgets/client_list_tile.dart';
 import 'package:kardex_business/kardex_business.dart';
@@ -237,7 +238,7 @@ class _PendingClientsDialogState extends State<PendingClientsDialog> {
                       itemBuilder: (context, index) {
                         final client = filteredClients[index];
                         final balanceFormatted =
-                            NumberFormatter.convertToMoneyLike(client.balance);
+                            ClientBalanceDisplayHelper.formatBalance(client.balance);
                         final tileColor = RowColorTool.getRowColor(index);
 
                         return CustomClientListTile(
