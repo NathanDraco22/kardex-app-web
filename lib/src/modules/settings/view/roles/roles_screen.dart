@@ -27,6 +27,7 @@ class _RolesView extends StatelessWidget {
     await context.read<RolesCubit>().createRole(
           name: result.name,
           access: result.access,
+          capabilities: result.capabilities,
         );
   }
 
@@ -45,6 +46,7 @@ class _RolesView extends StatelessWidget {
           roleId: role.id,
           name: result.name,
           access: result.access,
+          capabilities: result.capabilities,
         );
   }
 

@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/cubits/shift/shift_cubit.dart';
+import 'package:kardex_app_front/src/core/access_manager.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 
@@ -24,7 +25,10 @@ class ClientInvoiceViewController extends ChangeNotifier {
   VoidCallback? onPricesChanged;
 
   set selectedClient(ClientInDb? value) {
-    final hasCredit = value?.isCreditActive ?? false;
+    final canCredit = AccessManager().hasCurrentCapability(
+      RoleCapability.allowCreditInvoicing,
+    );
+    final hasCredit = (value?.isCreditActive ?? false) && canCredit;
     final initValue = hasCredit ? PaymentType.credit : PaymentType.cash;
     selectedPaymentType = initValue;
     _selectedClient = value;

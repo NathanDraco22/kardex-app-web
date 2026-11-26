@@ -4,10 +4,12 @@ import 'package:kardex_business/kardex_business.dart';
 class RoleEditorResult {
   final String name;
   final List<String> access;
+  final RoleCapabilities capabilities;
 
   const RoleEditorResult({
     required this.name,
     required this.access,
+    this.capabilities = const RoleCapabilities(),
   });
 }
 
@@ -43,6 +45,7 @@ class _RoleEditorDialogState extends State<_RoleEditorDialog> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _nameController;
   late Set<String> _selectedAccess;
+  late RoleCapabilities _capabilities;
 
   bool get _isEditing => widget.existingRole != null;
   bool get _isAdminRole => widget.existingRole?.id == 'Admin';
@@ -56,6 +59,8 @@ class _RoleEditorDialogState extends State<_RoleEditorDialog> {
       text: widget.existingRole?.name ?? '',
     );
     _selectedAccess = Set<String>.from(widget.existingRole?.access ?? []);
+    _capabilities =
+        widget.existingRole?.capabilities ?? const RoleCapabilities();
   }
 
   @override
@@ -119,6 +124,9 @@ class _RoleEditorDialogState extends State<_RoleEditorDialog> {
       RoleEditorResult(
         name: _nameController.text.trim(),
         access: _selectedAccess.toList(),
+        capabilities: (_hasAllAccess || _isAdminRole)
+            ? const RoleCapabilities()
+            : _capabilities,
       ),
     );
   }
@@ -278,9 +286,20 @@ class _RoleEditorDialogState extends State<_RoleEditorDialog> {
               const SizedBox(height: 8),
               Expanded(
                 child: ListView.separated(
-                  itemCount: widget.catalog.modules.length,
+                  itemCount: widget.catalog.modules.length + 1,
                   separatorBuilder: (_, _) => const SizedBox(height: 8),
                   itemBuilder: (context, index) {
+                    if (index == widget.catalog.modules.length) {
+                      return _CapabilitiesSectionCard(
+                        capabilities: (_hasAllAccess || _isAdminRole)
+                            ? const RoleCapabilities()
+                            : _capabilities,
+                        isLockedByAll: _hasAllAccess || _isAdminRole,
+                        onChanged: (updated) {
+                          setState(() => _capabilities = updated);
+                        },
+                      );
+                    }
                     final module = widget.catalog.modules[index];
                     final isModuleActive =
                         _hasAllAccess || _selectedAccess.contains(module.key);
@@ -415,6 +434,96 @@ class _ModuleSwitchCard extends StatelessWidget {
               ),
             ),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+class _CapabilitiesSectionCard extends StatelessWidget {
+  const _CapabilitiesSectionCard({
+    required this.capabilities,
+    required this.isLockedByAll,
+    required this.onChanged,
+  });
+
+  final RoleCapabilities capabilities;
+  final bool isLockedByAll;
+  final ValueChanged<RoleCapabilities> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+            child: Text(
+              'Permisos Operativos',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: Colors.grey.shade700,
+              ),
+            ),
+          ),
+          SwitchListTile(
+            dense: true,
+            value: capabilities.allowInvoicing,
+            onChanged: isLockedByAll
+                ? null
+                : (val) => onChanged(capabilities.copyWith(allowInvoicing: val)),
+            title: const Text(
+              'Permitir facturar',
+              style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600),
+            ),
+            subtitle: Text(
+              'Habilita Terminal de Venta, Facturación y conversión de órdenes/cotizaciones a factura.',
+              style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600),
+            ),
+          ),
+          const Divider(height: 1),
+          SwitchListTile(
+            dense: true,
+            value: capabilities.allowCreditInvoicing,
+            onChanged: isLockedByAll
+                ? null
+                : (val) => onChanged(
+                      capabilities.copyWith(allowCreditInvoicing: val),
+                    ),
+            title: const Text(
+              'Permitir facturar a crédito',
+              style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600),
+            ),
+            subtitle: Text(
+              'Permite seleccionar Crédito como forma de pago al facturar.',
+              style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600),
+            ),
+          ),
+          const Divider(height: 1),
+          SwitchListTile(
+            dense: true,
+            value: capabilities.showClientCreditDetails,
+            onChanged: isLockedByAll
+                ? null
+                : (val) => onChanged(
+                      capabilities.copyWith(showClientCreditDetails: val),
+                    ),
+            title: const Text(
+              'Ver montos de crédito de clientes',
+              style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600),
+            ),
+            subtitle: Text(
+              'Si se desactiva, solo se indicará "Con saldo pendiente" sin mostrar montos.',
+              style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600),
+            ),
+          ),
         ],
       ),
     );

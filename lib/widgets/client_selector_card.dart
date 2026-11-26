@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/src/tools/client_balance_display_helper.dart';
 import 'package:kardex_app_front/widgets/buttons/secondary_menu_button.dart';
 import 'package:kardex_app_front/widgets/dialogs/client_full_details_dialog.dart';
 import 'package:kardex_app_front/widgets/dialogs/selectors/client_selection_dialog.dart';
@@ -103,12 +104,14 @@ class _ClientSelectorCardState extends State<ClientSelectorCard> {
                 mainAxisAlignment: .spaceBetween,
                 children: [
                   Text(
-                    "Saldo: ${NumberFormatter.convertToMoneyLike(
-                      _selectedClient?.balance ?? 0,
-                    )}",
+                    ClientBalanceDisplayHelper.canShowDetails()
+                        ? "Saldo: ${NumberFormatter.convertToMoneyLike(_selectedClient?.balance ?? 0)}"
+                        : "Estado: ${ClientBalanceDisplayHelper.formatBalance(_selectedClient?.balance ?? 0, showDetails: false)}",
                     style: TextStyle(
                       fontWeight: .w500,
-                      color: Colors.red.shade700,
+                      color: (_selectedClient?.balance ?? 0) > 0
+                          ? Colors.red.shade700
+                          : Colors.green.shade700,
                       fontSize: 18,
                     ),
                   ),

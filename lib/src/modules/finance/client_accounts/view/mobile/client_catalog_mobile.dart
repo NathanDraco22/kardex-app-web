@@ -119,7 +119,7 @@ class MobileClientsTable extends StatelessWidget {
                       }
                     }
 
-                    final balanceFormatted = NumberFormatter.convertToMoneyLike(currentClient.balance);
+                    final balanceFormatted = ClientBalanceDisplayHelper.formatBalance(currentClient.balance);
                     return CustomClientListTile(
                       client: currentClient,
                       backgroundColor: rowColor,

@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/src/tools/client_balance_display_helper.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -99,11 +100,13 @@ class ClientDetailsDialog extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
-              _DetailItem(
-                title: "Límite de Crédito",
-                value: NumberFormatter.convertToMoneyLike(client.creditLimit),
-              ),
+              if (ClientBalanceDisplayHelper.canShowDetails()) ...[
+                const SizedBox(height: 12),
+                _DetailItem(
+                  title: "Límite de Crédito",
+                  value: NumberFormatter.convertToMoneyLike(client.creditLimit),
+                ),
+              ],
             ],
           ),
         ),
@@ -292,7 +295,7 @@ class _BalanceCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  NumberFormatter.convertToMoneyLike(balance.toInt()),
+                  ClientBalanceDisplayHelper.formatBalance(balance.toInt()),
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,

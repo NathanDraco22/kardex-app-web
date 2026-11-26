@@ -11,6 +11,8 @@ import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
 import 'package:kardex_app_front/widgets/row_widgets/sale_item_row.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/src/core/access_manager.dart';
+import 'package:kardex_app_front/widgets/gates/gates.dart';
 import 'package:kardex_app_front/src/tools/printers/order_printer.dart';
 import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 import 'package:kardex_app_front/src/tools/exports/pdf/templates/single_order_template.dart';
@@ -217,18 +219,34 @@ class _RootScaffold extends StatelessWidget {
                     icon: const Icon(Icons.cancel),
                     label: const Text("Cancelar Orden"),
                   ),
-                  const SizedBox(width: 32),
-                  ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green.shade300,
+                  Gate(
+                    filters: [
+                      const RoleCapabilityGateFilter(
+                        capability: RoleCapability.allowInvoicing,
+                      ),
+                      if (orderContainer.order.paymentType == PaymentType.credit)
+                        const RoleCapabilityGateFilter(
+                          capability: RoleCapability.allowCreditInvoicing,
+                        ),
+                    ],
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const SizedBox(width: 32),
+                        ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green.shade300,
+                          ),
+                          onPressed: () async {
+                            final res = await showConfirmOrderInvoiceModal(context, orderContainer.order);
+                            if (res != true) return;
+                            writeCubit.convertOrderToInvoice(orderContainer.order.id);
+                          },
+                          icon: const Icon(Icons.check),
+                          label: const Text("Facturar Orden"),
+                        ),
+                      ],
                     ),
-                    onPressed: () async {
-                      final res = await showConfirmOrderInvoiceModal(context, orderContainer.order);
-                      if (res != true) return;
-                      writeCubit.convertOrderToInvoice(orderContainer.order.id);
-                    },
-                    icon: const Icon(Icons.check),
-                    label: const Text("Facturar Orden"),
                   ),
                 ],
               );

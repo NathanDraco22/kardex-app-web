@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/constants/route_names.dart';
+import 'package:kardex_app_front/src/core/access_manager.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_app_front/widgets/menu_app_bar.dart';
 import 'package:kardex_app_front/widgets/dialogs/search_products/commercial/search_product_commercial_delegate.dart';
@@ -52,6 +53,9 @@ class _Body extends StatelessWidget {
               RolePermissionGateFilter(
                 permissions: [CommercialSubModules.createInvoice],
               ),
+              RoleCapabilityGateFilter(
+                capability: RoleCapability.allowInvoicing,
+              ),
             ],
             child: ShortcutAddableListTile(
               routeName: RouteNames.saleTerminal,
@@ -68,6 +72,9 @@ class _Body extends StatelessWidget {
             filters: const [
               RolePermissionGateFilter(
                 permissions: [CommercialSubModules.createInvoice],
+              ),
+              RoleCapabilityGateFilter(
+                capability: RoleCapability.allowInvoicing,
               ),
             ],
             child: ShortcutAddableListTile(
@@ -133,6 +140,9 @@ class _Body extends StatelessWidget {
               RolePermissionGateFilter(
                 permissions: [CommercialSubModules.createInvoice],
               ),
+              RoleCapabilityGateFilter(
+                capability: RoleCapability.allowInvoicing,
+              ),
             ],
             child: ShortcutAddableListTile(
               routeName: RouteNames.clientInvoice,
@@ -149,6 +159,9 @@ class _Body extends StatelessWidget {
             filters: const [
               RolePermissionGateFilter(
                 permissions: [CommercialSubModules.createInvoice],
+              ),
+              RoleCapabilityGateFilter(
+                capability: RoleCapability.allowInvoicing,
               ),
             ],
             child: ShortcutAddableListTile(

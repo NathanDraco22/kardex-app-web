@@ -2,6 +2,8 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/src/core/access_manager.dart';
+import 'package:kardex_app_front/widgets/gates/gates.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/commercial/current_orders/cubit/write_order_cubit.dart';
@@ -234,18 +236,34 @@ class _RootScaffold extends StatelessWidget {
                     icon: const Icon(Icons.cancel),
                     label: const Text("Cancelar"),
                   ),
-                  const SizedBox(width: 32),
-                  ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green.shade300,
+                  Gate(
+                    filters: [
+                      const RoleCapabilityGateFilter(
+                        capability: RoleCapability.allowInvoicing,
+                      ),
+                      if (orderContainer.order.paymentType == PaymentType.credit)
+                        const RoleCapabilityGateFilter(
+                          capability: RoleCapability.allowCreditInvoicing,
+                        ),
+                    ],
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const SizedBox(width: 32),
+                        ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green.shade300,
+                          ),
+                          onPressed: () async {
+                            final res = await showConfirmOrderInvoiceModal(context, orderContainer.order);
+                            if (res != true) return;
+                            writeCubit.convertOrderToInvoice(orderContainer.order.id);
+                          },
+                          icon: const Icon(Icons.check),
+                          label: const Text("Facturar"),
+                        ),
+                      ],
                     ),
-                    onPressed: () async {
-                      final res = await showConfirmOrderInvoiceModal(context, orderContainer.order);
-                      if (res != true) return;
-                      writeCubit.convertOrderToInvoice(orderContainer.order.id);
-                    },
-                    icon: const Icon(Icons.check),
-                    label: const Text("Facturar"),
                   ),
                 ],
               );
@@ -429,8 +447,17 @@ class _BodyState extends State<_Body> {
                                       ),
                                       ButtonSegment<PaymentType>(
                                         value: PaymentType.credit,
-                                        enabled: !isSaleClient,
-                                        tooltip: isSaleClient ? "Cliente Ocasional no puede tener crédito" : null,
+                                        enabled: !isSaleClient &&
+                                            AccessManager().hasCurrentCapability(
+                                              RoleCapability.allowCreditInvoicing,
+                                            ),
+                                        tooltip: isSaleClient
+                                            ? "Cliente Ocasional no puede tener crédito"
+                                            : (!AccessManager().hasCurrentCapability(
+                                                    RoleCapability.allowCreditInvoicing,
+                                                  )
+                                                ? "Tu rol no tiene permitido facturar a crédito"
+                                                : null),
                                         label: const Text(
                                           "CRÉDITO",
                                           style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),

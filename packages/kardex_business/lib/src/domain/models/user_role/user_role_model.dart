@@ -1,16 +1,76 @@
+class RoleCapabilities {
+  final bool allowInvoicing;
+  final bool allowCreditInvoicing;
+  final bool showClientCreditDetails;
+
+  const RoleCapabilities({
+    this.allowInvoicing = true,
+    this.allowCreditInvoicing = true,
+    this.showClientCreditDetails = true,
+  });
+
+  factory RoleCapabilities.fromJson(Map<String, dynamic>? json) {
+    if (json == null) return const RoleCapabilities();
+    return RoleCapabilities(
+      allowInvoicing: json['allowInvoicing'] as bool? ?? true,
+      allowCreditInvoicing: json['allowCreditInvoicing'] as bool? ?? true,
+      showClientCreditDetails: json['showClientCreditDetails'] as bool? ?? true,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'allowInvoicing': allowInvoicing,
+      'allowCreditInvoicing': allowCreditInvoicing,
+      'showClientCreditDetails': showClientCreditDetails,
+    };
+  }
+
+  RoleCapabilities copyWith({
+    bool? allowInvoicing,
+    bool? allowCreditInvoicing,
+    bool? showClientCreditDetails,
+  }) {
+    return RoleCapabilities(
+      allowInvoicing: allowInvoicing ?? this.allowInvoicing,
+      allowCreditInvoicing: allowCreditInvoicing ?? this.allowCreditInvoicing,
+      showClientCreditDetails:
+          showClientCreditDetails ?? this.showClientCreditDetails,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is RoleCapabilities &&
+        other.allowInvoicing == allowInvoicing &&
+        other.allowCreditInvoicing == allowCreditInvoicing &&
+        other.showClientCreditDetails == showClientCreditDetails;
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(allowInvoicing, allowCreditInvoicing, showClientCreditDetails);
+}
+
 class BaseUserRole {
   final String name;
   final List<String> access;
+  final RoleCapabilities capabilities;
 
   BaseUserRole({
     required this.name,
     required this.access,
+    this.capabilities = const RoleCapabilities(),
   });
 
   factory BaseUserRole.fromJson(Map<String, dynamic> json) {
     return BaseUserRole(
       name: json['name'] as String,
       access: List<String>.from(json['access'] as List),
+      capabilities: RoleCapabilities.fromJson(
+        json['capabilities'] as Map<String, dynamic>?,
+      ),
     );
   }
 
@@ -18,6 +78,7 @@ class BaseUserRole {
     return {
       'name': name,
       'access': access,
+      'capabilities': capabilities.toJson(),
     };
   }
 }
@@ -26,12 +87,16 @@ class CreateUserRole extends BaseUserRole {
   CreateUserRole({
     required super.name,
     required super.access,
+    super.capabilities,
   });
 
   factory CreateUserRole.fromJson(Map<String, dynamic> json) {
     return CreateUserRole(
       name: json['name'] as String,
       access: List<String>.from(json['access'] as List),
+      capabilities: RoleCapabilities.fromJson(
+        json['capabilities'] as Map<String, dynamic>?,
+      ),
     );
   }
 }
@@ -39,13 +104,15 @@ class CreateUserRole extends BaseUserRole {
 class UpdateUserRole {
   final String? name;
   final List<String>? access;
+  final RoleCapabilities? capabilities;
 
-  UpdateUserRole({this.name, this.access});
+  UpdateUserRole({this.name, this.access, this.capabilities});
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = {
       'name': name,
       'access': access,
+      'capabilities': capabilities?.toJson(),
     };
     data.removeWhere((key, value) => value == null);
     return data;
@@ -62,6 +129,7 @@ class UserRoleInDb extends BaseUserRole {
     required this.id,
     required super.name,
     required super.access,
+    super.capabilities,
     required this.createdAt,
     this.updatedAt,
     this.isDefault = false,
@@ -72,6 +140,9 @@ class UserRoleInDb extends BaseUserRole {
       id: json['id'] as String,
       name: json['name'] as String,
       access: List<String>.from(json['access'] as List),
+      capabilities: RoleCapabilities.fromJson(
+        json['capabilities'] as Map<String, dynamic>?,
+      ),
       createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
       updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt'] as int) : null,
       isDefault: json['isDefault'] as bool? ?? false,

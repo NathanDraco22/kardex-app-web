@@ -5,6 +5,7 @@ import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
+import 'package:kardex_app_front/src/core/access_manager.dart';
 import 'package:kardex_app_front/src/core/shift_guard.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_invoices/view_controller.dart';
 import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
@@ -151,10 +152,18 @@ class _BodyState extends State<_Body> {
                               listenable: viewController,
                               builder: (context, _) {
                                 final selectedClient = viewController.selectedClient;
+                                final canCredit = (selectedClient?.isCreditActive ?? false) &&
+                                    AccessManager().hasCurrentCapability(
+                                      RoleCapability.allowCreditInvoicing,
+                                    );
+                                final currentValue = (!canCredit &&
+                                        viewController.selectedPaymentType == PaymentType.credit)
+                                    ? PaymentType.cash
+                                    : viewController.selectedPaymentType;
 
                                 final dropdown = DropdownButtonFormField(
                                   key: ValueKey(selectedClient ?? 'select_payment_type'),
-                                  initialValue: viewController.selectedPaymentType,
+                                  initialValue: currentValue,
                                   style: const TextStyle(
                                     color: Colors.black,
                                     fontWeight: FontWeight.bold,
@@ -165,7 +174,7 @@ class _BodyState extends State<_Body> {
                                       value: PaymentType.cash,
                                       child: Text("Contado"),
                                     ),
-                                    if (selectedClient?.isCreditActive ?? false)
+                                    if (canCredit)
                                       const DropdownMenuItem(
                                         value: PaymentType.credit,
                                         child: Text("Credito"),

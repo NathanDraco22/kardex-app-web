@@ -5,6 +5,7 @@ import 'package:kardex_app_front/src/modules/finance/client_movements/view/clien
 import 'package:kardex_app_front/widgets/widgets.dart';
 
 import '../../cubit/client_read_cubit.dart';
+import 'package:kardex_app_front/src/tools/client_balance_display_helper.dart';
 import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
 class ClientsTable extends StatelessWidget {
@@ -126,7 +127,7 @@ class _RowWidget extends StatelessWidget {
   final Color color;
   @override
   Widget build(BuildContext context) {
-    final balanceFormatted = NumberFormatter.convertToMoneyLike(client.balance);
+    final balanceFormatted = ClientBalanceDisplayHelper.formatBalance(client.balance);
 
     return CustomClientListTile(
       client: client,

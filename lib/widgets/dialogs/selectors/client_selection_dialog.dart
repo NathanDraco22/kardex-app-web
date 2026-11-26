@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/src/tools/client_balance_display_helper.dart';
 import 'package:kardex_app_front/widgets/super_widgets/search_debounce.dart';
 
 enum ClientFilterOptionType { all, noClient, client }
@@ -318,7 +319,7 @@ class _ClientResultTile extends StatelessWidget {
                     fit: BoxFit.scaleDown,
                     alignment: Alignment.centerRight,
                     child: Text(
-                      NumberFormatter.convertToMoneyLike(client.balance),
+                      ClientBalanceDisplayHelper.formatBalance(client.balance),
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,

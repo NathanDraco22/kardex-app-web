@@ -30,6 +30,7 @@ class RolesCubit extends Cubit<RolesState> {
   Future<bool> createRole({
     required String name,
     required List<String> access,
+    RoleCapabilities capabilities = const RoleCapabilities(),
   }) async {
     final current = state;
     if (current is! RolesLoaded) return false;
@@ -37,7 +38,11 @@ class RolesCubit extends Cubit<RolesState> {
     emit(current.copyWith(isSubmitting: true));
     try {
       final created = await userRolesRepository.createUserRole(
-        CreateUserRole(name: name.trim(), access: access),
+        CreateUserRole(
+          name: name.trim(),
+          access: access,
+          capabilities: capabilities,
+        ),
       );
       if (isClosed) return false;
 
@@ -60,6 +65,7 @@ class RolesCubit extends Cubit<RolesState> {
     required String roleId,
     required String name,
     required List<String> access,
+    RoleCapabilities capabilities = const RoleCapabilities(),
   }) async {
     final current = state;
     if (current is! RolesLoaded) return false;
@@ -68,7 +74,11 @@ class RolesCubit extends Cubit<RolesState> {
     try {
       final updated = await userRolesRepository.updateUserRoleById(
         roleId,
-        UpdateUserRole(name: name.trim(), access: access),
+        UpdateUserRole(
+          name: name.trim(),
+          access: access,
+          capabilities: capabilities,
+        ),
       );
       if (isClosed) return false;
 
