@@ -19,6 +19,7 @@ class InventoryProduct {
   final int defaultUnitIndex;
   final int wholesaleUnitIndex;
   final int priceUnitFactor;
+  final bool showBasicUnit;
 
   InventoryProduct({
     required this.id,
@@ -36,6 +37,7 @@ class InventoryProduct {
     this.defaultUnitIndex = 0,
     this.wholesaleUnitIndex = 0,
     this.priceUnitFactor = 1,
+    this.showBasicUnit = true,
   });
 
   String get defaultUnitName {
@@ -72,6 +74,7 @@ class InventoryProduct {
       defaultUnitIndex: json['defaultUnitIndex'] as int? ?? 0,
       wholesaleUnitIndex: json['wholesaleUnitIndex'] as int? ?? 0,
       priceUnitFactor: rawPriceFactor < 1 ? 1 : rawPriceFactor,
+      showBasicUnit: json['showBasicUnit'] as bool? ?? true,
     );
   }
 
@@ -92,6 +95,7 @@ class InventoryProduct {
       'defaultUnitIndex': defaultUnitIndex,
       'wholesaleUnitIndex': wholesaleUnitIndex,
       'priceUnitFactor': priceUnitFactor < 1 ? 1 : priceUnitFactor,
+      'showBasicUnit': showBasicUnit,
     };
   }
 }

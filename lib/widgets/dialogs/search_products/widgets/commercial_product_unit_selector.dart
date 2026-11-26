@@ -18,11 +18,13 @@ class CommercialProductUnitSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final product = result.product;
+    final showBaseUnit = product.showBasicUnit || product.extraUnits.isEmpty;
     final List<DropdownMenuItem<int>> items = [
-      DropdownMenuItem<int>(
-        value: 0,
-        child: Text(product.unitName),
-      ),
+      if (showBaseUnit)
+        DropdownMenuItem<int>(
+          value: 0,
+          child: Text(product.unitName),
+        ),
       ...List.generate(product.extraUnits.length, (index) {
         final extra = product.extraUnits[index];
         return DropdownMenuItem<int>(
@@ -31,6 +33,10 @@ class CommercialProductUnitSelector extends StatelessWidget {
         );
       }),
     ];
+
+    final effectiveValue = (!showBaseUnit && result.selectedUnitIndex == 0)
+        ? 1
+        : result.selectedUnitIndex;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -42,7 +48,7 @@ class CommercialProductUnitSelector extends StatelessWidget {
         const SizedBox(height: 6),
         DropdownButtonFormField<int>(
           focusNode: focusNode,
-          initialValue: result.selectedUnitIndex,
+          initialValue: effectiveValue,
           isExpanded: true,
           decoration: const InputDecoration(
             isDense: true,

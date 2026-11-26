@@ -34,6 +34,9 @@ class TerminalProductTile extends StatelessWidget {
         return product.extraUnits[idx].name;
       }
     }
+    if (!product.showBasicUnit && product.extraUnits.isNotEmpty && product.defaultUnitIndex == 0) {
+      return product.extraUnits.first.name;
+    }
     return product.defaultUnitName;
   }
 
@@ -43,6 +46,9 @@ class TerminalProductTile extends StatelessWidget {
       if (idx >= 0 && idx < product.extraUnits.length) {
         return product.extraUnits[idx].conversionFactor;
       }
+    }
+    if (!product.showBasicUnit && product.extraUnits.isNotEmpty && product.defaultUnitIndex == 0) {
+      return product.extraUnits.first.conversionFactor;
     }
     return product.defaultUnitFactor;
   }

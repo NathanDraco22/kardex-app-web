@@ -25,6 +25,9 @@ class CommercialProductResult {
     if (product.extraUnits.isEmpty || resolvedUnitIndex > product.extraUnits.length) {
       resolvedUnitIndex = 0;
     }
+    if (!product.showBasicUnit && product.extraUnits.isNotEmpty && resolvedUnitIndex == 0) {
+      resolvedUnitIndex = 1;
+    }
 
     selectedUnitIndex = resolvedUnitIndex;
     if (resolvedUnitIndex == 0) {

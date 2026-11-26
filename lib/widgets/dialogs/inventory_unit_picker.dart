@@ -42,8 +42,10 @@ Future<UnitPickerResult?> showInventoryUnitPicker(
     );
   }
 
+  final showBasic = product.showBasicUnit || !hasExtras;
+
   final unitOptions = <_UnitOption>[
-    _UnitOption(index: 0, name: product.unitName, factor: 1),
+    if (showBasic) _UnitOption(index: 0, name: product.unitName, factor: 1),
     for (var i = 0; i < product.extraUnits.length; i++)
       _UnitOption(
         index: i + 1,
@@ -51,6 +53,15 @@ Future<UnitPickerResult?> showInventoryUnitPicker(
         factor: product.extraUnits[i].conversionFactor,
       ),
   ];
+
+  if (unitOptions.length == 1) {
+    final onlyOption = unitOptions.first;
+    return UnitPickerResult(
+      unitIndex: onlyOption.index,
+      conversionFactor: onlyOption.factor,
+      unitName: onlyOption.name,
+    );
+  }
 
   return await showDialog<UnitPickerResult?>(
     context: context,
@@ -86,13 +97,9 @@ class _InventoryUnitPickerDialogState extends State<_InventoryUnitPickerDialog> 
   void initState() {
     super.initState();
     final defaultIndex = widget.product.defaultUnitIndex;
-    int initialFocusIndex = 0;
-    if (defaultIndex >= 0 && defaultIndex < widget.unitOptions.length) {
-      selectedOption = widget.unitOptions[defaultIndex];
-      initialFocusIndex = defaultIndex;
-    } else {
-      selectedOption = widget.unitOptions.first;
-    }
+    final matchedIdx = widget.unitOptions.indexWhere((opt) => opt.index == defaultIndex);
+    final int initialFocusIndex = matchedIdx >= 0 ? matchedIdx : 0;
+    selectedOption = widget.unitOptions[initialFocusIndex];
 
     _focusNodes = List.generate(
       widget.unitOptions.length,
