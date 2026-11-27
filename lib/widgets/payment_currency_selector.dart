@@ -8,35 +8,34 @@ class PaymentCurrencySettings {
   final AppCurrency primaryCurrency;
   final AppCurrency secondaryCurrency;
   final double exchangeRate;
-  final bool allowSecondaryCurrencyPayment;
+  final SecondaryCurrencyAvailability availability;
 
   const PaymentCurrencySettings({
     required this.primaryCurrency,
     required this.secondaryCurrency,
     required this.exchangeRate,
-    this.allowSecondaryCurrencyPayment = false,
+    this.availability = SecondaryCurrencyAvailability.disabled,
   });
 
-  bool get canUseDifferentSecondary =>
-      allowSecondaryCurrencyPayment && secondaryCurrency != primaryCurrency;
-  bool get hasValidExchangeRate => exchangeRate > 0;
+  bool get canUseDifferentSecondary => availability.isFeatureEnabled;
+  bool get hasValidExchangeRate => availability.isAvailable;
 
   static PaymentCurrencySettings fromContext(BuildContext context) {
     try {
-      final cubit = context.watch<AppSettingsCubit>();
+      final policy = context.watch<AppSettingsCubit>().policy;
       return PaymentCurrencySettings(
-        primaryCurrency: cubit.currency,
-        secondaryCurrency: cubit.secondaryCurrency,
-        exchangeRate: cubit.exchangeRate,
-        allowSecondaryCurrencyPayment: cubit.allowSecondaryCurrencyPayment,
+        primaryCurrency: policy.currency,
+        secondaryCurrency: policy.secondaryCurrency,
+        exchangeRate: policy.exchangeRate,
+        availability: policy.paymentAvailability,
       );
     } catch (_) {
-      final secondaryConfig = NumberFormatter.secondaryCurrencyConfig;
+      const policy = AppSettingsPolicy();
       return PaymentCurrencySettings(
-        primaryCurrency: NumberFormatter.currency,
-        secondaryCurrency: secondaryConfig?.currency ?? AppCurrency.usd,
-        exchangeRate: secondaryConfig?.exchangeRate ?? 0.0,
-        allowSecondaryCurrencyPayment: false,
+        primaryCurrency: policy.currency,
+        secondaryCurrency: policy.secondaryCurrency,
+        exchangeRate: policy.exchangeRate,
+        availability: policy.paymentAvailability,
       );
     }
   }

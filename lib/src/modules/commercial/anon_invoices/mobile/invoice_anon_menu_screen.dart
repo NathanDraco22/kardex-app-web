@@ -262,24 +262,28 @@ class _SendButton extends StatelessWidget {
           onPressed: () async {
             if (!await ShiftGuard.ensureShiftReady(context)) return;
             if (!context.mounted) return;
-            final totalCost = widget.saleItems.fold<int>(
+            final saleItems = widget.saleItems;
+            final totalCost = saleItems.fold<int>(
               0,
               (previousValue, element) => previousValue + element.lineCost,
             );
 
-            final itemsNet = widget.saleItems.fold<int>(
+            final itemsNet = saleItems.fold<int>(
               0,
               (previousValue, element) => previousValue + element.total,
             );
-            final itemsDisc = widget.saleItems.fold<int>(
+            final itemsDisc = saleItems.fold<int>(
               0,
               (previousValue, element) => previousValue + element.totalDiscount,
             );
-            final invDisc = DiscountType.calculateDiscountAmount(
+            var invDisc = DiscountType.calculateDiscountAmount(
               type: widget.discountType,
               discountValue: widget.discountValue,
               baseAmount: itemsNet,
             );
+            if (InvoiceRounding.isEnabled) {
+              invDisc = InvoiceRounding.roundDownToWholeUnit(invDisc);
+            }
             final total = (itemsNet - invDisc).clamp(0, itemsNet);
 
             final authState = getIt<AuthCubit>().state;
@@ -293,7 +297,7 @@ class _SendButton extends StatelessWidget {
               clientInfo: ClientInfo(name: "Sin Cliente", group: ""),
               description: viewController.description,
               docNumber: "",
-              saleItems: widget.saleItems,
+              saleItems: saleItems,
               status: InvoiceStatus.paid,
               paymentType: PaymentType.cash,
               bankReference: "",

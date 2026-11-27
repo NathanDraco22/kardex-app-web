@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kardex_app_front/src/modules/commercial/client_invoices/widgets/dialogs/payment_confirmation_dialog.dart';
 import 'package:kardex_app_front/widgets/payment_currency_selector.dart';
 import 'package:kardex_business/kardex_business.dart';
 
@@ -19,7 +20,7 @@ void main() {
         primaryCurrency: AppCurrency.nio,
         secondaryCurrency: AppCurrency.usd,
         exchangeRate: 36.0,
-        allowSecondaryCurrencyPayment: true,
+        availability: SecondaryCurrencyAvailability.available,
       );
       expect(settings.canUseDifferentSecondary, isTrue);
 
@@ -28,7 +29,10 @@ void main() {
         secondaryCurrency: AppCurrency.usd,
         exchangeRate: 36.0,
       );
-      expect(disabledSettings.allowSecondaryCurrencyPayment, isFalse);
+      expect(
+        disabledSettings.availability,
+        SecondaryCurrencyAvailability.disabled,
+      );
       expect(disabledSettings.canUseDifferentSecondary, isFalse);
 
       final detail = buildPaymentDetail(
@@ -60,6 +64,7 @@ void main() {
         primaryCurrency: AppCurrency.nio,
         secondaryCurrency: AppCurrency.usd,
         exchangeRate: 0.0,
+        availability: SecondaryCurrencyAvailability.missingExchangeRate,
       );
 
       final detail = buildPaymentDetail(
@@ -136,6 +141,29 @@ void main() {
       });
       expect(withDetailRec.paymentDetail, isNotNull);
       expect(withDetailRec.paymentDetail!.paidCurrency, AppCurrency.usd);
+    });
+
+    test('PaymentResult mapea PaymentType al método del recibo', () {
+      expect(
+        PaymentResult(method: PaymentType.cash, amountReceived: 100).receiptPaymentMethod,
+        PaymentMethod.cash,
+      );
+      expect(
+        PaymentResult(method: PaymentType.card, amountReceived: 100).receiptPaymentMethod,
+        PaymentMethod.card,
+      );
+      expect(
+        PaymentResult(method: PaymentType.transfer, amountReceived: 100).receiptPaymentMethod,
+        PaymentMethod.transfer,
+      );
+      expect(
+        PaymentResult(method: PaymentType.check, amountReceived: 100).receiptPaymentMethod,
+        PaymentMethod.check,
+      );
+      expect(
+        PaymentResult(method: PaymentType.other, amountReceived: 100).receiptPaymentMethod,
+        PaymentMethod.other,
+      );
     });
   });
 }

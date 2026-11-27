@@ -24,38 +24,63 @@ class ViewController extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool _isLinkedCreditNote(CreditNoteInDb creditNote, InvoiceInDb invoice) {
+    if (creditNote.invoiceId.isNotEmpty) {
+      return creditNote.invoiceId == invoice.id;
+    }
+    return creditNote.invoiceDocNumber.isNotEmpty && creditNote.invoiceDocNumber == invoice.docNumber;
+  }
+
+  void _addCreditNote(CreditNoteInDb creditNote) {
+    if (_selectedCreditNotes.any((existing) => existing.id == creditNote.id)) {
+      return;
+    }
+    _selectedCreditNotes.add(creditNote);
+  }
+
+  void _addDevolution(DevolutionInDb devolution) {
+    if (_selectedDevolutions.any((existing) => existing.id == devolution.id)) {
+      return;
+    }
+    _selectedDevolutions.add(devolution);
+  }
+
   void addToSelected(InvoiceInDb invoice) {
-    _selectedInvoices.add(invoice);
+    if (!_selectedInvoices.any((existing) => existing.id == invoice.id)) {
+      _selectedInvoices.add(invoice);
+    }
     final devolutionsMatched = devolutions.where(
-      (devolution) =>
-          devolution.originalInvoiceId == invoice.id &&
-          devolution.status == DevolutionStatus.confirmed,
+      (devolution) => devolution.originalInvoiceId == invoice.id && devolution.status == DevolutionStatus.confirmed,
     );
-    _selectedDevolutions.addAll(devolutionsMatched);
+    for (final devolution in devolutionsMatched) {
+      _addDevolution(devolution);
+    }
 
     final creditNotesMatched = creditNotes.where(
-      (cn) =>
-          cn.invoiceId == invoice.id ||
-          (cn.invoiceDocNumber.isNotEmpty && cn.invoiceDocNumber == invoice.docNumber),
+      (cn) => _isLinkedCreditNote(cn, invoice),
     );
-    _selectedCreditNotes.addAll(creditNotesMatched);
+    for (final creditNote in creditNotesMatched) {
+      _addCreditNote(creditNote);
+    }
 
-    // Also include unlinked amount-type credit notes for this client
+    // Also include amount-type credit notes, linked or unlinked.
     final amountNotes = creditNotes.where(
-      (cn) => cn.type == CreditNoteType.monto && !_selectedCreditNotes.contains(cn),
+      (cn) => cn.type == CreditNoteType.monto,
     );
-    _selectedCreditNotes.addAll(amountNotes);
+    for (final creditNote in amountNotes) {
+      _addCreditNote(creditNote);
+    }
 
     notifyListeners();
   }
 
   void removeFromSelected(InvoiceInDb invoice) {
-    _selectedInvoices.remove(invoice);
-    _selectedDevolutions.removeWhere((devolution) => devolution.originalInvoiceId == invoice.id);
+    _selectedInvoices.removeWhere((existing) => existing.id == invoice.id);
+    _selectedDevolutions.removeWhere(
+      (devolution) => devolution.originalInvoiceId == invoice.id,
+    );
     _selectedCreditNotes.removeWhere(
-      (cn) =>
-          cn.invoiceId == invoice.id ||
-          (cn.invoiceDocNumber.isNotEmpty && cn.invoiceDocNumber == invoice.docNumber),
+      (creditNote) => _isLinkedCreditNote(creditNote, invoice),
     );
     if (_selectedInvoices.isEmpty) {
       _selectedCreditNotes.clear();
@@ -70,7 +95,7 @@ class ViewController extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool isInSelected(InvoiceInDb invoice) => _selectedInvoices.contains(invoice);
+  bool isInSelected(InvoiceInDb invoice) => _selectedInvoices.any((existing) => existing.id == invoice.id);
 }
 
 class PendingInvoiceMediator extends InheritedNotifier<ViewController> {

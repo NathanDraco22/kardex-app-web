@@ -90,9 +90,60 @@ lib/src/modules/settings/
     - La línea usa el formato `Total(USD): US$27.31`.
   - `showInvoiceItemsSummary` (bool): Muestra el resumen de **Total ítems** y **Total cantidad** (incluyendo bonificaciones) en el visor, ticket térmico y PDF A4 de facturas (`false` por defecto).
   - `showInvoiceOrderCreator` (bool): Muestra el nombre de quien creó la orden o cotización de origen (`Tomado por: <nombre>`) en el visor, ticket térmico y PDF A4 de facturas (`false` por defecto).
-  - `chargeConvertedOrdersToShift` (bool): Cuando `useShifts` está activo, si el usuario tiene un turno abierto en la sucursal carga a su caja las órdenes y cotizaciones convertidas a facturas; si no tiene turno activo, factura sin asignar turno (`false` por defecto).
-  - `requireShiftForConvertedOrders` (bool): Cuando `useShifts` y `chargeConvertedOrdersToShift` están activos, exige turno abierto en la sucursal antes de convertir una orden o cotización a factura (`false` por defecto).
+  - `chargeConvertedOrdersToShift` (bool): Cuando `useShifts` está activo, si el usuario tiene un turno abierto en la sucursal de la orden o cotización, la factura se carga a su caja; si no tiene turno activo y `requireShiftForConvertedOrders` está desactivado, factura sin asignar turno (`false` por defecto).
+  - `requireShiftForConvertedOrders` (bool): Cuando `useShifts` y `chargeConvertedOrdersToShift` están activos, exige un turno abierto en la sucursal antes de convertir una orden o cotización a factura; si no hay turno, la conversión se bloquea (`false` por defecto).
+  - `allowCancellationsOutsideShift` (bool): Permite solicitar y aprobar la anulación de facturas y recibos aunque pertenezcan a un turno ya cerrado (`false` por defecto). Los arqueos de turnos cerrados conservan sus totales almacenados y no se recalculan; los reportes vivos de la fecha sí cambian y el reembolso de efectivo no se registra automáticamente, por lo que debe gestionarse fuera del sistema.
+  - `roundUpInvoiceTotals` (bool): Redondea el subtotal de cada línea hacia arriba y los descuentos hacia abajo para que subtotal y total queden en unidades enteras de la moneda (`false` por defecto). No agrega una línea de redondeo; el ajuste queda integrado en los importes. Solo aplica a facturas nuevas (directas, anónimas y conversiones); no modifica órdenes, cotizaciones ni facturas existentes.
   - `companyLogoUrl` (`String?`): URL pública de la imagen corporativa global de la empresa. Es un parámetro **solo estético**; no se usa en facturas, tickets, reportes ni cálculos.
+
+#### Reglas de negocio: conversión de órdenes/cotizaciones a factura con turnos
+
+Aplica al endpoint `POST /api/v1/orders/make-invoice/{order_id}`, usado tanto para **órdenes** como para **cotizaciones**. Las banderas se evalúan en cascada:
+
+| `useShifts` | `chargeConvertedOrdersToShift` | `requireShiftForConvertedOrders` | Resultado |
+| :---: | :---: | :---: | :--- |
+| `false` | cualquiera | cualquiera | La conversión no interactúa con turnos; la factura se guarda con `shiftId = null`. |
+| `true` | `false` | cualquiera | La conversión **no se carga al turno**, aunque el cajero tenga uno abierto. El frontend no envía `shiftId` y el backend lo descarta. |
+| `true` | `true` | `false` | Si el cajero tiene un turno abierto en la sucursal de la orden/cotización, la factura se carga a ese turno. Si no tiene turno, se factura con `shiftId = null`. |
+| `true` | `true` | `true` | Se exige un turno abierto en la sucursal. Si no existe, `ShiftGuard.ensureShiftReady` ofrece abrirlo y cancela la conversión si el usuario no lo abre; el backend rechaza la petición con HTTP 400 si llega sin `shiftId`. |
+
+- **Valores por defecto:** las tres banderas son `false`.
+- **Precedencia:** `requireShiftForConvertedOrders` solo tiene efecto cuando `useShifts` y `chargeConvertedOrdersToShift` están activos.
+- **Implementación:** `AppSettingsPolicy.convertedOrderShiftPolicy` en `current_orders` y `current_proforma`; `ShiftGuard.ensureShiftReady` y `ShiftCubit` aplican la decisión. El backend aplica la regla en `OrdersController.convert_order_to_invoice` y valida el turno en `InvoiceRegister`/`validate_shift_link`.
+- **Alcance:** esta excepción aplica solo a la conversión de órdenes y cotizaciones. La facturación directa desde terminal de venta mantiene su propia validación de turno.
+
+#### Regla de negocio: redondeo hacia arriba en facturas
+
+- **Bandera:** `roundUpInvoiceTotals` (`false` por defecto).
+- **Cálculo:** el subtotal de cada línea se redondea hacia arriba al siguiente entero de la moneda; los descuentos por línea y el descuento global se redondean hacia abajo. Así `subtotal − descuentos = total` y todos los importes quedan enteros.
+- **Sin línea adicional:** el ajuste queda integrado en los subtotales/descuentos; no se agrega un campo ni una línea “Redondeo”.
+- **Alcance:** solo facturas nuevas (facturación directa, anónima y conversión de órdenes/cotizaciones). Las órdenes, cotizaciones y facturas existentes no se recalculan.
+- **Implementación frontend:** `InvoiceRounding` se configura desde `AppSettingsPolicy.roundUpInvoiceTotals` y aplica la regla en `CommercialProductResult`, los controladores de facturación y `CreateInvoice.ensureCostAndTotal`. Las conversiones usan `projectedInvoiceTotal` para el diálogo de pago y el total mostrado.
+- **Backend:** `InvoiceRegister` lee `AppSettingsTool` y `normalize_invoice_discounts` aplica la misma regla al guardar la factura.
+
+#### Capa de decisiones: `AppSettingsPolicy`
+
+Las reglas anteriores no se evalúan en cada pantalla. Están centralizadas en una **Policy** pura:
+
+- **Ubicación:** `packages/kardex_business/lib/src/core/policies/app_settings/`.
+- **Acceso:** `getIt<AppSettingsCubit>().policy` o `context.watch<AppSettingsCubit>().policy`.
+- **Cubit delgado:** `AppSettingsCubit` solo expone `policy` y `currentSettings`; no mantiene getters por bandera. Así hay una sola forma de consultar cada decisión.
+- **Convención de retorno:**
+  - `bool` para una decisión binaria (`hasExchangeRate`, `showsExchangeRateStatus`).
+  - `enum` para varias salidas (`ConvertedOrderShiftPolicy`, `SecondaryCurrencyAvailability`).
+  - objeto opcional cuando puede no existir (`SecondaryCurrencyPaymentTerms?`, `SecondaryCurrencyDisplay?`, `SuggestedPrice?`).
+  - objeto respuesta cuando siempre hay un resultado compuesto (`InvoiceDisplayConfig`).
+- **Decisiones cubiertas:**
+  - `convertedOrderShiftPolicy`: traduce las tres banderas de turnos a `never`, `optional` o `required`.
+  - `paymentAvailability`: `disabled`, `sameCurrency`, `missingExchangeRate` o `available`.
+  - `invoiceDisplayAvailability`: mismas reglas para el total secundario.
+  - `secondaryCurrencyPaymentTerms`: solo existe si se puede cobrar en moneda secundaria.
+  - `invoiceSecondaryCurrencyDisplay`: solo existe si se puede mostrar el total secundario.
+  - `suggestedPriceFor(...)`: devuelve `SuggestedPrice?` con el precio base y el equivalente por unidad.
+  - `invoiceDisplayConfig`: objeto respuesta con las banderas de visualización.
+- **Transiciones:** `policy` es una vista calculada de `currentSettings`. Durante `Saving` conserva la configuración anterior; en `Loaded` adopta la nueva; en `Error` usa `lastSettings`; en `clear` vuelve a defaults. El formulario de settings mantiene su draft local y solo se sincroniza en `Loaded`.
+
+Ver [`../policy_object.md`](../policy_object.md) para el patrón completo.
 
 #### Identidad de la Empresa (`companyLogoUrl`):
 - La sección **“Identidad de la empresa”** es el primer bloque de `AppSettingsScreen`.
@@ -106,6 +157,7 @@ lib/src/modules/settings/
 
 #### Uso Operativo del Margen de Ganancia Sugerido:
 1. **Editor de Precios de Producto (`ProductPriceEditorScreen`):**
+   - El cálculo vive en `AppSettingsPolicy.suggestedPriceFor(...)`, que devuelve `SuggestedPrice?` o `null` si la función está apagada o el costo no es positivo.
    - Si `useDefaultProfitMargin` está encendido y el producto cuenta con costo registrado (`averageCost` o `lastCost`), se renderiza una tarjeta destacada con el porcentaje configurado y el precio sugerido calculado ($\text{Costo} \times [1 + \frac{\text{Margen}}{100}]$).
    - Al pulsar el botón **"Usar Precio Sugerido"**, `SuggestedPriceCard` aplica el valor al primer nivel mediante `PriceLevelSyncController.applySuggestedBasePrice`, actualizando el precio base y su equivalente por unidad extra.
 2. **Creación Rápida de Producto con Datos (`CreateProductWithDataDialog`):**

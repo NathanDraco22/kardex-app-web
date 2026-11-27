@@ -44,12 +44,18 @@ lib/src/modules/pending_accounts/
 - **Propósito:** Registrar ingresos de dinero asociados a una o varias facturas a crédito pendientes.
 - **Vistas:** `InvoicePaymentsMenuScreen`, `InvoicePaymentsDetailScreen`.
 - **Cubits:** `InvoicePaymentsCubit`.
-- **Flujo de Pago:**
+- **Flujo de Pago (Crear Recibo → Abonar / Liquidar):**
   1. Selección de factura o selección de cliente con saldo.
-  2. Definición del monto del abono y método de pago (Efectivo, Transferencia, Cheque).
-  3. Emisión automática de recibo de caja (`ReceiptInDb`).
-  4. Reducción proporcional del saldo de la factura y del balance global del cliente.
-  5. Impresión de comprobante de pago mediante `ReceiptPrinter`.
+  2. Definición del monto a abonar por factura.
+  3. Captura del pago con el mismo diálogo de facturación: Efectivo, Tarjeta o Transferencia; en efectivo permite moneda primaria o secundaria, monto recibido y cambio; en tarjeta/transferencia exige banco y referencia.
+  4. Emisión automática de recibo de caja (`ReceiptInDb`) con `paymentMethod`, `bankReference` y `paymentDetail`.
+  5. Reducción proporcional del saldo de la factura y del balance global del cliente.
+  6. Impresión de comprobante de pago mediante `ReceiptPrinter`; el recibo muestra `Recibido`, `Cambio` y `Total Cobrado`.
+
+- **Flujo de Abono Rápido:** el botón `Abono` de la cabecera captura el pago con `FastPaymentModal`; acepta efectivo en moneda primaria o secundaria con cambio, o tarjeta/transferencia con referencia. El recibo resultante usa el mismo `paymentDetail` y las mismas etiquetas.
+- **Un solo método por recibo:** el modelo actual guarda un `paymentMethod` y un `paymentDetail` por recibo; no se admite pago mixto (parte efectivo, parte tarjeta) en un mismo abono.
+- **Notas por monto:** las notas de crédito `CreditNoteType.monto` no vinculadas se distribuyen entre las facturas con saldo disponible; el mediador deduplica por `id`, el modal muestra el total y bloquea el abono si las notas superan la capacidad.
+- **Etiquetas:** los recibos usan `Recibido` y `Cambio`; las facturas conservan `Pagó con` y `Cambio`.
 
 ### 2.3. Transacciones por Sesión de Crédito (`pending_client_transactions`)
 - **Propósito:** Trazabilidad detallada de los cargos y abonos efectuados dentro de una sesión o período crediticio específico de un cliente.

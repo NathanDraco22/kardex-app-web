@@ -24,11 +24,16 @@ class AnonInvoiceViewController extends ChangeNotifier {
 
   int get itemsNetTotal => items.fold<int>(0, (sum, e) => sum + e.total);
 
-  int get invoiceDiscountAmount => DiscountType.calculateDiscountAmount(
-    type: invoiceDiscountType,
-    discountValue: invoiceDiscountValue,
-    baseAmount: itemsNetTotal,
-  );
+  int get invoiceDiscountAmount {
+    final raw = DiscountType.calculateDiscountAmount(
+      type: invoiceDiscountType,
+      discountValue: invoiceDiscountValue,
+      baseAmount: itemsNetTotal,
+    );
+    return InvoiceRounding.isEnabled
+        ? InvoiceRounding.roundDownToWholeUnit(raw)
+        : raw;
+  }
 
   int get totalDiscount => itemDiscounts + invoiceDiscountAmount;
 
@@ -59,6 +64,7 @@ class AnonInvoiceViewController extends ChangeNotifier {
     final existingItem = items.any((i) => i.product.id == item.product.id);
     if (existingItem) return;
 
+    item.roundUpLineTotals = true;
     items = [...items, item];
     notifyListeners();
   }
@@ -68,6 +74,7 @@ class AnonInvoiceViewController extends ChangeNotifier {
   void updateItem(CommercialProductResult oldItem, CommercialProductResult newItem) {
     final index = items.indexOf(oldItem);
     if (index != -1) {
+      newItem.roundUpLineTotals = true;
       items[index] = newItem;
       notifyListeners();
     }

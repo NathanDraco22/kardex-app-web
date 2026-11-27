@@ -23,7 +23,7 @@ class ShiftCubit extends Cubit<ShiftState> {
 
   bool get isFeatureEnabled =>
       getIt.isRegistered<AppSettingsCubit>() &&
-      getIt<AppSettingsCubit>().useShifts;
+      getIt<AppSettingsCubit>().policy.useShifts;
 
   ShiftInDb? get currentShift =>
       state is ShiftActive ? (state as ShiftActive).shift : null;
@@ -47,12 +47,12 @@ class ShiftCubit extends Cubit<ShiftState> {
   void _listenAppSettings() {
     if (!getIt.isRegistered<AppSettingsCubit>()) return;
     final settingsCubit = getIt<AppSettingsCubit>();
-    _lastUseShifts = settingsCubit.useShifts;
+    _lastUseShifts = settingsCubit.policy.useShifts;
     if (!_lastUseShifts) {
       emit(ShiftFeatureDisabled());
     }
     _settingsSub = settingsCubit.stream.listen((_) {
-      final enabled = settingsCubit.useShifts;
+      final enabled = settingsCubit.policy.useShifts;
       if (!enabled) {
         _lastUseShifts = false;
         emit(ShiftFeatureDisabled());

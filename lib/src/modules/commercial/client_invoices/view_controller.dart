@@ -7,9 +7,13 @@ import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/widgets/dialogs/models/commercial_product_result.dart';
 
 class ClientInvoiceViewController extends ChangeNotifier {
-  ClientInvoiceViewController({this.isWholesale = false});
+  ClientInvoiceViewController({
+    this.isWholesale = false,
+    this.applyInvoiceRounding = false,
+  });
 
   final bool isWholesale;
+  final bool applyInvoiceRounding;
 
   DateTime? _selectedDate;
 
@@ -72,22 +76,31 @@ class ClientInvoiceViewController extends ChangeNotifier {
     final existingItem = items.any((i) => i.product.id == item.product.id);
     if (existingItem) return;
 
+    item.roundUpLineTotals = applyInvoiceRounding;
     items = [...items, item];
     notifyListeners();
   }
 
   void addMultipleItems(List<CommercialProductResult> newItems) {
+    for (final item in newItems) {
+      item.roundUpLineTotals = applyInvoiceRounding;
+    }
     items = [...items, ...newItems];
     notifyListeners();
   }
 
   void refreshItems(List<CommercialProductResult> newItems) {
+    for (final item in newItems) {
+      item.roundUpLineTotals = applyInvoiceRounding;
+    }
     items = newItems;
     notifyListeners();
   }
 
   void updateItem(CommercialProductResult oldItem, CommercialProductResult newItem) {
     final index = items.indexOf(oldItem);
+    if (index == -1) return;
+    newItem.roundUpLineTotals = applyInvoiceRounding;
     items[index] = newItem;
     notifyListeners();
   }
@@ -118,11 +131,16 @@ class ClientInvoiceViewController extends ChangeNotifier {
 
   int get itemsNetTotal => items.fold<int>(0, (sum, e) => sum + e.total);
 
-  int get invoiceDiscountAmount => DiscountType.calculateDiscountAmount(
-    type: invoiceDiscountType,
-    discountValue: invoiceDiscountValue,
-    baseAmount: itemsNetTotal,
-  );
+  int get invoiceDiscountAmount {
+    final raw = DiscountType.calculateDiscountAmount(
+      type: invoiceDiscountType,
+      discountValue: invoiceDiscountValue,
+      baseAmount: itemsNetTotal,
+    );
+    final shouldRound =
+        applyInvoiceRounding && InvoiceRounding.isEnabled;
+    return shouldRound ? InvoiceRounding.roundDownToWholeUnit(raw) : raw;
+  }
 
   int get totalDiscount => itemDiscounts + invoiceDiscountAmount;
 
@@ -191,11 +209,16 @@ class ClientInvoiceViewController extends ChangeNotifier {
       itemsNet += item.total;
       itemsDisc += item.totalDiscount;
     }
-    final invDisc = DiscountType.calculateDiscountAmount(
+    var invDisc = DiscountType.calculateDiscountAmount(
       type: invoiceDiscountType,
       discountValue: invoiceDiscountValue,
       baseAmount: itemsNet,
     );
+    final shouldRound =
+        applyInvoiceRounding && InvoiceRounding.isEnabled;
+    if (shouldRound) {
+      invDisc = InvoiceRounding.roundDownToWholeUnit(invDisc);
+    }
     final total = (itemsNet - invDisc).clamp(0, itemsNet);
 
     final authState = getIt<AuthCubit>().state;

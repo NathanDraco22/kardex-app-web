@@ -25,7 +25,7 @@ class WriteAnonInvoiceCubit extends Cubit<WriteAnonInvoiceState> {
       }
 
       CreateInvoice currentInvoice = createInvoice;
-      currentInvoice.ensureCostAndTotal();
+      currentInvoice.ensureCostAndTotal(applyRounding: !isOrder);
 
       final invoice = await invoicesRepository.createInvoice(currentInvoice);
       emit(WriteAnonInvoiceSuccess(invoice));

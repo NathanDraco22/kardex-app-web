@@ -35,7 +35,7 @@ class WriteInvoiceCubit extends Cubit<WriteInvoiceState> {
     emit(WriteInvoiceInProgress());
     try {
       CreateInvoice currentInvoice = createInvoice;
-      currentInvoice.ensureCostAndTotal();
+      currentInvoice.ensureCostAndTotal(applyRounding: !isOrder);
       if (createInvoice.paymentType != PaymentType.credit) {
         final refreshedData = createInvoice.toJson();
         refreshedData['amountPaid'] = createInvoice.total;

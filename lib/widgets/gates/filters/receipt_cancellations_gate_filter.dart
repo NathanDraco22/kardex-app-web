@@ -22,7 +22,7 @@ class ReceiptCancellationsGateFilter extends GateFilter {
 
   @override
   bool isAllowed(BuildContext context) {
-    return _resolveAppSettingsCubit()?.useReceiptCancellations ?? false;
+    return _resolveAppSettingsCubit()?.policy.useReceiptCancellations ?? false;
   }
 
   @override

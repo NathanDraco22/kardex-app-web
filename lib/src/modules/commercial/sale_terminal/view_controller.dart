@@ -92,11 +92,16 @@ class SaleTerminalViewController extends ChangeNotifier {
 
   int get itemsNetTotal => items.fold(0, (previousValue, element) => previousValue + element.total);
 
-  int get invoiceDiscountAmount => DiscountType.calculateDiscountAmount(
-    type: invoiceDiscountType,
-    discountValue: invoiceDiscountValue,
-    baseAmount: itemsNetTotal,
-  );
+  int get invoiceDiscountAmount {
+    final raw = DiscountType.calculateDiscountAmount(
+      type: invoiceDiscountType,
+      discountValue: invoiceDiscountValue,
+      baseAmount: itemsNetTotal,
+    );
+    return InvoiceRounding.isEnabled
+        ? InvoiceRounding.roundDownToWholeUnit(raw)
+        : raw;
+  }
 
   int get totalDiscount => itemDiscounts + invoiceDiscountAmount;
 
@@ -123,6 +128,7 @@ class SaleTerminalViewController extends ChangeNotifier {
   }
 
   void addItem(CommercialProductResult item) {
+    item.roundUpLineTotals = true;
     final existingIndex = items.indexWhere((i) => i.product.id == item.product.id);
     if (existingIndex != -1) {
       items[existingIndex] = item;
@@ -133,9 +139,11 @@ class SaleTerminalViewController extends ChangeNotifier {
   }
 
   void quickAddItem(CommercialProductResult item) {
+    item.roundUpLineTotals = true;
     final existingIndex = items.indexWhere((i) => i.product.id == item.product.id);
     if (existingIndex != -1) {
       final existing = items[existingIndex];
+      existing.roundUpLineTotals = true;
       if (!existing.product.tracksInventory) {
         existing.quantity += 1.0;
         notifyListeners();
@@ -187,6 +195,7 @@ class SaleTerminalViewController extends ChangeNotifier {
   void updateItem(CommercialProductResult oldItem, CommercialProductResult newItem) {
     final index = items.indexOf(oldItem);
     if (index == -1) return;
+    newItem.roundUpLineTotals = true;
     items[index] = newItem;
     notifyListeners();
   }
@@ -269,7 +278,11 @@ class SaleTerminalViewController extends ChangeNotifier {
     selectedPaymentType = (!canCredit && draft.selectedPaymentType == PaymentType.credit)
         ? PaymentType.cash
         : draft.selectedPaymentType;
-    items = draft.items.map((i) => i.toCommercialProductResult()).toList();
+    items = draft.items.map((i) {
+      final item = i.toCommercialProductResult();
+      item.roundUpLineTotals = true;
+      return item;
+    }).toList();
     invoiceDiscountType = draft.discountType;
     invoiceDiscountValue = draft.discountValue;
     notifyListeners();
@@ -322,11 +335,14 @@ class SaleTerminalViewController extends ChangeNotifier {
       itemsNet += item.total;
       itemsDisc += item.totalDiscount;
     }
-    final invDisc = DiscountType.calculateDiscountAmount(
+    var invDisc = DiscountType.calculateDiscountAmount(
       type: invoiceDiscountType,
       discountValue: invoiceDiscountValue,
       baseAmount: itemsNet,
     );
+    if (InvoiceRounding.isEnabled) {
+      invDisc = InvoiceRounding.roundDownToWholeUnit(invDisc);
+    }
     final total = (itemsNet - invDisc).clamp(0, itemsNet);
 
     final authState = getIt<AuthCubit>().state;

@@ -260,17 +260,12 @@ class _RootScaffold extends StatelessWidget {
                           ),
                           onPressed: () async {
                             final order = orderContainer.order;
-                            final appSettings = getIt.isRegistered<AppSettingsCubit>()
-                                ? getIt<AppSettingsCubit>()
-                                : null;
-                            final shouldChargeToShift =
-                                appSettings != null &&
-                                appSettings.useShifts &&
-                                appSettings.chargeConvertedOrdersToShift;
-                            final requireShift =
-                                shouldChargeToShift && appSettings.requireShiftForConvertedOrders;
+                            final policy = getIt.isRegistered<AppSettingsCubit>()
+                                ? getIt<AppSettingsCubit>().policy
+                                : const AppSettingsPolicy();
+                            final shiftPolicy = policy.convertedOrderShiftPolicy;
 
-                            if (requireShift) {
+                            if (shiftPolicy.requiresOpenShift) {
                               if (!await ShiftGuard.ensureShiftReady(context)) return;
                               if (!context.mounted) return;
                             }
@@ -283,9 +278,13 @@ class _RootScaffold extends StatelessWidget {
                               final res = await showConfirmOrderInvoiceModal(context, order);
                               if (res != true || !context.mounted) return;
                             } else {
+                              final invoiceTotal = InvoiceRounding.projectedInvoiceTotal(
+                                fallbackTotal: order.total,
+                                items: order.saleItems,
+                              );
                               final paymentResult = await showTerminalPaymentConfirmationDialog(
                                 context,
-                                order.total,
+                                invoiceTotal,
                                 showCredit: false,
                                 initialMethod: order.paymentType,
                                 initialObservations: order.description,
@@ -297,7 +296,7 @@ class _RootScaffold extends StatelessWidget {
                             }
 
                             String? shiftId;
-                            if (shouldChargeToShift && getIt.isRegistered<ShiftCubit>()) {
+                            if (shiftPolicy.linkToShift && getIt.isRegistered<ShiftCubit>()) {
                               final shiftCubit = getIt<ShiftCubit>();
                               if (shiftCubit.hasOpenShift &&
                                   shiftCubit.currentShift?.branchId == order.branchId) {
@@ -373,7 +372,11 @@ class _BodyState extends State<_Body> {
 
     final order = _currentOrder!;
     final saleItems = order.saleItems;
-    final totalFormatted = NumberFormatter.convertToMoneyLike(order.total);
+    final invoiceTotal = InvoiceRounding.projectedInvoiceTotal(
+      fallbackTotal: order.total,
+      items: order.saleItems,
+    );
+    final totalFormatted = NumberFormatter.convertToMoneyLike(invoiceTotal);
 
     return BlocListener<WriteOrderCubit, WriteOrderState>(
       listener: (context, state) {

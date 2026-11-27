@@ -22,7 +22,7 @@ class OrdersGateFilter extends GateFilter {
 
   @override
   bool isAllowed(BuildContext context) {
-    return _resolveAppSettingsCubit()?.useOrders ?? false;
+    return _resolveAppSettingsCubit()?.policy.useOrders ?? false;
   }
 
   @override

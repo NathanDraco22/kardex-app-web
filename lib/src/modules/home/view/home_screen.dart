@@ -87,7 +87,7 @@ class _RootScaffold extends StatelessWidget {
         }
 
         final user = authState.session.user;
-        final appSettings = context.watch<AppSettingsCubit>();
+        final policy = context.watch<AppSettingsCubit>().policy;
         final businessName = authState.servin.name.trim().isNotEmpty ? authState.servin.name.trim() : "Neptuno App";
 
         final hasShortcuts = context.watch<ShortcutsCubit>().state.shortcuts.isNotEmpty;
@@ -121,7 +121,7 @@ class _RootScaffold extends StatelessWidget {
             endDrawer: HomeEndDrawer(user: user),
             appBar: AppBar(
               title: CompanyLogo(
-                imageUrl: appSettings.companyLogoUrl,
+                imageUrl: policy.companyLogoUrl,
                 height: 30,
                 width: 120,
                 fit: BoxFit.contain,
@@ -182,7 +182,7 @@ class _AvatarButtonState extends State<AvatarButton> {
     super.didChangeDependencies();
     final authState = getIt<AuthCubit>().state;
     final isAllowedByServin = authState is Authenticated && authState.servin.isUsingExpirationDate;
-    final isAllowedBySettings = getIt<AppSettingsCubit>().useExpirationDates;
+    final isAllowedBySettings = getIt<AppSettingsCubit>().policy.useExpirationDates;
 
     if (!isAllowedByServin || !isAllowedBySettings) {
       return;

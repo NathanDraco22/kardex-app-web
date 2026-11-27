@@ -34,7 +34,10 @@ class _ClientInvoiceScreenState extends State<ClientInvoiceScreen> {
   @override
   void initState() {
     super.initState();
-    viewController = ClientInvoiceViewController(isWholesale: widget.isWholesale);
+    viewController = ClientInvoiceViewController(
+      isWholesale: widget.isWholesale,
+      applyInvoiceRounding: !widget.isOrder,
+    );
     final initialClient = widget.initialClient;
     if (initialClient != null) {
       viewController.selectedClient = initialClient;

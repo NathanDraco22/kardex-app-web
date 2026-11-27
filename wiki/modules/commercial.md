@@ -63,6 +63,7 @@ lib/src/modules/commercial/
 - **Vistas:** `ProformaScreen`, `CurrentProformaScreen`.
 - **Flujo de Conversión:**
   - Una proforma puede buscarse desde `QuotationOrderSearchScreen` y cargarse directamente en la pantalla de facturación o terminal de ventas para convertirse en venta final.
+  - **Turnos:** la conversión de una orden o cotización a factura resuelve la decisión con `AppSettingsPolicy.convertedOrderShiftPolicy` (`never` / `optional` / `required`). Solo se carga al turno si `useShifts` y `chargeConvertedOrdersToShift` están activos; con `requireShiftForConvertedOrders` se exige un turno abierto en la sucursal y la conversión se cancela si no existe. Ver [`settings.md`](./settings.md) y [`policy_object.md`](../policy_object.md).
 
 ### 2.4. Devoluciones (`devolutions`, `client_devolution`, `devolution_history`)
 - **Propósito:** Registro de notas de crédito y reversión de inventario por productos devueltos por clientes.
@@ -94,6 +95,7 @@ lib/src/modules/commercial/
   - Incorpora `CreditNotesSummaryTile` (`lib/src/modules/commercial/pending_invoice/widget/credit_notes_summary_tile.dart`) que se renderiza justo antes de la lista de facturas pendientes.
   - Presenta un banner interactivo en tonos púrpura con el saldo total a favor del cliente, píldora con el conteo de notas (`AppStatusBadge`), y sección expandible con el desglose individual y botón para abrir el visor `showCreditNoteViewerDialog`.
   - La barra inferior (`_BottomPendingInvoice`) y el modal de abono rápido calculan el balance neto a pagar deduciendo de forma canónica las notas de crédito y devoluciones.
+  - **Cobro con método, moneda y cambio:** el abono rápido (`FastPaymentModal`) y el flujo `ReceiptCreatorScreen`/`PartialPaymentModal` comparten el diálogo de cobro; registran `paymentMethod`, `bankReference` y `paymentDetail` (moneda, monto recibido, tasa y cambio) en el `CreateReceipt`. Los recibos muestran “Recibido” y “Cambio”; las facturas conservan “Pagó con”.
 
 ## 3. Repositorios y Fuentes de Datos Involucrados
 

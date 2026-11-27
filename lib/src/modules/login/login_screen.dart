@@ -127,7 +127,7 @@ class _BodyState extends State<_Body> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.sizeOf(context);
-    final appSettings = context.watch<AppSettingsCubit>();
+    final policy = context.watch<AppSettingsCubit>().policy;
 
     return Container(
       height: screenSize.height,
@@ -157,7 +157,7 @@ class _BodyState extends State<_Body> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         _CompanyLoginAvatar(
-                          imageUrl: appSettings.companyLogoUrl,
+                          imageUrl: policy.companyLogoUrl,
                           businessName: _businessName,
                         ),
                         const SizedBox(height: 20),

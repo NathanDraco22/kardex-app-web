@@ -391,7 +391,7 @@ Future<Uint8List> generateTicketPdfFromReceipt(
                 mainAxisAlignment: pw.MainAxisAlignment.end,
                 children: [
                   pw.Text(
-                    'Pagó con: ${receipt.paymentDetail!.formatTenderedLabel(NumberFormatter.currency)}',
+                    'Recibido: ${receipt.paymentDetail!.formatTenderedLabel(NumberFormatter.currency)}',
                     style: pw.TextStyle(
                       fontSize: TicketSettings.contentFontSize(paperSize) - 1,
                     ),

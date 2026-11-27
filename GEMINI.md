@@ -1,3 +1,30 @@
+## Simplificación de `AppSettingsCubit`: solo `policy` (Noviembre 2026)
+
+- **Alcance:** eliminados todos los getters de decisión de `AppSettingsCubit` (`useShifts`, `useOrders`, `useQuotations`, `useExpirationDates`, `useDiscounts`, `useInvoiceCancellations`, `useReceiptCancellations`, `useQuickProductSearch`, `companyLogoUrl`, `hasCompanyLogo`, `currency`, `secondaryCurrency`, `exchangeRate`, etc.). El cubit queda con `policy`, `currentSettings`, `loadSettings`, `updateSettings`, `clear` y `close`.
+- **Motivo:** evitar dos formas de acceder a la misma decisión y una superficie pública que crecía con cada ajuste. La policy es la única fuente de lectura.
+- **Consumidores migrados:** 7 `GateFilter` (`shifts`, `orders`, `quotations`, `expirationDate`, `discounts`, `invoiceCancellations`, `receiptCancellations`), `ShiftCubit`, `ShiftGuard`, `home_quick_search_dialog`, `home_screen`, `login_screen`, `admin_panel_screen`, `multibranch_home_screen` y `client_invoices_screen_mobile`; todos usan `.policy.<decisión>`.
+- **Excepción:** `currentSettings` se conserva porque el formulario de ajustes y el quick search necesitan saber si la configuración ya se cargó (los defaults de `useOrders`/`useQuotations` son `true`).
+- **Verificación:** `flutter analyze` limpio; 48 pruebas dirigidas aprobadas (`gate_test`, `shift_cubit_test`, `invoice_cancellation_requests_test`, `invoice_discounts_test`, `app_settings_cubit_policy_test`, `app_settings_screen_test`, `payment_detail_test`).
+- **Documentación:** actualizados `wiki/policy_object.md`, `wiki/conventions.md` y `wiki/modules/settings.md` para fijar que el cubit no replica getters.
+- **Regla `main`/`lite`:** cambios solo en `main`; al sincronizar `lite`, buscar consumidores de getters eliminados y migrarlos a `.policy`.
+
+## Patrón `Policy Object` y `AppSettingsPolicy` (Noviembre 2026)
+
+- **Alcance:** Implementación del patrón `Policy Object` en `packages/kardex_business` y migración de las decisiones derivadas de `AppSettings` (`main`; sin sincronización a `lite` por instrucción explícita).
+- **Dominio (`packages/kardex_business`):** Nuevo `AppSettingModel.defaults`; nueva capa `lib/src/core/policies/app_settings/` con `AppSettingsPolicy`, `ConvertedOrderShiftPolicy`, `SecondaryCurrencyAvailability`, `SecondaryCurrencyPaymentTerms`, `SecondaryCurrencyDisplay` y `SuggestedPrice`; exportada desde `kardex_business.dart`. `BaseBranch.configureTaxIdLabelResolver` ahora acepta `null` y restaura `'RUC'`.
+- **Cubit:** `AppSettingsCubit.policy` deriva la policy de `currentSettings`; los getters existentes delegan en ella. Los resolvers de `NumberFormatter`, `InvoiceRounding`, `BaseInvoice` y `BaseBranch` leen `policy`; `close()` limpia todos (incluido `BaseBranch`). `currentSettings` contempla `AppSettingsError.lastSettings`.
+- **Puntos migrados:** conversión de órdenes/cotizaciones (`convertedOrderShiftPolicy`), selector de moneda secundaria (`paymentAvailability`), botón de tasa (`showsExchangeRateStatus`), tarjeta y diálogos de precio sugerido (`suggestedPriceFor`), y configuración de visualización de factura (`invoiceDisplayConfig`).
+- **Tests:** Nuevos `test/app_settings_policy_test.dart` (22 casos) y `test/app_settings_cubit_policy_test.dart` (6 casos: transiciones Initial/Loaded/Saving/Error/clear + integración de resolvers); `test/payment_detail_test.dart` actualizado a `SecondaryCurrencyAvailability`. `flutter analyze` limpio y tests nuevos aprobados. El suite completo conserva un fallo preexistente en `devolutions_selection_test.dart` (falta `CreditNotesRepository` en el árbol de prueba; no tocado en esta sesión).
+- **Documentación:** Nueva `wiki/policy_object.md`; actualizados `wiki/conventions.md`, `wiki/project_index.md`, `wiki/modules/settings.md`, `wiki/modules/commercial.md` y `wiki/INDEX.md`.
+- **Regla `main`/`lite`:** cambios solo en `main`; la sincronización con `lite` queda pendiente por instrucción del usuario.
+
+## Reglas de Negocio de Conversión con Turnos (Noviembre 2026)
+
+- **Alcance:** documentación de la cascada `useShifts` → `chargeConvertedOrdersToShift` → `requireShiftForConvertedOrders` para la conversión de órdenes/cotizaciones a factura (`main`; pendiente de sincronizar en `lite`).
+- **Wiki:** nueva sección en `wiki/modules/settings.md` y referencia en `wiki/modules/commercial.md`.
+- **Reglas:** con `useShifts` solo la conversión no se carga al turno; `chargeConvertedOrdersToShift` habilita la carga; `requireShiftForConvertedOrders` exige turno abierto y bloquea la conversión si falta.
+- **Sin cambios de código:** solo documentación.
+
 ## Devoluciones en Facturas a Crédito Sin Abonos (Noviembre 2026)
 
 - **Alcance:** Eliminada la restricción que obligaba a usar Notas de Crédito en devoluciones de facturas a crédito; ahora se permiten devoluciones directas sobre facturas a crédito sin abonos (`amountPaid == 0` y `status == open`) manteniendo intacto el comportamiento habitual de contado (`main` y `lite`).
@@ -655,3 +682,45 @@ Esta estructura se ha seguido para módulos como 'Historial de Facturas', 'Histo
 - **Formulario:** `form_section.dart` envia `branchId` al crear o al convertir un articulo; al editar un servicio/no inventariable no lo envia. Se actualizo la confirmacion Articulo -> Servicio (requiere existencias y comprometido en 0 en todas las sucursales) y se agrego la confirmacion Servicio/No inventariable -> Articulo (pasa al catalogo global y reinicia costos de referencia).
 - **Tests:** `test/product_type_test.dart` valida que `UpdateProduct` solo serializa `branchId` cuando se provee y que `CreateProduct` lo conserva (6 pruebas).
 - **Verificacion:** `flutter analyze` limpio; `flutter test` 260/260. Sin commit.
+
+## Anulación de Facturas y Recibos Fuera de Turno (Noviembre 2026)
+- **Objetivo:** nueva opción global en `AppSettings` para permitir solicitar y aprobar la anulación de facturas y recibos pertenecientes a turnos ya cerrados.
+- **Dominio:** `allowCancellationsOutsideShift` (`false` por defecto) en `AppSettingModel`/`UpdateAppSetting`; getter homónimo en `AppSettingsCubit`.
+- **UI:** switch "Permitir Anular Facturas y Recibos Fuera de Turno" en `app_settings_screen.dart`, después de las opciones de solicitudes de anulación; se incluye en el guardado y en la detección de cambios pendientes.
+- **Backend:** `BaseAppSetting`/`UpdateAppSetting` exponen la bandera; `validate_invoice_cancellable` y `validate_receipt_cancellable` omiten solo el bloqueo por turno cerrado cuando está activa. Las demás validaciones se mantienen.
+- **Tests:** `invoice_cancellation_requests_test.dart` cubre el default `false`, la lectura desde JSON y la serialización del PATCH; el backend agrega pruebas de validación con turno cerrado y bandera activa.
+- **Verificación:** `flutter analyze --no-pub` sin issues; `dart analyze packages/kardex_business` sin issues; tests de anulación/AppSettings 14/14. La suite completa mantiene 1 fallo preexistente en `devolutions_selection_test.dart`, no relacionado con este cambio.
+- **Sin commit.**
+
+## Correcciones de Auditoría — Anulación Fuera de Turno (Noviembre 2026)
+- **C1 (aprobado):** la ruta `/settings` y sus subrutas ahora exigen sesión (`/login` si no hay) y `Modules.settings` (`/home` si no tiene permiso); el backend restringe las escrituras de AppSettings con `require_settings_access` y deja público solo `GET /app-settings/current` para el arranque.
+- **M2 (aprobado):** `_saveSettings` construye un PATCH parcial con solo los campos modificados respecto de la configuración cargada, evitando que dos sesiones se sobrescriban mutuamente.
+- **M4/B1 (aprobado):** tests backend de creación/aprobación con turno cerrado y bandera activa, y casos negativos con devoluciones activas/facturas anuladas; se restauró la aserción de `useReceiptCancellations` y se agregó un widget test del switch que verifica sincronización, guardado y PATCH parcial.
+- **B3 (aprobado):** el subtítulo del switch y las wikis advierten que los arqueos cerrados conservan sus totales, pero los reportes vivos cambian y el reembolso de efectivo no se registra automáticamente.
+- **Verificación:** `flutter analyze --no-pub` sin issues; `dart analyze packages/kardex_business` sin issues; tests relevantes y widget test del switch aprobados; suites completas con los fallos preexistentes ya documentados.
+- **Sin commit.**
+- **Deuda pendiente por decisión del usuario:** N1 (redirect en `AuthInitial/AuthLoading` al refrescar/deep-link), N3 (widget test desde `true` + campos numéricos/otros switches), N4 (test de creación de recibo con turno cerrado), N5 (tests de integración de rutas/redirect) y N6 (semántica Admin/root). N2 quedó corregido en la wiki del servidor.
+
+## Redondeo hacia Arriba en Facturas (Noviembre 2026)
+- **Objetivo:** nueva opción global `roundUpInvoiceTotals` (`false` por defecto) para que subtotales de línea y total de factura queden en unidades enteras.
+- **Cálculo:** `InvoiceRounding` redondea el subtotal de cada línea hacia arriba y los descuentos hacia abajo, manteniendo `subtotal − descuentos = total`. No se agrega línea de redondeo.
+- **Dominio y UI:** `AppSettingModel`/`UpdateAppSetting` y `AppSettingsCubit` exponen la bandera; `AppSettingsScreen` agrega el switch “Redondear a la Alta en Facturas” y lo incluye en el PATCH parcial.
+- **Facturación:** `CommercialProductResult` aplica la regla por línea; `sale_terminal`, `anon_invoices` y `client_invoices` redondean el descuento global; `CreateInvoice.ensureCostAndTotal(applyRounding)` cuadra el total enviado. Órdenes y cotizaciones no se redondean.
+- **Conversiones:** `current_orders` y `current_proforma` usan `projectedInvoiceTotal` para el diálogo de pago y el total mostrado; `confirm_order_invoice_modal` también muestra el total proyectado.
+- **Tests:** `invoice_rounding_test.dart` cubre helpers, `ensureCostAndTotal`, `projectedInvoiceTotal` y serialización; el widget test de AppSettings cubre el nuevo switch y el PATCH parcial.
+- **Correcciones de auditoría aprobadas (C1/M1/M2):** la facturación anónima móvil redondea el descuento global antes de abrir el diálogo de pago; `ensureCostAndTotal` recalcula el descuento de línea sobre el subtotal redondeado; y `process_anon_invoice` normaliza después de resolver `priceUnitFactor`.
+- **Deuda pendiente (B1/B2/B3 y cobertura adicional):** documentada en `../deuda_tecnica_pendiente.md`.
+- **Verificación:** `flutter analyze --no-pub` sin issues; `dart analyze packages/kardex_business` sin issues; tests nuevos y suites relevantes aprobados.
+- **Sin commit.**
+
+## Cobro de Abonos con Método, Moneda y Cambio (Noviembre 2026)
+- **Objetivo:** que los abonos registren el método de pago, la moneda, el monto recibido y el cambio, igual que la facturación, y que el recibo los refleje.
+- **Abonar/Liquidar:** `partial_payment_modal.dart` y `receipt_creator_screen.dart` ahora usan `showPaymentConfirmationDialog` para capturar Efectivo/Tarjeta/Transferencia, moneda primaria/secundaria, monto recibido, cambio y referencia; se envía `paymentMethod`, `bankReference` y `paymentDetail` al `CreateReceipt`. Se eliminó el slider duplicado: el diálogo de cobro es la confirmación.
+- **Notas por monto:** `receipt_allocation.dart` distribuye las notas `CreditNoteType.monto` no vinculadas entre las facturas con saldo, deduplica por `id` y prioriza `invoiceId` sobre `invoiceDocNumber`. El mediador también deduplica notas y devoluciones por `id`, `isInSelected`/`removeFromSelected` comparan por `id`, y el modal deduplica los totales de notas y devoluciones por factura. El total de notas por monto se muestra en la barra inferior, bloquea el abono si supera la capacidad y permite abonos solo con notas.
+- **Turno:** se conserva el `ShiftGuard` previo al modal y se agregó una segunda validación justo antes de crear el recibo, para no enviar `shiftId` nulo si el turno se cierra mientras se captura el pago.
+- **Abono rápido:** `fast_payment_modal.dart` permite sobrepago en efectivo primario, aplica el saldo y calcula el cambio; tarjeta/transferencia siguen limitadas al saldo y exigen referencia.
+- **Recibo:** los comprobantes muestran `Recibido` y `Cambio`; el PDF rotula `Total Cobrado` (antes `Total Recibido`). Las facturas conservan `Pagó con`.
+- **UI:** el diálogo de cobro usa `SingleChildScrollView` y teclado decimal; `CustomSlider` escala la etiqueta; el modal rápido usa scroll; la barra inferior de Abonar usa `Wrap` y los títulos largos usan ellipsis para pantallas de 360 px.
+- **Tests:** `fast_payment_modal_test.dart`, `payment_confirmation_dialog_test.dart` (incluye 360×640), `partial_payment_modal_test.dart` (incluye 360×640 con notas), `receipt_allocation_test.dart` (incluye efectivo + nota y listas duplicadas), `receipt_builder_test.dart`, `pending_invoice_mediator_test.dart` (incluye recarga con el mismo `id`) y `payment_detail_test.dart`.
+- **Verificación:** `flutter analyze --no-pub` sin issues; `dart analyze packages/kardex_business` sin issues; suite frontend **402 passed** con el fallo preexistente de `devolutions_selection_test.dart`; backend **188 passed** con la nueva validación de pagos (incluye moneda secundaria deshabilitada) y sin regresiones.
+- **Sin commit.** La sincronización `main` → `lite` queda pendiente para el lote final por decisión del usuario.

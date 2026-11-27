@@ -22,7 +22,7 @@ class ShiftsGateFilter extends GateFilter {
 
   @override
   bool isAllowed(BuildContext context) {
-    return _resolveAppSettingsCubit()?.useShifts ?? false;
+    return _resolveAppSettingsCubit()?.policy.useShifts ?? false;
   }
 
   @override

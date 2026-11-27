@@ -10,8 +10,11 @@ import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/cubit/read_pending_invoice_cubit.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/cubit/write_receipt_cubit.dart';
+import 'package:kardex_app_front/src/modules/commercial/client_invoices/widgets/dialogs/payment_confirmation_dialog.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/modals/confirm_receipt_modal.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/web/receipt_creator/modals/partial_payment_modal.dart';
+import 'package:kardex_app_front/src/modules/commercial/pending_invoice/web/receipt_creator/receipt_allocation.dart';
+import 'package:kardex_app_front/src/modules/commercial/pending_invoice/web/receipt_creator/receipt_builder.dart';
 import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/receipt_viewer.dart';
@@ -150,8 +153,7 @@ class _CreateReceiptBottomBar extends StatelessWidget {
     final mediator = CreateReceiptMediator.of(context);
     final client = mediator.client;
     final invoices = mediator.invoices;
-    final confirmedDevolutions =
-        mediator.devolutions.where((d) => d.status == DevolutionStatus.confirmed).toList();
+    final confirmedDevolutions = mediator.devolutions.where((d) => d.status == DevolutionStatus.confirmed).toList();
     final creditNotes = mediator.creditNotes;
 
     final total = invoices.fold(0, (int previousValue, invoice) {
@@ -202,6 +204,9 @@ class _CreateReceiptBottomBar extends StatelessWidget {
                     return;
                   }
 
+                  if (!await ShiftGuard.ensureShiftReady(context)) return;
+                  if (!context.mounted) return;
+
                   final result = await showPartialPaymentModal(
                     context,
                     client: client,
@@ -218,41 +223,25 @@ class _CreateReceiptBottomBar extends StatelessWidget {
                   final currentUser = authState.session.user;
                   final currentBranch = authState.branch;
 
-                  // 1. Calculate Applied Invoices (Cash Input + Linked Devolutions + Linked Credit Notes)
-                  final appliedInvoices = <AppliedInvoice>[];
-                  int receiptTotalCents = 0;
+                  // 1. Distribuir efectivo, devoluciones y notas entre las facturas
+                  final allocation = allocatePartialAbono(
+                    invoices: invoices,
+                    payments: result.payments,
+                    confirmedDevolutions: confirmedDevolutions,
+                    creditNotes: creditNotes,
+                    usedCreditNotes: result.usedCreditNotes,
+                  );
 
-                  for (var invoice in invoices) {
-                    final cashInput = result.payments[invoice.id] ?? 0.0;
-                    final cashInputCents = (cashInput * 100).round();
-
-                    // Find linked devolutions for this invoice
-                    final linkedDevolutions = confirmedDevolutions
-                        .where((d) => d.originalInvoiceId == invoice.id)
-                        .toList();
-                    final linkedDevolutionTotal = linkedDevolutions.fold(0, (sum, d) => sum + d.total);
-
-                    // Find linked credit notes for this invoice
-                    final linkedCreditNotes = creditNotes.where(
-                      (cn) =>
-                          cn.invoiceId == invoice.id ||
-                          (cn.invoiceDocNumber.isNotEmpty && cn.invoiceDocNumber == invoice.docNumber),
-                    ).toList();
-                    final linkedCreditNoteTotal = linkedCreditNotes.fold(0, (sum, cn) => sum + cn.total);
-
-                    final totalAppliedCents = cashInputCents + linkedDevolutionTotal + linkedCreditNoteTotal;
-
-                    if (totalAppliedCents > 0) {
-                      appliedInvoices.add(
-                        AppliedInvoice(
-                          invoiceId: invoice.id,
-                          docNumber: invoice.docNumber,
-                          amountApplied: totalAppliedCents,
-                        ),
-                      );
-                      receiptTotalCents += cashInputCents;
-                    }
+                  if (!allocation.isValid) {
+                    await DialogManager.showErrorDialog(
+                      context,
+                      allocation.error!,
+                    );
+                    return;
                   }
+
+                  final appliedInvoices = allocation.appliedInvoices;
+                  final receiptTotalCents = allocation.totalCashCents;
 
                   // 2. Calculate Applied Devolutions
                   final appliedDevolutions = result.usedDevolutions.map((devolution) {
@@ -275,23 +264,14 @@ class _CreateReceiptBottomBar extends StatelessWidget {
                   // 4. Create Receipt
                   if (!await ShiftGuard.ensureShiftReady(context)) return;
                   if (!context.mounted) return;
-                  final createReceipt = CreateReceipt(
+                  final createReceipt = buildAbonoReceipt(
                     branchId: currentBranch.id,
-                    clientInfo: ClientInfo(
-                      name: client.name,
-                      group: client.group,
-                      address: client.address,
-                      phone: client.phone,
-                      email: client.email,
-                      cardId: client.cardId,
-                      location: client.location,
-                    ),
-                    clientId: client.id,
+                    client: client,
                     appliedInvoices: appliedInvoices,
                     appliedDevolutions: appliedDevolutions,
                     appliedCreditNotes: appliedCreditNotes,
-                    paymentMethod: PaymentMethod.cash,
-                    total: receiptTotalCents, // Only the cash amount is the receipt total
+                    payment: result.payment,
+                    total: receiptTotalCents,
                     shiftId: getIt.isRegistered<ShiftCubit>() ? getIt<ShiftCubit>().activeShiftId : null,
                     createdBy: UserInfo(
                       id: currentUser.id,
@@ -309,7 +289,8 @@ class _CreateReceiptBottomBar extends StatelessWidget {
 
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: (hasDevolutionExceeding ||
+                  backgroundColor:
+                      (hasDevolutionExceeding ||
                           devolutionTotal > total ||
                           (creditNoteTotal > 0 && creditNoteTotal > (total - devolutionTotal)))
                       ? Colors.grey
@@ -331,15 +312,26 @@ class _CreateReceiptBottomBar extends StatelessWidget {
                     return;
                   }
 
-                  final res = await showConfirmReceiptModal(
-                    context,
-                    client,
-                    invoices,
-                    totalPayableFormatted,
-                  );
-                  if (res != true) return;
-                  if (!context.mounted) return;
                   if (!await ShiftGuard.ensureShiftReady(context)) return;
+                  if (!context.mounted) return;
+
+                  PaymentResult? payment;
+                  if (totalPayable > 0) {
+                    payment = await showPaymentConfirmationDialog(
+                      context,
+                      totalPayable,
+                      warningText: "Se liquidarán las facturas seleccionadas. Esta acción no se puede revertir.",
+                    );
+                    if (payment == null) return;
+                  } else {
+                    final res = await showConfirmReceiptModal(
+                      context,
+                      client,
+                      invoices,
+                      totalPayableFormatted,
+                    );
+                    if (res != true) return;
+                  }
                   if (!context.mounted) return;
 
                   final appliedInvoices = invoices.map((invoice) {
@@ -368,27 +360,21 @@ class _CreateReceiptBottomBar extends StatelessWidget {
 
                   if (!context.mounted) return;
 
+                  if (!await ShiftGuard.ensureShiftReady(context)) return;
+                  if (!context.mounted) return;
+
                   final authState = getIt<AuthCubit>().state;
                   if (authState is! Authenticated) throw Exception("User or branch not found");
                   final currentUser = authState.session.user;
                   final currentBranch = authState.branch;
 
-                  final createReceipt = CreateReceipt(
+                  final createReceipt = buildAbonoReceipt(
                     branchId: currentBranch.id,
-                    clientInfo: ClientInfo(
-                      name: client.name,
-                      group: client.group,
-                      address: client.address,
-                      phone: client.phone,
-                      email: client.email,
-                      cardId: client.cardId,
-                      location: client.location,
-                    ),
-                    clientId: client.id,
+                    client: client,
                     appliedInvoices: appliedInvoices,
                     appliedDevolutions: appliedDevolutions,
                     appliedCreditNotes: appliedCreditNotes,
-                    paymentMethod: PaymentMethod.cash,
+                    payment: payment,
                     total: totalPayable,
                     shiftId: getIt.isRegistered<ShiftCubit>() ? getIt<ShiftCubit>().activeShiftId : null,
                     createdBy: UserInfo(
@@ -482,7 +468,11 @@ class _Body extends StatelessWidget {
                           if (creditNotes.isNotEmpty)
                             Text(
                               "Notas de Crédito: ${creditNotes.length}",
-                              style: const TextStyle(fontSize: 16, color: Colors.deepPurple, fontWeight: FontWeight.w600),
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.deepPurple,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                         ],
                       ),
@@ -554,7 +544,10 @@ class _Body extends StatelessWidget {
                               ],
                               if (creditNotes.isNotEmpty) ...[
                                 const Divider(),
-                                const Text("Notas de Crédito", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.deepPurple)),
+                                const Text(
+                                  "Notas de Crédito",
+                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.deepPurple),
+                                ),
                                 ..._buildCreditNotesRows(creditNotes),
                               ],
                             ],

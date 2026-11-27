@@ -6,67 +6,44 @@ class AppSettingsCubit extends Cubit<AppSettingsState> {
   final AppSettingsRepository appSettingsRepository;
 
   AppSettingsCubit(this.appSettingsRepository) : super(AppSettingsInitial()) {
-    NumberFormatter.configureCurrencyResolver(() => currency);
+    NumberFormatter.configureCurrencyResolver(() => policy.currency);
     NumberFormatter.configureSecondaryCurrencyResolver(
-      () => SecondaryCurrencyConfig(
-        currency: secondaryCurrency,
-        exchangeRate: exchangeRate,
-        showInvoiceTotal: showInvoiceTotalInSecondaryCurrency,
-      ),
+      _secondaryCurrencyConfig,
     );
-    BaseBranch.configureTaxIdLabelResolver(() => taxIdLabel);
+    InvoiceRounding.configureEnabledResolver(
+      () => policy.roundUpInvoiceTotals,
+    );
+    BaseBranch.configureTaxIdLabelResolver(() => policy.taxIdLabel);
     BaseInvoice.configureDisplayConfigResolver(
-      () => InvoiceDisplayConfig(
-        showItemsSummary: showInvoiceItemsSummary,
-        showOrderCreator: showInvoiceOrderCreator,
-      ),
+      () => policy.invoiceDisplayConfig,
     );
   }
 
+  /// Decisiones derivadas de la configuración vigente.
+  ///
+  /// Es una vista calculada de [currentSettings]; no mantiene estado propio y
+  /// sigue las mismas transiciones que el cubit.
+  AppSettingsPolicy get policy => AppSettingsPolicy(currentSettings ?? AppSettingModel.defaults);
+
   AppSettingModel? get currentSettings {
-    if (state is AppSettingsLoaded) return (state as AppSettingsLoaded).settings;
-    if (state is AppSettingsSaving) return (state as AppSettingsSaving).currentSettings;
+    final current = state;
+    if (current is AppSettingsLoaded) return current.settings;
+    if (current is AppSettingsSaving) return current.currentSettings;
+    if (current is AppSettingsError) {
+      return current.lastSettings ?? appSettingsRepository.currentAppSettings;
+    }
     return appSettingsRepository.currentAppSettings;
   }
 
-  AppCurrency get currency => currentSettings?.currency ?? AppCurrency.nio;
-
-  AppCurrency get secondaryCurrency => currentSettings?.secondaryCurrency ?? AppCurrency.usd;
-
-  double get exchangeRate => currentSettings?.exchangeRate ?? 0.0;
-
-  bool get showInvoiceTotalInSecondaryCurrency => currentSettings?.showInvoiceTotalInSecondaryCurrency ?? false;
-
-  bool get allowSecondaryCurrencyPayment => currentSettings?.allowSecondaryCurrencyPayment ?? false;
-
-  bool get showInvoiceItemsSummary => currentSettings?.showInvoiceItemsSummary ?? false;
-
-  bool get showInvoiceOrderCreator => currentSettings?.showInvoiceOrderCreator ?? false;
-
-  String? get companyLogoUrl => currentSettings?.companyLogoUrl;
-
-  String get taxIdLabel => currentSettings?.taxIdLabel ?? 'RUC';
-
-  bool get hasCompanyLogo => (companyLogoUrl ?? '').trim().isNotEmpty;
-
-  bool get hasExchangeRate => exchangeRate > 0;
-
-  bool get useExpirationDates => currentSettings?.useExpirationDates ?? true;
-  bool get useOrders => currentSettings?.useOrders ?? true;
-  bool get useQuotations => currentSettings?.useQuotations ?? true;
-  bool get useDefaultProfitMargin => currentSettings?.useDefaultProfitMargin ?? false;
-  double get defaultProfitMargin => currentSettings?.defaultProfitMargin ?? 20.0;
-  bool get allowNegativeStock => currentSettings?.allowNegativeStock ?? false;
-  bool get alertMinStock => currentSettings?.alertMinStock ?? true;
-  int get defaultPaymentTermDays => currentSettings?.defaultPaymentTermDays ?? 30;
-  bool get useHoldSales => currentSettings?.useHoldSales ?? true;
-  bool get useQuickProductSearch => currentSettings?.useQuickProductSearch ?? false;
-  bool get useShifts => currentSettings?.useShifts ?? false;
-  bool get chargeConvertedOrdersToShift => currentSettings?.chargeConvertedOrdersToShift ?? false;
-  bool get requireShiftForConvertedOrders => currentSettings?.requireShiftForConvertedOrders ?? false;
-  bool get useInvoiceCancellations => currentSettings?.useInvoiceCancellations ?? false;
-  bool get useReceiptCancellations => currentSettings?.useReceiptCancellations ?? false;
-  bool get useDiscounts => currentSettings?.useDiscounts ?? false;
+  SecondaryCurrencyConfig? _secondaryCurrencyConfig() {
+    final display = policy.invoiceSecondaryCurrencyDisplay;
+    if (display == null) return null;
+    return SecondaryCurrencyConfig(
+      currency: display.secondaryCurrency,
+      exchangeRate: display.exchangeRate,
+      showInvoiceTotal: true,
+    );
+  }
 
   Future<void> loadSettings() async {
     emit(AppSettingsLoading());
@@ -116,7 +93,9 @@ class AppSettingsCubit extends Cubit<AppSettingsState> {
   Future<void> close() async {
     NumberFormatter.configureCurrencyResolver(null);
     NumberFormatter.configureSecondaryCurrencyResolver(null);
+    InvoiceRounding.configureEnabledResolver(null);
     BaseInvoice.configureDisplayConfigResolver(null);
+    BaseBranch.configureTaxIdLabelResolver(null);
     await super.close();
   }
 }
