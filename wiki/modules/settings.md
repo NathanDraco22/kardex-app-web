@@ -90,9 +90,25 @@ lib/src/modules/settings/
     - La línea usa el formato `Total(USD): US$27.31`.
   - `showInvoiceItemsSummary` (bool): Muestra el resumen de **Total ítems** y **Total cantidad** (incluyendo bonificaciones) en el visor, ticket térmico y PDF A4 de facturas (`false` por defecto).
   - `showInvoiceOrderCreator` (bool): Muestra el nombre de quien creó la orden o cotización de origen (`Tomado por: <nombre>`) en el visor, ticket térmico y PDF A4 de facturas (`false` por defecto).
-  - `chargeConvertedOrdersToShift` (bool): Cuando `useShifts` está activo, si el usuario tiene un turno abierto en la sucursal carga a su caja las órdenes y cotizaciones convertidas a facturas; si no tiene turno activo, factura sin asignar turno (`false` por defecto).
-  - `requireShiftForConvertedOrders` (bool): Cuando `useShifts` y `chargeConvertedOrdersToShift` están activos, exige turno abierto en la sucursal antes de convertir una orden o cotización a factura (`false` por defecto).
+  - `chargeConvertedOrdersToShift` (bool): Cuando `useShifts` está activo, si el usuario tiene un turno abierto en la sucursal de la orden o cotización, la factura se carga a su caja; si no tiene turno activo y `requireShiftForConvertedOrders` está desactivado, factura sin asignar turno (`false` por defecto).
+  - `requireShiftForConvertedOrders` (bool): Cuando `useShifts` y `chargeConvertedOrdersToShift` están activos, exige un turno abierto en la sucursal antes de convertir una orden o cotización a factura; si no hay turno, la conversión se bloquea (`false` por defecto).
   - `companyLogoUrl` (`String?`): URL pública de la imagen corporativa global de la empresa. Es un parámetro **solo estético**; no se usa en facturas, tickets, reportes ni cálculos.
+
+#### Reglas de negocio: conversión de órdenes/cotizaciones a factura con turnos
+
+Aplica al endpoint `POST /api/v1/orders/make-invoice/{order_id}`, usado tanto para **órdenes** como para **cotizaciones**. Las banderas se evalúan en cascada:
+
+| `useShifts` | `chargeConvertedOrdersToShift` | `requireShiftForConvertedOrders` | Resultado |
+| :---: | :---: | :---: | :--- |
+| `false` | cualquiera | cualquiera | La conversión no interactúa con turnos; la factura se guarda con `shiftId = null`. |
+| `true` | `false` | cualquiera | La conversión **no se carga al turno**, aunque el cajero tenga uno abierto. El frontend no envía `shiftId` y el backend lo descarta. |
+| `true` | `true` | `false` | Si el cajero tiene un turno abierto en la sucursal de la orden/cotización, la factura se carga a ese turno. Si no tiene turno, se factura con `shiftId = null`. |
+| `true` | `true` | `true` | Se exige un turno abierto en la sucursal. Si no existe, `ShiftGuard.ensureShiftReady` ofrece abrirlo y cancela la conversión si el usuario no lo abre; el backend rechaza la petición con HTTP 400 si llega sin `shiftId`. |
+
+- **Valores por defecto:** las tres banderas son `false`.
+- **Precedencia:** `requireShiftForConvertedOrders` solo tiene efecto cuando `useShifts` y `chargeConvertedOrdersToShift` están activos.
+- **Implementación:** `ShiftGuard.ensureShiftReady` y `ShiftCubit` en `current_orders` y `current_proforma`; el backend aplica la regla en `OrdersController.convert_order_to_invoice` y valida el turno en `InvoiceRegister`/`validate_shift_link`.
+- **Alcance:** esta excepción aplica solo a la conversión de órdenes y cotizaciones. La facturación directa desde terminal de venta mantiene su propia validación de turno.
 
 #### Identidad de la Empresa (`companyLogoUrl`):
 - La sección **“Identidad de la empresa”** es el primer bloque de `AppSettingsScreen`.

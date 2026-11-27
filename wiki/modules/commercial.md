@@ -63,6 +63,7 @@ lib/src/modules/commercial/
 - **Vistas:** `ProformaScreen`, `CurrentProformaScreen`.
 - **Flujo de Conversión:**
   - Una proforma puede buscarse desde `QuotationOrderSearchScreen` y cargarse directamente en la pantalla de facturación o terminal de ventas para convertirse en venta final.
+  - **Turnos:** la conversión de una orden o cotización a factura solo se carga al turno si `AppSettings.useShifts` y `AppSettings.chargeConvertedOrdersToShift` están activos. Con `requireShiftForConvertedOrders` activo se exige un turno abierto en la sucursal y la conversión se cancela si no existe. Ver [`settings.md`](./settings.md).
 
 ### 2.4. Devoluciones (`devolutions`, `client_devolution`, `devolution_history`)
 - **Propósito:** Registro de notas de crédito y reversión de inventario por productos devueltos por clientes.

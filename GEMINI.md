@@ -1,3 +1,10 @@
+## Reglas de Negocio de Conversión con Turnos (Noviembre 2026)
+
+- **Alcance:** documentación de la cascada `useShifts` → `chargeConvertedOrdersToShift` → `requireShiftForConvertedOrders` para la conversión de órdenes/cotizaciones a factura (`main`; pendiente de sincronizar en `lite`).
+- **Wiki:** nueva sección en `wiki/modules/settings.md` y referencia en `wiki/modules/commercial.md`.
+- **Reglas:** con `useShifts` solo la conversión no se carga al turno; `chargeConvertedOrdersToShift` habilita la carga; `requireShiftForConvertedOrders` exige turno abierto y bloquea la conversión si falta.
+- **Sin cambios de código:** solo documentación.
+
 ## Devoluciones en Facturas a Crédito Sin Abonos (Noviembre 2026)
 
 - **Alcance:** Eliminada la restricción que obligaba a usar Notas de Crédito en devoluciones de facturas a crédito; ahora se permiten devoluciones directas sobre facturas a crédito sin abonos (`amountPaid == 0` y `status == open`) manteniendo intacto el comportamiento habitual de contado (`main` y `lite`).
