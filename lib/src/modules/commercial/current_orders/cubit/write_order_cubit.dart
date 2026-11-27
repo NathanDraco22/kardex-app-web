@@ -33,12 +33,18 @@ class WriteOrderCubit extends Cubit<WriteOrderState> {
   Future<void> convertOrderToInvoice(
     String orderId, {
     String? shiftId,
+    PaymentType? paymentType,
+    String? bankReference,
+    PaymentDetail? paymentDetail,
   }) async {
     emit(WriteOrderInProgress());
     try {
       final res = await ordersRepository.convertOrderToInvoice(
         orderId,
         shiftId: shiftId,
+        paymentType: paymentType,
+        bankReference: bankReference,
+        paymentDetail: paymentDetail,
       );
 
       if (res == null) {

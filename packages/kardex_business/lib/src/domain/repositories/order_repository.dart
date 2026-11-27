@@ -76,10 +76,16 @@ class OrdersRepository with ReactiveRepository<OrderInDb> {
   Future<OrderToInvoiceResponse?> convertOrderToInvoice(
     String orderId, {
     String? shiftId,
+    PaymentType? paymentType,
+    String? bankReference,
+    PaymentDetail? paymentDetail,
   }) async {
     final result = await ordersDataSource.convertOrderToInvoice(
       orderId,
       shiftId: shiftId,
+      paymentType: paymentType?.name,
+      bankReference: bankReference,
+      paymentDetail: paymentDetail?.toJson(),
     );
     if (result == null) return null;
     final response = OrderToInvoiceResponse.fromJson(result);
