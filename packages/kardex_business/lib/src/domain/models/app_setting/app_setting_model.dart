@@ -15,6 +15,8 @@ class AppSettingModel {
   final bool useQuickProductSearch;
   final bool useShifts;
   final bool chargeConvertedOrdersToShift;
+  final bool useInvoiceCancellations;
+  final bool useReceiptCancellations;
   final bool useDiscounts;
   final AppCurrency currency;
   final AppCurrency secondaryCurrency;
@@ -42,6 +44,8 @@ class AppSettingModel {
     this.useQuickProductSearch = false,
     this.useShifts = false,
     this.chargeConvertedOrdersToShift = false,
+    this.useInvoiceCancellations = false,
+    this.useReceiptCancellations = false,
     this.useDiscounts = false,
     this.currency = AppCurrency.nio,
     this.secondaryCurrency = AppCurrency.usd,
@@ -73,6 +77,10 @@ class AppSettingModel {
       useShifts: json['useShifts'] as bool? ?? false,
       chargeConvertedOrdersToShift:
           json['chargeConvertedOrdersToShift'] as bool? ?? false,
+      useInvoiceCancellations:
+          json['useInvoiceCancellations'] as bool? ?? false,
+      useReceiptCancellations:
+          json['useReceiptCancellations'] as bool? ?? false,
       useDiscounts: json['useDiscounts'] as bool? ?? false,
       currency: AppCurrency.fromCode(json['currency'] as String?),
       secondaryCurrency: AppCurrency.fromCode(
@@ -110,6 +118,8 @@ class AppSettingModel {
       'useQuickProductSearch': useQuickProductSearch,
       'useShifts': useShifts,
       'chargeConvertedOrdersToShift': chargeConvertedOrdersToShift,
+      'useInvoiceCancellations': useInvoiceCancellations,
+      'useReceiptCancellations': useReceiptCancellations,
       'useDiscounts': useDiscounts,
       'currency': currency.code,
       'secondaryCurrency': secondaryCurrency.code,
@@ -140,6 +150,8 @@ class AppSettingModel {
     bool? useQuickProductSearch,
     bool? useShifts,
     bool? chargeConvertedOrdersToShift,
+    bool? useInvoiceCancellations,
+    bool? useReceiptCancellations,
     bool? useDiscounts,
     AppCurrency? currency,
     AppCurrency? secondaryCurrency,
@@ -171,6 +183,10 @@ class AppSettingModel {
       useShifts: useShifts ?? this.useShifts,
       chargeConvertedOrdersToShift:
           chargeConvertedOrdersToShift ?? this.chargeConvertedOrdersToShift,
+      useInvoiceCancellations:
+          useInvoiceCancellations ?? this.useInvoiceCancellations,
+      useReceiptCancellations:
+          useReceiptCancellations ?? this.useReceiptCancellations,
       useDiscounts: useDiscounts ?? this.useDiscounts,
       currency: currency ?? this.currency,
       secondaryCurrency: secondaryCurrency ?? this.secondaryCurrency,
@@ -206,6 +222,8 @@ class UpdateAppSetting {
   final bool? useQuickProductSearch;
   final bool? useShifts;
   final bool? chargeConvertedOrdersToShift;
+  final bool? useInvoiceCancellations;
+  final bool? useReceiptCancellations;
   final bool? useDiscounts;
   final AppCurrency? currency;
   final AppCurrency? secondaryCurrency;
@@ -230,6 +248,8 @@ class UpdateAppSetting {
     this.useQuickProductSearch,
     this.useShifts,
     this.chargeConvertedOrdersToShift,
+    this.useInvoiceCancellations,
+    this.useReceiptCancellations,
     this.useDiscounts,
     this.currency,
     this.secondaryCurrency,
@@ -279,6 +299,12 @@ class UpdateAppSetting {
     }
     if (chargeConvertedOrdersToShift != null) {
       data['chargeConvertedOrdersToShift'] = chargeConvertedOrdersToShift;
+    }
+    if (useInvoiceCancellations != null) {
+      data['useInvoiceCancellations'] = useInvoiceCancellations;
+    }
+    if (useReceiptCancellations != null) {
+      data['useReceiptCancellations'] = useReceiptCancellations;
     }
     if (useDiscounts != null) {
       data['useDiscounts'] = useDiscounts;

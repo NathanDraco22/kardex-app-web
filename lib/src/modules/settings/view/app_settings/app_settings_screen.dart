@@ -50,6 +50,8 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
   bool _useQuickProductSearch = false;
   bool _useShifts = false;
   bool _chargeConvertedOrdersToShift = false;
+  bool _useInvoiceCancellations = false;
+  bool _useReceiptCancellations = false;
   bool _useDiscounts = false;
   AppCurrency _currency = AppCurrency.nio;
   AppCurrency _secondaryCurrency = AppCurrency.usd;
@@ -95,6 +97,8 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
       _useQuickProductSearch = settings.useQuickProductSearch;
       _useShifts = settings.useShifts;
       _chargeConvertedOrdersToShift = settings.chargeConvertedOrdersToShift;
+      _useInvoiceCancellations = settings.useInvoiceCancellations;
+      _useReceiptCancellations = settings.useReceiptCancellations;
       _useDiscounts = settings.useDiscounts;
       _showInvoiceTotalInSecondaryCurrency = settings.showInvoiceTotalInSecondaryCurrency;
       _allowSecondaryCurrencyPayment = settings.allowSecondaryCurrencyPayment;
@@ -143,6 +147,8 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
         _useQuickProductSearch != settings.useQuickProductSearch ||
         _useShifts != settings.useShifts ||
         _chargeConvertedOrdersToShift != settings.chargeConvertedOrdersToShift ||
+        _useInvoiceCancellations != settings.useInvoiceCancellations ||
+        _useReceiptCancellations != settings.useReceiptCancellations ||
         _useDiscounts != settings.useDiscounts ||
         _showInvoiceTotalInSecondaryCurrency != settings.showInvoiceTotalInSecondaryCurrency ||
         _allowSecondaryCurrencyPayment != settings.allowSecondaryCurrencyPayment ||
@@ -167,6 +173,8 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
       useQuickProductSearch: _useQuickProductSearch,
       useShifts: _useShifts,
       chargeConvertedOrdersToShift: _chargeConvertedOrdersToShift,
+      useInvoiceCancellations: _useInvoiceCancellations,
+      useReceiptCancellations: _useReceiptCancellations,
       useDiscounts: _useDiscounts,
       showInvoiceTotalInSecondaryCurrency: _showInvoiceTotalInSecondaryCurrency,
       allowSecondaryCurrencyPayment: _allowSecondaryCurrencyPayment,
@@ -1204,6 +1212,36 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                           ),
                           value: _useDiscounts,
                           onChanged: isSaving ? null : (val) => setState(() => _useDiscounts = val),
+                        ),
+                        const Divider(height: 1),
+                        SwitchListTile(
+                          title: const Text(
+                            "Solicitudes de Anulación de Facturas",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: const Text(
+                            "Muestra el módulo de solicitudes de anulación de facturas y permite solicitarlas desde el visor",
+                            style: TextStyle(fontSize: 13, color: Colors.black54),
+                          ),
+                          value: _useInvoiceCancellations,
+                          onChanged: isSaving
+                              ? null
+                              : (val) => setState(() => _useInvoiceCancellations = val),
+                        ),
+                        const Divider(height: 1),
+                        SwitchListTile(
+                          title: const Text(
+                            "Solicitudes de Anulación de Recibos",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: const Text(
+                            "Muestra el módulo de solicitudes de anulación de recibos y permite solicitarlas desde el visor",
+                            style: TextStyle(fontSize: 13, color: Colors.black54),
+                          ),
+                          value: _useReceiptCancellations,
+                          onChanged: isSaving
+                              ? null
+                              : (val) => setState(() => _useReceiptCancellations = val),
                         ),
                       ],
                     ),

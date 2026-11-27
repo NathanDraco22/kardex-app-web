@@ -6,5 +6,7 @@ export 'filters/role_capability_gate_filter.dart';
 export 'filters/role_permission_gate_filter.dart';
 export 'filters/root_user_gate_filter.dart';
 export 'filters/shifts_gate_filter.dart';
+export 'filters/invoice_cancellations_gate_filter.dart';
+export 'filters/receipt_cancellations_gate_filter.dart';
 export 'gate.dart';
 export 'gate_filter.dart';

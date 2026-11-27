@@ -78,6 +78,8 @@ class ShiftArqueoTotals {
   final int receiptOtherTotal;
   final int receiptTotal;
   final int receiptCount;
+  final int cancelledReceiptTotal;
+  final int cancelledReceiptCount;
   final int devolutionTotal;
   final int devolutionCount;
   final int creditNoteTotal;
@@ -112,6 +114,8 @@ class ShiftArqueoTotals {
     this.receiptOtherTotal = 0,
     this.receiptTotal = 0,
     this.receiptCount = 0,
+    this.cancelledReceiptTotal = 0,
+    this.cancelledReceiptCount = 0,
     this.devolutionTotal = 0,
     this.devolutionCount = 0,
     this.creditNoteTotal = 0,
@@ -148,6 +152,8 @@ class ShiftArqueoTotals {
       receiptOtherTotal: _asInt(json['receiptOtherTotal']),
       receiptTotal: _asInt(json['receiptTotal']),
       receiptCount: _asInt(json['receiptCount']),
+      cancelledReceiptTotal: _asInt(json['cancelledReceiptTotal']),
+      cancelledReceiptCount: _asInt(json['cancelledReceiptCount']),
       devolutionTotal: _asInt(json['devolutionTotal']),
       devolutionCount: _asInt(json['devolutionCount']),
       creditNoteTotal: _asInt(json['creditNoteTotal']),

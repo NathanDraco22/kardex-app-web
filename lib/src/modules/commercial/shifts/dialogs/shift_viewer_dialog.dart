@@ -118,6 +118,8 @@ class _ShiftViewerDialogState extends State<ShiftViewerDialog> {
       receiptCashTotal: t.receiptCashTotal,
       receiptTotal: t.receiptTotal,
       receiptCount: t.receiptCount,
+      cancelledReceiptTotal: t.cancelledReceiptTotal,
+      cancelledReceiptCount: t.cancelledReceiptCount,
       devolutionTotal: t.devolutionTotal,
       devolutionCount: t.devolutionCount,
       creditNoteTotal: t.creditNoteTotal,
@@ -498,6 +500,14 @@ class _ShiftViewerDialogState extends State<ShiftViewerDialog> {
                     'Anuladas a crédito (ya excluidas)',
                     data.cancelledInvoiceCreditTotal,
                   ),
+              ],
+              if (data.cancelledReceiptCount > 0) ...[
+                const Divider(height: 16),
+                _row(
+                  'Recibos anulados (${data.cancelledReceiptCount})',
+                  data.cancelledReceiptTotal,
+                  color: AppThemeTokens.danger,
+                ),
               ],
               const Divider(height: 16),
               _row(

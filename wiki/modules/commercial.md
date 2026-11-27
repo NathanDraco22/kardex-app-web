@@ -122,6 +122,7 @@ lib/src/modules/commercial/
 - `/commercial/devolution-history`: Historial de devoluciones.
 - `/commercial/credit-notes`: Gestión y emisión de notas de crédito (devolución y monto).
 - `/commercial/invoice-cancellation-requests`: Solicitudes de anulación de factura (solicitud, aprobación/rechazo por Supervisor/Admin).
+- `/commercial/receipt-cancellation-requests`: Solicitudes de anulación de recibos (visibles según `useReceiptCancellations` en `AppSettings`).
 - `/commercial/user-operations-results`: Arqueo y resultados por usuario.
 
 ---

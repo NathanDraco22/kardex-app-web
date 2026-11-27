@@ -1,3 +1,11 @@
+## Visibilidad Configurable de Anulaciones (`AppSettings`) y Anulación de Recibos (Noviembre 2026)
+
+- **Alcance:** Ocultamiento por defecto desde `AppSettings` (`useInvoiceCancellations = false`, `useReceiptCancellations = false`) e implementación completa de **Solicitudes de Anulación de Recibos** (`main` y `lite`).
+- **Dominio y Datos (`packages/kardex_business`):** `useInvoiceCancellations` / `useReceiptCancellations` en `AppSettingModel`/`UpdateAppSetting`; campos de cancelación e `isCancelled` en `ReceiptInDb`; `CommercialSubModules.approveReceiptCancellation`; `cancelledReceiptTotal`/`cancelledReceiptCount` en `ShiftModel`/`ShiftArqueoComposite`; y `ReceiptCancellationRequestsRepository` registrado en `provider_container.dart`.
+- **Gates y Configuración:** Nuevos `InvoiceCancellationsGateFilter` y `ReceiptCancellationsGateFilter` aplicados al menú comercial, `home_modules_registry.dart` y botones de solicitar anulación en `invoice_viewer.dart` y `receipt_viewer.dart`; switches agregados en `app_settings_screen.dart`.
+- **UI de Recibos y Turnos:** Nuevo módulo `lib/src/modules/commercial/receipt_cancellation_requests/` con cubits reactivos, filtros por estado y botones Aprobar/Rechazar protegidos con `RolePermissionGateFilter([CommercialSubModules.approveReceiptCancellation])`; banner **"RECIBO ANULADO"** en `receipt_viewer.dart`; línea informativa de recibos anulados en `shift_viewer_dialog.dart`, `close_shift_dialog.dart` y `shift_printer.dart`.
+- **Verificación:** `dart analyze` en `packages/kardex_business` (`No issues found!`), `flutter analyze --no-pub` (`No issues found!`) y `flutter test --no-pub test/invoice_cancellation_requests_test.dart` (`5 passed`) en `main` y `lite`.
+
 ## Solicitudes de Anulación de Factura e Integración en Turnos (Noviembre 2026)
 
 - **Alcance:** Flujo completo de solicitudes de anulación de facturas en `packages/kardex_business` y `kardex_app_front` (`main` y sincronizado en `lite`).

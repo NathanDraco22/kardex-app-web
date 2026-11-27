@@ -26,6 +26,7 @@ export 'src/domain/query_params/order_query_params.dart';
 export 'src/domain/query_params/product_query_params.dart';
 export 'src/domain/query_params/product_stats_query.dart';
 export 'src/domain/query_params/receipt_query_params.dart';
+export 'src/domain/query_params/receipt_cancellation_request_query_params.dart';
 export 'src/domain/query_params/totals_query_params.dart';
 export 'src/domain/query_params/transaction_query_params.dart';
 export 'src/domain/query_params/transfer_query_params.dart';

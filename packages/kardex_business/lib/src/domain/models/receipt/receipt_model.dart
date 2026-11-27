@@ -212,6 +212,12 @@ class ReceiptInDb extends BaseReceipt {
   final String id;
   final DateTime createdAt;
   final DateTime? updatedAt;
+  final bool isDeleted;
+  final DateTime? deletedAt;
+  final DateTime? cancelledAt;
+  final UserInfo? cancelledBy;
+  final String? cancellationReason;
+  final String? cancellationRequestId;
 
   ReceiptInDb({
     required this.id,
@@ -230,7 +236,15 @@ class ReceiptInDb extends BaseReceipt {
     required this.updatedAt,
     required super.createdBy,
     super.shiftId,
+    this.isDeleted = false,
+    this.deletedAt,
+    this.cancelledAt,
+    this.cancelledBy,
+    this.cancellationReason,
+    this.cancellationRequestId,
   });
+
+  bool get isCancelled => isDeleted || cancelledAt != null;
 
   factory ReceiptInDb.fromJson(Map<String, dynamic> json) => ReceiptInDb(
     id: json['id'],
@@ -253,6 +267,18 @@ class ReceiptInDb extends BaseReceipt {
     updatedAt: (json['updatedAt'] != null) ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt']) : null,
     createdBy: UserInfo.fromJson(json['createdBy']),
     shiftId: json['shiftId'] as String?,
+    isDeleted: json['isDeleted'] as bool? ?? false,
+    deletedAt: json['deletedAt'] != null
+        ? DateTime.fromMillisecondsSinceEpoch((json['deletedAt'] as num).toInt())
+        : null,
+    cancelledAt: json['cancelledAt'] != null
+        ? DateTime.fromMillisecondsSinceEpoch((json['cancelledAt'] as num).toInt())
+        : null,
+    cancelledBy: json['cancelledBy'] != null
+        ? UserInfo.fromJson(json['cancelledBy'] as Map<String, dynamic>)
+        : null,
+    cancellationReason: json['cancellationReason'] as String?,
+    cancellationRequestId: json['cancellationRequestId'] as String?,
   );
 
   @override
@@ -262,6 +288,12 @@ class ReceiptInDb extends BaseReceipt {
       'id': id,
       'createdAt': createdAt.millisecondsSinceEpoch,
       'updatedAt': updatedAt?.millisecondsSinceEpoch,
+      'isDeleted': isDeleted,
+      if (deletedAt != null) 'deletedAt': deletedAt!.millisecondsSinceEpoch,
+      if (cancelledAt != null) 'cancelledAt': cancelledAt!.millisecondsSinceEpoch,
+      if (cancelledBy != null) 'cancelledBy': cancelledBy!.toJson(),
+      if (cancellationReason != null) 'cancellationReason': cancellationReason,
+      if (cancellationRequestId != null) 'cancellationRequestId': cancellationRequestId,
     });
     return data;
   }

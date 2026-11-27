@@ -62,6 +62,8 @@ class ProviderContainer extends StatelessWidget {
     final adjustmentRequestsDataSource = AdjustmentRequestsDataSource();
     final invoiceCancellationRequestsDataSource =
         InvoiceCancellationRequestsDataSource();
+    final receiptCancellationRequestsDataSource =
+        ReceiptCancellationRequestsDataSource();
     final integrationsDataSource = IntegrationsDataSource();
     final clientGroupsDataSource = ClientGroupDataSource();
     final reportsDataSource = ReportsDataSource();
@@ -260,6 +262,12 @@ class ProviderContainer extends StatelessWidget {
         RepositoryProvider(
           create: (context) => InvoiceCancellationRequestsRepository(
             invoiceCancellationRequestsDataSource,
+          ),
+          dispose: (repo) => repo.disposeReactiveRepo(),
+        ),
+        RepositoryProvider(
+          create: (context) => ReceiptCancellationRequestsRepository(
+            receiptCancellationRequestsDataSource,
           ),
           dispose: (repo) => repo.disposeReactiveRepo(),
         ),

@@ -63,6 +63,8 @@ class AppSettingsCubit extends Cubit<AppSettingsState> {
   bool get useQuickProductSearch => currentSettings?.useQuickProductSearch ?? false;
   bool get useShifts => currentSettings?.useShifts ?? false;
   bool get chargeConvertedOrdersToShift => currentSettings?.chargeConvertedOrdersToShift ?? false;
+  bool get useInvoiceCancellations => currentSettings?.useInvoiceCancellations ?? false;
+  bool get useReceiptCancellations => currentSettings?.useReceiptCancellations ?? false;
   bool get useDiscounts => currentSettings?.useDiscounts ?? false;
 
   Future<void> loadSettings() async {
