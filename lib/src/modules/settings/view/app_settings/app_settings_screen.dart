@@ -1191,7 +1191,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                             subtitle: const Text(
-                              "Al facturar una orden o cotización, exige turno abierto y carga la factura a la caja del turno activo",
+                              "Al facturar una orden o cotización, si el usuario tiene un turno abierto en la sucursal se carga a su caja; si no tiene turno activo, se factura sin asignar turno",
                               style: TextStyle(fontSize: 13, color: Colors.black54),
                             ),
                             value: _chargeConvertedOrdersToShift,

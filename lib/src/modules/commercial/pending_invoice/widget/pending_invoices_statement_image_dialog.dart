@@ -1,15 +1,18 @@
 import 'dart:ui' as ui;
+import 'package:file_saver/file_saver.dart';
 import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/src/tools/cache/image_bytes_resolver.dart';
+import 'package:kardex_app_front/src/tools/exports/file_save_helper.dart';
 import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:toastification/toastification.dart';
 
 /// Diálogo y generador visual para compartir el estado de cuenta o liquidación de facturas en formato de imagen PNG.
 Future<void> showPendingInvoicesStatementImageDialog({
@@ -72,6 +75,7 @@ class _PendingInvoicesStatementImageDialogState
   Uint8List? _logoBytes;
   bool _isGenerating = true;
   bool _isSharing = false;
+  bool _isDownloading = false;
 
   @override
   void initState() {
@@ -84,11 +88,13 @@ class _PendingInvoicesStatementImageDialogState
   Future<void> _captureStatementImage() async {
     try {
       // 1. Resolver asíncronamente los bytes del logo de la sucursal desde imageUrl
-      final authState = getIt<AuthCubit>().state;
-      if (authState is Authenticated) {
-        final branch = authState.branch;
-        _logoBytes = await branch.resolveLogoBytes();
-        if (mounted) setState(() {});
+      if (getIt.isRegistered<AuthCubit>()) {
+        final authState = getIt<AuthCubit>().state;
+        if (authState is Authenticated) {
+          final branch = authState.branch;
+          _logoBytes = await branch.resolveLogoBytes();
+          if (mounted) setState(() {});
+        }
       }
 
       // 2. Esperar brevemente para asegurar que fuentes, logo e íconos se hayan pintado
@@ -121,12 +127,42 @@ class _PendingInvoicesStatementImageDialogState
   }
 
   String _generateFileName() {
-    final sanitizedClient = widget.client.name
-        .trim()
-        .replaceAll(RegExp(r'[^\w\s-]'), '')
-        .replaceAll(RegExp(r'\s+'), '_');
-    final dateStr = DateTimeTool.formatyyyyMMdd(DateTime.now());
-    return '${widget.filePrefix}_${sanitizedClient}_$dateStr';
+    return FileSaveHelper.buildStatementFileName(
+      prefix: widget.filePrefix,
+      clientName: widget.client.name,
+    );
+  }
+
+  Future<void> _downloadImage() async {
+    if (_capturedImageBytes == null) return;
+    setState(() => _isDownloading = true);
+    try {
+      await FileSaveHelper.saveBytes(
+        baseName: _generateFileName(),
+        bytes: _capturedImageBytes!,
+        fileExtension: 'png',
+        mimeType: MimeType.png,
+        dialogTitle: 'Guardar Estado de Cuenta (Imagen)',
+      );
+      if (!mounted) return;
+      toastification.show(
+        context: context,
+        type: ToastificationType.success,
+        title: const Text('Imagen guardada'),
+        autoCloseDuration: const Duration(seconds: 2),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      toastification.show(
+        context: context,
+        type: ToastificationType.error,
+        title: const Text('Error al descargar imagen'),
+        description: Text(e.toString()),
+        autoCloseDuration: const Duration(seconds: 3),
+      );
+    } finally {
+      if (mounted) setState(() => _isDownloading = false);
+    }
   }
 
   Future<void> _shareImage() async {
@@ -153,9 +189,11 @@ class _PendingInvoicesStatementImageDialogState
   @override
   Widget build(BuildContext context) {
     BranchInDb? branch;
-    final authState = getIt<AuthCubit>().state;
-    if (authState is Authenticated) {
-      branch = authState.branch;
+    if (getIt.isRegistered<AuthCubit>()) {
+      final authState = getIt<AuthCubit>().state;
+      if (authState is Authenticated) {
+        branch = authState.branch;
+      }
     }
 
     return Dialog(
@@ -258,7 +296,7 @@ class _PendingInvoicesStatementImageDialogState
 
             const Divider(height: 1, thickness: 1, color: AppThemeTokens.borderLight),
 
-            // Barra de Acciones Inferior: Conteo a la izquierda y botón Compartir a la derecha
+            // Barra de Acciones Inferior: Conteo a la izquierda y botones Descargar / Compartir a la derecha
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               child: Row(
@@ -272,8 +310,24 @@ class _PendingInvoicesStatementImageDialogState
                     ),
                   ),
                   const Spacer(),
+                  OutlinedButton.icon(
+                    onPressed: _isGenerating || _isSharing || _isDownloading ? null : _downloadImage,
+                    icon: _isDownloading
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.download_rounded, size: 18),
+                    label: const Text("Descargar"),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: AppThemeTokens.borderRadiusSm),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
                   PrimaryMenuButton(
-                    onPressed: _isGenerating || _isSharing ? null : _shareImage,
+                    onPressed: _isGenerating || _isSharing || _isDownloading ? null : _shareImage,
                     icon: _isSharing
                         ? const SizedBox(
                             width: 16,
@@ -835,14 +889,18 @@ class _StatementVisualCard extends StatelessWidget {
                             color: Color(0xFF0F172A),
                           ),
                         ),
-                        FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(
-                            NumberFormatter.convertToMoneyLike(netTotal),
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w900,
-                              color: Color(0xFF1D4ED8),
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              NumberFormatter.convertToMoneyLike(netTotal),
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w900,
+                                color: Color(0xFF1D4ED8),
+                              ),
                             ),
                           ),
                         ),
@@ -903,14 +961,18 @@ class _StatementVisualCard extends StatelessWidget {
               fontWeight: FontWeight.w500,
             ),
           ),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Text(
-              value,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: valueColor ?? const Color(0xFF1E293B),
+          const SizedBox(width: 8),
+          Flexible(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerRight,
+              child: Text(
+                value,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: valueColor ?? const Color(0xFF1E293B),
+                ),
               ),
             ),
           ),

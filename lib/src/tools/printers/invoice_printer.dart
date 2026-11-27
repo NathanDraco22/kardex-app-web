@@ -438,18 +438,24 @@ Future<Uint8List> generateTicketPdfFromInvoice(
               pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                 children: [
-                  pw.Text(
-                    'Ítems: ${invoice.totalItemsCount}',
-                    style: pw.TextStyle(
-                      fontWeight: pw.FontWeight.bold,
-                      fontSize: TicketSettings.contentFontSize(paperSize),
+                  pw.Flexible(
+                    child: pw.Text(
+                      'Ítems: ${invoice.totalItemsCount}',
+                      style: pw.TextStyle(
+                        fontWeight: pw.FontWeight.bold,
+                        fontSize: TicketSettings.contentFontSize(paperSize),
+                      ),
                     ),
                   ),
-                  pw.Text(
-                    'Cant. total: ${invoice.formattedTotalItemsQuantity}',
-                    style: pw.TextStyle(
-                      fontWeight: pw.FontWeight.bold,
-                      fontSize: TicketSettings.contentFontSize(paperSize),
+                  pw.SizedBox(width: 4),
+                  pw.Flexible(
+                    child: pw.Text(
+                      'Cant. total: ${invoice.formattedTotalItemsQuantity}',
+                      textAlign: pw.TextAlign.right,
+                      style: pw.TextStyle(
+                        fontWeight: pw.FontWeight.bold,
+                        fontSize: TicketSettings.contentFontSize(paperSize),
+                      ),
                     ),
                   ),
                 ],
