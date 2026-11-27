@@ -70,10 +70,19 @@ class OrdersDataSource with HttpService {
     return res;
   }
 
-  Future<Map<String, dynamic>?> convertOrderToInvoice(String orderId) async {
+  Future<Map<String, dynamic>?> convertOrderToInvoice(
+    String orderId, {
+    String? shiftId,
+  }) async {
     final uri = HttpTools.generateUri("$_endpoint/make-invoice/$orderId");
     final headers = HttpTools.generateAuthHeaders();
-    final res = await postQuery(uri, {}, headers: headers);
+    final res = await postQuery(
+      uri,
+      {
+        'shiftId': ?shiftId,
+      },
+      headers: headers,
+    );
     return res;
   }
 

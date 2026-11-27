@@ -30,10 +30,16 @@ class WriteOrderCubit extends Cubit<WriteOrderState> {
     }
   }
 
-  Future<void> convertOrderToInvoice(String orderId) async {
+  Future<void> convertOrderToInvoice(
+    String orderId, {
+    String? shiftId,
+  }) async {
     emit(WriteOrderInProgress());
     try {
-      final res = await ordersRepository.convertOrderToInvoice(orderId);
+      final res = await ordersRepository.convertOrderToInvoice(
+        orderId,
+        shiftId: shiftId,
+      );
 
       if (res == null) {
         throw "Error al generar la factura";
