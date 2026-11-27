@@ -103,11 +103,11 @@ class _HeaderSection extends StatelessWidget {
                     if (state is! ReadInvoiceSuccess || state.invoices.isEmpty) {
                       DialogManager.showInfoDialog(
                         context,
-                        "No hay facturas pendientes para compartir.",
+                        "No hay facturas pendientes para generar el estado de cuenta.",
                       );
                       return;
                     }
-                    showPendingInvoicesStatementImageDialog(
+                    showPendingInvoicesStatementOptionsDialog(
                       context: context,
                       client: client,
                       invoices: state.invoices,
@@ -115,8 +115,8 @@ class _HeaderSection extends StatelessWidget {
                       creditNotes: state.creditNotes,
                     );
                   },
-                  icon: const Icon(Icons.share_outlined, size: 18),
-                  label: const Text("Compartir"),
+                  icon: const Icon(Icons.description_outlined, size: 18),
+                  label: const Text("Estado de Cuenta"),
                 ),
                 Builder(
                   builder: (context) {

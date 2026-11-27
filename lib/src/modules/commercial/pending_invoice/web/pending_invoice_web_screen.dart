@@ -12,7 +12,7 @@ import 'package:kardex_app_front/src/modules/commercial/pending_invoice/web/moda
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/web/receipt_creator/receipt_creator_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/widget/invoice_devolution_tile.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/widget/credit_notes_summary_tile.dart';
-import 'package:kardex_app_front/src/modules/commercial/pending_invoice/widget/pending_invoices_statement_image_dialog.dart';
+import 'package:kardex_app_front/src/modules/commercial/pending_invoice/widget/pending_invoices_statement_options_dialog.dart';
 import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/devolution_viewer.dart';
@@ -137,19 +137,19 @@ class _RootScaffoldState extends State<_RootScaffold> {
           title: const Text("Facturas por Cobrar de Cliente"),
           actions: [
             IconButton(
-              icon: const Icon(Icons.share_outlined),
-              tooltip: "Compartir estado de cuenta en imagen",
+              icon: const Icon(Icons.description_outlined),
+              tooltip: "Estado de Cuenta",
               onPressed: () {
                 final state = context.read<ReadPendingInvoiceCubit>().state;
                 final selectedClient = PendingInvoiceMediator.of(context).notifier?.selectedClient;
                 if (selectedClient == null || state is! ReadInvoiceSuccess || state.invoices.isEmpty) {
                   DialogManager.showInfoDialog(
                     context,
-                    "No hay facturas pendientes para compartir.",
+                    "No hay facturas pendientes para generar el estado de cuenta.",
                   );
                   return;
                 }
-                showPendingInvoicesStatementImageDialog(
+                showPendingInvoicesStatementOptionsDialog(
                   context: context,
                   client: selectedClient,
                   invoices: state.invoices,
