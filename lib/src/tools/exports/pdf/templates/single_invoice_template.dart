@@ -7,11 +7,16 @@ import 'package:pdf/widgets.dart' as pw;
 class SingleInvoiceTemplate implements PdfTemplate {
   final InvoiceInDb invoice;
   final BranchInDb branch;
+  final InvoiceDisplayConfig? displayConfig;
 
   SingleInvoiceTemplate({
     required this.invoice,
     required this.branch,
+    this.displayConfig,
   });
+
+  InvoiceDisplayConfig get _effectiveDisplayConfig =>
+      displayConfig ?? BaseInvoice.displayConfig;
 
   @override
   Future<pw.Document> buildDocument() async {
@@ -188,6 +193,14 @@ class SingleInvoiceTemplate implements PdfTemplate {
                       "Fecha Ped: ${DateTimeTool.formatddMMyy(invoice.orderInfo!.createdAt)}",
                       style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey700),
                     ),
+                    if (_effectiveDisplayConfig.showOrderCreator &&
+                        invoice.orderInfo!.createdBy.name.trim().isNotEmpty) ...[
+                      pw.SizedBox(height: 2),
+                      pw.Text(
+                        "Tomado por: ${invoice.orderInfo!.createdBy.name}",
+                        style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey700),
+                      ),
+                    ],
                   ],
                   if (invoice.description.isNotEmpty) ...[
                     pw.SizedBox(height: 2),
@@ -350,6 +363,52 @@ class SingleInvoiceTemplate implements PdfTemplate {
       child: pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.end,
         children: [
+          if (_effectiveDisplayConfig.showItemsSummary) ...[
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.end,
+              children: [
+                pw.Text(
+                  "Total de ítems:",
+                  style: const pw.TextStyle(
+                    fontWeight: pw.FontWeight.bold,
+                    fontSize: 11,
+                    color: PdfColors.grey700,
+                  ),
+                ),
+                pw.SizedBox(
+                  width: 110,
+                  child: pw.Text(
+                    "${invoice.totalItemsCount}",
+                    style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 11),
+                    textAlign: pw.TextAlign.right,
+                  ),
+                ),
+              ],
+            ),
+            pw.SizedBox(height: 2),
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.end,
+              children: [
+                pw.Text(
+                  "Total cantidad:",
+                  style: const pw.TextStyle(
+                    fontWeight: pw.FontWeight.bold,
+                    fontSize: 11,
+                    color: PdfColors.grey700,
+                  ),
+                ),
+                pw.SizedBox(
+                  width: 110,
+                  child: pw.Text(
+                    invoice.formattedTotalItemsQuantity,
+                    style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 11),
+                    textAlign: pw.TextAlign.right,
+                  ),
+                ),
+              ],
+            ),
+            pw.SizedBox(height: 6),
+          ],
           pw.Row(
             mainAxisAlignment: pw.MainAxisAlignment.end,
             children: [

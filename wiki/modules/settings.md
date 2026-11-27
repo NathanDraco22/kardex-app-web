@@ -88,6 +88,8 @@ lib/src/modules/settings/
     - El equivalente aparece después del total final en el visor de facturas, el ticket térmico (imprimir/compartir) y el PDF A4.
     - Solo se muestra si la moneda secundaria es distinta a la principal y la tasa es mayor que cero. No modifica montos, pagos, cuentas por cobrar ni inventario.
     - La línea usa el formato `Total(USD): US$27.31`.
+  - `showInvoiceItemsSummary` (bool): Muestra el resumen de **Total ítems** y **Total cantidad** (incluyendo bonificaciones) en el visor, ticket térmico y PDF A4 de facturas (`false` por defecto).
+  - `showInvoiceOrderCreator` (bool): Muestra el nombre de quien creó la orden o cotización de origen (`Tomado por: <nombre>`) en el visor, ticket térmico y PDF A4 de facturas (`false` por defecto).
   - `companyLogoUrl` (`String?`): URL pública de la imagen corporativa global de la empresa. Es un parámetro **solo estético**; no se usa en facturas, tickets, reportes ni cálculos.
 
 #### Identidad de la Empresa (`companyLogoUrl`):

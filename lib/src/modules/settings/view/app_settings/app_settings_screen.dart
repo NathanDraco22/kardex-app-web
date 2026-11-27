@@ -55,6 +55,8 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
   double _exchangeRate = 0.0;
   bool _showInvoiceTotalInSecondaryCurrency = false;
   bool _allowSecondaryCurrencyPayment = false;
+  bool _showInvoiceItemsSummary = false;
+  bool _showInvoiceOrderCreator = false;
   String _taxIdLabel = 'RUC';
 
   @override
@@ -94,6 +96,8 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
       _useDiscounts = settings.useDiscounts;
       _showInvoiceTotalInSecondaryCurrency = settings.showInvoiceTotalInSecondaryCurrency;
       _allowSecondaryCurrencyPayment = settings.allowSecondaryCurrencyPayment;
+      _showInvoiceItemsSummary = settings.showInvoiceItemsSummary;
+      _showInvoiceOrderCreator = settings.showInvoiceOrderCreator;
       _initialized = true;
     }
 
@@ -138,7 +142,9 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
         _useShifts != settings.useShifts ||
         _useDiscounts != settings.useDiscounts ||
         _showInvoiceTotalInSecondaryCurrency != settings.showInvoiceTotalInSecondaryCurrency ||
-        _allowSecondaryCurrencyPayment != settings.allowSecondaryCurrencyPayment;
+        _allowSecondaryCurrencyPayment != settings.allowSecondaryCurrencyPayment ||
+        _showInvoiceItemsSummary != settings.showInvoiceItemsSummary ||
+        _showInvoiceOrderCreator != settings.showInvoiceOrderCreator;
   }
 
   Future<void> _saveSettings() async {
@@ -160,6 +166,8 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
       useDiscounts: _useDiscounts,
       showInvoiceTotalInSecondaryCurrency: _showInvoiceTotalInSecondaryCurrency,
       allowSecondaryCurrencyPayment: _allowSecondaryCurrencyPayment,
+      showInvoiceItemsSummary: _showInvoiceItemsSummary,
+      showInvoiceOrderCreator: _showInvoiceOrderCreator,
     );
 
     final success = await getIt<AppSettingsCubit>().updateSettings(update);
@@ -656,6 +664,76 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
     );
   }
 
+  Widget _buildInvoiceDisplaySection({required bool isSaving}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildSectionHeader(
+          icon: Icons.receipt_long_rounded,
+          title: "Visualización en Facturas",
+          subtitle: "Controla qué datos opcionales se muestran en visor, PDF y ticket térmico",
+        ),
+        const SizedBox(height: 8),
+        Card(
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+            side: BorderSide(color: Colors.grey.shade200),
+          ),
+          child: Column(
+            children: [
+              SwitchListTile(
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 4,
+                ),
+                title: const Text(
+                  "Mostrar resumen de ítems en facturas",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                subtitle: const Text(
+                  "Muestra el total de ítems y la cantidad total en el visor, PDF y ticket térmico.",
+                  style: TextStyle(fontSize: 13, color: Colors.black54),
+                ),
+                value: _showInvoiceItemsSummary,
+                onChanged: isSaving
+                    ? null
+                    : (value) {
+                        setState(() {
+                          _showInvoiceItemsSummary = value;
+                        });
+                      },
+              ),
+              const Divider(height: 1),
+              SwitchListTile(
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 4,
+                ),
+                title: const Text(
+                  "Mostrar creador de orden o cotización en facturas",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                subtitle: const Text(
+                  "Muestra el nombre de quien creó la orden o cotización de origen en el visor, PDF y ticket térmico.",
+                  style: TextStyle(fontSize: 13, color: Colors.black54),
+                ),
+                value: _showInvoiceOrderCreator,
+                onChanged: isSaving
+                    ? null
+                    : (value) {
+                        setState(() {
+                          _showInvoiceOrderCreator = value;
+                        });
+                      },
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildCompanyLogoCard({required bool isSaving}) {
     final hasLogo = (_companyLogoUrl ?? '').trim().isNotEmpty || _pendingCompanyLogoBytes != null;
     final isBusy = _isSavingCompanyLogo;
@@ -935,6 +1013,8 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                   _buildInvoiceSecondaryTotalSwitch(isSaving: isSaving),
                   const SizedBox(height: 12),
                   _buildSecondaryPaymentSwitch(isSaving: isSaving),
+                  const SizedBox(height: 24),
+                  _buildInvoiceDisplaySection(isSaving: isSaving),
                   const SizedBox(height: 24),
                   _buildSectionHeader(
                     icon: Icons.trending_up_rounded,

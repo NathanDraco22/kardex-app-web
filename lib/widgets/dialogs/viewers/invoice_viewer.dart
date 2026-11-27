@@ -196,14 +196,17 @@ class InvoiceViewerContent extends StatelessWidget {
     required this.invoice,
     required this.branch,
     this.creditNotes = const [],
+    this.displayConfig,
   });
 
   final InvoiceInDb invoice;
   final BranchInDb branch;
   final List<CreditNoteInDb> creditNotes;
+  final InvoiceDisplayConfig? displayConfig;
 
   @override
   Widget build(BuildContext context) {
+    final effectiveDisplayConfig = displayConfig ?? BaseInvoice.displayConfig;
     final itemDiscounts = invoice.effectiveItemDiscounts;
     final invoiceDiscount = invoice.invoiceDiscount;
     final totalDiscount = invoice.totalDiscount;
@@ -366,10 +369,12 @@ class InvoiceViewerContent extends StatelessWidget {
                   ),
                 ],
               ),
-              Text(
-                "Tomado por: ${invoice.orderInfo!.createdBy.name}",
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: Colors.blueGrey.shade700),
-              ),
+              if (effectiveDisplayConfig.showOrderCreator &&
+                  invoice.orderInfo!.createdBy.name.trim().isNotEmpty)
+                Text(
+                  "Tomado por: ${invoice.orderInfo!.createdBy.name}",
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: Colors.blueGrey.shade700),
+                ),
             ],
 
             if (invoice.description.isNotEmpty)
@@ -504,6 +509,31 @@ class InvoiceViewerContent extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    if (effectiveDisplayConfig.showItemsSummary) ...[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            "Total ítems: ${invoice.totalItemsCount}",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                              color: Colors.grey.shade700,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Text(
+                            "Total cantidad: ${invoice.formattedTotalItemsQuantity}",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                              color: Colors.grey.shade700,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                    ],
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
