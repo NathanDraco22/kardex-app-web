@@ -92,6 +92,8 @@ lib/src/modules/settings/
   - `showInvoiceOrderCreator` (bool): Muestra el nombre de quien creó la orden o cotización de origen (`Tomado por: <nombre>`) en el visor, ticket térmico y PDF A4 de facturas (`false` por defecto).
   - `chargeConvertedOrdersToShift` (bool): Cuando `useShifts` está activo, si el usuario tiene un turno abierto en la sucursal de la orden o cotización, la factura se carga a su caja; si no tiene turno activo y `requireShiftForConvertedOrders` está desactivado, factura sin asignar turno (`false` por defecto).
   - `requireShiftForConvertedOrders` (bool): Cuando `useShifts` y `chargeConvertedOrdersToShift` están activos, exige un turno abierto en la sucursal antes de convertir una orden o cotización a factura; si no hay turno, la conversión se bloquea (`false` por defecto).
+  - `allowCancellationsOutsideShift` (bool): Permite solicitar y aprobar la anulación de facturas y recibos aunque pertenezcan a un turno ya cerrado (`false` por defecto). Los arqueos de turnos cerrados conservan sus totales almacenados y no se recalculan; los reportes vivos de la fecha sí cambian y el reembolso de efectivo no se registra automáticamente, por lo que debe gestionarse fuera del sistema.
+  - `roundUpInvoiceTotals` (bool): Redondea el subtotal de cada línea hacia arriba y los descuentos hacia abajo para que subtotal y total queden en unidades enteras de la moneda (`false` por defecto). No agrega una línea de redondeo; el ajuste queda integrado en los importes. Solo aplica a facturas nuevas (directas, anónimas y conversiones); no modifica órdenes, cotizaciones ni facturas existentes.
   - `companyLogoUrl` (`String?`): URL pública de la imagen corporativa global de la empresa. Es un parámetro **solo estético**; no se usa en facturas, tickets, reportes ni cálculos.
 
 #### Reglas de negocio: conversión de órdenes/cotizaciones a factura con turnos
@@ -109,6 +111,15 @@ Aplica al endpoint `POST /api/v1/orders/make-invoice/{order_id}`, usado tanto pa
 - **Precedencia:** `requireShiftForConvertedOrders` solo tiene efecto cuando `useShifts` y `chargeConvertedOrdersToShift` están activos.
 - **Implementación:** `ShiftGuard.ensureShiftReady` y `ShiftCubit` en `current_orders` y `current_proforma`; el backend aplica la regla en `OrdersController.convert_order_to_invoice` y valida el turno en `InvoiceRegister`/`validate_shift_link`.
 - **Alcance:** esta excepción aplica solo a la conversión de órdenes y cotizaciones. La facturación directa desde terminal de venta mantiene su propia validación de turno.
+
+#### Regla de negocio: redondeo hacia arriba en facturas
+
+- **Bandera:** `roundUpInvoiceTotals` (`false` por defecto).
+- **Cálculo:** el subtotal de cada línea se redondea hacia arriba al siguiente entero de la moneda; los descuentos por línea y el descuento global se redondean hacia abajo. Así `subtotal − descuentos = total` y todos los importes quedan enteros.
+- **Sin línea adicional:** el ajuste queda integrado en los subtotales/descuentos; no se agrega un campo ni una línea “Redondeo”.
+- **Alcance:** solo facturas nuevas (facturación directa, anónima y conversión de órdenes/cotizaciones). Las órdenes, cotizaciones y facturas existentes no se recalculan.
+- **Implementación frontend:** `InvoiceRounding` configura `CommercialProductResult`, los controladores de facturación y `CreateInvoice.ensureCostAndTotal`. Las conversiones usan `projectedInvoiceTotal` para el diálogo de pago y el total mostrado.
+- **Backend:** `InvoiceRegister` lee `AppSettingsTool` y `normalize_invoice_discounts` aplica la misma regla al guardar la factura.
 
 #### Identidad de la Empresa (`companyLogoUrl`):
 - La sección **“Identidad de la empresa”** es el primer bloque de `AppSettingsScreen`.

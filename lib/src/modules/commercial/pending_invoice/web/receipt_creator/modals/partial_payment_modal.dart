@@ -1,17 +1,21 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/src/modules/commercial/client_invoices/widgets/dialogs/payment_confirmation_dialog.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/modals/confirm_receipt_modal.dart';
+import 'package:kardex_app_front/src/tools/input_formatters.dart';
 import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
 
 class PartialPaymentResult {
   final Map<String, double> payments;
   final List<DevolutionInDb> usedDevolutions;
   final List<CreditNoteInDb> usedCreditNotes;
+  final PaymentResult? payment;
 
   PartialPaymentResult({
     required this.payments,
     required this.usedDevolutions,
     this.usedCreditNotes = const [],
+    this.payment,
   });
 }
 
@@ -73,7 +77,12 @@ class _PartialPaymentModalState extends State<PartialPaymentModal> {
   }
 
   List<DevolutionInDb> _getLinkedDevolutions(String invoiceId) {
-    return widget.devolutions.where((d) => d.originalInvoiceId == invoiceId).toList();
+    final seen = <String>{};
+    return widget.devolutions
+        .where(
+          (devolution) => devolution.originalInvoiceId == invoiceId && seen.add(devolution.id),
+        )
+        .toList();
   }
 
   int _getLinkedDevolutionsTotal(String invoiceId) {
@@ -82,11 +91,14 @@ class _PartialPaymentModalState extends State<PartialPaymentModal> {
   }
 
   List<CreditNoteInDb> _getLinkedCreditNotes(InvoiceInDb invoice) {
-    return widget.creditNotes.where(
-      (cn) =>
-          cn.invoiceId == invoice.id ||
-          (cn.invoiceDocNumber.isNotEmpty && cn.invoiceDocNumber == invoice.docNumber),
-    ).toList();
+    final seen = <String>{};
+    return widget.creditNotes.where((cn) {
+      if (!seen.add(cn.id)) return false;
+      if (cn.invoiceId.isNotEmpty) {
+        return cn.invoiceId == invoice.id;
+      }
+      return cn.invoiceDocNumber.isNotEmpty && cn.invoiceDocNumber == invoice.docNumber;
+    }).toList();
   }
 
   int _getLinkedCreditNotesTotal(InvoiceInDb invoice) {
@@ -94,16 +106,39 @@ class _PartialPaymentModalState extends State<PartialPaymentModal> {
     return linked.fold(0, (sum, item) => sum + item.total);
   }
 
+  int _getUnlinkedAmountNotesTotal(Set<String> linkedCreditNoteIds) {
+    final seen = <String>{};
+    return widget.creditNotes
+        .where((cn) {
+          if (cn.type != CreditNoteType.monto) return false;
+          if (linkedCreditNoteIds.contains(cn.id)) return false;
+          return seen.add(cn.id);
+        })
+        .fold(0, (sum, cn) => sum + cn.total);
+  }
+
+  int _getAvailableCapacityCents() {
+    return widget.invoices.fold<int>(0, (sum, invoice) {
+      final balanceCents = invoice.total - invoice.amountPaid;
+      final inputCents = ((_inputAmounts[invoice.id] ?? 0.0) * 100).round();
+      final devCents = _getLinkedDevolutionsTotal(invoice.id);
+      final cnCents = _getLinkedCreditNotesTotal(invoice);
+      final remaining = balanceCents - (inputCents + devCents + cnCents);
+      return sum + (remaining > 0 ? remaining : 0);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    double totalCashInput = 0;
-    _inputAmounts.forEach((_, value) => totalCashInput += value);
-
     return Dialog.fullscreen(
       child: SafeArea(
         child: Scaffold(
           appBar: AppBar(
-            title: Text("Abonar a Facturas - ${widget.client.name}"),
+            title: Text(
+              "Abonar a Facturas - ${widget.client.name}",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
             leading: IconButton(
               icon: const Icon(Icons.close),
               onPressed: () => Navigator.pop(context),
@@ -125,7 +160,7 @@ class _PartialPaymentModalState extends State<PartialPaymentModal> {
                       },
                     ),
                   ),
-                  _buildBottomBar(totalCashInput),
+                  _buildBottomBar(),
                 ],
               ),
             ),
@@ -162,11 +197,15 @@ class _PartialPaymentModalState extends State<PartialPaymentModal> {
           children: [
             Row(
               children: [
-                Text(
-                  "Factura #${invoice.docNumber}",
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                Expanded(
+                  child: Text(
+                    "Factura #${invoice.docNumber}",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
                 ),
-                const Spacer(),
+                const SizedBox(width: 8),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -276,8 +315,9 @@ class _PartialPaymentModalState extends State<PartialPaymentModal> {
                   child: TextField(
                     controller: _controllers[invoice.id],
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    inputFormatters: const [DecimalTextInputFormatter()],
                     decoration: InputDecoration(
-                      labelText: "Monto a Abonar (Efectivo)",
+                      labelText: "Monto a Abonar",
                       border: const OutlineInputBorder(),
                       prefixText: "\$ ",
                       errorText: isValid ? null : "El monto excede el saldo pendiente",
@@ -313,7 +353,24 @@ class _PartialPaymentModalState extends State<PartialPaymentModal> {
     );
   }
 
-  Widget _buildBottomBar(double totalCashInput) {
+  Widget _buildBottomBar() {
+    final totalCents = _inputAmounts.values.fold<int>(
+      0,
+      (sum, value) => sum + (value * 100).round(),
+    );
+
+    final linkedCreditNoteIds = <String>{};
+    for (var invoice in widget.invoices) {
+      linkedCreditNoteIds.addAll(
+        _getLinkedCreditNotes(invoice).map((cn) => cn.id),
+      );
+    }
+    final unlinkedAmountNotesTotal = _getUnlinkedAmountNotesTotal(
+      linkedCreditNoteIds,
+    );
+    final availableCapacityCents = _getAvailableCapacityCents();
+    final notesFit = unlinkedAmountNotesTotal <= availableCapacityCents;
+
     // Validate all inputs
     bool allValid = true;
     for (var invoice in widget.invoices) {
@@ -326,6 +383,7 @@ class _PartialPaymentModalState extends State<PartialPaymentModal> {
         break;
       }
     }
+    if (!notesFit) allValid = false;
 
     bool hasAnyApplication = false;
     for (var invoice in widget.invoices) {
@@ -337,6 +395,7 @@ class _PartialPaymentModalState extends State<PartialPaymentModal> {
         break;
       }
     }
+    if (unlinkedAmountNotesTotal > 0) hasAnyApplication = true;
 
     return Container(
       padding: const EdgeInsets.all(8),
@@ -350,7 +409,11 @@ class _PartialPaymentModalState extends State<PartialPaymentModal> {
           ),
         ],
       ),
-      child: Row(
+      child: Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 8,
+        runSpacing: 8,
         children: [
           PrimaryMenuButton(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -358,40 +421,55 @@ class _PartialPaymentModalState extends State<PartialPaymentModal> {
                 ? () async {
                     final usedDevolutions = <DevolutionInDb>[];
                     final usedCreditNotes = <CreditNoteInDb>[];
+                    final usedDevolutionIds = <String>{};
+                    final usedCreditNoteIds = <String>{};
+
                     for (var invoice in widget.invoices) {
-                      final linkedDevs = _getLinkedDevolutions(invoice.id);
-                      if (linkedDevs.isNotEmpty) {
-                        usedDevolutions.addAll(linkedDevs);
+                      for (var devolution in _getLinkedDevolutions(invoice.id)) {
+                        if (usedDevolutionIds.add(devolution.id)) {
+                          usedDevolutions.add(devolution);
+                        }
                       }
-                      final linkedCns = _getLinkedCreditNotes(invoice);
-                      if (linkedCns.isNotEmpty) {
-                        usedCreditNotes.addAll(linkedCns);
+                      for (var creditNote in _getLinkedCreditNotes(invoice)) {
+                        if (usedCreditNoteIds.add(creditNote.id)) {
+                          usedCreditNotes.add(creditNote);
+                        }
                       }
                     }
 
-                    // Add any amount credit notes
-                    final amountNotes = widget.creditNotes.where(
-                      (cn) => cn.type == CreditNoteType.monto && !usedCreditNotes.contains(cn),
-                    );
-                    usedCreditNotes.addAll(amountNotes);
+                    for (var creditNote in widget.creditNotes) {
+                      if (creditNote.type == CreditNoteType.monto && usedCreditNoteIds.add(creditNote.id)) {
+                        usedCreditNotes.add(creditNote);
+                      }
+                    }
 
-                    final confirm = await showConfirmPartialPayReceipt(
-                      context,
-                      widget.client,
-                      widget.invoices.length,
-                      NumberFormatter.convertToMoneyLike((totalCashInput * 100).round()),
-                    );
+                    PaymentResult? payment;
+                    if (totalCents > 0) {
+                      payment = await showPaymentConfirmationDialog(
+                        context,
+                        totalCents,
+                        warningText:
+                            "Se aplicará el abono a las facturas seleccionadas. Esta acción no se puede revertir.",
+                      );
+                      if (payment == null) return;
+                    } else {
+                      final confirm = await showConfirmPartialPayReceipt(
+                        context,
+                        widget.client,
+                        widget.invoices.length,
+                        NumberFormatter.convertToMoneyLike(totalCents),
+                      );
+                      if (confirm != true) return;
+                    }
 
-                    if (confirm != true) return;
-                    if (!context.mounted) return;
-                    final currentContext = context;
-                    if (!currentContext.mounted) return;
+                    if (!mounted) return;
                     Navigator.pop(
-                      currentContext,
+                      context,
                       PartialPaymentResult(
                         payments: _inputAmounts,
                         usedDevolutions: usedDevolutions,
                         usedCreditNotes: usedCreditNotes,
+                        payment: payment,
                       ),
                     );
                   }
@@ -399,15 +477,28 @@ class _PartialPaymentModalState extends State<PartialPaymentModal> {
             label: const Text("Confirmar Abonos"),
           ),
 
-          const Spacer(),
-
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text("Total Recibo (Efectivo/Pago):"),
+              if (unlinkedAmountNotesTotal > 0) ...[
+                Text(
+                  "Notas por monto: -${NumberFormatter.convertToMoneyLike(unlinkedAmountNotesTotal)}",
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.deepPurple,
+                  ),
+                ),
+                if (!notesFit)
+                  const Text(
+                    "Las notas por monto superan el saldo disponible.",
+                    style: TextStyle(fontSize: 11, color: Colors.red),
+                  ),
+              ],
+              const Text("Total a Cobrar:"),
               Text(
-                NumberFormatter.convertToMoneyLike((totalCashInput * 100).round()),
+                NumberFormatter.convertToMoneyLike(totalCents),
                 style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
             ],

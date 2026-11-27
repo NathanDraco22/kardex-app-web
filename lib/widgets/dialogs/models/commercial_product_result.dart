@@ -46,6 +46,7 @@ class CommercialProductResult {
   DiscountType? manualDiscountType;
   int manualDiscountValue = 0;
   double quantity = 0.0;
+  bool roundUpLineTotals = false;
   
   int selectedUnitIndex = 0;
   int conversionFactor = 1;
@@ -55,12 +56,18 @@ class CommercialProductResult {
 
   String get formattedQuantity => UnitConversionTool.formatQuantity(quantity);
 
+  bool get _roundingEnabled =>
+      roundUpLineTotals && InvoiceRounding.isEnabled;
+
   int get subTotal {
-    return UnitConversionTool.calculateLineTotal(
+    final raw = UnitConversionTool.calculateLineTotal(
       _newPrice,
       baseQuantity,
       priceUnitFactor: product.priceUnitFactor,
     );
+    return _roundingEnabled
+        ? InvoiceRounding.roundUpToWholeUnit(raw)
+        : raw;
   }
 
   int get newPrice => _newPrice;
@@ -119,18 +126,20 @@ class CommercialProductResult {
   }
 
   int get totalDiscount {
-    if (manualDiscountType != null && manualDiscountValue > 0) {
-      return DiscountType.calculateDiscountAmount(
-        type: manualDiscountType,
-        discountValue: manualDiscountValue,
-        baseAmount: subTotal,
-      );
-    }
-    return DiscountType.calculateDiscountAmount(
-      type: selectedDiscount != null ? DiscountType.percentage : null,
-      discountValue: selectedDiscount?.percentValue ?? 0,
-      baseAmount: subTotal,
-    );
+    final raw = manualDiscountType != null && manualDiscountValue > 0
+        ? DiscountType.calculateDiscountAmount(
+            type: manualDiscountType,
+            discountValue: manualDiscountValue,
+            baseAmount: subTotal,
+          )
+        : DiscountType.calculateDiscountAmount(
+            type: selectedDiscount != null ? DiscountType.percentage : null,
+            discountValue: selectedDiscount?.percentValue ?? 0,
+            baseAmount: subTotal,
+          );
+    return _roundingEnabled
+        ? InvoiceRounding.roundDownToWholeUnit(raw)
+        : raw;
   }
 
   int get total {
@@ -148,12 +157,15 @@ class CommercialProductResult {
     int? selectedUnitIndex,
     int? conversionFactor,
     String? selectedUnitName,
+    bool? roundUpLineTotals,
   }) {
     final result = CommercialProductResult(
       product: product ?? this.product,
       defaultPriceLevel: selectedPriceLevel ?? this.selectedPriceLevel,
     );
 
+    result.roundUpLineTotals =
+        roundUpLineTotals ?? this.roundUpLineTotals;
     if (newPrice != null) {
       result.newPrice = newPrice;
     } else {

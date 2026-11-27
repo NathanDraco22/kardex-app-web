@@ -103,6 +103,10 @@ Los permisos se declaran como enums en
 | Estado de sesión | `SplashScreen` + `AuthCubit` | Redirige a `login`, `activation` o `inactive`. |
 | `isCommerce` | `app_router.dart` (comercial y cuentas pendientes) | Si la sucursal no es comercial, redirige a `/home`. |
 | Feature flags | `app_router.dart` (escalas de unidades) | Redirige a la pestaña permitida si `SHOW_UNIT_SCALES=false`. |
+| Permiso `settings` | `app_router.dart` (`/settings` y subrutas) | Sin sesión redirige a `/login`; sin `Modules.settings` redirige a `/home`. |
+
+> [!WARNING]
+> **Deuda conocida (N1):** al refrescar o abrir un deep link de `/settings` en web, el redirect puede evaluarse durante `AuthInitial`/`AuthLoading` y enviar a `/login` antes de que `SplashScreen` restaure la sesión. Pendiente: redirigir a `/splash` o esperar la restauración.
 | Permisos de UI | `Gate` (`RolePermissionGateFilter`) / `AccessManager` | Oculta o reemplaza widgets. |
 
 > Las pantallas operativas se abren a pantalla completa. Si agregas una ruta nueva, decide explícitamente si necesita guard de sesión, de `isCommerce` o de permisos.

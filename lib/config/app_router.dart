@@ -4,6 +4,7 @@ import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/constants/feature_flags.dart';
 import 'package:kardex_app_front/constants/route_names.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/src/core/access_manager.dart';
 import 'package:kardex_app_front/src/modules/commercial/product_demand_vs_stock/product_demand_vs_stock_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/daily_operations_results/daily_operations_results_screen.dart';
 import 'package:kardex_app_front/src/modules/finance/range_finance_report/range_finance_report_screen.dart';
@@ -713,6 +714,17 @@ class AppRouter {
       GoRoute(
         path: '/settings',
         name: 'settings',
+        redirect: (context, state) {
+          final authState = getIt<AuthCubit>().state;
+          if (authState is! Authenticated) return '/login';
+          if (!AccessManager().hasAccessTo(
+            authState.session.user,
+            Modules.settings.name,
+          )) {
+            return '/home';
+          }
+          return null;
+        },
         builder: (context, state) => const SettingsScreen(),
         routes: [
           GoRoute(

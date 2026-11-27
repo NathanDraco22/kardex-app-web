@@ -87,6 +87,7 @@ Authenticated _buildAuthenticated({
 
 void main() {
   tearDown(() async {
+    InvoiceRounding.configureEnabledResolver(null);
     await getIt.reset();
   });
 
@@ -219,6 +220,18 @@ void main() {
     const settings = AppSettingModel(id: 'Default', createdAt: 0);
     expect(settings.useInvoiceCancellations, isFalse);
     expect(settings.useReceiptCancellations, isFalse);
+    expect(settings.allowCancellationsOutsideShift, isFalse);
+
+    final enabledSettings = AppSettingModel.fromJson({
+      'id': 'Default',
+      'createdAt': 0,
+      'allowCancellationsOutsideShift': true,
+    });
+    expect(enabledSettings.allowCancellationsOutsideShift, isTrue);
+    expect(
+      const UpdateAppSetting(allowCancellationsOutsideShift: true).toJson(),
+      {'allowCancellationsOutsideShift': true},
+    );
 
     final receipt = ReceiptInDb.fromJson({
       'id': 'rec-1',

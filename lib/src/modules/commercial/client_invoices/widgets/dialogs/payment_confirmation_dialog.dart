@@ -18,6 +18,16 @@ class PaymentResult {
     this.reference,
     this.paymentDetail,
   });
+
+  /// Método equivalente para los recibos de abono.
+  PaymentMethod get receiptPaymentMethod => switch (method) {
+    PaymentType.cash => PaymentMethod.cash,
+    PaymentType.card => PaymentMethod.card,
+    PaymentType.transfer => PaymentMethod.transfer,
+    PaymentType.check => PaymentMethod.check,
+    PaymentType.other => PaymentMethod.other,
+    PaymentType.credit => PaymentMethod.other,
+  };
 }
 
 Future<PaymentResult?> showPaymentConfirmationDialog(
@@ -25,6 +35,7 @@ Future<PaymentResult?> showPaymentConfirmationDialog(
   int total, {
   bool showCredit = false,
   PaymentType initialMethod = PaymentType.cash,
+  String? warningText,
 }) async {
   PaymentResult? result;
 
@@ -35,6 +46,7 @@ Future<PaymentResult?> showPaymentConfirmationDialog(
         total: total,
         showCredit: showCredit,
         initialMethod: initialMethod,
+        warningText: warningText,
       );
     },
   ).then((value) => result = value);
@@ -46,11 +58,13 @@ class _PaymentDialog extends StatefulWidget {
   final int total;
   final bool showCredit;
   final PaymentType initialMethod;
+  final String? warningText;
 
   const _PaymentDialog({
     required this.total,
     this.showCredit = false,
     this.initialMethod = PaymentType.cash,
+    this.warningText,
   });
 
   @override
@@ -68,10 +82,9 @@ class _PaymentDialogState extends State<_PaymentDialog> {
   @override
   void initState() {
     super.initState();
-    _selectedMethod =
-        (!widget.showCredit && widget.initialMethod == PaymentType.credit)
-            ? PaymentType.cash
-            : widget.initialMethod;
+    _selectedMethod = (!widget.showCredit && widget.initialMethod == PaymentType.credit)
+        ? PaymentType.cash
+        : widget.initialMethod;
   }
 
   int _effectivePrimaryCents(PaymentCurrencySettings settings) {
@@ -112,179 +125,207 @@ class _PaymentDialogState extends State<_PaymentDialog> {
       title: const Text("Confirmar Pago", textAlign: TextAlign.center),
       content: SizedBox(
         width: 400,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              "Total a Pagar: ${NumberFormatter.convertToMoneyLike(widget.total)}",
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            SegmentedButton<PaymentType>(
-              style: ButtonStyle(
-                foregroundColor: WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
-                  if (states.contains(WidgetState.selected)) {
-                    return Colors.white;
-                  }
-                  return Colors.black;
-                }),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "Total a Pagar: ${NumberFormatter.convertToMoneyLike(widget.total)}",
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-              segments: [
-                const ButtonSegment(
-                  value: PaymentType.cash,
-                  label: Text("Efectivo", style: TextStyle(fontSize: 16)),
-                  icon: Icon(Icons.money),
+              const SizedBox(height: 20),
+              SegmentedButton<PaymentType>(
+                style: ButtonStyle(
+                  foregroundColor: WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
+                    if (states.contains(WidgetState.selected)) {
+                      return Colors.white;
+                    }
+                    return Colors.black;
+                  }),
                 ),
-                const ButtonSegment(
-                  value: PaymentType.card,
-                  label: Text("Tarjeta", style: TextStyle(fontSize: 16)),
-                  icon: Icon(Icons.credit_card),
-                ),
-                const ButtonSegment(
-                  value: PaymentType.transfer,
-                  label: Padding(
-                    padding: EdgeInsets.all(4.0),
-                    child: Text("Transf.", style: TextStyle(fontSize: 16)),
-                  ),
-                  icon: Icon(Icons.account_balance),
-                ),
-                if (widget.showCredit)
+                segments: [
                   const ButtonSegment(
-                    value: PaymentType.credit,
-                    label: Text("Crédito", style: TextStyle(fontSize: 16)),
-                    icon: Icon(Icons.schedule),
+                    value: PaymentType.cash,
+                    label: Text("Efectivo", style: TextStyle(fontSize: 16)),
+                    icon: Icon(Icons.money),
                   ),
-              ],
-              selected: {_selectedMethod},
-              onSelectionChanged: (newSelection) {
-                setState(() {
-                  _selectedMethod = newSelection.first;
-                  if (_selectedMethod == PaymentType.cash ||
-                      _selectedMethod == PaymentType.credit) {
-                    _selectedBank = null;
-                  }
-                });
-              },
-            ),
-            const SizedBox(height: 20),
-            if (_selectedMethod == PaymentType.cash) ...[
-              PaymentCurrencySelector(
-                settings: currencySettings,
-                useSecondary: _useSecondaryCurrency,
-                onChanged: (useSecondary) {
-                  setState(() => _useSecondaryCurrency = useSecondary);
-                },
-              ),
-              if (currencySettings.canUseDifferentSecondary)
-                const SizedBox(height: 12),
-              TextField(
-                controller: _receivedController,
-                autofocus: true,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                ),
-                inputFormatters: [const DecimalTextInputFormatter()],
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: "Dinero Recibido",
-                  prefixText: _useSecondaryCurrency
-                      ? '${currencySettings.secondaryCurrency.symbol} '
-                      : '${currencySettings.primaryCurrency.symbol} ',
-                  helperText: (_useSecondaryCurrency &&
-                          currencySettings.hasValidExchangeRate &&
-                          _receivedAmount > 0)
-                      ? 'Equivalente: ${NumberFormatter.formatMoney(effectivePrimary, currencySettings.primaryCurrency)}'
-                      : null,
-                  border: const OutlineInputBorder(),
-                ),
-                onChanged: (value) {
+                  const ButtonSegment(
+                    value: PaymentType.card,
+                    label: Text("Tarjeta", style: TextStyle(fontSize: 16)),
+                    icon: Icon(Icons.credit_card),
+                  ),
+                  const ButtonSegment(
+                    value: PaymentType.transfer,
+                    label: Padding(
+                      padding: EdgeInsets.all(4.0),
+                      child: Text("Transf.", style: TextStyle(fontSize: 16)),
+                    ),
+                    icon: Icon(Icons.account_balance),
+                  ),
+                  if (widget.showCredit)
+                    const ButtonSegment(
+                      value: PaymentType.credit,
+                      label: Text("Crédito", style: TextStyle(fontSize: 16)),
+                      icon: Icon(Icons.schedule),
+                    ),
+                ],
+                selected: {_selectedMethod},
+                onSelectionChanged: (newSelection) {
                   setState(() {
-                    _receivedAmount =
-                        NumberFormatter.convertFromDoubleToCents(
-                          double.tryParse(value) ?? 0,
-                        );
+                    _selectedMethod = newSelection.first;
+                    if (_selectedMethod == PaymentType.cash || _selectedMethod == PaymentType.credit) {
+                      _selectedBank = null;
+                    }
                   });
                 },
               ),
-              const SizedBox(height: 10),
-              Text(
-                "Cambio: ${formatPaymentChangeLabel(change, primaryCurrency: currencySettings.primaryCurrency, secondaryCurrency: _useSecondaryCurrency ? currencySettings.secondaryCurrency : null, exchangeRate: _useSecondaryCurrency ? currencySettings.exchangeRate : null)}",
-                style: TextStyle(
-                  fontSize: 18,
-                  color: change >= 0 ? Colors.green : Colors.red,
-                  fontWeight: FontWeight.w500,
+              const SizedBox(height: 20),
+              if (_selectedMethod == PaymentType.cash) ...[
+                PaymentCurrencySelector(
+                  settings: currencySettings,
+                  useSecondary: _useSecondaryCurrency,
+                  onChanged: (useSecondary) {
+                    setState(() => _useSecondaryCurrency = useSecondary);
+                  },
                 ),
-              ),
-            ] else ...[
-              if (_selectedMethod == PaymentType.card ||
-                  _selectedMethod == PaymentType.transfer) ...[
-                BankChipsSelector(
-                  selectedBank: _selectedBank,
-                  onChanged: (bank) => setState(() => _selectedBank = bank),
+                if (currencySettings.canUseDifferentSecondary) const SizedBox(height: 12),
+                TextField(
+                  controller: _receivedController,
+                  autofocus: true,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  inputFormatters: [const DecimalTextInputFormatter()],
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  decoration: InputDecoration(
+                    labelText: "Dinero Recibido",
+                    prefixText: _useSecondaryCurrency
+                        ? '${currencySettings.secondaryCurrency.symbol} '
+                        : '${currencySettings.primaryCurrency.symbol} ',
+                    helperText: (_useSecondaryCurrency && currencySettings.hasValidExchangeRate && _receivedAmount > 0)
+                        ? 'Equivalente: ${NumberFormatter.formatMoney(effectivePrimary, currencySettings.primaryCurrency)}'
+                        : null,
+                    border: const OutlineInputBorder(),
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      _receivedAmount = NumberFormatter.convertFromDoubleToCents(
+                        double.tryParse(value) ?? 0,
+                      );
+                    });
+                  },
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
+                Text(
+                  "Cambio: ${formatPaymentChangeLabel(change, primaryCurrency: currencySettings.primaryCurrency, secondaryCurrency: _useSecondaryCurrency ? currencySettings.secondaryCurrency : null, exchangeRate: _useSecondaryCurrency ? currencySettings.exchangeRate : null)}",
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: change >= 0 ? Colors.green : Colors.red,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ] else ...[
+                if (_selectedMethod == PaymentType.card || _selectedMethod == PaymentType.transfer) ...[
+                  BankChipsSelector(
+                    selectedBank: _selectedBank,
+                    onChanged: (bank) => setState(() => _selectedBank = bank),
+                  ),
+                  const SizedBox(height: 12),
+                ],
+                TextField(
+                  controller: _refController,
+                  autofocus: true,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  inputFormatters: [IntegerTextInputFormatter()],
+                  keyboardType: const TextInputType.numberWithOptions(decimal: false),
+                  decoration: const InputDecoration(
+                    labelText: "Número de Referencia",
+                    border: OutlineInputBorder(),
+                  ),
+                  onChanged: (_) => setState(() {}),
+                ),
               ],
-              TextField(
-                controller: _refController,
-                autofocus: true,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
+              if (widget.warningText != null) ...[
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.amber.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.amber.shade300),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.warning_amber_rounded,
+                        size: 18,
+                        color: Colors.amber.shade900,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          widget.warningText!,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.amber.shade900,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                inputFormatters: [IntegerTextInputFormatter()],
-                keyboardType: const TextInputType.numberWithOptions(decimal: false),
-                decoration: const InputDecoration(
-                  labelText: "Número de Referencia",
-                  border: OutlineInputBorder(),
+              ],
+              const SizedBox(height: 30),
+              AbsorbPointer(
+                absorbing: !canConfirm,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: CustomSlider(
+                        hintText: "Desliza para Confirmar",
+                        hintIcon: Icons.check_circle,
+                        sliderColor: canConfirm ? Colors.green : Colors.grey,
+                        sliderText: "Confirmar",
+                        onSubmit: () {
+                          if (!canConfirm) {
+                            return;
+                          }
+                          final detail = _selectedMethod == PaymentType.cash
+                              ? buildPaymentDetail(
+                                  useSecondary: _useSecondaryCurrency,
+                                  tenderedCents: _receivedAmount,
+                                  changePrimaryCents: change,
+                                  settings: currencySettings,
+                                )
+                              : null;
+                          context.pop(
+                            PaymentResult(
+                              method: _selectedMethod,
+                              amountReceived: _selectedMethod == PaymentType.cash ? effectivePrimary : widget.total,
+                              reference: (_selectedMethod == PaymentType.cash || _selectedMethod == PaymentType.credit)
+                                  ? null
+                                  : formatBankReference(
+                                      bank: _selectedBank,
+                                      reference: _refController.text,
+                                    ),
+                              paymentDetail: detail,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-                onChanged: (_) => setState(() {}),
               ),
             ],
-            const SizedBox(height: 30),
-            AbsorbPointer(
-              absorbing: !canConfirm,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: CustomSlider(
-                      hintText: "Desliza para Confirmar",
-                      hintIcon: Icons.check_circle,
-                      sliderColor: canConfirm ? Colors.green : Colors.grey,
-                      sliderText: "Confirmar",
-                      onSubmit: () {
-                        if (!canConfirm) {
-                          return;
-                        }
-                        final detail = _selectedMethod == PaymentType.cash
-                            ? buildPaymentDetail(
-                                useSecondary: _useSecondaryCurrency,
-                                tenderedCents: _receivedAmount,
-                                changePrimaryCents: change,
-                                settings: currencySettings,
-                              )
-                            : null;
-                        context.pop(
-                          PaymentResult(
-                            method: _selectedMethod,
-                            amountReceived: _selectedMethod == PaymentType.cash ? effectivePrimary : widget.total,
-                            reference: (_selectedMethod == PaymentType.cash || _selectedMethod == PaymentType.credit)
-                                ? null
-                                : formatBankReference(
-                                    bank: _selectedBank,
-                                    reference: _refController.text,
-                                  ),
-                            paymentDetail: detail,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

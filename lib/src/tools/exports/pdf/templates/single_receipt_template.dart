@@ -466,7 +466,7 @@ class SingleReceiptTemplate implements PdfTemplate {
               mainAxisAlignment: pw.MainAxisAlignment.end,
               mainAxisSize: pw.MainAxisSize.min,
               children: [
-                pw.Text("Total Recibido:", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
+                pw.Text("Total Cobrado:", style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
                 pw.SizedBox(
                   width: 120,
                   child: pw.Text(
@@ -481,7 +481,7 @@ class SingleReceiptTemplate implements PdfTemplate {
           if (receipt.paymentDetail != null) ...[
             pw.SizedBox(height: 4),
             pw.Text(
-              "Pagó con: ${receipt.paymentDetail!.formatTenderedLabel(NumberFormatter.currency)}",
+              "Recibido: ${receipt.paymentDetail!.formatTenderedLabel(NumberFormatter.currency)}",
               style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey700),
             ),
             if (receipt.paymentDetail!.changeAmount > 0)

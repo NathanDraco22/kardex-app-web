@@ -266,9 +266,13 @@ class _RootScaffold extends StatelessWidget {
                               final res = await showConfirmOrderInvoiceModal(context, order);
                               if (res != true || !context.mounted) return;
                             } else {
+                              final invoiceTotal = InvoiceRounding.projectedInvoiceTotal(
+                                fallbackTotal: order.total,
+                                items: order.saleItems,
+                              );
                               final paymentResult = await showTerminalPaymentConfirmationDialog(
                                 context,
-                                order.total,
+                                invoiceTotal,
                                 showCredit: false,
                                 initialMethod: order.paymentType,
                                 initialObservations: order.description,
@@ -356,7 +360,11 @@ class _BodyState extends State<_Body> {
     if (_currentOrder == null) return const SizedBox.shrink();
     final order = _currentOrder!;
     final saleItems = order.saleItems;
-    final totalFormatted = NumberFormatter.convertToMoneyLike(order.total);
+    final invoiceTotal = InvoiceRounding.projectedInvoiceTotal(
+      fallbackTotal: order.total,
+      items: order.saleItems,
+    );
+    final totalFormatted = NumberFormatter.convertToMoneyLike(invoiceTotal);
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 600),

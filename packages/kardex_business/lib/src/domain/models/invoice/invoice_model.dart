@@ -4,6 +4,7 @@ import 'package:kardex_business/src/domain/models/common/order_info.dart';
 import 'package:kardex_business/src/domain/models/common/payment_detail.dart';
 import 'package:kardex_business/src/domain/models/common/sale_item_model.dart';
 import 'package:kardex_business/src/domain/models/common/user_info.dart';
+import 'package:kardex_business/src/tools/invoice_rounding.dart';
 import 'package:kardex_business/src/tools/unit_conversion_tool.dart';
 
 enum InvoiceStatus { draft, open, paid, partiallypaid, cancelled }
@@ -282,21 +283,35 @@ class CreateInvoice extends BaseInvoice {
     );
   }
 
-  void ensureCostAndTotal() {
+  void ensureCostAndTotal({bool applyRounding = true}) {
+    final shouldRound = applyRounding && InvoiceRounding.isEnabled;
     int newTotalCost = 0;
     int newItemsNet = 0;
     int newItemDiscounts = 0;
     for (var item in saleItems) {
       newTotalCost += item.lineCost;
-      newItemsNet += item.total;
-      newItemDiscounts += item.totalDiscount;
+      final subTotal = shouldRound
+          ? InvoiceRounding.roundUpToWholeUnit(item.subTotal)
+          : item.subTotal;
+      final discount = shouldRound
+          ? InvoiceRounding.roundDownToWholeUnit(
+              InvoiceRounding.rawItemDiscount(item, subTotal),
+            )
+          : item.totalDiscount;
+      newItemsNet += subTotal - discount;
+      newItemDiscounts += discount;
     }
     itemDiscounts = newItemDiscounts;
-    invoiceDiscount = DiscountType.calculateDiscountAmount(
+    var newInvoiceDiscount = DiscountType.calculateDiscountAmount(
       type: discountType,
       discountValue: discountValue,
       baseAmount: newItemsNet,
     );
+    if (shouldRound) {
+      newInvoiceDiscount =
+          InvoiceRounding.roundDownToWholeUnit(newInvoiceDiscount);
+    }
+    invoiceDiscount = newInvoiceDiscount;
     totalCost = newTotalCost;
     total = (newItemsNet - invoiceDiscount).clamp(0, newItemsNet);
   }

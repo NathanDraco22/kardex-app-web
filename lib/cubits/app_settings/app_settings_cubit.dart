@@ -14,6 +14,7 @@ class AppSettingsCubit extends Cubit<AppSettingsState> {
         showInvoiceTotal: showInvoiceTotalInSecondaryCurrency,
       ),
     );
+    InvoiceRounding.configureEnabledResolver(() => roundUpInvoiceTotals);
     BaseBranch.configureTaxIdLabelResolver(() => taxIdLabel);
     BaseInvoice.configureDisplayConfigResolver(
       () => InvoiceDisplayConfig(
@@ -66,7 +67,11 @@ class AppSettingsCubit extends Cubit<AppSettingsState> {
   bool get requireShiftForConvertedOrders => currentSettings?.requireShiftForConvertedOrders ?? false;
   bool get useInvoiceCancellations => currentSettings?.useInvoiceCancellations ?? false;
   bool get useReceiptCancellations => currentSettings?.useReceiptCancellations ?? false;
+  bool get allowCancellationsOutsideShift =>
+      currentSettings?.allowCancellationsOutsideShift ?? false;
   bool get useDiscounts => currentSettings?.useDiscounts ?? false;
+  bool get roundUpInvoiceTotals =>
+      currentSettings?.roundUpInvoiceTotals ?? false;
 
   Future<void> loadSettings() async {
     emit(AppSettingsLoading());
@@ -116,6 +121,7 @@ class AppSettingsCubit extends Cubit<AppSettingsState> {
   Future<void> close() async {
     NumberFormatter.configureCurrencyResolver(null);
     NumberFormatter.configureSecondaryCurrencyResolver(null);
+    InvoiceRounding.configureEnabledResolver(null);
     BaseInvoice.configureDisplayConfigResolver(null);
     await super.close();
   }

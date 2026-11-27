@@ -422,7 +422,7 @@ class _ReceiptViewer extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Text(
-                "Pagó con:",
+                "Recibido:",
                 style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
               ),
               const SizedBox(width: 8),

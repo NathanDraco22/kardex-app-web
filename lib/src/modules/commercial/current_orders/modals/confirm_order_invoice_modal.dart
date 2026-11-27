@@ -14,7 +14,11 @@ Future<bool?> showConfirmOrderInvoiceModal(
     backgroundColor: Colors.transparent,
     shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(12))),
     builder: (context) {
-      final totalFormatted = NumberFormatter.convertToMoneyLike(order.total);
+      final invoiceTotal = InvoiceRounding.projectedInvoiceTotal(
+        fallbackTotal: order.total,
+        items: order.saleItems,
+      );
+      final totalFormatted = NumberFormatter.convertToMoneyLike(invoiceTotal);
       return Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 600),

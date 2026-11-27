@@ -42,6 +42,7 @@ export 'src/services/exceptions/http_exceptions.dart';
 export 'src/tools/http_tool.dart';
 export 'src/tools/constant.dart';
 export 'src/tools/number_formatter.dart';
+export 'src/tools/invoice_rounding.dart';
 export 'src/tools/unit_conversion_tool.dart';
 export 'src/tools/unit_display_formatter.dart';
 export 'src/tools/unit_scale_presets.dart';

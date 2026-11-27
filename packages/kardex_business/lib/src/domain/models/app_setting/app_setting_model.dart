@@ -18,7 +18,9 @@ class AppSettingModel {
   final bool requireShiftForConvertedOrders;
   final bool useInvoiceCancellations;
   final bool useReceiptCancellations;
+  final bool allowCancellationsOutsideShift;
   final bool useDiscounts;
+  final bool roundUpInvoiceTotals;
   final AppCurrency currency;
   final AppCurrency secondaryCurrency;
   final double exchangeRate;
@@ -48,7 +50,9 @@ class AppSettingModel {
     this.requireShiftForConvertedOrders = false,
     this.useInvoiceCancellations = false,
     this.useReceiptCancellations = false,
+    this.allowCancellationsOutsideShift = false,
     this.useDiscounts = false,
+    this.roundUpInvoiceTotals = false,
     this.currency = AppCurrency.nio,
     this.secondaryCurrency = AppCurrency.usd,
     this.exchangeRate = 0.0,
@@ -85,7 +89,10 @@ class AppSettingModel {
           json['useInvoiceCancellations'] as bool? ?? false,
       useReceiptCancellations:
           json['useReceiptCancellations'] as bool? ?? false,
+      allowCancellationsOutsideShift:
+          json['allowCancellationsOutsideShift'] as bool? ?? false,
       useDiscounts: json['useDiscounts'] as bool? ?? false,
+      roundUpInvoiceTotals: json['roundUpInvoiceTotals'] as bool? ?? false,
       currency: AppCurrency.fromCode(json['currency'] as String?),
       secondaryCurrency: AppCurrency.fromCode(
         json['secondaryCurrency'] as String?,
@@ -125,7 +132,9 @@ class AppSettingModel {
       'requireShiftForConvertedOrders': requireShiftForConvertedOrders,
       'useInvoiceCancellations': useInvoiceCancellations,
       'useReceiptCancellations': useReceiptCancellations,
+      'allowCancellationsOutsideShift': allowCancellationsOutsideShift,
       'useDiscounts': useDiscounts,
+      'roundUpInvoiceTotals': roundUpInvoiceTotals,
       'currency': currency.code,
       'secondaryCurrency': secondaryCurrency.code,
       'exchangeRate': exchangeRate,
@@ -158,7 +167,9 @@ class AppSettingModel {
     bool? requireShiftForConvertedOrders,
     bool? useInvoiceCancellations,
     bool? useReceiptCancellations,
+    bool? allowCancellationsOutsideShift,
     bool? useDiscounts,
+    bool? roundUpInvoiceTotals,
     AppCurrency? currency,
     AppCurrency? secondaryCurrency,
     double? exchangeRate,
@@ -195,7 +206,11 @@ class AppSettingModel {
           useInvoiceCancellations ?? this.useInvoiceCancellations,
       useReceiptCancellations:
           useReceiptCancellations ?? this.useReceiptCancellations,
+      allowCancellationsOutsideShift:
+          allowCancellationsOutsideShift ?? this.allowCancellationsOutsideShift,
       useDiscounts: useDiscounts ?? this.useDiscounts,
+      roundUpInvoiceTotals:
+          roundUpInvoiceTotals ?? this.roundUpInvoiceTotals,
       currency: currency ?? this.currency,
       secondaryCurrency: secondaryCurrency ?? this.secondaryCurrency,
       exchangeRate: exchangeRate ?? this.exchangeRate,
@@ -233,7 +248,9 @@ class UpdateAppSetting {
   final bool? requireShiftForConvertedOrders;
   final bool? useInvoiceCancellations;
   final bool? useReceiptCancellations;
+  final bool? allowCancellationsOutsideShift;
   final bool? useDiscounts;
+  final bool? roundUpInvoiceTotals;
   final AppCurrency? currency;
   final AppCurrency? secondaryCurrency;
   final double? exchangeRate;
@@ -260,7 +277,9 @@ class UpdateAppSetting {
     this.requireShiftForConvertedOrders,
     this.useInvoiceCancellations,
     this.useReceiptCancellations,
+    this.allowCancellationsOutsideShift,
     this.useDiscounts,
+    this.roundUpInvoiceTotals,
     this.currency,
     this.secondaryCurrency,
     this.exchangeRate,
@@ -319,8 +338,14 @@ class UpdateAppSetting {
     if (useReceiptCancellations != null) {
       data['useReceiptCancellations'] = useReceiptCancellations;
     }
+    if (allowCancellationsOutsideShift != null) {
+      data['allowCancellationsOutsideShift'] = allowCancellationsOutsideShift;
+    }
     if (useDiscounts != null) {
       data['useDiscounts'] = useDiscounts;
+    }
+    if (roundUpInvoiceTotals != null) {
+      data['roundUpInvoiceTotals'] = roundUpInvoiceTotals;
     }
     if (currency != null) {
       data['currency'] = currency!.code;

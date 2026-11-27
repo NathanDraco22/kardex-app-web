@@ -69,14 +69,11 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
   int _appliedPrimaryCents(PaymentCurrencySettings settings) {
     final maxCents = (widget.maxAmountToPay * 100).round();
     final primary = _convertedPrimaryCents(settings);
-    if (_useSecondaryCurrency && primary > maxCents) {
-      return maxCents;
-    }
-    return primary;
+    return primary > maxCents ? maxCents : primary;
   }
 
   int _changePrimaryCents(PaymentCurrencySettings settings) {
-    if (_selectedMethod != PaymentMethod.cash || !_useSecondaryCurrency) {
+    if (_selectedMethod != PaymentMethod.cash) {
       return 0;
     }
     final maxCents = (widget.maxAmountToPay * 100).round();
@@ -121,9 +118,7 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
   bool _canConfirmFor(PaymentCurrencySettings settings) {
     final maxCents = (widget.maxAmountToPay * 100).round();
     if (maxCents <= 0) return false;
-    if (_selectedMethod == PaymentMethod.cash &&
-        _useSecondaryCurrency &&
-        !settings.hasValidExchangeRate) {
+    if (_selectedMethod == PaymentMethod.cash && _useSecondaryCurrency && !settings.hasValidExchangeRate) {
       return false;
     }
     final tenderedCents = _tenderedCents();
@@ -131,7 +126,9 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
 
     final primaryCents = _convertedPrimaryCents(settings);
     if (primaryCents <= 0) return false;
-    if (!_useSecondaryCurrency && primaryCents > maxCents) return false;
+    if (_selectedMethod != PaymentMethod.cash && primaryCents > maxCents) {
+      return false;
+    }
 
     if (_selectedMethod == PaymentMethod.cash) return true;
     return _refController.text.trim().isNotEmpty;
@@ -154,200 +151,216 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
         constraints: const BoxConstraints(maxWidth: 400),
         child: Padding(
           padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                "Abono Rápido - ${widget.clientName}",
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                "Deuda total: $maxAmountFormatted",
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              if (maxCents <= 0) ...[
-                const SizedBox(height: 10),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.amber.shade50,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.amber.shade300),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  "Abono Rápido - ${widget.clientName}",
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
                   ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.warning_amber_rounded, size: 18, color: Colors.amber.shade900),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          "Las devoluciones o notas de crédito cubren o superan el adeudo de facturas. No es posible abonar un monto adicional.",
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.amber.shade900,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  "Deuda total: $maxAmountFormatted",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                if (maxCents <= 0) ...[
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.shade50,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.amber.shade300),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.warning_amber_rounded, size: 18, color: Colors.amber.shade900),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            "Las devoluciones o notas de crédito cubren o superan el adeudo de facturas. No es posible abonar un monto adicional.",
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.amber.shade900,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-              const SizedBox(height: 20),
-              SegmentedButton<PaymentMethod>(
-                style: ButtonStyle(
-                  foregroundColor: WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
-                    if (states.contains(WidgetState.selected)) {
-                      return Colors.white;
-                    }
-                    return Colors.black;
-                  }),
-                ),
-                segments: const [
-                  ButtonSegment(
-                    value: PaymentMethod.cash,
-                    label: Text("Efectivo", style: TextStyle(fontSize: 16)),
-                    icon: Icon(Icons.money),
-                  ),
-                  ButtonSegment(
-                    value: PaymentMethod.card,
-                    label: Text("Tarjeta", style: TextStyle(fontSize: 16)),
-                    icon: Icon(Icons.credit_card),
-                  ),
-                  ButtonSegment(
-                    value: PaymentMethod.transfer,
-                    label: Padding(
-                      padding: EdgeInsets.all(4.0),
-                      child: Text("Transf.", style: TextStyle(fontSize: 16)),
+                      ],
                     ),
-                    icon: Icon(Icons.account_balance),
                   ),
                 ],
-                selected: {_selectedMethod},
-                onSelectionChanged: (newSelection) {
-                  setState(() {
-                    _selectedMethod = newSelection.first;
-                    if (_selectedMethod == PaymentMethod.cash) {
-                      _selectedBank = null;
-                    } else {
-                      _useSecondaryCurrency = false;
-                    }
-                  });
-                },
-              ),
-              if (_selectedMethod == PaymentMethod.cash &&
-                  currencySettings.canUseDifferentSecondary) ...[
-                const SizedBox(height: 16),
-                PaymentCurrencySelector(
-                  settings: currencySettings,
-                  useSecondary: _useSecondaryCurrency,
-                  onChanged: (useSecondary) {
-                    setState(() => _useSecondaryCurrency = useSecondary);
+                const SizedBox(height: 20),
+                SegmentedButton<PaymentMethod>(
+                  style: ButtonStyle(
+                    foregroundColor: WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
+                      if (states.contains(WidgetState.selected)) {
+                        return Colors.white;
+                      }
+                      return Colors.black;
+                    }),
+                  ),
+                  segments: const [
+                    ButtonSegment(
+                      value: PaymentMethod.cash,
+                      label: Text("Efectivo", style: TextStyle(fontSize: 16)),
+                      icon: Icon(Icons.money),
+                    ),
+                    ButtonSegment(
+                      value: PaymentMethod.card,
+                      label: Text("Tarjeta", style: TextStyle(fontSize: 16)),
+                      icon: Icon(Icons.credit_card),
+                    ),
+                    ButtonSegment(
+                      value: PaymentMethod.transfer,
+                      label: Padding(
+                        padding: EdgeInsets.all(4.0),
+                        child: Text("Transf.", style: TextStyle(fontSize: 16)),
+                      ),
+                      icon: Icon(Icons.account_balance),
+                    ),
+                  ],
+                  selected: {_selectedMethod},
+                  onSelectionChanged: (newSelection) {
+                    setState(() {
+                      _selectedMethod = newSelection.first;
+                      if (_selectedMethod == PaymentMethod.cash) {
+                        _selectedBank = null;
+                      } else {
+                        _useSecondaryCurrency = false;
+                      }
+                    });
                   },
                 ),
-              ],
-              const SizedBox(height: 20),
-              TextField(
-                controller: _amountController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                autofocus: true,
-                inputFormatters: [const DecimalTextInputFormatter()],
-                decoration: InputDecoration(
-                  labelText: "Monto a Abonar",
-                  border: const OutlineInputBorder(),
-                  prefixText: _useSecondaryCurrency
-                      ? '${currencySettings.secondaryCurrency.symbol} '
-                      : '${currencySettings.primaryCurrency.symbol} ',
-                  errorText: () {
-                    if (tenderedCents <= 0 && _amountController.text.isNotEmpty) {
-                      return "Ingrese un monto mayor a 0";
-                    }
-                    if (!_useSecondaryCurrency && convertedPrimaryCents > maxCents) {
-                      return "El monto excede la deuda total";
-                    }
-                    return null;
-                  }(),
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    _currentInput = double.tryParse(value) ?? 0.0;
-                  });
-                },
-                onSubmitted: (_) => _submit(currencySettings),
-              ),
-              if (_useSecondaryCurrency &&
-                  currencySettings.hasValidExchangeRate &&
-                  tenderedCents > 0) ...[
-                const SizedBox(height: 8),
-                Text(
-                  changePrimaryCents > 0
-                      ? 'Equivalente: ${NumberFormatter.formatMoney(convertedPrimaryCents, currencySettings.primaryCurrency)} (Se aplican ${NumberFormatter.formatMoney(appliedPrimaryCents, currencySettings.primaryCurrency)})'
-                      : 'Equivalente a abonar: ${NumberFormatter.formatMoney(appliedPrimaryCents, currencySettings.primaryCurrency)}',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.grey.shade800,
-                  ),
-                ),
-                if (changePrimaryCents > 0) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    'Cambio: ${formatPaymentChangeLabel(changePrimaryCents, primaryCurrency: currencySettings.primaryCurrency, secondaryCurrency: currencySettings.secondaryCurrency, exchangeRate: currencySettings.exchangeRate)}',
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green,
-                    ),
+                if (_selectedMethod == PaymentMethod.cash && currencySettings.canUseDifferentSecondary) ...[
+                  const SizedBox(height: 16),
+                  PaymentCurrencySelector(
+                    settings: currencySettings,
+                    useSecondary: _useSecondaryCurrency,
+                    onChanged: (useSecondary) {
+                      setState(() => _useSecondaryCurrency = useSecondary);
+                    },
                   ),
                 ],
-              ],
-              if (_selectedMethod != PaymentMethod.cash) ...[
-                const SizedBox(height: 14),
-                BankChipsSelector(
-                  selectedBank: _selectedBank,
-                  onChanged: (bank) => setState(() => _selectedBank = bank),
-                ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 20),
                 TextField(
-                  controller: _refController,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
+                  controller: _amountController,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  autofocus: true,
+                  inputFormatters: [const DecimalTextInputFormatter()],
+                  decoration: InputDecoration(
+                    labelText: "Monto a Abonar",
+                    border: const OutlineInputBorder(),
+                    prefixText: _useSecondaryCurrency
+                        ? '${currencySettings.secondaryCurrency.symbol} '
+                        : '${currencySettings.primaryCurrency.symbol} ',
+                    errorText: () {
+                      if (tenderedCents <= 0 && _amountController.text.isNotEmpty) {
+                        return "Ingrese un monto mayor a 0";
+                      }
+                      if (_selectedMethod != PaymentMethod.cash &&
+                          !_useSecondaryCurrency &&
+                          convertedPrimaryCents > maxCents) {
+                        return "El monto excede la deuda total";
+                      }
+                      return null;
+                    }(),
                   ),
-                  inputFormatters: [IntegerTextInputFormatter()],
-                  keyboardType: const TextInputType.numberWithOptions(decimal: false),
-                  decoration: const InputDecoration(
-                    labelText: "Número de Referencia",
-                    border: OutlineInputBorder(),
-                  ),
-                  onChanged: (_) => setState(() {}),
+                  onChanged: (value) {
+                    setState(() {
+                      _currentInput = double.tryParse(value) ?? 0.0;
+                    });
+                  },
+                  onSubmitted: (_) => _submit(currencySettings),
                 ),
-              ],
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text("Cancelar"),
+                if (_selectedMethod == PaymentMethod.cash &&
+                    tenderedCents > 0 &&
+                    ((_useSecondaryCurrency && currencySettings.hasValidExchangeRate) || changePrimaryCents > 0)) ...[
+                  const SizedBox(height: 8),
+                  if (_useSecondaryCurrency) ...[
+                    Text(
+                      changePrimaryCents > 0
+                          ? 'Equivalente: ${NumberFormatter.formatMoney(convertedPrimaryCents, currencySettings.primaryCurrency)} (Se aplican ${NumberFormatter.formatMoney(appliedPrimaryCents, currencySettings.primaryCurrency)})'
+                          : 'Equivalente a abonar: ${NumberFormatter.formatMoney(appliedPrimaryCents, currencySettings.primaryCurrency)}',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey.shade800,
+                      ),
+                    ),
+                  ] else ...[
+                    Text(
+                      'Se aplican: ${NumberFormatter.formatMoney(appliedPrimaryCents, currencySettings.primaryCurrency)}',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey.shade800,
+                      ),
+                    ),
+                  ],
+                  if (changePrimaryCents > 0) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      'Cambio: ${formatPaymentChangeLabel(changePrimaryCents, primaryCurrency: currencySettings.primaryCurrency, secondaryCurrency: _useSecondaryCurrency ? currencySettings.secondaryCurrency : null, exchangeRate: _useSecondaryCurrency ? currencySettings.exchangeRate : null)}',
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
+                      ),
+                    ),
+                  ],
+                ],
+                if (_selectedMethod != PaymentMethod.cash) ...[
+                  const SizedBox(height: 14),
+                  BankChipsSelector(
+                    selectedBank: _selectedBank,
+                    onChanged: (bank) => setState(() => _selectedBank = bank),
                   ),
-                  const SizedBox(width: 16),
-                  PrimaryMenuButton(
-                    onPressed: canConfirm ? () => _submit(currencySettings) : null,
-                    label: const Text("Aplicar Abono"),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _refController,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    inputFormatters: [IntegerTextInputFormatter()],
+                    keyboardType: const TextInputType.numberWithOptions(decimal: false),
+                    decoration: const InputDecoration(
+                      labelText: "Número de Referencia",
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: (_) => setState(() {}),
                   ),
                 ],
-              ),
-            ],
+                const SizedBox(height: 24),
+                Wrap(
+                  alignment: WrapAlignment.end,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 16,
+                  runSpacing: 8,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text("Cancelar"),
+                    ),
+                    PrimaryMenuButton(
+                      onPressed: canConfirm ? () => _submit(currencySettings) : null,
+                      label: const Text("Aplicar Abono"),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

@@ -53,7 +53,9 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
   bool _requireShiftForConvertedOrders = false;
   bool _useInvoiceCancellations = false;
   bool _useReceiptCancellations = false;
+  bool _allowCancellationsOutsideShift = false;
   bool _useDiscounts = false;
+  bool _roundUpInvoiceTotals = false;
   AppCurrency _currency = AppCurrency.nio;
   AppCurrency _secondaryCurrency = AppCurrency.usd;
   double _exchangeRate = 0.0;
@@ -101,7 +103,9 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
       _requireShiftForConvertedOrders = settings.requireShiftForConvertedOrders;
       _useInvoiceCancellations = settings.useInvoiceCancellations;
       _useReceiptCancellations = settings.useReceiptCancellations;
+      _allowCancellationsOutsideShift = settings.allowCancellationsOutsideShift;
       _useDiscounts = settings.useDiscounts;
+      _roundUpInvoiceTotals = settings.roundUpInvoiceTotals;
       _showInvoiceTotalInSecondaryCurrency = settings.showInvoiceTotalInSecondaryCurrency;
       _allowSecondaryCurrencyPayment = settings.allowSecondaryCurrencyPayment;
       _showInvoiceItemsSummary = settings.showInvoiceItemsSummary;
@@ -152,41 +156,101 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
         _requireShiftForConvertedOrders != settings.requireShiftForConvertedOrders ||
         _useInvoiceCancellations != settings.useInvoiceCancellations ||
         _useReceiptCancellations != settings.useReceiptCancellations ||
+        _allowCancellationsOutsideShift != settings.allowCancellationsOutsideShift ||
         _useDiscounts != settings.useDiscounts ||
+        _roundUpInvoiceTotals != settings.roundUpInvoiceTotals ||
         _showInvoiceTotalInSecondaryCurrency != settings.showInvoiceTotalInSecondaryCurrency ||
         _allowSecondaryCurrencyPayment != settings.allowSecondaryCurrencyPayment ||
         _showInvoiceItemsSummary != settings.showInvoiceItemsSummary ||
         _showInvoiceOrderCreator != settings.showInvoiceOrderCreator;
   }
 
-  Future<void> _saveSettings() async {
+  /// Construye un PATCH parcial con solo los campos que cambiaron respecto de
+  /// [settings]. Evita que dos sesiones de configuración se sobrescriban entre sí.
+  UpdateAppSetting _buildChangedUpdate(AppSettingModel settings) {
     final profitMargin = _profitMarginValue;
     final paymentTerm = _paymentTermValue;
+    T? changed<T>(T local, T remote) => local == remote ? null : local;
 
-    final update = UpdateAppSetting(
-      useDefaultProfitMargin: _useDefaultProfitMargin,
-      defaultProfitMargin: profitMargin,
-      useExpirationDates: _useExpirationDates,
-      useOrders: _useOrders,
-      useQuotations: _useQuotations,
-      allowNegativeStock: _allowNegativeStock,
-      alertMinStock: _alertMinStock,
-      defaultPaymentTermDays: paymentTerm,
-      useHoldSales: _useHoldSales,
-      useQuickProductSearch: _useQuickProductSearch,
-      useShifts: _useShifts,
-      chargeConvertedOrdersToShift: _chargeConvertedOrdersToShift,
-      requireShiftForConvertedOrders: _requireShiftForConvertedOrders,
-      useInvoiceCancellations: _useInvoiceCancellations,
-      useReceiptCancellations: _useReceiptCancellations,
-      useDiscounts: _useDiscounts,
-      showInvoiceTotalInSecondaryCurrency: _showInvoiceTotalInSecondaryCurrency,
-      allowSecondaryCurrencyPayment: _allowSecondaryCurrencyPayment,
-      showInvoiceItemsSummary: _showInvoiceItemsSummary,
-      showInvoiceOrderCreator: _showInvoiceOrderCreator,
+    return UpdateAppSetting(
+      useDefaultProfitMargin:
+          changed(_useDefaultProfitMargin, settings.useDefaultProfitMargin),
+      defaultProfitMargin:
+          changed(profitMargin, settings.defaultProfitMargin),
+      useExpirationDates:
+          changed(_useExpirationDates, settings.useExpirationDates),
+      useOrders: changed(_useOrders, settings.useOrders),
+      useQuotations: changed(_useQuotations, settings.useQuotations),
+      allowNegativeStock:
+          changed(_allowNegativeStock, settings.allowNegativeStock),
+      alertMinStock: changed(_alertMinStock, settings.alertMinStock),
+      defaultPaymentTermDays:
+          changed(paymentTerm, settings.defaultPaymentTermDays),
+      useHoldSales: changed(_useHoldSales, settings.useHoldSales),
+      useQuickProductSearch:
+          changed(_useQuickProductSearch, settings.useQuickProductSearch),
+      useShifts: changed(_useShifts, settings.useShifts),
+      chargeConvertedOrdersToShift: changed(
+        _chargeConvertedOrdersToShift,
+        settings.chargeConvertedOrdersToShift,
+      ),
+      requireShiftForConvertedOrders: changed(
+        _requireShiftForConvertedOrders,
+        settings.requireShiftForConvertedOrders,
+      ),
+      useInvoiceCancellations: changed(
+        _useInvoiceCancellations,
+        settings.useInvoiceCancellations,
+      ),
+      useReceiptCancellations: changed(
+        _useReceiptCancellations,
+        settings.useReceiptCancellations,
+      ),
+      allowCancellationsOutsideShift: changed(
+        _allowCancellationsOutsideShift,
+        settings.allowCancellationsOutsideShift,
+      ),
+      useDiscounts: changed(_useDiscounts, settings.useDiscounts),
+      roundUpInvoiceTotals:
+          changed(_roundUpInvoiceTotals, settings.roundUpInvoiceTotals),
+      showInvoiceTotalInSecondaryCurrency: changed(
+        _showInvoiceTotalInSecondaryCurrency,
+        settings.showInvoiceTotalInSecondaryCurrency,
+      ),
+      allowSecondaryCurrencyPayment: changed(
+        _allowSecondaryCurrencyPayment,
+        settings.allowSecondaryCurrencyPayment,
+      ),
+      showInvoiceItemsSummary: changed(
+        _showInvoiceItemsSummary,
+        settings.showInvoiceItemsSummary,
+      ),
+      showInvoiceOrderCreator: changed(
+        _showInvoiceOrderCreator,
+        settings.showInvoiceOrderCreator,
+      ),
     );
+  }
 
-    final success = await getIt<AppSettingsCubit>().updateSettings(update);
+  Future<void> _saveSettings() async {
+    final cubit = getIt<AppSettingsCubit>();
+    final currentSettings = cubit.currentSettings;
+
+    if (currentSettings == null) {
+      _showSettingsSnackBar(
+        "No hay configuración cargada. Recarga e intenta de nuevo.",
+        isError: true,
+      );
+      return;
+    }
+
+    final update = _buildChangedUpdate(currentSettings);
+    if (update.toJson().isEmpty) {
+      _showSettingsSnackBar("No hay cambios para guardar.");
+      return;
+    }
+
+    final success = await cubit.updateSettings(update);
 
     if (mounted) {
       if (success) {
@@ -1238,6 +1302,21 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                         const Divider(height: 1),
                         SwitchListTile(
                           title: const Text(
+                            "Redondear a la Alta en Facturas",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: const Text(
+                            "Redondea el subtotal de cada línea hacia arriba y los descuentos hacia abajo para que subtotal y total queden en números enteros. Solo aplica a facturas nuevas; no modifica órdenes ni cotizaciones.",
+                            style: TextStyle(fontSize: 13, color: Colors.black54),
+                          ),
+                          value: _roundUpInvoiceTotals,
+                          onChanged: isSaving
+                              ? null
+                              : (val) => setState(() => _roundUpInvoiceTotals = val),
+                        ),
+                        const Divider(height: 1),
+                        SwitchListTile(
+                          title: const Text(
                             "Solicitudes de Anulación de Facturas",
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
@@ -1264,6 +1343,21 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                           onChanged: isSaving
                               ? null
                               : (val) => setState(() => _useReceiptCancellations = val),
+                        ),
+                        const Divider(height: 1),
+                        SwitchListTile(
+                          title: const Text(
+                            "Permitir Anular Facturas y Recibos Fuera de Turno",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: const Text(
+                            "Permite solicitar y aprobar la anulación de facturas y recibos de turnos ya cerrados. Los arqueos cerrados conservan sus totales, pero los reportes vivos de la fecha cambian y el reembolso de efectivo no se registra automáticamente.",
+                            style: TextStyle(fontSize: 13, color: Colors.black54),
+                          ),
+                          value: _allowCancellationsOutsideShift,
+                          onChanged: isSaving
+                              ? null
+                              : (val) => setState(() => _allowCancellationsOutsideShift = val),
                         ),
                       ],
                     ),
