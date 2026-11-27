@@ -2,28 +2,40 @@ import 'package:material_ui/material_ui.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 class DevolutionsSelectionViewController extends ChangeNotifier {
-  List<SaleItem> _selectedItems = [];
+  final Map<int, SaleItem> _selectedByIndex = {};
 
-  List<SaleItem> get selectedItems => _selectedItems;
+  List<SaleItem> get selectedItems => _selectedByIndex.values.toList();
 
   String devolutionDescription = '';
 
+  void toggleIndex(int index, SaleItem item, bool selected) {
+    if (selected) {
+      _selectedByIndex[index] = item;
+    } else {
+      _selectedByIndex.remove(index);
+    }
+    notifyListeners();
+  }
+
   void addToSelected(SaleItem item) {
-    _selectedItems.add(item);
+    final idx = item.invoiceItemIndex ?? _selectedByIndex.length;
+    _selectedByIndex[idx] = item;
     notifyListeners();
   }
 
   void removeFromSelected(SaleItem item) {
-    _selectedItems.remove(item);
+    _selectedByIndex.removeWhere((_, value) => value == item);
     notifyListeners();
   }
 
   void clearSelected() {
-    _selectedItems = [];
+    _selectedByIndex.clear();
     notifyListeners();
   }
 
-  bool isInSelected(SaleItem item) => _selectedItems.contains(item);
+  bool isIndexSelected(int index) => _selectedByIndex.containsKey(index);
+
+  bool isInSelected(SaleItem item) => _selectedByIndex.containsValue(item);
 }
 
 class DevolutionsSelectionMediator extends InheritedNotifier<DevolutionsSelectionViewController> {

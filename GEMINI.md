@@ -1,3 +1,11 @@
+## Devoluciones en Facturas a Crédito Sin Abonos (Noviembre 2026)
+
+- **Alcance:** Eliminada la restricción que obligaba a usar Notas de Crédito en devoluciones de facturas a crédito; ahora se permiten devoluciones directas sobre facturas a crédito sin abonos (`amountPaid == 0` y `status == open`) manteniendo intacto el comportamiento habitual de contado (`main` y `lite`).
+- **Dominio (`packages/kardex_business`):** Agregado `originalInvoicePaymentType` (`String?`) en `BaseDevolution`, `CreateDevolution` y `DevolutionInDb`; agregado `SaleItem.copyWith({int? invoiceItemIndex})`.
+- **Elegibilidad y cruce acumulado:** Nuevo helper `lib/src/modules/commercial/devolutions/devolution_eligibility.dart` (`validateInvoiceForDevolution` y `computePreviouslyReturnedByLine`) aplicado en `devolutions`, `client_devolution` y `create_credit_note_dialog.dart`, adjuntando `invoiceItemIndex` y sumando cantidades devueltas entre Devoluciones y Notas de Crédito.
+- **Cobranza (`pending_invoice`):** En `ReadPendingInvoiceCubit` (ruta fallback sin composite), filtradas `devolutions` a las vinculadas con facturas pendientes.
+- **Verificación:** `dart analyze packages/kardex_business`, `flutter analyze --no-pub` (`No issues found!`) y `flutter test --no-pub test/devolution_credit_eligibility_test.dart` (`8/8 passed`) en `main` y `lite`.
+
 ## Visibilidad Configurable de Anulaciones (`AppSettings`) y Anulación de Recibos (Noviembre 2026)
 
 - **Alcance:** Ocultamiento por defecto desde `AppSettings` (`useInvoiceCancellations = false`, `useReceiptCancellations = false`) e implementación completa de **Solicitudes de Anulación de Recibos** (`main` y `lite`).

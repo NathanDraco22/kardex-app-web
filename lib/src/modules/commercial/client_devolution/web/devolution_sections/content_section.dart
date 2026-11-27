@@ -5,13 +5,16 @@ class _ContentSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final invoice = context.findAncestorWidgetOfExactType<_Body>()!.invoice;
-    final devolutions = context.findAncestorWidgetOfExactType<_Body>()!.devolutions;
+    final bodyWidget = context.findAncestorWidgetOfExactType<_Body>()!;
+    final invoice = bodyWidget.invoice;
+    final devolutions = bodyWidget.devolutions;
+    final creditNotes = bodyWidget.creditNotes;
     final viewController = DevolutionSelectionMediator.of(context).notifier!;
     final targetDevolutions = devolutions.where((devolution) => devolution.originalInvoiceId == invoice.id).toList();
-    final returnedItems = targetDevolutions.fold<List<SaleItem>>(
-      [],
-      (previousValue, devolution) => [...previousValue, ...devolution.returnedItems],
+    final returnedByLine = computePreviouslyReturnedByLine(
+      saleItems: invoice.saleItems,
+      devolutions: targetDevolutions,
+      creditNotes: creditNotes,
     );
 
     return Card(
@@ -33,7 +36,7 @@ class _ContentSection extends StatelessWidget {
               itemCount: invoice.saleItems.length,
               itemBuilder: (context, index) {
                 final item = invoice.saleItems[index];
-                final hasItemReturned = returnedItems.any((returnedItem) => returnedItem.product.id == item.product.id);
+                final hasItemReturned = (returnedByLine[index] ?? 0) > 0;
                 return CheckboxListTile(
                   enabled: !hasItemReturned,
                   controlAffinity: ListTileControlAffinity.leading,
@@ -54,13 +57,13 @@ class _ContentSection extends StatelessWidget {
                       ),
                     ],
                   ),
-                  value: viewController.isInSelected(item),
+                  value: viewController.isIndexSelected(index),
                   onChanged: (bool? value) {
-                    if (value == true) {
-                      viewController.addToSelected(item);
-                    } else {
-                      viewController.removeFromSelected(item);
-                    }
+                    viewController.toggleIndex(
+                      index,
+                      item.copyWith(invoiceItemIndex: index),
+                      value == true,
+                    );
                   },
                 );
               },

@@ -152,26 +152,22 @@ class _ContentSection extends StatelessWidget {
   }
 
   Future<void> _openDevolutionSelection(BuildContext context, InvoiceInDb currentInvoice) async {
-    if (currentInvoice.status == InvoiceStatus.cancelled) {
-      DialogManager.showInfoDialog(
-        context,
-        "No se pueden realizar devoluciones sobre facturas canceladas.",
-      );
-      return;
-    }
-    if (currentInvoice.paymentType == PaymentType.credit) {
-      DialogManager.showInfoDialog(
-        context,
-        "Las facturas a crédito deben procesarse desde el módulo de Notas de Crédito.",
-      );
+    final errorMsg = validateInvoiceForDevolution(currentInvoice);
+    if (errorMsg != null) {
+      DialogManager.showInfoDialog(context, errorMsg);
       return;
     }
 
     LoadingDialogManager.showLoadingDialog(context);
     try {
-      final result = await context
-          .read<InvoicesRepository>()
-          .getInvoiceDevolutionById(currentInvoice.id);
+      final invoicesRepo = context.read<InvoicesRepository>();
+      final creditNotesRepo = context.read<CreditNotesRepository>();
+      final resultFuture = invoicesRepo.getInvoiceDevolutionById(currentInvoice.id);
+      final creditNotesFuture = creditNotesRepo
+          .getCreditNotesByInvoiceId(currentInvoice.id)
+          .catchError((_) => const <CreditNoteInDb>[]);
+      final result = await resultFuture;
+      final creditNotes = await creditNotesFuture;
       if (!context.mounted) return;
       LoadingDialogManager.closeLoadingDialog(context);
       await Navigator.push(
@@ -180,6 +176,7 @@ class _ContentSection extends StatelessWidget {
           builder: (context) => DevolutionsSelectionScreen(
             invoice: result.invoice,
             devolutions: result.devolutions,
+            creditNotes: creditNotes,
           ),
         ),
       );

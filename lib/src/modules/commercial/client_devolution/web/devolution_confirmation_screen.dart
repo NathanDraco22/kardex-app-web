@@ -102,6 +102,13 @@ class _RootScaffold extends StatelessWidget {
           icon: const Icon(Icons.check),
           label: const Text("Finalizar Devolución"),
           onPressed: () async {
+            if (invoice.invoiceDiscount > 0) {
+              DialogManager.showErrorDialog(
+                context,
+                "No se permiten devoluciones por producto en facturas con descuento global.",
+              );
+              return;
+            }
             if (!await ShiftGuard.ensureShiftReady(context)) return;
             if (!context.mounted) return;
             final total = selectedItems.fold<int>(
