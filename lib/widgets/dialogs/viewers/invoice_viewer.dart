@@ -208,109 +208,136 @@ class _InvoiceViewer extends StatelessWidget {
     if (authState is! Authenticated) return;
 
     final repo = context.read<InvoiceCancellationRequestsRepository>();
-    final reasonController = TextEditingController();
-    final formKey = GlobalKey<FormState>();
-    bool submitting = false;
-
-    await showDialog<void>(
+    final sent = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
-      builder: (dialogContext) {
-        return StatefulBuilder(
-          builder: (ctx, setState) {
-            return AlertDialog(
-              title: Text("Solicitar anulación #${invoice.docNumber}"),
-              content: Form(
-                key: formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Esta solicitud deberá ser aprobada por un supervisor o administrador antes de anular la factura y revertir el inventario.",
-                      style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: reasonController,
-                      maxLines: 3,
-                      autofocus: true,
-                      decoration: const InputDecoration(
-                        labelText: "Motivo de anulación *",
-                        hintText: "Ej. Error en productos o método de pago",
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (v) {
-                        if (v == null || v.trim().length < 3) {
-                          return "Ingresa un motivo de al menos 3 caracteres.";
-                        }
-                        return null;
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: submitting ? null : () => Navigator.of(dialogContext).pop(),
-                  child: const Text("Cancelar"),
-                ),
-                ElevatedButton(
-                  onPressed: submitting
-                      ? null
-                      : () async {
-                          if (!formKey.currentState!.validate()) return;
-                          setState(() => submitting = true);
-                          try {
-                            await repo.createRequest(
-                              CreateInvoiceCancellationRequest(
-                                invoiceId: invoice.id,
-                                reason: reasonController.text.trim(),
-                                requestedBy: UserInfo(
-                                  id: authState.session.user.id,
-                                  name: authState.session.user.username,
-                                ),
-                              ),
-                            );
-                            if (dialogContext.mounted) {
-                              Navigator.of(dialogContext).pop();
-                            }
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    "Solicitud de anulación enviada correctamente.",
-                                  ),
-                                ),
-                              );
-                            }
-                          } catch (e) {
-                            setState(() => submitting = false);
-                            if (dialogContext.mounted) {
-                              ScaffoldMessenger.of(dialogContext).showSnackBar(
-                                SnackBar(
-                                  content: Text(e.toString()),
-                                  backgroundColor: Colors.red.shade700,
-                                ),
-                              );
-                            }
-                          }
-                        },
-                  child: submitting
-                      ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Text("Enviar solicitud"),
-                ),
-              ],
-            );
-          },
-        );
-      },
+      builder: (_) => _RequestInvoiceCancellationDialog(
+        invoice: invoice,
+        requestedBy: UserInfo(
+          id: authState.session.user.id,
+          name: authState.session.user.username,
+        ),
+        repository: repo,
+      ),
     );
-    reasonController.dispose();
+    if (sent == true && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Solicitud de anulación enviada correctamente."),
+        ),
+      );
+    }
+  }
+}
+
+class _RequestInvoiceCancellationDialog extends StatefulWidget {
+  final InvoiceInDb invoice;
+  final UserInfo requestedBy;
+  final InvoiceCancellationRequestsRepository repository;
+
+  const _RequestInvoiceCancellationDialog({
+    required this.invoice,
+    required this.requestedBy,
+    required this.repository,
+  });
+
+  @override
+  State<_RequestInvoiceCancellationDialog> createState() =>
+      _RequestInvoiceCancellationDialogState();
+}
+
+class _RequestInvoiceCancellationDialogState
+    extends State<_RequestInvoiceCancellationDialog> {
+  final _reasonController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  bool _submitting = false;
+
+  @override
+  void dispose() {
+    _reasonController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _submitting = true);
+    try {
+      await widget.repository.createRequest(
+        CreateInvoiceCancellationRequest(
+          invoiceId: widget.invoice.id,
+          reason: _reasonController.text.trim(),
+          requestedBy: widget.requestedBy,
+        ),
+      );
+      if (!mounted) return;
+      Navigator.of(context).pop(true);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _submitting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+          backgroundColor: Colors.red.shade700,
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PopScope(
+      canPop: !_submitting,
+      child: AlertDialog(
+        title: Text("Solicitar anulación #${widget.invoice.docNumber}"),
+        content: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Esta solicitud deberá ser aprobada por un supervisor o administrador antes de anular la factura y revertir el inventario.",
+                style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _reasonController,
+                maxLines: 3,
+                autofocus: true,
+                enabled: !_submitting,
+                decoration: const InputDecoration(
+                  labelText: "Motivo de anulación *",
+                  hintText: "Ej. Error en productos o método de pago",
+                  border: OutlineInputBorder(),
+                ),
+                validator: (v) {
+                  if (v == null || v.trim().length < 3) {
+                    return "Ingresa un motivo de al menos 3 caracteres.";
+                  }
+                  return null;
+                },
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: _submitting ? null : () => Navigator.of(context).pop(false),
+            child: const Text("Cancelar"),
+          ),
+          ElevatedButton(
+            onPressed: _submitting ? null : _submit,
+            child: _submitting
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Text("Enviar solicitud"),
+          ),
+        ],
+      ),
+    );
   }
 }
 

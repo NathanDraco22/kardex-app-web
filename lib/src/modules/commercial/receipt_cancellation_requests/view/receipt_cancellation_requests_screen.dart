@@ -284,68 +284,72 @@ class _ReceiptCancellationRequestCard extends StatelessWidget {
             ],
             if (request.status == ReceiptCancellationRequestStatus.pending) ...[
               const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  if (isRequester || isApprover)
-                    TextButton(
-                      onPressed: isWriting || currentUser == null
-                          ? null
-                          : () => context
-                              .read<WriteReceiptCancellationRequestsCubit>()
-                              .cancelRequest(
-                                request.id,
-                                UserInfo(
-                                  id: currentUser.id,
-                                  name: currentUser.username,
+              Align(
+                alignment: Alignment.centerRight,
+                child: Wrap(
+                  alignment: WrapAlignment.end,
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    if (isRequester || isApprover)
+                      TextButton(
+                        onPressed: isWriting || currentUser == null
+                            ? null
+                            : () => context
+                                .read<WriteReceiptCancellationRequestsCubit>()
+                                .cancelRequest(
+                                  request.id,
+                                  UserInfo(
+                                    id: currentUser.id,
+                                    name: currentUser.username,
+                                  ),
                                 ),
-                              ),
-                      child: const Text('Cancelar solicitud'),
-                    ),
-                  const SizedBox(width: 8),
-                  Gate(
-                    filters: const [
-                      RolePermissionGateFilter(
-                        permissions: [
-                          CommercialSubModules.approveReceiptCancellation,
-                        ],
+                        child: const Text('Cancelar solicitud'),
                       ),
-                    ],
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        OutlinedButton(
-                          onPressed: isWriting || currentUser == null
-                              ? null
-                              : () => _showRejectDialog(
-                                    context,
-                                    UserInfo(
-                                      id: currentUser.id,
-                                      name: currentUser.username,
-                                    ),
-                                  ),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: AppThemeTokens.danger,
-                          ),
-                          child: const Text('Rechazar'),
-                        ),
-                        const SizedBox(width: 8),
-                        ElevatedButton(
-                          onPressed: isWriting || currentUser == null
-                              ? null
-                              : () => _showApproveDialog(
-                                    context,
-                                    UserInfo(
-                                      id: currentUser.id,
-                                      name: currentUser.username,
-                                    ),
-                                  ),
-                          child: const Text('Aprobar'),
+                    Gate(
+                      filters: const [
+                        RolePermissionGateFilter(
+                          permissions: [
+                            CommercialSubModules.approveReceiptCancellation,
+                          ],
                         ),
                       ],
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          OutlinedButton(
+                            onPressed: isWriting || currentUser == null
+                                ? null
+                                : () => _showRejectDialog(
+                                      context,
+                                      UserInfo(
+                                        id: currentUser.id,
+                                        name: currentUser.username,
+                                      ),
+                                    ),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: AppThemeTokens.danger,
+                            ),
+                            child: const Text('Rechazar'),
+                          ),
+                          ElevatedButton(
+                            onPressed: isWriting || currentUser == null
+                                ? null
+                                : () => _showApproveDialog(
+                                      context,
+                                      UserInfo(
+                                        id: currentUser.id,
+                                        name: currentUser.username,
+                                      ),
+                                    ),
+                            child: const Text('Aprobar'),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ],
@@ -355,103 +359,142 @@ class _ReceiptCancellationRequestCard extends StatelessWidget {
   }
 
   Future<void> _showApproveDialog(BuildContext context, UserInfo reviewer) async {
-    final notesController = TextEditingController();
     final writeCubit = context.read<WriteReceiptCancellationRequestsCubit>();
-    final confirmed = await showDialog<bool>(
+    final notes = await showDialog<String>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text('Aprobar anulación de recibo #${request.receiptDocNumber}'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Al aprobar, el recibo quedará anulado y se revertirán los abonos aplicados en sus facturas y el saldo del cliente.',
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: notesController,
-              decoration: const InputDecoration(
-                labelText: 'Notas (opcional)',
-                border: OutlineInputBorder(),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Confirmar anulación'),
-          ),
-        ],
-      ),
+      builder: (_) => _ApproveReceiptDialog(docNumber: request.receiptDocNumber),
     );
-
-    if (confirmed == true) {
+    if (notes != null) {
       await writeCubit.approveRequest(
         request.id,
         reviewer,
-        reviewNotes: notesController.text.trim(),
+        reviewNotes: notes,
       );
     }
-    notesController.dispose();
   }
 
   Future<void> _showRejectDialog(BuildContext context, UserInfo reviewer) async {
-    final notesController = TextEditingController();
-    final formKey = GlobalKey<FormState>();
     final writeCubit = context.read<WriteReceiptCancellationRequestsCubit>();
-
-    final confirmed = await showDialog<bool>(
+    final reason = await showDialog<String>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text('Rechazar solicitud #${request.docNumber}'),
-        content: Form(
-          key: formKey,
-          child: TextFormField(
-            controller: notesController,
-            maxLines: 2,
-            autofocus: true,
-            decoration: const InputDecoration(
-              labelText: 'Motivo de rechazo *',
-              border: OutlineInputBorder(),
-            ),
-            validator: (v) {
-              if (v == null || v.trim().length < 3) {
-                return 'Ingresa un motivo de al menos 3 caracteres.';
-              }
-              return null;
-            },
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (formKey.currentState!.validate()) {
-                Navigator.of(ctx).pop(true);
-              }
-            },
-            child: const Text('Rechazar'),
-          ),
-        ],
-      ),
+      builder: (_) => _RejectReceiptDialog(docNumber: request.docNumber),
     );
-
-    if (confirmed == true) {
+    if (reason != null) {
       await writeCubit.rejectRequest(
         request.id,
         reviewer,
-        reviewNotes: notesController.text.trim(),
+        reviewNotes: reason,
       );
     }
-    notesController.dispose();
+  }
+}
+
+class _ApproveReceiptDialog extends StatefulWidget {
+  final String docNumber;
+  const _ApproveReceiptDialog({required this.docNumber});
+
+  @override
+  State<_ApproveReceiptDialog> createState() => _ApproveReceiptDialogState();
+}
+
+class _ApproveReceiptDialogState extends State<_ApproveReceiptDialog> {
+  final _notesController = TextEditingController();
+
+  @override
+  void dispose() {
+    _notesController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Aprobar anulación de recibo #${widget.docNumber}'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Al aprobar, el recibo quedará anulado y se revertirán los abonos aplicados en sus facturas y el saldo del cliente.',
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _notesController,
+            decoration: const InputDecoration(
+              labelText: 'Notas (opcional)',
+              border: OutlineInputBorder(),
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(null),
+          child: const Text('Cancelar'),
+        ),
+        ElevatedButton(
+          onPressed: () => Navigator.of(context).pop(_notesController.text.trim()),
+          child: const Text('Confirmar anulación'),
+        ),
+      ],
+    );
+  }
+}
+
+class _RejectReceiptDialog extends StatefulWidget {
+  final String docNumber;
+  const _RejectReceiptDialog({required this.docNumber});
+
+  @override
+  State<_RejectReceiptDialog> createState() => _RejectReceiptDialogState();
+}
+
+class _RejectReceiptDialogState extends State<_RejectReceiptDialog> {
+  final _notesController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  void dispose() {
+    _notesController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Rechazar solicitud #${widget.docNumber}'),
+      content: Form(
+        key: _formKey,
+        child: TextFormField(
+          controller: _notesController,
+          maxLines: 2,
+          autofocus: true,
+          decoration: const InputDecoration(
+            labelText: 'Motivo de rechazo *',
+            border: OutlineInputBorder(),
+          ),
+          validator: (v) {
+            if (v == null || v.trim().length < 3) {
+              return 'Ingresa un motivo de al menos 3 caracteres.';
+            }
+            return null;
+          },
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(null),
+          child: const Text('Cancelar'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            if (_formKey.currentState!.validate()) {
+              Navigator.of(context).pop(_notesController.text.trim());
+            }
+          },
+          child: const Text('Rechazar'),
+        ),
+      ],
+    );
   }
 }
