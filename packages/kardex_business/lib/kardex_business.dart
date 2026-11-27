@@ -21,6 +21,7 @@ export 'src/domain/query_params/expense_query_params.dart';
 export 'src/domain/query_params/expiration_query_params.dart';
 export 'src/domain/query_params/history_params.dart';
 export 'src/domain/query_params/invoice_query_params.dart';
+export 'src/domain/query_params/invoice_cancellation_request_query_params.dart';
 export 'src/domain/query_params/order_query_params.dart';
 export 'src/domain/query_params/product_query_params.dart';
 export 'src/domain/query_params/product_stats_query.dart';

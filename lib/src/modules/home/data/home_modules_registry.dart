@@ -635,6 +635,22 @@ List<HomeModuleCategory> getHomeModuleCategories(
               ),
             ],
           ),
+          const HomeSubmoduleItem(
+            section: "Anulaciones",
+            title: "Solicitudes de Anulación",
+            subtitle: "Solicitar, aprobar o rechazar anulaciones de factura",
+            icon: Icons.cancel_schedule_send_outlined,
+            accentColor: Color(0xFFDC2626),
+            routeName: RouteNames.invoiceCancellationRequests,
+            gates: [
+              RolePermissionGateFilter(
+                permissions: [
+                  CommercialSubModules.invoiceHistory,
+                  CommercialSubModules.approveInvoiceCancellation,
+                ],
+              ),
+            ],
+          ),
         ],
       ),
     if (isCommerce)

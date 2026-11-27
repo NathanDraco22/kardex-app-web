@@ -27,6 +27,7 @@ export 'hold_sales_repository.dart';
 export 'imports_repository.dart';
 export 'integrations_repository.dart';
 export 'inventories_repository.dart';
+export 'invoice_cancellation_requests_repository.dart';
 export 'invoice_repository.dart';
 export 'order_repository.dart';
 export 'product_accounts_repository.dart';

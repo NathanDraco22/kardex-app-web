@@ -54,6 +54,10 @@ class BaseInvoice {
   final UserInfo createdBy;
   final UserInfo? invoicedBy;
   final String? shiftId;
+  final DateTime? cancelledAt;
+  final UserInfo? cancelledBy;
+  final String? cancellationReason;
+  final String? cancellationRequestId;
 
   BaseInvoice({
     required this.branchId,
@@ -79,7 +83,13 @@ class BaseInvoice {
     required this.createdBy,
     this.invoicedBy,
     this.shiftId,
+    this.cancelledAt,
+    this.cancelledBy,
+    this.cancellationReason,
+    this.cancellationRequestId,
   });
+
+  bool get isCancelled => status == InvoiceStatus.cancelled;
 
   int get itemsSubTotal =>
       saleItems.fold<int>(0, (sum, item) => sum + item.subTotal);
@@ -133,6 +143,14 @@ class BaseInvoice {
         ? UserInfo.fromJson(json['invoicedBy'])
         : null,
     shiftId: json['shiftId'] as String?,
+    cancelledAt: json['cancelledAt'] != null
+        ? DateTime.fromMillisecondsSinceEpoch((json['cancelledAt'] as num).toInt())
+        : null,
+    cancelledBy: json['cancelledBy'] != null
+        ? UserInfo.fromJson(json['cancelledBy'] as Map<String, dynamic>)
+        : null,
+    cancellationReason: json['cancellationReason'] as String?,
+    cancellationRequestId: json['cancellationRequestId'] as String?,
   );
 
   Map<String, dynamic> toJson() => {
@@ -159,6 +177,10 @@ class BaseInvoice {
     'createdBy': createdBy.toJson(),
     if (invoicedBy != null) 'invoicedBy': invoicedBy!.toJson(),
     if (shiftId != null) 'shiftId': shiftId,
+    if (cancelledAt != null) 'cancelledAt': cancelledAt!.millisecondsSinceEpoch,
+    if (cancelledBy != null) 'cancelledBy': cancelledBy!.toJson(),
+    if (cancellationReason != null) 'cancellationReason': cancellationReason,
+    if (cancellationRequestId != null) 'cancellationRequestId': cancellationRequestId,
   };
 }
 
@@ -186,6 +208,10 @@ class CreateInvoice extends BaseInvoice {
     required super.createdBy,
     super.invoicedBy,
     super.shiftId,
+    super.cancelledAt,
+    super.cancelledBy,
+    super.cancellationReason,
+    super.cancellationRequestId,
   });
 
   factory CreateInvoice.fromJson(Map<String, dynamic> json) => CreateInvoice(
@@ -215,6 +241,14 @@ class CreateInvoice extends BaseInvoice {
         ? UserInfo.fromJson(json['invoicedBy'])
         : null,
     shiftId: json['shiftId'] as String?,
+    cancelledAt: json['cancelledAt'] != null
+        ? DateTime.fromMillisecondsSinceEpoch((json['cancelledAt'] as num).toInt())
+        : null,
+    cancelledBy: json['cancelledBy'] != null
+        ? UserInfo.fromJson(json['cancelledBy'] as Map<String, dynamic>)
+        : null,
+    cancellationReason: json['cancellationReason'] as String?,
+    cancellationRequestId: json['cancellationRequestId'] as String?,
   );
 
   CreateInvoice copyWithPaymentMethod(
@@ -316,6 +350,10 @@ class InvoiceInDb extends BaseInvoice {
     required super.createdBy,
     super.invoicedBy,
     super.shiftId,
+    super.cancelledAt,
+    super.cancelledBy,
+    super.cancellationReason,
+    super.cancellationRequestId,
   });
 
   factory InvoiceInDb.fromJson(Map<String, dynamic> json) => InvoiceInDb(
@@ -349,6 +387,14 @@ class InvoiceInDb extends BaseInvoice {
         ? UserInfo.fromJson(json['invoicedBy'])
         : null,
     shiftId: json['shiftId'] as String?,
+    cancelledAt: json['cancelledAt'] != null
+        ? DateTime.fromMillisecondsSinceEpoch((json['cancelledAt'] as num).toInt())
+        : null,
+    cancelledBy: json['cancelledBy'] != null
+        ? UserInfo.fromJson(json['cancelledBy'] as Map<String, dynamic>)
+        : null,
+    cancellationReason: json['cancellationReason'] as String?,
+    cancellationRequestId: json['cancellationRequestId'] as String?,
   );
 
   @override

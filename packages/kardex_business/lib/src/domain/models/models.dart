@@ -44,6 +44,7 @@ export 'inventory/inventory.dart';
 export 'inventory/inventory_model.dart';
 export 'invoice/invoice_model.dart';
 export 'invoice/invoice_totals.dart';
+export 'invoice_cancellation_request/invoice_cancellation_request_model.dart';
 export 'order/order_model.dart';
 export 'product/product.dart';
 export 'product/product_model.dart';

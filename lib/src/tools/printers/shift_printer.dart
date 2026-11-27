@@ -159,6 +159,8 @@ Future<Uint8List> generateShiftTicketPdf(
           rowLine('Tarjetas y otros', shift.totalCardsAndOthers),
           rowLine('Ventas a crédito', shift.invoiceCreditTotal),
           rowLine('Notas de crédito (${shift.creditNoteCount})', shift.creditNoteTotal),
+          if (shift.cancelledInvoiceCount > 0)
+            rowLine('Facturas anuladas (${shift.cancelledInvoiceCount})', shift.cancelledInvoiceTotal),
           pw.Divider(),
           rowLine('TOTAL GENERAL', shift.grandTotal, bold: true),
           if (shift.closingNotes.isNotEmpty) ...[

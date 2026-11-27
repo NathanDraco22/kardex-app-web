@@ -107,6 +107,14 @@ class _ShiftViewerDialogState extends State<ShiftViewerDialog> {
       invoiceCreditTotal: t.invoiceCreditTotal,
       invoiceTotal: t.invoiceTotal,
       invoiceCount: t.invoiceCount,
+      cancelledInvoiceCashTotal: t.cancelledInvoiceCashTotal,
+      cancelledInvoiceTransferTotal: t.cancelledInvoiceTransferTotal,
+      cancelledInvoiceCardTotal: t.cancelledInvoiceCardTotal,
+      cancelledInvoiceOtherTotal: t.cancelledInvoiceOtherTotal,
+      cancelledInvoiceCashSalesTotal: t.cancelledInvoiceCashSalesTotal,
+      cancelledInvoiceCreditTotal: t.cancelledInvoiceCreditTotal,
+      cancelledInvoiceTotal: t.cancelledInvoiceTotal,
+      cancelledInvoiceCount: t.cancelledInvoiceCount,
       receiptCashTotal: t.receiptCashTotal,
       receiptTotal: t.receiptTotal,
       receiptCount: t.receiptCount,
@@ -473,6 +481,24 @@ class _ShiftViewerDialogState extends State<ShiftViewerDialog> {
               ],
               _row('Ventas a crédito', data.invoiceCreditTotal),
               _row('Notas de crédito (${data.creditNoteCount})', data.creditNoteTotal),
+              if (data.cancelledInvoiceCount > 0) ...[
+                const Divider(height: 16),
+                _row(
+                  'Facturas anuladas (${data.cancelledInvoiceCount})',
+                  data.cancelledInvoiceTotal,
+                  color: AppThemeTokens.danger,
+                ),
+                if (data.cancelledInvoiceCashSalesTotal > 0)
+                  _subRow(
+                    'Anuladas de contado (ya excluidas)',
+                    data.cancelledInvoiceCashSalesTotal,
+                  ),
+                if (data.cancelledInvoiceCreditTotal > 0)
+                  _subRow(
+                    'Anuladas a crédito (ya excluidas)',
+                    data.cancelledInvoiceCreditTotal,
+                  ),
+              ],
               const Divider(height: 16),
               _row(
                 'Total General',
@@ -725,17 +751,27 @@ class _ShiftViewerDialogState extends State<ShiftViewerDialog> {
                       if (doc.referenceDocNumber != null &&
                           doc.referenceDocNumber!.isNotEmpty)
                         'Ref: #${doc.referenceDocNumber}',
+                      if (doc.cancellationReason != null &&
+                          doc.cancellationReason!.isNotEmpty)
+                        'Motivo: ${doc.cancellationReason}',
                       dateFormat.format(dt),
                     ];
+                    final isCancelledDoc = doc.status == 'cancelled';
                     return Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,
                         vertical: 10,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF8FAFC),
+                        color: isCancelledDoc
+                            ? Colors.red.shade50.withValues(alpha: 0.4)
+                            : const Color(0xFFF8FAFC),
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: const Color(0xFFE2E8F0)),
+                        border: Border.all(
+                          color: isCancelledDoc
+                              ? Colors.red.shade200
+                              : const Color(0xFFE2E8F0),
+                        ),
                       ),
                       child: Row(
                         children: [
@@ -747,9 +783,12 @@ class _ShiftViewerDialogState extends State<ShiftViewerDialog> {
                                   children: [
                                     Text(
                                       '#${doc.docNumber}',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 13.5,
                                         fontWeight: FontWeight.w700,
+                                        decoration: isCancelledDoc
+                                            ? TextDecoration.lineThrough
+                                            : null,
                                       ),
                                     ),
                                     const SizedBox(width: 8),
@@ -759,22 +798,28 @@ class _ShiftViewerDialogState extends State<ShiftViewerDialog> {
                                         vertical: 2,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: (doc.counted
-                                                ? AppThemeTokens.success
-                                                : const Color(0xFF94A3B8))
+                                        color: (isCancelledDoc
+                                                ? AppThemeTokens.danger
+                                                : doc.counted
+                                                    ? AppThemeTokens.success
+                                                    : const Color(0xFF94A3B8))
                                             .withValues(alpha: 0.14),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: Text(
-                                        doc.counted
-                                            ? 'Contabilizado'
-                                            : (doc.status ?? 'Excluido'),
+                                        isCancelledDoc
+                                            ? 'Anulada'
+                                            : doc.counted
+                                                ? 'Contabilizado'
+                                                : (doc.status ?? 'Excluido'),
                                         style: TextStyle(
                                           fontSize: 10.5,
                                           fontWeight: FontWeight.w600,
-                                          color: doc.counted
-                                              ? AppThemeTokens.success
-                                              : const Color(0xFF475569),
+                                          color: isCancelledDoc
+                                              ? AppThemeTokens.danger
+                                              : doc.counted
+                                                  ? AppThemeTokens.success
+                                                  : const Color(0xFF475569),
                                         ),
                                       ),
                                     ),
@@ -796,10 +841,15 @@ class _ShiftViewerDialogState extends State<ShiftViewerDialog> {
                           ),
                           Text(
                             NumberFormatter.convertToMoneyLike(doc.amount),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
+                              decoration: isCancelledDoc
+                                  ? TextDecoration.lineThrough
+                                  : null,
+                              color: isCancelledDoc
+                                  ? AppThemeTokens.danger
+                                  : const Color(0xFF0F172A),
                               fontWeight: FontWeight.w700,
-                              color: Color(0xFF0F172A),
                             ),
                           ),
                         ],

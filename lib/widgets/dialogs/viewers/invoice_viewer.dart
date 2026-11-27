@@ -144,10 +144,20 @@ class _InvoiceViewer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final canRequestCancellation = !invoice.isCancelled &&
+        (invoice.paymentType != PaymentType.credit ||
+            (invoice.status == InvoiceStatus.open && invoice.amountPaid == 0));
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Factura #${invoice.docNumber}"),
         actions: [
+          if (canRequestCancellation)
+            IconButton(
+              tooltip: "Solicitar anulación",
+              onPressed: () => _showRequestCancellationDialog(context),
+              icon: const Icon(Icons.cancel_schedule_send_outlined),
+            ),
           IconButton(
             tooltip: "Exportar PDF (A4)",
             onPressed: onExportPdf,
@@ -187,6 +197,116 @@ class _InvoiceViewer extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _showRequestCancellationDialog(BuildContext context) async {
+    final authState = getIt<AuthCubit>().state;
+    if (authState is! Authenticated) return;
+
+    final repo = context.read<InvoiceCancellationRequestsRepository>();
+    final reasonController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    bool submitting = false;
+
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (ctx, setState) {
+            return AlertDialog(
+              title: Text("Solicitar anulación #${invoice.docNumber}"),
+              content: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Esta solicitud deberá ser aprobada por un supervisor o administrador antes de anular la factura y revertir el inventario.",
+                      style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: reasonController,
+                      maxLines: 3,
+                      autofocus: true,
+                      decoration: const InputDecoration(
+                        labelText: "Motivo de anulación *",
+                        hintText: "Ej. Error en productos o método de pago",
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (v) {
+                        if (v == null || v.trim().length < 3) {
+                          return "Ingresa un motivo de al menos 3 caracteres.";
+                        }
+                        return null;
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: submitting ? null : () => Navigator.of(dialogContext).pop(),
+                  child: const Text("Cancelar"),
+                ),
+                ElevatedButton(
+                  onPressed: submitting
+                      ? null
+                      : () async {
+                          if (!formKey.currentState!.validate()) return;
+                          setState(() => submitting = true);
+                          try {
+                            await repo.createRequest(
+                              CreateInvoiceCancellationRequest(
+                                invoiceId: invoice.id,
+                                reason: reasonController.text.trim(),
+                                requestedBy: UserInfo(
+                                  id: authState.session.user.id,
+                                  name: authState.session.user.username,
+                                ),
+                              ),
+                            );
+                            if (dialogContext.mounted) {
+                              Navigator.of(dialogContext).pop();
+                            }
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    "Solicitud de anulación enviada correctamente.",
+                                  ),
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            setState(() => submitting = false);
+                            if (dialogContext.mounted) {
+                              ScaffoldMessenger.of(dialogContext).showSnackBar(
+                                SnackBar(
+                                  content: Text(e.toString()),
+                                  backgroundColor: Colors.red.shade700,
+                                ),
+                              );
+                            }
+                          }
+                        },
+                  child: submitting
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text("Enviar solicitud"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+    reasonController.dispose();
   }
 }
 
@@ -238,6 +358,55 @@ class InvoiceViewerContent extends StatelessWidget {
     final netInvoiceTotal = (invoice.total - creditNotesTotal) > 0 ? (invoice.total - creditNotesTotal) : 0;
     return Column(
       children: [
+        if (invoice.isCancelled)
+          Container(
+            width: double.infinity,
+            margin: const EdgeInsets.only(bottom: 10),
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.red.shade50,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.red.shade300),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.cancel_outlined, color: Colors.red.shade700, size: 18),
+                    const SizedBox(width: 6),
+                    Text(
+                      "FACTURA ANULADA",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red.shade800,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+                if (invoice.cancelledBy != null || invoice.cancelledAt != null) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    [
+                      if (invoice.cancelledBy != null) "Por: ${invoice.cancelledBy!.name}",
+                      if (invoice.cancelledAt != null)
+                        "${DateTimeTool.formatddMMyy(invoice.cancelledAt!)} ${DateTimeTool.formatHHmm(invoice.cancelledAt!)}",
+                    ].join(" • "),
+                    style: TextStyle(fontSize: 12, color: Colors.red.shade900),
+                  ),
+                ],
+                if (invoice.cancellationReason != null &&
+                    invoice.cancellationReason!.isNotEmpty) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    "Motivo: ${invoice.cancellationReason!}",
+                    style: TextStyle(fontSize: 12, color: Colors.red.shade900),
+                  ),
+                ],
+              ],
+            ),
+          ),
         const Text(
           "Factura",
           style: TextStyle(

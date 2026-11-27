@@ -569,6 +569,29 @@ class _Body extends StatelessWidget {
               ),
             ),
           ),
+          const MenuSectionDivider(title: "Anulaciones"),
+          Gate(
+            filters: const [
+              RolePermissionGateFilter(
+                permissions: [
+                  CommercialSubModules.invoiceHistory,
+                  CommercialSubModules.approveInvoiceCancellation,
+                ],
+              ),
+            ],
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.invoiceCancellationRequests,
+              child: MenuOptionCard(
+                icon: Icons.cancel_schedule_send_outlined,
+                accentColor: Colors.red.shade600,
+                title: "Solicitudes de Anulación",
+                subtitle: "Solicitar, aprobar o rechazar anulaciones de factura",
+                onTap: () => context.pushNamed(
+                  RouteNames.invoiceCancellationRequests,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
