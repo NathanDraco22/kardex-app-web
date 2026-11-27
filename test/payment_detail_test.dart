@@ -20,7 +20,7 @@ void main() {
         primaryCurrency: AppCurrency.nio,
         secondaryCurrency: AppCurrency.usd,
         exchangeRate: 36.0,
-        allowSecondaryCurrencyPayment: true,
+        availability: SecondaryCurrencyAvailability.available,
       );
       expect(settings.canUseDifferentSecondary, isTrue);
 
@@ -29,7 +29,10 @@ void main() {
         secondaryCurrency: AppCurrency.usd,
         exchangeRate: 36.0,
       );
-      expect(disabledSettings.allowSecondaryCurrencyPayment, isFalse);
+      expect(
+        disabledSettings.availability,
+        SecondaryCurrencyAvailability.disabled,
+      );
       expect(disabledSettings.canUseDifferentSecondary, isFalse);
 
       final detail = buildPaymentDetail(
@@ -61,6 +64,7 @@ void main() {
         primaryCurrency: AppCurrency.nio,
         secondaryCurrency: AppCurrency.usd,
         exchangeRate: 0.0,
+        availability: SecondaryCurrencyAvailability.missingExchangeRate,
       );
 
       final detail = buildPaymentDetail(

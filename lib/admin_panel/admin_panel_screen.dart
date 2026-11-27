@@ -43,15 +43,15 @@ class _RootScaffold extends StatelessWidget {
       return const Center(child: CircularProgressIndicator());
     }
     final user = authState.session.user;
-    final appSettings = context.watch<AppSettingsCubit>();
+    final policy = context.watch<AppSettingsCubit>().policy;
     return Scaffold(
       endDrawer: PanelEndDrawer(user: user),
       appBar: AppBar(
         title: Row(
           children: [
-            if (appSettings.hasCompanyLogo) ...[
+            if (policy.hasCompanyLogo) ...[
               CompanyLogo(
-                imageUrl: appSettings.companyLogoUrl,
+                imageUrl: policy.companyLogoUrl,
                 height: 26,
                 width: 90,
                 fit: BoxFit.contain,

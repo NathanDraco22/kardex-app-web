@@ -74,6 +74,7 @@ La arquitectura es **Onion + BLoC/Cubit**: la UI consume cubits, los cubits cons
 | `.../domain/repositories/` | Repositorios: caché, mapeo y reactividad. |
 | `.../domain/query_params/` | Filtros y parámetros de consulta tipados. |
 | `.../domain/responses/` | Envoltorios de respuesta (`ListResponse`, etc.). |
+| `.../core/policies/` | Políticas de decisión puras (`*_policy.dart`). |
 | `.../services/` | `http_service.dart`, `dio_http_service.dart`. |
 | `.../tools/` | `TokenManager`, `ReactiveRepository` y utilidades del paquete. |
 | `test/` | Suite de tests (`flutter test`). |
@@ -93,6 +94,7 @@ La arquitectura es **Onion + BLoC/Cubit**: la UI consume cubits, los cubits cons
 | Una petición HTTP | `packages/kardex_business/lib/src/data/<entidad>_data_source.dart` |
 | El mapeo JSON → modelo | `packages/kardex_business/lib/src/domain/repositories/<entidad>_repository.dart` |
 | Un modelo o DTO | `packages/kardex_business/lib/src/domain/models/<entidad>/` |
+| Una decisión de negocio | `packages/kardex_business/lib/src/core/policies/<dominio>/` ([`policy_object.md`](./policy_object.md)) |
 | Filtros de búsqueda | `packages/kardex_business/lib/src/domain/query_params/` |
 | Un cubit de pantalla | `lib/src/modules/<modulo>/<vista>/cubit/` |
 | Un cubit global | `lib/cubits/<nombre>/` |
@@ -128,6 +130,7 @@ La arquitectura es **Onion + BLoC/Cubit**: la UI consume cubits, los cubits cons
 | Enlace | Qué encontrarás |
 | :--- | :--- |
 | [`conventions.md`](./conventions.md) | Capas, naming, modelos, reactividad, reglas de UI, atajos, lints y tests. |
+| [`policy_object.md`](./policy_object.md) | Patrón `Policy Object`: decisiones de negocio centralizadas con retornos tipados. |
 | [`security.md`](./security.md) | Autenticación, sesión, permisos (`AccessManager`, `Gate` / `RolePermissionGateFilter`), guards de router y `isCommerce`. |
 | [`sistema_gates.md`](./sistema_gates.md) | Sistema unificado `Gate` + `GateFilter` componibles, reactividad, combinadores y guía para nuevos filtros. |
 | [`operations.md`](./operations.md) | `flutter pub get`, ejecución con `secrets.json`, defines, analyze/test, builds y problemas comunes. |
@@ -218,6 +221,7 @@ La arquitectura es **Onion + BLoC/Cubit**: la UI consume cubits, los cubits cons
 
 1. **Módulo nuevo:** agrégalo a [`modules/modules_index.md`](./modules/modules_index.md) y crea su ficha si el flujo es complejo.
 2. **Cambio de arquitectura o convención:** actualiza [`conventions.md`](./conventions.md) o [`project_index.md`](./project_index.md).
-3. **Cambio de permisos o sesión:** actualiza [`security.md`](./security.md).
-4. **Cambio de build, defines o scripts:** actualiza [`operations.md`](./operations.md).
-5. **No dupliques contenido:** este INDEX enlaza; el detalle vive en el documento de su tema.
+3. **Decisión de negocio nueva:** crea una `Policy` en `packages/kardex_business/lib/src/core/policies/` y documenta su tabla en el módulo; ver [`policy_object.md`](./policy_object.md).
+4. **Cambio de permisos o sesión:** actualiza [`security.md`](./security.md).
+5. **Cambio de build, defines o scripts:** actualiza [`operations.md`](./operations.md).
+6. **No dupliques contenido:** este INDEX enlaza; el detalle vive en el documento de su tema.

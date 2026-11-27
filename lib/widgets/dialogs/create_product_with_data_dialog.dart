@@ -799,16 +799,30 @@ class _InnerContent extends StatelessWidget {
                 AnimatedBuilder(
                   animation: costController,
                   builder: (context, _) {
-                    final appSettings = getIt<AppSettingsCubit>();
-                    if (!appSettings.useDefaultProfitMargin) {
-                      return const SizedBox.shrink();
-                    }
-                    final profitMargin = appSettings.defaultProfitMargin;
-                    final costVal = double.tryParse(costController.text.trim().replaceAll(',', '')) ?? 0.0;
+                    final costVal = double.tryParse(
+                          costController.text.trim().replaceAll(',', ''),
+                        ) ??
+                        0.0;
                     if (costVal <= 0) {
                       return const SizedBox.shrink();
                     }
-                    final suggestedPrice = costVal * (1 + profitMargin / 100);
+                    final suggestion = getIt<AppSettingsCubit>()
+                        .policy
+                        .suggestedPriceFor(
+                          costInCents:
+                              NumberFormatter.convertFromDoubleToCents(costVal),
+                        );
+                    if (suggestion == null) {
+                      return const SizedBox.shrink();
+                    }
+                    final marginText = suggestion.marginPercent.toStringAsFixed(
+                      suggestion.marginPercent.truncateToDouble() ==
+                              suggestion.marginPercent
+                          ? 0
+                          : 1,
+                    );
+                    final suggestedPriceText =
+                        '${NumberFormatter.currencySymbol} ${(suggestion.priceInCents / 100).toStringAsFixed(2)}';
 
                     return Container(
                       margin: const EdgeInsets.only(top: 8),
@@ -827,7 +841,7 @@ class _InnerContent extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Precio Sugerido (+${profitMargin.toStringAsFixed(profitMargin.truncateToDouble() == profitMargin ? 0 : 1)}%): ${NumberFormatter.currencySymbol} ${suggestedPrice.toStringAsFixed(2)}",
+                                  "Precio Sugerido (+$marginText%): $suggestedPriceText",
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
@@ -848,7 +862,8 @@ class _InnerContent extends StatelessWidget {
                               textStyle: const TextStyle(color: Colors.white),
                             ),
                             onPressed: () {
-                              priceController.text = suggestedPrice.toStringAsFixed(2);
+                              priceController.text =
+                                  (suggestion.priceInCents / 100).toStringAsFixed(2);
                             },
                             child: const Text("Usar Precio Sugerido", style: TextStyle(color: Colors.white)),
                           ),

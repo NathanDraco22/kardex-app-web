@@ -362,20 +362,23 @@ class _RootScaffoldState extends State<_RootScaffold> {
 
                       Builder(
                         builder: (context) {
-                          final appSettings = getIt<AppSettingsCubit>();
-                          if (!appSettings.useDefaultProfitMargin) {
-                            return const SizedBox.shrink();
-                          }
                           final costInCents = _effectiveReferenceCostCents > 0
                               ? _effectiveReferenceCostCents
                               : widget.product.account.lastCost;
+                          final suggestion = getIt<AppSettingsCubit>()
+                              .policy
+                              .suggestedPriceFor(
+                                costInCents: costInCents,
+                                unitFactor: priceController.factor,
+                              );
+                          if (suggestion == null) {
+                            return const SizedBox.shrink();
+                          }
 
                           return SuggestedPriceCard(
-                            costInCents: costInCents,
-                            profitMargin: appSettings.defaultProfitMargin,
+                            suggestion: suggestion,
                             baseUnitName: widget.product.unitName,
                             selectedUnitName: priceController.selectedUnit?.name,
-                            selectedUnitFactor: priceController.factor,
                             onApplySuggested: (baseCents) {
                               setState(() {
                                 priceController.applySuggestedBasePrice(baseCents);

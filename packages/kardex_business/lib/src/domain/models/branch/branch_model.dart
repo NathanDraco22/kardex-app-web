@@ -18,8 +18,10 @@ class BaseBranch {
   static String Function() _taxIdLabelResolver = () => 'RUC';
 
   /// Configura el resolvedor global de etiqueta tributaria (ej. `RUC`, `RTN`, `NIT`).
-  static void configureTaxIdLabelResolver(String Function() resolver) {
-    _taxIdLabelResolver = resolver;
+  ///
+  /// Pasar `null` restaura el valor por defecto `'RUC'`.
+  static void configureTaxIdLabelResolver(String Function()? resolver) {
+    _taxIdLabelResolver = resolver ?? () => 'RUC';
   }
 
   /// Etiqueta tributaria activa en la configuración global (por defecto `'RUC'`).

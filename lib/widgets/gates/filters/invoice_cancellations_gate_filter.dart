@@ -22,7 +22,7 @@ class InvoiceCancellationsGateFilter extends GateFilter {
 
   @override
   bool isAllowed(BuildContext context) {
-    return _resolveAppSettingsCubit()?.useInvoiceCancellations ?? false;
+    return _resolveAppSettingsCubit()?.policy.useInvoiceCancellations ?? false;
   }
 
   @override

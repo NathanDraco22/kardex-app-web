@@ -24,6 +24,7 @@ flowchart LR
 | Modelo | `packages/kardex_business/lib/src/domain/models/` | DTO inmutable con `fromJson`, `toJson`, `copyWith`. | Lógica de red o estado mutable. |
 | DataSource | `packages/kardex_business/lib/src/data/` | Petición HTTP y retorno de `Map<String, dynamic>`. | Conocer modelos de dominio. |
 | Repository | `packages/kardex_business/lib/src/domain/repositories/` | Mapear JSON a modelos, caché en memoria y reactividad. | Hacer HTTP directo (usa el DataSource). |
+| Policy | `packages/kardex_business/lib/src/core/policies/` | Decisiones de negocio puras: `bool`, `enum` u objeto. | I/O, Flutter, estado mutable, HTTP. |
 | Cubit | `lib/src/modules/.../cubit/` o `lib/cubits/` | Estado de la vista y orquestación de casos de uso. | Llamar DataSources o hacer HTTP. |
 | Vista | `lib/src/modules/.../` o `lib/widgets/` | Render declarativo y consumo de cubits. | Lógica de negocio. |
 
@@ -39,6 +40,7 @@ flowchart LR
 | Clases | `PascalCase` | `CreditNotesCubit` |
 | DataSources | `<nombre>_data_source.dart` / `<Nombre>DataSource` | `ClientsDataSource` |
 | Repositorios | `<nombre>_repository.dart` / `<Nombre>Repository` | `ClientsRepository` |
+| Policies | `<dominio>_policy.dart` / `<Dominio>Policy` | `AppSettingsPolicy` |
 | Cubits | `<nombre>_cubit.dart` + `<nombre>_state.dart` | `WriteExpenseCubit` |
 | Vistas | `<nombre>_screen.dart` | `ExpenseListScreen` |
 | Widgets | `<nombre>_widget.dart` o componente | `NearExpirationBanner` |
@@ -107,6 +109,18 @@ class CreditNotesRepository with ReactiveRepository<CreditNoteInDb> {
 - Nunca hacen HTTP ni conocen DataSources.
 - Cierran suscripciones y streams en `close()`.
 - Para permisos, consulta `AccessManager` o envuelve la UI en `Gate(filters: [RolePermissionGateFilter(...)])`.
+
+### 6.1 Políticas de decisión (`Policy Object`)
+
+Cuando una decisión combina varias banderas o se repite en varias pantallas, extráela a un objeto puro en `packages/kardex_business/lib/src/core/policies/<dominio>/`.
+
+- El cubit la compone y la expone como `policy`.
+- No repliques cada bandera como getter en el cubit; los consumidores usan `policy`.
+- La UI la consume con `getIt<AppSettingsCubit>().policy` o `context.watch<...>().policy`.
+- Regla de retorno: `bool` para sí/no, `enum` para varios estados, objeto opcional para “existe o no”, y objeto respuesta para resultados compuestos.
+- No hace I/O ni conoce Flutter.
+
+Ver [`policy_object.md`](./policy_object.md).
 
 ---
 

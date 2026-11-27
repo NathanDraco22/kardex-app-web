@@ -243,17 +243,12 @@ class _RootScaffold extends StatelessWidget {
                           ),
                           onPressed: () async {
                             final order = orderContainer.order;
-                            final appSettings = getIt.isRegistered<AppSettingsCubit>()
-                                ? getIt<AppSettingsCubit>()
-                                : null;
-                            final shouldChargeToShift =
-                                appSettings != null &&
-                                appSettings.useShifts &&
-                                appSettings.chargeConvertedOrdersToShift;
-                            final requireShift =
-                                shouldChargeToShift && appSettings.requireShiftForConvertedOrders;
+                            final policy = getIt.isRegistered<AppSettingsCubit>()
+                                ? getIt<AppSettingsCubit>().policy
+                                : const AppSettingsPolicy();
+                            final shiftPolicy = policy.convertedOrderShiftPolicy;
 
-                            if (requireShift) {
+                            if (shiftPolicy.requiresOpenShift) {
                               if (!await ShiftGuard.ensureShiftReady(context)) return;
                               if (!context.mounted) return;
                             }
@@ -284,7 +279,7 @@ class _RootScaffold extends StatelessWidget {
                             }
 
                             String? shiftId;
-                            if (shouldChargeToShift && getIt.isRegistered<ShiftCubit>()) {
+                            if (shiftPolicy.linkToShift && getIt.isRegistered<ShiftCubit>()) {
                               final shiftCubit = getIt<ShiftCubit>();
                               if (shiftCubit.hasOpenShift &&
                                   shiftCubit.currentShift?.branchId == order.branchId) {

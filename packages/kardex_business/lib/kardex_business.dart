@@ -1,3 +1,4 @@
+export 'src/core/core.dart';
 export 'src/data/data_sources.dart';
 export 'src/domain/models/models.dart';
 export 'src/domain/repositories/repositories.dart';

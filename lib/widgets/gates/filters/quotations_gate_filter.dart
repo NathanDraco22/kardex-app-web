@@ -22,7 +22,7 @@ class QuotationsGateFilter extends GateFilter {
 
   @override
   bool isAllowed(BuildContext context) {
-    return _resolveAppSettingsCubit()?.useQuotations ?? false;
+    return _resolveAppSettingsCubit()?.policy.useQuotations ?? false;
   }
 
   @override

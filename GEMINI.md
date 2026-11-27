@@ -1,3 +1,23 @@
+## Simplificación de `AppSettingsCubit`: solo `policy` (Noviembre 2026)
+
+- **Alcance:** eliminados todos los getters de decisión de `AppSettingsCubit` (`useShifts`, `useOrders`, `useQuotations`, `useExpirationDates`, `useDiscounts`, `useInvoiceCancellations`, `useReceiptCancellations`, `useQuickProductSearch`, `companyLogoUrl`, `hasCompanyLogo`, `currency`, `secondaryCurrency`, `exchangeRate`, etc.). El cubit queda con `policy`, `currentSettings`, `loadSettings`, `updateSettings`, `clear` y `close`.
+- **Motivo:** evitar dos formas de acceder a la misma decisión y una superficie pública que crecía con cada ajuste. La policy es la única fuente de lectura.
+- **Consumidores migrados:** 7 `GateFilter` (`shifts`, `orders`, `quotations`, `expirationDate`, `discounts`, `invoiceCancellations`, `receiptCancellations`), `ShiftCubit`, `ShiftGuard`, `home_quick_search_dialog`, `home_screen`, `login_screen`, `admin_panel_screen`, `multibranch_home_screen` y `client_invoices_screen_mobile`; todos usan `.policy.<decisión>`.
+- **Excepción:** `currentSettings` se conserva porque el formulario de ajustes y el quick search necesitan saber si la configuración ya se cargó (los defaults de `useOrders`/`useQuotations` son `true`).
+- **Verificación:** `flutter analyze` limpio; 48 pruebas dirigidas aprobadas (`gate_test`, `shift_cubit_test`, `invoice_cancellation_requests_test`, `invoice_discounts_test`, `app_settings_cubit_policy_test`, `app_settings_screen_test`, `payment_detail_test`).
+- **Documentación:** actualizados `wiki/policy_object.md`, `wiki/conventions.md` y `wiki/modules/settings.md` para fijar que el cubit no replica getters.
+- **Regla `main`/`lite`:** cambios solo en `main`; al sincronizar `lite`, buscar consumidores de getters eliminados y migrarlos a `.policy`.
+
+## Patrón `Policy Object` y `AppSettingsPolicy` (Noviembre 2026)
+
+- **Alcance:** Implementación del patrón `Policy Object` en `packages/kardex_business` y migración de las decisiones derivadas de `AppSettings` (`main`; sin sincronización a `lite` por instrucción explícita).
+- **Dominio (`packages/kardex_business`):** Nuevo `AppSettingModel.defaults`; nueva capa `lib/src/core/policies/app_settings/` con `AppSettingsPolicy`, `ConvertedOrderShiftPolicy`, `SecondaryCurrencyAvailability`, `SecondaryCurrencyPaymentTerms`, `SecondaryCurrencyDisplay` y `SuggestedPrice`; exportada desde `kardex_business.dart`. `BaseBranch.configureTaxIdLabelResolver` ahora acepta `null` y restaura `'RUC'`.
+- **Cubit:** `AppSettingsCubit.policy` deriva la policy de `currentSettings`; los getters existentes delegan en ella. Los resolvers de `NumberFormatter`, `InvoiceRounding`, `BaseInvoice` y `BaseBranch` leen `policy`; `close()` limpia todos (incluido `BaseBranch`). `currentSettings` contempla `AppSettingsError.lastSettings`.
+- **Puntos migrados:** conversión de órdenes/cotizaciones (`convertedOrderShiftPolicy`), selector de moneda secundaria (`paymentAvailability`), botón de tasa (`showsExchangeRateStatus`), tarjeta y diálogos de precio sugerido (`suggestedPriceFor`), y configuración de visualización de factura (`invoiceDisplayConfig`).
+- **Tests:** Nuevos `test/app_settings_policy_test.dart` (22 casos) y `test/app_settings_cubit_policy_test.dart` (6 casos: transiciones Initial/Loaded/Saving/Error/clear + integración de resolvers); `test/payment_detail_test.dart` actualizado a `SecondaryCurrencyAvailability`. `flutter analyze` limpio y tests nuevos aprobados. El suite completo conserva un fallo preexistente en `devolutions_selection_test.dart` (falta `CreditNotesRepository` en el árbol de prueba; no tocado en esta sesión).
+- **Documentación:** Nueva `wiki/policy_object.md`; actualizados `wiki/conventions.md`, `wiki/project_index.md`, `wiki/modules/settings.md`, `wiki/modules/commercial.md` y `wiki/INDEX.md`.
+- **Regla `main`/`lite`:** cambios solo en `main`; la sincronización con `lite` queda pendiente por instrucción del usuario.
+
 ## Reglas de Negocio de Conversión con Turnos (Noviembre 2026)
 
 - **Alcance:** documentación de la cascada `useShifts` → `chargeConvertedOrdersToShift` → `requireShiftForConvertedOrders` para la conversión de órdenes/cotizaciones a factura (`main`; pendiente de sincronizar en `lite`).

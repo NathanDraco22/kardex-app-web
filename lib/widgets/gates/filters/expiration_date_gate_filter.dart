@@ -7,7 +7,7 @@ import 'package:material_ui/material_ui.dart';
 /// Filtro reactivo para el control de fechas de vencimiento.
 ///
 /// Requiere que el `servin` autenticado tenga habilitado
-/// `isUsingExpirationDate` y que `AppSettingsCubit.useExpirationDates` sea
+/// `isUsingExpirationDate` y que `AppSettingsCubit.policy.useExpirationDates` sea
 /// verdadero.
 class ExpirationDateGateFilter extends GateFilter {
   const ExpirationDateGateFilter({
@@ -38,7 +38,7 @@ class ExpirationDateGateFilter extends GateFilter {
     if (authState is! Authenticated) return false;
     if (!authState.servin.isUsingExpirationDate) return false;
 
-    return _resolveAppSettingsCubit()?.useExpirationDates ?? false;
+    return _resolveAppSettingsCubit()?.policy.useExpirationDates ?? false;
   }
 
   @override

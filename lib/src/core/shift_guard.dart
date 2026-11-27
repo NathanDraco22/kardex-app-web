@@ -11,7 +11,7 @@ class ShiftGuard {
 
   static Future<bool> ensureShiftReady(BuildContext context) async {
     if (!getIt.isRegistered<AppSettingsCubit>() ||
-        !getIt<AppSettingsCubit>().useShifts) {
+        !getIt<AppSettingsCubit>().policy.useShifts) {
       return true;
     }
 

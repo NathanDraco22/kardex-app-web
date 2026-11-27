@@ -2,6 +2,14 @@ import 'app_currency.dart';
 import 'app_tax_id_label.dart';
 
 class AppSettingModel {
+  /// Configuración de respaldo cuando todavía no se cargaron los ajustes.
+  ///
+  /// Todos los valores provienen del constructor para no duplicar defaults.
+  static const AppSettingModel defaults = AppSettingModel(
+    id: 'Default',
+    createdAt: 0,
+  );
+
   final String id;
   final bool useDefaultProfitMargin;
   final double defaultProfitMargin;

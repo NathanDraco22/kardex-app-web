@@ -69,7 +69,7 @@ class _MultibranchBodyState extends State<_MultibranchBody> {
 
   Widget _buildAuthenticated(BuildContext context, Authenticated authState) {
     final user = authState.session.user;
-    final appSettings = context.watch<AppSettingsCubit>();
+    final policy = context.watch<AppSettingsCubit>().policy;
     final isAdmin = user.role == "Admin" || user.username.toLowerCase() == "root";
     final branches = isAdmin
         ? authState.branches
@@ -105,7 +105,7 @@ class _MultibranchBodyState extends State<_MultibranchBody> {
                           companyName: companyName,
                           firstName: firstName,
                           role: user.role,
-                          companyLogoUrl: appSettings.companyLogoUrl,
+                          companyLogoUrl: policy.companyLogoUrl,
                           branchCount: branches.length,
                           isWide: isWide,
                         ),

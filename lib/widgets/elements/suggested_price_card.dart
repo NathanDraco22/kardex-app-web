@@ -8,44 +8,37 @@ import 'package:kardex_business/kardex_business.dart';
 class SuggestedPriceCard extends StatelessWidget {
   const SuggestedPriceCard({
     super.key,
-    required this.costInCents,
-    required this.profitMargin,
+    required this.suggestion,
     required this.baseUnitName,
     required this.onApplySuggested,
     this.selectedUnitName,
-    this.selectedUnitFactor = 1,
   });
 
-  final int costInCents;
-  final double profitMargin;
+  final SuggestedPrice suggestion;
   final String baseUnitName;
   final ValueChanged<int> onApplySuggested;
 
   final String? selectedUnitName;
-  final int selectedUnitFactor;
 
   @override
   Widget build(BuildContext context) {
-    if (costInCents <= 0) {
+    if (suggestion.costInCents <= 0) {
       return const SizedBox.shrink();
     }
 
-    final suggestedPriceInCents = (costInCents * (1 + profitMargin / 100)).round();
-    final factor = selectedUnitFactor <= 0 ? 1 : selectedUnitFactor;
+    final factor = suggestion.unitFactor;
     final hasExtra = selectedUnitName != null && factor > 1;
-    final extraSuggestedCents = suggestedPriceInCents * factor;
-    final extraCostInCents = costInCents * factor;
-    final marginText = profitMargin.toStringAsFixed(
-      profitMargin.truncateToDouble() == profitMargin ? 0 : 1,
+    final marginText = suggestion.marginPercent.toStringAsFixed(
+      suggestion.marginPercent.truncateToDouble() == suggestion.marginPercent ? 0 : 1,
     );
 
     final mainText = hasExtra
-        ? "Precio Sugerido (+$marginText%): ${NumberFormatter.convertToMoneyLike(extraSuggestedCents)} por $selectedUnitName"
-        : "Precio Sugerido (+$marginText%): ${NumberFormatter.convertToMoneyLike(suggestedPriceInCents)}";
+        ? "Precio Sugerido (+$marginText%): ${NumberFormatter.convertToMoneyLike(suggestion.totalPriceInCents)} por $selectedUnitName"
+        : "Precio Sugerido (+$marginText%): ${NumberFormatter.convertToMoneyLike(suggestion.priceInCents)}";
 
     final subtitleText = hasExtra
-        ? "Costo base: ${NumberFormatter.convertToMoneyLike(costInCents)} ($baseUnitName) · Equivale a ${NumberFormatter.convertToMoneyLike(extraCostInCents)} por $selectedUnitName"
-        : "Costo base: ${NumberFormatter.convertToMoneyLike(costInCents)}";
+        ? "Costo base: ${NumberFormatter.convertToMoneyLike(suggestion.costInCents)} ($baseUnitName) · Equivale a ${NumberFormatter.convertToMoneyLike(suggestion.totalCostInCents)} por $selectedUnitName"
+        : "Costo base: ${NumberFormatter.convertToMoneyLike(suggestion.costInCents)}";
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -88,7 +81,7 @@ class SuggestedPriceCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 12),
               textStyle: const TextStyle(color: Colors.white),
             ),
-            onPressed: () => onApplySuggested(suggestedPriceInCents),
+            onPressed: () => onApplySuggested(suggestion.priceInCents),
             child: const Text("Usar Precio Sugerido", style: TextStyle(color: Colors.white)),
           ),
         ],

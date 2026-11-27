@@ -109,7 +109,7 @@ Aplica al endpoint `POST /api/v1/orders/make-invoice/{order_id}`, usado tanto pa
 
 - **Valores por defecto:** las tres banderas son `false`.
 - **Precedencia:** `requireShiftForConvertedOrders` solo tiene efecto cuando `useShifts` y `chargeConvertedOrdersToShift` están activos.
-- **Implementación:** `ShiftGuard.ensureShiftReady` y `ShiftCubit` en `current_orders` y `current_proforma`; el backend aplica la regla en `OrdersController.convert_order_to_invoice` y valida el turno en `InvoiceRegister`/`validate_shift_link`.
+- **Implementación:** `AppSettingsPolicy.convertedOrderShiftPolicy` en `current_orders` y `current_proforma`; `ShiftGuard.ensureShiftReady` y `ShiftCubit` aplican la decisión. El backend aplica la regla en `OrdersController.convert_order_to_invoice` y valida el turno en `InvoiceRegister`/`validate_shift_link`.
 - **Alcance:** esta excepción aplica solo a la conversión de órdenes y cotizaciones. La facturación directa desde terminal de venta mantiene su propia validación de turno.
 
 #### Regla de negocio: redondeo hacia arriba en facturas
@@ -118,8 +118,32 @@ Aplica al endpoint `POST /api/v1/orders/make-invoice/{order_id}`, usado tanto pa
 - **Cálculo:** el subtotal de cada línea se redondea hacia arriba al siguiente entero de la moneda; los descuentos por línea y el descuento global se redondean hacia abajo. Así `subtotal − descuentos = total` y todos los importes quedan enteros.
 - **Sin línea adicional:** el ajuste queda integrado en los subtotales/descuentos; no se agrega un campo ni una línea “Redondeo”.
 - **Alcance:** solo facturas nuevas (facturación directa, anónima y conversión de órdenes/cotizaciones). Las órdenes, cotizaciones y facturas existentes no se recalculan.
-- **Implementación frontend:** `InvoiceRounding` configura `CommercialProductResult`, los controladores de facturación y `CreateInvoice.ensureCostAndTotal`. Las conversiones usan `projectedInvoiceTotal` para el diálogo de pago y el total mostrado.
+- **Implementación frontend:** `InvoiceRounding` se configura desde `AppSettingsPolicy.roundUpInvoiceTotals` y aplica la regla en `CommercialProductResult`, los controladores de facturación y `CreateInvoice.ensureCostAndTotal`. Las conversiones usan `projectedInvoiceTotal` para el diálogo de pago y el total mostrado.
 - **Backend:** `InvoiceRegister` lee `AppSettingsTool` y `normalize_invoice_discounts` aplica la misma regla al guardar la factura.
+
+#### Capa de decisiones: `AppSettingsPolicy`
+
+Las reglas anteriores no se evalúan en cada pantalla. Están centralizadas en una **Policy** pura:
+
+- **Ubicación:** `packages/kardex_business/lib/src/core/policies/app_settings/`.
+- **Acceso:** `getIt<AppSettingsCubit>().policy` o `context.watch<AppSettingsCubit>().policy`.
+- **Cubit delgado:** `AppSettingsCubit` solo expone `policy` y `currentSettings`; no mantiene getters por bandera. Así hay una sola forma de consultar cada decisión.
+- **Convención de retorno:**
+  - `bool` para una decisión binaria (`hasExchangeRate`, `showsExchangeRateStatus`).
+  - `enum` para varias salidas (`ConvertedOrderShiftPolicy`, `SecondaryCurrencyAvailability`).
+  - objeto opcional cuando puede no existir (`SecondaryCurrencyPaymentTerms?`, `SecondaryCurrencyDisplay?`, `SuggestedPrice?`).
+  - objeto respuesta cuando siempre hay un resultado compuesto (`InvoiceDisplayConfig`).
+- **Decisiones cubiertas:**
+  - `convertedOrderShiftPolicy`: traduce las tres banderas de turnos a `never`, `optional` o `required`.
+  - `paymentAvailability`: `disabled`, `sameCurrency`, `missingExchangeRate` o `available`.
+  - `invoiceDisplayAvailability`: mismas reglas para el total secundario.
+  - `secondaryCurrencyPaymentTerms`: solo existe si se puede cobrar en moneda secundaria.
+  - `invoiceSecondaryCurrencyDisplay`: solo existe si se puede mostrar el total secundario.
+  - `suggestedPriceFor(...)`: devuelve `SuggestedPrice?` con el precio base y el equivalente por unidad.
+  - `invoiceDisplayConfig`: objeto respuesta con las banderas de visualización.
+- **Transiciones:** `policy` es una vista calculada de `currentSettings`. Durante `Saving` conserva la configuración anterior; en `Loaded` adopta la nueva; en `Error` usa `lastSettings`; en `clear` vuelve a defaults. El formulario de settings mantiene su draft local y solo se sincroniza en `Loaded`.
+
+Ver [`../policy_object.md`](../policy_object.md) para el patrón completo.
 
 #### Identidad de la Empresa (`companyLogoUrl`):
 - La sección **“Identidad de la empresa”** es el primer bloque de `AppSettingsScreen`.
@@ -133,6 +157,7 @@ Aplica al endpoint `POST /api/v1/orders/make-invoice/{order_id}`, usado tanto pa
 
 #### Uso Operativo del Margen de Ganancia Sugerido:
 1. **Editor de Precios de Producto (`ProductPriceEditorScreen`):**
+   - El cálculo vive en `AppSettingsPolicy.suggestedPriceFor(...)`, que devuelve `SuggestedPrice?` o `null` si la función está apagada o el costo no es positivo.
    - Si `useDefaultProfitMargin` está encendido y el producto cuenta con costo registrado (`averageCost` o `lastCost`), se renderiza una tarjeta destacada con el porcentaje configurado y el precio sugerido calculado ($\text{Costo} \times [1 + \frac{\text{Margen}}{100}]$).
    - Al pulsar el botón **"Usar Precio Sugerido"**, `SuggestedPriceCard` aplica el valor al primer nivel mediante `PriceLevelSyncController.applySuggestedBasePrice`, actualizando el precio base y su equivalente por unidad extra.
 2. **Creación Rápida de Producto con Datos (`CreateProductWithDataDialog`):**

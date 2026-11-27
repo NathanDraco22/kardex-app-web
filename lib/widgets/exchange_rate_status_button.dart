@@ -25,28 +25,25 @@ class ExchangeRateStatusButton extends StatelessWidget {
       bloc: getIt<AppSettingsCubit>(),
       builder: (context, _) {
         final cubit = getIt<AppSettingsCubit>();
-        final settings = cubit.currentSettings;
-        if (settings == null) return const SizedBox.shrink();
-
-        final featureEnabled = settings.allowSecondaryCurrencyPayment || settings.showInvoiceTotalInSecondaryCurrency;
-        if (!featureEnabled || settings.secondaryCurrency == settings.currency) {
+        final policy = cubit.policy;
+        if (!policy.showsExchangeRateStatus) {
           return const SizedBox.shrink();
         }
 
-        final hasRate = settings.exchangeRate > 0;
+        final hasRate = policy.hasExchangeRate;
         final color = hasRate ? Colors.teal.shade500 : AppThemeTokens.warning;
         final formattedRate = NumberFormat('#,##0.##', 'en_US').format(
-          settings.exchangeRate,
+          policy.exchangeRate,
         );
 
         final label = hasRate
             ? (compact
-                  ? '${settings.currency.symbol}$formattedRate'
-                  : '1 ${settings.secondaryCurrency.symbol} = ${settings.currency.symbol}$formattedRate')
+                  ? '${policy.currency.symbol}$formattedRate'
+                  : '1 ${policy.secondaryCurrency.symbol} = ${policy.currency.symbol}$formattedRate')
             : (compact ? 'Sin T.C.' : 'Configurar T.C.');
 
         final tooltip = hasRate
-            ? 'Tasa de cambio (${settings.secondaryCurrency.code} → ${settings.currency.code}). Toca para actualizar.'
+            ? 'Tasa de cambio (${policy.secondaryCurrency.code} → ${policy.currency.code}). Toca para actualizar.'
             : 'Tasa de cambio no configurada. Toca para configurar.';
 
         return Tooltip(
@@ -59,9 +56,9 @@ class ExchangeRateStatusButton extends StatelessWidget {
               onTap: () async {
                 final saved = await showCurrencySettingsDialog(
                   context,
-                  primaryCurrency: settings.currency,
-                  secondaryCurrency: settings.secondaryCurrency,
-                  exchangeRate: settings.exchangeRate,
+                  primaryCurrency: policy.currency,
+                  secondaryCurrency: policy.secondaryCurrency,
+                  exchangeRate: policy.exchangeRate,
                 );
                 if (saved == true && context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(

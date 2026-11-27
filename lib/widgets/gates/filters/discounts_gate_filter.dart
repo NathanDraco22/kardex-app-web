@@ -22,7 +22,7 @@ class DiscountsGateFilter extends GateFilter {
 
   @override
   bool isAllowed(BuildContext context) {
-    return _resolveAppSettingsCubit()?.useDiscounts ?? false;
+    return _resolveAppSettingsCubit()?.policy.useDiscounts ?? false;
   }
 
   @override

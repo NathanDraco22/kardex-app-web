@@ -57,6 +57,11 @@ flowchart TD
    - Representan la fuente de verdad en memoria de la aplicación.
    - Reciben los mapas crudos de los DataSources y los transforman en modelos de dominio mediante `.fromJson()`.
    - Manejan caché local en memoria cuando aplica y notifican mediante reactividad (`ReactiveRepository`).
+3.1 **Policies (`packages/kardex_business/lib/src/core/policies/`):**
+   - Objetos puros que resuelven decisiones de negocio derivadas de un contexto (por ejemplo, `AppSettingsPolicy`).
+   - Devuelven `bool`, `enum`, objetos opcionales u objetos respuesta.
+   - No hacen I/O, no conocen Flutter y no mutan estado.
+   - El cubit las compone y las expone como `policy`; ver [`policy_object.md`](./policy_object.md).
 4. **Cubits (`lib/src/modules/<modulo>/.../cubit/` o `lib/cubits/`):**
    - Extienden de `Cubit<TState>`.
    - Reciben el Repositorio inyectado o vía `context.read<TRepository>()`.

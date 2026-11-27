@@ -94,7 +94,7 @@ class _RootScaffold extends StatelessWidget {
         child: FloatingActionButton.extended(
           onPressed: () async {
             final isRestrictStock = writeCubit.documentType != CommercialDocumentType.quote;
-            final useQuickSearch = getIt<AppSettingsCubit>().useQuickProductSearch;
+            final useQuickSearch = getIt<AppSettingsCubit>().policy.useQuickProductSearch;
 
             if (useQuickSearch) {
               final items = await showQuickCommercialProductSearchDelegate(

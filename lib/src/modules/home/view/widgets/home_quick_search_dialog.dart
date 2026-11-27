@@ -31,10 +31,11 @@ bool canShowClientQuickSearch(BuildContext context) {
   final canCreateOrder = _hasAccess(context, CommercialSubModules.createOrder);
   final settings = getIt<AppSettingsCubit>();
   final settingsAvailable = settings.currentSettings != null;
+  final policy = settings.policy;
 
   return canCreateInvoice ||
       canSeePendingInvoices ||
-      (canCreateOrder && settingsAvailable && (settings.useQuotations || settings.useOrders));
+      (canCreateOrder && settingsAvailable && (policy.useQuotations || policy.useOrders));
 }
 
 bool canShowProductQuickSearch(BuildContext context) {
@@ -74,14 +75,15 @@ Future<void> showHomeQuickSearchDialog(BuildContext context) async {
   final canCreateOrder = _hasAccess(context, CommercialSubModules.createOrder);
   final settings = getIt<AppSettingsCubit>();
   final settingsAvailable = settings.currentSettings != null;
+  final policy = settings.policy;
 
   final action = await showClientQuickActionsDialog(
     context,
     client: client,
     showInvoiceAction: _hasAccess(context, CommercialSubModules.createInvoice) &&
         AccessManager().hasCurrentCapability(RoleCapability.allowInvoicing),
-    showQuoteAction: canCreateOrder && settingsAvailable && settings.useQuotations,
-    showOrderAction: canCreateOrder && settingsAvailable && settings.useOrders,
+    showQuoteAction: canCreateOrder && settingsAvailable && policy.useQuotations,
+    showOrderAction: canCreateOrder && settingsAvailable && policy.useOrders,
     showPendingInvoicesAction:
         _hasAccess(context, Modules.pendingInvoices) || _hasAccess(context, CommercialSubModules.pendingInvoices),
   );
