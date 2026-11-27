@@ -60,6 +60,7 @@ export 'product_stat/product_stat_in_db.dart';
 export 'product_transaction/product_transaction.dart';
 export 'receipt/receipt_model.dart';
 export 'receipt/receipt_total.dart';
+export 'receipt_cancellation_request/receipt_cancellation_request_model.dart';
 export 'reports/expense_totals.dart';
 export 'reports/totals_result.dart';
 export 'servin/servin.dart';

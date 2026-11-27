@@ -51,6 +51,8 @@ class BaseShift {
   final int receiptOtherTotal;
   final int receiptTotal;
   final int receiptCount;
+  final int cancelledReceiptTotal;
+  final int cancelledReceiptCount;
 
   // Consolidado de Devoluciones y Notas de Crédito
   final int devolutionTotal;
@@ -104,6 +106,8 @@ class BaseShift {
     this.receiptOtherTotal = 0,
     this.receiptTotal = 0,
     this.receiptCount = 0,
+    this.cancelledReceiptTotal = 0,
+    this.cancelledReceiptCount = 0,
     this.devolutionTotal = 0,
     this.devolutionCount = 0,
     this.creditNoteTotal = 0,
@@ -153,6 +157,8 @@ class BaseShift {
         receiptOtherTotal: (json['receiptOtherTotal'] as num?)?.toInt() ?? 0,
         receiptTotal: (json['receiptTotal'] as num?)?.toInt() ?? 0,
         receiptCount: (json['receiptCount'] as num?)?.toInt() ?? 0,
+        cancelledReceiptTotal: (json['cancelledReceiptTotal'] as num?)?.toInt() ?? 0,
+        cancelledReceiptCount: (json['cancelledReceiptCount'] as num?)?.toInt() ?? 0,
         devolutionTotal: (json['devolutionTotal'] as num?)?.toInt() ?? 0,
         devolutionCount: (json['devolutionCount'] as num?)?.toInt() ?? 0,
         creditNoteTotal: (json['creditNoteTotal'] as num?)?.toInt() ?? 0,
@@ -199,6 +205,8 @@ class BaseShift {
         'receiptOtherTotal': receiptOtherTotal,
         'receiptTotal': receiptTotal,
         'receiptCount': receiptCount,
+        'cancelledReceiptTotal': cancelledReceiptTotal,
+        'cancelledReceiptCount': cancelledReceiptCount,
         'devolutionTotal': devolutionTotal,
         'devolutionCount': devolutionCount,
         'creditNoteTotal': creditNoteTotal,
@@ -310,6 +318,8 @@ class ShiftPreview extends BaseShift {
     super.receiptOtherTotal,
     super.receiptTotal,
     super.receiptCount,
+    super.cancelledReceiptTotal,
+    super.cancelledReceiptCount,
     super.devolutionTotal,
     super.devolutionCount,
     super.creditNoteTotal,
@@ -359,6 +369,8 @@ class ShiftPreview extends BaseShift {
       receiptOtherTotal: base.receiptOtherTotal,
       receiptTotal: base.receiptTotal,
       receiptCount: base.receiptCount,
+      cancelledReceiptTotal: base.cancelledReceiptTotal,
+      cancelledReceiptCount: base.cancelledReceiptCount,
       devolutionTotal: base.devolutionTotal,
       devolutionCount: base.devolutionCount,
       creditNoteTotal: base.creditNoteTotal,
@@ -419,6 +431,8 @@ class ShiftInDb extends BaseShift {
     super.receiptOtherTotal,
     super.receiptTotal,
     super.receiptCount,
+    super.cancelledReceiptTotal,
+    super.cancelledReceiptCount,
     super.devolutionTotal,
     super.devolutionCount,
     super.creditNoteTotal,
@@ -476,6 +490,8 @@ class ShiftInDb extends BaseShift {
       receiptOtherTotal: base.receiptOtherTotal,
       receiptTotal: base.receiptTotal,
       receiptCount: base.receiptCount,
+      cancelledReceiptTotal: base.cancelledReceiptTotal,
+      cancelledReceiptCount: base.cancelledReceiptCount,
       devolutionTotal: base.devolutionTotal,
       devolutionCount: base.devolutionCount,
       creditNoteTotal: base.creditNoteTotal,

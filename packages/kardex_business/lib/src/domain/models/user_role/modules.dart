@@ -24,5 +24,6 @@ enum CommercialSubModules {
   processDevolution,
   createCreditNote,
   creditNoteHistory,
-  approveInvoiceCancellation;
+  approveInvoiceCancellation,
+  approveReceiptCancellation;
 }

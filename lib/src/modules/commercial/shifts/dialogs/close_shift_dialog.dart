@@ -355,6 +355,11 @@ class _CloseShiftDialogState extends State<CloseShiftDialog> {
               'Facturas anuladas (${preview.cancelledInvoiceCount})',
               preview.cancelledInvoiceTotal,
             ),
+          if (preview.cancelledReceiptCount > 0)
+            _metricRow(
+              'Recibos anulados (${preview.cancelledReceiptCount})',
+              preview.cancelledReceiptTotal,
+            ),
           const Divider(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

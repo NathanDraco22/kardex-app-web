@@ -52,6 +52,7 @@ class RouteNames {
   static const devolutionHistory = 'devolution-history';
   static const creditNotes = 'credit-notes';
   static const invoiceCancellationRequests = 'invoice-cancellation-requests';
+  static const receiptCancellationRequests = 'receipt-cancellation-requests';
   static const shifts = 'shifts';
   static const productPriceSetting = 'product-price-setting';
   static const commercialProductMovements = 'commercial-product-movements';

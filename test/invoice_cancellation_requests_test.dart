@@ -1,9 +1,19 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
+import 'package:kardex_app_front/cubits/app_settings/app_settings_state.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/widgets/gates/gates.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:material_ui/material_ui.dart';
+
+class _FakeAppSettingsRepository implements AppSettingsRepository {
+  @override
+  AppSettingModel? get currentAppSettings => null;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
 
 class _FakeAuthRepository implements AuthRepository {
   @override
@@ -203,5 +213,71 @@ void main() {
       ),
     );
     expect(find.text('Aprobar'), findsOneWidget);
+  });
+
+  test('AppSettingModel y ReceiptInDb soportan banderas de anulación por defecto en false', () {
+    const settings = AppSettingModel(id: 'Default', createdAt: 0);
+    expect(settings.useInvoiceCancellations, isFalse);
+    expect(settings.useReceiptCancellations, isFalse);
+
+    final receipt = ReceiptInDb.fromJson({
+      'id': 'rec-1',
+      'branchId': 'b-1',
+      'clientId': 'c-1',
+      'clientInfo': {'name': 'Cliente'},
+      'docNumber': 'R-0001',
+      'appliedInvoices': [],
+      'appliedDevolutions': [],
+      'paymentMethod': 'cash',
+      'total': 1000,
+      'createdAt': 1700000000000,
+      'createdBy': {'id': 'u-1', 'name': 'Cajero'},
+      'isDeleted': true,
+      'cancelledAt': 1700000005000,
+      'cancelledBy': {'id': 'u-2', 'name': 'Supervisor'},
+      'cancellationReason': 'Monto errado',
+    });
+    expect(receipt.isCancelled, isTrue);
+    expect(receipt.cancellationReason, 'Monto errado');
+  });
+
+  testWidgets('InvoiceCancellationsGateFilter y ReceiptCancellationsGateFilter ocultan por defecto y muestran al activarse', (tester) async {
+    final settingsCubit = AppSettingsCubit(_FakeAppSettingsRepository());
+    getIt.registerSingleton<AppSettingsCubit>(settingsCubit);
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: Column(
+            children: [
+              Gate(
+                filters: [InvoiceCancellationsGateFilter()],
+                child: Text('AnularFactura'),
+              ),
+              Gate(
+                filters: [ReceiptCancellationsGateFilter()],
+                child: Text('AnularRecibo'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    expect(find.text('AnularFactura'), findsNothing);
+    expect(find.text('AnularRecibo'), findsNothing);
+
+    settingsCubit.emit(
+      AppSettingsLoaded(
+        const AppSettingModel(
+          id: 'Default',
+          createdAt: 0,
+          useInvoiceCancellations: true,
+          useReceiptCancellations: true,
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.text('AnularFactura'), findsOneWidget);
+    expect(find.text('AnularRecibo'), findsOneWidget);
   });
 }

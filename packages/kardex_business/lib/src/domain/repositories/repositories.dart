@@ -37,6 +37,7 @@ export 'product_repository.dart';
 export 'product_sale_profile_repository.dart';
 export 'product_stats_repository.dart';
 export 'product_transaction_repository.dart';
+export 'receipt_cancellation_requests_repository.dart';
 export 'receipt_repository.dart';
 export 'reports_repository.dart';
 export 'servin_repository.dart';

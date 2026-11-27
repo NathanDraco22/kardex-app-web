@@ -15,6 +15,7 @@ import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 import 'package:kardex_app_front/src/tools/printers/paper_settings.dart';
 import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/adaptive_viewer.dart';
+import 'package:kardex_app_front/widgets/gates/gates.dart';
 
 Future<void> showReceiptViewerDialog(BuildContext context, ReceiptInDb receipt) async {
   final currentBranch = (getIt<AuthCubit>().state as Authenticated).branch;
@@ -98,6 +99,15 @@ class _ReceiptViewer extends StatelessWidget {
       appBar: AppBar(
         title: Text("Recibo #${receipt.docNumber}"),
         actions: [
+          if (!receipt.isCancelled)
+            Gate(
+              filters: const [ReceiptCancellationsGateFilter()],
+              child: IconButton(
+                tooltip: "Solicitar anulación",
+                onPressed: () => _showRequestCancellationDialog(context),
+                icon: const Icon(Icons.cancel_schedule_send_outlined),
+              ),
+            ),
           IconButton(
             tooltip: "Exportar PDF (A4)",
             onPressed: onExportPdf,
@@ -129,6 +139,54 @@ class _ReceiptViewer extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  if (receipt.isCancelled)
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.red.shade50,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.red.shade300),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(Icons.cancel_outlined, color: Colors.red.shade700, size: 18),
+                              const SizedBox(width: 6),
+                              Text(
+                                "RECIBO ANULADO",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.red.shade800,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (receipt.cancelledBy != null || receipt.cancelledAt != null) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              [
+                                if (receipt.cancelledBy != null) "Por: ${receipt.cancelledBy!.name}",
+                                if (receipt.cancelledAt != null)
+                                  "${DateTimeTool.formatddMMyy(receipt.cancelledAt!)} ${DateTimeTool.formatHHmm(receipt.cancelledAt!)}",
+                              ].join(" • "),
+                              style: TextStyle(fontSize: 12, color: Colors.red.shade900),
+                            ),
+                          ],
+                          if (receipt.cancellationReason != null &&
+                              receipt.cancellationReason!.isNotEmpty) ...[
+                            const SizedBox(height: 2),
+                            Text(
+                              "Motivo: ${receipt.cancellationReason!}",
+                              style: TextStyle(fontSize: 12, color: Colors.red.shade900),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
                   const Text(
                     "Recibo",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
@@ -392,6 +450,116 @@ class _ReceiptViewer extends StatelessWidget {
         ],
       ],
     );
+  }
+
+  Future<void> _showRequestCancellationDialog(BuildContext context) async {
+    final authState = getIt<AuthCubit>().state;
+    if (authState is! Authenticated) return;
+
+    final repo = context.read<ReceiptCancellationRequestsRepository>();
+    final reasonController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    bool submitting = false;
+
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (ctx, setState) {
+            return AlertDialog(
+              title: Text("Solicitar anulación #${receipt.docNumber}"),
+              content: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Esta solicitud deberá ser aprobada por un supervisor o administrador antes de anular el recibo y revertir los abonos.",
+                      style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: reasonController,
+                      maxLines: 3,
+                      autofocus: true,
+                      decoration: const InputDecoration(
+                        labelText: "Motivo de anulación *",
+                        hintText: "Ej. Error en monto o método de pago",
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (v) {
+                        if (v == null || v.trim().length < 3) {
+                          return "Ingresa un motivo de al menos 3 caracteres.";
+                        }
+                        return null;
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: submitting ? null : () => Navigator.of(dialogContext).pop(),
+                  child: const Text("Cancelar"),
+                ),
+                ElevatedButton(
+                  onPressed: submitting
+                      ? null
+                      : () async {
+                          if (!formKey.currentState!.validate()) return;
+                          setState(() => submitting = true);
+                          try {
+                            await repo.createRequest(
+                              CreateReceiptCancellationRequest(
+                                receiptId: receipt.id,
+                                reason: reasonController.text.trim(),
+                                requestedBy: UserInfo(
+                                  id: authState.session.user.id,
+                                  name: authState.session.user.username,
+                                ),
+                              ),
+                            );
+                            if (dialogContext.mounted) {
+                              Navigator.of(dialogContext).pop();
+                            }
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    "Solicitud de anulación de recibo enviada.",
+                                  ),
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            setState(() => submitting = false);
+                            if (dialogContext.mounted) {
+                              ScaffoldMessenger.of(dialogContext).showSnackBar(
+                                SnackBar(
+                                  content: Text(e.toString()),
+                                  backgroundColor: Colors.red.shade700,
+                                ),
+                              );
+                            }
+                          }
+                        },
+                  child: submitting
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text("Enviar solicitud"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+    reasonController.dispose();
   }
 }
 

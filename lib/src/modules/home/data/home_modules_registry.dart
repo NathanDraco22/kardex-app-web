@@ -593,10 +593,28 @@ List<HomeModuleCategory> getHomeModuleCategories(
             accentColor: Color(0xFFDC2626),
             routeName: RouteNames.invoiceCancellationRequests,
             gates: [
+              InvoiceCancellationsGateFilter(),
               RolePermissionGateFilter(
                 permissions: [
                   CommercialSubModules.invoiceHistory,
                   CommercialSubModules.approveInvoiceCancellation,
+                ],
+              ),
+            ],
+          ),
+          const HomeSubmoduleItem(
+            section: "Anulaciones",
+            title: "Anulación de Recibos",
+            subtitle: "Solicitar, aprobar o rechazar anulaciones de recibos",
+            icon: Icons.receipt_long_outlined,
+            accentColor: Color(0xFFEA580C),
+            routeName: RouteNames.receiptCancellationRequests,
+            gates: [
+              ReceiptCancellationsGateFilter(),
+              RolePermissionGateFilter(
+                permissions: [
+                  CommercialSubModules.createInvoice,
+                  CommercialSubModules.approveReceiptCancellation,
                 ],
               ),
             ],

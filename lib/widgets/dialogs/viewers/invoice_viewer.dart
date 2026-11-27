@@ -11,6 +11,7 @@ import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/adaptive_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/credit_note_viewer.dart';
+import 'package:kardex_app_front/widgets/gates/gates.dart';
 
 Future<void> showInvoiceViewerDialog(BuildContext context, InvoiceInDb invoice) async {
   final currentBranch = (getIt<AuthCubit>().state as Authenticated).branch;
@@ -153,10 +154,13 @@ class _InvoiceViewer extends StatelessWidget {
         title: Text("Factura #${invoice.docNumber}"),
         actions: [
           if (canRequestCancellation)
-            IconButton(
-              tooltip: "Solicitar anulación",
-              onPressed: () => _showRequestCancellationDialog(context),
-              icon: const Icon(Icons.cancel_schedule_send_outlined),
+            Gate(
+              filters: const [InvoiceCancellationsGateFilter()],
+              child: IconButton(
+                tooltip: "Solicitar anulación",
+                onPressed: () => _showRequestCancellationDialog(context),
+                icon: const Icon(Icons.cancel_schedule_send_outlined),
+              ),
             ),
           IconButton(
             tooltip: "Exportar PDF (A4)",

@@ -569,9 +569,18 @@ class _Body extends StatelessWidget {
               ),
             ),
           ),
-          const MenuSectionDivider(title: "Anulaciones"),
+          const Gate(
+            filters: [
+              AnyGateFilter([
+                InvoiceCancellationsGateFilter(),
+                ReceiptCancellationsGateFilter(),
+              ]),
+            ],
+            child: MenuSectionDivider(title: "Anulaciones"),
+          ),
           Gate(
             filters: const [
+              InvoiceCancellationsGateFilter(),
               RolePermissionGateFilter(
                 permissions: [
                   CommercialSubModules.invoiceHistory,
@@ -588,6 +597,29 @@ class _Body extends StatelessWidget {
                 subtitle: "Solicitar, aprobar o rechazar anulaciones de factura",
                 onTap: () => context.pushNamed(
                   RouteNames.invoiceCancellationRequests,
+                ),
+              ),
+            ),
+          ),
+          Gate(
+            filters: const [
+              ReceiptCancellationsGateFilter(),
+              RolePermissionGateFilter(
+                permissions: [
+                  CommercialSubModules.createInvoice,
+                  CommercialSubModules.approveReceiptCancellation,
+                ],
+              ),
+            ],
+            child: ShortcutAddableListTile(
+              routeName: RouteNames.receiptCancellationRequests,
+              child: MenuOptionCard(
+                icon: Icons.receipt_long_outlined,
+                accentColor: Colors.deepOrange.shade600,
+                title: "Anulación de Recibos",
+                subtitle: "Solicitar, aprobar o rechazar anulaciones de recibos",
+                onTap: () => context.pushNamed(
+                  RouteNames.receiptCancellationRequests,
                 ),
               ),
             ),
