@@ -290,8 +290,7 @@ Future<Uint8List> generateTicketPdfFromOrder(
                             pw.Text(
                               item.displayUnitName,
                               style: pw.TextStyle(
-                                fontSize: TicketSettings.contentFontSize(paperSize) - 1,
-                                color: PdfColors.grey700,
+                                fontSize: TicketSettings.contentFontSize(paperSize),
                               ),
                             ),
                           ],
@@ -315,7 +314,6 @@ Future<Uint8List> generateTicketPdfFromOrder(
                                 textAlign: pw.TextAlign.center,
                                 style: pw.TextStyle(
                                   fontSize: TicketSettings.contentFontSize(paperSize) - 1,
-                                  color: PdfColors.grey700,
                                 ),
                               ),
                           ],

@@ -15,6 +15,12 @@ class AppSettingsCubit extends Cubit<AppSettingsState> {
       ),
     );
     BaseBranch.configureTaxIdLabelResolver(() => taxIdLabel);
+    BaseInvoice.configureDisplayConfigResolver(
+      () => InvoiceDisplayConfig(
+        showItemsSummary: showInvoiceItemsSummary,
+        showOrderCreator: showInvoiceOrderCreator,
+      ),
+    );
   }
 
   AppSettingModel? get currentSettings {
@@ -32,6 +38,10 @@ class AppSettingsCubit extends Cubit<AppSettingsState> {
   bool get showInvoiceTotalInSecondaryCurrency => currentSettings?.showInvoiceTotalInSecondaryCurrency ?? false;
 
   bool get allowSecondaryCurrencyPayment => currentSettings?.allowSecondaryCurrencyPayment ?? false;
+
+  bool get showInvoiceItemsSummary => currentSettings?.showInvoiceItemsSummary ?? false;
+
+  bool get showInvoiceOrderCreator => currentSettings?.showInvoiceOrderCreator ?? false;
 
   String? get companyLogoUrl => currentSettings?.companyLogoUrl;
 
@@ -102,6 +112,7 @@ class AppSettingsCubit extends Cubit<AppSettingsState> {
   Future<void> close() async {
     NumberFormatter.configureCurrencyResolver(null);
     NumberFormatter.configureSecondaryCurrencyResolver(null);
+    BaseInvoice.configureDisplayConfigResolver(null);
     await super.close();
   }
 }

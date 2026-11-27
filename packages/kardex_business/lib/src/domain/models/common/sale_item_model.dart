@@ -175,6 +175,11 @@ class SaleItem {
 
   String get formattedDisplayBonQuantity => _bonQuantityDisplay.quantityText;
 
+  double get effectiveTotalDisplayQuantity {
+    final factor = displayUnitFactor <= 1 ? 1 : displayUnitFactor;
+    return (quantity + bonQuantity) / factor;
+  }
+
   factory SaleItem.fromJson(Map<String, dynamic> json) {
     final pct = json['discountPercentage'] ?? 0;
     final totalDisc = json['totalDiscount'] ?? 0;

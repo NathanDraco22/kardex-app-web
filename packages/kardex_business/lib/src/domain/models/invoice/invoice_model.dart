@@ -4,10 +4,33 @@ import 'package:kardex_business/src/domain/models/common/order_info.dart';
 import 'package:kardex_business/src/domain/models/common/payment_detail.dart';
 import 'package:kardex_business/src/domain/models/common/sale_item_model.dart';
 import 'package:kardex_business/src/domain/models/common/user_info.dart';
+import 'package:kardex_business/src/tools/unit_conversion_tool.dart';
 
 enum InvoiceStatus { draft, open, paid, partiallypaid, cancelled }
 
+class InvoiceDisplayConfig {
+  const InvoiceDisplayConfig({
+    this.showItemsSummary = false,
+    this.showOrderCreator = false,
+  });
+
+  final bool showItemsSummary;
+  final bool showOrderCreator;
+}
+
+typedef InvoiceDisplayConfigResolver = InvoiceDisplayConfig Function();
+
 class BaseInvoice {
+  static InvoiceDisplayConfigResolver? _displayConfigResolver;
+
+  static void configureDisplayConfigResolver(
+    InvoiceDisplayConfigResolver? resolver,
+  ) {
+    _displayConfigResolver = resolver;
+  }
+
+  static InvoiceDisplayConfig get displayConfig =>
+      _displayConfigResolver?.call() ?? const InvoiceDisplayConfig();
   final String branchId;
   final String clientId;
   final ClientInfo clientInfo;
@@ -69,6 +92,16 @@ class BaseInvoice {
   int get totalDiscount => effectiveItemDiscounts + invoiceDiscount;
 
   int get totalRemaining => total - amountPaid;
+
+  int get totalItemsCount => saleItems.length;
+
+  double get totalItemsQuantity => saleItems.fold<double>(
+    0.0,
+    (sum, item) => sum + item.effectiveTotalDisplayQuantity,
+  );
+
+  String get formattedTotalItemsQuantity =>
+      UnitConversionTool.formatQuantity(totalItemsQuantity, maxDecimals: 6);
 
   factory BaseInvoice.fromJson(Map<String, dynamic> json) => BaseInvoice(
     branchId: json['branchId'],

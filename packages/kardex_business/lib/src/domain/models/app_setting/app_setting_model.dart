@@ -20,6 +20,8 @@ class AppSettingModel {
   final double exchangeRate;
   final bool showInvoiceTotalInSecondaryCurrency;
   final bool allowSecondaryCurrencyPayment;
+  final bool showInvoiceItemsSummary;
+  final bool showInvoiceOrderCreator;
   final String? companyLogoUrl;
   final String taxIdLabel;
   final int createdAt;
@@ -44,6 +46,8 @@ class AppSettingModel {
     this.exchangeRate = 0.0,
     this.showInvoiceTotalInSecondaryCurrency = false,
     this.allowSecondaryCurrencyPayment = false,
+    this.showInvoiceItemsSummary = false,
+    this.showInvoiceOrderCreator = false,
     this.companyLogoUrl,
     this.taxIdLabel = 'RUC',
     required this.createdAt,
@@ -76,6 +80,10 @@ class AppSettingModel {
           json['showInvoiceTotalInSecondaryCurrency'] as bool? ?? false,
       allowSecondaryCurrencyPayment:
           json['allowSecondaryCurrencyPayment'] as bool? ?? false,
+      showInvoiceItemsSummary:
+          json['showInvoiceItemsSummary'] as bool? ?? false,
+      showInvoiceOrderCreator:
+          json['showInvoiceOrderCreator'] as bool? ?? false,
       companyLogoUrl: json['companyLogoUrl'] as String?,
       taxIdLabel: AppTaxIdLabel.normalize(json['taxIdLabel'] as String?),
       createdAt: json['createdAt'] as int? ?? 0,
@@ -104,6 +112,8 @@ class AppSettingModel {
       'showInvoiceTotalInSecondaryCurrency':
           showInvoiceTotalInSecondaryCurrency,
       'allowSecondaryCurrencyPayment': allowSecondaryCurrencyPayment,
+      'showInvoiceItemsSummary': showInvoiceItemsSummary,
+      'showInvoiceOrderCreator': showInvoiceOrderCreator,
       'companyLogoUrl': companyLogoUrl,
       'taxIdLabel': taxIdLabel,
       'createdAt': createdAt,
@@ -130,6 +140,8 @@ class AppSettingModel {
     double? exchangeRate,
     bool? showInvoiceTotalInSecondaryCurrency,
     bool? allowSecondaryCurrencyPayment,
+    bool? showInvoiceItemsSummary,
+    bool? showInvoiceOrderCreator,
     String? companyLogoUrl,
     String? taxIdLabel,
     int? createdAt,
@@ -161,6 +173,10 @@ class AppSettingModel {
       allowSecondaryCurrencyPayment:
           allowSecondaryCurrencyPayment ??
           this.allowSecondaryCurrencyPayment,
+      showInvoiceItemsSummary:
+          showInvoiceItemsSummary ?? this.showInvoiceItemsSummary,
+      showInvoiceOrderCreator:
+          showInvoiceOrderCreator ?? this.showInvoiceOrderCreator,
       companyLogoUrl: companyLogoUrl ?? this.companyLogoUrl,
       taxIdLabel: taxIdLabel ?? this.taxIdLabel,
       createdAt: createdAt ?? this.createdAt,
@@ -187,6 +203,8 @@ class UpdateAppSetting {
   final double? exchangeRate;
   final bool? showInvoiceTotalInSecondaryCurrency;
   final bool? allowSecondaryCurrencyPayment;
+  final bool? showInvoiceItemsSummary;
+  final bool? showInvoiceOrderCreator;
   final String? companyLogoUrl;
   final String? taxIdLabel;
 
@@ -208,6 +226,8 @@ class UpdateAppSetting {
     this.exchangeRate,
     this.showInvoiceTotalInSecondaryCurrency,
     this.allowSecondaryCurrencyPayment,
+    this.showInvoiceItemsSummary,
+    this.showInvoiceOrderCreator,
     this.companyLogoUrl,
     this.taxIdLabel,
   });
@@ -265,6 +285,12 @@ class UpdateAppSetting {
     }
     if (allowSecondaryCurrencyPayment != null) {
       data['allowSecondaryCurrencyPayment'] = allowSecondaryCurrencyPayment;
+    }
+    if (showInvoiceItemsSummary != null) {
+      data['showInvoiceItemsSummary'] = showInvoiceItemsSummary;
+    }
+    if (showInvoiceOrderCreator != null) {
+      data['showInvoiceOrderCreator'] = showInvoiceOrderCreator;
     }
     if (companyLogoUrl != null) {
       data['companyLogoUrl'] = companyLogoUrl;

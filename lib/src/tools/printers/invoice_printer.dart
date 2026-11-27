@@ -8,13 +8,33 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
-Future<bool> printInvoice(InvoiceInDb invoice, BranchInDb branch, {PaperSize paperSize = PaperSize.mm80}) async {
-  final bytes = await generateTicketPdfFromInvoice(invoice, branch, paperSize: paperSize);
+Future<bool> printInvoice(
+  InvoiceInDb invoice,
+  BranchInDb branch, {
+  PaperSize paperSize = PaperSize.mm80,
+  InvoiceDisplayConfig? displayConfig,
+}) async {
+  final bytes = await generateTicketPdfFromInvoice(
+    invoice,
+    branch,
+    paperSize: paperSize,
+    displayConfig: displayConfig,
+  );
   return await PrintManager.printPdf(bytes, name: 'factura_${invoice.docNumber}.pdf', paperSize: paperSize);
 }
 
-Future<bool> shareInvoice(InvoiceInDb invoice, BranchInDb branch, {PaperSize paperSize = PaperSize.mm80}) async {
-  final bytes = await generateTicketPdfFromInvoice(invoice, branch, paperSize: paperSize);
+Future<bool> shareInvoice(
+  InvoiceInDb invoice,
+  BranchInDb branch, {
+  PaperSize paperSize = PaperSize.mm80,
+  InvoiceDisplayConfig? displayConfig,
+}) async {
+  final bytes = await generateTicketPdfFromInvoice(
+    invoice,
+    branch,
+    paperSize: paperSize,
+    displayConfig: displayConfig,
+  );
   return await Printing.sharePdf(bytes: bytes, filename: 'factura_${invoice.docNumber}.pdf');
 }
 
@@ -23,7 +43,9 @@ Future<Uint8List> generateTicketPdfFromInvoice(
   BranchInDb branch, {
   PaperSize paperSize = PaperSize.mm80,
   double? extraRightMarginMm,
+  InvoiceDisplayConfig? displayConfig,
 }) async {
+  final effectiveDisplayConfig = displayConfig ?? BaseInvoice.displayConfig;
   final pdf = pw.Document();
   final NumberFormat currencyFormat = NumberFormatter.currencyFormat;
 
@@ -175,7 +197,7 @@ Future<Uint8List> generateTicketPdfFromInvoice(
               ],
             ),
 
-            if (invoice.orderInfo != null)
+            if (invoice.orderInfo != null) ...[
               pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -205,6 +227,15 @@ Future<Uint8List> generateTicketPdfFromInvoice(
                   ),
                 ],
               ),
+              if (effectiveDisplayConfig.showOrderCreator &&
+                  invoice.orderInfo!.createdBy.name.trim().isNotEmpty)
+                pw.Text(
+                  'Tomado por: ${invoice.orderInfo!.createdBy.name}',
+                  style: pw.TextStyle(
+                    fontSize: TicketSettings.contentFontSize(paperSize),
+                  ),
+                ),
+            ],
 
             pw.Text(
               paymentType,
@@ -337,8 +368,7 @@ Future<Uint8List> generateTicketPdfFromInvoice(
                             pw.Text(
                               item.displayUnitName,
                               style: pw.TextStyle(
-                                fontSize: TicketSettings.contentFontSize(paperSize) - 1,
-                                color: PdfColors.grey700,
+                                fontSize: TicketSettings.contentFontSize(paperSize),
                               ),
                             ),
                           ],
@@ -362,7 +392,6 @@ Future<Uint8List> generateTicketPdfFromInvoice(
                                 textAlign: pw.TextAlign.center,
                                 style: pw.TextStyle(
                                   fontSize: TicketSettings.contentFontSize(paperSize) - 1,
-                                  color: PdfColors.grey700,
                                 ),
                               ),
                           ],
@@ -395,6 +424,30 @@ Future<Uint8List> generateTicketPdfFromInvoice(
               }).toList(),
             ),
             pw.Divider(color: PdfColors.grey800),
+
+            if (effectiveDisplayConfig.showItemsSummary) ...[
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Text(
+                    'Ítems: ${invoice.totalItemsCount}',
+                    style: pw.TextStyle(
+                      fontWeight: pw.FontWeight.bold,
+                      fontSize: TicketSettings.contentFontSize(paperSize),
+                    ),
+                  ),
+                  pw.Text(
+                    'Cant. total: ${invoice.formattedTotalItemsQuantity}',
+                    style: pw.TextStyle(
+                      fontWeight: pw.FontWeight.bold,
+                      fontSize: TicketSettings.contentFontSize(paperSize),
+                    ),
+                  ),
+                ],
+              ),
+              pw.SizedBox(height: 2),
+              pw.Divider(color: PdfColors.grey),
+            ],
 
             pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.end,
