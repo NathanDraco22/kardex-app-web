@@ -154,54 +154,46 @@ class _RootScaffold extends StatelessWidget {
       bottomNavigationBar: BottomAppBar(
         height: 60,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Row(
-            children: [
-              const Spacer(
-                flex: 6,
-              ),
-              const Expanded(
-                child: Center(
-                  child: Text(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: ListenableBuilder(
+            listenable: controller,
+            builder: (context, _) {
+              final totalMoney = NumberFormatter.convertToMoneyLike(controller.totalAmount);
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  const Spacer(),
+                  InvoiceDiscountActionChip(
+                    itemsNetTotal: controller.itemsNetTotal,
+                    discountType: controller.invoiceDiscountType,
+                    discountValue: controller.invoiceDiscountValue,
+                    invoiceDiscountAmount: controller.invoiceDiscountAmount,
+                    onDiscountChanged: controller.setInvoiceDiscount,
+                    onClearDiscount: controller.clearInvoiceDiscount,
+                  ),
+                  const SizedBox(width: 24),
+                  const Text(
                     "Total:",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
-              ),
-              Expanded(
-                child: ListenableBuilder(
-                  listenable: controller,
-                  builder: (context, _) {
-                    final totalMoney = NumberFormatter.convertToMoneyLike(controller.totalAmount);
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        InvoiceDiscountActionChip(
-                          itemsNetTotal: controller.itemsNetTotal,
-                          discountType: controller.invoiceDiscountType,
-                          discountValue: controller.invoiceDiscountValue,
-                          invoiceDiscountAmount: controller.invoiceDiscountAmount,
-                          onDiscountChanged: controller.setInvoiceDiscount,
-                          onClearDiscount: controller.clearInvoiceDiscount,
-                        ),
-                        const SizedBox(width: 16),
-                        Text(
-                          totalMoney,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                      ],
-                    );
-                  },
-                ),
-              ),
-            ],
+                  const SizedBox(width: 12),
+                  Flexible(
+                    child: Text(
+                      totalMoney,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                ],
+              );
+            },
           ),
         ),
       ),

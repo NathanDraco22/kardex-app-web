@@ -112,6 +112,7 @@ void main() {
       expect(defaults.showInvoiceItemsSummary, isFalse);
       expect(defaults.showInvoiceOrderCreator, isFalse);
       expect(defaults.chargeConvertedOrdersToShift, isFalse);
+      expect(defaults.requireShiftForConvertedOrders, isFalse);
 
       final fromLegacy = AppSettingModel.fromJson({
         'id': 'Default',
@@ -120,26 +121,32 @@ void main() {
       expect(fromLegacy.showInvoiceItemsSummary, isFalse);
       expect(fromLegacy.showInvoiceOrderCreator, isFalse);
       expect(fromLegacy.chargeConvertedOrdersToShift, isFalse);
+      expect(fromLegacy.requireShiftForConvertedOrders, isFalse);
       expect(fromLegacy.toJson()['showInvoiceItemsSummary'], isFalse);
       expect(fromLegacy.toJson()['showInvoiceOrderCreator'], isFalse);
       expect(fromLegacy.toJson()['chargeConvertedOrdersToShift'], isFalse);
+      expect(fromLegacy.toJson()['requireShiftForConvertedOrders'], isFalse);
 
       final copied = fromLegacy.copyWith(
         showInvoiceItemsSummary: true,
         showInvoiceOrderCreator: true,
         chargeConvertedOrdersToShift: true,
+        requireShiftForConvertedOrders: true,
       );
       expect(copied.showInvoiceItemsSummary, isTrue);
       expect(copied.showInvoiceOrderCreator, isTrue);
       expect(copied.chargeConvertedOrdersToShift, isTrue);
+      expect(copied.requireShiftForConvertedOrders, isTrue);
 
       const update = UpdateAppSetting(
         showInvoiceItemsSummary: true,
         chargeConvertedOrdersToShift: true,
+        requireShiftForConvertedOrders: true,
       );
       expect(update.toJson(), {
         'showInvoiceItemsSummary': true,
         'chargeConvertedOrdersToShift': true,
+        'requireShiftForConvertedOrders': true,
       });
     });
   });

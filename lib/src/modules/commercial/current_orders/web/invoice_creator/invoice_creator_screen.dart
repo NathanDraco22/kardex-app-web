@@ -14,6 +14,7 @@ import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/cubits/shift/shift_cubit.dart';
 import 'package:kardex_app_front/src/core/access_manager.dart';
+import 'package:kardex_app_front/src/core/shift_guard.dart';
 import 'package:kardex_app_front/src/modules/commercial/sale_terminal/widgets/terminal_payment_confirmation_dialog.dart';
 import 'package:kardex_app_front/widgets/gates/gates.dart';
 import 'package:kardex_app_front/src/tools/printers/order_printer.dart';
@@ -242,6 +243,21 @@ class _RootScaffold extends StatelessWidget {
                           ),
                           onPressed: () async {
                             final order = orderContainer.order;
+                            final appSettings = getIt.isRegistered<AppSettingsCubit>()
+                                ? getIt<AppSettingsCubit>()
+                                : null;
+                            final shouldChargeToShift =
+                                appSettings != null &&
+                                appSettings.useShifts &&
+                                appSettings.chargeConvertedOrdersToShift;
+                            final requireShift =
+                                shouldChargeToShift && appSettings.requireShiftForConvertedOrders;
+
+                            if (requireShift) {
+                              if (!await ShiftGuard.ensureShiftReady(context)) return;
+                              if (!context.mounted) return;
+                            }
+
                             PaymentType? selectedPaymentType;
                             String? bankReference;
                             PaymentDetail? paymentDetail;
@@ -264,10 +280,6 @@ class _RootScaffold extends StatelessWidget {
                             }
 
                             String? shiftId;
-                            final shouldChargeToShift =
-                                getIt.isRegistered<AppSettingsCubit>() &&
-                                getIt<AppSettingsCubit>().useShifts &&
-                                getIt<AppSettingsCubit>().chargeConvertedOrdersToShift;
                             if (shouldChargeToShift && getIt.isRegistered<ShiftCubit>()) {
                               final shiftCubit = getIt<ShiftCubit>();
                               if (shiftCubit.hasOpenShift &&

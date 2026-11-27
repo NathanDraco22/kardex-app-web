@@ -91,6 +91,7 @@ lib/src/modules/settings/
   - `showInvoiceItemsSummary` (bool): Muestra el resumen de **Total ítems** y **Total cantidad** (incluyendo bonificaciones) en el visor, ticket térmico y PDF A4 de facturas (`false` por defecto).
   - `showInvoiceOrderCreator` (bool): Muestra el nombre de quien creó la orden o cotización de origen (`Tomado por: <nombre>`) en el visor, ticket térmico y PDF A4 de facturas (`false` por defecto).
   - `chargeConvertedOrdersToShift` (bool): Cuando `useShifts` está activo, si el usuario tiene un turno abierto en la sucursal carga a su caja las órdenes y cotizaciones convertidas a facturas; si no tiene turno activo, factura sin asignar turno (`false` por defecto).
+  - `requireShiftForConvertedOrders` (bool): Cuando `useShifts` y `chargeConvertedOrdersToShift` están activos, exige turno abierto en la sucursal antes de convertir una orden o cotización a factura (`false` por defecto).
   - `companyLogoUrl` (`String?`): URL pública de la imagen corporativa global de la empresa. Es un parámetro **solo estético**; no se usa en facturas, tickets, reportes ni cálculos.
 
 #### Identidad de la Empresa (`companyLogoUrl`):
