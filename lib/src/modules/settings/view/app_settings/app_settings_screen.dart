@@ -50,6 +50,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
   bool _useQuickProductSearch = false;
   bool _useShifts = false;
   bool _chargeConvertedOrdersToShift = false;
+  bool _requireShiftForConvertedOrders = false;
   bool _useInvoiceCancellations = false;
   bool _useReceiptCancellations = false;
   bool _useDiscounts = false;
@@ -97,6 +98,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
       _useQuickProductSearch = settings.useQuickProductSearch;
       _useShifts = settings.useShifts;
       _chargeConvertedOrdersToShift = settings.chargeConvertedOrdersToShift;
+      _requireShiftForConvertedOrders = settings.requireShiftForConvertedOrders;
       _useInvoiceCancellations = settings.useInvoiceCancellations;
       _useReceiptCancellations = settings.useReceiptCancellations;
       _useDiscounts = settings.useDiscounts;
@@ -147,6 +149,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
         _useQuickProductSearch != settings.useQuickProductSearch ||
         _useShifts != settings.useShifts ||
         _chargeConvertedOrdersToShift != settings.chargeConvertedOrdersToShift ||
+        _requireShiftForConvertedOrders != settings.requireShiftForConvertedOrders ||
         _useInvoiceCancellations != settings.useInvoiceCancellations ||
         _useReceiptCancellations != settings.useReceiptCancellations ||
         _useDiscounts != settings.useDiscounts ||
@@ -173,6 +176,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
       useQuickProductSearch: _useQuickProductSearch,
       useShifts: _useShifts,
       chargeConvertedOrdersToShift: _chargeConvertedOrdersToShift,
+      requireShiftForConvertedOrders: _requireShiftForConvertedOrders,
       useInvoiceCancellations: _useInvoiceCancellations,
       useReceiptCancellations: _useReceiptCancellations,
       useDiscounts: _useDiscounts,
@@ -1199,6 +1203,24 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                                 ? null
                                 : (val) => setState(() => _chargeConvertedOrdersToShift = val),
                           ),
+                          if (_chargeConvertedOrdersToShift) ...[
+                            const Divider(height: 1),
+                            SwitchListTile(
+                              contentPadding: const EdgeInsets.fromLTRB(48, 4, 16, 4),
+                              title: const Text(
+                                "Exigir turno abierto para facturar órdenes y cotizaciones",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              subtitle: const Text(
+                                "Obliga a tener un turno de caja abierto en la sucursal antes de convertir una orden o cotización a factura",
+                                style: TextStyle(fontSize: 13, color: Colors.black54),
+                              ),
+                              value: _requireShiftForConvertedOrders,
+                              onChanged: isSaving
+                                  ? null
+                                  : (val) => setState(() => _requireShiftForConvertedOrders = val),
+                            ),
+                          ],
                         ],
                         const Divider(height: 1),
                         SwitchListTile(
@@ -1343,15 +1365,16 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                             subtitle: "Acciones irreversibles que impactan el inventario y auditoría",
                           ),
                           const SizedBox(height: 12),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFEF2F2),
+                          Material(
+                            color: const Color(0xFFFEF2F2),
+                            shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14),
-                              border: Border.all(
-                                color: const Color(0xFFFCA5A5),
+                              side: const BorderSide(
+                                color: Color(0xFFFCA5A5),
                                 width: 1.2,
                               ),
                             ),
+                            clipBehavior: Clip.antiAlias,
                             child: ListTile(
                               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                               leading: Container(

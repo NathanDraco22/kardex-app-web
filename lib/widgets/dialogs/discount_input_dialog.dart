@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:kardex_app_front/widgets/buttons/secondary_menu_button.dart';
 import 'package:kardex_app_front/widgets/gates/gates.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:material_ui/material_ui.dart';
@@ -326,25 +327,32 @@ class InvoiceDiscountActionChip extends StatelessWidget {
         ? 'Desc. factura$tag: -${NumberFormatter.convertToMoneyLike(invoiceDiscountAmount)}'
         : 'Desc. factura';
 
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Gate(
       filters: const [DiscountsGateFilter()],
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          ActionChip(
-            avatar: Icon(
+          SecondaryMenuButton(
+            icon: Icon(
               hasDiscount ? Icons.local_offer : Icons.local_offer_outlined,
               size: 16,
-              color: hasDiscount ? Colors.orange.shade700 : Colors.blue.shade700,
             ),
             label: Text(
               label,
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: hasDiscount ? FontWeight.w600 : FontWeight.w500,
-                color: hasDiscount ? Colors.red.shade700 : Colors.blue.shade700,
               ),
             ),
+            backgroundColor: hasDiscount
+                ? colorScheme.primary.withValues(alpha: 0.08)
+                : null,
+            borderColor: hasDiscount
+                ? colorScheme.primary.withValues(alpha: 0.35)
+                : null,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             onPressed: itemsNetTotal <= 0
                 ? null
                 : () async {

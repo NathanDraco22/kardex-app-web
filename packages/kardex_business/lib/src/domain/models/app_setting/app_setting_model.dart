@@ -15,6 +15,7 @@ class AppSettingModel {
   final bool useQuickProductSearch;
   final bool useShifts;
   final bool chargeConvertedOrdersToShift;
+  final bool requireShiftForConvertedOrders;
   final bool useInvoiceCancellations;
   final bool useReceiptCancellations;
   final bool useDiscounts;
@@ -44,6 +45,7 @@ class AppSettingModel {
     this.useQuickProductSearch = false,
     this.useShifts = false,
     this.chargeConvertedOrdersToShift = false,
+    this.requireShiftForConvertedOrders = false,
     this.useInvoiceCancellations = false,
     this.useReceiptCancellations = false,
     this.useDiscounts = false,
@@ -77,6 +79,8 @@ class AppSettingModel {
       useShifts: json['useShifts'] as bool? ?? false,
       chargeConvertedOrdersToShift:
           json['chargeConvertedOrdersToShift'] as bool? ?? false,
+      requireShiftForConvertedOrders:
+          json['requireShiftForConvertedOrders'] as bool? ?? false,
       useInvoiceCancellations:
           json['useInvoiceCancellations'] as bool? ?? false,
       useReceiptCancellations:
@@ -118,6 +122,7 @@ class AppSettingModel {
       'useQuickProductSearch': useQuickProductSearch,
       'useShifts': useShifts,
       'chargeConvertedOrdersToShift': chargeConvertedOrdersToShift,
+      'requireShiftForConvertedOrders': requireShiftForConvertedOrders,
       'useInvoiceCancellations': useInvoiceCancellations,
       'useReceiptCancellations': useReceiptCancellations,
       'useDiscounts': useDiscounts,
@@ -150,6 +155,7 @@ class AppSettingModel {
     bool? useQuickProductSearch,
     bool? useShifts,
     bool? chargeConvertedOrdersToShift,
+    bool? requireShiftForConvertedOrders,
     bool? useInvoiceCancellations,
     bool? useReceiptCancellations,
     bool? useDiscounts,
@@ -183,6 +189,8 @@ class AppSettingModel {
       useShifts: useShifts ?? this.useShifts,
       chargeConvertedOrdersToShift:
           chargeConvertedOrdersToShift ?? this.chargeConvertedOrdersToShift,
+      requireShiftForConvertedOrders:
+          requireShiftForConvertedOrders ?? this.requireShiftForConvertedOrders,
       useInvoiceCancellations:
           useInvoiceCancellations ?? this.useInvoiceCancellations,
       useReceiptCancellations:
@@ -222,6 +230,7 @@ class UpdateAppSetting {
   final bool? useQuickProductSearch;
   final bool? useShifts;
   final bool? chargeConvertedOrdersToShift;
+  final bool? requireShiftForConvertedOrders;
   final bool? useInvoiceCancellations;
   final bool? useReceiptCancellations;
   final bool? useDiscounts;
@@ -248,6 +257,7 @@ class UpdateAppSetting {
     this.useQuickProductSearch,
     this.useShifts,
     this.chargeConvertedOrdersToShift,
+    this.requireShiftForConvertedOrders,
     this.useInvoiceCancellations,
     this.useReceiptCancellations,
     this.useDiscounts,
@@ -299,6 +309,9 @@ class UpdateAppSetting {
     }
     if (chargeConvertedOrdersToShift != null) {
       data['chargeConvertedOrdersToShift'] = chargeConvertedOrdersToShift;
+    }
+    if (requireShiftForConvertedOrders != null) {
+      data['requireShiftForConvertedOrders'] = requireShiftForConvertedOrders;
     }
     if (useInvoiceCancellations != null) {
       data['useInvoiceCancellations'] = useInvoiceCancellations;
