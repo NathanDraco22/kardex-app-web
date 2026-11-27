@@ -2,6 +2,10 @@
 
 Reglas para **todo cambio** en el frontend. Complementa a [`project_index.md`](./project_index.md) (arquitectura) y [`diseno_e_identidad_visual.md`](./diseno_e_identidad_visual.md) (identidad visual).
 
+> [!IMPORTANT]
+> **Prioridad al crear entidades o módulos nuevos:**
+> Usa **Onion CLI** (`onion dart`, `onion dart-cubit`, `onion flutter-module`) para generar el esqueleto estándar en lugar de crear los archivos manualmente, y luego mueve/integra la capa de datos/dominio dentro de `packages/kardex_business` en la rama `main` antes de sincronizar con `lite`.
+
 ---
 
 ## 1. Capas y dependencias
