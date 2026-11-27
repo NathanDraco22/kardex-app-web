@@ -439,7 +439,9 @@ class _RootScaffoldState extends State<_RootScaffold> {
                                           final res = await showSubstractProductInventoryDialog(
                                             context,
                                             product: currentProduct,
-                                            allowNegativeStock: getIt<AppSettingsCubit>().allowNegativeStock,
+                                            allowNegativeStock: getIt<AppSettingsCubit>()
+                                                .policy
+                                                .allowNegativeStock,
                                           );
 
                                           if (res == null) return;
@@ -548,22 +550,25 @@ class _RootScaffoldState extends State<_RootScaffold> {
 
                         Builder(
                           builder: (context) {
-                            final appSettings = getIt<AppSettingsCubit>();
-                            if (!appSettings.useDefaultProfitMargin) {
-                              return const SizedBox.shrink();
-                            }
                             final costInCents = currentProduct.tracksInventory
                                 ? (currentProduct.account.averageCost > 0
                                       ? currentProduct.account.averageCost
                                       : currentProduct.account.lastCost)
                                 : _referenceCostInCents;
+                            final suggestion = getIt<AppSettingsCubit>()
+                                .policy
+                                .suggestedPriceFor(
+                                  costInCents: costInCents,
+                                  unitFactor: priceController.factor,
+                                );
+                            if (suggestion == null) {
+                              return const SizedBox.shrink();
+                            }
 
                             return SuggestedPriceCard(
-                              costInCents: costInCents,
-                              profitMargin: appSettings.defaultProfitMargin,
+                              suggestion: suggestion,
                               baseUnitName: currentProduct.unitName,
                               selectedUnitName: priceController.selectedUnit?.name,
-                              selectedUnitFactor: priceController.factor,
                               onApplySuggested: (baseCents) {
                                 setState(() {
                                   priceController.applySuggestedBasePrice(baseCents);

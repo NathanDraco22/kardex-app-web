@@ -1,3 +1,12 @@
+## Sincronización completa `main` → `lite` (Noviembre 2026)
+
+- **Alcance:** merge completo de `main` en `lite` (no solo la policy): `AppSettingsPolicy`, `added settings`, redondeo de facturas, cambios de pagos/recibos, modelos compartidos, tests y documentación.
+- **Adaptación lite-only:** `lib/widgets/dialogs/product_inventory_editor_dialog.dart` migrado a `policy.allowNegativeStock` y `SuggestedPriceCard(suggestion: ...)`.
+- **Rutas e identidad preservadas:** `product-movements`, `product-price-catalog` y `advanced-tools` siguen comentadas/no expuestas en `lite`; `product-inventory-catalog` permanece activa; `applicationId`, manifests y scripts de la edición lite intactos.
+- **Verificación:** `flutter analyze` limpio. `flutter test` ejecutó 449 pruebas; único fallo el preexistente de `devolutions_selection_test.dart` (falta `CreditNotesRepository` en el árbol de prueba, no relacionado con este merge).
+- **Rama de trabajo:** `sync/main-policy-into-lite`; al validar se actualiza `lite` por fast-forward. Sin push.
+- **Regla `main`/`lite`:** el merge baja todo `main`; las diferencias operativas de `lite` se conservan explícitamente.
+
 ## Simplificación de `AppSettingsCubit`: solo `policy` (Noviembre 2026)
 
 - **Alcance:** eliminados todos los getters de decisión de `AppSettingsCubit` (`useShifts`, `useOrders`, `useQuotations`, `useExpirationDates`, `useDiscounts`, `useInvoiceCancellations`, `useReceiptCancellations`, `useQuickProductSearch`, `companyLogoUrl`, `hasCompanyLogo`, `currency`, `secondaryCurrency`, `exchangeRate`, etc.). El cubit queda con `policy`, `currentSettings`, `loadSettings`, `updateSettings`, `clear` y `close`.
