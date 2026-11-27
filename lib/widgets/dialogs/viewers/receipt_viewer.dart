@@ -99,7 +99,9 @@ class _ReceiptViewer extends StatelessWidget {
       appBar: AppBar(
         title: Text("Recibo #${receipt.docNumber}"),
         actions: [
-          if (!receipt.isCancelled)
+          if (!receipt.isCancelled &&
+              receipt.appliedDevolutions.isEmpty &&
+              receipt.appliedCreditNotes.isEmpty)
             Gate(
               filters: const [ReceiptCancellationsGateFilter()],
               child: IconButton(
@@ -457,109 +459,136 @@ class _ReceiptViewer extends StatelessWidget {
     if (authState is! Authenticated) return;
 
     final repo = context.read<ReceiptCancellationRequestsRepository>();
-    final reasonController = TextEditingController();
-    final formKey = GlobalKey<FormState>();
-    bool submitting = false;
-
-    await showDialog<void>(
+    final sent = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
-      builder: (dialogContext) {
-        return StatefulBuilder(
-          builder: (ctx, setState) {
-            return AlertDialog(
-              title: Text("Solicitar anulación #${receipt.docNumber}"),
-              content: Form(
-                key: formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Esta solicitud deberá ser aprobada por un supervisor o administrador antes de anular el recibo y revertir los abonos.",
-                      style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: reasonController,
-                      maxLines: 3,
-                      autofocus: true,
-                      decoration: const InputDecoration(
-                        labelText: "Motivo de anulación *",
-                        hintText: "Ej. Error en monto o método de pago",
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (v) {
-                        if (v == null || v.trim().length < 3) {
-                          return "Ingresa un motivo de al menos 3 caracteres.";
-                        }
-                        return null;
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: submitting ? null : () => Navigator.of(dialogContext).pop(),
-                  child: const Text("Cancelar"),
-                ),
-                ElevatedButton(
-                  onPressed: submitting
-                      ? null
-                      : () async {
-                          if (!formKey.currentState!.validate()) return;
-                          setState(() => submitting = true);
-                          try {
-                            await repo.createRequest(
-                              CreateReceiptCancellationRequest(
-                                receiptId: receipt.id,
-                                reason: reasonController.text.trim(),
-                                requestedBy: UserInfo(
-                                  id: authState.session.user.id,
-                                  name: authState.session.user.username,
-                                ),
-                              ),
-                            );
-                            if (dialogContext.mounted) {
-                              Navigator.of(dialogContext).pop();
-                            }
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    "Solicitud de anulación de recibo enviada.",
-                                  ),
-                                ),
-                              );
-                            }
-                          } catch (e) {
-                            setState(() => submitting = false);
-                            if (dialogContext.mounted) {
-                              ScaffoldMessenger.of(dialogContext).showSnackBar(
-                                SnackBar(
-                                  content: Text(e.toString()),
-                                  backgroundColor: Colors.red.shade700,
-                                ),
-                              );
-                            }
-                          }
-                        },
-                  child: submitting
-                      ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Text("Enviar solicitud"),
-                ),
-              ],
-            );
-          },
-        );
-      },
+      builder: (_) => _RequestReceiptCancellationDialog(
+        receipt: receipt,
+        requestedBy: UserInfo(
+          id: authState.session.user.id,
+          name: authState.session.user.username,
+        ),
+        repository: repo,
+      ),
     );
-    reasonController.dispose();
+    if (sent == true && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Solicitud de anulación de recibo enviada."),
+        ),
+      );
+    }
+  }
+}
+
+class _RequestReceiptCancellationDialog extends StatefulWidget {
+  final ReceiptInDb receipt;
+  final UserInfo requestedBy;
+  final ReceiptCancellationRequestsRepository repository;
+
+  const _RequestReceiptCancellationDialog({
+    required this.receipt,
+    required this.requestedBy,
+    required this.repository,
+  });
+
+  @override
+  State<_RequestReceiptCancellationDialog> createState() =>
+      _RequestReceiptCancellationDialogState();
+}
+
+class _RequestReceiptCancellationDialogState
+    extends State<_RequestReceiptCancellationDialog> {
+  final _reasonController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  bool _submitting = false;
+
+  @override
+  void dispose() {
+    _reasonController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _submitting = true);
+    try {
+      await widget.repository.createRequest(
+        CreateReceiptCancellationRequest(
+          receiptId: widget.receipt.id,
+          reason: _reasonController.text.trim(),
+          requestedBy: widget.requestedBy,
+        ),
+      );
+      if (!mounted) return;
+      Navigator.of(context).pop(true);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _submitting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+          backgroundColor: Colors.red.shade700,
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PopScope(
+      canPop: !_submitting,
+      child: AlertDialog(
+        title: Text("Solicitar anulación #${widget.receipt.docNumber}"),
+        content: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Esta solicitud deberá ser aprobada por un supervisor o administrador antes de anular el recibo y revertir los abonos.",
+                style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _reasonController,
+                maxLines: 3,
+                autofocus: true,
+                enabled: !_submitting,
+                decoration: const InputDecoration(
+                  labelText: "Motivo de anulación *",
+                  hintText: "Ej. Error en monto o método de pago",
+                  border: OutlineInputBorder(),
+                ),
+                validator: (v) {
+                  if (v == null || v.trim().length < 3) {
+                    return "Ingresa un motivo de al menos 3 caracteres.";
+                  }
+                  return null;
+                },
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: _submitting ? null : () => Navigator.of(context).pop(false),
+            child: const Text("Cancelar"),
+          ),
+          ElevatedButton(
+            onPressed: _submitting ? null : _submit,
+            child: _submitting
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Text("Enviar solicitud"),
+          ),
+        ],
+      ),
+    );
   }
 }
 
