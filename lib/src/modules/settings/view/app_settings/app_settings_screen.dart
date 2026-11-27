@@ -49,6 +49,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
   bool _useHoldSales = true;
   bool _useQuickProductSearch = false;
   bool _useShifts = false;
+  bool _chargeConvertedOrdersToShift = false;
   bool _useDiscounts = false;
   AppCurrency _currency = AppCurrency.nio;
   AppCurrency _secondaryCurrency = AppCurrency.usd;
@@ -93,6 +94,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
       _useHoldSales = settings.useHoldSales;
       _useQuickProductSearch = settings.useQuickProductSearch;
       _useShifts = settings.useShifts;
+      _chargeConvertedOrdersToShift = settings.chargeConvertedOrdersToShift;
       _useDiscounts = settings.useDiscounts;
       _showInvoiceTotalInSecondaryCurrency = settings.showInvoiceTotalInSecondaryCurrency;
       _allowSecondaryCurrencyPayment = settings.allowSecondaryCurrencyPayment;
@@ -140,6 +142,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
         _useHoldSales != settings.useHoldSales ||
         _useQuickProductSearch != settings.useQuickProductSearch ||
         _useShifts != settings.useShifts ||
+        _chargeConvertedOrdersToShift != settings.chargeConvertedOrdersToShift ||
         _useDiscounts != settings.useDiscounts ||
         _showInvoiceTotalInSecondaryCurrency != settings.showInvoiceTotalInSecondaryCurrency ||
         _allowSecondaryCurrencyPayment != settings.allowSecondaryCurrencyPayment ||
@@ -163,6 +166,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
       useHoldSales: _useHoldSales,
       useQuickProductSearch: _useQuickProductSearch,
       useShifts: _useShifts,
+      chargeConvertedOrdersToShift: _chargeConvertedOrdersToShift,
       useDiscounts: _useDiscounts,
       showInvoiceTotalInSecondaryCurrency: _showInvoiceTotalInSecondaryCurrency,
       allowSecondaryCurrencyPayment: _allowSecondaryCurrencyPayment,
@@ -1170,6 +1174,24 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                           value: _useShifts,
                           onChanged: isSaving ? null : (val) => setState(() => _useShifts = val),
                         ),
+                        if (_useShifts) ...[
+                          const Divider(height: 1),
+                          SwitchListTile(
+                            contentPadding: const EdgeInsets.fromLTRB(32, 4, 16, 4),
+                            title: const Text(
+                              "Cargar a caja órdenes y cotizaciones convertidas a facturas",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: const Text(
+                              "Al facturar una orden o cotización, exige turno abierto y carga la factura a la caja del turno activo",
+                              style: TextStyle(fontSize: 13, color: Colors.black54),
+                            ),
+                            value: _chargeConvertedOrdersToShift,
+                            onChanged: isSaving
+                                ? null
+                                : (val) => setState(() => _chargeConvertedOrdersToShift = val),
+                          ),
+                        ],
                         const Divider(height: 1),
                         SwitchListTile(
                           title: const Text(

@@ -10,8 +10,11 @@ import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
 import 'package:kardex_app_front/widgets/row_widgets/sale_item_row.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
+import 'package:kardex_app_front/cubits/shift/shift_cubit.dart';
 import 'package:kardex_app_front/src/core/access_manager.dart';
+import 'package:kardex_app_front/src/core/shift_guard.dart';
 import 'package:kardex_app_front/widgets/gates/gates.dart';
 import 'package:kardex_app_front/src/tools/printers/order_printer.dart';
 import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
@@ -239,8 +242,23 @@ class _RootScaffold extends StatelessWidget {
                           ),
                           onPressed: () async {
                             final res = await showConfirmOrderInvoiceModal(context, orderContainer.order);
-                            if (res != true) return;
-                            writeCubit.convertOrderToInvoice(orderContainer.order.id);
+                            if (res != true || !context.mounted) return;
+                            String? shiftId;
+                            final shouldChargeToShift =
+                                getIt.isRegistered<AppSettingsCubit>() &&
+                                getIt<AppSettingsCubit>().useShifts &&
+                                getIt<AppSettingsCubit>().chargeConvertedOrdersToShift;
+                            if (shouldChargeToShift) {
+                              if (!await ShiftGuard.ensureShiftReady(context)) return;
+                              if (!context.mounted) return;
+                              shiftId = getIt.isRegistered<ShiftCubit>()
+                                  ? getIt<ShiftCubit>().activeShiftId
+                                  : null;
+                            }
+                            writeCubit.convertOrderToInvoice(
+                              orderContainer.order.id,
+                              shiftId: shiftId,
+                            );
                           },
                           icon: const Icon(Icons.check),
                           label: const Text("Facturar Orden"),
