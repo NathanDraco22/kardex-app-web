@@ -1,9 +1,15 @@
+## Fix del test de devoluciones (Noviembre 2026)
+
+- **Problema:** `devolutions_selection_test.dart` fallaba porque `DevolutionsScreenWeb._openDevolutionSelection` lee `CreditNotesRepository` del contexto y el test solo proveía `InvoicesRepository`.
+- **Fix:** se agregó `_FakeCreditNotesRepository` (devuelve una lista vacía en `getCreditNotesByInvoiceId`) y un `RepositoryProvider<CreditNotesRepository>` en el árbol de prueba; el repositorio se libera con `disposeReactiveRepo` en `addTearDown`.
+- **Verificación:** `flutter analyze` limpio; `flutter test test/devolutions_selection_test.dart` (2/2), suite completa de `main` (431 pruebas) y suite completa de `lite` (450 pruebas) aprobadas.
+
 ## Sincronización completa `main` → `lite` (Noviembre 2026)
 
 - **Alcance:** merge completo de `main` en `lite` (no solo la policy): `AppSettingsPolicy`, `added settings`, redondeo de facturas, cambios de pagos/recibos, modelos compartidos, tests y documentación.
 - **Adaptación lite-only:** `lib/widgets/dialogs/product_inventory_editor_dialog.dart` migrado a `policy.allowNegativeStock` y `SuggestedPriceCard(suggestion: ...)`.
 - **Rutas e identidad preservadas:** `product-movements`, `product-price-catalog` y `advanced-tools` siguen comentadas/no expuestas en `lite`; `product-inventory-catalog` permanece activa; `applicationId`, manifests y scripts de la edición lite intactos.
-- **Verificación:** `flutter analyze` limpio. `flutter test` ejecutó 449 pruebas; único fallo el preexistente de `devolutions_selection_test.dart` (falta `CreditNotesRepository` en el árbol de prueba, no relacionado con este merge).
+- **Verificación inicial:** `flutter analyze` limpio. `flutter test` ejecutó 449 pruebas; único fallo el preexistente de `devolutions_selection_test.dart`, corregido después en `main` y sincronizado en el merge siguiente.
 - **Rama de trabajo:** `sync/main-policy-into-lite`; al validar se actualiza `lite` por fast-forward. Sin push.
 - **Regla `main`/`lite`:** el merge baja todo `main`; las diferencias operativas de `lite` se conservan explícitamente.
 

@@ -31,6 +31,18 @@ class _FakeInvoiceDevolutionsDataSource implements InvoiceDevolutionsDataSource 
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
+class _FakeCreditNotesRepository extends CreditNotesRepository {
+  _FakeCreditNotesRepository() : super(CreditNotesDataSource());
+
+  @override
+  Future<List<CreditNoteInDb>> getCreditNotesByInvoiceId(
+    String invoiceId, {
+    String? clientId,
+  }) async {
+    return const <CreditNoteInDb>[];
+  }
+}
+
 class _FakeInvoicesRepository extends InvoicesRepository {
   _FakeInvoicesRepository(this.invoiceJson, this.devolutionsJson)
       : super(_FakeInvoicesDataSource(), _FakeInvoiceDevolutionsDataSource());
@@ -214,16 +226,21 @@ void main() {
       addTearDown(() => getIt.unregister<AuthCubit>());
 
       final repo = _FakeInvoicesRepository(_invoiceJson(), [_priorDevolutionJson()]);
+      final creditNotesRepo = _FakeCreditNotesRepository();
+      addTearDown(creditNotesRepo.disposeReactiveRepo);
       final cubit = ReadDevolutionsCubit(invoicesRepository: repo);
       await cubit.loadDailyInvoices('b-1');
 
       await tester.pumpWidget(
         RepositoryProvider<InvoicesRepository>.value(
           value: repo,
-          child: BlocProvider<ReadDevolutionsCubit>.value(
-            value: cubit,
-            child: const MaterialApp(
-              home: DevolutionsScreenWeb(),
+          child: RepositoryProvider<CreditNotesRepository>.value(
+            value: creditNotesRepo,
+            child: BlocProvider<ReadDevolutionsCubit>.value(
+              value: cubit,
+              child: const MaterialApp(
+                home: DevolutionsScreenWeb(),
+              ),
             ),
           ),
         ),
