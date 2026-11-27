@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/src/modules/commercial/client_devolution/web/devolution_selection_screen.dart';
+import 'package:kardex_app_front/src/modules/commercial/devolutions/devolution_eligibility.dart';
 import 'package:kardex_app_front/src/modules/commercial/pending_invoice/cubit/read_pending_invoice_cubit.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';

@@ -15,6 +15,7 @@ import 'package:kardex_app_front/widgets/dialogs/viewers/credit_note_viewer.dart
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
 
+import '../../devolutions/devolution_eligibility.dart';
 import '../credit_note_policy.dart';
 
 Future<CreditNoteInDb?> showCreateCreditNoteDialog(BuildContext context) async {
@@ -162,43 +163,23 @@ class _CreateCreditNoteDialogState extends State<_CreateCreditNoteDialog> {
     setState(() => _isLoadingPreviousCreditNotes = true);
 
     try {
-      final notes = await context.read<CreditNotesRepository>().getCreditNotesByInvoiceId(invoice.id);
+      final creditNotesFuture =
+          context.read<CreditNotesRepository>().getCreditNotesByInvoiceId(invoice.id);
+      final devolutionsFuture = widget.invoicesRepository
+          .getInvoiceDevolutionById(invoice.id)
+          .then<List<DevolutionInDb>>((res) => res.devolutions)
+          .catchError((_) => const <DevolutionInDb>[]);
+
+      final notes = await creditNotesFuture;
+      final devolutions = await devolutionsFuture;
 
       if (!mounted || _searchedInvoice?.id != invoice.id) return;
 
-      final previous = <int, int>{};
-      final legacyItems = <SaleItem>[];
-
-      for (final note in notes) {
-        if (note.status == CreditNoteStatus.cancelled) continue;
-        for (final item in note.returnedItems) {
-          final index = item.invoiceItemIndex;
-          if (index != null && index >= 0 && index < invoice.saleItems.length) {
-            previous[index] = (previous[index] ?? 0) + item.quantity.abs();
-          } else {
-            legacyItems.add(item);
-          }
-        }
-      }
-
-      // Fallback para notas antiguas sin invoiceItemIndex: se imputan solo
-      // cuando hay una única línea con el mismo producto y conversionFactor.
-      for (final item in legacyItems) {
-        final matches = <int>[];
-        for (var index = 0; index < invoice.saleItems.length; index++) {
-          final line = invoice.saleItems[index];
-          final sameProduct = line.product.id == item.product.id;
-          final sameFactor =
-              UnitConversionTool.ensureSafeFactor(line.conversionFactor) ==
-              UnitConversionTool.ensureSafeFactor(item.conversionFactor);
-          if (sameProduct && sameFactor) matches.add(index);
-        }
-        if (matches.length == 1) {
-          final index = matches.single;
-          previous[index] = (previous[index] ?? 0) + item.quantity.abs();
-        }
-        // Si hay ambigüedad se ignora; el backend sigue validando por índice.
-      }
+      final previous = computePreviouslyReturnedByLine(
+        saleItems: invoice.saleItems,
+        devolutions: devolutions,
+        creditNotes: notes,
+      );
 
       setState(() {
         _previouslyReturnedBase

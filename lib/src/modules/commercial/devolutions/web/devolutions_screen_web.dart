@@ -11,6 +11,7 @@ import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:kardex_business/kardex_business.dart';
 
 import '../cubit/read_devolutions_cubit.dart';
+import '../devolution_eligibility.dart';
 import 'devolutions_selection_screen.dart';
 
 part 'sections/header_section.dart';
@@ -35,18 +36,25 @@ class DevolutionsScreenWeb extends StatelessWidget {
           }
 
           return FloatingActionButton.extended(
-            onPressed: () {
+            onPressed: () async {
               final state = readCubit.state as ReadDevolutionsSearchResult;
-              if (state.invoice.clientId != kSaleClientId && state.invoice.amountPaid > 0) {
-                DialogManager.showInfoDialog(context, "Los clientes de crédito con facturas abonadas no pueden hacer devoluciones de productos");
+              final errorMsg = validateInvoiceForDevolution(state.invoice);
+              if (errorMsg != null) {
+                DialogManager.showInfoDialog(context, errorMsg);
                 return;
               }
+              final creditNotesRepo = context.read<CreditNotesRepository>();
+              final creditNotes = await creditNotesRepo
+                  .getCreditNotesByInvoiceId(state.invoice.id)
+                  .catchError((_) => const <CreditNoteInDb>[]);
+              if (!context.mounted) return;
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => DevolutionsSelectionScreen(
                     invoice: state.invoice,
                     devolutions: state.devolutions,
+                    creditNotes: creditNotes,
                   ),
                 ),
               );

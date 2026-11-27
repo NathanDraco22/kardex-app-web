@@ -69,11 +69,17 @@ class _ContentSection extends StatelessWidget {
 
               return ListTile(
                 tileColor: tileColor,
-                onTap: () {
-                  if (currentInvoice.amountPaid > 0) {
-                    DialogManager.showInfoDialog(context, "Los clientes de crédito con facturas abonadas no pueden hacer devoluciones de productos");
+                onTap: () async {
+                  final errorMsg = validateInvoiceForDevolution(currentInvoice);
+                  if (errorMsg != null) {
+                    DialogManager.showInfoDialog(context, errorMsg);
                     return;
                   }
+                  final creditNotesRepo = context.read<CreditNotesRepository>();
+                  final creditNotes = await creditNotesRepo
+                      .getCreditNotesByInvoiceId(currentInvoice.id)
+                      .catchError((_) => const <CreditNoteInDb>[]);
+                  if (!context.mounted) return;
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -81,6 +87,7 @@ class _ContentSection extends StatelessWidget {
                         return DevolutionSelectionScreen(
                           invoice: currentInvoice,
                           devolutions: devolutions,
+                          creditNotes: creditNotes,
                         );
                       },
                     ),

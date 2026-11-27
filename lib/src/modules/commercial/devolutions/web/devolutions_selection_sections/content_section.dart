@@ -5,14 +5,17 @@ class _ContentSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final invoice = context.findAncestorWidgetOfExactType<_Body>()!.invoice;
-    final devolutions = context.findAncestorWidgetOfExactType<_Body>()!.devolutions;
+    final bodyWidget = context.findAncestorWidgetOfExactType<_Body>()!;
+    final invoice = bodyWidget.invoice;
+    final devolutions = bodyWidget.devolutions;
+    final creditNotes = bodyWidget.creditNotes;
     final viewController = DevolutionsSelectionMediator.of(context).notifier!;
     final targetDevolutions =
         devolutions.where((devolution) => devolution.originalInvoiceId == invoice.id).toList();
-    final returnedItems = targetDevolutions.fold<List<SaleItem>>(
-      [],
-      (previousValue, devolution) => [...previousValue, ...devolution.returnedItems],
+    final returnedByLine = computePreviouslyReturnedByLine(
+      saleItems: invoice.saleItems,
+      devolutions: targetDevolutions,
+      creditNotes: creditNotes,
     );
 
     final selectedItems = viewController.selectedItems;
@@ -52,8 +55,9 @@ class _ContentSection extends StatelessWidget {
               itemCount: invoice.saleItems.length,
               itemBuilder: (context, index) {
                 final item = invoice.saleItems[index];
-                final hasItemReturned =
-                    returnedItems.any((returnedItem) => returnedItem.product.id == item.product.id);
+                final returnedQty = returnedByLine[index] ?? 0;
+                final hasItemReturned = returnedQty > 0;
+                final isPartialReturned = hasItemReturned && returnedQty < item.quantity;
                 final productCode = item.product.code;
                 final hasCode = productCode != null && productCode.isNotEmpty;
                 final unitPriceText = NumberFormatter.convertToMoneyLike(item.displayUnitPrice);
@@ -79,7 +83,7 @@ class _ContentSection extends StatelessWidget {
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
-                            "Ya devuelto",
+                            isPartialReturned ? "Devuelto parcial (NC)" : "Ya devuelto",
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
@@ -136,13 +140,13 @@ class _ContentSection extends StatelessWidget {
                       ),
                     ],
                   ),
-                  value: viewController.isInSelected(item),
+                  value: viewController.isIndexSelected(index),
                   onChanged: (bool? value) {
-                    if (value == true) {
-                      viewController.addToSelected(item);
-                    } else {
-                      viewController.removeFromSelected(item);
-                    }
+                    viewController.toggleIndex(
+                      index,
+                      item.copyWith(invoiceItemIndex: index),
+                      value == true,
+                    );
                   },
                 );
               },

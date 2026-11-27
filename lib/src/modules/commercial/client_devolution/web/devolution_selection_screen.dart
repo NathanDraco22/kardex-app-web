@@ -4,6 +4,7 @@ import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'devolution_confirmation_screen.dart';
+import '../../devolutions/devolution_eligibility.dart';
 import 'mediators/devolution_selection_mediator.dart';
 
 part 'devolution_sections/content_section.dart';
@@ -14,10 +15,12 @@ class DevolutionSelectionScreen extends StatefulWidget {
     super.key,
     required this.invoice,
     required this.devolutions,
+    this.creditNotes = const [],
   });
 
   final InvoiceInDb invoice;
   final List<DevolutionInDb> devolutions;
+  final List<CreditNoteInDb> creditNotes;
 
   @override
   State<DevolutionSelectionScreen> createState() => _DevolutionSelectionScreenState();
@@ -30,15 +33,24 @@ class _DevolutionSelectionScreenState extends State<DevolutionSelectionScreen> {
   Widget build(BuildContext context) {
     return DevolutionSelectionMediator(
       notifier: viewController,
-      child: _RootScaffold(invoice: widget.invoice, devolutions: widget.devolutions),
+      child: _RootScaffold(
+        invoice: widget.invoice,
+        devolutions: widget.devolutions,
+        creditNotes: widget.creditNotes,
+      ),
     );
   }
 }
 
 class _RootScaffold extends StatelessWidget {
-  const _RootScaffold({required this.invoice, required this.devolutions});
+  const _RootScaffold({
+    required this.invoice,
+    required this.devolutions,
+    this.creditNotes = const [],
+  });
   final InvoiceInDb invoice;
   final List<DevolutionInDb> devolutions;
+  final List<CreditNoteInDb> creditNotes;
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +58,11 @@ class _RootScaffold extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Seleccionar para Devolución"),
       ),
-      body: _Body(invoice: invoice, devolutions: devolutions),
+      body: _Body(
+        invoice: invoice,
+        devolutions: devolutions,
+        creditNotes: creditNotes,
+      ),
       floatingActionButton: FloatingActionButton.extended(
         icon: const Icon(Icons.check),
         label: const Text("Crear Devolución"),
@@ -70,7 +86,7 @@ class _RootScaffold extends StatelessWidget {
                     },
                     validator: (value) {
                       if (value == null || value.isEmpty) return "Campo requerido";
-                      if (value.length < 15) return "El motivo debe tener menos de 15 caracteres";
+                      if (value.length < 15) return "El motivo debe tener al menos 15 caracteres";
                       return null;
                     },
                   ),
@@ -122,9 +138,14 @@ class _RootScaffold extends StatelessWidget {
 }
 
 class _Body extends StatelessWidget {
-  const _Body({required this.invoice, required this.devolutions});
+  const _Body({
+    required this.invoice,
+    required this.devolutions,
+    this.creditNotes = const [],
+  });
   final InvoiceInDb invoice;
   final List<DevolutionInDb> devolutions;
+  final List<CreditNoteInDb> creditNotes;
 
   @override
   Widget build(BuildContext context) {

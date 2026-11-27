@@ -241,4 +241,26 @@ class SaleItem {
     }
     return data;
   }
+
+  SaleItem copyWith({int? invoiceItemIndex}) {
+    return SaleItem(
+      product: product,
+      selectedPrice: selectedPrice,
+      quantity: quantity,
+      bonQuantity: bonQuantity,
+      cost: cost,
+      price: price,
+      subTotal: subTotal,
+      discountType: discountType,
+      discountPercentage: discountPercentage,
+      totalDiscount: totalDiscount,
+      total: total,
+      conversionFactor: conversionFactor,
+      priceUnitFactor: priceUnitFactor,
+      selectedUnitName: selectedUnitName,
+      standardUnitName: standardUnitName,
+      standardUnitFactor: standardUnitFactor,
+      invoiceItemIndex: invoiceItemIndex ?? this.invoiceItemIndex,
+    );
+  }
 }

@@ -5,6 +5,7 @@ import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
 import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'devolutions_confirmation_screen.dart';
+import '../devolution_eligibility.dart';
 import 'mediators/devolutions_selection_mediator.dart';
 
 part 'devolutions_selection_sections/content_section.dart';
@@ -15,10 +16,12 @@ class DevolutionsSelectionScreen extends StatefulWidget {
     super.key,
     required this.invoice,
     required this.devolutions,
+    this.creditNotes = const [],
   });
 
   final InvoiceInDb invoice;
   final List<DevolutionInDb> devolutions;
+  final List<CreditNoteInDb> creditNotes;
 
   @override
   State<DevolutionsSelectionScreen> createState() => _DevolutionsSelectionScreenState();
@@ -34,15 +37,21 @@ class _DevolutionsSelectionScreenState extends State<DevolutionsSelectionScreen>
       child: _RootScaffold(
         invoice: widget.invoice,
         devolutions: widget.devolutions,
+        creditNotes: widget.creditNotes,
       ),
     );
   }
 }
 
 class _RootScaffold extends StatelessWidget {
-  const _RootScaffold({required this.invoice, required this.devolutions});
+  const _RootScaffold({
+    required this.invoice,
+    required this.devolutions,
+    this.creditNotes = const [],
+  });
   final InvoiceInDb invoice;
   final List<DevolutionInDb> devolutions;
+  final List<CreditNoteInDb> creditNotes;
 
   @override
   Widget build(BuildContext context) {
@@ -63,6 +72,7 @@ class _RootScaffold extends StatelessWidget {
       body: _Body(
         invoice: invoice,
         devolutions: devolutions,
+        creditNotes: creditNotes,
       ),
       floatingActionButton: FloatingActionButton.extended(
         icon: const Icon(Icons.check),
@@ -87,7 +97,7 @@ class _RootScaffold extends StatelessWidget {
                     },
                     validator: (value) {
                       if (value == null || value.isEmpty) return "Campo requerido";
-                      if (value.length < 15) return "El motivo debe tener más de 15 caracteres";
+                      if (value.length < 15) return "El motivo debe tener al menos 15 caracteres";
                       return null;
                     },
                   ),
@@ -139,9 +149,14 @@ class _RootScaffold extends StatelessWidget {
 }
 
 class _Body extends StatelessWidget {
-  const _Body({required this.invoice, required this.devolutions});
+  const _Body({
+    required this.invoice,
+    required this.devolutions,
+    this.creditNotes = const [],
+  });
   final InvoiceInDb invoice;
   final List<DevolutionInDb> devolutions;
+  final List<CreditNoteInDb> creditNotes;
 
   @override
   Widget build(BuildContext context) {

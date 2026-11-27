@@ -62,10 +62,14 @@ class ReadPendingInvoiceCubit extends Cubit<ReadInvoiceState> {
           Future.value(<CreditNoteInDb>[]),
       ]);
       final response = res[0] as ListResponse<InvoiceInDb>;
-      final devolutions = res[1] as List<DevolutionInDb>;
+      final rawDevolutions = res[1] as List<DevolutionInDb>;
       final creditNotes = res[2] as List<CreditNoteInDb>;
 
       _invoicesCache = response.data;
+      final pendingIds = _invoicesCache.map((inv) => inv.id).toSet();
+      final devolutions = rawDevolutions
+          .where((d) => pendingIds.contains(d.originalInvoiceId))
+          .toList();
       if (_invoicesCache.length >= response.count) {
         isLastPage = true;
       } else {
