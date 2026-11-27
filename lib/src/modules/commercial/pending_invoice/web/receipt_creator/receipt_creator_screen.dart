@@ -150,19 +150,27 @@ class _CreateReceiptBottomBar extends StatelessWidget {
     final mediator = CreateReceiptMediator.of(context);
     final client = mediator.client;
     final invoices = mediator.invoices;
-    final devolutions = mediator.devolutions;
+    final confirmedDevolutions =
+        mediator.devolutions.where((d) => d.status == DevolutionStatus.confirmed).toList();
     final creditNotes = mediator.creditNotes;
 
     final total = invoices.fold(0, (int previousValue, invoice) {
       return previousValue + invoice.totalRemaining;
     });
 
-    final devolutionTotal = devolutions.fold(0, (int previousValue, devolution) {
+    final devolutionTotal = confirmedDevolutions.fold(0, (int previousValue, devolution) {
       return previousValue + devolution.total;
     });
 
     final creditNoteTotal = creditNotes.fold(0, (int previousValue, cn) {
       return previousValue + cn.total;
+    });
+
+    final hasDevolutionExceeding = invoices.any((inv) {
+      final linkedTotal = confirmedDevolutions
+          .where((d) => d.originalInvoiceId == inv.id)
+          .fold<int>(0, (sum, d) => sum + d.total);
+      return linkedTotal > inv.totalRemaining;
     });
 
     final totalWithDiscounts = total - devolutionTotal - creditNoteTotal;
@@ -179,6 +187,13 @@ class _CreateReceiptBottomBar extends StatelessWidget {
             children: [
               PrimaryMenuButton(
                 onPressed: () async {
+                  if (hasDevolutionExceeding || devolutionTotal > total) {
+                    await DialogManager.showErrorDialog(
+                      context,
+                      "No es posible abonar: El monto de devoluciones vinculadas supera el saldo pendiente de la factura.",
+                    );
+                    return;
+                  }
                   if (creditNoteTotal > 0 && creditNoteTotal > (total - devolutionTotal)) {
                     await DialogManager.showErrorDialog(
                       context,
@@ -191,7 +206,7 @@ class _CreateReceiptBottomBar extends StatelessWidget {
                     context,
                     client: client,
                     invoices: invoices,
-                    devolutions: devolutions,
+                    devolutions: confirmedDevolutions,
                     creditNotes: creditNotes,
                   );
 
@@ -212,7 +227,9 @@ class _CreateReceiptBottomBar extends StatelessWidget {
                     final cashInputCents = (cashInput * 100).round();
 
                     // Find linked devolutions for this invoice
-                    final linkedDevolutions = devolutions.where((d) => d.originalInvoiceId == invoice.id).toList();
+                    final linkedDevolutions = confirmedDevolutions
+                        .where((d) => d.originalInvoiceId == invoice.id)
+                        .toList();
                     final linkedDevolutionTotal = linkedDevolutions.fold(0, (sum, d) => sum + d.total);
 
                     // Find linked credit notes for this invoice
@@ -292,11 +309,20 @@ class _CreateReceiptBottomBar extends StatelessWidget {
 
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: (creditNoteTotal > 0 && creditNoteTotal > (total - devolutionTotal))
+                  backgroundColor: (hasDevolutionExceeding ||
+                          devolutionTotal > total ||
+                          (creditNoteTotal > 0 && creditNoteTotal > (total - devolutionTotal)))
                       ? Colors.grey
                       : Colors.green,
                 ),
                 onPressed: () async {
+                  if (hasDevolutionExceeding || devolutionTotal > total) {
+                    await DialogManager.showErrorDialog(
+                      context,
+                      "No es posible liquidar: El monto de devoluciones vinculadas supera el saldo pendiente de la factura.",
+                    );
+                    return;
+                  }
                   if (creditNoteTotal > 0 && creditNoteTotal > (total - devolutionTotal)) {
                     await DialogManager.showErrorDialog(
                       context,
@@ -324,7 +350,7 @@ class _CreateReceiptBottomBar extends StatelessWidget {
                     );
                   }).toList();
 
-                  final appliedDevolutions = devolutions.map((devolution) {
+                  final appliedDevolutions = confirmedDevolutions.map((devolution) {
                     return AppliedDevolution(
                       devolutionId: devolution.id,
                       docNumber: devolution.docNumber,

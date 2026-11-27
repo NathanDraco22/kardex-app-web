@@ -230,20 +230,13 @@ class _BottomPendingInvoice extends StatelessWidget {
             totalDevolutions = state.summary!.totalDevolutions;
             totalCreditNotes = state.summary!.totalCreditNotes;
           } else {
-            total = state.invoices.fold(0, (int previousValue, invoice) {
-              total += invoice.totalRemaining;
-              return total;
-            });
+            total = state.invoices.fold(0, (sum, invoice) => sum + invoice.totalRemaining);
 
-            totalDevolutions = state.devolutions.fold(0, (int previousValue, devolution) {
-              totalDevolutions += devolution.total;
-              return totalDevolutions;
-            });
+            totalDevolutions = state.devolutions
+                .where((d) => d.status == DevolutionStatus.confirmed)
+                .fold(0, (sum, devolution) => sum + devolution.total);
 
-            totalCreditNotes = state.creditNotes.fold(0, (int previousValue, cn) {
-              totalCreditNotes += cn.total;
-              return totalCreditNotes;
-            });
+            totalCreditNotes = state.creditNotes.fold(0, (sum, cn) => sum + cn.total);
           }
         }
 

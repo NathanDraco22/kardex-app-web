@@ -11,6 +11,7 @@ import 'package:kardex_app_front/src/tools/printers/paper_settings.dart';
 import 'package:kardex_app_front/src/tools/printers/print_manager.dart';
 import 'package:kardex_app_front/widgets/design_system/app_status_badge.dart';
 import 'package:kardex_app_front/widgets/design_system/app_theme_tokens.dart';
+import 'package:kardex_app_front/widgets/dialogs/dialog_manager.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/credit_note_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
 
@@ -100,6 +101,8 @@ class _InvoiceAcreditViewer extends StatelessWidget {
                     child: InvoiceViewerContent(
                       invoice: invoice,
                       branch: branch,
+                      devolutions: devolutions,
+                      creditNotes: creditNotes,
                     ),
                   ),
                   const Divider(thickness: 2),
@@ -115,7 +118,11 @@ class _InvoiceAcreditViewer extends StatelessWidget {
 
   Widget _buildPaymentSummaryRow(BuildContext context) {
     final targetDevolution = devolutions.where((d) => d.originalInvoiceId == invoice.id).toList();
-    final int devolutionsTotal = targetDevolution.fold(0, (sum, d) => sum + d.total);
+    final confirmedDevolutions =
+        targetDevolution.where((d) => d.status == DevolutionStatus.confirmed).toList();
+    final openDevolutions =
+        targetDevolution.where((d) => d.status == DevolutionStatus.open).toList();
+    final int devolutionsTotal = confirmedDevolutions.fold(0, (sum, d) => sum + d.total);
 
     final visibleCreditNotes = creditNotes.where((cn) {
       final isMatchingInvoice = cn.invoiceId == invoice.id ||
@@ -136,12 +143,21 @@ class _InvoiceAcreditViewer extends StatelessWidget {
     ).toList();
 
     final int netDebtBeforeCreditNotes = invoice.totalRemaining - devolutionsTotal;
+    final bool isDevolutionExceeding = devolutionsTotal > invoice.totalRemaining;
     final bool isCreditNotesExceeding = creditNotesTotal > 0 && creditNotesTotal > netDebtBeforeCreditNotes;
 
     final int remaining = (invoice.totalRemaining - devolutionsTotal - creditNotesTotal) > 0
         ? (invoice.totalRemaining - devolutionsTotal - creditNotesTotal)
         : 0;
-    final bool isPaidOut = remaining <= 0;
+    final bool hasOpenDevolutions = openDevolutions.isNotEmpty;
+    final bool isAlreadyPaid = invoice.status == InvoiceStatus.paid || invoice.totalRemaining <= 0;
+    final bool canSettleZeroCash = !isAlreadyPaid &&
+        remaining == 0 &&
+        (devolutionsTotal > 0 || creditNotesTotal > 0) &&
+        !hasOpenDevolutions &&
+        !isDevolutionExceeding &&
+        !isCreditNotesExceeding;
+    final bool isPaidOut = remaining <= 0 && !canSettleZeroCash;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -337,34 +353,86 @@ class _InvoiceAcreditViewer extends StatelessWidget {
               ),
             ),
           ],
+          if (hasOpenDevolutions) ...[
+            Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.amber.shade50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.amber.shade400),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.lock_outline, color: Colors.amber.shade900, size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      "Esta factura tiene una devolución pendiente de confirmar. Confirme o cancele la devolución antes de registrar un abono.",
+                      style: TextStyle(
+                        color: Colors.amber.shade900,
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
           SizedBox(
             width: double.infinity,
             height: 50,
             child: ElevatedButton.icon(
-              onPressed: (isPaidOut || isCreditNotesExceeding)
+              onPressed: (hasOpenDevolutions || isPaidOut || isDevolutionExceeding || isCreditNotesExceeding)
                   ? null
-                  : () async {
-                      final paymentResult = await showFastPaymentModal(
-                        context,
-                        maxAmountToPay: NumberFormatter.convertFromCentsToDouble(remaining),
-                        clientName: invoice.clientInfo.name,
-                      );
+                  : canSettleZeroCash
+                      ? () async {
+                          final confirm = await DialogManager.slideToConfirmActionDialog(
+                            context,
+                            "¿Deseas liquidar la factura #${invoice.docNumber} en \$0.00 aplicando las devoluciones/notas vinculadas?",
+                          );
+                          if (confirm == true && context.mounted) {
+                            Navigator.pop(
+                              context,
+                              FastPaymentResult(
+                                amount: 0.0,
+                                method: PaymentMethod.cash,
+                                bankReference: "",
+                              ),
+                            );
+                          }
+                        }
+                      : () async {
+                          final paymentResult = await showFastPaymentModal(
+                            context,
+                            maxAmountToPay: NumberFormatter.convertFromCentsToDouble(remaining),
+                            clientName: invoice.clientInfo.name,
+                          );
 
-                      if (paymentResult != null && context.mounted) {
-                        Navigator.pop(context, paymentResult);
-                      }
-                    },
-              icon: const Icon(Icons.payment),
+                          if (paymentResult != null && context.mounted) {
+                            Navigator.pop(context, paymentResult);
+                          }
+                        },
+              icon: Icon(canSettleZeroCash ? Icons.check_circle_outline : Icons.payment),
               label: Text(
-                isCreditNotesExceeding
-                    ? "Notas de Crédito Exceden Saldo"
-                    : (isPaidOut ? "Factura Pagada" : "Abonar a esta Factura"),
+                hasOpenDevolutions
+                    ? "Devolución Pendiente por Confirmar"
+                    : isDevolutionExceeding
+                        ? "Devolución Excede Saldo"
+                        : isCreditNotesExceeding
+                            ? "Notas de Crédito Exceden Saldo"
+                            : canSettleZeroCash
+                                ? "Liquidar con Devolución / Nota (\$0.00)"
+                                : (isPaidOut ? "Factura Pagada" : "Abonar a esta Factura"),
                 style: const TextStyle(fontSize: 16),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: isCreditNotesExceeding
+                backgroundColor: (hasOpenDevolutions || isDevolutionExceeding || isCreditNotesExceeding)
                     ? Colors.grey
-                    : Theme.of(context).primaryColor,
+                    : canSettleZeroCash
+                        ? Colors.green.shade600
+                        : Theme.of(context).primaryColor,
                 foregroundColor: Colors.white,
               ),
             ),

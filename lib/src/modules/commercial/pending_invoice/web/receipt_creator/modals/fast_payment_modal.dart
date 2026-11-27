@@ -190,7 +190,7 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          "Las notas de crédito cubren o superan el adeudo de facturas. No es posible abonar en efectivo.",
+                          "Las devoluciones o notas de crédito cubren o superan el adeudo de facturas. No es posible abonar un monto adicional.",
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,

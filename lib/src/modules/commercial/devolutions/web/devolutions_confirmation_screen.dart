@@ -85,7 +85,6 @@ class _RootScaffold extends StatelessWidget {
           if (!context.mounted) return;
           Navigator.pop(context);
           Navigator.pop(context);
-          Navigator.pop(context);
         }
       },
       child: Scaffold(
@@ -118,13 +117,7 @@ class _RootScaffold extends StatelessWidget {
 
             final totalCost = selectedItems.fold<int>(
               0,
-              (previousValue, element) =>
-                  previousValue +
-                  UnitConversionTool.calculateLineTotal(
-                    element.cost,
-                    element.quantity,
-                    priceUnitFactor: element.priceUnitFactor,
-                  ),
+              (previousValue, element) => previousValue + element.lineCost,
             );
 
             final userInfo = UserInfo(id: user.id, name: user.username);

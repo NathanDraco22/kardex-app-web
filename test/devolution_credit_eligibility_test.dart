@@ -1,6 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kardex_app_front/src/modules/commercial/devolutions/devolution_eligibility.dart';
+import 'package:kardex_app_front/src/modules/commercial/pending_invoice/web/receipt_creator/fast_receipt_logic.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/invoice_viewer.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:material_ui/material_ui.dart';
 
 InvoiceInDb _makeInvoice({
   PaymentType paymentType = PaymentType.cash,
@@ -219,6 +222,196 @@ void main() {
 
       final parsed = DevolutionInDb.fromJson(json);
       expect(parsed.originalInvoicePaymentType, 'credit');
+    });
+  });
+
+  group('SaleItem.lineCost con bonificaciones', () {
+    test('incluye bonQuantity en el costo de línea', () {
+      final item = SaleItem(
+        product: ProductItem(id: 'p-1', name: 'Prod', unitName: 'Unidad'),
+        selectedPrice: 100,
+        quantity: 5,
+        bonQuantity: 2,
+        cost: 40,
+        price: 100,
+        subTotal: 500,
+        total: 500,
+      );
+      expect(item.lineCost, 280);
+    });
+  });
+
+  group('FastReceiptLogic con devoluciones', () {
+    final client = ClientInDb(
+      id: 'client-1',
+      name: 'Cliente Demo',
+      group: 'General',
+      createdAt: DateTime(2026, 11, 27),
+    );
+
+    test('ignora devoluciones open y bloquea factura con devolución pendiente', () {
+      final inv = _makeInvoice(
+        paymentType: PaymentType.credit,
+        status: InvoiceStatus.open,
+        total: 1000,
+        amountPaid: 0,
+        clientId: 'client-1',
+      );
+      final openDev = _makeDevolution(
+        status: DevolutionStatus.open,
+        returnedItems: [_makeSaleItem(invoiceItemIndex: 0)],
+        originalInvoicePaymentType: 'credit',
+      );
+
+      final (receipt, message) = FastReceiptLogic.allocateFastPayment(
+        paymentAmountCents: 900,
+        invoices: [inv],
+        devolutions: [openDev],
+        client: client,
+        branchId: 'branch-1',
+        currentUserId: 'u-1',
+        currentUserName: 'Cajero',
+      );
+
+      expect(receipt, isNull);
+      expect(message, contains('pendientes por confirmar'));
+    });
+
+    test('liquida factura 100% devuelta con paymentAmountCents == 0', () {
+      final inv = _makeInvoice(
+        paymentType: PaymentType.credit,
+        status: InvoiceStatus.open,
+        total: 1000,
+        amountPaid: 0,
+        clientId: 'client-1',
+      );
+      final confirmedDev = DevolutionInDb(
+        id: 'dev-conf',
+        branchId: 'branch-1',
+        clientId: 'client-1',
+        clientInfo: ClientInfo(name: 'Cliente', group: 'General'),
+        docNumber: 'DEV-001',
+        originalInvoiceId: 'inv-1',
+        originalInvoiceDocNumber: 'FAC-001',
+        originalInvoicePaymentType: 'credit',
+        returnedItems: [_makeSaleItem(invoiceItemIndex: 0)],
+        description: 'Devolución total de prueba',
+        status: DevolutionStatus.confirmed,
+        totalCost: 500,
+        total: 1000,
+        createdBy: const UserInfo(id: 'u-1', name: 'Cajero'),
+        createdAt: DateTime(2026, 11, 27),
+      );
+
+      final (receipt, _) = FastReceiptLogic.allocateFastPayment(
+        paymentAmountCents: 0,
+        invoices: [inv],
+        devolutions: [confirmedDev],
+        client: client,
+        branchId: 'branch-1',
+        currentUserId: 'u-1',
+        currentUserName: 'Cajero',
+      );
+
+      expect(receipt, isNotNull);
+      expect(receipt!.total, 0);
+      expect(receipt.appliedDevolutions.single.amountApplied, 1000);
+      expect(receipt.appliedInvoices.single.amountApplied, 1000);
+    });
+
+    test('rechaza si devolución vinculada supera el saldo pendiente de la factura', () {
+      final inv = _makeInvoice(
+        paymentType: PaymentType.credit,
+        status: InvoiceStatus.partiallypaid,
+        total: 1000,
+        amountPaid: 600,
+        clientId: 'client-1',
+      );
+      final confirmedDev = DevolutionInDb(
+        id: 'dev-conf',
+        branchId: 'branch-1',
+        clientId: 'client-1',
+        clientInfo: ClientInfo(name: 'Cliente', group: 'General'),
+        docNumber: 'DEV-001',
+        originalInvoiceId: 'inv-1',
+        originalInvoiceDocNumber: 'FAC-001',
+        originalInvoicePaymentType: 'credit',
+        returnedItems: [_makeSaleItem(invoiceItemIndex: 0)],
+        description: 'Devolución mayor al saldo',
+        status: DevolutionStatus.confirmed,
+        totalCost: 300,
+        total: 600,
+        createdBy: const UserInfo(id: 'u-1', name: 'Cajero'),
+        createdAt: DateTime(2026, 11, 27),
+      );
+
+      final (receipt, message) = FastReceiptLogic.allocateFastPayment(
+        paymentAmountCents: 0,
+        invoices: [inv],
+        devolutions: [confirmedDev],
+        client: client,
+        branchId: 'branch-1',
+        currentUserId: 'u-1',
+        currentUserName: 'Cajero',
+      );
+
+      expect(receipt, isNull);
+      expect(message, contains('supera el saldo pendiente'));
+    });
+  });
+
+  group('InvoiceViewerContent con devoluciones', () {
+    testWidgets('muestra devoluciones confirmadas y total neto', (tester) async {
+      final branch = BranchInDb(
+        id: 'branch-1',
+        name: 'Sucursal Central',
+        idCard: 'J031',
+        address: 'Dir',
+        email: 'a@b.com',
+        phone: '8888',
+        createdAt: DateTime(2026, 1, 1),
+      );
+      final inv = _makeInvoice(
+        paymentType: PaymentType.credit,
+        status: InvoiceStatus.open,
+        total: 1000,
+        amountPaid: 0,
+        clientId: 'client-1',
+        saleItems: [_makeSaleItem(quantity: 2)],
+      );
+      final confirmedDev = DevolutionInDb(
+        id: 'dev-conf',
+        branchId: 'branch-1',
+        clientId: 'client-1',
+        clientInfo: ClientInfo(name: 'Cliente', group: 'General'),
+        docNumber: 'DEV-001',
+        originalInvoiceId: 'inv-1',
+        originalInvoiceDocNumber: 'FAC-001',
+        originalInvoicePaymentType: 'credit',
+        returnedItems: [_makeSaleItem(quantity: 1, invoiceItemIndex: 0)],
+        description: 'Devolución parcial',
+        status: DevolutionStatus.confirmed,
+        totalCost: 50,
+        total: 400,
+        createdBy: const UserInfo(id: 'u-1', name: 'Cajero'),
+        createdAt: DateTime(2026, 11, 27),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: InvoiceViewerContent(
+              invoice: inv,
+              branch: branch,
+              devolutions: [confirmedDev],
+              displayConfig: const InvoiceDisplayConfig(),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Devoluciones:'), findsOneWidget);
+      expect(find.text('Total Neto:'), findsOneWidget);
     });
   });
 }

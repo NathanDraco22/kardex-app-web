@@ -50,7 +50,7 @@ class ReadPendingInvoiceCubit extends Cubit<ReadInvoiceState> {
         else
           Future.value(ListResponse<InvoiceInDb>(data: [], count: 0)),
         if (devolutionsRepository != null)
-          devolutionsRepository!.getAllActiveDevolutions(clientId, branchId)
+          devolutionsRepository!.getAllActiveDevolutions(clientId)
         else
           Future.value(<DevolutionInDb>[]),
         if (creditNotesRepository != null)
