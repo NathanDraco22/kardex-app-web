@@ -1,3 +1,9 @@
+## Fix del test de devoluciones (Noviembre 2026)
+
+- **Problema:** `devolutions_selection_test.dart` fallaba porque `DevolutionsScreenWeb._openDevolutionSelection` lee `CreditNotesRepository` del contexto y el test solo proveía `InvoicesRepository`.
+- **Fix:** se agregó `_FakeCreditNotesRepository` (devuelve una lista vacía en `getCreditNotesByInvoiceId`) y un `RepositoryProvider<CreditNotesRepository>` en el árbol de prueba; el repositorio se libera con `disposeReactiveRepo` en `addTearDown`.
+- **Verificación:** `flutter analyze` limpio; `flutter test test/devolutions_selection_test.dart` (2/2) y suite completa de `main` (431 pruebas) aprobadas.
+
 ## Simplificación de `AppSettingsCubit`: solo `policy` (Noviembre 2026)
 
 - **Alcance:** eliminados todos los getters de decisión de `AppSettingsCubit` (`useShifts`, `useOrders`, `useQuotations`, `useExpirationDates`, `useDiscounts`, `useInvoiceCancellations`, `useReceiptCancellations`, `useQuickProductSearch`, `companyLogoUrl`, `hasCompanyLogo`, `currency`, `secondaryCurrency`, `exchangeRate`, etc.). El cubit queda con `policy`, `currentSettings`, `loadSettings`, `updateSettings`, `clear` y `close`.
