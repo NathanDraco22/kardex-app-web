@@ -11,6 +11,7 @@ import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/adaptive_viewer.dart';
 import 'package:kardex_app_front/widgets/dialogs/viewers/credit_note_viewer.dart';
+import 'package:kardex_app_front/widgets/dialogs/viewers/devolution_viewer.dart';
 import 'package:kardex_app_front/widgets/gates/gates.dart';
 
 Future<void> showInvoiceViewerDialog(BuildContext context, InvoiceInDb invoice) async {
@@ -143,63 +144,100 @@ class _InvoiceViewer extends StatelessWidget {
   final VoidCallback? onPrint;
   final VoidCallback? onExportPdf;
 
+  Future<(List<CreditNoteInDb>, List<DevolutionInDb>)> _loadRelatedReturns(
+    BuildContext context,
+  ) async {
+    Future<List<CreditNoteInDb>> creditNotesFuture = Future.value(const []);
+    Future<List<DevolutionInDb>> devolutionsFuture = Future.value(const []);
+
+    try {
+      creditNotesFuture = context
+          .read<CreditNotesRepository>()
+          .getCreditNotesByInvoiceId(invoice.id)
+          .catchError((_) => const <CreditNoteInDb>[]);
+    } catch (_) {}
+
+    try {
+      devolutionsFuture = context
+          .read<InvoicesRepository>()
+          .getInvoiceDevolutionById(invoice.id)
+          .then((res) => res.devolutions)
+          .catchError((_) => const <DevolutionInDb>[]);
+    } catch (_) {}
+
+    final creditNotes = await creditNotesFuture;
+    final devolutions = await devolutionsFuture;
+    return (creditNotes, devolutions);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final canRequestCancellation = !invoice.isCancelled &&
+    final canRequestCancellationBase = !invoice.isCancelled &&
         (invoice.paymentType != PaymentType.credit ||
             (invoice.status == InvoiceStatus.open && invoice.amountPaid == 0));
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Factura #${invoice.docNumber}"),
-        actions: [
-          if (canRequestCancellation)
-            Gate(
-              filters: const [InvoiceCancellationsGateFilter()],
-              child: IconButton(
-                tooltip: "Solicitar anulación",
-                onPressed: () => _showRequestCancellationDialog(context),
-                icon: const Icon(Icons.cancel_schedule_send_outlined),
+    return FutureBuilder<(List<CreditNoteInDb>, List<DevolutionInDb>)>(
+      future: _loadRelatedReturns(context),
+      builder: (context, snapshot) {
+        final creditNotes = snapshot.data?.$1 ?? const <CreditNoteInDb>[];
+        final devolutions = snapshot.data?.$2 ?? const <DevolutionInDb>[];
+        final hasActiveReturns = devolutions.any((d) => d.status != DevolutionStatus.cancelled) ||
+            creditNotes.any(
+              (cn) =>
+                  cn.status != CreditNoteStatus.cancelled &&
+                  cn.status != CreditNoteStatus.rejected,
+            );
+        final canRequestCancellation = canRequestCancellationBase && !hasActiveReturns;
+
+        return Scaffold(
+          appBar: AppBar(
+            title: Text("Factura #${invoice.docNumber}"),
+            actions: [
+              if (canRequestCancellation)
+                Gate(
+                  filters: const [InvoiceCancellationsGateFilter()],
+                  child: IconButton(
+                    tooltip: "Solicitar anulación",
+                    onPressed: () => _showRequestCancellationDialog(context),
+                    icon: const Icon(Icons.cancel_schedule_send_outlined),
+                  ),
+                ),
+              IconButton(
+                tooltip: "Exportar PDF (A4)",
+                onPressed: onExportPdf,
+                icon: const Icon(Icons.picture_as_pdf),
               ),
-            ),
-          IconButton(
-            tooltip: "Exportar PDF (A4)",
-            onPressed: onExportPdf,
-            icon: const Icon(Icons.picture_as_pdf),
+              IconButton(
+                tooltip: "Compartir Factura",
+                onPressed: onShare,
+                icon: const Icon(Icons.share),
+              ),
+              IconButton(
+                tooltip: "Imprimir Factura",
+                onPressed: onPrint,
+                icon: const Icon(Icons.print),
+              ),
+            ],
           ),
-          IconButton(
-            tooltip: "Compartir Factura",
-            onPressed: onShare,
-            icon: const Icon(Icons.share),
-          ),
-          IconButton(
-            tooltip: "Imprimir Factura",
-            onPressed: onPrint,
-            icon: const Icon(Icons.print),
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: Center(
-          child: Container(
-            color: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 600),
-              child: FutureBuilder<List<CreditNoteInDb>>(
-                future: context.read<CreditNotesRepository>().getCreditNotesByInvoiceId(invoice.id),
-                builder: (context, snapshot) {
-                  return InvoiceViewerContent(
+          body: SafeArea(
+            child: Center(
+              child: Container(
+                color: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 600),
+                  child: InvoiceViewerContent(
                     invoice: invoice,
                     branch: branch,
-                    creditNotes: snapshot.data ?? const [],
-                  );
-                },
+                    creditNotes: creditNotes,
+                    devolutions: devolutions,
+                  ),
+                ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -347,12 +385,14 @@ class InvoiceViewerContent extends StatelessWidget {
     required this.invoice,
     required this.branch,
     this.creditNotes = const [],
+    this.devolutions = const [],
     this.displayConfig,
   });
 
   final InvoiceInDb invoice;
   final BranchInDb branch;
   final List<CreditNoteInDb> creditNotes;
+  final List<DevolutionInDb> devolutions;
   final InvoiceDisplayConfig? displayConfig;
 
   @override
@@ -386,7 +426,15 @@ class InvoiceViewerContent extends StatelessWidget {
       cn.status == CreditNoteStatus.emitted || cn.status == CreditNoteStatus.open
     ).toList();
 
-    final netInvoiceTotal = (invoice.total - creditNotesTotal) > 0 ? (invoice.total - creditNotesTotal) : 0;
+    final confirmedDevolutions = devolutions.where((d) =>
+      d.status == DevolutionStatus.confirmed || d.status == DevolutionStatus.applied
+    ).toList();
+    final int confirmedDevolutionsTotal = confirmedDevolutions.fold(0, (sum, d) => sum + d.total);
+    final pendingDevolutions = devolutions.where((d) => d.status == DevolutionStatus.open).toList();
+
+    final netInvoiceTotal = (invoice.total - confirmedDevolutionsTotal - creditNotesTotal) > 0
+        ? (invoice.total - confirmedDevolutionsTotal - creditNotesTotal)
+        : 0;
     return Column(
       children: [
         if (invoice.isCancelled)
@@ -836,6 +884,87 @@ class InvoiceViewerContent extends StatelessWidget {
                         ],
                       ),
                     ),
+                    if (confirmedDevolutions.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                "Devoluciones:",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                  color: Colors.orange.shade800,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              IconButton(
+                                visualDensity: VisualDensity.compact,
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                                icon: Icon(
+                                  Icons.visibility_outlined,
+                                  size: 18,
+                                  color: Colors.orange.shade800,
+                                ),
+                                tooltip: "Ver Devolución",
+                                onPressed: () {
+                                  if (confirmedDevolutions.length == 1) {
+                                    showDevolutionViewerDialog(context, confirmedDevolutions.first);
+                                  } else {
+                                    showDialog(
+                                      context: context,
+                                      builder: (ctx) => AlertDialog(
+                                        title: const Text("Devoluciones Confirmadas"),
+                                        content: SizedBox(
+                                          width: double.maxFinite,
+                                          child: ListView.builder(
+                                            shrinkWrap: true,
+                                            itemCount: confirmedDevolutions.length,
+                                            itemBuilder: (_, idx) {
+                                              final dev = confirmedDevolutions[idx];
+                                              return ListTile(
+                                                title: Text("Dev #${dev.docNumber}"),
+                                                trailing: Text(NumberFormatter.convertToMoneyLike(dev.total)),
+                                                onTap: () {
+                                                  Navigator.pop(ctx);
+                                                  showDevolutionViewerDialog(context, dev);
+                                                },
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.pop(ctx),
+                                            child: const Text("Cerrar"),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            width: 120,
+                            child: Text(
+                              "- ${NumberFormatter.convertToMoneyLike(confirmedDevolutionsTotal)}",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                                color: Colors.orange.shade800,
+                              ),
+                              textAlign: TextAlign.end,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                     if (approvedCreditNotes.isNotEmpty) ...[
                       const SizedBox(height: 4),
                       Row(
@@ -916,6 +1045,8 @@ class InvoiceViewerContent extends StatelessWidget {
                           ),
                         ],
                       ),
+                    ],
+                    if (confirmedDevolutions.isNotEmpty || approvedCreditNotes.isNotEmpty) ...[
                       const SizedBox(height: 4),
                       DecoratedBox(
                         decoration: BoxDecoration(
@@ -947,6 +1078,24 @@ class InvoiceViewerContent extends StatelessWidget {
                             ),
                           ],
                         ),
+                      ),
+                    ],
+                    if (pendingDevolutions.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Icon(Icons.schedule_rounded, size: 14, color: Colors.amber.shade900),
+                          const SizedBox(width: 4),
+                          Text(
+                            "Devoluciones pendientes de confirmar: ${pendingDevolutions.length} (no descuenta)",
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.amber.shade900,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                     if (pendingApprovalCreditNotes.isNotEmpty) ...[

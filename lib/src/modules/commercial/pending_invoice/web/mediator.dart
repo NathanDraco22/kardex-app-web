@@ -26,7 +26,11 @@ class ViewController extends ChangeNotifier {
 
   void addToSelected(InvoiceInDb invoice) {
     _selectedInvoices.add(invoice);
-    final devolutionsMatched = devolutions.where((devolution) => devolution.originalInvoiceId == invoice.id);
+    final devolutionsMatched = devolutions.where(
+      (devolution) =>
+          devolution.originalInvoiceId == invoice.id &&
+          devolution.status == DevolutionStatus.confirmed,
+    );
     _selectedDevolutions.addAll(devolutionsMatched);
 
     final creditNotesMatched = creditNotes.where(

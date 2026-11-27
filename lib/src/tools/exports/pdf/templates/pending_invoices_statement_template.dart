@@ -33,7 +33,9 @@ class PendingInvoicesStatementPdfTemplate implements PdfTemplate {
     final generatedAt = DateTime.now();
 
     final totalInvoices = invoices.fold(0, (sum, inv) => sum + inv.totalRemaining);
-    final totalDevolutions = devolutions.fold(0, (sum, d) => sum + d.total);
+    final totalDevolutions = devolutions
+        .where((d) => d.status == DevolutionStatus.confirmed)
+        .fold(0, (sum, d) => sum + d.total);
     final totalCreditNotes = creditNotes.fold(0, (sum, cn) => sum + cn.total);
     final netTotal = (totalInvoices - totalDevolutions - totalCreditNotes) > 0
         ? (totalInvoices - totalDevolutions - totalCreditNotes)
@@ -294,7 +296,11 @@ class PendingInvoicesStatementPdfTemplate implements PdfTemplate {
         ),
         ...List.generate(invoices.length, (index) {
           final inv = invoices[index];
-          final targetDev = devolutions.where((d) => d.originalInvoiceId == inv.id);
+          final targetDev = devolutions.where(
+            (d) =>
+                d.originalInvoiceId == inv.id &&
+                d.status == DevolutionStatus.confirmed,
+          );
           final targetCn = creditNotes.where(
             (cn) => cn.invoiceId == inv.id || (cn.invoiceDocNumber.isNotEmpty && cn.invoiceDocNumber == inv.docNumber),
           );

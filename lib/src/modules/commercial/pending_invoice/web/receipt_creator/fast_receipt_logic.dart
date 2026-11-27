@@ -19,12 +19,35 @@ class FastReceiptLogic {
       cn.status == CreditNoteStatus.approved || cn.status == CreditNoteStatus.confirmed
     ).toList();
 
-    if (paymentAmountCents <= 0 && devolutions.isEmpty && validCreditNotes.isEmpty) {
+    final openInvoiceIds = devolutions
+        .where((d) => d.status == DevolutionStatus.open)
+        .map((d) => d.originalInvoiceId)
+        .toSet();
+    final eligibleInvoices = invoices
+        .where((inv) => !openInvoiceIds.contains(inv.id))
+        .toList();
+
+    if (eligibleInvoices.isEmpty) {
+      return (
+        null,
+        "Las facturas seleccionadas tienen devoluciones pendientes por confirmar. Confirme o cancele la devolución antes de registrar el abono.",
+      );
+    }
+
+    final validDevolutions = devolutions
+        .where(
+          (d) =>
+              d.status == DevolutionStatus.confirmed &&
+              eligibleInvoices.any((inv) => inv.id == d.originalInvoiceId),
+        )
+        .toList();
+
+    if (paymentAmountCents <= 0 && validDevolutions.isEmpty && validCreditNotes.isEmpty) {
       return (null, "Debe existir al menos un monto en efectivo, devoluciones o notas de crédito pendientes para abonar.");
     }
 
-    final totalInvoicesDebt = invoices.fold(0, (sum, inv) => sum + (inv.total - inv.amountPaid));
-    final totalDevolutions = devolutions.fold(0, (sum, dev) => sum + dev.total);
+    final totalInvoicesDebt = eligibleInvoices.fold(0, (sum, inv) => sum + (inv.total - inv.amountPaid));
+    final totalDevolutions = validDevolutions.fold(0, (sum, dev) => sum + dev.total);
     final netInvoicesDebt = totalInvoicesDebt - totalDevolutions;
     final totalCreditNotes = validCreditNotes.fold(0, (sum, cn) => sum + cn.total);
 
@@ -35,7 +58,7 @@ class FastReceiptLogic {
       );
     }
 
-    final sortedInvoices = List<InvoiceInDb>.from(invoices)..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    final sortedInvoices = List<InvoiceInDb>.from(eligibleInvoices)..sort((a, b) => a.createdAt.compareTo(b.createdAt));
 
     int remainingPayment = paymentAmountCents;
     final appliedInvoices = <AppliedInvoice>[];
@@ -52,12 +75,17 @@ class FastReceiptLogic {
 
       int totalAppliedToThisInvoice = 0;
 
-      // 1. Linked devolutions
-      final linkedDevolutions = devolutions.where((d) => d.originalInvoiceId == invoice.id).toList();
+      // 1. Linked devolutions (solo confirmadas; no recortar excedentes silenciosamente)
+      final linkedDevolutions = validDevolutions.where((d) => d.originalInvoiceId == invoice.id).toList();
       for (var dev in linkedDevolutions) {
-        if (balanceRemainingCents <= 0) break;
+        if (dev.total > balanceRemainingCents) {
+          return (
+            null,
+            "La devolución #${dev.docNumber} (${NumberFormatter.convertToMoneyLike(dev.total)}) supera el saldo pendiente de la factura #${invoice.docNumber} (${NumberFormatter.convertToMoneyLike(balanceRemainingCents)}).",
+          );
+        }
 
-        final devAmountToApply = dev.total > balanceRemainingCents ? balanceRemainingCents : dev.total;
+        final devAmountToApply = dev.total;
 
         if (devAmountToApply > 0) {
           appliedDevolutions.add(

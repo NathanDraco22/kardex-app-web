@@ -63,9 +63,10 @@ class InvoiceDevolutionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final targetDevolution = devolutions.where((d) => d.originalInvoiceId == invoice.id).toList();
+    final confirmedDevolutions =
+        targetDevolution.where((d) => d.status == DevolutionStatus.confirmed).toList();
     final bool hasOpenDevolutions = targetDevolution.any((d) => d.status == DevolutionStatus.open);
-    final bool hasConfirmedDevolutions =
-        targetDevolution.isNotEmpty && targetDevolution.every((d) => d.status == DevolutionStatus.confirmed);
+    final bool hasConfirmedDevolutions = confirmedDevolutions.isNotEmpty;
     final bool isDisabled = hasOpenDevolutions;
 
     final targetCreditNotes = creditNotes
@@ -76,7 +77,7 @@ class InvoiceDevolutionTile extends StatelessWidget {
         )
         .toList();
 
-    final int devolutionsTotal = targetDevolution.fold(0, (sum, d) => sum + d.total);
+    final int devolutionsTotal = confirmedDevolutions.fold(0, (sum, d) => sum + d.total);
     final int creditNotesTotal = targetCreditNotes.fold(0, (sum, cn) => sum + cn.total);
     final int adjustedTotal = invoice.totalRemaining - devolutionsTotal - creditNotesTotal;
 
@@ -264,7 +265,7 @@ class InvoiceDevolutionTile extends StatelessWidget {
                       Expanded(
                         child: _buildSummaryItem("Abonado", invoice.amountPaid, color: Colors.teal.shade700),
                       ),
-                      if (targetDevolution.isNotEmpty)
+                      if (confirmedDevolutions.isNotEmpty)
                         Expanded(
                           child: _buildSummaryItem("Devolución", devolutionsTotal, color: Colors.orange.shade800),
                         ),

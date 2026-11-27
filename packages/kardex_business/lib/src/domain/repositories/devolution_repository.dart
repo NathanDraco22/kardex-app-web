@@ -34,10 +34,11 @@ class DevolutionsRepository with ReactiveRepository<DevolutionInDb> {
     return response.data;
   }
 
-  Future<List<DevolutionInDb>> getAllActiveDevolutions(String userId, String branchId) async {
-    final params = DevolutionQueryParams()
-      ..branchId = branchId
-      ..clientId = userId;
+  Future<List<DevolutionInDb>> getAllActiveDevolutions(String userId, [String? branchId]) async {
+    final params = DevolutionQueryParams()..clientId = userId;
+    if (branchId != null && branchId.isNotEmpty) {
+      params.branchId = branchId;
+    }
 
     final results = await devolutionsDataSource.getAllActiveDevolutions(params.toMap());
     final response = ListResponse<DevolutionInDb>.fromJson(results, DevolutionInDb.fromJson);

@@ -49,6 +49,7 @@ class _ContentSection extends StatelessWidget {
                         child: InvoiceViewerContent(
                           invoice: state.invoice,
                           branch: branch,
+                          devolutions: state.devolutions,
                         ),
                       ),
                     );

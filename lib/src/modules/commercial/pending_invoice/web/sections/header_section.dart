@@ -120,19 +120,30 @@ class _HeaderSection extends StatelessWidget {
                 ),
                 Builder(
                   builder: (context) {
+                    List<InvoiceInDb> eligibleInvoices = const [];
+                    List<DevolutionInDb> confirmedDevolutions = const [];
                     int total = 0;
                     int totalDevolutions = 0;
                     int totalCreditNotes = 0;
                     if (state is ReadInvoiceSuccess) {
-                      if (state.summary != null) {
-                        total = state.summary!.totalInvoices;
-                        totalDevolutions = state.summary!.totalDevolutions;
-                        totalCreditNotes = state.summary!.totalCreditNotes;
-                      } else {
-                        total = state.invoices.fold(0, (sum, inv) => sum + inv.totalRemaining);
-                        totalDevolutions = state.devolutions.fold(0, (sum, d) => sum + d.total);
-                        totalCreditNotes = state.creditNotes.fold(0, (sum, cn) => sum + cn.total);
-                      }
+                      final openInvoiceIds = state.devolutions
+                          .where((d) => d.status == DevolutionStatus.open)
+                          .map((d) => d.originalInvoiceId)
+                          .toSet();
+                      eligibleInvoices = state.invoices
+                          .where((inv) => !openInvoiceIds.contains(inv.id))
+                          .toList();
+                      final eligibleIds = eligibleInvoices.map((inv) => inv.id).toSet();
+                      confirmedDevolutions = state.devolutions
+                          .where(
+                            (d) =>
+                                d.status == DevolutionStatus.confirmed &&
+                                eligibleIds.contains(d.originalInvoiceId),
+                          )
+                          .toList();
+                      total = eligibleInvoices.fold(0, (sum, inv) => sum + inv.totalRemaining);
+                      totalDevolutions = confirmedDevolutions.fold(0, (sum, d) => sum + d.total);
+                      totalCreditNotes = state.creditNotes.fold(0, (sum, cn) => sum + cn.total);
                     }
 
                     final netPayableCents = (total - totalDevolutions - totalCreditNotes) > 0
@@ -141,11 +152,23 @@ class _HeaderSection extends StatelessWidget {
 
                     final isCreditNotesExceeding =
                         totalCreditNotes > 0 && totalCreditNotes > (total - totalDevolutions);
+                    final canSettleZeroCash = eligibleInvoices.isNotEmpty &&
+                        netPayableCents == 0 &&
+                        (totalDevolutions > 0 || totalCreditNotes > 0) &&
+                        !isCreditNotesExceeding;
 
                     return PrimaryMenuButton(
-                      icon: const Icon(Icons.flash_on),
+                      icon: Icon(canSettleZeroCash ? Icons.check_circle_outline : Icons.flash_on),
                       onPressed: () async {
                         if (state is! ReadInvoiceSuccess || state.invoices.isEmpty) return;
+
+                        if (eligibleInvoices.isEmpty) {
+                          await DialogManager.showInfoDialog(
+                            context,
+                            "Todas las facturas pendientes tienen devoluciones en proceso por confirmar. Confirme o cancele la devolución antes de abonar.",
+                          );
+                          return;
+                        }
 
                         if (isCreditNotesExceeding) {
                           await DialogManager.showErrorDialog(
@@ -158,15 +181,30 @@ class _HeaderSection extends StatelessWidget {
                         final selectedClient = PendingInvoiceMediator.of(context).notifier?.selectedClient;
                         if (selectedClient == null) return;
 
-                        final maxAmountDouble = netPayableCents / 100;
+                        late final int amountCents;
+                        late final PaymentMethod paymentMethod;
+                        late final String bankReference;
+                        PaymentDetail? paymentDetail;
 
-                        final paymentResult = await showFastPaymentModal(
-                          context,
-                          maxAmountToPay: maxAmountDouble,
-                          clientName: selectedClient.name,
-                        );
+                        if (canSettleZeroCash) {
+                          amountCents = 0;
+                          paymentMethod = PaymentMethod.cash;
+                          bankReference = "";
+                        } else {
+                          final maxAmountDouble = netPayableCents / 100;
+                          final paymentResult = await showFastPaymentModal(
+                            context,
+                            maxAmountToPay: maxAmountDouble,
+                            clientName: selectedClient.name,
+                          );
 
-                        if (paymentResult == null || paymentResult.amount <= 0) return;
+                          if (paymentResult == null || paymentResult.amount <= 0) return;
+
+                          amountCents = (paymentResult.amount * 100).round();
+                          paymentMethod = paymentResult.method;
+                          bankReference = paymentResult.bankReference;
+                          paymentDetail = paymentResult.paymentDetail;
+                        }
 
                         if (!context.mounted) return;
                         final authState = getIt<AuthCubit>().state;
@@ -177,19 +215,18 @@ class _HeaderSection extends StatelessWidget {
                         if (!await ShiftGuard.ensureShiftReady(context)) return;
                         if (!context.mounted) return;
 
-                        final amountCents = (paymentResult.amount * 100).round();
                         final (createReceiptPayload, summary) = FastReceiptLogic.allocateFastPayment(
                           paymentAmountCents: amountCents,
-                          invoices: state.invoices,
-                          devolutions: state.devolutions,
+                          invoices: eligibleInvoices,
+                          devolutions: confirmedDevolutions,
                           creditNotes: state.creditNotes,
                           client: selectedClient,
                           branchId: currentBranch.id,
                           currentUserId: currentUser.id,
                           currentUserName: currentUser.username,
-                          paymentMethod: paymentResult.method,
-                          bankReference: paymentResult.bankReference,
-                          paymentDetail: paymentResult.paymentDetail,
+                          paymentMethod: paymentMethod,
+                          bankReference: bankReference,
+                          paymentDetail: paymentDetail,
                           shiftId: getIt.isRegistered<ShiftCubit>() ? getIt<ShiftCubit>().activeShiftId : null,
                         );
 
@@ -211,9 +248,13 @@ class _HeaderSection extends StatelessWidget {
                         if (!context.mounted) return;
                         context.read<WriteReceiptCubit>().createNewReceipt(createReceiptPayload);
                       },
-                      backgroundColor: isCreditNotesExceeding ? Colors.grey.shade400 : Colors.amber.shade700,
+                      backgroundColor: isCreditNotesExceeding
+                          ? Colors.grey.shade400
+                          : canSettleZeroCash
+                              ? Colors.green.shade600
+                              : Colors.amber.shade700,
                       foregroundColor: Colors.white,
-                      label: const Text("Abono"),
+                      label: Text(canSettleZeroCash ? "Liquidar (\$0.00)" : "Abono"),
                     );
                   },
                 ),

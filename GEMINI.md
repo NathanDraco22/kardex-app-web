@@ -4,7 +4,13 @@
 - **Dominio (`packages/kardex_business`):** Agregado `originalInvoicePaymentType` (`String?`) en `BaseDevolution`, `CreateDevolution` y `DevolutionInDb`; agregado `SaleItem.copyWith({int? invoiceItemIndex})`.
 - **Elegibilidad y cruce acumulado:** Nuevo helper `lib/src/modules/commercial/devolutions/devolution_eligibility.dart` (`validateInvoiceForDevolution` y `computePreviouslyReturnedByLine`) aplicado en `devolutions`, `client_devolution` y `create_credit_note_dialog.dart`, adjuntando `invoiceItemIndex` y sumando cantidades devueltas entre Devoluciones y Notas de Crédito.
 - **Cobranza (`pending_invoice`):** En `ReadPendingInvoiceCubit` (ruta fallback sin composite), filtradas `devolutions` a las vinculadas con facturas pendientes.
-- **Verificación:** `dart analyze packages/kardex_business`, `flutter analyze --no-pub` (`No issues found!`) y `flutter test --no-pub test/devolution_credit_eligibility_test.dart` (`8/8 passed`) en `main` y `lite`.
+- **Correcciones de Auditoría (Críticos `C1–C5` y Altos `A1–A4`):**
+  - **C1 / C4:** `DevolutionsRepository.getAllActiveDevolutions` ahora admite `branchId` opcional para operar multi-sucursal en Cuentas por Cobrar; `InvoiceDevolutionTile`, `ViewController`, `PendingInvoiceWebScreen`, `FastReceiptLogic`, `ReceiptCreatorScreen` y los estados de cuenta PDF/PNG solo descuentan devoluciones `confirmed` y bloquean facturas con devoluciones `open`.
+  - **C2:** `InvoiceAcreditViewer` y el botón **Abono** (`header_section.dart`) habilitan la liquidación directa en `\$0.00` (**"Liquidar con Devolución / Nota ($0.00)"**) cuando devoluciones confirmadas / NC cubren el 100% de una factura aún abierta.
+  - **C3:** Corregido el exceso de `Navigator.pop` (de 3 a 2) en `DevolutionsConfirmationScreen`.
+  - **C5:** `InvoiceViewer` / `InvoiceViewerContent` cargan y desglosan devoluciones vinculadas en **Total Neto**, avisan si hay `open` y ocultan **"Solicitar anulación"** ante devoluciones o NC activas.
+  - **A1:** `totalCost` en `DevolutionsConfirmationScreen` y `DevolutionConfirmationScreen` usa `SaleItem.lineCost` (incluyendo `bonQuantity`).
+- **Verificación:** `dart analyze packages/kardex_business`, `flutter analyze --no-pub` (`No issues found!`) y `flutter test --no-pub` (`22/22 passed` en `devolution_credit_eligibility_test.dart`, `invoice_display_settings_test.dart` y `pending_invoices_statement_test.dart`) en `main` y `lite`.
 
 ## Visibilidad Configurable de Anulaciones (`AppSettings`) y Anulación de Recibos (Noviembre 2026)
 

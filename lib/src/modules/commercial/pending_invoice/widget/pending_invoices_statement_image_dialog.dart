@@ -373,7 +373,9 @@ class _StatementVisualCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final int totalInvoices = invoices.fold(0, (sum, inv) => sum + inv.totalRemaining);
-    final int totalDevolutions = devolutions.fold(0, (sum, d) => sum + d.total);
+    final int totalDevolutions = devolutions
+        .where((d) => d.status == DevolutionStatus.confirmed)
+        .fold(0, (sum, d) => sum + d.total);
     final int totalCreditNotes = creditNotes.fold(0, (sum, cn) => sum + cn.total);
     final int netTotal = (totalInvoices - totalDevolutions - totalCreditNotes) > 0
         ? (totalInvoices - totalDevolutions - totalCreditNotes)
@@ -700,7 +702,13 @@ class _StatementVisualCard extends StatelessWidget {
                   itemCount: invoices.length,
                   itemBuilder: (context, index) {
                     final inv = invoices[index];
-                    final targetDev = devolutions.where((d) => d.originalInvoiceId == inv.id).toList();
+                    final targetDev = devolutions
+                        .where(
+                          (d) =>
+                              d.originalInvoiceId == inv.id &&
+                              d.status == DevolutionStatus.confirmed,
+                        )
+                        .toList();
                     final targetCn = creditNotes.where((cn) => cn.invoiceId == inv.id || (cn.invoiceDocNumber.isNotEmpty && cn.invoiceDocNumber == inv.docNumber)).toList();
 
                     final devTotal = targetDev.fold(0, (sum, d) => sum + d.total);
