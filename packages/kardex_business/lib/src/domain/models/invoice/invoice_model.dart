@@ -52,6 +52,7 @@ class BaseInvoice {
   int total;
   final DateTime? paidAt;
   final UserInfo createdBy;
+  final UserInfo? invoicedBy;
   final String? shiftId;
 
   BaseInvoice({
@@ -76,6 +77,7 @@ class BaseInvoice {
     required this.total,
     this.paidAt,
     required this.createdBy,
+    this.invoicedBy,
     this.shiftId,
   });
 
@@ -127,6 +129,9 @@ class BaseInvoice {
     total: json['total'],
     paidAt: json['paidAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['paidAt']) : null,
     createdBy: UserInfo.fromJson(json['createdBy']),
+    invoicedBy: json['invoicedBy'] != null
+        ? UserInfo.fromJson(json['invoicedBy'])
+        : null,
     shiftId: json['shiftId'] as String?,
   );
 
@@ -152,6 +157,7 @@ class BaseInvoice {
     'total': total,
     'paidAt': paidAt?.millisecondsSinceEpoch,
     'createdBy': createdBy.toJson(),
+    if (invoicedBy != null) 'invoicedBy': invoicedBy!.toJson(),
     if (shiftId != null) 'shiftId': shiftId,
   };
 }
@@ -178,6 +184,7 @@ class CreateInvoice extends BaseInvoice {
     required super.totalCost,
     required super.total,
     required super.createdBy,
+    super.invoicedBy,
     super.shiftId,
   });
 
@@ -204,6 +211,9 @@ class CreateInvoice extends BaseInvoice {
     totalCost: json['totalCost'],
     total: json['total'],
     createdBy: UserInfo.fromJson(json['createdBy']),
+    invoicedBy: json['invoicedBy'] != null
+        ? UserInfo.fromJson(json['invoicedBy'])
+        : null,
     shiftId: json['shiftId'] as String?,
   );
 
@@ -233,6 +243,7 @@ class CreateInvoice extends BaseInvoice {
       totalCost: totalCost,
       total: total,
       createdBy: createdBy,
+      invoicedBy: invoicedBy,
       shiftId: shiftId,
     );
   }
@@ -303,6 +314,7 @@ class InvoiceInDb extends BaseInvoice {
     this.updatedAt,
     super.paidAt,
     required super.createdBy,
+    super.invoicedBy,
     super.shiftId,
   });
 
@@ -333,6 +345,9 @@ class InvoiceInDb extends BaseInvoice {
     createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt']),
     updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt']) : null,
     createdBy: UserInfo.fromJson(json['createdBy']),
+    invoicedBy: json['invoicedBy'] != null
+        ? UserInfo.fromJson(json['invoicedBy'])
+        : null,
     shiftId: json['shiftId'] as String?,
   );
 

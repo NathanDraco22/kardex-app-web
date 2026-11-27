@@ -715,7 +715,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 subtitle: const Text(
-                  "Muestra el nombre de quien creó la orden o cotización de origen en el visor, PDF y ticket térmico.",
+                  "Muestra quién creó y quién facturó la orden o cotización de origen en el visor, PDF y ticket térmico.",
                   style: TextStyle(fontSize: 13, color: Colors.black54),
                 ),
                 value: _showInvoiceOrderCreator,

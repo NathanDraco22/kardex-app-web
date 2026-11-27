@@ -202,6 +202,15 @@ class SingleInvoiceTemplate implements PdfTemplate {
                       ),
                     ],
                   ],
+                  if (_effectiveDisplayConfig.showOrderCreator &&
+                      invoice.invoicedBy != null &&
+                      invoice.invoicedBy!.name.trim().isNotEmpty) ...[
+                    pw.SizedBox(height: 2),
+                    pw.Text(
+                      "Facturado por: ${invoice.invoicedBy!.name}",
+                      style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey700),
+                    ),
+                  ],
                   if (invoice.description.isNotEmpty) ...[
                     pw.SizedBox(height: 2),
                     pw.Text(

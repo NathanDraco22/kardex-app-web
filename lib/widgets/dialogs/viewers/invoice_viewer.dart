@@ -376,6 +376,13 @@ class InvoiceViewerContent extends StatelessWidget {
                   style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: Colors.blueGrey.shade700),
                 ),
             ],
+            if (effectiveDisplayConfig.showOrderCreator &&
+                invoice.invoicedBy != null &&
+                invoice.invoicedBy!.name.trim().isNotEmpty)
+              Text(
+                "Facturado por: ${invoice.invoicedBy!.name}",
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: Colors.blueGrey.shade700),
+              ),
 
             if (invoice.description.isNotEmpty)
               Text(

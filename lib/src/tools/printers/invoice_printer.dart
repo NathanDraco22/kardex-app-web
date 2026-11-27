@@ -236,6 +236,15 @@ Future<Uint8List> generateTicketPdfFromInvoice(
                   ),
                 ),
             ],
+            if (effectiveDisplayConfig.showOrderCreator &&
+                invoice.invoicedBy != null &&
+                invoice.invoicedBy!.name.trim().isNotEmpty)
+              pw.Text(
+                'Facturado por: ${invoice.invoicedBy!.name}',
+                style: pw.TextStyle(
+                  fontSize: TicketSettings.contentFontSize(paperSize),
+                ),
+              ),
 
             pw.Text(
               paymentType,
