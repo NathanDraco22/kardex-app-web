@@ -21,7 +21,7 @@ BranchInDb _buildBranch() {
   );
 }
 
-InvoiceInDb _buildInvoice({OrderInfo? orderInfo}) {
+InvoiceInDb _buildInvoice({OrderInfo? orderInfo, UserInfo? invoicedBy}) {
   final now = DateTime(2026, 11, 26, 10, 30);
   return InvoiceInDb(
     id: 'inv-1',
@@ -84,6 +84,7 @@ InvoiceInDb _buildInvoice({OrderInfo? orderInfo}) {
       id: 'user-1',
       name: 'Cajero Principal',
     ),
+    invoicedBy: invoicedBy,
   );
 }
 
@@ -155,6 +156,10 @@ void main() {
             name: 'Carlos Vendedor',
           ),
         ),
+        invoicedBy: const UserInfo(
+          id: 'cashier-1',
+          name: 'María Cajera',
+        ),
       );
 
       await tester.pumpWidget(
@@ -172,6 +177,7 @@ void main() {
       expect(find.text('Contado'), findsOneWidget);
       expect(find.text('Pedido No. ORD-10'), findsOneWidget);
       expect(find.textContaining('Tomado por:'), findsNothing);
+      expect(find.textContaining('Facturado por:'), findsNothing);
       expect(find.textContaining('Total ítems:'), findsNothing);
       expect(find.textContaining('Total cantidad:'), findsNothing);
     });
@@ -186,6 +192,10 @@ void main() {
             id: 'seller-1',
             name: 'Carlos Vendedor',
           ),
+        ),
+        invoicedBy: const UserInfo(
+          id: 'cashier-1',
+          name: 'María Cajera',
         ),
       );
 
@@ -206,8 +216,14 @@ void main() {
 
       expect(find.text('Contado'), findsOneWidget);
       expect(find.text('Tomado por: Carlos Vendedor'), findsOneWidget);
+      expect(find.text('Facturado por: María Cajera'), findsOneWidget);
       expect(find.text('Total ítems: 2'), findsOneWidget);
       expect(find.text('Total cantidad: 4.5'), findsOneWidget);
+
+      final json = invoice.toJson();
+      final reparsed = InvoiceInDb.fromJson(json);
+      expect(reparsed.invoicedBy?.id, 'cashier-1');
+      expect(reparsed.invoicedBy?.name, 'María Cajera');
     });
   });
 
@@ -223,6 +239,10 @@ void main() {
             id: 'seller-1',
             name: 'Carlos Vendedor',
           ),
+        ),
+        invoicedBy: const UserInfo(
+          id: 'cashier-1',
+          name: 'María Cajera',
         ),
       );
 
