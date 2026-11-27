@@ -1,6 +1,13 @@
 enum TransactionType { credit, debit }
 
-enum TransactionSubType { invoice, discount, devolution, receipt, creditNote }
+enum TransactionSubType {
+  invoice,
+  discount,
+  devolution,
+  receipt,
+  creditNote,
+  invoiceCancellation,
+}
 
 class BaseClientTransaction {
   final String documentId;
@@ -30,6 +37,7 @@ class BaseClientTransaction {
       type: TransactionType.values.byName(json['type']),
       subtype: switch (json['subtype']) {
         'credit_note' => TransactionSubType.creditNote,
+        'invoice_cancellation' => TransactionSubType.invoiceCancellation,
         _ => TransactionSubType.values.byName(json['subtype']),
       },
       resultBalance: json['resultBalance'],
@@ -43,7 +51,11 @@ class BaseClientTransaction {
       'clientId': clientId,
       'amount': amount,
       'type': type.name,
-      'subtype': subtype == TransactionSubType.creditNote ? 'credit_note' : subtype.name,
+      'subtype': switch (subtype) {
+        TransactionSubType.creditNote => 'credit_note',
+        TransactionSubType.invoiceCancellation => 'invoice_cancellation',
+        _ => subtype.name,
+      },
       'resultBalance': resultBalance,
     };
   }
@@ -76,6 +88,7 @@ class ClientTransactionInDb extends BaseClientTransaction {
       type: TransactionType.values.byName(json['type']),
       subtype: switch (json['subtype']) {
         'credit_note' => TransactionSubType.creditNote,
+        'invoice_cancellation' => TransactionSubType.invoiceCancellation,
         _ => TransactionSubType.values.byName(json['subtype']),
       },
       resultBalance: json['resultBalance'],

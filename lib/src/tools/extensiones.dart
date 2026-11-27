@@ -41,6 +41,8 @@ extension TransactionSubTypeExtension on TransactionSubType {
         return 'Pérdida';
       case TransactionSubType.creditNote:
         return 'Nota de Crédito';
+      case TransactionSubType.invoiceCancellation:
+        return 'Anulación de Factura';
     }
   }
 }

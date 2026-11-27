@@ -44,6 +44,7 @@ class MovementMobileRow extends StatelessWidget {
         onTap: () {
           switch (currentTransaction.subtype) {
             case TransactionSubType.invoice:
+            case TransactionSubType.invoiceCancellation:
               showInvoiceViewerDialogFromDocNumber(context, currentTransaction.docNumber);
               break;
             case TransactionSubType.receipt:
@@ -164,6 +165,8 @@ extension _TransactionSubTypeExt on TransactionSubType {
         return "Nota de Crédito";
       case TransactionSubType.discount:
         return "Descuento";
+      case TransactionSubType.invoiceCancellation:
+        return "Anulación de Factura";
     }
   }
 }

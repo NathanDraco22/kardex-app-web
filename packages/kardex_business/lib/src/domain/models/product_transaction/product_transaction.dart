@@ -3,7 +3,17 @@ enum TransactionType {
   exit,
 }
 
-enum TransactionSubType { entry, exit, invoice, devolution, transfer, adjustment, loss, creditNote }
+enum TransactionSubType {
+  entry,
+  exit,
+  invoice,
+  devolution,
+  transfer,
+  adjustment,
+  loss,
+  creditNote,
+  invoiceCancellation,
+}
 
 class BaseProductTransaction {
   final String documentId;
@@ -34,6 +44,7 @@ class BaseProductTransaction {
     type: TransactionType.values.byName(json['type']),
     subtype: switch (json['subtype']) {
       'credit_note' => TransactionSubType.creditNote,
+      'invoice_cancellation' => TransactionSubType.invoiceCancellation,
       _ => TransactionSubType.values.byName(json['subtype']),
     },
     productId: json['productId'],
@@ -47,7 +58,11 @@ class BaseProductTransaction {
     'documentId': documentId,
     'docNumber': docNumber,
     'type': type.name,
-    'subtype': subtype == TransactionSubType.creditNote ? 'credit_note' : subtype.name,
+    'subtype': switch (subtype) {
+      TransactionSubType.creditNote => 'credit_note',
+      TransactionSubType.invoiceCancellation => 'invoice_cancellation',
+      _ => subtype.name,
+    },
     'productId': productId,
     'branchId': branchId,
     'quantity': quantity,
@@ -82,6 +97,7 @@ class ProductTransactionInDb extends BaseProductTransaction {
     type: TransactionType.values.byName(json['type']),
     subtype: switch (json['subtype']) {
       'credit_note' => TransactionSubType.creditNote,
+      'invoice_cancellation' => TransactionSubType.invoiceCancellation,
       _ => TransactionSubType.values.byName(json['subtype']),
     },
     productId: json['productId'],

@@ -19,6 +19,7 @@ class ShiftArqueoDocument {
   final String? clientName;
   final int createdAt;
   final String? referenceDocNumber;
+  final String? cancellationReason;
   final bool counted;
 
   const ShiftArqueoDocument({
@@ -32,6 +33,7 @@ class ShiftArqueoDocument {
     this.clientName,
     required this.createdAt,
     this.referenceDocNumber,
+    this.cancellationReason,
     required this.counted,
   });
 
@@ -47,6 +49,7 @@ class ShiftArqueoDocument {
       clientName: json['clientName']?.toString(),
       createdAt: _asInt(json['createdAt']),
       referenceDocNumber: json['referenceDocNumber']?.toString(),
+      cancellationReason: json['cancellationReason']?.toString(),
       counted: json['counted'] as bool? ?? false,
     );
   }
@@ -61,6 +64,14 @@ class ShiftArqueoTotals {
   final int invoiceCreditTotal;
   final int invoiceTotal;
   final int invoiceCount;
+  final int cancelledInvoiceCashTotal;
+  final int cancelledInvoiceTransferTotal;
+  final int cancelledInvoiceCardTotal;
+  final int cancelledInvoiceOtherTotal;
+  final int cancelledInvoiceCashSalesTotal;
+  final int cancelledInvoiceCreditTotal;
+  final int cancelledInvoiceTotal;
+  final int cancelledInvoiceCount;
   final int receiptCashTotal;
   final int receiptTransferTotal;
   final int receiptCardTotal;
@@ -87,6 +98,14 @@ class ShiftArqueoTotals {
     this.invoiceCreditTotal = 0,
     this.invoiceTotal = 0,
     this.invoiceCount = 0,
+    this.cancelledInvoiceCashTotal = 0,
+    this.cancelledInvoiceTransferTotal = 0,
+    this.cancelledInvoiceCardTotal = 0,
+    this.cancelledInvoiceOtherTotal = 0,
+    this.cancelledInvoiceCashSalesTotal = 0,
+    this.cancelledInvoiceCreditTotal = 0,
+    this.cancelledInvoiceTotal = 0,
+    this.cancelledInvoiceCount = 0,
     this.receiptCashTotal = 0,
     this.receiptTransferTotal = 0,
     this.receiptCardTotal = 0,
@@ -115,6 +134,14 @@ class ShiftArqueoTotals {
       invoiceCreditTotal: _asInt(json['invoiceCreditTotal']),
       invoiceTotal: _asInt(json['invoiceTotal']),
       invoiceCount: _asInt(json['invoiceCount']),
+      cancelledInvoiceCashTotal: _asInt(json['cancelledInvoiceCashTotal']),
+      cancelledInvoiceTransferTotal: _asInt(json['cancelledInvoiceTransferTotal']),
+      cancelledInvoiceCardTotal: _asInt(json['cancelledInvoiceCardTotal']),
+      cancelledInvoiceOtherTotal: _asInt(json['cancelledInvoiceOtherTotal']),
+      cancelledInvoiceCashSalesTotal: _asInt(json['cancelledInvoiceCashSalesTotal']),
+      cancelledInvoiceCreditTotal: _asInt(json['cancelledInvoiceCreditTotal']),
+      cancelledInvoiceTotal: _asInt(json['cancelledInvoiceTotal']),
+      cancelledInvoiceCount: _asInt(json['cancelledInvoiceCount']),
       receiptCashTotal: _asInt(json['receiptCashTotal']),
       receiptTransferTotal: _asInt(json['receiptTransferTotal']),
       receiptCardTotal: _asInt(json['receiptCardTotal']),

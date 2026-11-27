@@ -350,6 +350,11 @@ class _CloseShiftDialogState extends State<CloseShiftDialog> {
           _metricRow('Tarjetas / Cheques / Otros', preview.totalCardsAndOthers),
           _metricRow('Ventas a crédito', preview.invoiceCreditTotal),
           _metricRow('Notas de crédito (${preview.creditNoteCount})', preview.creditNoteTotal),
+          if (preview.cancelledInvoiceCount > 0)
+            _metricRow(
+              'Facturas anuladas (${preview.cancelledInvoiceCount})',
+              preview.cancelledInvoiceTotal,
+            ),
           const Divider(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

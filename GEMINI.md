@@ -1,3 +1,11 @@
+## Solicitudes de Anulación de Factura e Integración en Turnos (Noviembre 2026)
+
+- **Alcance:** Flujo completo de solicitudes de anulación de facturas en `packages/kardex_business` y `kardex_app_front` (`main` y sincronizado en `lite`).
+- **Dominio y Datos (`packages/kardex_business`):** Campos `cancelledAt`, `cancelledBy`, `cancellationReason`, `cancellationRequestId` y `isCancelled` en `InvoiceInDb`; `TransactionSubType.invoiceCancellation` en `product_transaction.dart` y `client_transaction.dart`; `CommercialSubModules.approveInvoiceCancellation`; 8 campos `cancelledInvoice*` en `ShiftModel` y `ShiftArqueoComposite`; nuevos `InvoiceCancellationRequestModel`, `InvoiceCancellationRequestQueryParams`, `InvoiceCancellationRequestsDataSource` e `InvoiceCancellationRequestsRepository` (reactivo, registrado en `provider_container.dart`).
+- **UI y Seguridad:** Visor de factura (`invoice_viewer.dart`) con banner **"Factura Anulada"** y botón **"Solicitar anulación"**; módulo `lib/src/modules/commercial/invoice_cancellation_requests/` con cubits reactivos, filtros por estado y acciones **Aprobar** / **Rechazar** protegidas con `Gate(RolePermissionGateFilter([CommercialSubModules.approveInvoiceCancellation]))`; rutas y accesos en `route_names.dart`, `app_router.dart`, `commercial_menu_screen.dart` y `home_modules_registry.dart`.
+- **Turnos:** Sección **"Facturas Anuladas"** en `shift_viewer_dialog.dart`, `close_shift_dialog.dart` y `shift_printer.dart` (informativa, sin doble resta en arqueo), y badge **"Anulada"** en documentos del arqueo.
+- **Verificación:** `dart analyze` en `packages/kardex_business` (`No issues found!`), `flutter analyze --no-pub` (`No issues found!`) y `flutter test --no-pub test/invoice_cancellation_requests_test.dart` (`3 passed`) en `main` y `lite`.
+
 ## Sistema Unificado `Gate` con `GateFilter` Componibles (Noviembre 2026)
 
 - **Alcance:** Consolidación de los 7 widgets Gate independientes (`ExpirationDateGate`, `OrdersGate`, `QuotationsGate`, `QuotationsOrOrdersGate`, `RolePermissionGate`, `RootUserGate`, `ShiftsGate`) en un único widget `Gate` (`lib/widgets/gates/gate.dart`) que recibe `List<GateFilter>` (patrón análogo a `inputFormatters`).

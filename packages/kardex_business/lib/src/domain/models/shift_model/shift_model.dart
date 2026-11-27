@@ -34,6 +34,16 @@ class BaseShift {
   final int invoiceTotal;
   final int invoiceCount;
 
+  // Consolidado de Facturas Anuladas
+  final int cancelledInvoiceCashTotal;
+  final int cancelledInvoiceTransferTotal;
+  final int cancelledInvoiceCardTotal;
+  final int cancelledInvoiceOtherTotal;
+  final int cancelledInvoiceCashSalesTotal;
+  final int cancelledInvoiceCreditTotal;
+  final int cancelledInvoiceTotal;
+  final int cancelledInvoiceCount;
+
   // Consolidado de Recibos / Abonos
   final int receiptCashTotal;
   final int receiptTransferTotal;
@@ -80,6 +90,14 @@ class BaseShift {
     this.invoiceCreditTotal = 0,
     this.invoiceTotal = 0,
     this.invoiceCount = 0,
+    this.cancelledInvoiceCashTotal = 0,
+    this.cancelledInvoiceTransferTotal = 0,
+    this.cancelledInvoiceCardTotal = 0,
+    this.cancelledInvoiceOtherTotal = 0,
+    this.cancelledInvoiceCashSalesTotal = 0,
+    this.cancelledInvoiceCreditTotal = 0,
+    this.cancelledInvoiceTotal = 0,
+    this.cancelledInvoiceCount = 0,
     this.receiptCashTotal = 0,
     this.receiptTransferTotal = 0,
     this.receiptCardTotal = 0,
@@ -121,6 +139,14 @@ class BaseShift {
         invoiceCreditTotal: (json['invoiceCreditTotal'] as num?)?.toInt() ?? 0,
         invoiceTotal: (json['invoiceTotal'] as num?)?.toInt() ?? 0,
         invoiceCount: (json['invoiceCount'] as num?)?.toInt() ?? 0,
+        cancelledInvoiceCashTotal: (json['cancelledInvoiceCashTotal'] as num?)?.toInt() ?? 0,
+        cancelledInvoiceTransferTotal: (json['cancelledInvoiceTransferTotal'] as num?)?.toInt() ?? 0,
+        cancelledInvoiceCardTotal: (json['cancelledInvoiceCardTotal'] as num?)?.toInt() ?? 0,
+        cancelledInvoiceOtherTotal: (json['cancelledInvoiceOtherTotal'] as num?)?.toInt() ?? 0,
+        cancelledInvoiceCashSalesTotal: (json['cancelledInvoiceCashSalesTotal'] as num?)?.toInt() ?? 0,
+        cancelledInvoiceCreditTotal: (json['cancelledInvoiceCreditTotal'] as num?)?.toInt() ?? 0,
+        cancelledInvoiceTotal: (json['cancelledInvoiceTotal'] as num?)?.toInt() ?? 0,
+        cancelledInvoiceCount: (json['cancelledInvoiceCount'] as num?)?.toInt() ?? 0,
         receiptCashTotal: (json['receiptCashTotal'] as num?)?.toInt() ?? 0,
         receiptTransferTotal: (json['receiptTransferTotal'] as num?)?.toInt() ?? 0,
         receiptCardTotal: (json['receiptCardTotal'] as num?)?.toInt() ?? 0,
@@ -159,6 +185,14 @@ class BaseShift {
         'invoiceCreditTotal': invoiceCreditTotal,
         'invoiceTotal': invoiceTotal,
         'invoiceCount': invoiceCount,
+        'cancelledInvoiceCashTotal': cancelledInvoiceCashTotal,
+        'cancelledInvoiceTransferTotal': cancelledInvoiceTransferTotal,
+        'cancelledInvoiceCardTotal': cancelledInvoiceCardTotal,
+        'cancelledInvoiceOtherTotal': cancelledInvoiceOtherTotal,
+        'cancelledInvoiceCashSalesTotal': cancelledInvoiceCashSalesTotal,
+        'cancelledInvoiceCreditTotal': cancelledInvoiceCreditTotal,
+        'cancelledInvoiceTotal': cancelledInvoiceTotal,
+        'cancelledInvoiceCount': cancelledInvoiceCount,
         'receiptCashTotal': receiptCashTotal,
         'receiptTransferTotal': receiptTransferTotal,
         'receiptCardTotal': receiptCardTotal,
@@ -262,6 +296,14 @@ class ShiftPreview extends BaseShift {
     super.invoiceCreditTotal,
     super.invoiceTotal,
     super.invoiceCount,
+    super.cancelledInvoiceCashTotal,
+    super.cancelledInvoiceTransferTotal,
+    super.cancelledInvoiceCardTotal,
+    super.cancelledInvoiceOtherTotal,
+    super.cancelledInvoiceCashSalesTotal,
+    super.cancelledInvoiceCreditTotal,
+    super.cancelledInvoiceTotal,
+    super.cancelledInvoiceCount,
     super.receiptCashTotal,
     super.receiptTransferTotal,
     super.receiptCardTotal,
@@ -303,6 +345,14 @@ class ShiftPreview extends BaseShift {
       invoiceCreditTotal: base.invoiceCreditTotal,
       invoiceTotal: base.invoiceTotal,
       invoiceCount: base.invoiceCount,
+      cancelledInvoiceCashTotal: base.cancelledInvoiceCashTotal,
+      cancelledInvoiceTransferTotal: base.cancelledInvoiceTransferTotal,
+      cancelledInvoiceCardTotal: base.cancelledInvoiceCardTotal,
+      cancelledInvoiceOtherTotal: base.cancelledInvoiceOtherTotal,
+      cancelledInvoiceCashSalesTotal: base.cancelledInvoiceCashSalesTotal,
+      cancelledInvoiceCreditTotal: base.cancelledInvoiceCreditTotal,
+      cancelledInvoiceTotal: base.cancelledInvoiceTotal,
+      cancelledInvoiceCount: base.cancelledInvoiceCount,
       receiptCashTotal: base.receiptCashTotal,
       receiptTransferTotal: base.receiptTransferTotal,
       receiptCardTotal: base.receiptCardTotal,
@@ -355,6 +405,14 @@ class ShiftInDb extends BaseShift {
     super.invoiceCreditTotal,
     super.invoiceTotal,
     super.invoiceCount,
+    super.cancelledInvoiceCashTotal,
+    super.cancelledInvoiceTransferTotal,
+    super.cancelledInvoiceCardTotal,
+    super.cancelledInvoiceOtherTotal,
+    super.cancelledInvoiceCashSalesTotal,
+    super.cancelledInvoiceCreditTotal,
+    super.cancelledInvoiceTotal,
+    super.cancelledInvoiceCount,
     super.receiptCashTotal,
     super.receiptTransferTotal,
     super.receiptCardTotal,
@@ -404,6 +462,14 @@ class ShiftInDb extends BaseShift {
       invoiceCreditTotal: base.invoiceCreditTotal,
       invoiceTotal: base.invoiceTotal,
       invoiceCount: base.invoiceCount,
+      cancelledInvoiceCashTotal: base.cancelledInvoiceCashTotal,
+      cancelledInvoiceTransferTotal: base.cancelledInvoiceTransferTotal,
+      cancelledInvoiceCardTotal: base.cancelledInvoiceCardTotal,
+      cancelledInvoiceOtherTotal: base.cancelledInvoiceOtherTotal,
+      cancelledInvoiceCashSalesTotal: base.cancelledInvoiceCashSalesTotal,
+      cancelledInvoiceCreditTotal: base.cancelledInvoiceCreditTotal,
+      cancelledInvoiceTotal: base.cancelledInvoiceTotal,
+      cancelledInvoiceCount: base.cancelledInvoiceCount,
       receiptCashTotal: base.receiptCashTotal,
       receiptTransferTotal: base.receiptTransferTotal,
       receiptCardTotal: base.receiptCardTotal,

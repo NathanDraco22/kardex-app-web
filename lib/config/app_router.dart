@@ -45,6 +45,7 @@ import 'package:kardex_app_front/src/modules/commercial/daily_product_in_orders/
 import 'package:kardex_app_front/src/modules/commercial/daily_product_sales/daily_product_sales_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/daily_receipt/daily_receipt_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/credit_notes/credit_notes_screen.dart';
+import 'package:kardex_app_front/src/modules/commercial/invoice_cancellation_requests/view/invoice_cancellation_requests_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/shifts/view/shifts_view.dart';
 import 'package:kardex_app_front/src/modules/commercial/devolution_history/devolution_history_screen.dart';
 import 'package:kardex_app_front/src/modules/commercial/invoice_history/invoice_history_screen.dart';
@@ -407,6 +408,13 @@ class AppRouter {
             path: "credit-notes",
             name: "credit-notes",
             builder: (context, state) => const CreditNotesScreen(),
+          ),
+
+          GoRoute(
+            path: "invoice-cancellation-requests",
+            name: RouteNames.invoiceCancellationRequests,
+            builder: (context, state) =>
+                const InvoiceCancellationRequestsScreen(),
           ),
 
           GoRoute(
