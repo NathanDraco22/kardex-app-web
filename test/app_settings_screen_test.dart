@@ -30,6 +30,8 @@ class _FakeAppSettingsRepository implements AppSettingsRepository {
           _settings.allowCancellationsOutsideShift,
       roundUpInvoiceTotals:
           body.roundUpInvoiceTotals ?? _settings.roundUpInvoiceTotals,
+      useAbonoReceivedAmount:
+          body.useAbonoReceivedAmount ?? _settings.useAbonoReceivedAmount,
     );
     return _settings;
   }
@@ -143,6 +145,35 @@ void main() {
       await tester.tap(find.text('Guardar'));
       await tester.pumpAndSettle();
       expect(repository.lastUpdate!.roundUpInvoiceTotals, isTrue);
+
+      final abonoReceivedTitle = find.text(
+        'Capturar dinero recibido y cambio en abonos',
+      );
+      await tester.scrollUntilVisible(
+        abonoReceivedTitle,
+        500,
+        scrollable: find.byType(Scrollable).first,
+      );
+      final abonoReceivedTile = find.ancestor(
+        of: abonoReceivedTitle,
+        matching: find.byType(SwitchListTile),
+      );
+      expect(abonoReceivedTile, findsOneWidget);
+      expect(
+        tester.widget<SwitchListTile>(abonoReceivedTile).value,
+        isFalse,
+      );
+
+      await tester.tap(abonoReceivedTitle);
+      await tester.pumpAndSettle();
+      expect(
+        tester.widget<SwitchListTile>(abonoReceivedTile).value,
+        isTrue,
+      );
+
+      await tester.tap(find.text('Guardar'));
+      await tester.pumpAndSettle();
+      expect(repository.lastUpdate!.useAbonoReceivedAmount, isTrue);
     },
   );
 }

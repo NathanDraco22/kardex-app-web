@@ -1,3 +1,14 @@
+## Abono Rápido con Dinero Recibido y Cambio (Noviembre 2026)
+
+- **Objetivo:** permitir que el abono rápido capture por separado el monto a abonar y el dinero recibido, y que el recibo muestre `Recibido` y `Cambio` contra el abono (no contra la deuda total).
+- **Policy:** nueva `AbonoPaymentPolicy` en `packages/kardex_business/lib/src/core/policies/receipts/abono_payment_policy.dart`, con `AbonoCaptureMode`, `AbonoPaymentError` y `AbonoPaymentDecision`. Decide el modo, valida los montos, convierte moneda secundaria, calcula el cambio y construye el `PaymentDetail`. `AppSettingsPolicy.abonoPaymentPolicy` la expone.
+- **Bandera:** `useAbonoReceivedAmount` (bool, `false` por defecto) en `AppSettingModel`/`UpdateAppSetting` y `AppSettingsPolicy`; switch "Capturar dinero recibido y cambio en abonos" en `AppSettingsScreen`.
+- **Comportamiento:** con la bandera apagada, `FastPaymentModal` conserva el flujo histórico de un solo monto y el sobrepago sobre la deuda; con la bandera activa, muestra "Monto a Abonar" y "Dinero Recibido", exige recibido ≥ abono y calcula el cambio. Tarjeta/transferencia no cambian.
+- **Recibo:** sin cambios; `receipt_viewer`, `receipt_printer` y `single_receipt_template` ya muestran `Recibido`/`Cambio` cuando existe `paymentDetail`.
+- **Tests:** `abono_payment_policy_test.dart` (tabla completa), `fast_payment_modal_test.dart` (ambos modos, 360 px), `app_settings_policy_test.dart` y `app_settings_screen_test.dart`.
+- **Verificación:** `dart analyze packages/kardex_business` y `flutter analyze --no-pub` limpios; `flutter test --no-pub` 465/465.
+- **Regla `main`/`lite`:** la bandera, la policy y el modal son código compartido; la sincronización con `lite` queda pendiente por los cambios locales sin commit en `main`.
+
 ## Convención transversal de policies (Noviembre 2026)
 
 - **Regla documentada:** toda policy vive en `packages/kardex_business/lib/src/core/policies/<dominio>/`, con una subcarpeta por dominio. El backend replica la estructura en `packages/kardex-business/src/kardex/core/policies/<dominio>/`.

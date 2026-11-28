@@ -7,6 +7,7 @@ AppSettingsPolicy _policy({
   bool requireShiftForConvertedOrders = false,
   bool allowSecondaryCurrencyPayment = false,
   bool showInvoiceTotalInSecondaryCurrency = false,
+  bool useAbonoReceivedAmount = false,
   AppCurrency currency = AppCurrency.nio,
   AppCurrency secondaryCurrency = AppCurrency.usd,
   double exchangeRate = 0.0,
@@ -24,6 +25,7 @@ AppSettingsPolicy _policy({
       requireShiftForConvertedOrders: requireShiftForConvertedOrders,
       allowSecondaryCurrencyPayment: allowSecondaryCurrencyPayment,
       showInvoiceTotalInSecondaryCurrency: showInvoiceTotalInSecondaryCurrency,
+      useAbonoReceivedAmount: useAbonoReceivedAmount,
       currency: currency,
       secondaryCurrency: secondaryCurrency,
       exchangeRate: exchangeRate,
@@ -45,6 +47,11 @@ void main() {
       expect(policy.exchangeRate, 0);
       expect(policy.defaultPaymentTermDays, 30);
       expect(policy.useShifts, isFalse);
+      expect(policy.useAbonoReceivedAmount, isFalse);
+      expect(
+        policy.abonoPaymentPolicy.mode,
+        AbonoCaptureMode.singleAmount,
+      );
       expect(policy.hasExchangeRate, isFalse);
       expect(policy.hasCompanyLogo, isFalse);
       expect(policy.taxIdLabel, 'RUC');
@@ -53,6 +60,44 @@ void main() {
       expect(policy.secondaryCurrencyPaymentTerms, isNull);
       expect(policy.invoiceSecondaryCurrencyDisplay, isNull);
       expect(policy.suggestedPriceFor(costInCents: 1000), isNull);
+    });
+  });
+
+  group('captura de abonos', () {
+    test('AppSettingModel y UpdateAppSetting serializan la bandera', () {
+      final legacy = AppSettingModel.fromJson({});
+      expect(legacy.useAbonoReceivedAmount, isFalse);
+
+      final loaded = AppSettingModel.fromJson({
+        'useAbonoReceivedAmount': true,
+      });
+      expect(loaded.useAbonoReceivedAmount, isTrue);
+      expect(loaded.toJson()['useAbonoReceivedAmount'], isTrue);
+
+      expect(
+        const UpdateAppSetting(useAbonoReceivedAmount: true).toJson(),
+        {'useAbonoReceivedAmount': true},
+      );
+    });
+
+    test('la bandera construye la policy de dos montos', () {
+      final policy = _policy(useAbonoReceivedAmount: true);
+
+      expect(policy.useAbonoReceivedAmount, isTrue);
+      expect(
+        policy.abonoPaymentPolicy.mode,
+        AbonoCaptureMode.appliedAndReceived,
+      );
+    });
+
+    test('sin bandera conserva el modo de un solo monto', () {
+      final policy = _policy();
+
+      expect(policy.useAbonoReceivedAmount, isFalse);
+      expect(
+        policy.abonoPaymentPolicy.mode,
+        AbonoCaptureMode.singleAmount,
+      );
     });
   });
 

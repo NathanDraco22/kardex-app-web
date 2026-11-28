@@ -174,7 +174,9 @@ En el backend, `AppSettingsTool` sigue siendo el acceso a la configuración y `A
 ## 7. Referencias
 
 - `packages/kardex_business/lib/src/core/policies/app_settings/app_settings_policy.dart`
+- `packages/kardex_business/lib/src/core/policies/receipts/abono_payment_policy.dart`
 - `lib/cubits/app_settings/app_settings_cubit.dart`
 - `wiki/modules/settings.md`
 - `test/app_settings_policy_test.dart`
+- `test/abono_payment_policy_test.dart`
 - `test/app_settings_cubit_policy_test.dart`

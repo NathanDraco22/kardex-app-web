@@ -1,3 +1,4 @@
+import 'package:kardex_business/src/core/policies/receipts/abono_payment_policy.dart';
 import 'package:kardex_business/src/domain/models/app_setting/app_currency.dart';
 import 'package:kardex_business/src/domain/models/app_setting/app_setting_model.dart';
 import 'package:kardex_business/src/domain/models/app_setting/app_tax_id_label.dart';
@@ -65,6 +66,12 @@ final class AppSettingsPolicy {
       settings.showInvoiceTotalInSecondaryCurrency;
   bool get allowSecondaryCurrencyPayment =>
       settings.allowSecondaryCurrencyPayment;
+  bool get useAbonoReceivedAmount => settings.useAbonoReceivedAmount;
+
+  /// Política de captura del abono rápido. La bandera decide si se usa el
+  /// modo histórico de un monto o el modo de abono + dinero recibido.
+  AbonoPaymentPolicy get abonoPaymentPolicy =>
+      AbonoPaymentPolicy(useReceivedAmount: useAbonoReceivedAmount);
 
   // ── Decisiones binarias derivadas ───────────────────────────────────────
 

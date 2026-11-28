@@ -61,6 +61,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
   double _exchangeRate = 0.0;
   bool _showInvoiceTotalInSecondaryCurrency = false;
   bool _allowSecondaryCurrencyPayment = false;
+  bool _useAbonoReceivedAmount = false;
   bool _showInvoiceItemsSummary = false;
   bool _showInvoiceOrderCreator = false;
   String _taxIdLabel = 'RUC';
@@ -108,6 +109,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
       _roundUpInvoiceTotals = settings.roundUpInvoiceTotals;
       _showInvoiceTotalInSecondaryCurrency = settings.showInvoiceTotalInSecondaryCurrency;
       _allowSecondaryCurrencyPayment = settings.allowSecondaryCurrencyPayment;
+      _useAbonoReceivedAmount = settings.useAbonoReceivedAmount;
       _showInvoiceItemsSummary = settings.showInvoiceItemsSummary;
       _showInvoiceOrderCreator = settings.showInvoiceOrderCreator;
       _initialized = true;
@@ -161,6 +163,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
         _roundUpInvoiceTotals != settings.roundUpInvoiceTotals ||
         _showInvoiceTotalInSecondaryCurrency != settings.showInvoiceTotalInSecondaryCurrency ||
         _allowSecondaryCurrencyPayment != settings.allowSecondaryCurrencyPayment ||
+        _useAbonoReceivedAmount != settings.useAbonoReceivedAmount ||
         _showInvoiceItemsSummary != settings.showInvoiceItemsSummary ||
         _showInvoiceOrderCreator != settings.showInvoiceOrderCreator;
   }
@@ -220,6 +223,10 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
       allowSecondaryCurrencyPayment: changed(
         _allowSecondaryCurrencyPayment,
         settings.allowSecondaryCurrencyPayment,
+      ),
+      useAbonoReceivedAmount: changed(
+        _useAbonoReceivedAmount,
+        settings.useAbonoReceivedAmount,
       ),
       showInvoiceItemsSummary: changed(
         _showInvoiceItemsSummary,
@@ -1313,6 +1320,25 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                           onChanged: isSaving
                               ? null
                               : (val) => setState(() => _roundUpInvoiceTotals = val),
+                        ),
+                        const Divider(height: 1),
+                        SwitchListTile(
+                          secondary: const Icon(
+                            Icons.payments_outlined,
+                            color: Colors.teal,
+                          ),
+                          title: const Text(
+                            "Capturar dinero recibido y cambio en abonos",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: const Text(
+                            "Muestra el campo 'Dinero Recibido' en el abono rápido y calcula el cambio contra el monto abonado. Si está desactivado, se mantiene el abono de un solo monto.",
+                            style: TextStyle(fontSize: 13, color: Colors.black54),
+                          ),
+                          value: _useAbonoReceivedAmount,
+                          onChanged: isSaving
+                              ? null
+                              : (val) => setState(() => _useAbonoReceivedAmount = val),
                         ),
                         const Divider(height: 1),
                         SwitchListTile(

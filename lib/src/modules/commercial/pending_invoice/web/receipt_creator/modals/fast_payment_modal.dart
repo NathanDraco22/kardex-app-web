@@ -1,5 +1,7 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/widgets/bank_chips_selector.dart';
 import 'package:kardex_app_front/widgets/buttons/primary_menu_button.dart';
@@ -24,13 +26,25 @@ Future<FastPaymentResult?> showFastPaymentModal(
   required double maxAmountToPay,
   required String clientName,
 }) {
+  final useReceivedAmount = _useAbonoReceivedAmount(context);
   return showDialog<FastPaymentResult>(
     context: context,
     builder: (context) => FastPaymentModal(
       maxAmountToPay: maxAmountToPay,
       clientName: clientName,
+      useReceivedAmount: useReceivedAmount,
     ),
   );
+}
+
+/// Lee la bandera de `AppSettings` con un fallback conservador para pruebas o
+/// contextos sin el cubit.
+bool _useAbonoReceivedAmount(BuildContext context) {
+  try {
+    return context.read<AppSettingsCubit>().policy.useAbonoReceivedAmount;
+  } catch (_) {
+    return false;
+  }
 }
 
 class FastPaymentModal extends StatefulWidget {
@@ -38,10 +52,12 @@ class FastPaymentModal extends StatefulWidget {
     super.key,
     required this.maxAmountToPay,
     required this.clientName,
+    this.useReceivedAmount = false,
   });
 
   final double maxAmountToPay;
   final String clientName;
+  final bool useReceivedAmount;
 
   @override
   State<FastPaymentModal> createState() => _FastPaymentModalState();
@@ -49,53 +65,45 @@ class FastPaymentModal extends StatefulWidget {
 
 class _FastPaymentModalState extends State<FastPaymentModal> {
   final TextEditingController _amountController = TextEditingController();
+  final TextEditingController _receivedController = TextEditingController();
   final TextEditingController _refController = TextEditingController();
-  double _currentInput = 0.0;
+  final FocusNode _receivedFocusNode = FocusNode();
+  double _currentAmount = 0.0;
+  double _currentReceived = 0.0;
   PaymentMethod _selectedMethod = PaymentMethod.cash;
   bool _useSecondaryCurrency = false;
   String? _selectedBank;
 
-  int _tenderedCents() => NumberFormatter.convertFromDoubleToCents(_currentInput);
+  AbonoPaymentPolicy get _paymentPolicy => AbonoPaymentPolicy(useReceivedAmount: widget.useReceivedAmount);
 
-  int _convertedPrimaryCents(PaymentCurrencySettings settings) {
-    final tendered = _tenderedCents();
-    if (!_useSecondaryCurrency) return tendered;
-    return NumberFormatter.convertSecondaryToPrimaryCents(
-      tendered,
-      settings.exchangeRate,
+  int _amountInputCents() => NumberFormatter.convertFromDoubleToCents(_currentAmount);
+
+  int _receivedInputCents() => NumberFormatter.convertFromDoubleToCents(_currentReceived);
+
+  AbonoPaymentDecision _evaluate(PaymentCurrencySettings settings) {
+    final maxCents = (widget.maxAmountToPay * 100).round();
+    return _paymentPolicy.evaluate(
+      method: _selectedMethod,
+      maxDebtCents: maxCents,
+      appliedInputCents: _amountInputCents(),
+      receivedInputCents: _receivedInputCents(),
+      useSecondaryCurrency: _useSecondaryCurrency,
+      primaryCurrency: settings.primaryCurrency,
+      secondaryCurrency: settings.secondaryCurrency,
+      exchangeRate: settings.exchangeRate,
+      hasValidExchangeRate: settings.hasValidExchangeRate,
+      hasReference: _refController.text.trim().isNotEmpty,
     );
   }
 
-  int _appliedPrimaryCents(PaymentCurrencySettings settings) {
-    final maxCents = (widget.maxAmountToPay * 100).round();
-    final primary = _convertedPrimaryCents(settings);
-    return primary > maxCents ? maxCents : primary;
-  }
-
-  int _changePrimaryCents(PaymentCurrencySettings settings) {
-    if (_selectedMethod != PaymentMethod.cash) {
-      return 0;
-    }
-    final maxCents = (widget.maxAmountToPay * 100).round();
-    final primary = _convertedPrimaryCents(settings);
-    return primary > maxCents ? primary - maxCents : 0;
-  }
-
   void _submit(PaymentCurrencySettings settings) {
-    if (!_canConfirmFor(settings)) return;
-    final appliedCents = _appliedPrimaryCents(settings);
-    final detail = _selectedMethod == PaymentMethod.cash
-        ? buildPaymentDetail(
-            useSecondary: _useSecondaryCurrency,
-            tenderedCents: _tenderedCents(),
-            changePrimaryCents: _changePrimaryCents(settings),
-            settings: settings,
-          )
-        : null;
+    final decision = _evaluate(settings);
+    if (!decision.isValid) return;
+
     Navigator.pop(
       context,
       FastPaymentResult(
-        amount: appliedCents / 100.0,
+        amount: decision.appliedPrimaryCents / 100.0,
         method: _selectedMethod,
         bankReference: _selectedMethod == PaymentMethod.cash
             ? ""
@@ -103,7 +111,7 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
                 bank: _selectedBank,
                 reference: _refController.text,
               ),
-        paymentDetail: detail,
+        paymentDetail: decision.paymentDetail,
       ),
     );
   }
@@ -111,40 +119,27 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
   @override
   void dispose() {
     _amountController.dispose();
+    _receivedController.dispose();
     _refController.dispose();
+    _receivedFocusNode.dispose();
     super.dispose();
-  }
-
-  bool _canConfirmFor(PaymentCurrencySettings settings) {
-    final maxCents = (widget.maxAmountToPay * 100).round();
-    if (maxCents <= 0) return false;
-    if (_selectedMethod == PaymentMethod.cash && _useSecondaryCurrency && !settings.hasValidExchangeRate) {
-      return false;
-    }
-    final tenderedCents = _tenderedCents();
-    if (tenderedCents <= 0) return false;
-
-    final primaryCents = _convertedPrimaryCents(settings);
-    if (primaryCents <= 0) return false;
-    if (_selectedMethod != PaymentMethod.cash && primaryCents > maxCents) {
-      return false;
-    }
-
-    if (_selectedMethod == PaymentMethod.cash) return true;
-    return _refController.text.trim().isNotEmpty;
   }
 
   @override
   Widget build(BuildContext context) {
     final currencySettings = PaymentCurrencySettings.fromContext(context);
-    final tenderedCents = _tenderedCents();
-    final convertedPrimaryCents = _convertedPrimaryCents(currencySettings);
-    final appliedPrimaryCents = _appliedPrimaryCents(currencySettings);
-    final changePrimaryCents = _changePrimaryCents(currencySettings);
+    final decision = _evaluate(currencySettings);
+    final canConfirm = decision.isValid;
     final maxCents = (widget.maxAmountToPay * 100).round();
-    final canConfirm = _canConfirmFor(currencySettings);
-
     final maxAmountFormatted = NumberFormatter.convertToMoneyLike(maxCents);
+
+    final showCashAmountSummary =
+        decision.isValid &&
+        _selectedMethod == PaymentMethod.cash &&
+        _amountInputCents() > 0 &&
+        (widget.useReceivedAmount ||
+            (_useSecondaryCurrency && currencySettings.hasValidExchangeRate) ||
+            decision.changePrimaryCents > 0);
 
     return Dialog(
       child: ConstrainedBox(
@@ -176,7 +171,10 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
                 if (maxCents <= 0) ...[
                   const SizedBox(height: 10),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.amber.shade50,
                       borderRadius: BorderRadius.circular(8),
@@ -184,7 +182,11 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.warning_amber_rounded, size: 18, color: Colors.amber.shade900),
+                        Icon(
+                          Icons.warning_amber_rounded,
+                          size: 18,
+                          color: Colors.amber.shade900,
+                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
@@ -203,7 +205,9 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
                 const SizedBox(height: 20),
                 SegmentedButton<PaymentMethod>(
                   style: ButtonStyle(
-                    foregroundColor: WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
+                    foregroundColor: WidgetStateProperty.resolveWith<Color>((
+                      Set<WidgetState> states,
+                    ) {
                       if (states.contains(WidgetState.selected)) {
                         return Colors.white;
                       }
@@ -254,10 +258,13 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
                 ],
                 const SizedBox(height: 20),
                 TextField(
+                  key: const Key('fast-payment-amount-field'),
                   controller: _amountController,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
                   autofocus: true,
-                  inputFormatters: [const DecimalTextInputFormatter()],
+                  inputFormatters: const [DecimalTextInputFormatter()],
                   decoration: InputDecoration(
                     labelText: "Monto a Abonar",
                     border: const OutlineInputBorder(),
@@ -265,12 +272,10 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
                         ? '${currencySettings.secondaryCurrency.symbol} '
                         : '${currencySettings.primaryCurrency.symbol} ',
                     errorText: () {
-                      if (tenderedCents <= 0 && _amountController.text.isNotEmpty) {
+                      if (_amountInputCents() <= 0 && _amountController.text.isNotEmpty) {
                         return "Ingrese un monto mayor a 0";
                       }
-                      if (_selectedMethod != PaymentMethod.cash &&
-                          !_useSecondaryCurrency &&
-                          convertedPrimaryCents > maxCents) {
+                      if (decision.error == AbonoPaymentError.amountExceedsDebt) {
                         return "El monto excede la deuda total";
                       }
                       return null;
@@ -278,20 +283,56 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
                   ),
                   onChanged: (value) {
                     setState(() {
-                      _currentInput = double.tryParse(value) ?? 0.0;
+                      _currentAmount = double.tryParse(value) ?? 0.0;
                     });
                   },
-                  onSubmitted: (_) => _submit(currencySettings),
+                  onSubmitted: (_) {
+                    if (widget.useReceivedAmount && _selectedMethod == PaymentMethod.cash) {
+                      _receivedFocusNode.requestFocus();
+                      return;
+                    }
+                    _submit(currencySettings);
+                  },
                 ),
-                if (_selectedMethod == PaymentMethod.cash &&
-                    tenderedCents > 0 &&
-                    ((_useSecondaryCurrency && currencySettings.hasValidExchangeRate) || changePrimaryCents > 0)) ...[
+                if (_selectedMethod == PaymentMethod.cash && widget.useReceivedAmount) ...[
+                  const SizedBox(height: 12),
+                  TextField(
+                    key: const Key('fast-payment-received-field'),
+                    controller: _receivedController,
+                    focusNode: _receivedFocusNode,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    inputFormatters: const [DecimalTextInputFormatter()],
+                    decoration: InputDecoration(
+                      labelText: "Dinero Recibido",
+                      border: const OutlineInputBorder(),
+                      prefixText: _useSecondaryCurrency
+                          ? '${currencySettings.secondaryCurrency.symbol} '
+                          : '${currencySettings.primaryCurrency.symbol} ',
+                      helperText:
+                          (_useSecondaryCurrency && currencySettings.hasValidExchangeRate && _receivedInputCents() > 0)
+                          ? 'Equivalente: ${NumberFormatter.formatMoney(NumberFormatter.convertSecondaryToPrimaryCents(_receivedInputCents(), currencySettings.exchangeRate), currencySettings.primaryCurrency)}'
+                          : null,
+                      errorText: decision.error == AbonoPaymentError.receivedBelowApplied
+                          ? "El dinero recibido no cubre el abono"
+                          : null,
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        _currentReceived = double.tryParse(value) ?? 0.0;
+                      });
+                    },
+                    onSubmitted: (_) => _submit(currencySettings),
+                  ),
+                ],
+                if (showCashAmountSummary) ...[
                   const SizedBox(height: 8),
                   if (_useSecondaryCurrency) ...[
                     Text(
-                      changePrimaryCents > 0
-                          ? 'Equivalente: ${NumberFormatter.formatMoney(convertedPrimaryCents, currencySettings.primaryCurrency)} (Se aplican ${NumberFormatter.formatMoney(appliedPrimaryCents, currencySettings.primaryCurrency)})'
-                          : 'Equivalente a abonar: ${NumberFormatter.formatMoney(appliedPrimaryCents, currencySettings.primaryCurrency)}',
+                      decision.changePrimaryCents > 0
+                          ? 'Equivalente: ${NumberFormatter.formatMoney(decision.receivedPrimaryCents, currencySettings.primaryCurrency)} (Se aplican ${NumberFormatter.formatMoney(decision.appliedPrimaryCents, currencySettings.primaryCurrency)})'
+                          : 'Equivalente a abonar: ${NumberFormatter.formatMoney(decision.appliedPrimaryCents, currencySettings.primaryCurrency)}',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -300,7 +341,7 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
                     ),
                   ] else ...[
                     Text(
-                      'Se aplican: ${NumberFormatter.formatMoney(appliedPrimaryCents, currencySettings.primaryCurrency)}',
+                      'Se aplican: ${NumberFormatter.formatMoney(decision.appliedPrimaryCents, currencySettings.primaryCurrency)}',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -308,14 +349,14 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
                       ),
                     ),
                   ],
-                  if (changePrimaryCents > 0) ...[
+                  if (widget.useReceivedAmount || decision.changePrimaryCents > 0) ...[
                     const SizedBox(height: 4),
                     Text(
-                      'Cambio: ${formatPaymentChangeLabel(changePrimaryCents, primaryCurrency: currencySettings.primaryCurrency, secondaryCurrency: _useSecondaryCurrency ? currencySettings.secondaryCurrency : null, exchangeRate: _useSecondaryCurrency ? currencySettings.exchangeRate : null)}',
-                      style: const TextStyle(
+                      'Cambio: ${formatPaymentChangeLabel(decision.changePrimaryCents, primaryCurrency: currencySettings.primaryCurrency, secondaryCurrency: _useSecondaryCurrency ? currencySettings.secondaryCurrency : null, exchangeRate: _useSecondaryCurrency ? currencySettings.exchangeRate : null)}',
+                      style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
-                        color: Colors.green,
+                        color: decision.changePrimaryCents > 0 ? Colors.green : Colors.grey.shade700,
                       ),
                     ),
                   ],
@@ -334,7 +375,9 @@ class _FastPaymentModalState extends State<FastPaymentModal> {
                       fontWeight: FontWeight.w500,
                     ),
                     inputFormatters: [IntegerTextInputFormatter()],
-                    keyboardType: const TextInputType.numberWithOptions(decimal: false),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: false,
+                    ),
                     decoration: const InputDecoration(
                       labelText: "Número de Referencia",
                       border: OutlineInputBorder(),

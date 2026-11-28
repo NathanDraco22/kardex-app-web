@@ -52,10 +52,21 @@ lib/src/modules/pending_accounts/
   5. Reducción proporcional del saldo de la factura y del balance global del cliente.
   6. Impresión de comprobante de pago mediante `ReceiptPrinter`; el recibo muestra `Recibido`, `Cambio` y `Total Cobrado`.
 
-- **Flujo de Abono Rápido:** el botón `Abono` de la cabecera captura el pago con `FastPaymentModal`; acepta efectivo en moneda primaria o secundaria con cambio, o tarjeta/transferencia con referencia. El recibo resultante usa el mismo `paymentDetail` y las mismas etiquetas.
+- **Flujo de Abono Rápido:** el botón `Abono` de la cabecera captura el pago con `FastPaymentModal`. La decisión y los montos viven en `AbonoPaymentPolicy`; el recibo resultante usa `paymentDetail` y muestra `Recibido`/`Cambio` igual que el resto de recibos.
 - **Un solo método por recibo:** el modelo actual guarda un `paymentMethod` y un `paymentDetail` por recibo; no se admite pago mixto (parte efectivo, parte tarjeta) en un mismo abono.
 - **Notas por monto:** las notas de crédito `CreditNoteType.monto` no vinculadas se distribuyen entre las facturas con saldo disponible; el mediador deduplica por `id`, el modal muestra el total y bloquea el abono si las notas superan la capacidad.
 - **Etiquetas:** los recibos usan `Recibido` y `Cambio`; las facturas conservan `Pagó con` y `Cambio`.
+
+#### Modos del Abono Rápido
+
+Tarjeta y transferencia mantienen su flujo con referencia bancaria y sin cambio en ambos modos.
+
+| `useAbonoReceivedAmount` | Método | Captura | Regla |
+| :---: | :--- | :--- | :--- |
+| `false` | Efectivo | Un solo monto | Se aplica hasta la deuda; el excedente sobre la deuda es cambio. |
+| `false` | Tarjeta/transferencia | Un solo monto | Limitado a la deuda; exige referencia; sin `paymentDetail`. |
+| `true` | Efectivo | "Monto a Abonar" + "Dinero Recibido" | El abono no supera la deuda; recibido ≥ abono; cambio = recibido − abono. Recibido vacío se asume igual al abono. |
+| `true` | Tarjeta/transferencia | Un solo monto | Igual que el modo apagado. |
 
 ### 2.3. Transacciones por Sesión de Crédito (`pending_client_transactions`)
 - **Propósito:** Trazabilidad detallada de los cargos y abonos efectuados dentro de una sesión o período crediticio específico de un cliente.

@@ -34,6 +34,7 @@ class AppSettingModel {
   final double exchangeRate;
   final bool showInvoiceTotalInSecondaryCurrency;
   final bool allowSecondaryCurrencyPayment;
+  final bool useAbonoReceivedAmount;
   final bool showInvoiceItemsSummary;
   final bool showInvoiceOrderCreator;
   final String? companyLogoUrl;
@@ -66,6 +67,7 @@ class AppSettingModel {
     this.exchangeRate = 0.0,
     this.showInvoiceTotalInSecondaryCurrency = false,
     this.allowSecondaryCurrencyPayment = false,
+    this.useAbonoReceivedAmount = false,
     this.showInvoiceItemsSummary = false,
     this.showInvoiceOrderCreator = false,
     this.companyLogoUrl,
@@ -111,6 +113,7 @@ class AppSettingModel {
           json['showInvoiceTotalInSecondaryCurrency'] as bool? ?? false,
       allowSecondaryCurrencyPayment:
           json['allowSecondaryCurrencyPayment'] as bool? ?? false,
+      useAbonoReceivedAmount: json['useAbonoReceivedAmount'] as bool? ?? false,
       showInvoiceItemsSummary:
           json['showInvoiceItemsSummary'] as bool? ?? false,
       showInvoiceOrderCreator:
@@ -149,6 +152,7 @@ class AppSettingModel {
       'showInvoiceTotalInSecondaryCurrency':
           showInvoiceTotalInSecondaryCurrency,
       'allowSecondaryCurrencyPayment': allowSecondaryCurrencyPayment,
+      'useAbonoReceivedAmount': useAbonoReceivedAmount,
       'showInvoiceItemsSummary': showInvoiceItemsSummary,
       'showInvoiceOrderCreator': showInvoiceOrderCreator,
       'companyLogoUrl': companyLogoUrl,
@@ -183,6 +187,7 @@ class AppSettingModel {
     double? exchangeRate,
     bool? showInvoiceTotalInSecondaryCurrency,
     bool? allowSecondaryCurrencyPayment,
+    bool? useAbonoReceivedAmount,
     bool? showInvoiceItemsSummary,
     bool? showInvoiceOrderCreator,
     String? companyLogoUrl,
@@ -228,6 +233,8 @@ class AppSettingModel {
       allowSecondaryCurrencyPayment:
           allowSecondaryCurrencyPayment ??
           this.allowSecondaryCurrencyPayment,
+      useAbonoReceivedAmount:
+          useAbonoReceivedAmount ?? this.useAbonoReceivedAmount,
       showInvoiceItemsSummary:
           showInvoiceItemsSummary ?? this.showInvoiceItemsSummary,
       showInvoiceOrderCreator:
@@ -264,6 +271,7 @@ class UpdateAppSetting {
   final double? exchangeRate;
   final bool? showInvoiceTotalInSecondaryCurrency;
   final bool? allowSecondaryCurrencyPayment;
+  final bool? useAbonoReceivedAmount;
   final bool? showInvoiceItemsSummary;
   final bool? showInvoiceOrderCreator;
   final String? companyLogoUrl;
@@ -293,6 +301,7 @@ class UpdateAppSetting {
     this.exchangeRate,
     this.showInvoiceTotalInSecondaryCurrency,
     this.allowSecondaryCurrencyPayment,
+    this.useAbonoReceivedAmount,
     this.showInvoiceItemsSummary,
     this.showInvoiceOrderCreator,
     this.companyLogoUrl,
@@ -370,6 +379,9 @@ class UpdateAppSetting {
     }
     if (allowSecondaryCurrencyPayment != null) {
       data['allowSecondaryCurrencyPayment'] = allowSecondaryCurrencyPayment;
+    }
+    if (useAbonoReceivedAmount != null) {
+      data['useAbonoReceivedAmount'] = useAbonoReceivedAmount;
     }
     if (showInvoiceItemsSummary != null) {
       data['showInvoiceItemsSummary'] = showInvoiceItemsSummary;
