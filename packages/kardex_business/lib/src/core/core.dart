@@ -4,4 +4,5 @@ export 'policies/app_settings/secondary_currency_availability.dart';
 export 'policies/app_settings/secondary_currency_display.dart';
 export 'policies/app_settings/secondary_currency_payment_terms.dart';
 export 'policies/app_settings/suggested_price.dart';
+export 'policies/clients/client_price_preference_policy.dart';
 export 'policies/receipts/abono_payment_policy.dart';

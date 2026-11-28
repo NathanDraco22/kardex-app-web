@@ -2,8 +2,11 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/client_list/cubit/client_write_cubit.dart';
+import 'package:kardex_app_front/src/modules/client_catalog/client_list/widgets/client_price_level_dropdown.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -47,8 +50,14 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
   bool isActive = true;
   bool isCreditActive = true;
   int creditLimit = 0;
+  bool usePreferredPrice = false;
   int defaultPriceLevel = 1;
   String? _selectedGroupName;
+
+  bool get _useClientPreferredPrices {
+    if (!getIt.isRegistered<AppSettingsCubit>()) return false;
+    return getIt<AppSettingsCubit>().policy.useClientPreferredPrices;
+  }
 
   @override
   void initState() {
@@ -60,12 +69,30 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
       creationMap['coordinates'] = widget.client!.coordinates;
       creationMap['personalReferences'] = List<PersonalReference>.from(widget.client!.personalReferences);
       creditLimit = widget.client!.creditLimit;
-      defaultPriceLevel = widget.client!.defaultPriceLevel;
+      final selection = ClientPricePreferencePolicy.normalize(
+        usePreferredPrice: widget.client!.usePreferredPrice,
+        defaultPriceLevel: widget.client!.defaultPriceLevel,
+      );
+      usePreferredPrice = selection.usePreferredPrice;
+      defaultPriceLevel = selection.defaultPriceLevel;
     } else {
       creationMap['personalReferences'] = <PersonalReference>[];
+      usePreferredPrice = false;
       defaultPriceLevel = 1;
     }
     super.initState();
+  }
+
+  void _onPriceLevelChanged({
+    required bool usePreferredPrice,
+    required int defaultPriceLevel,
+  }) {
+    setState(() {
+      this.usePreferredPrice = usePreferredPrice;
+      this.defaultPriceLevel = defaultPriceLevel;
+      creationMap['usePreferredPrice'] = usePreferredPrice;
+      creationMap['defaultPriceLevel'] = defaultPriceLevel;
+    });
   }
 
   @override
@@ -102,6 +129,7 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
     creationMap['isActive'] = isActive;
     creationMap['isCreditActive'] = isCreditActive;
     creationMap['creditLimit'] = creditLimit;
+    creationMap['usePreferredPrice'] = usePreferredPrice;
     creationMap['defaultPriceLevel'] = defaultPriceLevel;
 
     final currentClient = widget.client;
@@ -437,28 +465,14 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
                       },
                     ),
 
-                    const SizedBox(height: 12),
-                    DropdownButtonFormField<int>(
-                      decoration: const InputDecoration(
-                        labelText: 'Nivel de precio predeterminado',
-                        border: OutlineInputBorder(),
+                    if (_useClientPreferredPrices) ...[
+                      const SizedBox(height: 12),
+                      ClientPriceLevelDropdown(
+                        usePreferredPrice: usePreferredPrice,
+                        defaultPriceLevel: defaultPriceLevel,
+                        onChanged: _onPriceLevelChanged,
                       ),
-                      initialValue: defaultPriceLevel,
-                      items: const [
-                        DropdownMenuItem(value: 1, child: Text('Precio 1')),
-                        DropdownMenuItem(value: 2, child: Text('Precio 2')),
-                        DropdownMenuItem(value: 3, child: Text('Precio 3')),
-                        DropdownMenuItem(value: 4, child: Text('Precio 4')),
-                      ],
-                      onChanged: (value) {
-                        if (value != null) {
-                          setState(() {
-                            defaultPriceLevel = value;
-                            creationMap['defaultPriceLevel'] = value;
-                          });
-                        }
-                      },
-                    ),
+                    ],
 
                     if (currentClient != null) ...[
                       const Divider(),

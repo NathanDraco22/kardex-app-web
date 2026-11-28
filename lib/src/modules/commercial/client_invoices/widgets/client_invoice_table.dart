@@ -205,7 +205,7 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
                         onPressed: () async {
                           final res = await showSearchProductCommercialDialog(
                             context,
-                            defaultPriceLevel: widget.controller.selectedClient?.defaultPriceLevel ?? 1,
+                            defaultPriceLevel: widget.controller.selectedPriceLevel,
                             preferredUnitType: widget.controller.isWholesale ? 'max' : 'min',
                             restrictStock: widget.restrictStock,
                           );
@@ -254,15 +254,14 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
           final res = await showSearchProductCommercialDialog(
             context,
             product: item.product,
-            defaultPriceLevel: widget.controller.selectedClient?.defaultPriceLevel ?? 1,
+            defaultPriceLevel: widget.controller.selectedPriceLevel,
             preferredUnitType: widget.controller.isWholesale ? 'max' : 'min',
             restrictStock: widget.restrictStock,
           );
           if (res == null) return;
           if (widget.restrictStock &&
               res.product.tracksInventory &&
-              (res.baseQuantity > res.product.account.availableStock ||
-                  res.product.account.availableStock == 0)) {
+              (res.baseQuantity > res.product.account.availableStock || res.product.account.availableStock == 0)) {
             if (!context.mounted) return;
             await DialogManager.showErrorDialog(
               context,
@@ -283,8 +282,7 @@ class _ClientInvoiceTableState extends State<ClientInvoiceTable> {
           if (res == null) return;
           if (widget.restrictStock &&
               res.product.tracksInventory &&
-              (res.baseQuantity > res.product.account.availableStock ||
-                  res.product.account.availableStock == 0)) {
+              (res.baseQuantity > res.product.account.availableStock || res.product.account.availableStock == 0)) {
             if (!context.mounted) return;
             await DialogManager.showErrorDialog(
               context,

@@ -2,8 +2,11 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kardex_business/kardex_business.dart';
+import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
 import 'package:kardex_app_front/src/tools/tools.dart';
 import 'package:kardex_app_front/src/modules/client_catalog/client_list/cubit/client_write_cubit.dart';
+import 'package:kardex_app_front/src/modules/client_catalog/client_list/widgets/client_price_level_dropdown.dart';
 import 'package:kardex_app_front/widgets/widgets.dart';
 
 Future<ClientInDb?> showCreateClientDialog(BuildContext context, {ClientInDb? client}) async {
@@ -39,6 +42,44 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
   final formKey = GlobalKey<FormState>();
   final creationMap = {};
 
+  bool usePreferredPrice = false;
+  int defaultPriceLevel = 1;
+
+  bool get _useClientPreferredPrices {
+    if (!getIt.isRegistered<AppSettingsCubit>()) return false;
+    return getIt<AppSettingsCubit>().policy.useClientPreferredPrices;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final client = widget.client;
+    if (client == null) {
+      usePreferredPrice = false;
+      defaultPriceLevel = 1;
+      return;
+    }
+
+    final selection = ClientPricePreferencePolicy.normalize(
+      usePreferredPrice: client.usePreferredPrice,
+      defaultPriceLevel: client.defaultPriceLevel,
+    );
+    usePreferredPrice = selection.usePreferredPrice;
+    defaultPriceLevel = selection.defaultPriceLevel;
+  }
+
+  void _onPriceLevelChanged({
+    required bool usePreferredPrice,
+    required int defaultPriceLevel,
+  }) {
+    setState(() {
+      this.usePreferredPrice = usePreferredPrice;
+      this.defaultPriceLevel = defaultPriceLevel;
+      creationMap['usePreferredPrice'] = usePreferredPrice;
+      creationMap['defaultPriceLevel'] = defaultPriceLevel;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final writeCubit = context.read<WriteClientCubit>();
@@ -54,6 +95,8 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
     }
 
     creationMap['isActive'] = isActive;
+    creationMap['usePreferredPrice'] = usePreferredPrice;
+    creationMap['defaultPriceLevel'] = defaultPriceLevel;
 
     final currentClient = widget.client;
 
@@ -192,6 +235,15 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
                         return null;
                       },
                     ),
+
+                    if (_useClientPreferredPrices) ...[
+                      const SizedBox(height: 12),
+                      ClientPriceLevelDropdown(
+                        usePreferredPrice: usePreferredPrice,
+                        defaultPriceLevel: defaultPriceLevel,
+                        onChanged: _onPriceLevelChanged,
+                      ),
+                    ],
 
                     const SizedBox(height: 12),
 

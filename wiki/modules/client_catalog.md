@@ -46,8 +46,17 @@ lib/widgets/dialogs/selectors/
   - Teléfono, Email, Dirección y Ubicación GPS.
   - Límite de crédito permitido y días de plazo acordados.
   - Balance actual deudor acumulado en tiempo real.
+  - Nivel de precio predeterminado (`defaultPriceLevel`).
 - **Diálogos:**
   - `showCreateClientDialog`: Modal con validaciones para alta/edición de clientes.
+
+#### Precio preferencial del cliente (`usePreferredPrice` + `defaultPriceLevel`)
+
+- **Valores:** `usePreferredPrice = true` aplica `defaultPriceLevel` (`1..4` = “Precio 1”…“Precio 4”). `usePreferredPrice = false` significa **“Sin Preferencia”** y se guarda siempre con `defaultPriceLevel = 1`. Un nivel `0` o fuera de `1..4` tampoco aplica preferencia.
+- **Alta:** los clientes nuevos creados desde la app nacen en `usePreferredPrice = false` y nivel `1`. Los clientes existentes conservan su bandera y nivel. Un documento persistido o legacy sin `usePreferredPrice` se lee como `true` con su nivel actual (o `1` si falta el nivel). Si un cliente existente trae `usePreferredPrice = true` pero un nivel fuera de `1..4`, el formulario normaliza a `false` + `1` mediante `ClientPricePreferencePolicy.normalize`.
+- **Selector:** `ClientPriceLevelDropdown` (`lib/src/modules/client_catalog/client_list/widgets/client_price_level_dropdown.dart`) es el widget compartido por el diálogo del catálogo y el de cuentas por cobrar (`finance/client_accounts`). Solo se muestra cuando `AppSettingsPolicy.useClientPreferredPrices` está activo. “Sin Preferencia” entrega `false` + `1`; “Precio N” entrega `true` + `N`.
+- **Persistencia:** el formulario siempre envía `usePreferredPrice` y `defaultPriceLevel` para no borrar el valor existente al editar con el selector oculto. `UpdateClient.toJson` conserva `false` y el nivel enviado.
+- **Aplicación:** la preferencia se aplica al seleccionar el cliente en terminal de venta y facturación mediante `ClientPricePreferencePolicy`; “Sin Preferencia” deja intactos el nivel y los precios del carrito.
 
 ### 2.2. Grupos de Clientes (`client_groups`)
 - **Propósito:** Segmentación de clientes (ej. "Mayoristas", "Minoristas", "VIP", "Distribuidores") para aplicar listas de precios y porcentajes de descuento predefinidos.

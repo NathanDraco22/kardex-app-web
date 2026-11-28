@@ -1,7 +1,9 @@
+import 'package:kardex_business/src/core/policies/clients/client_price_preference_policy.dart';
 import 'package:kardex_business/src/core/policies/receipts/abono_payment_policy.dart';
 import 'package:kardex_business/src/domain/models/app_setting/app_currency.dart';
 import 'package:kardex_business/src/domain/models/app_setting/app_setting_model.dart';
 import 'package:kardex_business/src/domain/models/app_setting/app_tax_id_label.dart';
+import 'package:kardex_business/src/domain/models/client/client_model.dart';
 import 'package:kardex_business/src/domain/models/invoice/invoice_model.dart';
 
 import 'converted_order_shift_policy.dart';
@@ -58,6 +60,7 @@ final class AppSettingsPolicy {
       settings.allowCancellationsOutsideShift;
   bool get useDiscounts => settings.useDiscounts;
   bool get roundUpInvoiceTotals => settings.roundUpInvoiceTotals;
+  bool get useClientPreferredPrices => settings.useClientPreferredPrices;
   bool get useDefaultProfitMargin => settings.useDefaultProfitMargin;
   double get defaultProfitMargin => settings.defaultProfitMargin;
   bool get showInvoiceItemsSummary => settings.showInvoiceItemsSummary;
@@ -72,6 +75,13 @@ final class AppSettingsPolicy {
   /// modo histórico de un monto o el modo de abono + dinero recibido.
   AbonoPaymentPolicy get abonoPaymentPolicy =>
       AbonoPaymentPolicy(useReceivedAmount: useAbonoReceivedAmount);
+
+  /// Preferencia de precio del cliente según la bandera global.
+  ClientPricePreferencePolicy clientPricePreferenceFor(ClientInDb? client) =>
+      ClientPricePreferencePolicy(
+        client: client,
+        enabled: useClientPreferredPrices,
+      );
 
   // ── Decisiones binarias derivadas ───────────────────────────────────────
 

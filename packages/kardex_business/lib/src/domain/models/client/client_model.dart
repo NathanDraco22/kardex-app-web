@@ -52,6 +52,7 @@ class BaseClient {
   final bool isCreditActive;
   final bool isActive;
   final List<PersonalReference> personalReferences;
+  final bool usePreferredPrice;
   final int defaultPriceLevel;
 
   BaseClient({
@@ -70,6 +71,7 @@ class BaseClient {
     this.lastReceiptDate,
     this.coordinates,
     this.personalReferences = const [],
+    this.usePreferredPrice = true,
     this.defaultPriceLevel = 1,
   });
 
@@ -97,9 +99,12 @@ class BaseClient {
           : null,
       personalReferences: json['personalReferences'] != null
           ? (json['personalReferences'] as List<dynamic>)
-                .map((e) => PersonalReference.fromJson(e as Map<String, dynamic>))
+                .map(
+                  (e) => PersonalReference.fromJson(e as Map<String, dynamic>),
+                )
                 .toList()
           : [],
+      usePreferredPrice: json['usePreferredPrice'] as bool? ?? true,
       defaultPriceLevel: json['defaultPriceLevel'] as int? ?? 1,
     );
   }
@@ -121,6 +126,7 @@ class BaseClient {
       'lastReceiptDate': lastReceiptDate?.millisecondsSinceEpoch,
       'coordinates': coordinates?.toJson(),
       'personalReferences': personalReferences.map((e) => e.toJson()).toList(),
+      'usePreferredPrice': usePreferredPrice,
       'defaultPriceLevel': defaultPriceLevel,
     };
   }
@@ -141,6 +147,7 @@ class CreateClient extends BaseClient {
     super.isActive,
     super.coordinates,
     super.personalReferences,
+    super.usePreferredPrice = false,
     super.defaultPriceLevel = 1,
   });
 
@@ -180,6 +187,7 @@ class CreateClient extends BaseClient {
       isActive: json['isActive'] as bool? ?? true,
       coordinates: coordinates,
       personalReferences: personalReferences,
+      usePreferredPrice: json['usePreferredPrice'] as bool? ?? false,
       defaultPriceLevel: json['defaultPriceLevel'] as int? ?? 1,
     );
   }
@@ -198,6 +206,7 @@ class UpdateClient {
   final int? creditLimit;
   final Coordinates? coordinates;
   final List<PersonalReference>? personalReferences;
+  final bool? usePreferredPrice;
   final int? defaultPriceLevel;
 
   UpdateClient({
@@ -213,6 +222,7 @@ class UpdateClient {
     this.creditLimit,
     this.coordinates,
     this.personalReferences,
+    this.usePreferredPrice,
     this.defaultPriceLevel,
   });
 
@@ -251,6 +261,7 @@ class UpdateClient {
       creditLimit: json['creditLimit'] as int?,
       coordinates: coordinates,
       personalReferences: personalReferences,
+      usePreferredPrice: json['usePreferredPrice'] as bool?,
       defaultPriceLevel: json['defaultPriceLevel'] as int?,
     );
   }
@@ -269,6 +280,7 @@ class UpdateClient {
       'creditLimit': creditLimit,
       'coordinates': coordinates?.toJson(),
       'personalReferences': personalReferences?.map((e) => e.toJson()).toList(),
+      'usePreferredPrice': usePreferredPrice,
       'defaultPriceLevel': defaultPriceLevel,
     };
     data.removeWhere((key, value) => value == null);
@@ -302,6 +314,7 @@ class ClientInDb extends BaseClient {
     this.updatedAt,
     super.coordinates,
     super.personalReferences,
+    super.usePreferredPrice = true,
     super.defaultPriceLevel = 1,
   });
 
@@ -321,7 +334,9 @@ class ClientInDb extends BaseClient {
       isActive: json['isActive'] as bool? ?? true,
       isDeleted: json['isDeleted'] as bool? ?? false,
       createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
-      updatedAt: json['updatedAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt'] as int) : null,
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt'] as int)
+          : null,
       coordinates: json['coordinates'] != null
           ? Coordinates.fromJson(json['coordinates'] as Map<String, dynamic>)
           : null,
@@ -333,9 +348,12 @@ class ClientInDb extends BaseClient {
           : null,
       personalReferences: json['personalReferences'] != null
           ? (json['personalReferences'] as List<dynamic>)
-                .map((e) => PersonalReference.fromJson(e as Map<String, dynamic>))
+                .map(
+                  (e) => PersonalReference.fromJson(e as Map<String, dynamic>),
+                )
                 .toList()
           : [],
+      usePreferredPrice: json['usePreferredPrice'] as bool? ?? true,
       defaultPriceLevel: json['defaultPriceLevel'] as int? ?? 1,
     );
   }

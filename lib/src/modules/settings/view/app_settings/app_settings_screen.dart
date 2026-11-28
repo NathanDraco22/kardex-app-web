@@ -56,6 +56,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
   bool _allowCancellationsOutsideShift = false;
   bool _useDiscounts = false;
   bool _roundUpInvoiceTotals = false;
+  bool _useClientPreferredPrices = true;
   AppCurrency _currency = AppCurrency.nio;
   AppCurrency _secondaryCurrency = AppCurrency.usd;
   double _exchangeRate = 0.0;
@@ -107,6 +108,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
       _allowCancellationsOutsideShift = settings.allowCancellationsOutsideShift;
       _useDiscounts = settings.useDiscounts;
       _roundUpInvoiceTotals = settings.roundUpInvoiceTotals;
+      _useClientPreferredPrices = settings.useClientPreferredPrices;
       _showInvoiceTotalInSecondaryCurrency = settings.showInvoiceTotalInSecondaryCurrency;
       _allowSecondaryCurrencyPayment = settings.allowSecondaryCurrencyPayment;
       _useAbonoReceivedAmount = settings.useAbonoReceivedAmount;
@@ -161,6 +163,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
         _allowCancellationsOutsideShift != settings.allowCancellationsOutsideShift ||
         _useDiscounts != settings.useDiscounts ||
         _roundUpInvoiceTotals != settings.roundUpInvoiceTotals ||
+        _useClientPreferredPrices != settings.useClientPreferredPrices ||
         _showInvoiceTotalInSecondaryCurrency != settings.showInvoiceTotalInSecondaryCurrency ||
         _allowSecondaryCurrencyPayment != settings.allowSecondaryCurrencyPayment ||
         _useAbonoReceivedAmount != settings.useAbonoReceivedAmount ||
@@ -176,22 +179,16 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
     T? changed<T>(T local, T remote) => local == remote ? null : local;
 
     return UpdateAppSetting(
-      useDefaultProfitMargin:
-          changed(_useDefaultProfitMargin, settings.useDefaultProfitMargin),
-      defaultProfitMargin:
-          changed(profitMargin, settings.defaultProfitMargin),
-      useExpirationDates:
-          changed(_useExpirationDates, settings.useExpirationDates),
+      useDefaultProfitMargin: changed(_useDefaultProfitMargin, settings.useDefaultProfitMargin),
+      defaultProfitMargin: changed(profitMargin, settings.defaultProfitMargin),
+      useExpirationDates: changed(_useExpirationDates, settings.useExpirationDates),
       useOrders: changed(_useOrders, settings.useOrders),
       useQuotations: changed(_useQuotations, settings.useQuotations),
-      allowNegativeStock:
-          changed(_allowNegativeStock, settings.allowNegativeStock),
+      allowNegativeStock: changed(_allowNegativeStock, settings.allowNegativeStock),
       alertMinStock: changed(_alertMinStock, settings.alertMinStock),
-      defaultPaymentTermDays:
-          changed(paymentTerm, settings.defaultPaymentTermDays),
+      defaultPaymentTermDays: changed(paymentTerm, settings.defaultPaymentTermDays),
       useHoldSales: changed(_useHoldSales, settings.useHoldSales),
-      useQuickProductSearch:
-          changed(_useQuickProductSearch, settings.useQuickProductSearch),
+      useQuickProductSearch: changed(_useQuickProductSearch, settings.useQuickProductSearch),
       useShifts: changed(_useShifts, settings.useShifts),
       chargeConvertedOrdersToShift: changed(
         _chargeConvertedOrdersToShift,
@@ -214,8 +211,11 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
         settings.allowCancellationsOutsideShift,
       ),
       useDiscounts: changed(_useDiscounts, settings.useDiscounts),
-      roundUpInvoiceTotals:
-          changed(_roundUpInvoiceTotals, settings.roundUpInvoiceTotals),
+      roundUpInvoiceTotals: changed(_roundUpInvoiceTotals, settings.roundUpInvoiceTotals),
+      useClientPreferredPrices: changed(
+        _useClientPreferredPrices,
+        settings.useClientPreferredPrices,
+      ),
       showInvoiceTotalInSecondaryCurrency: changed(
         _showInvoiceTotalInSecondaryCurrency,
         settings.showInvoiceTotalInSecondaryCurrency,
@@ -1270,9 +1270,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                               style: TextStyle(fontSize: 13, color: Colors.black54),
                             ),
                             value: _chargeConvertedOrdersToShift,
-                            onChanged: isSaving
-                                ? null
-                                : (val) => setState(() => _chargeConvertedOrdersToShift = val),
+                            onChanged: isSaving ? null : (val) => setState(() => _chargeConvertedOrdersToShift = val),
                           ),
                           if (_chargeConvertedOrdersToShift) ...[
                             const Divider(height: 1),
@@ -1317,9 +1315,20 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                             style: TextStyle(fontSize: 13, color: Colors.black54),
                           ),
                           value: _roundUpInvoiceTotals,
-                          onChanged: isSaving
-                              ? null
-                              : (val) => setState(() => _roundUpInvoiceTotals = val),
+                          onChanged: isSaving ? null : (val) => setState(() => _roundUpInvoiceTotals = val),
+                        ),
+                        const Divider(height: 1),
+                        SwitchListTile(
+                          title: const Text(
+                            "Precios Preferenciales para Clientes",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: const Text(
+                            "Muestra el nivel de precio en el alta de clientes y aplica ese precio al seleccionar el cliente en terminal de venta, facturación, órdenes y cotizaciones. Con 'Sin Preferencia' el carrito conserva sus precios actuales.",
+                            style: TextStyle(fontSize: 13, color: Colors.black54),
+                          ),
+                          value: _useClientPreferredPrices,
+                          onChanged: isSaving ? null : (val) => setState(() => _useClientPreferredPrices = val),
                         ),
                         const Divider(height: 1),
                         SwitchListTile(
@@ -1336,9 +1345,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                             style: TextStyle(fontSize: 13, color: Colors.black54),
                           ),
                           value: _useAbonoReceivedAmount,
-                          onChanged: isSaving
-                              ? null
-                              : (val) => setState(() => _useAbonoReceivedAmount = val),
+                          onChanged: isSaving ? null : (val) => setState(() => _useAbonoReceivedAmount = val),
                         ),
                         const Divider(height: 1),
                         SwitchListTile(
@@ -1351,9 +1358,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                             style: TextStyle(fontSize: 13, color: Colors.black54),
                           ),
                           value: _useInvoiceCancellations,
-                          onChanged: isSaving
-                              ? null
-                              : (val) => setState(() => _useInvoiceCancellations = val),
+                          onChanged: isSaving ? null : (val) => setState(() => _useInvoiceCancellations = val),
                         ),
                         const Divider(height: 1),
                         SwitchListTile(
@@ -1366,9 +1371,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                             style: TextStyle(fontSize: 13, color: Colors.black54),
                           ),
                           value: _useReceiptCancellations,
-                          onChanged: isSaving
-                              ? null
-                              : (val) => setState(() => _useReceiptCancellations = val),
+                          onChanged: isSaving ? null : (val) => setState(() => _useReceiptCancellations = val),
                         ),
                         const Divider(height: 1),
                         SwitchListTile(
@@ -1381,9 +1384,7 @@ class _AppSettingsViewState extends State<_AppSettingsView> {
                             style: TextStyle(fontSize: 13, color: Colors.black54),
                           ),
                           value: _allowCancellationsOutsideShift,
-                          onChanged: isSaving
-                              ? null
-                              : (val) => setState(() => _allowCancellationsOutsideShift = val),
+                          onChanged: isSaving ? null : (val) => setState(() => _allowCancellationsOutsideShift = val),
                         ),
                       ],
                     ),

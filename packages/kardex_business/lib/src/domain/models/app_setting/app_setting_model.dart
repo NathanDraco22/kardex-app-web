@@ -29,6 +29,7 @@ class AppSettingModel {
   final bool allowCancellationsOutsideShift;
   final bool useDiscounts;
   final bool roundUpInvoiceTotals;
+  final bool useClientPreferredPrices;
   final AppCurrency currency;
   final AppCurrency secondaryCurrency;
   final double exchangeRate;
@@ -62,6 +63,7 @@ class AppSettingModel {
     this.allowCancellationsOutsideShift = false,
     this.useDiscounts = false,
     this.roundUpInvoiceTotals = false,
+    this.useClientPreferredPrices = true,
     this.currency = AppCurrency.nio,
     this.secondaryCurrency = AppCurrency.usd,
     this.exchangeRate = 0.0,
@@ -103,6 +105,8 @@ class AppSettingModel {
           json['allowCancellationsOutsideShift'] as bool? ?? false,
       useDiscounts: json['useDiscounts'] as bool? ?? false,
       roundUpInvoiceTotals: json['roundUpInvoiceTotals'] as bool? ?? false,
+      useClientPreferredPrices:
+          json['useClientPreferredPrices'] as bool? ?? true,
       currency: AppCurrency.fromCode(json['currency'] as String?),
       secondaryCurrency: AppCurrency.fromCode(
         json['secondaryCurrency'] as String?,
@@ -146,6 +150,7 @@ class AppSettingModel {
       'allowCancellationsOutsideShift': allowCancellationsOutsideShift,
       'useDiscounts': useDiscounts,
       'roundUpInvoiceTotals': roundUpInvoiceTotals,
+      'useClientPreferredPrices': useClientPreferredPrices,
       'currency': currency.code,
       'secondaryCurrency': secondaryCurrency.code,
       'exchangeRate': exchangeRate,
@@ -182,6 +187,7 @@ class AppSettingModel {
     bool? allowCancellationsOutsideShift,
     bool? useDiscounts,
     bool? roundUpInvoiceTotals,
+    bool? useClientPreferredPrices,
     AppCurrency? currency,
     AppCurrency? secondaryCurrency,
     double? exchangeRate,
@@ -222,8 +228,9 @@ class AppSettingModel {
       allowCancellationsOutsideShift:
           allowCancellationsOutsideShift ?? this.allowCancellationsOutsideShift,
       useDiscounts: useDiscounts ?? this.useDiscounts,
-      roundUpInvoiceTotals:
-          roundUpInvoiceTotals ?? this.roundUpInvoiceTotals,
+      roundUpInvoiceTotals: roundUpInvoiceTotals ?? this.roundUpInvoiceTotals,
+      useClientPreferredPrices:
+          useClientPreferredPrices ?? this.useClientPreferredPrices,
       currency: currency ?? this.currency,
       secondaryCurrency: secondaryCurrency ?? this.secondaryCurrency,
       exchangeRate: exchangeRate ?? this.exchangeRate,
@@ -231,8 +238,7 @@ class AppSettingModel {
           showInvoiceTotalInSecondaryCurrency ??
           this.showInvoiceTotalInSecondaryCurrency,
       allowSecondaryCurrencyPayment:
-          allowSecondaryCurrencyPayment ??
-          this.allowSecondaryCurrencyPayment,
+          allowSecondaryCurrencyPayment ?? this.allowSecondaryCurrencyPayment,
       useAbonoReceivedAmount:
           useAbonoReceivedAmount ?? this.useAbonoReceivedAmount,
       showInvoiceItemsSummary:
@@ -266,6 +272,7 @@ class UpdateAppSetting {
   final bool? allowCancellationsOutsideShift;
   final bool? useDiscounts;
   final bool? roundUpInvoiceTotals;
+  final bool? useClientPreferredPrices;
   final AppCurrency? currency;
   final AppCurrency? secondaryCurrency;
   final double? exchangeRate;
@@ -296,6 +303,7 @@ class UpdateAppSetting {
     this.allowCancellationsOutsideShift,
     this.useDiscounts,
     this.roundUpInvoiceTotals,
+    this.useClientPreferredPrices,
     this.currency,
     this.secondaryCurrency,
     this.exchangeRate,
@@ -363,6 +371,9 @@ class UpdateAppSetting {
     }
     if (roundUpInvoiceTotals != null) {
       data['roundUpInvoiceTotals'] = roundUpInvoiceTotals;
+    }
+    if (useClientPreferredPrices != null) {
+      data['useClientPreferredPrices'] = useClientPreferredPrices;
     }
     if (currency != null) {
       data['currency'] = currency!.code;

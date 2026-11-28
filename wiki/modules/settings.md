@@ -95,6 +95,7 @@ lib/src/modules/settings/
   - `requireShiftForConvertedOrders` (bool): Cuando `useShifts` y `chargeConvertedOrdersToShift` están activos, exige un turno abierto en la sucursal antes de convertir una orden o cotización a factura; si no hay turno, la conversión se bloquea (`false` por defecto).
   - `allowCancellationsOutsideShift` (bool): Permite solicitar y aprobar la anulación de facturas y recibos aunque pertenezcan a un turno ya cerrado (`false` por defecto). Los arqueos de turnos cerrados conservan sus totales almacenados y no se recalculan; los reportes vivos de la fecha sí cambian y el reembolso de efectivo no se registra automáticamente, por lo que debe gestionarse fuera del sistema.
   - `roundUpInvoiceTotals` (bool): Redondea el subtotal de cada línea hacia arriba y los descuentos hacia abajo para que subtotal y total queden en unidades enteras de la moneda (`false` por defecto). No agrega una línea de redondeo; el ajuste queda integrado en los importes. Solo aplica a facturas nuevas (directas, anónimas y conversiones); no modifica órdenes, cotizaciones ni facturas existentes.
+  - `useClientPreferredPrices` (bool): Habilita los precios preferenciales por cliente (**`true` por defecto** para conservar el comportamiento histórico). Encendido muestra el selector de nivel de precio en el alta/edición de clientes y aplica ese nivel al seleccionar el cliente en terminal de venta y facturación (incluidas órdenes y cotizaciones creadas desde esos flujos). Apagado oculta el selector y el carrito conserva los precios actuales. La decisión vive en `ClientPricePreferencePolicy`; “Sin Preferencia” se representa con `usePreferredPrice = false` y nivel `1`.
   - `useAbonoReceivedAmount` (bool): Muestra el campo "Dinero Recibido" en el abono rápido y calcula el cambio contra el monto abonado (`false` por defecto). Apagado conserva el flujo histórico de un solo monto; encendido permite abonar 300 y recibir 500 con cambio 200. La decisión vive en `AbonoPaymentPolicy`. Tarjeta/transferencia no cambian.
   - `companyLogoUrl` (`String?`): URL pública de la imagen corporativa global de la empresa. Es un parámetro **solo estético**; no se usa en facturas, tickets, reportes ni cálculos.
 
@@ -113,6 +114,14 @@ Aplica al endpoint `POST /api/v1/orders/make-invoice/{order_id}`, usado tanto pa
 - **Precedencia:** `requireShiftForConvertedOrders` solo tiene efecto cuando `useShifts` y `chargeConvertedOrdersToShift` están activos.
 - **Implementación:** `AppSettingsPolicy.convertedOrderShiftPolicy` en `current_orders` y `current_proforma`; `ShiftGuard.ensureShiftReady` y `ShiftCubit` aplican la decisión. El backend aplica la regla en `OrdersController.convert_order_to_invoice` y valida el turno en `InvoiceRegister`/`validate_shift_link`.
 - **Alcance:** esta excepción aplica solo a la conversión de órdenes y cotizaciones. La facturación directa desde terminal de venta mantiene su propia validación de turno.
+
+#### Regla de negocio: precios preferenciales de clientes
+
+- **Bandera:** `useClientPreferredPrices` (`true` por defecto).
+- **Origen de la decisión:** `ClientInDb.usePreferredPrice` + `ClientInDb.defaultPriceLevel`. `usePreferredPrice = true` aplica el nivel `1..4`; `false` significa “Sin Preferencia” y se guarda con nivel `1`. Un nivel `0` o fuera de `1..4` tampoco aplica preferencia.
+- **Alta/edición:** el selector “Nivel de precio predeterminado” (widget compartido `ClientPriceLevelDropdown`) solo aparece con la bandera activa. Los clientes nuevos creados desde la app nacen en `false` + `1`; los existentes conservan su bandera y nivel, y un documento persistido/legacy sin `usePreferredPrice` se lee como `true` con su nivel actual (o `1` si falta). No hay migración de datos.
+- **Selección:** al elegir un cliente en terminal de venta o facturación, `ClientPricePreferencePolicy` devuelve el nivel solo si la bandera global está activa, `AppSettingsCubit.currentSettings` ya está cargado, el cliente tiene `usePreferredPrice = true` y el nivel está en `1..4`. Con “Sin Preferencia” o con ajustes aún no cargados no se modifican el nivel seleccionado ni los precios del carrito. El acceso al ajuste se hace con `getIt<AppSettingsCubit>().policy` y guards `getIt.isRegistered<AppSettingsCubit>()` + `currentSettings != null` para tests unitarios y arranque.
+- **Implementación:** `packages/kardex_business/lib/src/core/policies/clients/client_price_preference_policy.dart`; el backend solo persiste `useClientPreferredPrices`, `usePreferredPrice` y `defaultPriceLevel`, sin lógica de repreciso.
 
 #### Regla de negocio: redondeo hacia arriba en facturas
 
@@ -142,6 +151,7 @@ Las reglas anteriores no se evalúan en cada pantalla. Están centralizadas en u
   - `secondaryCurrencyPaymentTerms`: solo existe si se puede cobrar en moneda secundaria.
   - `invoiceSecondaryCurrencyDisplay`: solo existe si se puede mostrar el total secundario.
   - `suggestedPriceFor(...)`: devuelve `SuggestedPrice?` con el precio base y el equivalente por unidad.
+  - `clientPricePreferenceFor(...)`: devuelve `ClientPricePreferencePolicy` con el nivel `1..4` o `null` (“Sin Preferencia”).
   - `invoiceDisplayConfig`: objeto respuesta con las banderas de visualización.
 - **Transiciones:** `policy` es una vista calculada de `currentSettings`. Durante `Saving` conserva la configuración anterior; en `Loaded` adopta la nueva; en `Error` usa `lastSettings`; en `clear` vuelve a defaults. El formulario de settings mantiene su draft local y solo se sincroniza en `Loaded`.
 

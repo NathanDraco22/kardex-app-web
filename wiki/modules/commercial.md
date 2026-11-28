@@ -50,6 +50,10 @@ lib/src/modules/commercial/
 - **Acciones Clave:**
   - Emisión de factura / ticket mediante `InvoiceRepository` y `ReceiptRepository`.
   - Integración con impresión directa mediante `InvoicePrinter` y `ReceiptPrinter`.
+- **Precios preferenciales del cliente:**
+  - Al seleccionar un cliente, `SaleTerminalViewController` resuelve `AppSettingsPolicy.clientPricePreferenceFor(...)` y asigna `selectedPriceLevel` solo si el cliente tiene `usePreferredPrice = true`, un nivel `1..4` y `useClientPreferredPrices` está activo.
+  - Con “Sin Preferencia” (`usePreferredPrice = false`, nivel `1`) no se toca `selectedPriceLevel` ni se reprecia el carrito. Mientras `AppSettingsCubit.currentSettings` no esté cargado tampoco se aplica ninguna preferencia.
+  - Los productos nuevos usan el `selectedPriceLevel` vigente al abrir el buscador.
 
 ### 2.2. Facturación de Clientes y Anónimos (`client_invoices` y `anon_invoices`)
 - **Propósito:** Flujos dedicados para registrar ventas nominativas (con cliente registrado, límite de crédito y NIT/RNC) o ventas al consumidor final.
@@ -57,6 +61,10 @@ lib/src/modules/commercial/
 - **Integraciones:**
   - Validación de stock disponible (`currentStock - promiseStock`).
   - Verificación del estado de crédito del cliente mediante `ClientRepository`.
+- **Precios preferenciales del cliente (`ClientInvoiceViewController`):**
+  - Mantiene `selectedPriceLevel` (inicial `1`) como nivel vigente del documento. Al seleccionar un cliente con `usePreferredPrice = true` y nivel `1..4`, actualiza el nivel y reprecia los ítems existentes con el `priceMap` de `salePrice..salePrice4`, invocando `onPricesChanged` si hay ítems.
+  - Con “Sin Preferencia” (`usePreferredPrice = false`) no modifica los ítems ni el nivel; los productos nuevos conservan el `selectedPriceLevel` vigente. Con ajustes aún no cargados tampoco reprecia. `clear()` reinicia el nivel a `1`.
+  - La tabla web y la pantalla móvil usan `controller.selectedPriceLevel` para abrir el buscador de productos; no leen `selectedClient.defaultPriceLevel` directamente. El mismo controlador se reutiliza en cotizaciones (`proforma`).
 
 ### 2.3. Cotizaciones y Proformas (`proforma` y `current_proforma`)
 - **Propósito:** Permite generar propuestas comerciales y presupuestos sin descontar stock físico del inventario.

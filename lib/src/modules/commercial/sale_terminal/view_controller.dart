@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/cubits/shift/shift_cubit.dart';
 import 'package:kardex_app_front/src/core/access_manager.dart';
@@ -48,10 +49,23 @@ class SaleTerminalViewController extends ChangeNotifier {
     final hasCredit = (value?.isCreditActive ?? false) && canCredit;
     selectedPaymentType = hasCredit ? PaymentType.credit : PaymentType.cash;
     _selectedClient = value;
-    if (value != null) {
-      selectedPriceLevel = value.defaultPriceLevel;
+    final preferredPriceLevel = _preferredPriceLevelFor(value);
+    if (preferredPriceLevel != null) {
+      selectedPriceLevel = preferredPriceLevel;
     }
     notifyListeners();
+  }
+
+  /// Resuelve la preferencia del cliente sin acoplar el controlador a la
+  /// configuración global cuando aún no está registrada (tests unitarios) o
+  /// todavía no se cargaron los ajustes.
+  int? _preferredPriceLevelFor(ClientInDb? client) {
+    if (!getIt.isRegistered<AppSettingsCubit>()) return null;
+
+    final appSettings = getIt<AppSettingsCubit>();
+    if (appSettings.currentSettings == null) return null;
+
+    return appSettings.policy.clientPricePreferenceFor(client).preferredPriceLevel;
   }
 
   set selectedPriceLevel(int value) {
@@ -98,9 +112,7 @@ class SaleTerminalViewController extends ChangeNotifier {
       discountValue: invoiceDiscountValue,
       baseAmount: itemsNetTotal,
     );
-    return InvoiceRounding.isEnabled
-        ? InvoiceRounding.roundDownToWholeUnit(raw)
-        : raw;
+    return InvoiceRounding.isEnabled ? InvoiceRounding.roundDownToWholeUnit(raw) : raw;
   }
 
   int get totalDiscount => itemDiscounts + invoiceDiscountAmount;
@@ -113,9 +125,7 @@ class SaleTerminalViewController extends ChangeNotifier {
       invoiceDiscountValue = 0;
     } else {
       invoiceDiscountType = type;
-      invoiceDiscountValue = type == DiscountType.percentage
-          ? value.clamp(0, 100)
-          : value.clamp(0, itemsNetTotal);
+      invoiceDiscountValue = type == DiscountType.percentage ? value.clamp(0, 100) : value.clamp(0, itemsNetTotal);
     }
     notifyListeners();
   }

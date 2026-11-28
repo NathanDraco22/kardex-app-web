@@ -13,6 +13,7 @@ AppSettingsPolicy _policy({
   double exchangeRate = 0.0,
   bool useDefaultProfitMargin = false,
   double defaultProfitMargin = 20.0,
+  bool useClientPreferredPrices = true,
   String taxIdLabel = 'RUC',
   String? companyLogoUrl,
 }) {
@@ -31,6 +32,7 @@ AppSettingsPolicy _policy({
       exchangeRate: exchangeRate,
       useDefaultProfitMargin: useDefaultProfitMargin,
       defaultProfitMargin: defaultProfitMargin,
+      useClientPreferredPrices: useClientPreferredPrices,
       taxIdLabel: taxIdLabel,
       companyLogoUrl: companyLogoUrl,
     ),
@@ -368,6 +370,49 @@ void main() {
 
       expect(policy.invoiceDisplayConfig.showItemsSummary, isTrue);
       expect(policy.invoiceDisplayConfig.showOrderCreator, isTrue);
+    });
+  });
+
+  group('precios preferenciales de clientes', () {
+    test('la bandera está activa por defecto', () {
+      const policy = AppSettingsPolicy();
+
+      expect(policy.useClientPreferredPrices, isTrue);
+      expect(AppSettingModel.defaults.useClientPreferredPrices, isTrue);
+      expect(
+        AppSettingModel.fromJson({'id': 'legacy', 'createdAt': 0}).useClientPreferredPrices,
+        isTrue,
+      );
+    });
+
+    test('AppSettingModel serializa la bandera', () {
+      const settings = AppSettingModel(
+        id: 'test',
+        createdAt: 0,
+        useClientPreferredPrices: false,
+      );
+
+      expect(settings.toJson()['useClientPreferredPrices'], isFalse);
+      expect(
+        settings.copyWith(useClientPreferredPrices: true).useClientPreferredPrices,
+        isTrue,
+      );
+    });
+
+    test('UpdateAppSetting envía la bandera solo cuando cambia', () {
+      expect(const UpdateAppSetting().toJson(), isEmpty);
+      expect(
+        const UpdateAppSetting(useClientPreferredPrices: false).toJson(),
+        {'useClientPreferredPrices': false},
+      );
+    });
+
+    test('la policy expone la preferencia según la bandera', () {
+      final active = _policy(useClientPreferredPrices: true);
+      final inactive = _policy(useClientPreferredPrices: false);
+
+      expect(active.useClientPreferredPrices, isTrue);
+      expect(inactive.useClientPreferredPrices, isFalse);
     });
   });
 

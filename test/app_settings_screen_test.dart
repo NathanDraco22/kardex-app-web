@@ -29,6 +29,7 @@ class _FakeAppSettingsRepository implements AppSettingsRepository {
       allowCancellationsOutsideShift: body.allowCancellationsOutsideShift ?? _settings.allowCancellationsOutsideShift,
       roundUpInvoiceTotals: body.roundUpInvoiceTotals ?? _settings.roundUpInvoiceTotals,
       useAbonoReceivedAmount: body.useAbonoReceivedAmount ?? _settings.useAbonoReceivedAmount,
+      useClientPreferredPrices: body.useClientPreferredPrices ?? _settings.useClientPreferredPrices,
     );
     return _settings;
   }
@@ -165,6 +166,27 @@ void main() {
       await tester.tap(find.text('Guardar'));
       await tester.pumpAndSettle();
       expect(repository.lastUpdate!.useAbonoReceivedAmount, isTrue);
+
+      final preferredTitle = find.text('Precios Preferenciales para Clientes');
+      await tester.scrollUntilVisible(
+        preferredTitle,
+        500,
+        scrollable: find.byType(Scrollable).first,
+      );
+      final preferredTile = find.ancestor(
+        of: preferredTitle,
+        matching: find.byType(SwitchListTile),
+      );
+      expect(preferredTile, findsOneWidget);
+      expect(tester.widget<SwitchListTile>(preferredTile).value, isTrue);
+
+      await tester.tap(preferredTitle);
+      await tester.pumpAndSettle();
+      expect(tester.widget<SwitchListTile>(preferredTile).value, isFalse);
+
+      await tester.tap(find.text('Guardar'));
+      await tester.pumpAndSettle();
+      expect(repository.lastUpdate!.useClientPreferredPrices, isFalse);
     },
   );
 }

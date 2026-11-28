@@ -100,7 +100,7 @@ class _RootScaffold extends StatelessWidget {
               final items = await showQuickCommercialProductSearchDelegate(
                 context,
                 restrictStock: isRestrictStock,
-                defaultPriceLevel: viewController.selectedClient?.defaultPriceLevel ?? 1,
+                defaultPriceLevel: viewController.selectedPriceLevel,
                 preferredUnitType: viewController.isWholesale ? 'max' : 'min',
               );
               if (items == null || items.isEmpty) return;
@@ -113,7 +113,7 @@ class _RootScaffold extends StatelessWidget {
 
             final res = await showCommercialProductSearchDelegate(
               context,
-              defaultPriceLevel: viewController.selectedClient?.defaultPriceLevel ?? 1,
+              defaultPriceLevel: viewController.selectedPriceLevel,
               preferredUnitType: viewController.isWholesale ? 'max' : 'min',
               restrictStock: isRestrictStock,
             );
@@ -379,7 +379,7 @@ class _Body extends StatelessWidget {
                           final isRestrictStock = writeCubit.documentType != CommercialDocumentType.quote;
                           final res = await showCommercialProductSearchDelegate(
                             context,
-                            defaultPriceLevel: viewController.selectedClient?.defaultPriceLevel ?? 1,
+                            defaultPriceLevel: viewController.selectedPriceLevel,
                             preferredUnitType: viewController.isWholesale ? 'max' : 'min',
                             restrictStock: isRestrictStock,
                           );

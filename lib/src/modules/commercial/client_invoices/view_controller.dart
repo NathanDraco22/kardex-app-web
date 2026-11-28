@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
+import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
 import 'package:kardex_app_front/cubits/auth/auth_cubit.dart';
 import 'package:kardex_app_front/cubits/shift/shift_cubit.dart';
 import 'package:kardex_app_front/src/core/access_manager.dart';
@@ -25,6 +26,10 @@ class ClientInvoiceViewController extends ChangeNotifier {
 
   ClientInDb? get selectedClient => _selectedClient;
 
+  int _selectedPriceLevel = 1;
+
+  int get selectedPriceLevel => _selectedPriceLevel;
+
   bool updatePricesOnClientChange = true;
   VoidCallback? onPricesChanged;
 
@@ -37,25 +42,40 @@ class ClientInvoiceViewController extends ChangeNotifier {
     selectedPaymentType = initValue;
     _selectedClient = value;
     if (value != null && updatePricesOnClientChange) {
-      final level = value.defaultPriceLevel;
-      items = items.map((item) {
-        final priceMap = {
-          1: item.product.saleProfile.salePrice,
-          2: item.product.saleProfile.salePrice2,
-          3: item.product.saleProfile.salePrice3,
-          4: item.product.saleProfile.salePrice4,
-        };
-        final newPrice = priceMap[level] ?? item.product.saleProfile.salePrice;
-        return item.copyWith(
-          newPrice: newPrice,
-          selectedPriceLevel: level,
-        );
-      }).toList();
-      if (items.isNotEmpty) {
-        onPricesChanged?.call();
+      final level = _preferredPriceLevelFor(value);
+      if (level != null) {
+        _selectedPriceLevel = level;
+        items = items.map((item) {
+          final priceMap = {
+            1: item.product.saleProfile.salePrice,
+            2: item.product.saleProfile.salePrice2,
+            3: item.product.saleProfile.salePrice3,
+            4: item.product.saleProfile.salePrice4,
+          };
+          final newPrice = priceMap[level] ?? item.product.saleProfile.salePrice;
+          return item.copyWith(
+            newPrice: newPrice,
+            selectedPriceLevel: level,
+          );
+        }).toList();
+        if (items.isNotEmpty) {
+          onPricesChanged?.call();
+        }
       }
     }
     notifyListeners();
+  }
+
+  /// Resuelve la preferencia del cliente sin acoplar el controlador a la
+  /// configuración global cuando aún no está registrada (tests unitarios) o
+  /// todavía no se cargaron los ajustes.
+  int? _preferredPriceLevelFor(ClientInDb client) {
+    if (!getIt.isRegistered<AppSettingsCubit>()) return null;
+
+    final appSettings = getIt<AppSettingsCubit>();
+    if (appSettings.currentSettings == null) return null;
+
+    return appSettings.policy.clientPricePreferenceFor(client).preferredPriceLevel;
   }
 
   bool get hasZeroPriceItems => items.any((item) => item.newPrice <= 0);
@@ -118,6 +138,7 @@ class ClientInvoiceViewController extends ChangeNotifier {
     invoiceDiscountType = null;
     invoiceDiscountValue = 0;
     selectedClient = null;
+    _selectedPriceLevel = 1;
     selectedPaymentType = PaymentType.cash;
     notifyListeners();
   }
@@ -137,15 +158,13 @@ class ClientInvoiceViewController extends ChangeNotifier {
       discountValue: invoiceDiscountValue,
       baseAmount: itemsNetTotal,
     );
-    final shouldRound =
-        applyInvoiceRounding && InvoiceRounding.isEnabled;
+    final shouldRound = applyInvoiceRounding && InvoiceRounding.isEnabled;
     return shouldRound ? InvoiceRounding.roundDownToWholeUnit(raw) : raw;
   }
 
   int get totalDiscount => itemDiscounts + invoiceDiscountAmount;
 
-  int get totalAmount =>
-      (itemsNetTotal - invoiceDiscountAmount).clamp(0, itemsNetTotal);
+  int get totalAmount => (itemsNetTotal - invoiceDiscountAmount).clamp(0, itemsNetTotal);
 
   void setInvoiceDiscount(DiscountType? type, int value) {
     if (type == null || value <= 0) {
@@ -153,9 +172,7 @@ class ClientInvoiceViewController extends ChangeNotifier {
       invoiceDiscountValue = 0;
     } else {
       invoiceDiscountType = type;
-      invoiceDiscountValue = type == DiscountType.percentage
-          ? value.clamp(0, 100)
-          : value.clamp(0, itemsNetTotal);
+      invoiceDiscountValue = type == DiscountType.percentage ? value.clamp(0, 100) : value.clamp(0, itemsNetTotal);
     }
     notifyListeners();
   }
@@ -214,8 +231,7 @@ class ClientInvoiceViewController extends ChangeNotifier {
       discountValue: invoiceDiscountValue,
       baseAmount: itemsNet,
     );
-    final shouldRound =
-        applyInvoiceRounding && InvoiceRounding.isEnabled;
+    final shouldRound = applyInvoiceRounding && InvoiceRounding.isEnabled;
     if (shouldRound) {
       invDisc = InvoiceRounding.roundDownToWholeUnit(invDisc);
     }
