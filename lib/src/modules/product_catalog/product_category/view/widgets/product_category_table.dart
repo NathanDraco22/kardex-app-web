@@ -1,6 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kardex_app_front/src/modules/product_catalog/product_category/cubit/read_product_category_cubit.dart';
+import 'package:kardex_app_front/src/cubits/product_category_cubit/read_product_category_cubit.dart';
 import 'package:kardex_app_front/src/modules/product_catalog/product_category/dialogs/create_product_category_dialog.dart';
 import 'package:kardex_app_front/src/tools/row_color_tool.dart';
 
@@ -41,16 +41,11 @@ class ProductCategoryTable extends StatelessWidget {
                   tileColor: rowColor,
                   title: Text(currentProductCategory.name),
                   trailing: IconButton(
-                    onPressed: () async {
-                      final res = await showCreateProductCategoryDialog(
+                    onPressed: () {
+                      showCreateProductCategoryDialog(
                         context,
                         category: currentProductCategory,
                       );
-                      if (res == null) return;
-                      if (!context.mounted) return;
-                      await context.read<ReadProductCategoryCubit>().markProductCategoryUpdated(res);
-                      if (!context.mounted) return;
-                      context.read<ReadProductCategoryCubit>().refreshProductCategory();
                     },
                     icon: const Icon(
                       Icons.edit,

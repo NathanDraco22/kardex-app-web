@@ -75,12 +75,7 @@ class _WebBody extends StatelessWidget {
                 SizedBox(
                   height: 40,
                   child: PrimaryMenuButton(
-                    onPressed: () async {
-                      final res = await showClientGroupFormDialog(context);
-                      if (res == null) return;
-                      if (!context.mounted) return;
-                      await context.read<ReadClientGroupCubit>().putGroupFirst(res);
-                    },
+                    onPressed: () => showClientGroupFormDialog(context),
                     icon: const Icon(Icons.add),
                     label: const Text("Agregar Grupo de Clientes"),
                   ),
@@ -99,12 +94,7 @@ class _WebBody extends StatelessWidget {
                       title: Text(group.name),
                       subtitle: group.description.isNotEmpty ? Text(group.description) : null,
                       trailing: const Icon(Icons.chevron_right),
-                      onTap: () async {
-                        final res = await showClientGroupFormDialog(context, group: group);
-                        if (res == null) return;
-                        if (!context.mounted) return;
-                        await context.read<ReadClientGroupCubit>().markGroupUpdated(res);
-                      },
+                      onTap: () => showClientGroupFormDialog(context, group: group),
                     );
                   },
                 ),

@@ -114,15 +114,13 @@ class _FormContentState extends State<_FormContent> {
     final activeBranchName = _activeBranchName();
 
     if (!_selectedType.tracksInventory &&
-        (widget.currentProduct == null ||
-            widget.currentProduct!.tracksInventory) &&
+        (widget.currentProduct == null || widget.currentProduct!.tracksInventory) &&
         activeBranchId.isNotEmpty) {
       widget.creationMap['branchId'] = activeBranchId;
     }
 
     if (widget.currentProduct != null) {
-      if (widget.currentProduct!.tracksInventory &&
-          !_selectedType.tracksInventory) {
+      if (widget.currentProduct!.tracksInventory && !_selectedType.tracksInventory) {
         final confirmed = await DialogManager.confirmActionDialog(
           context,
           "Al convertir este artículo a ${_selectedType.label}, quedará asignado únicamente a la sucursal actual ($activeBranchName). "
@@ -130,8 +128,7 @@ class _FormContentState extends State<_FormContent> {
           "Se conservan las facturas, el kárdex previo y los precios.\n\n¿Deseas continuar?",
         );
         if (confirmed != true || !mounted) return;
-      } else if (!widget.currentProduct!.tracksInventory &&
-          _selectedType.tracksInventory) {
+      } else if (!widget.currentProduct!.tracksInventory && _selectedType.tracksInventory) {
         final confirmed = await DialogManager.confirmActionDialog(
           context,
           "Al convertir este ${widget.currentProduct!.productType.label} a artículo, pasará al catálogo global de todas las sucursales y sus costos de referencia se reiniciarán.\n\n¿Deseas continuar?",
@@ -171,9 +168,7 @@ class _FormContentState extends State<_FormContent> {
         final priceDouble = double.tryParse(_initialPriceController.text.trim().replaceAll(',', '')) ?? 0.0;
         final costDouble = double.tryParse(_initialCostController.text.trim().replaceAll(',', '')) ?? 0.0;
 
-        if (!_selectedType.tracksInventory &&
-            activeBranchId.isNotEmpty &&
-            (priceDouble > 0 || costDouble > 0)) {
+        if (!_selectedType.tracksInventory && activeBranchId.isNotEmpty && (priceDouble > 0 || costDouble > 0)) {
           final data = CreateProductWithData(
             createProduct: createProduct,
             branchId: activeBranchId,
@@ -241,13 +236,6 @@ class _FormContentState extends State<_FormContent> {
       },
     );
 
-    final productCaterogriesRepo = context.read<ProductCategoriesRepository>();
-    final productCaterogriesEntries = productCaterogriesRepo.productCategories.map(
-      (value) {
-        return DropdownMenuEntry<String>(value: value.name, label: value.name);
-      },
-    );
-
     final wordPrefix = widget.currentProduct == null ? "Agregar" : "Actualizar";
 
     if (context.isMobile()) {
@@ -266,7 +254,6 @@ class _FormContentState extends State<_FormContent> {
             _InnerContent(
               widget: widget,
               unitsMenuEntries: unitsMenuEntries,
-              productCaterogriesEntries: productCaterogriesEntries,
               controller: controller,
               unitController: _unitController,
               initialPriceController: _initialPriceController,
@@ -332,7 +319,6 @@ class _FormContentState extends State<_FormContent> {
             content: _InnerContent(
               widget: widget,
               unitsMenuEntries: unitsMenuEntries,
-              productCaterogriesEntries: productCaterogriesEntries,
               controller: controller,
               unitController: _unitController,
               initialPriceController: _initialPriceController,
@@ -354,7 +340,6 @@ class _InnerContent extends StatelessWidget {
   const _InnerContent({
     required this.widget,
     required this.unitsMenuEntries,
-    required this.productCaterogriesEntries,
     required this.controller,
     required this.unitController,
     required this.initialPriceController,
@@ -368,7 +353,6 @@ class _InnerContent extends StatelessWidget {
 
   final _FormContent widget;
   final Iterable<DropdownMenuEntry<String>> unitsMenuEntries;
-  final Iterable<DropdownMenuEntry<String>> productCaterogriesEntries;
   final WordChipTextController controller;
   final TextEditingController unitController;
   final TextEditingController initialPriceController;
@@ -575,38 +559,10 @@ class _InnerContent extends StatelessWidget {
               const SizedBox(width: 12),
 
               Flexible(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const Text(
-                      "Categoria",
-                      textAlign: TextAlign.start,
-                    ),
-                    const SizedBox(height: 6),
-                    CustomAutocompleteTextfield<ProductCategoryInDb>(
-                      readOnly: false,
-                      onClose: (value) => widget.creationMap['categoryName'] = value.name,
-                      onSearch: (value) {
-                        final repo = context.read<ProductCategoriesRepository>();
-                        return repo.searchProductCategoryByKeywordLocal(value);
-                      },
-                      suggestionBuilder: (value, close) {
-                        return ListView.builder(
-                          itemCount: value.length,
-                          shrinkWrap: true,
-                          itemBuilder: (context, index) => ListTile(
-                            title: Text(value[index].name),
-                            onTap: () {
-                              widget.creationMap['categoryName'] = value[index].name;
-                              close(value[index]);
-                              FocusScope.of(context).nextFocus();
-                            },
-                          ),
-                        );
-                      },
-                      titleBuilder: (value) => value.name,
-                    ),
-                  ],
+                child: ProductCategorySelectorField(
+                  initialCategoryName:
+                      (widget.creationMap['categoryName'] as String?) ?? widget.currentProduct?.categoryName,
+                  onChanged: (name) => widget.creationMap['categoryName'] = name ?? '',
                 ),
               ),
             ],

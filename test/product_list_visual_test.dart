@@ -17,18 +17,12 @@ class _FakeUnitsRepository implements UnitsRepository {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-class _FakeCategoriesRepository implements ProductCategoriesRepository {
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
-}
-
 class _TestReadProductCubit extends ReadProductCubit {
   _TestReadProductCubit(List<ProductInDb> initialProducts)
-      : super(
-          productsRepository: _FakeProductsRepository(),
-          unitsRepository: _FakeUnitsRepository(),
-          categoriesRepository: _FakeCategoriesRepository(),
-        ) {
+    : super(
+        productsRepository: _FakeProductsRepository(),
+        unitsRepository: _FakeUnitsRepository(),
+      ) {
     isLastPage = true;
     // ignore: invalid_use_of_visible_for_testing_member
     emit(ReadProductSuccess(initialProducts));

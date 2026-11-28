@@ -7,6 +7,8 @@ import 'package:kardex_business/kardex_business.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
 import 'package:kardex_app_front/cubits/shift/shift_cubit.dart';
+import 'package:kardex_app_front/src/cubits/client_group_cubit/read_client_group_cubit.dart';
+import 'package:kardex_app_front/src/cubits/product_category_cubit/read_product_category_cubit.dart';
 
 part 'auth_state.dart';
 
@@ -15,13 +17,11 @@ class AuthCubit extends Cubit<AuthState> {
     required this.authRepository,
     required this.branchesRepository,
     required this.servinRepository,
-    required this.clientGroupRepository,
   }) : super(AuthInitial());
 
   final AuthRepository authRepository;
   final BranchesRepository branchesRepository;
   final ServinRepository servinRepository;
-  final ClientGroupsRepository clientGroupRepository;
 
   String get currentBranchId => (state is Authenticated) ? (state as Authenticated).branch.id : kOriginBranchId;
 
@@ -190,6 +190,8 @@ class AuthCubit extends Cubit<AuthState> {
     TokenManager().removeToken();
     await SessionManager().removeSession();
     _clearShift();
+    _clearClientGroups();
+    _clearProductCategories();
     emit(Unauthenticated(servin: currentServin));
   }
 
@@ -199,6 +201,8 @@ class AuthCubit extends Cubit<AuthState> {
     AppKardexConfig().setBranchId(null);
     _clearAppSettings();
     _clearShift();
+    _clearClientGroups();
+    _clearProductCategories();
     emit(AuthInactive());
   }
 
@@ -223,6 +227,38 @@ class AuthCubit extends Cubit<AuthState> {
   void _clearShift() {
     if (getIt.isRegistered<ShiftCubit>()) {
       getIt<ShiftCubit>().clear();
+    }
+  }
+
+  Future<void> _loadClientGroups() async {
+    try {
+      if (getIt.isRegistered<ReadClientGroupCubit>()) {
+        await getIt<ReadClientGroupCubit>().loadAllClientGroups();
+      }
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
+  void _clearClientGroups() {
+    if (getIt.isRegistered<ReadClientGroupCubit>()) {
+      getIt<ReadClientGroupCubit>().clear();
+    }
+  }
+
+  Future<void> _loadProductCategories() async {
+    try {
+      if (getIt.isRegistered<ReadProductCategoryCubit>()) {
+        await getIt<ReadProductCategoryCubit>().loadAllProductCategories();
+      }
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
+  void _clearProductCategories() {
+    if (getIt.isRegistered<ReadProductCategoryCubit>()) {
+      getIt<ReadProductCategoryCubit>().clear();
     }
   }
 
@@ -260,11 +296,8 @@ class AuthCubit extends Cubit<AuthState> {
       throw Exception("Branch not found");
     }
 
-    try {
-      clientGroupRepository.getAllClientGroups();
-    } catch (e) {
-      log(e.toString());
-    }
+    _loadClientGroups();
+    _loadProductCategories();
 
     _updateNetworkConfig(
       servin: refreshedServin ?? currentServin,

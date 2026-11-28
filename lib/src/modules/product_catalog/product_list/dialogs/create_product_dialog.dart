@@ -26,14 +26,10 @@ Future<ProductInDb?> showCreateProductDialog(
   final writeCubit = context.read<WriteProductCubit>();
   final readCubit = context.read<ReadProductCubit>();
 
-  final productCateRepo = context.read<ProductCategoriesRepository>();
   final unitRepo = context.read<UnitsRepository>();
 
-  final widget = MultiRepositoryProvider(
-    providers: [
-      RepositoryProvider.value(value: productCateRepo),
-      RepositoryProvider.value(value: unitRepo),
-    ],
+  final widget = RepositoryProvider.value(
+    value: unitRepo,
     child: MultiBlocProvider(
       providers: [
         BlocProvider.value(value: writeCubit),

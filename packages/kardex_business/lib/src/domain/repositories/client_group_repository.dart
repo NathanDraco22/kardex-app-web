@@ -1,20 +1,21 @@
 import 'package:kardex_business/src/data/client_group_data_source.dart';
 import 'package:kardex_business/src/domain/models/client_group/client_group_model.dart';
 import 'package:kardex_business/src/domain/responses/list_responses.dart';
+import 'package:kardex_business/src/tools/reactive_repo/reactive_repository.dart';
 
-class ClientGroupsRepository {
+class ClientGroupsRepository with ReactiveRepository<ClientGroupInDb> {
   final ClientGroupDataSource clientGroupDataSource;
 
   ClientGroupsRepository(this.clientGroupDataSource);
 
-  List<ClientGroupInDb> _clientGroups = [];
-
-  List<ClientGroupInDb> get clientGroups => _clientGroups;
-
-  Future<ClientGroupInDb> createClientGroup(CreateClientGroup createGroup) async {
-    final result = await clientGroupDataSource.createClientGroup(createGroup.toJson());
+  Future<ClientGroupInDb> createClientGroup(
+    CreateClientGroup createGroup,
+  ) async {
+    final result = await clientGroupDataSource.createClientGroup(
+      createGroup.toJson(),
+    );
     final newGroup = ClientGroupInDb.fromJson(result);
-    _clientGroups = [newGroup, ..._clientGroups];
+    notifyItemCreated(newGroup);
     return newGroup;
   }
 
@@ -26,28 +27,13 @@ class ClientGroupsRepository {
       ClientGroupInDb.fromJson,
     );
 
-    _clientGroups = response.data;
-    _clientGroups.sort(
-      (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
-    );
-    return _clientGroups;
+    return response.data;
   }
 
   Future<ClientGroupInDb?> getClientGroupById(String groupId) async {
     final result = await clientGroupDataSource.getClientGroupById(groupId);
     if (result == null) return null;
     return ClientGroupInDb.fromJson(result);
-  }
-
-  Future<List<ClientGroupInDb>> searchClientGroupByKeywordLocal(String keyword) async {
-    final result = _clientGroups
-        .where(
-          (u) => u.name.toLowerCase().contains(
-            keyword.toLowerCase(),
-          ),
-        )
-        .toList();
-    return result;
   }
 
   Future<ClientGroupInDb?> updateClientGroupById(
@@ -61,10 +47,7 @@ class ClientGroupsRepository {
     if (result == null) return null;
 
     final updatedGroup = ClientGroupInDb.fromJson(result);
-    final index = _clientGroups.indexWhere((u) => u.id == groupId);
-    if (index != -1) {
-      _clientGroups[index] = updatedGroup;
-    }
+    notifyItemUpdated(updatedGroup);
     return updatedGroup;
   }
 
@@ -73,7 +56,7 @@ class ClientGroupsRepository {
     if (result == null) return null;
 
     final deletedGroup = ClientGroupInDb.fromJson(result);
-    _clientGroups.removeWhere((u) => u.id == groupId);
+    notifyItemDeleted(deletedGroup);
     return deletedGroup;
   }
 }

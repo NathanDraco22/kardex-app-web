@@ -11,13 +11,11 @@ class ReadProductCubit extends Cubit<ReadProductState> {
   ReadProductCubit({
     required this.productsRepository,
     required this.unitsRepository,
-    required this.categoriesRepository,
     this.branchId,
   }) : super(ReadProductInitial());
 
   final ProductsRepository productsRepository;
   final UnitsRepository unitsRepository;
-  final ProductCategoriesRepository categoriesRepository;
   final String? branchId;
 
   bool isLastPage = false;
@@ -43,10 +41,7 @@ class ReadProductCubit extends Cubit<ReadProductState> {
     }
     emit(ReadProductLoading());
     try {
-      await Future.wait([
-        unitsRepository.getAllUnits(),
-        categoriesRepository.getAllProductCategories(),
-      ]);
+      await unitsRepository.getAllUnits();
       final products = await productsRepository.getPaginatedProducts(
         _productsCache.length,
         branchId: _activeBranchId,

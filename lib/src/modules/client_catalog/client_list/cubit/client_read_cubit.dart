@@ -4,21 +4,14 @@ import 'package:kardex_business/kardex_business.dart';
 part 'client_read_state.dart';
 
 class ReadClientCubit extends Cubit<ReadClientState> {
-  ReadClientCubit(this.clientsRepository, this.clientGroupsRepository) : super(ReadClientInitial());
+  ReadClientCubit(this.clientsRepository) : super(ReadClientInitial());
 
   final ClientsRepository clientsRepository;
-  final ClientGroupsRepository clientGroupsRepository;
 
   Future<void> loadAllClients() async {
     emit(ReadClientLoading());
     try {
-      final result = await Future.wait([
-        clientGroupsRepository.getAllClientGroups(),
-        clientsRepository.getAllClients(),
-      ]);
-
-      final clients = result[1] as List<ClientInDb>;
-
+      final clients = await clientsRepository.getAllClients();
       emit(ReadClientSuccess(clients));
     } catch (error) {
       emit(ClientReadError(error.toString()));

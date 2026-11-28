@@ -17,10 +17,9 @@ class ClientMapScreenWeb extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final clientRepo = context.read<ClientsRepository>();
-    final clientGroupRepo = context.read<ClientGroupsRepository>();
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => ReadClientCubit(clientRepo, clientGroupRepo)..loadAllClients()),
+        BlocProvider(create: (context) => ReadClientCubit(clientRepo)..loadAllClients()),
       ],
       child: const _RootScaffold(),
     );

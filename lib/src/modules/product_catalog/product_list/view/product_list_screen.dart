@@ -18,14 +18,12 @@ class ProductListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final productRepo = context.read<ProductsRepository>();
-    final productCateRepo = context.read<ProductCategoriesRepository>();
     final unitRepo = context.read<UnitsRepository>();
     return MultiBlocProvider(
       providers: [
         BlocProvider(
           create: (context) => ReadProductCubit(
             productsRepository: productRepo,
-            categoriesRepository: productCateRepo,
             unitsRepository: unitRepo,
           )..loadPaginatedProducts(),
         ),

@@ -16,12 +16,21 @@ lib/src/modules/client_catalog/
 │   ├── dialogs/                         # CreateClientDialog, ClientDetailsModal
 │   └── view/client_catalog_screen.dart  # Pantalla principal del catálogo
 ├── client_groups/                       # Segmentación y grupos comerciales
-│   ├── cubit/                           # ClientGroupsCubit
+│   ├── dialog/                          # ClientGroupFormDialog (alta/edición)
 │   └── client_groups_screen.dart        # Gestión de grupos y tarifas especiales
 ├── initial_balance/                     # Configuración de balances y deudas históricas
 │   └── view/initial_balance_screen.dart # Pantalla de carga de saldos iniciales
 └── cllient_map/                         # Localización y rutas en mapa
     └── client_map_screen.dart           # Visualizador de clientes geolocalizados
+
+lib/src/cubits/client_group_cubit/       # Cubits globales de grupos de clientes
+├── read_client_group_cubit.dart         # Lista reactiva (fuente de verdad)
+├── read_client_group_state.dart
+├── write_client_group_cubit.dart        # Alta/edición/borrado
+└── write_client_group_state.dart
+
+lib/widgets/dialogs/selectors/
+└── client_group_selection_dialog.dart   # Selector modal con búsqueda local y alta rápida
 ```
 
 ---
@@ -42,8 +51,11 @@ lib/src/modules/client_catalog/
 
 ### 2.2. Grupos de Clientes (`client_groups`)
 - **Propósito:** Segmentación de clientes (ej. "Mayoristas", "Minoristas", "VIP", "Distribuidores") para aplicar listas de precios y porcentajes de descuento predefinidos.
-- **Vistas:** `ClientGroupsScreen`.
-- **Cubits:** `ClientGroupsCubit`.
+- **Vistas:** `ClientGroupsScreen` (envuelve `ClientGroupsScreenWeb`).
+- **Cubits globales:** `ReadClientGroupCubit` y `WriteClientGroupCubit` viven en `lib/src/cubits/client_group_cubit/` y se registran/exponen desde `GlobalCubitProvider` (`lib/provider_container.dart`). La pantalla llama `ensureLoaded()` en `initState` y no crea providers locales.
+- **Repositorio reactivo:** `ClientGroupsRepository` implementa el mixin `ReactiveRepository<ClientGroupInDb>` y **no mantiene caché interna**. `ReadClientGroupCubit` escucha `eventStream` y es la única fuente de verdad de la lista; los eventos `notifyItemCreated/Updated/Deleted` actualizan el estado sin recargar.
+- **Selector modal:** `lib/widgets/dialogs/selectors/client_group_selection_dialog.dart` expone `showClientGroupSelectionDialog(...)`. Filtra localmente por nombre/descripción sobre el estado del `ReadClientGroupCubit`, permite elegir "Sin grupo" y ofrece el botón **"Crear Grupo de Clientes"**, que abre `showClientGroupFormDialog` y selecciona automáticamente el grupo creado. Se usa en el formulario de clientes (`create_client_dialog.dart`) en lugar del autocompletado anterior.
+- **Formulario:** `dialog/client_group_form_dialog.dart` usa el `WriteClientGroupCubit` global vía `context.read`; la lista se refresca por eventos, sin `putGroupFirst`/`markGroupUpdated`.
 
 ### 2.3. Balance Inicial (`initial_balance`)
 - **Propósito:** Carga o migración de saldos adeudados previos a la implantación del sistema, permitiendo iniciar operaciones con carteras preexistentes.
@@ -60,7 +72,7 @@ lib/src/modules/client_catalog/
 | Submódulo | DataSource | Repositorio |
 | :--- | :--- | :--- |
 | Clientes | `ClientDataSource` | `ClientRepository` |
-| Grupos de Clientes | `ClientGroupsDataSource` | `ClientGroupsRepository` |
+| Grupos de Clientes | `ClientGroupsDataSource` | `ClientGroupsRepository` (`ReactiveRepository`, sin caché) |
 
 ---
 

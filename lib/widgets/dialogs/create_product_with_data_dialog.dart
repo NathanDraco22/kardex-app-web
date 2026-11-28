@@ -17,7 +17,6 @@ Future<ProductInDbInBranch?> showCreateProductWithDataDialog(
   String? branchId,
 }) async {
   final productRepo = context.read<ProductsRepository>();
-  final productCateRepo = context.read<ProductCategoriesRepository>();
   final unitRepo = context.read<UnitsRepository>();
 
   WriteProductCubit writeCubit;
@@ -30,7 +29,6 @@ Future<ProductInDbInBranch?> showCreateProductWithDataDialog(
   final widget = MultiRepositoryProvider(
     providers: [
       RepositoryProvider.value(value: productRepo),
-      RepositoryProvider.value(value: productCateRepo),
       RepositoryProvider.value(value: unitRepo),
     ],
     child: BlocProvider.value(
@@ -324,14 +322,6 @@ class _FormContentState extends State<_FormContent> {
       ),
     );
 
-    final productCateRepo = context.read<ProductCategoriesRepository>();
-    final productCateEntries = productCateRepo.productCategories.map(
-      (value) => DropdownMenuEntry<String>(
-        value: value.name,
-        label: value.name,
-      ),
-    );
-
     if (context.isMobile()) {
       return Scaffold(
         appBar: AppBar(
@@ -352,7 +342,6 @@ class _FormContentState extends State<_FormContent> {
               onTypeChanged: _onTypeChanged,
               onScaleChanged: _onScaleChanged,
               unitsMenuEntries: unitsMenuEntries,
-              productCategoriesEntries: productCateEntries,
               tagController: _tagController,
               unitController: _unitController,
               quantityController: _quantityController,
@@ -413,7 +402,6 @@ class _FormContentState extends State<_FormContent> {
               onTypeChanged: _onTypeChanged,
               onScaleChanged: _onScaleChanged,
               unitsMenuEntries: unitsMenuEntries,
-              productCategoriesEntries: productCateEntries,
               tagController: _tagController,
               unitController: _unitController,
               quantityController: _quantityController,
@@ -437,7 +425,6 @@ class _InnerContent extends StatelessWidget {
     required this.onTypeChanged,
     required this.onScaleChanged,
     required this.unitsMenuEntries,
-    required this.productCategoriesEntries,
     required this.tagController,
     required this.unitController,
     required this.quantityController,
@@ -453,7 +440,6 @@ class _InnerContent extends StatelessWidget {
   final ValueChanged<ProductType> onTypeChanged;
   final VoidCallback onScaleChanged;
   final Iterable<DropdownMenuEntry<String>> unitsMenuEntries;
-  final Iterable<DropdownMenuEntry<String>> productCategoriesEntries;
   final _WordChipTextController tagController;
   final TextEditingController unitController;
   final TextEditingController quantityController;
@@ -649,38 +635,9 @@ class _InnerContent extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               Flexible(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const Text(
-                      "Categoría",
-                      textAlign: TextAlign.start,
-                    ),
-                    const SizedBox(height: 6),
-                    CustomAutocompleteTextfield<ProductCategoryInDb>(
-                      readOnly: false,
-                      onClose: (value) => creationMap['categoryName'] = value.name,
-                      onSearch: (value) {
-                        final repo = context.read<ProductCategoriesRepository>();
-                        return repo.searchProductCategoryByKeywordLocal(value);
-                      },
-                      suggestionBuilder: (value, close) {
-                        return ListView.builder(
-                          itemCount: value.length,
-                          shrinkWrap: true,
-                          itemBuilder: (context, index) => ListTile(
-                            title: Text(value[index].name),
-                            onTap: () {
-                              creationMap['categoryName'] = value[index].name;
-                              close(value[index]);
-                              FocusScope.of(context).nextFocus();
-                            },
-                          ),
-                        );
-                      },
-                      titleBuilder: (value) => value.name,
-                    ),
-                  ],
+                child: ProductCategorySelectorField(
+                  initialCategoryName: creationMap['categoryName'] as String?,
+                  onChanged: (name) => creationMap['categoryName'] = name ?? '',
                 ),
               ),
             ],
@@ -799,27 +756,22 @@ class _InnerContent extends StatelessWidget {
                 AnimatedBuilder(
                   animation: costController,
                   builder: (context, _) {
-                    final costVal = double.tryParse(
+                    final costVal =
+                        double.tryParse(
                           costController.text.trim().replaceAll(',', ''),
                         ) ??
                         0.0;
                     if (costVal <= 0) {
                       return const SizedBox.shrink();
                     }
-                    final suggestion = getIt<AppSettingsCubit>()
-                        .policy
-                        .suggestedPriceFor(
-                          costInCents:
-                              NumberFormatter.convertFromDoubleToCents(costVal),
-                        );
+                    final suggestion = getIt<AppSettingsCubit>().policy.suggestedPriceFor(
+                      costInCents: NumberFormatter.convertFromDoubleToCents(costVal),
+                    );
                     if (suggestion == null) {
                       return const SizedBox.shrink();
                     }
                     final marginText = suggestion.marginPercent.toStringAsFixed(
-                      suggestion.marginPercent.truncateToDouble() ==
-                              suggestion.marginPercent
-                          ? 0
-                          : 1,
+                      suggestion.marginPercent.truncateToDouble() == suggestion.marginPercent ? 0 : 1,
                     );
                     final suggestedPriceText =
                         '${NumberFormatter.currencySymbol} ${(suggestion.priceInCents / 100).toStringAsFixed(2)}';
@@ -862,8 +814,7 @@ class _InnerContent extends StatelessWidget {
                               textStyle: const TextStyle(color: Colors.white),
                             ),
                             onPressed: () {
-                              priceController.text =
-                                  (suggestion.priceInCents / 100).toStringAsFixed(2);
+                              priceController.text = (suggestion.priceInCents / 100).toStringAsFixed(2);
                             },
                             child: const Text("Usar Precio Sugerido", style: TextStyle(color: Colors.white)),
                           ),

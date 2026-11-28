@@ -30,17 +30,11 @@ class _FakeServinRepository implements ServinRepository {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-class _FakeClientGroupsRepository implements ClientGroupsRepository {
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
-}
-
 AuthCubit _createTestAuthCubit() {
   return AuthCubit(
     authRepository: _FakeAuthRepository(),
     branchesRepository: _FakeBranchesRepository(),
     servinRepository: _FakeServinRepository(),
-    clientGroupRepository: _FakeClientGroupsRepository(),
   );
 }
 
@@ -169,7 +163,9 @@ void main() {
     expect(totals.cancelledInvoiceTotal, 2000);
   });
 
-  testWidgets('Gate con approveInvoiceCancellation oculta botones para Cajero y los muestra para Supervisor', (tester) async {
+  testWidgets('Gate con approveInvoiceCancellation oculta botones para Cajero y los muestra para Supervisor', (
+    tester,
+  ) async {
     final authCubit = _createTestAuthCubit();
     getIt.registerSingleton<AuthCubit>(authCubit);
 
@@ -254,43 +250,46 @@ void main() {
     expect(receipt.cancellationReason, 'Monto errado');
   });
 
-  testWidgets('InvoiceCancellationsGateFilter y ReceiptCancellationsGateFilter ocultan por defecto y muestran al activarse', (tester) async {
-    final settingsCubit = AppSettingsCubit(_FakeAppSettingsRepository());
-    getIt.registerSingleton<AppSettingsCubit>(settingsCubit);
+  testWidgets(
+    'InvoiceCancellationsGateFilter y ReceiptCancellationsGateFilter ocultan por defecto y muestran al activarse',
+    (tester) async {
+      final settingsCubit = AppSettingsCubit(_FakeAppSettingsRepository());
+      getIt.registerSingleton<AppSettingsCubit>(settingsCubit);
 
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: Scaffold(
-          body: Column(
-            children: [
-              Gate(
-                filters: [InvoiceCancellationsGateFilter()],
-                child: Text('AnularFactura'),
-              ),
-              Gate(
-                filters: [ReceiptCancellationsGateFilter()],
-                child: Text('AnularRecibo'),
-              ),
-            ],
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: Column(
+              children: [
+                Gate(
+                  filters: [InvoiceCancellationsGateFilter()],
+                  child: Text('AnularFactura'),
+                ),
+                Gate(
+                  filters: [ReceiptCancellationsGateFilter()],
+                  child: Text('AnularRecibo'),
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-    );
-    expect(find.text('AnularFactura'), findsNothing);
-    expect(find.text('AnularRecibo'), findsNothing);
+      );
+      expect(find.text('AnularFactura'), findsNothing);
+      expect(find.text('AnularRecibo'), findsNothing);
 
-    settingsCubit.emit(
-      AppSettingsLoaded(
-        const AppSettingModel(
-          id: 'Default',
-          createdAt: 0,
-          useInvoiceCancellations: true,
-          useReceiptCancellations: true,
+      settingsCubit.emit(
+        AppSettingsLoaded(
+          const AppSettingModel(
+            id: 'Default',
+            createdAt: 0,
+            useInvoiceCancellations: true,
+            useReceiptCancellations: true,
+          ),
         ),
-      ),
-    );
-    await tester.pump();
-    expect(find.text('AnularFactura'), findsOneWidget);
-    expect(find.text('AnularRecibo'), findsOneWidget);
-  });
+      );
+      await tester.pump();
+      expect(find.text('AnularFactura'), findsOneWidget);
+      expect(find.text('AnularRecibo'), findsOneWidget);
+    },
+  );
 }

@@ -293,23 +293,22 @@ Each repository follows the standard CRUD pattern where applicable:
 ---
 
 #### ProductCategoriesRepository
-**Purpose**: Product categorization. Allows organizing the catalog into hierarchical categories for easier filtering and reporting. Supports both remote (API) and local (in-memory) search to optimize UI performance.
+**Purpose**: Product categorization. Allows organizing the catalog into hierarchical categories for easier filtering and reporting. Uses `ReactiveRepository` so read cubits stay in sync without a repository cache; keyword search goes to the API.
 
 | Feature | Detail |
 |---|---|
 | Models | `ProductCategoryInDb`, `CreateProductCategory`, `UpdateProductCategory` |
 | Query Params | None |
-| In-memory Cache | ✓ (sorted A-Z) |
+| In-memory Cache | No (`ReactiveRepository`) |
 
 | Method | Signature | Description |
 |---|---|---|
-| `createProductCategory` | `Future<ProductCategoryInDb> createProductCategory(CreateProductCategory cat)` | Creates a new product category. |
-| `getAllProductCategories` | `Future<List<ProductCategoryInDb>> getAllProductCategories()` | Gets all categories, refreshes in-memory cache. |
+| `createProductCategory` | `Future<ProductCategoryInDb> createProductCategory(CreateProductCategory cat)` | Creates a new product category and notifies `eventStream`. |
+| `getAllProductCategories` | `Future<List<ProductCategoryInDb>> getAllProductCategories()` | Gets all categories (no cache). |
 | `getProductCategoryById` | `Future<ProductCategoryInDb?> getProductCategoryById(String id)` | Gets a category by ID. |
 | `searchProductCategoryByKeyword` | `Future<List<ProductCategoryInDb>> searchProductCategoryByKeyword(String kw)` | Searches categories by keyword against the API. |
-| `searchProductCategoryByKeywordLocal` | `Future<List<ProductCategoryInDb>> searchProductCategoryByKeywordLocal(String kw)` | Searches categories in the local cache (no HTTP call). |
-| `updateProductCategoryById` | `Future<ProductCategoryInDb?> updateProductCategoryById(String id, UpdateProductCategory data)` | Updates a category. Syncs cache. |
-| `deleteProductCategoryById` | `Future<ProductCategoryInDb?> deleteProductCategoryById(String id)` | Deletes a category. Syncs cache. |
+| `updateProductCategoryById` | `Future<ProductCategoryInDb?> updateProductCategoryById(String id, UpdateProductCategory data)` | Updates a category and notifies `eventStream`. |
+| `deleteProductCategoryById` | `Future<ProductCategoryInDb?> deleteProductCategoryById(String id)` | Deletes a category and notifies `eventStream`. |
 
 ---
 
@@ -579,22 +578,21 @@ Each repository follows the standard CRUD pattern where applicable:
 ---
 
 #### ClientGroupsRepository
-**Purpose**: Client grouping. Allows organizing clients into categories or segments (e.g., "Wholesale", "Retail", "VIP"). Facilitates filtering, reporting, and group-based pricing. Supports local search for dropdown performance.
+**Purpose**: Client grouping. Allows organizing clients into categories or segments (e.g., "Wholesale", "Retail", "VIP"). Facilitates filtering, reporting, and group-based pricing. Uses `ReactiveRepository` so read cubits stay in sync without a repository cache.
 
 | Feature | Detail |
 |---|---|
 | Models | `ClientGroupInDb`, `CreateClientGroup`, `UpdateClientGroup` |
 | Query Params | None |
-| In-memory Cache | ✓ (sorted A-Z) |
+| In-memory Cache | No (`ReactiveRepository`) |
 
 | Method | Signature | Description |
 |---|---|---|
-| `createClientGroup` | `Future<ClientGroupInDb> createClientGroup(CreateClientGroup group)` | Creates a new client group. |
-| `getAllClientGroups` | `Future<List<ClientGroupInDb>> getAllClientGroups()` | Gets all groups, refreshes cache. |
+| `createClientGroup` | `Future<ClientGroupInDb> createClientGroup(CreateClientGroup group)` | Creates a new client group and notifies `eventStream`. |
+| `getAllClientGroups` | `Future<List<ClientGroupInDb>> getAllClientGroups()` | Gets all groups (no cache). |
 | `getClientGroupById` | `Future<ClientGroupInDb?> getClientGroupById(String id)` | Gets a group by ID. |
-| `searchClientGroupByKeywordLocal` | `Future<List<ClientGroupInDb>> searchClientGroupByKeywordLocal(String kw)` | Searches groups in local cache (no HTTP call). |
-| `updateClientGroupById` | `Future<ClientGroupInDb?> updateClientGroupById(String id, UpdateClientGroup data)` | Updates a group. Syncs cache. |
-| `deleteClientGroupById` | `Future<ClientGroupInDb?> deleteClientGroupById(String id)` | Deletes a group. Syncs cache. |
+| `updateClientGroupById` | `Future<ClientGroupInDb?> updateClientGroupById(String id, UpdateClientGroup data)` | Updates a group and notifies `eventStream`. |
+| `deleteClientGroupById` | `Future<ClientGroupInDb?> deleteClientGroupById(String id)` | Deletes a group and notifies `eventStream`. |
 
 ---
 

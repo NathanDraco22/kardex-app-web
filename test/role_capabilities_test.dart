@@ -22,17 +22,11 @@ class _FakeServinRepository implements ServinRepository {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-class _FakeClientGroupsRepository implements ClientGroupsRepository {
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
-}
-
 AuthCubit _createTestAuthCubit() {
   return AuthCubit(
     authRepository: _FakeAuthRepository(),
     branchesRepository: _FakeBranchesRepository(),
     servinRepository: _FakeServinRepository(),
-    clientGroupRepository: _FakeClientGroupsRepository(),
   );
 }
 

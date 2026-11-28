@@ -68,11 +68,8 @@ class _WebBody extends StatelessWidget {
                 SizedBox(
                   height: 40,
                   child: PrimaryMenuButton(
-                    onPressed: () async {
-                      final res = await showCreateProductCategoryDialog(context);
-                      if (res == null) return;
-                      if (!context.mounted) return;
-                      await context.read<ReadProductCategoryCubit>().putProductCategoryFirst(res);
+                    onPressed: () {
+                      showCreateProductCategoryDialog(context);
                     },
                     icon: const Icon(Icons.add),
                     label: const Text("Agregar Categoria de Producto"),

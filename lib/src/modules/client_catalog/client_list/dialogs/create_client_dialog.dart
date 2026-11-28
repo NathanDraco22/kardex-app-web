@@ -42,14 +42,20 @@ class WriteClientDialog extends StatefulWidget {
 class _WriteClientDialogState extends State<WriteClientDialog> {
   final formKey = GlobalKey<FormState>();
   final creationMap = {};
+  late final TextEditingController _groupController;
 
   bool isActive = true;
   bool isCreditActive = true;
   int creditLimit = 0;
   int defaultPriceLevel = 1;
+  String? _selectedGroupName;
 
   @override
   void initState() {
+    final currentGroup = widget.client?.group.trim();
+    _selectedGroupName = (currentGroup == null || currentGroup.isEmpty) ? null : currentGroup;
+    _groupController = TextEditingController(text: _selectedGroupName ?? '');
+
     if (widget.client != null) {
       creationMap['coordinates'] = widget.client!.coordinates;
       creationMap['personalReferences'] = List<PersonalReference>.from(widget.client!.personalReferences);
@@ -60,6 +66,26 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
       defaultPriceLevel = 1;
     }
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _groupController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _openGroupSelector() async {
+    final result = await showClientGroupSelectionDialog(
+      context,
+      selectedGroupName: _selectedGroupName,
+    );
+    if (!mounted || result == null) return;
+
+    setState(() {
+      _selectedGroupName = result.group?.name;
+      _groupController.text = result.group?.name ?? '';
+      creationMap['group'] = result.group?.name ?? '';
+    });
   }
 
   @override
@@ -250,55 +276,15 @@ class _WriteClientDialogState extends State<WriteClientDialog> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              const Text(
-                                "Grupo de Clientes",
-                                textAlign: TextAlign.start,
-                              ),
-                              const SizedBox(height: 6),
-                              Builder(
-                                builder: (context) {
-                                  final groupsRepo = context.read<ClientGroupsRepository>();
-                                  ClientGroupInDb? currentGroup;
-                                  if (widget.client != null) {
-                                    for (var g in groupsRepo.clientGroups) {
-                                      if (g.name == widget.client!.group) {
-                                        currentGroup = g;
-                                        break;
-                                      }
-                                    }
-                                  }
-
-                                  return CustomAutocompleteTextfield<ClientGroupInDb>(
-                                    initValue: currentGroup,
-                                    onClose: (value) => creationMap['group'] = value.name,
-                                    onFieldSubmitted: (value) {
-                                      FocusScope.of(context).nextFocus();
-                                    },
-                                    onSearch: (value) {
-                                      return groupsRepo.searchClientGroupByKeywordLocal(value);
-                                    },
-                                    suggestionBuilder: (value, close) {
-                                      return ListView.builder(
-                                        itemCount: value.length,
-                                        shrinkWrap: true,
-                                        itemBuilder: (context, index) => ListTile(
-                                          title: Text(value[index].name),
-                                          onTap: () {
-                                            creationMap['group'] = value[index].name;
-                                            close(value[index]);
-                                            FocusScope.of(context).nextFocus();
-                                          },
-                                        ),
-                                      );
-                                    },
-                                    titleBuilder: (value) => value.name,
-                                  );
-                                },
-                              ),
-                            ],
+                          child: TitleTextField(
+                            title: "Grupo de Clientes",
+                            controller: _groupController,
+                            readOnly: true,
+                            onTap: _openGroupSelector,
+                            decoration: const InputDecoration(
+                              hintText: "Sin grupo",
+                              suffixIcon: Icon(Icons.arrow_drop_down),
+                            ),
                           ),
                         ),
                         SecondaryMenuButton(

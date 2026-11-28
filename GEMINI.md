@@ -1,3 +1,24 @@
+## Categorías de Producto Reactivas y Selector Global (Noviembre 2026)
+
+- **Repositorio:** `ProductCategoriesRepository` usa `ReactiveRepository<ProductCategoryInDb>` y elimina su caché interna, el getter `productCategories` y `searchProductCategoryByKeywordLocal`; `createProductCategory`, `updateProductCategoryById` y `deleteProductCategoryById` notifican por `eventStream`. Se conserva la búsqueda remota `searchProductCategoryByKeyword`.
+- **Cubits:** `ReadProductCategoryCubit` y `WriteProductCategoryCubit` se movieron a `lib/src/cubits/product_category_cubit/` (se borró la carpeta antigua del módulo) y son globales en `GlobalCubitProvider` (registrados en `getIt` y con `RepositoryProvider.dispose` para el stream). El read cubit escucha eventos, ordena A-Z, expone `ensureLoaded`/`clear`, descarta cargas viejas con contador de generación y emite `HighlightedProductCategory` para conservar el resaltado de creados/actualizados. `AuthCubit` carga categorías al inicializar sesión y las limpia en logout/exit.
+- **UI:** nuevo selector `lib/widgets/dialogs/selectors/product_category_selection_dialog.dart` con filtrado local por nombre, opción "Sin categoría", reintento y botón "Crear Categoría de Producto" (crea y selecciona). Nuevo `product_category_selector_field.dart` reutilizable, exportado desde `widgets.dart`; reemplaza los autocompletados de categoría en `create_product_dialog.dart` y `create_product_with_data_dialog.dart`.
+- **Listado de productos:** `ReadProductCubit` ya no recibe ni carga categorías; la pantalla de categorías usa los cubits globales y solo llama `ensureLoaded()`, y las acciones de crear/editar dependen del evento del repositorio (se eliminaron `putProductCategoryFirst`, `markProductCategoryUpdated` y `refreshProductCategory`).
+- **Tests:** nuevo `product_category_reactive_test.dart` (carga única, alta por evento sin reconsultar); `product_list_visual_test.dart` ajustado al `ReadProductCubit` sin repositorio de categorías.
+- **Verificación:** `flutter analyze --no-pub` y `dart analyze packages/kardex_business` sin issues; tests dirigidos 24/24 aprobados. Sin commit.
+- **Documentación:** actualizados `wiki/modules/product_catalog.md`, `packages/kardex_business/README.md` y `README_ES.md`.
+- **Regla `main`/`lite`:** cambio de código compartido; la sincronización con `lite` queda pendiente.
+
+## Grupos de Clientes Reactivos y Selector Global (Noviembre 2026)
+
+- **Repositorio:** `ClientGroupsRepository` usa `ReactiveRepository<ClientGroupInDb>` y elimina su caché interna; `createClientGroup`, `updateClientGroupById` y `deleteClientGroupById` notifican por `eventStream`.
+- **Cubits:** `ReadClientGroupCubit` y `WriteClientGroupCubit` se movieron a `lib/src/cubits/client_group_cubit/` y son globales en `GlobalCubitProvider` (registrados en `getIt`). El read cubit escucha eventos, ordena alfabéticamente y expone `ensureLoaded`/`clear`; `AuthCubit` carga los grupos en la inicialización de sesión y los limpia en logout/exit.
+- **UI:** nuevo selector `lib/widgets/dialogs/selectors/client_group_selection_dialog.dart` con búsqueda local, opción "Sin grupo" y botón "Crear Grupo de Clientes"; reemplaza el autocompletado en `create_client_dialog.dart`. La pantalla de grupos y el formulario usan los cubits globales y la lista se refresca por eventos.
+- **Listado de clientes:** `ReadClientCubit` ya no carga grupos; solo clientes.
+- **Tests:** nuevo `client_group_reactive_test.dart` (carga única y actualización por evento); `gate_test`, `invoice_cancellation_requests_test`, `role_capabilities_test` y `app_settings_screen_test` se ajustaron al `AuthCubit` sin repositorio de grupos.
+- **Verificación:** `flutter analyze --no-pub` y `dart analyze packages/kardex_business` limpios; tests dirigidos 22/22 aprobados. Sin commit.
+- **Regla `main`/`lite`:** cambio de código compartido; la sincronización con `lite` queda pendiente.
+
 ## Abono Rápido con Dinero Recibido y Cambio (Noviembre 2026)
 
 - **Objetivo:** permitir que el abono rápido capture por separado el monto a abonar y el dinero recibido, y que el recibo muestre `Recibido` y `Cambio` contra el abono (no contra la deuda total).

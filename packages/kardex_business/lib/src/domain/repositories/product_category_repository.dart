@@ -1,20 +1,21 @@
 import 'package:kardex_business/src/data/data.dart';
 import 'package:kardex_business/src/domain/models/product_category/product_category_model.dart';
 import 'package:kardex_business/src/domain/responses/list_responses.dart';
+import 'package:kardex_business/src/tools/reactive_repo/reactive_repository.dart';
 
-class ProductCategoriesRepository {
+class ProductCategoriesRepository with ReactiveRepository<ProductCategoryInDb> {
   final ProductCategoriesDataSource productCategoriesDataSource;
 
   ProductCategoriesRepository(this.productCategoriesDataSource);
 
-  List<ProductCategoryInDb> _productCategories = [];
-
-  List<ProductCategoryInDb> get productCategories => _productCategories;
-
-  Future<ProductCategoryInDb> createProductCategory(CreateProductCategory createProductCategory) async {
-    final result = await productCategoriesDataSource.createProductCategory(createProductCategory.toJson());
+  Future<ProductCategoryInDb> createProductCategory(
+    CreateProductCategory createProductCategory,
+  ) async {
+    final result = await productCategoriesDataSource.createProductCategory(
+      createProductCategory.toJson(),
+    );
     final newCategory = ProductCategoryInDb.fromJson(result);
-    _productCategories = [newCategory, ..._productCategories];
+    notifyItemCreated(newCategory);
     return newCategory;
   }
 
@@ -25,37 +26,27 @@ class ProductCategoriesRepository {
       ProductCategoryInDb.fromJson,
     );
 
-    _productCategories = models.data;
-    _productCategories.sort(
-      (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
-    );
-    return _productCategories;
+    return models.data;
   }
 
   Future<ProductCategoryInDb?> getProductCategoryById(String categoryId) async {
-    final result = await productCategoriesDataSource.getProductCategoryById(categoryId);
+    final result = await productCategoriesDataSource.getProductCategoryById(
+      categoryId,
+    );
     if (result == null) return null;
     return ProductCategoryInDb.fromJson(result);
   }
 
-  Future<List<ProductCategoryInDb>> searchProductCategoryByKeyword(String keyword) async {
-    final result = await productCategoriesDataSource.searchProductCategoryByKeyword(keyword);
+  Future<List<ProductCategoryInDb>> searchProductCategoryByKeyword(
+    String keyword,
+  ) async {
+    final result = await productCategoriesDataSource
+        .searchProductCategoryByKeyword(keyword);
     final categories = ListResponse<ProductCategoryInDb>.fromJson(
       result,
       ProductCategoryInDb.fromJson,
     ).data;
     return categories;
-  }
-
-  Future<List<ProductCategoryInDb>> searchProductCategoryByKeywordLocal(String keyword) async {
-    final result = _productCategories
-        .where(
-          (cat) => cat.name.toLowerCase().contains(
-            keyword.toLowerCase(),
-          ),
-        )
-        .toList();
-    return result;
   }
 
   Future<ProductCategoryInDb?> updateProductCategoryById(
@@ -69,19 +60,20 @@ class ProductCategoriesRepository {
     if (result == null) return null;
 
     final updatedCategory = ProductCategoryInDb.fromJson(result);
-    final index = _productCategories.indexWhere((cat) => cat.id == categoryId);
-    if (index != -1) {
-      _productCategories[index] = updatedCategory;
-    }
+    notifyItemUpdated(updatedCategory);
     return updatedCategory;
   }
 
-  Future<ProductCategoryInDb?> deleteProductCategoryById(String categoryId) async {
-    final result = await productCategoriesDataSource.deleteProductCategoryById(categoryId);
+  Future<ProductCategoryInDb?> deleteProductCategoryById(
+    String categoryId,
+  ) async {
+    final result = await productCategoriesDataSource.deleteProductCategoryById(
+      categoryId,
+    );
     if (result == null) return null;
 
     final deletedCategory = ProductCategoryInDb.fromJson(result);
-    _productCategories.removeWhere((cat) => cat.id == categoryId);
+    notifyItemDeleted(deletedCategory);
     return deletedCategory;
   }
 }

@@ -11,20 +11,6 @@ class ReadClientGroupSuccess extends ReadClientGroupState {
   ReadClientGroupSuccess(this.clientGroups);
 }
 
-final class ClientGroupReadSearching extends ReadClientGroupSuccess {
-  ClientGroupReadSearching(super.clientGroups);
-}
-
-class HighlightedClientGroup extends ReadClientGroupSuccess {
-  List<ClientGroupInDb> newGroups;
-  List<ClientGroupInDb> updatedGroups;
-  HighlightedClientGroup(
-    super.clientGroups, {
-    this.newGroups = const [],
-    this.updatedGroups = const [],
-  });
-}
-
 final class ClientGroupReadError extends ReadClientGroupState {
   final String message;
   ClientGroupReadError(this.message);

@@ -18,7 +18,6 @@ lib/src/modules/product_catalog/
 │   ├── dialogs/                          # CreateProductDialog, FormSection
 │   └── view/product_list_screen.dart     # Pantalla maestra de productos
 ├── product_category/                     # Categorías y familias de productos
-│   ├── cubit/                            # ProductCategoryCubit
 │   ├── dialogs/                          # CreateCategoryDialog
 │   └── view/product_category_screen.dart # Gestión de categorías
 ├── units/                                # Unidades de medida individuales
@@ -42,18 +41,21 @@ lib/src/modules/product_catalog/
 - **Vistas:**
   - `ProductListScreen`: Tabla interactiva con búsqueda por texto, código de barras, SKU y código alternativo (`altCode`).
 - **Cubits:**
-  - `ReadProductCubit`: Consulta de productos con paginación, filtros de categoría y búsqueda rápida.
+  - `ReadProductCubit`: Consulta de productos con paginación, filtros de categoría y búsqueda rápida. Solo carga productos y unidades; las categorías viven en su propio cubit global.
   - `WriteProductCubit`: Creación (`createProduct`) y actualización (`updateProduct`) de productos.
 - **Diálogos Clave:**
   - `showCreateProductDialog`: Modal reutilizable para alta y edición de producto.
   - Campos soportados: Nombre, Código de barras, `altCode` (Código alternativo), Marca, Categoría, Unidad de medida base, Precio de venta sugerido y subida/selección de imagen.
+  - La categoría se elige con `ProductCategorySelectorField` (`lib/widgets/dialogs/selectors/product_category_selector_field.dart`), que abre el selector modal y permite crear una categoría sin salir del formulario.
 - **Factoría de Integración con Sucursales:**
   - Utiliza `productInBranchFromProduct` y la extensión `ProductInDbInBranchUpdateX` en `lib/src/tools/factories/product_in_branch_factory.dart` para reflejar cambios inmediatamente en inventarios de sucursal sin duplicar llamadas.
 
 ### 2.2. Categorías de Productos (`product_category`)
 - **Propósito:** Estructuración jerárquica de productos para facilitar búsquedas, reportes agrupados y filtrado en el POS.
-- **Vistas:** `ProductCategoryScreen`.
-- **Cubits:** `ProductCategoryCubit`.
+- **Vistas:** `ProductCategoryScreen` (llama `ensureLoaded()` al montar).
+- **Cubits globales:** `ReadProductCategoryCubit` y `WriteProductCategoryCubit` viven en `lib/src/cubits/product_category_cubit/`, se registran en `getIt` y se exponen desde `GlobalCubitProvider` (no hay providers locales en la pantalla).
+- **Repositorio reactivo:** `ProductCategoriesRepository` usa `ReactiveRepository<ProductCategoryInDb>` y ya no mantiene caché ni búsqueda local. `createProductCategory`, `updateProductCategoryById` y `deleteProductCategoryById` notifican `eventStream`; el read cubit mantiene la lista ordenada A-Z y emite `HighlightedProductCategory` para resaltar creados/actualizados en la tabla sin volver a consultar.
+- **Selector modal:** `showProductCategorySelectionDialog` (`lib/widgets/dialogs/selectors/product_category_selection_dialog.dart`) filtra localmente por nombre, ofrece "Sin categoría" y el botón "Crear Categoría de Producto" (crea y selecciona automáticamente). Se usa desde `ProductCategorySelectorField` en los formularios de alta/edición de producto.
 - **Acciones:**
   - Creación, actualización y eliminación de categorías.
   - Asignación de iconos o colores identificativos.
@@ -99,6 +101,8 @@ lib/src/modules/product_catalog/
 | Categorías | `ProductCategoriesDataSource` | `ProductCategoriesRepository` |
 | Unidades | `UnitsDataSource` | `UnitsRepository` |
 | Escalas de Unidades | `UnitScalesDataSource` | `UnitScalesRepository` |
+
+> `ProductCategoriesRepository` es reactivo (`ReactiveRepository<ProductCategoryInDb>`): no guarda caché y expone `eventStream` para que los cubits de lectura se actualicen tras crear, actualizar o eliminar.
 
 ---
 

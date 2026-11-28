@@ -8,6 +8,10 @@ import 'package:kardex_app_front/cubits/shortcuts/shortcuts_cubit.dart';
 import 'package:kardex_app_front/cubits/toast/toast_cubit.dart';
 import 'package:kardex_app_front/cubits/app_settings/app_settings_cubit.dart';
 import 'package:kardex_app_front/cubits/shift/shift_cubit.dart';
+import 'package:kardex_app_front/src/cubits/client_group_cubit/read_client_group_cubit.dart';
+import 'package:kardex_app_front/src/cubits/client_group_cubit/write_client_group_cubit.dart';
+import 'package:kardex_app_front/src/cubits/product_category_cubit/read_product_category_cubit.dart';
+import 'package:kardex_app_front/src/cubits/product_category_cubit/write_product_category_cubit.dart';
 
 import 'package:kardex_app_front/src/core/app_config_manager.dart';
 import 'package:kardex_app_front/src/core/app_kardex_config.dart';
@@ -60,10 +64,8 @@ class ProviderContainer extends StatelessWidget {
     final adjustEntryDatasource = AdjustEntriesDataSource();
     final adjustExitDatasource = AdjustExitsDataSource();
     final adjustmentRequestsDataSource = AdjustmentRequestsDataSource();
-    final invoiceCancellationRequestsDataSource =
-        InvoiceCancellationRequestsDataSource();
-    final receiptCancellationRequestsDataSource =
-        ReceiptCancellationRequestsDataSource();
+    final invoiceCancellationRequestsDataSource = InvoiceCancellationRequestsDataSource();
+    final receiptCancellationRequestsDataSource = ReceiptCancellationRequestsDataSource();
     final integrationsDataSource = IntegrationsDataSource();
     final clientGroupsDataSource = ClientGroupDataSource();
     final reportsDataSource = ReportsDataSource();
@@ -88,6 +90,7 @@ class ProviderContainer extends StatelessWidget {
 
         RepositoryProvider(
           create: (context) => ProductCategoriesRepository(productCateDataSource),
+          dispose: (repo) => repo.disposeReactiveRepo(),
         ),
 
         RepositoryProvider(
@@ -276,6 +279,7 @@ class ProviderContainer extends StatelessWidget {
         ),
         RepositoryProvider(
           create: (context) => ClientGroupsRepository(clientGroupsDataSource),
+          dispose: (repo) => repo.disposeReactiveRepo(),
         ),
         RepositoryProvider(
           create: (context) => ReportsRepository(reportsDataSource),
@@ -324,6 +328,10 @@ class _GlobalCubitProviderState extends State<GlobalCubitProvider> {
   late final AuthCubit _authCubit;
   late final AppSettingsCubit _appSettingsCubit;
   late final ShiftCubit _shiftCubit;
+  late final ReadClientGroupCubit _readClientGroupCubit;
+  late final WriteClientGroupCubit _writeClientGroupCubit;
+  late final ReadProductCategoryCubit _readProductCategoryCubit;
+  late final WriteProductCategoryCubit _writeProductCategoryCubit;
 
   @override
   void initState() {
@@ -334,12 +342,24 @@ class _GlobalCubitProviderState extends State<GlobalCubitProvider> {
     final clientGroupRepo = context.read<ClientGroupsRepository>();
     final appSettingsRepo = context.read<AppSettingsRepository>();
     final shiftsRepo = context.read<ShiftsRepository>();
+    final productCategoryRepo = context.read<ProductCategoriesRepository>();
+
+    _readClientGroupCubit = ReadClientGroupCubit(clientGroupRepo);
+    getIt.registerSingleton<ReadClientGroupCubit>(_readClientGroupCubit);
+
+    _writeClientGroupCubit = WriteClientGroupCubit(clientGroupRepo);
+    getIt.registerSingleton<WriteClientGroupCubit>(_writeClientGroupCubit);
+
+    _readProductCategoryCubit = ReadProductCategoryCubit(productCategoryRepo);
+    getIt.registerSingleton<ReadProductCategoryCubit>(_readProductCategoryCubit);
+
+    _writeProductCategoryCubit = WriteProductCategoryCubit(productCategoryRepo);
+    getIt.registerSingleton<WriteProductCategoryCubit>(_writeProductCategoryCubit);
 
     _authCubit = AuthCubit(
       authRepository: authRepo,
       branchesRepository: branchRepo,
       servinRepository: servinRepo,
-      clientGroupRepository: clientGroupRepo,
     );
     getIt.registerSingleton<AuthCubit>(_authCubit);
 
@@ -358,6 +378,14 @@ class _GlobalCubitProviderState extends State<GlobalCubitProvider> {
     _authCubit.close();
     getIt.unregister<AppSettingsCubit>();
     _appSettingsCubit.close();
+    getIt.unregister<WriteClientGroupCubit>();
+    _writeClientGroupCubit.close();
+    getIt.unregister<ReadClientGroupCubit>();
+    _readClientGroupCubit.close();
+    getIt.unregister<WriteProductCategoryCubit>();
+    _writeProductCategoryCubit.close();
+    getIt.unregister<ReadProductCategoryCubit>();
+    _readProductCategoryCubit.close();
     super.dispose();
   }
 
@@ -380,6 +408,10 @@ class _GlobalCubitProviderState extends State<GlobalCubitProvider> {
         ),
         BlocProvider.value(value: _appSettingsCubit),
         BlocProvider.value(value: _shiftCubit),
+        BlocProvider.value(value: _readClientGroupCubit),
+        BlocProvider.value(value: _writeClientGroupCubit),
+        BlocProvider.value(value: _readProductCategoryCubit),
+        BlocProvider.value(value: _writeProductCategoryCubit),
       ],
       child: widget.child,
     );

@@ -26,12 +26,9 @@ class _FakeAppSettingsRepository implements AppSettingsRepository {
   ) async {
     lastUpdate = body;
     _settings = _settings.copyWith(
-      allowCancellationsOutsideShift: body.allowCancellationsOutsideShift ??
-          _settings.allowCancellationsOutsideShift,
-      roundUpInvoiceTotals:
-          body.roundUpInvoiceTotals ?? _settings.roundUpInvoiceTotals,
-      useAbonoReceivedAmount:
-          body.useAbonoReceivedAmount ?? _settings.useAbonoReceivedAmount,
+      allowCancellationsOutsideShift: body.allowCancellationsOutsideShift ?? _settings.allowCancellationsOutsideShift,
+      roundUpInvoiceTotals: body.roundUpInvoiceTotals ?? _settings.roundUpInvoiceTotals,
+      useAbonoReceivedAmount: body.useAbonoReceivedAmount ?? _settings.useAbonoReceivedAmount,
     );
     return _settings;
   }
@@ -51,11 +48,6 @@ class _FakeBranchesRepository implements BranchesRepository {
 }
 
 class _FakeServinRepository implements ServinRepository {
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
-}
-
-class _FakeClientGroupsRepository implements ClientGroupsRepository {
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
@@ -87,7 +79,6 @@ void main() {
           authRepository: _FakeAuthRepository(),
           branchesRepository: _FakeBranchesRepository(),
           servinRepository: _FakeServinRepository(),
-          clientGroupRepository: _FakeClientGroupsRepository(),
         ),
       );
 
