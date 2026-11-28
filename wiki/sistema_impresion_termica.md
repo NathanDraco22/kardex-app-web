@@ -54,6 +54,7 @@ flowchart TD
    - Provee el método centralizado `printPdf(...)` con *fallback* transparente al spooler del sistema en caso de desconexión o fallo.
 3. **[`LocalPrinterSettingsDialog`](../lib/src/modules/settings/view/local_printer_settings_dialog.dart):**
    - Interfaz de usuario para buscar dispositivos cercanos, vincular/desvincular impresoras, alternar opciones de hardware y ejecutar páginas de prueba (*self-test*).
+   - Se abre desde **Configuración → Configuración de Impresora Local** y desde el **drawer del usuario → Impresora de este equipo**. Esta segunda entrada está disponible para cualquier usuario autenticado, sin exigir el permiso `Modules.settings`.
 4. **Impresores Específicos:**
    - [`invoice_printer.dart`](../lib/src/tools/printers/invoice_printer.dart), [`order_printer.dart`](../lib/src/tools/printers/order_printer.dart), [`receipt_printer.dart`](../lib/src/tools/printers/receipt_printer.dart), [`devolution_printer.dart`](../lib/src/tools/printers/devolution_printer.dart), [`cash_counter_ticket_printer.dart`](../lib/src/tools/printers/cash_counter_ticket_printer.dart) delegan directamente en `PrintManager.printPdf(...)`.
 
@@ -180,7 +181,7 @@ Durante el diseño y pruebas físicas de esta solución se identificaron problem
 
 ## 4. Guía de Uso para el Usuario Final
 
-1. **Acceso:** Ir al menú lateral o menú de opciones $\rightarrow$ **Configuración** $\rightarrow$ **Configuración de Impresora Local**.
+1. **Acceso:** Desde el Home, abrir el menú del usuario (avatar) $\rightarrow$ **Impresora de este equipo**. También está disponible en **Configuración** $\rightarrow$ **Configuración de Impresora Local**. El acceso por el drawer está disponible para cualquier usuario autenticado; los ajustes se guardan en el equipo y se comparten entre usuarios.
 2. **Seleccionar Formato:** Elegir entre **80 mm (Estándar)** o **58 mm (Compacto)**.
 3. **Activar Impresión Térmica Directa:** Activar el interruptor *"Impresión Térmica Directa (1 Clic)"*.
 4. **Buscar Dispositivos:** Pulsar el botón **"Buscar"**. La app solicitará permisos de Bluetooth y escaneará los dispositivos cercanos.

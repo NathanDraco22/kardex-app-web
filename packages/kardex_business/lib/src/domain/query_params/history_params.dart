@@ -6,6 +6,8 @@ class InvoiceQueryParams {
   DateTime? startDate;
   DateTime? endDate;
   String? createdBy;
+  int? cursorDate;
+  String? cursorId;
 
   Map<String, String> toMap() {
     final map = {
@@ -16,6 +18,8 @@ class InvoiceQueryParams {
       'offset': offset.toString(),
       'limit': limit.toString(),
       'createdBy': ?createdBy,
+      'cursorDate': ?cursorDate?.toString(),
+      'cursorId': ?cursorId,
     };
     return map;
   }

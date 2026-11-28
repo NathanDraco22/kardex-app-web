@@ -191,6 +191,14 @@ class _LocalPrinterSettingsDialogState extends State<_LocalPrinterSettingsDialog
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Text(
+                'Estos ajustes se guardan en este equipo y aplican a todos los usuarios.',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 16),
+
               // Sección: Tamaño de papel
               Text(
                 'Tamaño de Papel Térmico',

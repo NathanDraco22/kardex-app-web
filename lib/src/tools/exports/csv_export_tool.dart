@@ -93,6 +93,33 @@ class CsvExportTool {
     }
   }
 
+  static Future<void> exportProductSalesDetailToCSV({
+    required List<InvoiceInDb> invoices,
+    required ProductInDb product,
+    required String fileName,
+  }) async {
+    if (invoices.isEmpty) return;
+
+    final buffer = StringBuffer()..writeln("Fecha,Factura,Cliente,Cantidad,Importe");
+
+    for (final invoice in invoices) {
+      final productLine = invoice.productLine(product.id);
+      if (productLine.isEmpty) continue;
+
+      final date =
+          "${DateTimeTool.formatddMMyy(invoice.createdAt)} ${DateTimeTool.formatHHmm(invoice.createdAt)}";
+      final client = invoice.clientInfo.name.replaceAll('"', '""');
+      final quantity = productLine.quantityText.replaceAll('"', '""');
+      final amount = NumberFormatter.convertFromCentsToUnitsCurrency(productLine.total);
+
+      buffer.writeln(
+        '"$date","#${invoice.docNumber}","$client","$quantity","$amount"',
+      );
+    }
+
+    await saveCsvContent(fileName: fileName, content: buffer.toString());
+  }
+
   static Future<void> exportExpensesToCSV({
     required List<ExpenseInDb> expenses,
     required String fileName,

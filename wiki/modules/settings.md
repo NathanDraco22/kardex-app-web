@@ -49,6 +49,7 @@ lib/src/modules/settings/
   - Impresoras de tickets térmicos (ancho 58mm / 80mm, USB o Bluetooth) con soporte de impresión directa nativa ESC/POS en 1 clic y fallback automático al diálogo del sistema.
   - Ver guía técnica completa, arquitectura y post-mortems en [Sistema de Impresión Térmica Directa](../sistema_impresion_termica.md).
   - Diálogo de configuración local interactivo: `LocalPrinterSettingsDialog` (`lib/src/modules/settings/view/local_printer_settings_dialog.dart`), accesible desde el menú de Ajustes en móvil y escritorio para vincular impresoras, calibrar papel, invertir polaridad, tramado halftone y pruebas de impresión.
+  - El mismo diálogo se abre desde el **drawer del usuario → Impresora de este equipo**, disponible para cualquier usuario autenticado sin exigir el permiso `Modules.settings`. La configuración se guarda en Hive por equipo y se comparte entre usuarios.
   - Lectores de códigos de barras (modo emulación teclado o serial).
   - Balanzas electrónicas y cajones portamonedas.
 - **Vistas:** `IntegrationsScreen`, `LocalPrinterSettingsDialog`.

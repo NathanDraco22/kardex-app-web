@@ -18,6 +18,8 @@ export 'common/exit_items.dart';
 export 'common/order_info.dart';
 export 'common/payment_detail.dart';
 export 'common/product_sale_total.dart';
+export 'common/product_invoice_line.dart';
+export 'common/product_sales_summary.dart';
 export 'common/product_stock_demand.dart';
 export 'common/sale_item_model.dart';
 export 'common/transfer_item.dart';

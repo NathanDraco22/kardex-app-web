@@ -643,11 +643,11 @@ Cada repositorio sigue el patrón CRUD estándar cuando aplica:
 ---
 
 #### InvoicesRepository
-**Propósito**: El repositorio más grande del paquete (15 métodos). Gestiona el ciclo completo de facturación: creación de facturas, consultas paginadas, filtros por cliente, facturas pendientes de pago, facturas pagadas, totalizadores, ventas por producto, historial y búsqueda por número de documento. Incluye soporte para **facturas anónimas** (cliente de mostrador `kSaleClientId`). Usa dos DataSources (`InvoicesDataSource` e `InvoiceDevolutionsDataSource`).
+**Propósito**: El repositorio más grande del paquete (17 métodos). Gestiona el ciclo completo de facturación: creación de facturas, consultas paginadas, filtros por cliente, facturas pendientes de pago, facturas pagadas, totalizadores, ventas por producto, ventas de un producto, historial y búsqueda por número de documento. Incluye soporte para **facturas anónimas** (cliente de mostrador `kSaleClientId`). Usa dos DataSources (`InvoicesDataSource` e `InvoiceDevolutionsDataSource`).
 
 | Característica | Detalle |
 |---|---|
-| Modelos | `InvoiceInDb`, `CreateInvoice`, `UpdateInvoice`, `InvoiceTotals`, `ProductSalesTotal`, `InvoiceDevolutionResponse` |
+| Modelos | `InvoiceInDb`, `CreateInvoice`, `UpdateInvoice`, `InvoiceTotals`, `ProductSalesTotal`, `ProductSalesSummary`, `InvoiceDevolutionResponse` |
 | Query Params | `InvoiceQueryParams` |
 | Cache en memoria | No |
 | `ListResponse` | ✓ |
@@ -670,6 +670,7 @@ Cada repositorio sigue el patrón CRUD estándar cuando aplica:
 | `getInvoiceByDocNumber` | `Future<InvoiceInDb> getInvoiceByDocNumber(String docNumber)` | Busca una factura por número de documento. |
 | `getAnonInvoiceDevolutionByDocNumber` | `Future<InvoiceDevolutionResponse> getAnonInvoiceDevolutionByDocNumber(String docNumber)` | Obtiene datos de devolución de factura anónima por número de documento. |
 | `getInvoicesByProduct` | `Future<ListResponse<InvoiceInDb>> getInvoicesByProduct(String productId, InvoiceQueryParams params)` | Obtiene facturas que contienen un producto específico. |
+| `getProductSalesSummary` | `Future<ProductSalesSummary> getProductSalesSummary(String productId, InvoiceQueryParams params)` | Obtiene el resumen agregado de ventas de un producto (facturas, cantidades y monto). |
 
 ---
 

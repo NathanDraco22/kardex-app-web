@@ -4,6 +4,8 @@
 > **Alias interno:** `Decision Object`.
 > **Implementación de referencia:** `AppSettingsPolicy` en `packages/kardex_business/lib/src/core/policies/app_settings/`.
 
+> **Ubicación obligatoria (frontend y backend):** toda policy vive en `packages/kardex_business/lib/src/core/policies/<dominio>/`, con una subcarpeta por dominio. No se crean policies en `lib/`, en `lib/src/modules/` ni fuera del paquete de negocio. El backend replica la misma estructura en `packages/kardex-business/src/kardex/core/policies/<dominio>/`.
+
 ---
 
 ## 1. Qué problema resuelve
@@ -38,7 +40,7 @@ La pantalla ya no combina banderas: pregunta por la decisión de negocio.
 
 Un `Policy`:
 
-- Vive en `packages/kardex_business/lib/src/core/policies/<dominio>/`.
+- Vive en `packages/kardex_business/lib/src/core/policies/<dominio>/`, con una subcarpeta por dominio. No se admiten policies sueltas en `core/policies/` ni en otras capas.
 - Es **Dart puro**: no importa Flutter, no hace HTTP, no consulta repositorios.
 - Recibe su contexto por constructor o parámetro (por ejemplo, `AppSettingModel`).
 - No muta estado.
@@ -165,7 +167,7 @@ El mismo patrón aplica al servidor, pero con una separación adicional:
 - **Policy:** decisión pura, recibe modelos y devuelve `bool`, `Enum` o un `@dataclass` de resultado.
 - **Core / Orchestrator:** consulta Mongo, maneja transacciones y llama a la policy.
 
-En el backend, `AppSettingsTool` sigue siendo el acceso a la configuración; `AppSettingsPolicy` sería la interpretación de esas banderas. La implementación queda pendiente por instrucción explícita.
+En el backend, `AppSettingsTool` sigue siendo el acceso a la configuración y `AppSettingsPolicy` interpreta esas banderas. Las policies viven en `packages/kardex-business/src/kardex/core/policies/<dominio>/`, con la misma separación entre policy pura y orquestador.
 
 ---
 

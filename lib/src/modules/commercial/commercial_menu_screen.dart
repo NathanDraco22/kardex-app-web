@@ -267,8 +267,8 @@ class _Body extends StatelessWidget {
               child: MenuOptionCard(
                 icon: Icons.find_in_page_rounded,
                 accentColor: Colors.green.shade800,
-                title: "Buscar facturas por producto",
-                subtitle: "Facturas asociadas a un artículo específico",
+                title: "Ventas de un Producto",
+                subtitle: "Facturas y detalle de ventas de un artículo",
                 onTap: () => context.pushNamed("invoices-by-product"),
               ),
             ),

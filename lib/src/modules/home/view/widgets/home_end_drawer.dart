@@ -13,9 +13,11 @@ class HomeEndDrawer extends StatelessWidget {
   const HomeEndDrawer({
     super.key,
     required this.user,
+    this.onOpenLocalPrinterSettings,
   });
 
   final UserInDbWithRole user;
+  final VoidCallback? onOpenLocalPrinterSettings;
 
   @override
   Widget build(BuildContext context) {
@@ -113,6 +115,24 @@ class HomeEndDrawer extends StatelessWidget {
                   context.goNamed("admin-panel");
                 },
               ),
+
+            ListTile(
+              leading: const Icon(
+                Icons.print_rounded,
+                color: Colors.blue,
+              ),
+              title: const Text(
+                "Impresora de este equipo",
+                style: TextStyle(fontSize: 16),
+              ),
+              subtitle: const Text(
+                "Ajustes compartidos por todos los usuarios",
+              ),
+              onTap: () {
+                Navigator.of(context).pop();
+                onOpenLocalPrinterSettings?.call();
+              },
+            ),
 
             const Spacer(),
             ListTile(

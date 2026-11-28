@@ -1,3 +1,20 @@
+## Convención transversal de policies (Noviembre 2026)
+
+- **Regla documentada:** toda policy vive en `packages/kardex_business/lib/src/core/policies/<dominio>/`, con una subcarpeta por dominio. El backend replica la estructura en `packages/kardex-business/src/kardex/core/policies/<dominio>/`.
+- **Alcance:** no se crean policies en `lib/`, `lib/src/modules/` ni fuera del paquete de negocio. Las decisiones compartidas van en la subcarpeta común equivalente.
+- **Documentación:** actualizados `wiki/policy_object.md`, `AGENTS.md` del workspace, `wiki/conventions.md` del servidor y el OKF (`AGENTS.md`, `README.md`, `policy_object.md` front/back y `log.md`).
+- **Regla `main`/`lite`:** cambio de documentación compartida; no modifica código ni requiere sincronización de código.
+
+## Acceso a configuración de impresora desde el drawer (Noviembre 2026)
+
+- **Alcance:** agregado un acceso directo a la configuración de impresora local en el drawer del usuario, disponible para cualquier usuario autenticado y sin exigir el permiso `Modules.settings` (`main`; sincronización con `lite` pendiente por instrucción del usuario).
+- **UI:** `home_screen.dart` pasa el callback `onOpenLocalPrinterSettings` a `HomeEndDrawer`; el drawer muestra el ítem **"Impresora de este equipo"** con el subtítulo "Ajustes compartidos por todos los usuarios". El diálogo existente se reutiliza sin cambios de persistencia.
+- **Alcance del ajuste:** se agregó al diálogo la nota "Estos ajustes se guardan en este equipo y aplican a todos los usuarios".
+- **Persistencia:** sin cambios; se conserva la caja Hive `LocalPrintSettings` y sus claves, por lo que no hay migración.
+- **Verificación:** `flutter analyze --no-pub` limpio y `flutter test --no-pub` con 439 pruebas aprobadas.
+- **Documentación:** actualizados `wiki/sistema_impresion_termica.md` y `wiki/modules/settings.md`.
+- **Regla `main`/`lite`:** cambios solo en `main`; la sincronización con `lite` queda pendiente por instrucción del usuario.
+
 ## Fix del test de devoluciones (Noviembre 2026)
 
 - **Problema:** `devolutions_selection_test.dart` fallaba porque `DevolutionsScreenWeb._openDevolutionSelection` lee `CreditNotesRepository` del contexto y el test solo proveía `InvoicesRepository`.

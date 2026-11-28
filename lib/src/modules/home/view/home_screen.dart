@@ -9,6 +9,7 @@ import 'package:kardex_app_front/cubits/toast/toast_cubit.dart';
 import 'package:kardex_app_front/cubits/near_expiration/near_expiration_cubit.dart';
 import 'package:kardex_app_front/config/get_it_config.dart';
 import 'package:kardex_app_front/src/core/access_manager.dart';
+import 'package:kardex_app_front/src/modules/settings/view/local_printer_settings_dialog.dart';
 import 'package:kardex_app_front/src/tools/extensiones.dart';
 import 'package:kardex_business/kardex_business.dart';
 
@@ -118,7 +119,10 @@ class _RootScaffold extends StatelessWidget {
                       ? FloatingActionButtonLocation.endFloat
                       : FloatingActionButtonLocation.centerTop)
                 : null,
-            endDrawer: HomeEndDrawer(user: user),
+            endDrawer: HomeEndDrawer(
+              user: user,
+              onOpenLocalPrinterSettings: () => showLocalPrinterSettingsDialog(context),
+            ),
             appBar: AppBar(
               title: CompanyLogo(
                 imageUrl: policy.companyLogoUrl,

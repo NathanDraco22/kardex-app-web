@@ -3,6 +3,7 @@ import 'package:kardex_business/src/data/data.dart';
 import 'package:kardex_business/src/domain/models/invoice/invoice_model.dart';
 import 'package:kardex_business/src/domain/models/invoice/invoice_totals.dart';
 import 'package:kardex_business/src/domain/models/common/product_sale_total.dart';
+import 'package:kardex_business/src/domain/models/common/product_sales_summary.dart';
 import 'package:kardex_business/src/domain/query_params/history_params.dart';
 import 'package:kardex_business/src/domain/responses/invoice_devolution_response.dart';
 import 'package:kardex_business/src/domain/responses/list_responses.dart';
@@ -159,5 +160,13 @@ class InvoicesRepository {
     final res = await invoicesDataSource.getInvoicesByProduct(productId, params.toMap());
     final result = ListResponse<InvoiceInDb>.fromJson(res, InvoiceInDb.fromJson);
     return result;
+  }
+
+  Future<ProductSalesSummary> getProductSalesSummary(
+    String productId,
+    InvoiceQueryParams params,
+  ) async {
+    final res = await invoicesDataSource.getProductSalesSummary(productId, params.toMap());
+    return ProductSalesSummary.fromJson(res);
   }
 }

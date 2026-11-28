@@ -21,7 +21,7 @@ lib/src/modules/commercial/
 ├── daily_anon_invoinces/                # Facturas anónimas del día
 ├── daily_receipt/ & receipt_history/    # Recibos diarios e historial global de recibos
 ├── invoice_history/                     # Historial maestro de facturas emitidas
-├── invoice_by_product/                  # Auditoría de ventas por producto
+├── invoice_by_product/                  # Ventas de un Producto: facturas y detalle por artículo
 ├── devolutions/ & client_devolution/    # Creación y emisión de notas de devolución
 ├── current_devolutions/ & devolution_history/ # Historial y estado de devoluciones
 ├── credit_notes/                        # Gestión y emisión reactiva de notas de crédito
@@ -81,7 +81,7 @@ lib/src/modules/commercial/
 
 ### 2.6. Historiales y Auditorías
 - **`invoice_history` / `receipt_history`:** Pantallas para consultar, reimprimir o filtrar facturas y recibos con `HistoryParams` (rango de fechas, cliente, sucursal, estado).
-- **`invoice_by_product`:** Permite saber con precisión qué facturas incluyeron determinado producto.
+- **`invoice_by_product`:** **Ventas de un Producto**. Consulta las facturas que incluyen un artículo específico con rango de fechas, filtro de cliente y usuario, resumen de facturas/unidades/monto y visor de factura al tocar. Excluye facturas anuladas.
 - **`user_operations_results`:** Muestra el desglose de ventas, cobros y anulaciones agrupados por usuario para el cierre de turno y arqueo de caja.
 
 ---
@@ -119,6 +119,7 @@ lib/src/modules/commercial/
 - `/commercial/client-invoices`: Facturación nominativa.
 - `/commercial/anon-invoices`: Facturas a consumidor final.
 - `/commercial/invoice-history`: Historial maestro de facturación.
+- `/commercial/invoices-by-product`: Ventas de un Producto (facturas y detalle de ventas por artículo).
 - `/commercial/receipt-history`: Historial de recibos.
 - `/commercial/devolutions`: Registro de devoluciones.
 - `/commercial/devolution-history`: Historial de devoluciones.

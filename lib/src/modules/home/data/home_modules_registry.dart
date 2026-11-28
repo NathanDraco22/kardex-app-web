@@ -377,8 +377,8 @@ List<HomeModuleCategory> getHomeModuleCategories(
           ),
           const HomeSubmoduleItem(
             section: "Punto de Venta y Facturación",
-            title: "Buscar Facturas por Producto",
-            subtitle: "Localización de transacciones por artículo",
+            title: "Ventas de un Producto",
+            subtitle: "Facturas y detalle de ventas por artículo",
             icon: Icons.find_in_page_rounded,
             accentColor: Color(0xFF15803D),
             routeName: "invoices-by-product",

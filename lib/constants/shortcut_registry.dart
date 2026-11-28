@@ -77,12 +77,12 @@ class ShortcutRouteRegistry {
       color: Color(0xFF43A047),
     ),
     RouteNames.invoicesByProduct: const ShortcutInfo(
-      title: "Buscar facturas por producto",
+      title: "Ventas de un Producto",
       icon: Icons.find_in_page_rounded,
       color: Color(0xFF2E7D32),
     ),
     RouteNames.dailyProductSales: const ShortcutInfo(
-      title: "Ventas diarias por Producto",
+      title: "Ventas por Producto",
       icon: FluentIcons.building_retail_money_24_filled,
       color: Color(0xFFFB8C00),
     ),
