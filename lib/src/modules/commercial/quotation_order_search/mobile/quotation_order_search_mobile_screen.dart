@@ -26,7 +26,7 @@ class QuotationOrderSearchMobileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Buscador de Cotizaciones/Órdenes'),
+        title: const Text('Cotizaciones'),
         actions: [
           BlocBuilder<ReadQuotationOrderSearchCubit, ReadQuotationOrderSearchState>(
             builder: (context, state) {
@@ -318,7 +318,7 @@ class _MobileFiltersState extends State<_MobileFilters> {
                     onPressed: () async {
                       final state = readCubit.state as ReadQuotationOrderSearchSuccess;
                       final template = OrdersByUserTemplate(
-                        title: 'Buscador de Cotizaciones/Órdenes',
+                        title: 'Cotizaciones',
                         userInfo: _selectedUser != null
                             ? UserInfo(id: _selectedUser!.id, name: _selectedUser!.username)
                             : null,

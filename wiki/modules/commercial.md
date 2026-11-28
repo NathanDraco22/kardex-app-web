@@ -68,9 +68,9 @@ lib/src/modules/commercial/
 
 ### 2.3. Cotizaciones y Proformas (`proforma` y `current_proforma`)
 - **Propósito:** Permite generar propuestas comerciales y presupuestos sin descontar stock físico del inventario.
-- **Vistas:** `ProformaScreen`, `CurrentProformaScreen`.
+- **Vistas:** `ProformaScreen`. La ruta heredada `proforma-history` (`CurrentProformaScreen`) permanece oculta, sin accesos en Home ni en el menú Comercial.
 - **Flujo de Conversión:**
-  - Una proforma puede buscarse desde `QuotationOrderSearchScreen` y cargarse directamente en la pantalla de facturación o terminal de ventas para convertirse en venta final.
+  - La entrada visible **Cotizaciones** abre `QuotationOrderSearchScreen`, que concentra historial, filtros y conversión. Una proforma puede buscarse allí y cargarse directamente en la pantalla de facturación o terminal de ventas para convertirse en venta final.
   - **Turnos:** la conversión de una orden o cotización a factura resuelve la decisión con `AppSettingsPolicy.convertedOrderShiftPolicy` (`never` / `optional` / `required`). Solo se carga al turno si `useShifts` y `chargeConvertedOrdersToShift` están activos; con `requireShiftForConvertedOrders` se exige un turno abierto en la sucursal y la conversión se cancela si no existe. Ver [`settings.md`](./settings.md) y [`policy_object.md`](../policy_object.md).
 
 ### 2.4. Devoluciones (`devolutions`, `client_devolution`, `devolution_history`)
@@ -145,7 +145,7 @@ El módulo Comercial interactúa de forma directa y reactiva con la configuraci�
 | Bandera en `AppSettings` | Filtro Asociado | Herramientas y Submódulos Afectados | Comportamiento si está Deshabilitado |
 | :--- | :--- | :--- | :--- |
 | `useOrders` | `OrdersGateFilter` | Órdenes de Compra (`current-orders`), Crear Orden (`sale-order`), Crear Orden Mayorista (`sale-order-wholesale`), Productos en Órdenes (`daily-product-in-orders`). | Oculta automáticamente las tarjetas y opciones en Desktop y Móvil. |
-| `useQuotations` | `QuotationsGateFilter` | Historial de Cotizaciones (`proforma-history`), Crear Cotización (`proforma`), Crear Cotización Mayorista (`proforma-wholesale`), Cotizaciones vs Existencias (`product-demand-vs-stock`). | Oculta las opciones y el separador completo de sección de cotizaciones. |
-| `useOrders` o `useQuotations` | `AnyGateFilter([QuotationsGateFilter(), OrdersGateFilter()])` | Buscador de Cotizaciones / Órdenes (`quotation-order-search`). | Solo se muestra si al menos una de las dos modalidades está activa en la configuración. |
+| `useQuotations` | `QuotationsGateFilter` | Crear Cotización (`proforma`), Crear Cotización Mayorista (`proforma-wholesale`), Cotizaciones vs Existencias (`product-demand-vs-stock`). | Oculta las opciones y el separador completo de sección de cotizaciones. |
+| `useOrders` o `useQuotations` | `AnyGateFilter([QuotationsGateFilter(), OrdersGateFilter()])` | Cotizaciones (`quotation-order-search`): historial, filtros y conversión de cotizaciones y órdenes. | Solo se muestra si al menos una de las dos modalidades está activa en la configuración. |
 | `useExpirationDates` | `ExpirationDateGateFilter` | Bitácora de Vencimientos (`expiration-logs`), columnas de lotes y fechas de caducidad. | Oculta la herramienta si la sucursal o las configuraciones globales tienen apagado el control de caducidad. |
 

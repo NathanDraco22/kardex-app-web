@@ -125,7 +125,7 @@ class _HeaderSectionState extends State<_HeaderSection> {
                             final state = readCubit.state as ReadQuotationOrderSearchSuccess;
 
                             final template = OrdersByUserTemplate(
-                              title: 'Buscador de Cotizaciones/Órdenes',
+                              title: 'Cotizaciones',
                               userInfo: currentSelectedUser != null
                                   ? UserInfo(
                                       id: currentSelectedUser!.id,

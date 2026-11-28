@@ -1,3 +1,15 @@
+## Cotizaciones unificadas en una sola entrada (Noviembre 2026)
+
+- **Objetivo:** eliminar la duplicidad entre `Cotizaciones (Historial)` y `Buscador de Cotizaciones/Órdenes`, dejando una sola entrada visible llamada **Cotizaciones**.
+- **Home:** se retiró el `HomeSubmoduleItem` de `proforma-history`; el ítem `quotation-order-search` ahora se muestra como **Cotizaciones**, en primer lugar de la sección, con el subtítulo "Consulta y búsqueda por cliente o fecha".
+- **Menú Comercial:** se retiró la tarjeta de historial (`RouteNames.proformaHistory`) y se renombró el buscador a **Cotizaciones**, ubicándolo antes de "Crear Cotización".
+- **Pantallas:** AppBar web/móvil, encabezado móvil y título del PDF del módulo `quotation_order_search` ahora dicen **Cotizaciones**.
+- **Atajos:** se eliminó `RouteNames.proformaHistory` de `shortcut_registry.dart` y se renombró el atajo de `quotation-order-search` a **Cotizaciones**.
+- **Legado:** la ruta `proforma-history` y `CurrentProformaScreen` se conservan ocultas; no se modificó el filtro inicial del buscador, que sigue abriendo con la fecha de hoy.
+- **Documentación:** actualizados `wiki/modules/commercial.md` y `wiki/sistema_gates.md`.
+- **Verificación:** `flutter analyze --no-pub` sin issues; `flutter test test/gate_test.dart --no-pub` 7/7 aprobados.
+- **Regla `main`/`lite`:** cambio de UI/navegación compartido; la sincronización con `lite` queda pendiente.
+
 ## Categorías de Producto Reactivas y Selector Global (Noviembre 2026)
 
 - **Repositorio:** `ProductCategoriesRepository` usa `ReactiveRepository<ProductCategoryInDb>` y elimina su caché interna, el getter `productCategories` y `searchProductCategoryByKeywordLocal`; `createProductCategory`, `updateProductCategoryById` y `deleteProductCategoryById` notifican por `eventStream`. Se conserva la búsqueda remota `searchProductCategoryByKeyword`.

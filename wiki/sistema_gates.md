@@ -167,7 +167,7 @@ En [`home_modules_registry.dart`](../lib/src/modules/home/data/home_modules_regi
 ```dart
 const HomeSubmoduleItem(
   section: "Cotizaciones y Proformas",
-  title: "Buscador de Cotizaciones/Órdenes",
+  title: "Cotizaciones",
   icon: Icons.manage_search,
   routeName: "quotation-order-search",
   gates: [

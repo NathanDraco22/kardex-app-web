@@ -351,19 +351,19 @@ class _Body extends StatelessWidget {
 
           Gate(
             filters: const [
-              QuotationsGateFilter(),
+              AnyGateFilter([QuotationsGateFilter(), OrdersGateFilter()]),
               RolePermissionGateFilter(
                 permissions: [CommercialSubModules.orders],
               ),
             ],
             child: ShortcutAddableListTile(
-              routeName: RouteNames.proformaHistory,
+              routeName: RouteNames.quotationOrderSearch,
               child: MenuOptionCard(
-                icon: FluentIcons.clipboard_search_24_filled,
-                accentColor: Colors.blue.shade600,
+                icon: Icons.manage_search,
+                accentColor: Colors.indigo.shade600,
                 title: "Cotizaciones",
-                subtitle: "Historial y seguimiento de presupuestos",
-                onTap: () => context.pushNamed("proforma-history"),
+                subtitle: "Consulta y búsqueda por cliente o fecha",
+                onTap: () => context.pushNamed("quotation-order-search"),
               ),
             ),
           ),
@@ -400,24 +400,6 @@ class _Body extends StatelessWidget {
                 title: "Crear Cotización (Mayorista)",
                 subtitle: "Cotización con tarifas al por mayor",
                 onTap: () => context.pushNamed("proforma-wholesale"),
-              ),
-            ),
-          ),
-          Gate(
-            filters: const [
-              AnyGateFilter([QuotationsGateFilter(), OrdersGateFilter()]),
-              RolePermissionGateFilter(
-                permissions: [CommercialSubModules.orders],
-              ),
-            ],
-            child: ShortcutAddableListTile(
-              routeName: RouteNames.quotationOrderSearch,
-              child: MenuOptionCard(
-                icon: Icons.manage_search,
-                accentColor: Colors.indigo.shade600,
-                title: "Buscador de Cotizaciones/Órdenes",
-                subtitle: "Rastreo por folio, fecha o cliente",
-                onTap: () => context.pushNamed("quotation-order-search"),
               ),
             ),
           ),

@@ -29,7 +29,7 @@ class QuotationOrderSearchScreenWeb extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Buscador de Cotizaciones/Órdenes'),
+        title: const Text('Cotizaciones'),
         actions: [
           BlocBuilder<ReadQuotationOrderSearchCubit, ReadQuotationOrderSearchState>(
             builder: (context, state) {

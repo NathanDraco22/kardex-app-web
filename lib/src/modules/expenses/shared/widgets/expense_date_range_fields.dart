@@ -5,7 +5,7 @@ import 'package:kardex_app_front/widgets/design_system/design_system.dart';
 /// Par de campos de fecha independientes y compactos para filtrar por un rango.
 ///
 /// Inspirado en el estilo de DatePickerListTile y DatePickerButton utilizados
-/// en el Buscador de Cotizaciones y reportes de la app, pero optimizado para
+/// en el módulo de Cotizaciones y reportes de la app, pero optimizado para
 /// caber en una toolbar horizontal delgada (36-40px de alto).
 class ExpenseDateRangeFields extends StatelessWidget {
   const ExpenseDateRangeFields({

@@ -468,13 +468,13 @@ List<HomeModuleCategory> getHomeModuleCategories(
           // Sección 3: Cotizaciones y Proformas
           const HomeSubmoduleItem(
             section: "Cotizaciones y Proformas",
-            title: "Cotizaciones (Historial)",
-            subtitle: "Consulta y gestión de proformas emitidas",
-            icon: FluentIcons.clipboard_search_24_filled,
-            accentColor: Color(0xFF2563EB),
-            routeName: "proforma-history",
+            title: "Cotizaciones",
+            subtitle: "Consulta y búsqueda por cliente o fecha",
+            icon: Icons.manage_search,
+            accentColor: Color(0xFF4F46E5),
+            routeName: "quotation-order-search",
             gates: [
-              QuotationsGateFilter(),
+              AnyGateFilter([QuotationsGateFilter(), OrdersGateFilter()]),
               RolePermissionGateFilter(
                 permissions: [CommercialSubModules.orders],
               ),
@@ -505,20 +505,6 @@ List<HomeModuleCategory> getHomeModuleCategories(
               QuotationsGateFilter(),
               RolePermissionGateFilter(
                 permissions: [CommercialSubModules.createOrder],
-              ),
-            ],
-          ),
-          const HomeSubmoduleItem(
-            section: "Cotizaciones y Proformas",
-            title: "Buscador de Cotizaciones/Órdenes",
-            subtitle: "Localización avanzada por cliente o fecha",
-            icon: Icons.manage_search,
-            accentColor: Color(0xFF4F46E5),
-            routeName: "quotation-order-search",
-            gates: [
-              AnyGateFilter([QuotationsGateFilter(), OrdersGateFilter()]),
-              RolePermissionGateFilter(
-                permissions: [CommercialSubModules.orders],
               ),
             ],
           ),

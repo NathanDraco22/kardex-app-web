@@ -101,11 +101,6 @@ class ShortcutRouteRegistry {
       icon: Icons.analytics_outlined,
       color: Color(0xFF1565C0),
     ),
-    RouteNames.proformaHistory: const ShortcutInfo(
-      title: "Cotizaciones",
-      icon: FluentIcons.clipboard_search_24_filled,
-      color: Color(0xFF1E88E5),
-    ),
     RouteNames.proforma: const ShortcutInfo(
       title: "Crear Cotización",
       icon: FluentIcons.document_text_24_filled,
@@ -122,7 +117,7 @@ class ShortcutRouteRegistry {
       color: Color(0xFFFB8C00),
     ),
     RouteNames.quotationOrderSearch: const ShortcutInfo(
-      title: "Buscador de Cotizaciones/Órdenes",
+      title: "Cotizaciones",
       icon: Icons.manage_search,
       color: Color(0xFF3F51B5),
     ),
